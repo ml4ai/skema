@@ -1,3 +1,3 @@
 fn main() {
-    println!("Hello, world!");
+    println!("Stub program for MORAE module.");
 }
