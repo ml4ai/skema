@@ -1,0 +1,284 @@
+{
+  "uid": "CHIME_SIR_Base_v01<->CHIME_SVIIvR_v01",
+  "gromet_ids": {
+    "g1_name": "CHIME_SIR_Base_v01",
+    "g1_uid": "CHIME_SIR_Base",
+    "g2_name": "CHIME_SVIIvR_v01",
+    "g2_uid": "CHIME_SVIIvR"
+  },
+  "common_nodes": [
+    {
+      "uid": "S_in",
+      "g1_variable": [
+        "V:s"
+      ],
+      "g2_variable": [
+        "V:s"
+      ]
+    },
+    {
+      "uid": "I_in",
+      "g1_variable": [
+        "V:i"
+      ],
+      "g2_variable": [
+        "V:i"
+      ]
+    },
+    {
+      "uid": "R_in",
+      "g1_variable": [
+        "V:r"
+      ],
+      "g2_variable": [
+        "V:r"
+      ]
+    },
+    {
+      "uid": "beta",
+      "g1_variable": [
+        "V:beta"
+      ],
+      "g2_variable": [
+        "V:beta"
+      ]
+    },
+    {
+      "uid": "n",
+      "g1_variable": [
+        "V:n"
+      ],
+      "g2_variable": [
+        "V:n"
+      ]
+    },
+    {
+      "uid": "scale",
+      "g1_variable": [
+        "V:scale"
+      ],
+      "g2_variable": [
+        "V:scale"
+      ]
+    },
+    {
+      "uid": "S_n",
+      "g1_variable": [
+        "V:s_n"
+      ],
+      "g2_variable": [
+        "V:s_n"
+      ]
+    },
+    {
+      "uid": "I_n",
+      "g1_variable": [
+        "V:i_n"
+      ],
+      "g2_variable": [
+        "V:i_n"
+      ]
+    },
+    {
+      "uid": "R_n",
+      "g1_variable": [
+        "V:r_n"
+      ],
+      "g2_variable": [
+        "V:r_n"
+      ]
+    },
+    {
+      "uid": "S_out",
+      "g1_variable": [
+        "V:s_1"
+      ],
+      "g2_variable": [
+        "V:s_1"
+      ]
+    },
+    {
+      "uid": "I_out",
+      "g1_variable": [
+        "V:i_1"
+      ],
+      "g2_variable": [
+        "V:i_1"
+      ]
+    },
+    {
+      "uid": "R_out",
+      "g1_variable": [
+        "V:r_1"
+      ],
+      "g2_variable": [
+        "V:r_1"
+      ]
+    }
+  ],
+  "oap_nodes": [],
+  "noap_nodes": [
+    {
+      "uid": "NOAP_1",
+      "gromet_name": "CHIME_SIR_Base_v01",
+      "variables": [
+        "V:gamma"
+      ]
+    },
+    {
+      "uid": "NOAP_2",
+      "gromet_name": "CHIME_SVIIvR_v01",
+      "variables": [
+        "V:vaccination_rate",
+        "V:vaccination_efficacy",
+        "V:v",
+        "V:i_v",
+        "V:gamma_vaccinated",
+        "V:gamma_unvaccinated"
+      ]
+    },
+    {
+      "uid": "NOAP_3",
+      "gromet_name": "CHIME_SVIIvR_v01",
+      "variables": [
+        "V:v_n",
+        "V:i_v_n"
+      ]
+    },
+    {
+      "uid": "NOAP_4",
+      "gromet_name": "CHIME_SVIIvR_v01",
+      "variables": [
+        "V:v_1",
+        "V:i_v_1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "type": "equal",
+      "src": "n",
+      "dst": "scale"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "beta",
+      "dst": "S_n"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "beta",
+      "dst": "I_n"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "S_in",
+      "dst": "S_n"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "S_in",
+      "dst": "I_n"
+    },
+    {
+      "type": "no_overlap",
+      "src": "S_in",
+      "dst": "NOAP_3"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "I_in",
+      "dst": "S_n"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "I_in",
+      "dst": "I_n"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "I_in",
+      "dst": "R_n"
+    },
+    {
+      "type": "no_overlap",
+      "src": "I_in",
+      "dst": "NOAP_3"
+    },
+    {
+      "type": "g1_subset_g2",
+      "src": "R_in",
+      "dst": "R_n"
+    },
+    {
+      "type": "no_overlap",
+      "src": "NOAP_1",
+      "dst": "I_n"
+    },
+    {
+      "type": "no_overlap",
+      "src": "NOAP_1",
+      "dst": "R_n"
+    },
+    {
+      "type": "no_overlap",
+      "src": "NOAP_2",
+      "dst": "NOAP_3"
+    },
+    {
+      "type": "no_overlap",
+      "src": "NOAP_2",
+      "dst": "S_n"
+    },
+    {
+      "type": "no_overlap",
+      "src": "NOAP_2",
+      "dst": "I_n"
+    },
+    {
+      "type": "no_overlap",
+      "src": "NOAP_2",
+      "dst": "R_n"
+    },
+    {
+      "type": "equal",
+      "src": "scale",
+      "dst": "S_out"
+    },
+    {
+      "type": "equal",
+      "src": "scale",
+      "dst": "I_out"
+    },
+    {
+      "type": "equal",
+      "src": "scale",
+      "dst": "R_out"
+    },
+    {
+      "type": "no_overlap",
+      "src": "scale",
+      "dst": "NOAP_4"
+    },
+    {
+      "type": "equal",
+      "src": "S_n",
+      "dst": "S_out"
+    },
+    {
+      "type": "equal",
+      "src": "I_n",
+      "dst": "I_out"
+    },
+    {
+      "type": "equal",
+      "src": "R_n",
+      "dst": "R_out"
+    },
+    {
+      "type": "no_overlap",
+      "src": "NOAP_3",
+      "dst": "NOAP_4"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+    "name": "fun2",
+    "fn": {
+        "b": [{"function_type":"MODULE","name":"module"}],
+        "bf": [
+            {"function_type":"LITERAL","value":{"value_type":"Integer","value":2},"name":""},
+            {"function_type":"FUNCTION","contents":1,"name":"module.foo_id0"},
+            {"function_type":"FUNCTION","contents":1,"name":"module.foo_id0"}
+        ],
+        "pif": [{"name":"","box":2},{"name":"","box":3}],
+        "pof": [{"name":"","box":1},
+                {"name":"x","box":2,
+                 "metadata":[
+                     {"metadata_type": "source_code_reference",
+                      "code_file_reference_uid": "uuid_fun2_1234",
+                      "line_begin": 5, "line_end": 5, "col_begin": 0, "col_end": 1, 
+                      "provenance": {"method": "skema_code2fn_program_analysis",
+                                     "timestamp": "2022-07-21T11:12:28Z"}},
+                     {"metadata_type": "text_definition",
+                      "provenance": {"method": "skema_text_reading",
+                                     "timestamp": "2022-07-21T11:12:28Z"},
+                      "text_extraction": {"document_reference_uid": "4b429087-7e7c-4623-80fd-64fb934a8be6",
+                                          "page": 12,
+                                          "block": 2,
+                                          "char_begin": 23,
+                                          "char_end": 44},
+                      "variable_identifier": "mu",
+                      "variable_definition": "the mass of the earth"}
+                 ]},
+                {"name":"y","box":3},
+                 "metadata":[
+                 ]],
+        "wff": [{"src":1,"tgt":1},{"src":2,"tgt":2}]
+    },
+    "attributes": [
+        {
+            "type": "FN",
+            "value": {
+                "b": [{"function_type":"FUNCTION","name":"foo"}],
+                "opi": [{"name":"x","box":1}],
+                "opo": [{"name":"","box":1}],
+                "bf": [
+                    {"function_type":"LITERAL","value":{"value_type":"Integer","value":3},"name":""},
+                    {"function_type":"PRIMITIVE","name":"+"}
+                ],
+                "pif": [{"name":"","box":2},{"name":"","box":2}], 
+                "pof": [{"name":"","box":1},{"name":"","box":2}],
+                "wfopi": [{"src":1,"tgt":1}],
+                "wff": [{"src":2,"tgt":1}],
+                "wfopo": [{"src":1,"tgt":2}]
+            }
+        }
+    ],
+    "metadata": [
+        {"metadata_type": "gromet_creation", 
+         "provenance": {"method": "skema_code2fn_program_analysis", "timestamp": "2022-07-21T11:12:28Z"}},
+        {"metadata_type": "code_collection",
+         "files": [
+            {"name": "fun2.py", 
+             "path": "gromet/examples/",
+             "uid": "uuid_fun2_1234"}
+         ],
+         "global_reference_id": "askem_1234",
+         "name": "gromet.examples.fun2",
+         "provenance": {"method": "skema_code2fn_program_analysis", "timestamp": "2022-07-21T11:12:28Z"}},
+        {"metadata_type": "textual_document_collection",
+         "uid": "chime_textual_document_ref_set",
+         "provenance": {
+             "metadata_type": "Provenance",
+             "method": "Manual_claytonm@az",
+             "timestamp": "2021-08-25T17:25:04:075312_MST-0700"
+         },
+         "documents": [
+             {"uid": "chime_webdocs_as_pdf",
+              "global_reference_id": {
+                  "type": "aske_id",
+                  "id": "4b429087-7e7c-4623-80fd-64fb934a8be6"
+               },
+              "cosmos_id": "COSMOS",
+              "cosmos_version_number": "3.0",
+              "automates_id": "AutoMATES-TR",
+              "automates_version_number": "2.0",
+              "bibjson": {
+                  "title": "CHIME: COVID-19 Hospital Impact for Epidemics - Online Documentation",
+                  "author": [{"name": "Jason Lubken"},{"name": "Marieke Jackson"},{"name": "Michael Chow"}],
+                  "type": "web_documentation",
+                  "website": {"type": "url", "location": "https://code-for-philly.gitbook.io/chime/"},
+              "timestamp": "2021-01-19T21:08",
+              "link": [
+                {
+                  "type": "gdrive",
+                  "location": "https://drive.google.com/file/d/122LEBSEMF9x-3r3tWbF6YQ9xeV4I_9Eh/view?usp=sharing"
+                }
+              ],
+              "identifier": [
+                {
+                  "type": "aske_id",
+                  "id": "8467496e-3dfb-4efd-9061-433fef1b92de"
+                }
+              ]
+            }
+        }
+      ]
+    }
+    ]
+}

@@ -1,0 +1,1172 @@
+{
+  "syntax": "Gromet",
+  "type": "FunctionNetwork",
+  "name": "CHIME",
+  "metadata": [
+    {
+      "metadata_type": "ModelDescription",
+      "uid": "chime_model_description",
+      "provenance": {
+        "metadata_type": "Provenance",
+        "method": "Manual_claytonm@az",
+        "timestamp": "2021-08-09T17:11:34:672172_MST-0700"
+      },
+      "name": "COVID-19 Hospital Impact Model for Epidemics",
+      "description": "The CHIME (COVID-19 Hospital Impact Model for Epidemics) App is designed to assist hospitals and public health officials understand hospital capacity needs as they relate to the COVID-19 pandemic. CHIME enables capacity planning by providing estimates of total daily (i.e. new) and running totals of (i.e. census) inpatient hospitalizations, ICU admissions, and patients requiring ventilation. These estimates are generated using a SIR (Susceptible, Infected, Recovered) model, a standard epidemiological modeling technique."
+    },
+    {
+      "metadata_type": "ModelInterface",
+      "uid": "chime_model_interface",
+      "provenance": {
+        "metadata_type": "Provenance",
+        "method": "Manual_claytonm@az",
+        "timestamp": "2021-08-09T17:11:34:672297_MST-0700"
+      },
+      "variables": [
+        "V:sir.s_in",
+        "V:sir.s_out",
+        "V:sir.i_in",
+        "V:sir.i_out",
+        "V:sir.r_in",
+        "V:sir.r_out"
+      ],
+      "parameters": [
+        "V:sir_n",
+        "V:sir.beta",
+        "V:sir.gamma"
+      ],
+      "initial_conditions": [
+        "V:sir.s_in",
+        "V:sir.i_in",
+        "V:sir.r_in"
+      ]
+    }
+  ],
+  "uid": "CHIME_FN",
+  "root": "B:sir",
+  "types": null,
+  "literals": null,
+  "junctions": null,
+  "ports": [
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Integer",
+      "uid": "P:sir.n",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "beta",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.beta",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "gamma",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.gamma",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.s_in",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.i_in",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.r_in",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.s_out",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.i_out",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.r_out",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "beta",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.beta",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.s",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.i",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "s_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.s_n",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "beta",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.beta",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.s",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.i",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "gamma",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.gamma",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "i_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.i_n",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "gamma",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.gamma",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.i",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.r",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "r_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.r_n",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.s_n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.i_n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.r_n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.scale",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_exp.s_n",
+      "box": "B:sir_s_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_exp.scale",
+      "box": "B:sir_s_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_exp.s",
+      "box": "B:sir_s_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_exp.i_n",
+      "box": "B:sir_i_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_exp.scale",
+      "box": "B:sir_i_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_exp.i",
+      "box": "B:sir_i_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_exp.r_n",
+      "box": "B:sir_r_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_exp.scale",
+      "box": "B:sir_r_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_exp.r",
+      "box": "B:sir_r_exp"
+    }
+  ],
+  "wires": [
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Integer",
+      "uid": "W:sir.n>sir_scale_exp.n",
+      "src": "P:sir.n",
+      "tgt": "P:sir_scale_exp.n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.beta>sir_s_n_exp.beta",
+      "src": "P:sir.beta",
+      "tgt": "P:sir_s_n_exp.beta"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.beta>sir_i_n_exp.beta",
+      "src": "P:sir.beta",
+      "tgt": "P:sir_i_n_exp.beta"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.gamma>sir_i_n_exp.gamma",
+      "src": "P:sir.gamma",
+      "tgt": "P:sir_i_n_exp.gamma"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.gamma>sir_r_n_exp.gamma",
+      "src": "P:sir.gamma",
+      "tgt": "P:sir_r_n_exp.gamma"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.s_in>sir_s_n_exp.s",
+      "src": "P:sir.s_in",
+      "tgt": "P:sir_s_n_exp.s"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.s_in>sir_i_n_exp.s",
+      "src": "P:sir.s_in",
+      "tgt": "P:sir_i_n_exp.s"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.i_in>sir_s_n_exp.i",
+      "src": "P:sir.i_in",
+      "tgt": "P:sir_s_n_exp.i"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.i_in>sir_i_n_exp.i",
+      "src": "P:sir.i_in",
+      "tgt": "P:sir_i_n_exp.i"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.i_in>sir_r_n_exp.i",
+      "src": "P:sir.i_in",
+      "tgt": "P:sir_r_n_exp.i"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.r_in>sir_r_n_exp.r",
+      "src": "P:sir.r_in",
+      "tgt": "P:sir_r_n_exp.r"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_s_n_exp.s_n>sir_scale_exp.s_n",
+      "src": "P:sir_s_n_exp.s_n",
+      "tgt": "P:sir_scale_exp.s_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_s_n_exp.s_n>sir_s_exp.s_n",
+      "src": "P:sir_s_n_exp.s_n",
+      "tgt": "P:sir_s_exp.s_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_i_n_exp.i_n>sir_scale_exp.i_n",
+      "src": "P:sir_i_n_exp.i_n",
+      "tgt": "P:sir_scale_exp.i_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_i_n_exp.i_n>sir_i_exp.i_n",
+      "src": "P:sir_i_n_exp.i_n",
+      "tgt": "P:sir_i_exp.i_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_r_n_exp.r_n>sir_scale_exp.r_n",
+      "src": "P:sir_r_n_exp.r_n",
+      "tgt": "P:sir_scale_exp.r_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_r_n_exp.r_n>sir_r_exp.r_n",
+      "src": "P:sir_r_n_exp.r_n",
+      "tgt": "P:sir_r_exp.r_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_scale_exp.scale>sir_s_exp.scale",
+      "src": "P:sir_scale_exp.scale",
+      "tgt": "P:sir_s_exp.scale"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_scale_exp.scale>sir_i_exp.scale",
+      "src": "P:sir_scale_exp.scale",
+      "tgt": "P:sir_i_exp.scale"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_scale_exp.scale>sir_r_exp.scale",
+      "src": "P:sir_scale_exp.scale",
+      "tgt": "P:sir_r_exp.scale"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_s_exp.s>sir.s_out",
+      "src": "P:sir_s_exp.s",
+      "tgt": "P:sir.s_out"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_i_exp.i>sir.i_out",
+      "src": "P:sir_i_exp.i",
+      "tgt": "P:sir.i_out"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_r_exp.r>sir.r_out",
+      "src": "P:sir_r_exp.r",
+      "tgt": "P:sir.r_out"
+    }
+  ],
+  "boxes": [
+    {
+      "wires": [
+        "W:sir.n>sir_scale_exp.n",
+        "W:sir.beta>sir_s_n_exp.beta",
+        "W:sir.beta>sir_i_n_exp.beta",
+        "W:sir.gamma>sir_i_n_exp.gamma",
+        "W:sir.gamma>sir_r_n_exp.gamma",
+        "W:sir.s_in>sir_s_n_exp.s",
+        "W:sir.s_in>sir_i_n_exp.s",
+        "W:sir.i_in>sir_s_n_exp.i",
+        "W:sir.i_in>sir_i_n_exp.i",
+        "W:sir.i_in>sir_r_n_exp.i",
+        "W:sir.r_in>sir_r_n_exp.r",
+        "W:sir_s_n_exp.s_n>sir_scale_exp.s_n",
+        "W:sir_s_n_exp.s_n>sir_s_exp.s_n",
+        "W:sir_i_n_exp.i_n>sir_scale_exp.i_n",
+        "W:sir_i_n_exp.i_n>sir_i_exp.i_n",
+        "W:sir_r_n_exp.r_n>sir_scale_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_r_exp.r_n",
+        "W:sir_scale_exp.scale>sir_s_exp.scale",
+        "W:sir_scale_exp.scale>sir_i_exp.scale",
+        "W:sir_scale_exp.scale>sir_r_exp.scale",
+        "W:sir_s_exp.s>sir.s_out",
+        "W:sir_i_exp.i>sir.i_out",
+        "W:sir_r_exp.r>sir.r_out"
+      ],
+      "boxes": [
+        "B:sir_s_n_exp",
+        "B:sir_i_n_exp",
+        "B:sir_r_n_exp",
+        "B:sir_scale_exp",
+        "B:sir_s_exp",
+        "B:sir_i_exp",
+        "B:sir_r_exp"
+      ],
+      "junctions": null,
+      "syntax": "Function",
+      "type": null,
+      "name": "sir",
+      "metadata": null,
+      "uid": "B:sir",
+      "ports": [
+        "P:sir.n",
+        "P:sir.beta",
+        "P:sir.gamma",
+        "P:sir.s_in",
+        "P:sir.i_in",
+        "P:sir.r_in",
+        "P:sir.s_out",
+        "P:sir.i_out",
+        "P:sir.r_out"
+      ]
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_s_n_exp",
+      "ports": [
+        "P:sir_s_n_exp.beta",
+        "P:sir_s_n_exp.s",
+        "P:sir_s_n_exp.i",
+        "P:sir_s_n_exp.s_n"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "+"
+        },
+        "args": [
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              {
+                "syntax": "Literal",
+                "type": "Int",
+                "name": null,
+                "metadata": null,
+                "uid": null,
+                "value": {
+                  "syntax": "Val",
+                  "val": "-1"
+                }
+              },
+              "P:sir_s_n_exp.beta",
+              "P:sir_s_n_exp.s",
+              "P:sir_s_n_exp.i"
+            ]
+          },
+          "P:sir_s_n_exp.s"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_i_n_exp",
+      "ports": [
+        "P:sir_i_n_exp.beta",
+        "P:sir_i_n_exp.s",
+        "P:sir_i_n_exp.i",
+        "P:sir_i_n_exp.gamma",
+        "P:sir_i_n_exp.i_n"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "+"
+        },
+        "args": [
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              "P:sir_i_n_exp.beta",
+              "P:sir_i_n_exp.s",
+              "P:sir_i_n_exp.i"
+            ]
+          },
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              {
+                "syntax": "Literal",
+                "type": "Int",
+                "name": null,
+                "metadata": null,
+                "uid": null,
+                "value": {
+                  "syntax": "Val",
+                  "val": "-1"
+                }
+              },
+              "P:sir_i_n_exp.i",
+              "P:sir_i_n_exp.gamma"
+            ]
+          },
+          "P:sir_i_n_exp.gamma"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_r_n_exp",
+      "ports": [
+        "P:sir_r_n_exp.gamma",
+        "P:sir_r_n_exp.i",
+        "P:sir_r_n_exp.r",
+        "P:sir_r_n_exp.r_n"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "+"
+        },
+        "args": [
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              "P:sir_r_n_exp.gamma",
+              "P:sir_r_n_exp.i",
+              "P:sir_r_n_exp.r"
+            ]
+          },
+          "P:sir_r_n_exp.r"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_scale_exp",
+      "ports": [
+        "P:sir_scale_exp.n",
+        "P:sir_scale_exp.s_n",
+        "P:sir_scale_exp.i_n",
+        "P:sir_scale_exp.r_n",
+        "P:sir_scale_exp.scale"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "/"
+        },
+        "args": [
+          "P:sir_scale_exp.n",
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "+"
+            },
+            "args": [
+              "P:sir_scale_exp.s_n",
+              "P:sir_scale_exp.i_n",
+              "P:sir_scale_exp.r_n"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_s_exp",
+      "ports": [
+        "P:sir_s_exp.s_n",
+        "P:sir_s_exp.scale",
+        "P:sir_s_exp.s"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "*"
+        },
+        "args": [
+          "P:sir_s_exp.s_n",
+          "P:sir_s_exp.scale"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_i_exp",
+      "ports": [
+        "P:sir_i_exp.i_n",
+        "P:sir_i_exp.scale",
+        "P:sir_i_exp.i"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "*"
+        },
+        "args": [
+          "P:sir_i_exp.i_n",
+          "P:sir_i_exp.scale"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_r_exp",
+      "ports": [
+        "P:sir_r_exp.r_n",
+        "P:sir_r_exp.scale",
+        "P:sir_r_exp.r"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "*"
+        },
+        "args": [
+          "P:sir_r_exp.r_n",
+          "P:sir_r_exp.scale"
+        ]
+      }
+    }
+  ],
+  "variables": [
+    {
+      "syntax": "Variable",
+      "type": "Integer",
+      "name": "n",
+      "metadata": null,
+      "uid": "V:sir_n",
+      "proxy_state": "P:sir.n",
+      "states": [
+        "P:sir.n",
+        "W:sir.n>sir_scale_exp.n",
+        "P:sir_scale_exp.n"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "beta",
+      "metadata": null,
+      "uid": "V:sir.beta",
+      "proxy_state": "P:sir.beta",
+      "states": [
+        "P:sir.beta",
+        "W:sir.beta>sir_s_n_exp.beta",
+        "P:sir_s_n_exp.beta",
+        "W:sir.beta>sir_i_n_exp.beta",
+        "P:sir_i_n_exp.beta"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "gamma",
+      "metadata": null,
+      "uid": "V:sir.gamma",
+      "proxy_state": "P:sir.gamma",
+      "states": [
+        "P:sir.gamma",
+        "W:sir.gamma>sir_i_n_exp.gamma",
+        "P:sir_i_n_exp.gamma",
+        "W:sir.gamma>sir_r_n_exp.gamma",
+        "P:sir_r_n_exp.gamma"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "s",
+      "metadata": null,
+      "uid": "V:sir.s_in",
+      "proxy_state": "P:sir.s_in",
+      "states": [
+        "P:sir.s_in",
+        "W:sir.s_in>sir_s_n_exp.s",
+        "P:sir_s_n_exp.s",
+        "W:sir.s_in>sir_i_n_exp.s",
+        "P:sir_i_n_exp.s"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "i",
+      "metadata": null,
+      "uid": "V:sir.i_in",
+      "proxy_state": "P:sir.i_in",
+      "states": [
+        "P:sir.i_in",
+        "W:sir.i_in>sir_s_n_exp.i",
+        "P:sir_s_n_exp.i",
+        "W:sir.i_in>sir_i_n_exp.i",
+        "P:sir_i_n_exp.i",
+        "W:sir.i_in>sir_r_n_exp.i",
+        "P:sir_r_n_exp.i"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "r",
+      "metadata": null,
+      "uid": "V:sir.r_in",
+      "proxy_state": "P:sir.r_in",
+      "states": [
+        "P:sir.r_in",
+        "W:sir.r_in>sir_r_n_exp.r",
+        "P:sir_r_n_exp.r"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "s_n",
+      "metadata": null,
+      "uid": "V:sir.s_n",
+      "proxy_state": "P:sir_s_n_exp.s_n",
+      "states": [
+        "P:sir_s_n_exp.s_n",
+        "W:sir_s_n_exp.s_n>sir_scale_exp.s_n",
+        "P:sir_scale_exp.s_n",
+        "W:sir_s_n_exp.s_n>sir_s_exp.s_n",
+        "P:sir_s_exp.s_n"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "i_n",
+      "metadata": null,
+      "uid": "V:sir.i_n",
+      "proxy_state": "P:sir_i_n_exp.i_n",
+      "states": [
+        "P:sir_i_n_exp.i_n",
+        "W:sir_i_n_exp.i_n>sir_scale_exp.i_n",
+        "P:sir_scale_exp.i_n",
+        "W:sir_i_n_exp.i_n>sir_i_exp.i_n",
+        "P:sir_i_exp.i_n"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "i_n",
+      "metadata": null,
+      "uid": "V:sir.r_n",
+      "proxy_state": "P:sir_r_n_exp.r_n",
+      "states": [
+        "P:sir_r_n_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_scale_exp.r_n",
+        "P:sir_scale_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_r_exp.r_n",
+        "P:sir_r_exp.r_n"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "i_n",
+      "metadata": null,
+      "uid": "V:sir.r_n",
+      "proxy_state": "P:sir_r_n_exp.r_n",
+      "states": [
+        "P:sir_r_n_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_scale_exp.r_n",
+        "P:sir_scale_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_r_exp.r_n",
+        "P:sir_r_exp.r_n"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "scale",
+      "metadata": null,
+      "uid": "V:sir.scale",
+      "proxy_state": "P:sir_scale_exp.scale",
+      "states": [
+        "P:sir_scale_exp.scale",
+        "W:sir_scale_exp.scale>sir_s_exp.scale",
+        "P:sir_s_exp.scale",
+        "W:sir_scale_exp.scale>sir_i_exp.scale",
+        "P:sir_i_exp.scale",
+        "W:sir_scale_exp.scale>sir_r_exp.scale",
+        "P:sir_r_exp.scale"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "s_out",
+      "metadata": null,
+      "uid": "V:sir.s_out",
+      "proxy_state": "P:sir_s_exp.s",
+      "states": [
+        "P:sir_s_exp.s",
+        "W:sir_s_exp.s>sir.s_out",
+        "P:sir.s_out"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "i_out",
+      "metadata": null,
+      "uid": "V:sir.i_out",
+      "proxy_state": "P:sir_i_exp.i",
+      "states": [
+        "P:sir_i_exp.i",
+        "W:sir_i_exp.i>sir.i_out",
+        "P:sir.i_out"
+      ]
+    },
+    {
+      "syntax": "Variable",
+      "type": "Float",
+      "name": "r_out",
+      "metadata": null,
+      "uid": "V:sir.r_out",
+      "proxy_state": "P:sir_r_exp.r",
+      "states": [
+        "P:sir_r_exp.r",
+        "W:sir_r_exp.r>sir.r_out",
+        "P:sir.r_out"
+      ]
+    }
+  ]
+}

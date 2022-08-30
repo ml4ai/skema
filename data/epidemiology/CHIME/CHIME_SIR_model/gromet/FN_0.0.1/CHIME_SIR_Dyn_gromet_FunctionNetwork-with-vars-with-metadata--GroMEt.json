@@ -1,0 +1,2686 @@
+{
+  "syntax": "Gromet",
+  "type": "FunctionNetwork",
+  "name": "CHIME_SIR_Dyn",
+  "metadata": [
+    {
+      "metadata_type": "ModelDescription",
+      "uid": "chime_model_description",
+      "provenance": {
+        "metadata_type": "Provenance",
+        "method": "Manual_claytonm@az",
+        "timestamp": "2021-08-25T13:58:39:224388_MST-0700"
+      },
+      "name": "CHIME SIR Dynamics",
+      "description": "The core SIR dynamics of the CHIME model"
+    },
+    {
+      "metadata_type": "ModelInterface",
+      "uid": "chime_model_interface",
+      "provenance": {
+        "metadata_type": "Provenance",
+        "method": "Manual_claytonm@az",
+        "timestamp": "2021-08-25T13:58:39:224484_MST-0700"
+      },
+      "variables": [
+        "V:n",
+        "V:beta",
+        "V:gamma",
+        "V:s",
+        "V:i",
+        "V:r",
+        "V:s_n",
+        "V:i_n",
+        "V:r_n",
+        "V:scale",
+        "V:s_1",
+        "V:i_1",
+        "V:r_1"
+      ],
+      "parameters": [
+        "V:beta",
+        "V:gamma"
+      ],
+      "initial_conditions": [
+        "V:n",
+        "V:s",
+        "V:i",
+        "V:r"
+      ]
+    },
+    {
+      "metadata_type": "CodeCollectionReference",
+      "uid": "chime_base_code_collection_ref",
+      "provenance": {
+        "metadata_type": "Provenance",
+        "method": "Manual_claytonm@az",
+        "timestamp": "2021-08-25T13:58:39:224528_MST-0700"
+      },
+      "global_reference_id": {
+        "type": "aske_id",
+        "id": "2c75d1ef-906b-4a60-bad6-416eff5cbfc4"
+      },
+      "file_ids": [
+        {
+          "uid": "chime_base_code",
+          "name": "CHIME_SIR_Base",
+          "path": "CHIME_SIR.py"
+        }
+      ]
+    },
+    {
+      "metadata_type": "TextualDocumentReferenceSet",
+      "uid": "chime_textual_document_ref_set",
+      "provenance": {
+        "metadata_type": "Provenance",
+        "method": "Manual_claytonm@az",
+        "timestamp": "2021-08-25T13:58:39:224570_MST-0700"
+      },
+      "documents": [
+        {
+          "uid": "chime_webdocs_as_pdf",
+          "global_reference_id": {
+            "type": "aske_id",
+            "id": "4b429087-7e7c-4623-80fd-64fb934a8be6"
+          },
+          "cosmos_id": "COSMOS",
+          "cosmos_version_number": "3.0",
+          "automates_id": "AutoMATES-TR",
+          "automates_version_number": "2.0",
+          "bibjson": {
+            "title": "CHIME: COVID-19 Hospital Impact for Epidemics - Online Documentation",
+            "author": [
+              {
+                "name": "Jason Lubken"
+              },
+              {
+                "name": "Marieke Jackson"
+              },
+              {
+                "name": "Michael Chow"
+              }
+            ],
+            "type": "web_documentation",
+            "website": {
+              "type": "url",
+              "location": "https://code-for-philly.gitbook.io/chime/"
+            },
+            "timestamp": "2021-01-19T21:08",
+            "link": [
+              {
+                "type": "gdrive",
+                "location": "https://drive.google.com/file/d/122LEBSEMF9x-3r3tWbF6YQ9xeV4I_9Eh/view?usp=sharing"
+              }
+            ],
+            "identifier": [
+              {
+                "type": "aske_id",
+                "id": "8467496e-3dfb-4efd-9061-433fef1b92de"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "uid": "CHIME_SIR_Dyn",
+  "root": "B:sir",
+  "types": null,
+  "literals": null,
+  "junctions": null,
+  "ports": [
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Integer",
+      "uid": "P:sir.n",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "beta",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.beta",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "gamma",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.gamma",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.s_in",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.i_in",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.r_in",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.s_out",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.i_out",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir.r_out",
+      "box": "B:sir"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "beta",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.beta",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.s",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.i",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "s_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_n_exp.s_n",
+      "box": "B:sir_s_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "beta",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.beta",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.s",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.i",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "gamma",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.gamma",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "i_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_n_exp.i_n",
+      "box": "B:sir_i_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "gamma",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.gamma",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.i",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.r",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "r_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_n_exp.r_n",
+      "box": "B:sir_r_n_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.s_n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.i_n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.r_n",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_scale_exp.scale",
+      "box": "B:sir_scale_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "s_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_exp.s_n",
+      "box": "B:sir_s_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_exp.scale",
+      "box": "B:sir_s_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "s",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_s_exp.s",
+      "box": "B:sir_s_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "i_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_exp.i_n",
+      "box": "B:sir_i_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_exp.scale",
+      "box": "B:sir_i_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "i",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_i_exp.i",
+      "box": "B:sir_i_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "r_n",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_exp.r_n",
+      "box": "B:sir_r_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortInput",
+      "name": "scale",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_exp.scale",
+      "box": "B:sir_r_exp"
+    },
+    {
+      "syntax": "Port",
+      "type": "PortOutput",
+      "name": "r",
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "P:sir_r_exp.r",
+      "box": "B:sir_r_exp"
+    }
+  ],
+  "wires": [
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Integer",
+      "uid": "W:sir.n>sir_scale_exp.n",
+      "src": "P:sir.n",
+      "tgt": "P:sir_scale_exp.n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.beta>sir_s_n_exp.beta",
+      "src": "P:sir.beta",
+      "tgt": "P:sir_s_n_exp.beta"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.beta>sir_i_n_exp.beta",
+      "src": "P:sir.beta",
+      "tgt": "P:sir_i_n_exp.beta"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.gamma>sir_i_n_exp.gamma",
+      "src": "P:sir.gamma",
+      "tgt": "P:sir_i_n_exp.gamma"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.gamma>sir_r_n_exp.gamma",
+      "src": "P:sir.gamma",
+      "tgt": "P:sir_r_n_exp.gamma"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.s_in>sir_s_n_exp.s",
+      "src": "P:sir.s_in",
+      "tgt": "P:sir_s_n_exp.s"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.s_in>sir_i_n_exp.s",
+      "src": "P:sir.s_in",
+      "tgt": "P:sir_i_n_exp.s"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.i_in>sir_s_n_exp.i",
+      "src": "P:sir.i_in",
+      "tgt": "P:sir_s_n_exp.i"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.i_in>sir_i_n_exp.i",
+      "src": "P:sir.i_in",
+      "tgt": "P:sir_i_n_exp.i"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.i_in>sir_r_n_exp.i",
+      "src": "P:sir.i_in",
+      "tgt": "P:sir_r_n_exp.i"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir.r_in>sir_r_n_exp.r",
+      "src": "P:sir.r_in",
+      "tgt": "P:sir_r_n_exp.r"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_s_n_exp.s_n>sir_scale_exp.s_n",
+      "src": "P:sir_s_n_exp.s_n",
+      "tgt": "P:sir_scale_exp.s_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_s_n_exp.s_n>sir_s_exp.s_n",
+      "src": "P:sir_s_n_exp.s_n",
+      "tgt": "P:sir_s_exp.s_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_i_n_exp.i_n>sir_scale_exp.i_n",
+      "src": "P:sir_i_n_exp.i_n",
+      "tgt": "P:sir_scale_exp.i_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_i_n_exp.i_n>sir_i_exp.i_n",
+      "src": "P:sir_i_n_exp.i_n",
+      "tgt": "P:sir_i_exp.i_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_r_n_exp.r_n>sir_scale_exp.r_n",
+      "src": "P:sir_r_n_exp.r_n",
+      "tgt": "P:sir_scale_exp.r_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_r_n_exp.r_n>sir_r_exp.r_n",
+      "src": "P:sir_r_n_exp.r_n",
+      "tgt": "P:sir_r_exp.r_n"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_scale_exp.scale>sir_s_exp.scale",
+      "src": "P:sir_scale_exp.scale",
+      "tgt": "P:sir_s_exp.scale"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_scale_exp.scale>sir_i_exp.scale",
+      "src": "P:sir_scale_exp.scale",
+      "tgt": "P:sir_i_exp.scale"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_scale_exp.scale>sir_r_exp.scale",
+      "src": "P:sir_scale_exp.scale",
+      "tgt": "P:sir_r_exp.scale"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_s_exp.s>sir.s_out",
+      "src": "P:sir_s_exp.s",
+      "tgt": "P:sir.s_out"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_i_exp.i>sir.i_out",
+      "src": "P:sir_i_exp.i",
+      "tgt": "P:sir.i_out"
+    },
+    {
+      "syntax": "Wire",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "value": null,
+      "value_type": "Float",
+      "uid": "W:sir_r_exp.r>sir.r_out",
+      "src": "P:sir_r_exp.r",
+      "tgt": "P:sir.r_out"
+    }
+  ],
+  "boxes": [
+    {
+      "wires": [
+        "W:sir.n>sir_scale_exp.n",
+        "W:sir.beta>sir_s_n_exp.beta",
+        "W:sir.beta>sir_i_n_exp.beta",
+        "W:sir.gamma>sir_i_n_exp.gamma",
+        "W:sir.gamma>sir_r_n_exp.gamma",
+        "W:sir.s_in>sir_s_n_exp.s",
+        "W:sir.s_in>sir_i_n_exp.s",
+        "W:sir.i_in>sir_s_n_exp.i",
+        "W:sir.i_in>sir_i_n_exp.i",
+        "W:sir.i_in>sir_r_n_exp.i",
+        "W:sir.r_in>sir_r_n_exp.r",
+        "W:sir_s_n_exp.s_n>sir_scale_exp.s_n",
+        "W:sir_s_n_exp.s_n>sir_s_exp.s_n",
+        "W:sir_i_n_exp.i_n>sir_scale_exp.i_n",
+        "W:sir_i_n_exp.i_n>sir_i_exp.i_n",
+        "W:sir_r_n_exp.r_n>sir_scale_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_r_exp.r_n",
+        "W:sir_scale_exp.scale>sir_s_exp.scale",
+        "W:sir_scale_exp.scale>sir_i_exp.scale",
+        "W:sir_scale_exp.scale>sir_r_exp.scale",
+        "W:sir_s_exp.s>sir.s_out",
+        "W:sir_i_exp.i>sir.i_out",
+        "W:sir_r_exp.r>sir.r_out"
+      ],
+      "boxes": [
+        "B:sir_s_n_exp",
+        "B:sir_i_n_exp",
+        "B:sir_r_n_exp",
+        "B:sir_scale_exp",
+        "B:sir_s_exp",
+        "B:sir_i_exp",
+        "B:sir_r_exp"
+      ],
+      "junctions": null,
+      "syntax": "Function",
+      "type": null,
+      "name": "sir",
+      "metadata": null,
+      "uid": "B:sir",
+      "ports": [
+        "P:sir.n",
+        "P:sir.beta",
+        "P:sir.gamma",
+        "P:sir.s_in",
+        "P:sir.i_in",
+        "P:sir.r_in",
+        "P:sir.s_out",
+        "P:sir.i_out",
+        "P:sir.r_out"
+      ]
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": [
+        {
+          "metadata_type": "EquationDefinition",
+          "uid": "eqn_def_sir_s_n_exp",
+          "provenance": {
+            "metadata_type": "Provenance",
+            "method": "Manual_claytonm@az",
+            "timestamp": "2021-08-25T13:58:39:224602_MST-0700"
+          },
+          "equation_extraction": {
+            "document_reference_uid": "chime_webdocs_as_pdf",
+            "equation_number": 0,
+            "equation_source_latex": "S_{t+1} = S_t - \\beta S_t I_t",
+            "equation_source_mml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\" title=\"S_{t+1} = S_t - \beta S_t I_t \"><mrow><msub><mrow><mi>S</mi></mrow><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mrow><mi>S</mi></mrow><mrow><mi>t</mi></mrow></msub><mo>-</mo><mi>\u03b2</mi><msub><mrow><mi>S</mi></mrow><mrow><mi>t</mi></mrow></msub><msub><mrow><mi>I</mi></mrow><mrow><mi>t</mi></mrow></msub></mrow></math>"
+          }
+        }
+      ],
+      "uid": "B:sir_s_n_exp",
+      "ports": [
+        "P:sir_s_n_exp.beta",
+        "P:sir_s_n_exp.s",
+        "P:sir_s_n_exp.i",
+        "P:sir_s_n_exp.s_n"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "+"
+        },
+        "args": [
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              {
+                "syntax": "Literal",
+                "type": "Int",
+                "name": null,
+                "metadata": null,
+                "uid": null,
+                "value": {
+                  "syntax": "Val",
+                  "val": "-1"
+                }
+              },
+              "P:sir_s_n_exp.beta",
+              "P:sir_s_n_exp.s",
+              "P:sir_s_n_exp.i"
+            ]
+          },
+          "P:sir_s_n_exp.s"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": [
+        {
+          "metadata_type": "EquationDefinition",
+          "uid": "eqn_def_sir_i_n_exp",
+          "provenance": {
+            "metadata_type": "Provenance",
+            "method": "Manual_claytonm@az",
+            "timestamp": "2021-08-25T13:58:39:224631_MST-0700"
+          },
+          "equation_extraction": {
+            "document_reference_uid": "chime_webdocs_as_pdf",
+            "equation_number": 1,
+            "equation_source_latex": "I_{t+1} = I_{t} + \\beta S_{t} I_{t} - \\gamma I_{t}",
+            "equation_source_mml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\" title=\"I_{t+1} = I_{t} + \beta S_{t} I_{t} - \\gamma I_{t} \"><mrow><msub><mrow><mi>I</mi></mrow><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mrow><mi>I</mi></mrow><mrow><mi>t</mi></mrow></msub><mo>+</mo><mi>\u03b2</mi><msub><mrow><mi>S</mi></mrow><mrow><mi>t</mi></mrow></msub><msub><mrow><mi>I</mi></mrow><mrow><mi>t</mi></mrow></msub><mo>-</mo><mi>\u03b3</mi><msub><mrow><mi>I</mi></mrow><mrow><mi>t</mi></mrow></msub></mrow></math>"
+          }
+        }
+      ],
+      "uid": "B:sir_i_n_exp",
+      "ports": [
+        "P:sir_i_n_exp.beta",
+        "P:sir_i_n_exp.s",
+        "P:sir_i_n_exp.i",
+        "P:sir_i_n_exp.gamma",
+        "P:sir_i_n_exp.i_n"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "+"
+        },
+        "args": [
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              "P:sir_i_n_exp.beta",
+              "P:sir_i_n_exp.s",
+              "P:sir_i_n_exp.i"
+            ]
+          },
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              {
+                "syntax": "Literal",
+                "type": "Int",
+                "name": null,
+                "metadata": null,
+                "uid": null,
+                "value": {
+                  "syntax": "Val",
+                  "val": "-1"
+                }
+              },
+              "P:sir_i_n_exp.i",
+              "P:sir_i_n_exp.gamma"
+            ]
+          },
+          "P:sir_i_n_exp.i"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": [
+        {
+          "metadata_type": "EquationDefinition",
+          "uid": "eqn_def_sir_r_n_exp",
+          "provenance": {
+            "metadata_type": "Provenance",
+            "method": "Manual_claytonm@az",
+            "timestamp": "2021-08-25T13:58:39:224657_MST-0700"
+          },
+          "equation_extraction": {
+            "document_reference_uid": "chime_webdocs_as_pdf",
+            "equation_number": 2,
+            "equation_source_latex": "R_{t+1} = R_{t} + \\gamma I_{t}",
+            "equation_source_mml": "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\" title=\"R_{t+1} = R_{t} + \\gamma I_{t} \"><mrow><msub><mrow><mi>R</mi></mrow><mrow><mi>t</mi><mo>+</mo><mn>1</mn></mrow></msub><mo>=</mo><msub><mrow><mi>R</mi></mrow><mrow><mi>t</mi></mrow></msub><mo>+</mo><mi>\u03b3</mi><msub><mrow><mi>I</mi></mrow><mrow><mi>t</mi></mrow></msub></mrow></math>"
+          }
+        }
+      ],
+      "uid": "B:sir_r_n_exp",
+      "ports": [
+        "P:sir_r_n_exp.gamma",
+        "P:sir_r_n_exp.i",
+        "P:sir_r_n_exp.r",
+        "P:sir_r_n_exp.r_n"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "+"
+        },
+        "args": [
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "*"
+            },
+            "args": [
+              "P:sir_r_n_exp.gamma",
+              "P:sir_r_n_exp.i",
+              "P:sir_r_n_exp.r"
+            ]
+          },
+          "P:sir_r_n_exp.r"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_scale_exp",
+      "ports": [
+        "P:sir_scale_exp.n",
+        "P:sir_scale_exp.s_n",
+        "P:sir_scale_exp.i_n",
+        "P:sir_scale_exp.r_n",
+        "P:sir_scale_exp.scale"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "/"
+        },
+        "args": [
+          "P:sir_scale_exp.n",
+          {
+            "syntax": "Expr",
+            "call": {
+              "syntax": "RefOp",
+              "name": "+"
+            },
+            "args": [
+              "P:sir_scale_exp.s_n",
+              "P:sir_scale_exp.i_n",
+              "P:sir_scale_exp.r_n"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_s_exp",
+      "ports": [
+        "P:sir_s_exp.s_n",
+        "P:sir_s_exp.scale",
+        "P:sir_s_exp.s"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "*"
+        },
+        "args": [
+          "P:sir_s_exp.s_n",
+          "P:sir_s_exp.scale"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_i_exp",
+      "ports": [
+        "P:sir_i_exp.i_n",
+        "P:sir_i_exp.scale",
+        "P:sir_i_exp.i"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "*"
+        },
+        "args": [
+          "P:sir_i_exp.i_n",
+          "P:sir_i_exp.scale"
+        ]
+      }
+    },
+    {
+      "syntax": "Expression",
+      "type": null,
+      "name": null,
+      "metadata": null,
+      "uid": "B:sir_r_exp",
+      "ports": [
+        "P:sir_r_exp.r_n",
+        "P:sir_r_exp.scale",
+        "P:sir_r_exp.r"
+      ],
+      "tree": {
+        "syntax": "Expr",
+        "call": {
+          "syntax": "RefOp",
+          "name": "*"
+        },
+        "args": [
+          "P:sir_r_exp.r_n",
+          "P:sir_r_exp.scale"
+        ]
+      }
+    }
+  ],
+  "variables": [
+    {
+      "uid": "V:n",
+      "proxy_state": "P:sir.n",
+      "name": "n",
+      "type": "Integer",
+      "states": [
+        "P:sir.n",
+        "W:sir.n>sir_scale_exp.n",
+        "P:sir_scale_exp.n"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.814977"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.699924"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 104,
+            "line_end": 104,
+            "col_begin": 30,
+            "col_end": 31
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078113"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 168,
+                  "char_end": 177
+                }
+              }
+            ]
+          },
+          "variable_identifier": "c",
+          "variable_definition": "exposed"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078113"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 32,
+                  "char_end": 85
+                }
+              }
+            ]
+          },
+          "variable_identifier": "c",
+          "variable_definition": "average number of people exposed"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078113"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 85,
+                  "char_end": 97
+                }
+              }
+            ]
+          },
+          "variable_identifier": "c",
+          "variable_definition": "parameter"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078113"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 2
+          },
+          "variable_identifier": "c",
+          "value": "c"
+        },
+        {
+          "type": "TEXT_UNIT",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078113"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 305,
+                  "char_end": 350
+                }
+              }
+            ]
+          },
+          "unit": "days"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:beta",
+      "proxy_state": "P:sir.beta",
+      "name": "beta",
+      "type": "Float",
+      "states": [
+        "P:sir.beta",
+        "W:sir.beta>sir_s_n_exp.beta",
+        "W:sir.beta>sir_i_n_exp.beta",
+        "P:sir_s_n_exp.beta",
+        "P:sir_i_n_exp.beta"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.814831"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.699826"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 104,
+            "line_end": 104,
+            "col_begin": 17,
+            "col_end": 21
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 4,
+                  "char_end": 32
+                }
+              }
+            ]
+          },
+          "variable_identifier": "\u03b2",
+          "variable_definition": "model's parameters"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 0,
+                  "char_end": 50
+                }
+              }
+            ]
+          },
+          "variable_identifier": "\u03b2",
+          "variable_definition": "effective contact rate"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 3
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 2
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 7
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 0
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.080376"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 6
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:gamma",
+      "proxy_state": "P:sir.gamma",
+      "name": "gamma",
+      "type": "Float",
+      "states": [
+        "P:sir.gamma",
+        "W:sir.gamma>sir_i_n_exp.gamma",
+        "W:sir.gamma>sir_r_n_exp.gamma",
+        "P:sir_i_n_exp.gamma",
+        "P:sir_r_n_exp.gamma"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.814904"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.699872"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 104,
+            "line_end": 104,
+            "col_begin": 23,
+            "col_end": 28
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 4,
+                  "char_end": 31
+                }
+              }
+            ]
+          },
+          "variable_identifier": "\u03b3",
+          "variable_definition": "model's parameters"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 0,
+                  "char_end": 51
+                }
+              }
+            ]
+          },
+          "variable_identifier": "\u03b3",
+          "variable_definition": "inverse of the mean recovery time, in days"
+        },
+        {
+          "type": "PARAMETER_SETTING",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 32,
+                  "char_end": 58
+                }
+              }
+            ]
+          },
+          "variable_identifier": "\u03b3",
+          "value": "14.0"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "\u03b3",
+          "value": "\u03b3"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 8
+          },
+          "variable_identifier": "\u03b3",
+          "value": "\u03b3"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 7
+          },
+          "variable_identifier": "\u03b3",
+          "value": "\u03b3"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 0
+          },
+          "variable_identifier": "\u03b3",
+          "value": "\u03b3"
+        },
+        {
+          "type": "TEXT_UNIT",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078298"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 32,
+                  "char_end": 58
+                }
+              }
+            ]
+          },
+          "unit": "days"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:s",
+      "proxy_state": "P:sir.s_in",
+      "name": "s",
+      "type": "Float",
+      "states": [
+        "P:sir.s_in",
+        "W:sir.s_in>sir_s_n_exp.s",
+        "W:sir.s_in>sir_i_n_exp.s",
+        "P:sir_s_n_exp.s",
+        "P:sir_i_n_exp.s"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.814586"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.699688"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 104,
+            "line_end": 104,
+            "col_begin": 8,
+            "col_end": 9
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.074033"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 63
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "individuals who are either Susceptible"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.074033"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 111,
+                  "char_end": 125
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "Susceptible"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.074033"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 0
+          },
+          "variable_identifier": "S",
+          "value": "S"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:i",
+      "proxy_state": "P:sir.i_in",
+      "name": "i",
+      "type": "Float",
+      "states": [
+        "P:sir.i_in",
+        "W:sir.i_in>sir_s_n_exp.i",
+        "W:sir.i_in>sir_i_n_exp.i",
+        "W:sir.i_in>sir_r_n_exp.i",
+        "P:sir_s_n_exp.i",
+        "P:sir_i_n_exp.i",
+        "P:sir_r_n_exp.i"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.814680"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.699734"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 104,
+            "line_end": 104,
+            "col_begin": 11,
+            "col_end": 12
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 78
+                }
+              }
+            ]
+          },
+          "variable_identifier": "I",
+          "variable_definition": "individuals who are Infected"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 3
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 8
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:r",
+      "proxy_state": "P:sir.r_in",
+      "name": "r",
+      "type": "Float",
+      "states": [
+        "P:sir.r_in",
+        "W:sir.r_in>sir_r_n_exp.r",
+        "P:sir_r_n_exp.r"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.814756"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.699780"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 104,
+            "line_end": 104,
+            "col_begin": 14,
+            "col_end": 15
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072970"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 96
+                }
+              }
+            ]
+          },
+          "variable_identifier": "R",
+          "variable_definition": "individuals who are Recovered"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072970"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 8
+          },
+          "variable_identifier": "R",
+          "value": "R_t"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:s_n",
+      "proxy_state": "P:sir_s_n_exp.s_n",
+      "name": "s_n",
+      "type": "Float",
+      "states": [
+        "P:sir_s_n_exp.s_n",
+        "W:sir_s_n_exp.s_n>sir_scale_exp.s_n",
+        "W:sir_s_n_exp.s_n>sir_s_exp.s_n",
+        "P:sir_scale_exp.s_n",
+        "P:sir_s_exp.s_n"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.815351"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.699971"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 115,
+            "line_end": 117,
+            "col_begin": 4,
+            "col_end": 9
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.077257"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 63
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "individuals who are either Susceptible"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.077257"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 111,
+                  "char_end": 125
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "Susceptible"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.077257"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 0
+          },
+          "variable_identifier": "S",
+          "value": "S"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:i_n",
+      "proxy_state": "P:sir_i_n_exp.i_n",
+      "name": "i_n",
+      "type": "Float",
+      "states": [
+        "P:sir_i_n_exp.i_n",
+        "W:sir_i_n_exp.i_n>sir_scale_exp.i_n",
+        "W:sir_i_n_exp.i_n>sir_i_exp.i_n",
+        "P:sir_scale_exp.i_n",
+        "P:sir_i_exp.i_n"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.817384"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.700023"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 118,
+            "line_end": 120,
+            "col_begin": 4,
+            "col_end": 9
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.075968"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 63
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "individuals who are either Susceptible"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.075968"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 111,
+                  "char_end": 125
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "Susceptible"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.075968"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 0
+          },
+          "variable_identifier": "S",
+          "value": "S"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:r_n",
+      "proxy_state": "P:sir_r_n_exp.r_n",
+      "name": "r_n",
+      "type": "Float",
+      "states": [
+        "P:sir_r_n_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_scale_exp.r_n",
+        "W:sir_r_n_exp.r_n>sir_r_exp.r_n",
+        "P:sir_scale_exp.r_n",
+        "P:sir_r_exp.r_n"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.819493"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.700070"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 121,
+            "line_end": 123,
+            "col_begin": 4,
+            "col_end": 5
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078886"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 96
+                }
+              }
+            ]
+          },
+          "variable_identifier": "R",
+          "variable_definition": "individuals who are Recovered"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078886"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 8
+          },
+          "variable_identifier": "R",
+          "value": "R_t"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:scale",
+      "proxy_state": "P:sir_scale_exp.scale",
+      "name": "scale",
+      "type": "Float",
+      "states": [
+        "P:sir_scale_exp.scale",
+        "W:sir_scale_exp.scale>sir_s_exp.scale",
+        "W:sir_scale_exp.scale>sir_i_exp.scale",
+        "W:sir_scale_exp.scale>sir_r_exp.scale",
+        "P:sir_s_exp.scale",
+        "P:sir_i_exp.scale",
+        "P:sir_r_exp.scale"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.820806"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.700116"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 125,
+            "line_end": 127,
+            "col_begin": 4,
+            "col_end": 5
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 4,
+                  "char_end": 32
+                }
+              }
+            ]
+          },
+          "variable_identifier": "\u03b2",
+          "variable_definition": "model's parameters"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 0,
+                  "char_end": 50
+                }
+              }
+            ]
+          },
+          "variable_identifier": "\u03b2",
+          "variable_definition": "effective contact rate"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 3
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 2
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 7
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 0
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072082"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 6
+          },
+          "variable_identifier": "\u03b2",
+          "value": "\u03b2"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": -1
+    },
+    {
+      "uid": "V:s_1",
+      "proxy_state": "P:sir.s_out",
+      "name": "s",
+      "type": "Float",
+      "states": [
+        "P:sir_s_exp.s",
+        "W:sir_s_exp.s>sir.s_out",
+        "P:sir.s_out"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.822888"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.700162"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 129,
+            "line_end": 129,
+            "col_begin": 4,
+            "col_end": 19
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.074033"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 63
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "individuals who are either Susceptible"
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.074033"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 111,
+                  "char_end": 125
+                }
+              }
+            ]
+          },
+          "variable_identifier": "S",
+          "variable_definition": "Susceptible"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.074033"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 0
+          },
+          "variable_identifier": "S",
+          "value": "S"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": 0
+    },
+    {
+      "uid": "V:i_1",
+      "proxy_state": "P:sir.i_out",
+      "name": "i",
+      "type": "Float",
+      "states": [
+        "P:sir_i_exp.i",
+        "W:sir_i_exp.i>sir.i_out",
+        "P:sir.i_out"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.823756"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.700208"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 130,
+            "line_end": 130,
+            "col_begin": 4,
+            "col_end": 19
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 78
+                }
+              }
+            ]
+          },
+          "variable_identifier": "I",
+          "variable_definition": "individuals who are Infected"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 3
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 5
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.078557"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 8
+          },
+          "variable_identifier": "I",
+          "value": "I_t"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": 0
+    },
+    {
+      "uid": "V:r_1",
+      "proxy_state": "P:sir.r_out",
+      "name": "r",
+      "type": "Float",
+      "states": [
+        "P:sir_r_exp.r",
+        "W:sir_r_exp.r>sir.r_out",
+        "P:sir.r_out"
+      ],
+      "metadata": [
+        {
+          "type": "DOMAIN",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.824610"
+          },
+          "data_type": "float",
+          "measurement_scale": "continuous",
+          "elements": []
+        },
+        {
+          "type": "CODE_SPAN_REFERENCE",
+          "provenance": {
+            "method": "PROGRAM_ANALYSIS_PIPELINE",
+            "timestamp": "2021-08-25 08:49:29.700254"
+          },
+          "code_type": "identifier",
+          "code_file_reference_uid": "",
+          "code_span": {
+            "line_begin": 131,
+            "line_end": 131,
+            "col_begin": 4,
+            "col_end": 19
+          }
+        },
+        {
+          "type": "TEXT_DEFINITION",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072970"
+          },
+          "text_extraction": {
+            "source_type": "text_document_source",
+            "document_reference_uid": "",
+            "text_spans": [
+              {
+                "page": null,
+                "block": null,
+                "span": {
+                  "char_begin": 22,
+                  "char_end": 96
+                }
+              }
+            ]
+          },
+          "variable_identifier": "R",
+          "variable_definition": "individuals who are Recovered"
+        },
+        {
+          "type": "EQUATION_PARAMETER",
+          "provenance": {
+            "method": "TEXT_READING_PIPELINE",
+            "timestamp": "2021-08-25 08:49:30.072970"
+          },
+          "equation_extraction": {
+            "source_type": "equation_document_source",
+            "document_reference_uid": "",
+            "equation_number": 8
+          },
+          "variable_identifier": "R",
+          "value": "R_t"
+        }
+      ],
+      "syntax": "Variable",
+      "corrected_ver": 0
+    }
+  ]
+}

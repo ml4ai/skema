@@ -1,0 +1,1 @@
+This file contains older versions of the GroMEt schema and related documents that are now deprecated.
