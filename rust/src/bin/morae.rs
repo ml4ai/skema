@@ -8,7 +8,7 @@ use skema::Gromet; // This brings in the Gromet Data struct
 /* TODO: Reserialize to make sure ingesting correctly. Including making tests.  */
 /* TODO: Write up latex documentation in docs. */
 fn main() {
-    let path_example = "../data/gromet/examples/cond1/cond1--Gromet-FN-auto.json";
+    let path_example = "../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json";
     // let path_example = "../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
 
     let mut data = fs::read_to_string(path_example).expect("Unable to read file");

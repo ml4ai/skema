@@ -1,6 +1,7 @@
 // Stub for SKEMA library
-use serde::{Deserialize, Serialize};
-use serde_json; // for json
+use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde_json;
+use serde_json::Value; // for json
 use std::fs;
 use std::string::ToString;
 use strum_macros::Display; // used for macro on enums // used for macro on enums
@@ -27,9 +28,11 @@ pub enum FunctionType {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct Value {
+pub struct ValueL {
     pub value_type: String, // could be enum?
-    pub value: i32, // This is the generic problem. floats are exported as ints but rust exports as floats so this is currently situational...
+    #[serde(deserialize_with = "de_value")]
+    #[serde(serialize_with = "se_value")]
+    pub value: String, // This is the generic problem. floats are exported as ints but rust exports as floats, making full generic isn't feasible since we don't know the number of instances before hand. So we import as a string to capture the data regardless of type.
 }
 
 #[derive(Deserialize, Serialize)]
@@ -38,7 +41,7 @@ pub struct GrometBox {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contents: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<Value>,
+    pub value: Option<ValueL>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -219,20 +222,29 @@ pub struct Gromet {
 }
 
 // Methods
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+// This is a custom deserialization of the value field in the Value struct.
+// Currently only for numerical values, as gromets develope will need maintaince.
+fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Error> {
+    Ok(match Value::deserialize(deserializer)? {
+        Value::Number(num) => num.to_string(),
+        _ => return Err(de::Error::custom("wrong type")),
+    })
+}
+
+// This is a custom serialization of the value field in the Value struct.
+// Currently only for numerical values (only ints right now too), as gromets develope will need maintaince.
+fn se_value<S>(x: &str, s: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
+{
+    let parse_num: i32 = x.parse().unwrap();
+    s.serialize_i32(parse_num)
 }
 
 // Tests
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 
     #[test]
     fn de_ser_exp0() {
