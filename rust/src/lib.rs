@@ -1,8 +1,9 @@
 // Stub for SKEMA library
 use serde::{Deserialize, Serialize};
-use strum_macros::Display; // used for macro on enums
-
-use std::string::ToString; // used for macro on enums
+use serde_json; // for json
+use std::fs;
+use std::string::ToString;
+use strum_macros::Display; // used for macro on enums // used for macro on enums
 
 /******** AST for the Gromet Data Structure ********/
 #[derive(Deserialize, Serialize)]
@@ -28,28 +29,28 @@ pub enum FunctionType {
 #[derive(Deserialize, Serialize)]
 pub struct Value {
     pub value_type: String, // could be enum?
-    pub value: f32,         // This is the generic problem
+    pub value: i32, // This is the generic problem. floats are exported as ints but rust exports as floats so this is currently situational...
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct GrometBox {
     pub function_type: FunctionType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub contents: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 }
 
 #[derive(Deserialize, Serialize)]
 pub struct GrometPort {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
     #[serde(rename = "box")]
     pub r#box: u8,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -79,17 +80,18 @@ pub struct GrometBoxLoop {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
 }
-
+// condition, body_if, and body_else don't match online documentation
+// They are vecs of gromet boxes not integers...
 #[derive(Deserialize, Serialize)]
 pub struct GrometBoxConditional {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub condition: Option<i32>,
+    pub condition: Option<Vec<GrometBox>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub body_if: Option<i32>,
+    pub body_if: Option<Vec<GrometBox>>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub body_else: Option<i32>,
+    pub body_else: Option<Vec<GrometBox>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
 }
@@ -169,6 +171,8 @@ pub struct Attributes {
     pub r#type: FnType,
     pub value: FunctionNet,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub index: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
 }
 
@@ -228,5 +232,65 @@ mod tests {
     fn it_works() {
         let result = add(2, 2);
         assert_eq!(result, 4);
+    }
+
+    #[test]
+    fn de_ser_exp0() {
+        let path_example = "../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json";
+        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
+
+        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
+        let res_serialized = serde_json::to_string(&res).unwrap();
+
+        // processing the imported data
+        data = data.replace("\n", "");
+        data = data.replace(" ", "");
+
+        assert_eq!(res_serialized, data);
+    }
+
+    #[test]
+    fn de_ser_fun3() {
+        let path_example = "../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json";
+        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
+
+        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
+        let res_serialized = serde_json::to_string(&res).unwrap();
+
+        // processing the imported data
+        data = data.replace("\n", "");
+        data = data.replace(" ", "");
+
+        assert_eq!(res_serialized, data);
+    }
+
+    #[test]
+    fn de_ser_while2() {
+        let path_example = "../data/gromet/examples/while2/while2--Gromet-FN-auto.json";
+        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
+
+        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
+        let res_serialized = serde_json::to_string(&res).unwrap();
+
+        // processing the imported data
+        data = data.replace("\n", "");
+        data = data.replace(" ", "");
+
+        assert_eq!(res_serialized, data);
+    }
+
+    #[test]
+    fn de_ser_cond1() {
+        let path_example = "../data/gromet/examples/cond1/cond1--Gromet-FN-auto.json";
+        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
+
+        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
+        let res_serialized = serde_json::to_string(&res).unwrap();
+
+        // processing the imported data
+        data = data.replace("\n", "");
+        data = data.replace(" ", "");
+
+        assert_eq!(res_serialized, data);
     }
 }
