@@ -6,6 +6,7 @@ use std::fs;
 use skema::Gromet; // This brings in the Gromet Data struct
 
 /* TODO: Write up latex documentation in docs. */
+/* Move rust directory into skema and name it skema-rs. */
 fn main() {
     let args: Vec<String> = env::args().collect();
 

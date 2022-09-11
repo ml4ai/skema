@@ -43,9 +43,9 @@ pub struct GrometBox {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<ValueL>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<Vec<Metadata>>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -91,6 +91,8 @@ pub struct GrometBoxConditional {
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub condition: Option<i32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub body: Option<i32>, // This exist is CHIME v2, but not in documentation...
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body_if: Option<i32>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -188,9 +190,25 @@ pub struct Provenance {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
+pub struct Files {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub uid: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub path: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata_type: Option<String>, // Could be enum?
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>, // only in highest meta
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub global_reference_id: Option<String>, // only in highest meta
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub files: Option<Vec<Files>>, // only in highest meta
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_language: Option<String>, // Could be enum?
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,13 +250,22 @@ fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Err
 }
 
 // This is a custom serialization of the value field in the Value struct.
-// Currently only for numerical values (only ints right now too), as gromets develope will need maintaince.
+// Currently only for numerical values, as gromets develope will need maintaince. Ideally we could run match control flow to determine the type and how to parse, similar to the deserialization for this field.
 fn se_value<S>(x: &str, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    let parse_num: i32 = x.parse().unwrap();
-    s.serialize_i32(parse_num)
+    // This is an interim solution for numerics, non numerics will require custom serialization for entire ValueL struct.
+    let mut parse_f32: f32 = x.parse().unwrap();
+
+    if parse_f32 == parse_f32.round() {
+        // if the float can be truncated without percision loss, truncate
+        s.serialize_i32(parse_f32 as i32)
+    } else {
+        // else include up to 7 digits for now, as per GroMEt specs
+        parse_f32 = (parse_f32 * 10_000_000.0).round() / 10_000_000.0;
+        s.serialize_f32(parse_f32)
+    }
 }
 
 // Tests
@@ -298,6 +325,25 @@ mod tests {
 
         let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
         let res_serialized = serde_json::to_string(&res).unwrap();
+
+        // processing the imported data
+        data = data.replace("\n", "");
+        data = data.replace(" ", "");
+
+        assert_eq!(res_serialized, data);
+    }
+
+    #[test]
+    fn de_ser_CHIME() {
+        let path_example = "../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
+        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
+
+        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
+        let mut res_serialized = serde_json::to_string(&res).unwrap();
+
+        // processing serialized data
+        res_serialized = res_serialized.replace("\n", "");
+        res_serialized = res_serialized.replace(" ", "");
 
         // processing the imported data
         data = data.replace("\n", "");
