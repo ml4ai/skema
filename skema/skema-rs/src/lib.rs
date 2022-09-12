@@ -273,64 +273,36 @@ mod tests {
     use super::*;
     use std::fs;
 
-    #[test]
-    fn de_ser_exp0() {
-        let path_example = "../../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json";
-        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
+    fn test_roundtrip_serialization(path_example: &str) -> () {
+        let mut file_contents = fs::read_to_string(path_example).expect("Unable to read file");
 
-        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
+        let res: Gromet = serde_json::from_str(&file_contents).expect("Unable to parse");
         let res_serialized = serde_json::to_string(&res).unwrap();
 
         // processing the imported data
-        data = data.replace("\n", "");
-        data = data.replace(" ", "");
+        file_contents = file_contents.replace("\n", "").replace(" ", "");
 
-        assert_eq!(res_serialized, data);
+        assert_eq!(res_serialized, file_contents);
+    }
+
+    #[test]
+    fn de_ser_exp0() {
+        test_roundtrip_serialization("../../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json");
     }
 
     #[test]
     fn de_ser_exp2() {
-        let path_example = "../../data/gromet/examples/exp2/exp2--Gromet-FN-auto.json";
-        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
-
-        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
-        let res_serialized = serde_json::to_string(&res).unwrap();
-
-        // processing the imported data
-        data = data.replace("\n", "");
-        data = data.replace(" ", "");
-
-        assert_eq!(res_serialized, data);
+        test_roundtrip_serialization("../../data/gromet/examples/exp2/exp2--Gromet-FN-auto.json");
     }
 
     #[test]
     fn de_ser_fun3() {
-        let path_example = "../../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json";
-        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
-
-        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
-        let res_serialized = serde_json::to_string(&res).unwrap();
-
-        // processing the imported data
-        data = data.replace("\n", "");
-        data = data.replace(" ", "");
-
-        assert_eq!(res_serialized, data);
+        test_roundtrip_serialization("../../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json");
     }
 
     #[test]
     fn de_ser_while2() {
-        let path_example = "../../data/gromet/examples/while2/while2--Gromet-FN-auto.json";
-        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
-
-        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
-        let res_serialized = serde_json::to_string(&res).unwrap();
-
-        // processing the imported data
-        data = data.replace("\n", "");
-        data = data.replace(" ", "");
-
-        assert_eq!(res_serialized, data);
+        test_roundtrip_serialization("../../data/gromet/examples/while2/while2--Gromet-FN-auto.json");
     }
 
     #[test]
