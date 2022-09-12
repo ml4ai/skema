@@ -12,9 +12,6 @@ fn main() {
 
     let path = &args[1];
 
-    // let path_example = "../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json";
-    // let path_example = "../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
-
     let data = fs::read_to_string(path).expect("Unable to read file");
 
     let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");

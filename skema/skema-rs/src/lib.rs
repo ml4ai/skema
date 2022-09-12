@@ -275,7 +275,7 @@ mod tests {
 
     #[test]
     fn de_ser_exp0() {
-        let path_example = "../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json";
+        let path_example = "../../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json";
         let mut data = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
@@ -290,7 +290,7 @@ mod tests {
 
     #[test]
     fn de_ser_exp2() {
-        let path_example = "../data/gromet/examples/exp2/exp2--Gromet-FN-auto.json";
+        let path_example = "../../data/gromet/examples/exp2/exp2--Gromet-FN-auto.json";
         let mut data = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
@@ -305,7 +305,7 @@ mod tests {
 
     #[test]
     fn de_ser_fun3() {
-        let path_example = "../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json";
+        let path_example = "../../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json";
         let mut data = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
@@ -320,7 +320,7 @@ mod tests {
 
     #[test]
     fn de_ser_while2() {
-        let path_example = "../data/gromet/examples/while2/while2--Gromet-FN-auto.json";
+        let path_example = "../../data/gromet/examples/while2/while2--Gromet-FN-auto.json";
         let mut data = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
@@ -334,8 +334,8 @@ mod tests {
     }
 
     #[test]
-    fn de_ser_CHIME() {
-        let path_example = "../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
+    fn de_ser_chime() {
+        let path_example = "../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
         let mut data = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
@@ -351,20 +351,4 @@ mod tests {
 
         assert_eq!(res_serialized, data);
     }
-
-    // This example is currently bugged, don't uncomment until fixed. (9/6/22)
-    /*#[test]
-    fn de_ser_cond1() {
-        let path_example = "../data/gromet/examples/cond1/cond1--Gromet-FN-auto.json";
-        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
-
-        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
-        let res_serialized = serde_json::to_string(&res).unwrap();
-
-        // processing the imported data
-        data = data.replace("\n", "");
-        data = data.replace(" ", "");
-
-        assert_eq!(res_serialized, data);
-    }*/
 }
