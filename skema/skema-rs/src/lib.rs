@@ -2,7 +2,6 @@
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
 use serde_json::Value; // for json
-use std::fs; // used in tests
 use std::string::ToString;
 use strum_macros::Display; // used for macro on enums // used for macro on enums
 
@@ -272,6 +271,7 @@ where
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
 
     #[test]
     fn de_ser_exp0() {
