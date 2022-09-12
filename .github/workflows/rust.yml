@@ -7,8 +7,12 @@ defaults:
 on:
   push:
     branches: [ "main" ]
+    paths: 
+    - 'skema/skema-rs/**'
   pull_request:
     branches: [ "main" ]
+    paths: 
+    - 'skema/skema-rs/**'
 
 env:
   CARGO_TERM_COLOR: always
