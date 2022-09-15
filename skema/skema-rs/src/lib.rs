@@ -9,6 +9,16 @@ use strum_macros::Display; // used for macro on enums // used for macro on enums
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "UPPERCASE")] // Allows variants to match to uppercase json values
 #[derive(strum_macros::Display)] // Allows variants to be printed as strings if needed
+pub enum Label {
+    // This is the enum of types of labels we can assign to the Gromet
+    PreProcess,
+    Model,
+    PostProcess,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
+#[serde(rename_all = "UPPERCASE")] // Allows variants to match to uppercase json values
+#[derive(strum_macros::Display)] // Allows variants to be printed as strings if needed
 pub enum FnType {
     Fn,
     Import,
@@ -178,6 +188,9 @@ pub struct Attributes {
     pub index: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    // This is for labeling the parts of the function network.
+    pub label: Option<Label>, // Right now we are doing this at the attribute level.
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -302,7 +315,9 @@ mod tests {
 
     #[test]
     fn de_ser_while2() {
-        test_roundtrip_serialization("../../data/gromet/examples/while2/while2--Gromet-FN-auto.json");
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/while2/while2--Gromet-FN-auto.json",
+        );
     }
 
     #[test]
