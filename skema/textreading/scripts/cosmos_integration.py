@@ -1,7 +1,10 @@
 """
-Purpose: Process COSMOS' output in parquet format into a json format suitable for consumption by the TR reading pipeline.
-This script was inherited from AUTOMATES
+Purpose: Process COSMOS' output in parquet format into a JSON format suitable
+for consumption by the text reading pipeline.
+
+This script was inherited from the AutoMATES project.
 """
+
 import pandas as pd
 import json
 import sys
@@ -27,7 +30,7 @@ def main():
             num_data_rows = max(
                 [int(k) for k in parquet_data[parquet_data_keys[0]]]
             )
-            
+
             row_order_parquet_data = [dict() for i in range(num_data_rows + 1)]
             for field_key, row_data in parquet_data.items():
                 for row_idx, datum in row_data.items():
@@ -36,7 +39,7 @@ def main():
 
             main_doc_re = r"documents_[a-zA-Z0-9]*\.parquet"
             if re.match(main_doc_re, filename) is not None:
-            # if filename == "documents.parquet":
+                # if filename == "documents.parquet":
                 # Sorts the content sections by page number and then by
                 # bounding box location. Use x-pos first to account for
                 # multi-column documents and then sort by y-pos.
