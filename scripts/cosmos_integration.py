@@ -114,15 +114,11 @@ def main(parquet_file_folder: str):
                 for pdf_name, pdf_data in name2results.items():
                     no_end_pdf_name = pdf_name.replace(".pdf", "")
                     pdf_json_data_path = parquet_filepath.replace(
-                        # Changed by Enrique
                         ".parquet",
                         f"{no_end_pdf_name}--COSMOS-data.json",
                     )
                     json.dump(pdf_data, open(pdf_json_data_path, "w"))
 
-            # if filename != "documents.parquet":
-            # if re.match(main_doc_re, filename) is None:
-            # Changed by Enrique. No point on doing another "if" if this is only the else statement
             else:
                 parquet_json_filepath = parquet_filepath.replace(
                     ".parquet", ".json"
