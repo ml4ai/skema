@@ -1,8 +1,10 @@
-"""
-Purpose: Process COSMOS' output in parquet format into a JSON format suitable
-for consumption by the text reading pipeline.
+#!/usr/bin/env python3
 
-This script was inherited from the AutoMATES project.
+# This script was inherited from the AutoMATES project.
+
+"""
+Script to process COSMOS' output in Parquet format into a JSON format suitable
+for consumption by the SKEMA text reading pipeline.
 """
 
 import pandas as pd
@@ -10,12 +12,12 @@ import json
 import sys
 import re
 import os
+import argparse
 
 from tqdm import tqdm
 
 
-def main():
-    parquet_file_folder = sys.argv[1]
+def main(parquet_file_folder: str):
 
     parquet_files = os.listdir(parquet_file_folder)
 
@@ -131,4 +133,15 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+
+    parser.add_argument(
+        "input",
+        help="The input directory with the COSMOS Parquet files to process.",
+    )
+
+    args = parser.parse_args()
+    main(args.input)
