@@ -65,12 +65,12 @@ fn line_starts_subpgm(line: &String) -> (bool, Option<String>) {
     (false, None)
 }
 
+// TODO: Implement support for internal comments
 #[derive(Default, Debug, Deserialize, Serialize)]
 struct SubprogramComments {
     head: Vec<String>,
     neck: Vec<String>,
     foot: Vec<String>,
-    internal: Vec<String>,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize)]
@@ -89,7 +89,7 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
     let mut prev_fn: Option<String> = None;
     let mut curr_marker: Option<String> = None;
     let mut in_neck = false;
-    let mut comments: Comments = Comments::default();
+    let mut comments = Comments::default();
     let extension = Path::new(&src_file_name).extension();
     let f = File::open(&src_file_name)?;
     let lines = io::BufReader::new(f).lines();
@@ -111,9 +111,24 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
                 let prev_fn = curr_fn.clone();
                 let curr_fn = f_name;
 
-                //if let Some(x) = prev_fn {
-                //comments[&x] = curr_comment;
-                //}
+                if let Some(x) = prev_fn {
+                    comments
+                        .subprograms
+                        .get_mut(&x)
+                        .expect("Subprogram named {x} not found in comment dictionary!")
+                        .foot = curr_comment.clone();
+                }
+
+                comments.subprograms.insert(
+                    curr_fn.unwrap(),
+                    SubprogramComments {
+                        head: curr_comment.clone(),
+                        neck: Vec::new(),
+                        foot: Vec::new(),
+                    }
+                );
+
+                curr_comment = Vec::new();
             }
         }
     }
