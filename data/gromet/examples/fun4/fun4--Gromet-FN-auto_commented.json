@@ -1,0 +1,71 @@
+{
+    "name": "fun4",
+    "fn": {
+        "b": [{"function_type":"MODULE","name":"module"}],
+        "bf": [
+            {"function_type":"LITERAL","value":{"value_type":"Integer","value":2}},
+            {"function_type":"FUNCTION","contents":1,"name":"module.foo_id0"}
+        ],
+        "pif": [{"id":1,"box":2}],
+        "pof": [{"id":1,"box":1},{"id":1,"name":"x","box":2}],
+        "wff": [{"src":1,"tgt":1}]
+    },
+    "attributes": [
+        {
+            "type": "FN",
+            "value": {
+                "b": [{"function_type":"FUNCTION","name":"foo"}], // function type for the attribute, and name if relevant
+                "opi": [{"id":1,"name":"x","box":1}], // input port, id: which port on box, name: name, box: which box this opi belongs to
+                "opo": [{"box":1}], // output port/slot 
+                "bf": [ // refers to the content of this box function, each entry refers to an attribute
+                    {"function_type":"EXPRESSION","contents":2}, // for each attribute entry this function references, contents is the index, start at 1 not 0.
+                    {"function_type":"EXPRESSION","contents":3} // function_type is the type of attribute. 
+                ], // things ground out in literals and primatives
+                "pif": [{"box":1},{"box":2}], // This refers to the inputs of the "bf"'s, indexed by the "box"
+                "pof": [{"name":"y","box":1},{"name":"z","box":2}], // This refers to the outputs of the "bf"'s indexed by box
+                "wfopi": [{"src":1,"tgt":1}], // connects opi to pif
+                "wfopo": [{"src":1,"tgt":2}] // connection opo to pof
+            },
+            "index": 1 // This won't always exist as it can be inferred implicitly
+        },
+        {
+            "type": "FN",
+            "value": {
+                "b": [{"function_type":"EXPRESSION"}],
+                "opi": [{"box":1}],
+                "opo": [{"box":1}],
+                "bf": [
+                    {"function_type":"LITERAL","value":{"value_type":"Integer","value":3}},
+                    {"function_type":"PRIMITIVE","name":"+"}
+                ],
+                "pif": [{"id":1,"box":2},{"id":2,"box":2}],
+                "pof": [{"id":1,"box":1},{"id":1,"box":2}],
+                "wfopi": [{"src":1,"tgt":1}],
+                "wff": [{"src":2,"tgt":1}],
+                "wfopo": [{"src":1,"tgt":2}]
+            },
+            "index": 2
+        },
+        {
+            "type": "FN",
+            "value": {
+                "b": [{"function_type":"EXPRESSION"}],
+                "opi": [{"box":1}],
+                "opo": [{"box":1}],
+                "bf": [
+                    {"function_type":"LITERAL","value":{"value_type":"Integer","value":2}},
+                    {"function_type":"PRIMITIVE","name":"*"}
+                ],
+                "pif": [{"id":1,"box":2},{"id":2,"box":2}],
+                "pof": [{"id":1,"box":1},{"id":1,"box":2}],
+                "wfopi": [{"src":1,"tgt":1}],
+                "wff": [{"src":2,"tgt":1}],
+                "wfopo": [{"src":1,"tgt":2}]
+            },
+            "index": 3
+        }
+    ],
+    "metadata": [
+
+    ]
+}

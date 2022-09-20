@@ -48,7 +48,7 @@ pub struct ValueL {
 pub struct GrometBox {
     pub function_type: FunctionType,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contents: Option<i32>,
+    pub contents: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<ValueL>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -180,7 +180,7 @@ pub struct FunctionNet {
 }
 
 #[derive(Deserialize, Serialize, Debug)]
-pub struct Attributes {
+pub struct Attribute {
     #[serde(rename = "type")]
     pub r#type: FnType,
     pub value: FunctionNet,
@@ -246,7 +246,7 @@ pub struct Gromet {
     pub name: String,
     #[serde(rename = "fn")]
     pub r#fn: FunctionNet,
-    pub attributes: Vec<Attributes>,
+    pub attributes: Vec<Attribute>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
 }
