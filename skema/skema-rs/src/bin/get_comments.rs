@@ -1,15 +1,14 @@
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json;
+use std::collections::HashMap;
 use std::collections::HashSet;
 use std::error::Error;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
-use regex::Regex;
-use std::collections::HashMap;
 
 use lazy_static::lazy_static;
-
 
 fn line_is_comment(line: &String) -> bool {
     // From FORTRAN Language Reference
@@ -46,43 +45,51 @@ fn line_starts_subpgm(line: &String) -> (bool, Option<String>) {
     ///Returns:
     ///    (true, f_name) if line begins a definition for subprogram f_name;
     ///    (false, None) if line does not begin a subprogram definition.
+
     lazy_static! {
         static ref RE_SUB_START: Regex = Regex::new(r"\s*subroutine\s+(\w+)\s*\(").unwrap();
-        static ref RE_FN_START: Regex = Regex::new(r"\s*(\w*\s*){0,2}function\s+(\w+)\s*\(").unwrap();
+        static ref RE_FN_START: Regex =
+            Regex::new(r"\s*(\w*\s*){0,2}function\s+(\w+)\s*\(").unwrap();
     }
 
     if let Some(c) = RE_SUB_START.captures(line) {
         let f_name = &c[1];
-        return (true, Some(f_name.to_string()))
+        return (true, Some(f_name.to_string()));
     }
 
     if let Some(c) = RE_FN_START.captures(line) {
         let f_name = &c[2];
-        return (true, Some(f_name.to_string()))
+        return (true, Some(f_name.to_string()));
     }
 
     (false, None)
 }
 
-//match = RE_SUB_START.match(line)
-//if match is not None:
-//f_name = match.group(1)
-//return True, f_name
+#[derive(Default, Debug, Deserialize, Serialize)]
+struct SubprogramComments {
+    head: Vec<String>,
+    neck: Vec<String>,
+    foot: Vec<String>,
+    internal: Vec<String>,
+}
 
-//match = RE_FN_START.match(line)
-//if match is not None:
-//f_name = match.group(2)
-//return True, f_name
+#[derive(Default, Debug, Deserialize, Serialize)]
+struct Comments {
+    #[serde(rename = "$file_head")]
+    file_head: Option<Vec<String>>,
 
-//return False, None
+    #[serde(rename = "$file_foot")]
+    file_foot: Option<Vec<String>>,
+    subprograms: HashMap<String, SubprogramComments>,
+}
 
-fn get_comments(src_file_name: String) -> Result<HashMap<String, Option<Vec<String>>>, Box<dyn Error + 'static>> {
+fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'static>> {
     let mut curr_comment: Vec<String> = Vec::new();
     let mut curr_fn: Option<String> = None;
     let mut prev_fn: Option<String> = None;
     let mut curr_marker: Option<String> = None;
     let mut in_neck = false;
-    let mut comments: HashMap<String, Option<Vec<String>>> = HashMap::new();
+    let mut comments: Comments = Comments::default();
     let extension = Path::new(&src_file_name).extension();
     let f = File::open(&src_file_name)?;
     let lines = io::BufReader::new(f).lines();
@@ -92,8 +99,8 @@ fn get_comments(src_file_name: String) -> Result<HashMap<String, Option<Vec<Stri
             if line_is_comment(&l) {
                 curr_comment.push(l.clone())
             } else {
-                if let None = comments["$file_head"] {
-                    comments["$file_head"] = Some(curr_comment.clone())
+                if let None = comments.file_head {
+                    comments.file_head = Some(curr_comment.clone())
                 }
             }
 
@@ -104,9 +111,9 @@ fn get_comments(src_file_name: String) -> Result<HashMap<String, Option<Vec<Stri
                 let prev_fn = curr_fn.clone();
                 let curr_fn = f_name;
 
-                if let Some(x) = prev_fn {
-                    comments[&prev_fn]["foot"] = curr_comment;
-                }
+                //if let Some(x) = prev_fn {
+                //comments[&x] = curr_comment;
+                //}
             }
         }
     }
