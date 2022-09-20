@@ -65,7 +65,7 @@ pub fn line_ends_subpgm(line: &String) -> bool {
 }
 
 // TODO: Implement a test for the logic of the function below.
-pub fn line_is_continuation(line: &String, extension: &String) -> bool {
+pub fn line_is_continuation(line: &String, extension: &str) -> bool {
     // From FORTRAN 77 Language Reference
     // (https://docs.oracle.com/cd/E19957-01/805-4939/6j4m0vn6l/index.html)   }
 
@@ -91,7 +91,10 @@ pub fn line_is_continuation(line: &String, extension: &String) -> bool {
         return false;
     }
 
+    // Adarsh: It would be nice if we could make this a global constant, but for some reason it is
+    // not obvious how to do this in Rust...
     let FIXED_FORM_EXT = HashSet::from([".f", ".for", ".blk", ".inc", ".gin"]);
+
     lazy_static! {
         static ref FIXED_FORM_SET: HashSet<char> =
             HashSet::from(['1', '2', '3', '4', '5', '6', '7', '8', '9']);
@@ -101,8 +104,8 @@ pub fn line_is_continuation(line: &String, extension: &String) -> bool {
     // characters at the expected positions. I am not 100% sure that is the case without diving
     // into the Fortran language specification, which I am not inclined to do at the moment. In any
     // case, the Python version of this code does not include any checks of this kind. If the
-    // expectation was for the script to crash in such cases, the original type signature did not
-    // reflect it.
+    // expectation was for the script to crash in such cases, the type signature in the original
+    // Python version did not reflect it.
     if FIXED_FORM_EXT.contains(&extension as &str) {
         if let Some(c_0) = &line.chars().nth(0) {
             if *c_0 == '\t' {
