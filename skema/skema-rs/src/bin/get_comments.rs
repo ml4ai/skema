@@ -6,17 +6,9 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
 use regex::Regex;
+use std::collections::HashMap;
 
 use lazy_static::lazy_static;
-
-#[derive(Default, Debug, Deserialize, Serialize)]
-struct Comments {
-    #[serde(rename = "$file_head")]
-    file_head: Option<Vec<String>>,
-
-    #[serde(rename = "$file_foot")]
-    file_foot: Option<Vec<String>>,
-}
 
 
 fn line_is_comment(line: &String) -> bool {
@@ -33,7 +25,6 @@ fn line_is_comment(line: &String) -> bool {
 
     // A totally blank line is a comment line as well.
 
-    //let FORTRAN_COMMENT_CHAR_SET: HashSet<char> = HashSet::from(['c', 'C', 'd', 'D', '*', '!']);
     lazy_static! {
         static ref FORTRAN_COMMENT_CHAR_SET: HashSet<char> =
             HashSet::from(['c', 'C', 'd', 'D', '*', '!']);
@@ -57,14 +48,20 @@ fn line_starts_subpgm(line: &String) -> (bool, Option<String>) {
     ///    (false, None) if line does not begin a subprogram definition.
     lazy_static! {
         static ref RE_SUB_START: Regex = Regex::new(r"\s*subroutine\s+(\w+)\s*\(").unwrap();
-    }
-    let captures = RE_SUB_START.captures(line);
-    if let Some(c) = captures {
-        println!("captures");
-        println!("{}", &c[0]);
+        static ref RE_FN_START: Regex = Regex::new(r"\s*(\w*\s*){0,2}function\s+(\w+)\s*\(").unwrap();
     }
 
-    (false, Some("".to_string()))
+    if let Some(c) = RE_SUB_START.captures(line) {
+        let f_name = &c[1];
+        return (true, Some(f_name.to_string()))
+    }
+
+    if let Some(c) = RE_FN_START.captures(line) {
+        let f_name = &c[2];
+        return (true, Some(f_name.to_string()))
+    }
+
+    (false, None)
 }
 
 //match = RE_SUB_START.match(line)
@@ -79,13 +76,13 @@ fn line_starts_subpgm(line: &String) -> (bool, Option<String>) {
 
 //return False, None
 
-fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'static>> {
+fn get_comments(src_file_name: String) -> Result<HashMap<String, Option<Vec<String>>>, Box<dyn Error + 'static>> {
     let mut curr_comment: Vec<String> = Vec::new();
     let mut curr_fn: Option<String> = None;
     let mut prev_fn: Option<String> = None;
     let mut curr_marker: Option<String> = None;
     let mut in_neck = false;
-    let mut comments = Comments::default();
+    let mut comments: HashMap<String, Option<Vec<String>>> = HashMap::new();
     let extension = Path::new(&src_file_name).extension();
     let f = File::open(&src_file_name)?;
     let lines = io::BufReader::new(f).lines();
@@ -93,14 +90,24 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
     for line in lines {
         if let Ok(l) = line {
             if line_is_comment(&l) {
-                curr_comment.push(l)
+                curr_comment.push(l.clone())
             } else {
-                if let None = comments.file_head {
-                    comments.file_head = Some(curr_comment.clone())
+                if let None = comments["$file_head"] {
+                    comments["$file_head"] = Some(curr_comment.clone())
                 }
             }
 
-            //line_starts_subpgm(&l);
+            let (f_start, f_name_maybe) = line_starts_subpgm(&l);
+
+            if f_start {
+                let f_name = f_name_maybe;
+                let prev_fn = curr_fn.clone();
+                let curr_fn = f_name;
+
+                if let Some(x) = prev_fn {
+                    comments[&prev_fn]["foot"] = curr_comment;
+                }
+            }
         }
     }
 
