@@ -126,16 +126,17 @@ fn get_comments(src_file_name: PathBuf) -> Result<Comments, Box<dyn Error + 'sta
 #[derive(Parser, Debug)]
 struct Cli {
     #[clap(parse(from_os_str))]
-    filepath: PathBuf
+    filepath: PathBuf,
 }
 
 fn main() {
     let args = Cli::parse();
     match get_comments(args.filepath) {
-        Ok(c) => {println!("{}", serde_json::to_string(&c).unwrap())},
-        Err(e) => panic!("Error getting the comments")
+        Ok(c) => {
+            println!("{}", serde_json::to_string(&c).unwrap())
+        }
+        Err(e) => panic!("Error getting the comments"),
     };
-    
 }
 
 #[test]
