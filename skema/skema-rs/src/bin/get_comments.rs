@@ -10,7 +10,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 use clap::Parser;
 
@@ -37,7 +37,7 @@ struct Comments {
     subprograms: HashMap<String, SubprogramComments>,
 }
 
-fn get_comments(src_file_name: PathBuf) -> Result<Comments, Box<dyn Error + 'static>> {
+fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'static>> {
     let mut curr_comment: Vec<String> = Vec::new();
     let mut curr_fn: Option<String> = None;
     let mut prev_fn: Option<String> = None;
@@ -125,8 +125,7 @@ fn get_comments(src_file_name: PathBuf) -> Result<Comments, Box<dyn Error + 'sta
 
 #[derive(Parser, Debug)]
 struct Cli {
-    #[clap(parse(from_os_str))]
-    filepath: PathBuf,
+    filepath: String,
 }
 
 fn main() {
