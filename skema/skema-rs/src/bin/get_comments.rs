@@ -3,7 +3,11 @@
 // project (https://ml4ai.github.io/automates)
 // This Rust port was written by Adarsh Pyarelal for the SKEMA project.
 
-use log::warn;
+//env_logger::init();
+
+use log::{debug, error, info, log_enabled, warn, Level};
+use pretty_env_logger;
+
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
@@ -54,6 +58,7 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
     let lines = io::BufReader::new(f).lines();
 
     for line in lines {
+        dbg!(lineno, &prev_fn, &curr_fn);
         if let Ok(l) = line {
             if line_is_comment(&l) {
                 curr_comment.push(l.clone())
@@ -61,47 +66,52 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
                 if comments.file_head.is_empty() {
                     comments.file_head = curr_comment.clone()
                 }
-            }
+                let (f_start, f_name) = line_starts_subpgm(&l);
 
-            let (f_start, f_name_maybe) = line_starts_subpgm(&l);
+                if f_start {
+                    prev_fn = curr_fn.clone();
+                    curr_fn = f_name;
+                    dbg!(&curr_fn);
 
-            if f_start {
-                let f_name = f_name_maybe;
-                let prev_fn = curr_fn.clone();
-                let curr_fn = f_name;
+                    if let Some(x) = &prev_fn {
+                        comments
+                            .subprograms
+                            .get_mut(x)
+                            .unwrap().foot = curr_comment.clone();
+                    }
 
-                if let Some(x) = prev_fn {
-                    comments
-                        .subprograms
-                        .get_mut(&x)
-                        .expect("Subprogram named {x} not found in comment dictionary!")
-                        .foot = curr_comment.clone();
+                    comments.subprograms.insert(
+                        curr_fn.as_ref().unwrap().to_string(),
+                        SubprogramComments {
+                            head: curr_comment.clone(),
+                            neck: Vec::new(),
+                            foot: Vec::new(),
+                        },
+                    );
+
+                    curr_comment = Vec::new();
+                    in_neck = true;
+                } else if line_ends_subpgm(&l) {
+                    curr_comment = Vec::new();
+                } else if line_is_continuation(&l, &extension) {
+                    lineno += 1;
+                    continue;
+                } else {
+                    dbg!(&curr_fn);
+                    if in_neck {
+                        comments
+                            .subprograms
+                            .get_mut(&curr_fn.clone().unwrap())
+                            .unwrap()
+                            .neck = curr_comment.clone();
+                        in_neck = false;
+                        curr_comment = Vec::new();
+                    }
+                    // TODO (maybe): Implement the logic for collecting the internal comments.
                 }
-
-                comments.subprograms.insert(
-                    curr_fn
-                        .expect("Error: curr_fn is None, we do not know how to handle this case!"),
-                    SubprogramComments {
-                        head: curr_comment.clone(),
-                        neck: Vec::new(),
-                        foot: Vec::new(),
-                    },
-                );
-
-                curr_comment = Vec::new();
-                in_neck = true;
-            } else if line_ends_subpgm(&l) {
-                curr_comment = Vec::new();
-            } else if line_is_continuation(&l, &extension) {
-                lineno += 1;
-                continue;
-            } else {
-                // TODO: Implement the logic for collecting the neck and internal comments. The
-                // logic from the original get_comments.py script doesn't quite seem to work, but
-                // perhaps it is a bug on my part - Adarsh
             }
+            lineno += 1;
         }
-        lineno += 1;
     }
 
     // If there's a comment at the very end of the file, make it the foot
@@ -129,6 +139,7 @@ struct Cli {
 }
 
 fn main() {
+    pretty_env_logger::init();
     let args = Cli::parse();
     match get_comments(args.filepath) {
         Ok(c) => {
