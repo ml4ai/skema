@@ -5,9 +5,9 @@
 
 //env_logger::init();
 
-use log::{debug, error, info, log_enabled, warn, Level};
 use pretty_env_logger;
 
+use log::warn;
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
@@ -18,7 +18,6 @@ use std::path::Path;
 
 use clap::Parser;
 
-//mod skema::fortran_syntax;
 use skema::fortran_syntax::{
     line_ends_subpgm, line_is_comment, line_is_continuation, line_starts_subpgm,
 };
@@ -45,10 +44,8 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
     let mut curr_comment: Vec<String> = Vec::new();
     let mut curr_fn: Option<String> = None;
     let mut prev_fn: Option<String> = None;
-    let mut curr_marker: Option<String> = None;
     let mut in_neck = false;
     let mut comments = Comments::default();
-    let mut lineno: usize = 1;
     let extension = Path::new(&src_file_name)
         .extension()
         .expect("Unable to get extension for {src_file_name}!")
@@ -58,10 +55,9 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
     let lines = io::BufReader::new(f).lines();
 
     for line in lines {
-        dbg!(lineno, &prev_fn, &curr_fn);
         if let Ok(l) = line {
             if line_is_comment(&l) {
-                curr_comment.push(l.clone())
+                curr_comment.push(l)
             } else {
                 if comments.file_head.is_empty() {
                     comments.file_head = curr_comment.clone()
@@ -71,13 +67,9 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
                 if f_start {
                     prev_fn = curr_fn.clone();
                     curr_fn = f_name;
-                    dbg!(&curr_fn);
 
                     if let Some(x) = &prev_fn {
-                        comments
-                            .subprograms
-                            .get_mut(x)
-                            .unwrap().foot = curr_comment.clone();
+                        comments.subprograms.get_mut(x).unwrap().foot = curr_comment.clone();
                     }
 
                     comments.subprograms.insert(
@@ -89,15 +81,13 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
                         },
                     );
 
-                    curr_comment = Vec::new();
+                    curr_comment.clear();
                     in_neck = true;
                 } else if line_ends_subpgm(&l) {
-                    curr_comment = Vec::new();
+                    curr_comment.clear();
                 } else if line_is_continuation(&l, &extension) {
-                    lineno += 1;
                     continue;
                 } else {
-                    dbg!(&curr_fn);
                     if in_neck {
                         comments
                             .subprograms
@@ -105,21 +95,18 @@ fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'stat
                             .unwrap()
                             .neck = curr_comment.clone();
                         in_neck = false;
-                        curr_comment = Vec::new();
+                        curr_comment.clear();
                     }
                     // TODO (maybe): Implement the logic for collecting the internal comments.
                 }
             }
-            lineno += 1;
         }
     }
 
     // If there's a comment at the very end of the file, make it the foot
     // comment of curr_fn
     match curr_fn {
-        None => {
-            warn!("curr_fn is None, we do not know how to handle this case!");
-        }
+        None => warn!("curr_fn is None, we do not know how to handle this case!"),
         Some(c) => {
             if !curr_comment.is_empty() {
                 if let Some(x) = comments.subprograms.get_mut(&c) {
@@ -142,10 +129,8 @@ fn main() {
     pretty_env_logger::init();
     let args = Cli::parse();
     match get_comments(args.filepath) {
-        Ok(c) => {
-            println!("{}", serde_json::to_string(&c).unwrap())
-        }
-        Err(e) => panic!("Error getting the comments"),
+        Ok(c) => println!("{}", serde_json::to_string(&c).unwrap()),
+        _ => panic!("Error getting the comments"),
     };
 }
 

@@ -93,7 +93,7 @@ pub fn line_is_continuation(line: &String, extension: &str) -> bool {
 
     // Adarsh: It would be nice if we could make this a global constant, but for some reason it is
     // not obvious how to do this in Rust...
-    let FIXED_FORM_EXT = HashSet::from(["f", "for", "blk", "inc", "gin"]);
+    let fixed_form_ext = HashSet::from(["f", "for", "blk", "inc", "gin"]);
 
     lazy_static! {
         static ref FIXED_FORM_SET: HashSet<char> =
@@ -106,7 +106,7 @@ pub fn line_is_continuation(line: &String, extension: &str) -> bool {
     // case, the Python version of this code does not include any checks of this kind. If the
     // expectation was for the script to crash in such cases, the type signature in the original
     // Python version did not reflect it.
-    if FIXED_FORM_EXT.contains(&extension as &str) {
+    if fixed_form_ext.contains(&extension as &str) {
         if line.chars().nth(0).unwrap() == '\t' {
             return FIXED_FORM_SET.contains(&line.chars().nth(1).unwrap());
         } else {
