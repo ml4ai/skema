@@ -93,6 +93,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "get_comments"
+version = "0.1.0"
+dependencies = [
+ "clap",
+ "lazy_static",
+ "log",
+ "pretty_env_logger",
+ "regex",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "hashbrown"
 version = "0.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -137,6 +150,12 @@ name = "itoa"
 version = "1.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c8af84674fe1f223a982c933a0ee1086ac4d4052aa0fb8060c12c6ad838e754"
+
+[[package]]
+name = "lazy_static"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
@@ -293,9 +312,6 @@ dependencies = [
 name = "skema"
 version = "0.1.0"
 dependencies = [
- "clap",
- "log",
- "pretty_env_logger",
  "serde",
  "serde_json",
  "strum",
