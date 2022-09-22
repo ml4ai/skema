@@ -5,8 +5,6 @@ use serde_json::Value; // for json
 use std::string::ToString;
 use strum_macros::Display; // used for macro on enums // used for macro on enums
 
-pub mod fortran_syntax;
-
 /******** AST for the Gromet Data Structure ********/
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "UPPERCASE")] // Allows variants to match to uppercase json values
