@@ -5,7 +5,6 @@ use std::fs;
 
 use skema::FunctionType;
 use skema::Gromet; // This brings in the Gromet Data struct
-                   /* TODO: Write up latex documentation in docs. */
 
 // ../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2_labeled.json
 #[derive(Debug, Clone)]
@@ -14,6 +13,7 @@ pub struct Subroutine {
     pub indexes: Vec<u32>,
     pub att_idx: u32,
     pub label: Option<Vec<String>>,
+    pub lines: Vec<u32>,
 }
 
 fn main() {
@@ -21,12 +21,6 @@ fn main() {
     let path = &args[1];
     let data = fs::read_to_string(path).expect("Unable to read file");
     let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
-
-    // let att_len = res.attributes.len();
-
-    // let's determine all the define functions of the code and label each one either model or not at first
-    // then we break down the lines of the main function to get more specific
-    // then we write some custom python scripts for test examples, namely nested function to refine this as well
 
     let mut subroutines: Vec<Subroutine> = vec![];
     let mut idx = 1;
@@ -67,9 +61,13 @@ fn main() {
                         indexes: idxs,
                         att_idx: idx,
                         label: None,
+                        lines: vec![0],
                     };
                     subroutines.push(uf);
                 } else {
+                    let lines_b = entry.value.b[0].metadata.as_ref().unwrap()[0].line_begin;
+                    let lines_e = entry.value.b[0].metadata.as_ref().unwrap()[0].line_end;
+                    let lines_be = vec![lines_b.unwrap(), lines_e.unwrap()];
                     let uf = Subroutine {
                         // pull name from attribute entry
                         name: entry.value.b[0].name.as_ref().unwrap().to_string(),
@@ -77,6 +75,7 @@ fn main() {
                         indexes: idxs,
                         att_idx: idx,
                         label: None,
+                        lines: lines_be,
                     };
                     subroutines.push(uf);
                 }
@@ -134,7 +133,7 @@ fn main() {
     }
     // we now label each function, for coarse grain labeling
     if tot == res.attributes.len() {
-        println!("All attributes accounted for.");
+        println!("All attributes accounted for!");
     } else {
         println!(
             "ERROR: Missing Attributes! \n {}, {}",
