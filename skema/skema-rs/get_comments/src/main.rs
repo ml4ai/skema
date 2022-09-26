@@ -17,6 +17,9 @@ use std::path::Path;
 use clap::Parser;
 
 pub mod fortran_syntax;
+pub mod python;
+
+use python::test_parser;
 
 use fortran_syntax::{
     line_ends_subpgm, line_is_comment, line_is_continuation, line_starts_subpgm,
@@ -137,7 +140,8 @@ fn main() {
 
 #[test]
 fn test_get_comments() {
-    get_comments(
-        "../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.for".to_string(),
-    );
+    //get_comments(
+        //"../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.for".to_string(),
+    //);
+    test_parser();
 }
