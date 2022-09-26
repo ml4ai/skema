@@ -23,13 +23,16 @@ fn parse(input: &str) -> IResult<&str, Comment> {
     ))
 }
 
-pub fn test_parser() {
-    //let contents = std::fs::read_to_string("../../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.py").unwrap();
-    //assert_eq!(parse(&contents), Ok(("", Comment { comment: " this is a comment".to_string()})));
+#[test]
+fn test_parser() {
+    let contents = std::fs::read_to_string(
+        "tests/data/python_example.py",
+    )
+    .unwrap();
     assert_eq!(
-        parse("   # This is a comment\n not this"),
+        parse(&contents),
         Ok((
-            "\n not this",
+            "\n",
             Comment {
                 comment: " This is a comment".to_string()
             }
