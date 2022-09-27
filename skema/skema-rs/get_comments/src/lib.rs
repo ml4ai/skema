@@ -5,27 +5,28 @@ use nom::{
         alpha1, alphanumeric0, anychar, line_ending, none_of, not_line_ending, space0,
     },
     character::is_alphanumeric,
-    combinator::{opt, recognize, not, value},
+    combinator::{not, opt, recognize, value},
     multi::{fold_many0, many0},
     sequence::{delimited, pair, preceded, tuple},
     IResult,
 };
+use nom_locate::{position, LocatedSpan};
 use serde::{Deserialize, Serialize};
 use serde_json;
-use strum_macros::Display; // used for macro on enums // used for macro on enums
-use nom_locate::{position, LocatedSpan};
 use std::collections::HashMap;
+use strum_macros::Display; // used for macro on enums // used for macro on enums
 
 type Span<'a> = LocatedSpan<&'a str>;
-
 
 #[derive(Debug, Display, Clone, Serialize, Deserialize)]
 enum Statement {
     WholeLineComment(u32, String),
-    Docstring { object_name: String, contents: Vec<String> },
-    Other
+    Docstring {
+        object_name: String,
+        contents: Vec<String>,
+    },
+    Other,
 }
-
 
 /// Triple quoted strings
 fn triple_quoted_string(input: Span) -> IResult<Span, Span> {
@@ -42,7 +43,6 @@ fn is_valid_name_character(c: char) -> bool {
 fn name(input: Span) -> IResult<Span, Span> {
     take_while(is_valid_name_character)(input)
 }
-
 
 #[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Comments {
@@ -64,10 +64,21 @@ fn docstring(input: Span) -> IResult<Span, Statement> {
         name,
         tuple((tag("("), take_until("):"), tag("):"), line_ending, space0)),
     );
-    let (input, (func_name, docstring_contents, _, _)) = tuple((func_declaration, triple_quoted_string, space0, line_ending))(input)?;
+    let (input, (func_name, docstring_contents, _, _)) =
+        tuple((func_declaration, triple_quoted_string, space0, line_ending))(input)?;
     let object_name = func_name.to_string();
-    let contents: Vec<String> = docstring_contents.to_string().split('\n').map(|x| {x.to_string()}).collect();
-    Ok((input, Statement::Docstring { object_name, contents }))
+    let contents: Vec<String> = docstring_contents
+        .to_string()
+        .split('\n')
+        .map(|x| x.to_string())
+        .collect();
+    Ok((
+        input,
+        Statement::Docstring {
+            object_name,
+            contents,
+        },
+    ))
 }
 
 fn comment(input: Span) -> IResult<Span, Statement> {
@@ -83,17 +94,19 @@ fn statement(input: Span) -> IResult<Span, Statement> {
     alt((comment, other))(input)
 }
 
-
 fn comments(input: Span) -> IResult<Span, Comments> {
     fold_many0(statement, Comments::default, |mut acc: Comments, item| {
         match item {
             Statement::WholeLineComment(line, x) => {
                 acc.whole_line_comments.push((line, x));
             }
-            Statement::Docstring {object_name, contents} => {
+            Statement::Docstring {
+                object_name,
+                contents,
+            } => {
                 acc.docstrings.insert(object_name, contents);
             }
-            _ => ()
+            _ => (),
         }
         acc
     })(input)
@@ -115,5 +128,4 @@ fn test_parser() {
         Ok((_, c)) => println!("{}", serde_json::to_string(&c).unwrap()),
         _ => panic!("Error getting the comments"),
     };
-
 }
