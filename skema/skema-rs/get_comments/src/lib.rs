@@ -10,6 +10,8 @@ use nom::{
     sequence::{delimited, pair, preceded, tuple},
     IResult,
 };
+use serde::{Deserialize, Serialize};
+use serde_json;
 use strum_macros::Display; // used for macro on enums // used for macro on enums
 use nom_locate::{position, LocatedSpan};
 use std::collections::HashMap;
@@ -17,7 +19,7 @@ use std::collections::HashMap;
 type Span<'a> = LocatedSpan<&'a str>;
 
 
-#[derive(Debug, Display, Clone)]
+#[derive(Debug, Display, Clone, Serialize, Deserialize)]
 enum Statement {
     WholeLineComment(u32, String),
     Docstring { object_name: String, contents: Vec<String> },
@@ -42,7 +44,7 @@ fn name(input: Span) -> IResult<Span, Span> {
 }
 
 
-#[derive(Debug, PartialEq, Default)]
+#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Comments {
     pub whole_line_comments: Vec<(u32, String)>,
     pub docstrings: HashMap<String, Vec<String>>,
@@ -100,7 +102,6 @@ fn comments(input: Span) -> IResult<Span, Comments> {
 fn parse(input: Span) -> IResult<Span, Comments> {
     let (remaining_input, matched) = comments(input)?;
     let (s, pos) = position(remaining_input)?;
-    //dbg!(pos);
 
     Ok((remaining_input, matched))
 }
@@ -108,8 +109,11 @@ fn parse(input: Span) -> IResult<Span, Comments> {
 #[test]
 fn test_parser() {
     let contents = std::fs::read_to_string("tests/data/CHIME_SIR.py").unwrap();
-    //let contents = std::fs::read_to_string("tests/data/python_example.py").unwrap();
     let span = Span::new(&contents);
-    let (_, comments) = comments(span).unwrap();
-    dbg!(comments);
+    let result = comments(span);
+    match result {
+        Ok((_, c)) => println!("{}", serde_json::to_string(&c).unwrap()),
+        _ => panic!("Error getting the comments"),
+    };
+
 }
