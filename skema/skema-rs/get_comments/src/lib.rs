@@ -107,7 +107,7 @@ fn parse(input: Span) -> IResult<Span, Comments> {
 
 #[test]
 fn test_parser() {
-    let contents = std::fs::read_to_string("../../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.py").unwrap();
+    let contents = std::fs::read_to_string("tests/data/CHIME_SIR.py").unwrap();
     //let contents = std::fs::read_to_string("tests/data/python_example.py").unwrap();
     let span = Span::new(&contents);
     let (_, comments) = comments(span).unwrap();
