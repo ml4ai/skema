@@ -2,20 +2,19 @@ use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashSet;
 
+/// From FORTRAN Language Reference
+/// (https://docs.oracle.com/cd/E19957-01/805-4939/z40007332024/index.html)
+///
+/// A line with a c, C, '*', d, D, or ! in column one is a comment line, except
+/// that if the -xld option is set, then the lines starting with D or d are
+/// compiled as debug lines. The d, D, and ! are nonstandard.
+///
+/// If you put an exclamation mark (!) in any column of the statement field,
+/// except within character literals, then everything after the ! on that
+/// line is a comment.
+///
+/// A totally blank line is a comment line as well.
 pub fn line_is_comment(line: &String) -> bool {
-    // From FORTRAN Language Reference
-    // (https://docs.oracle.com/cd/E19957-01/805-4939/z40007332024/index.html)
-
-    // A line with a c, C, '*', d, D, or ! in column one is a comment line, except
-    // that if the -xld option is set, then the lines starting with D or d are
-    // compiled as debug lines. The d, D, and ! are nonstandard.
-
-    // If you put an exclamation mark (!) in any column of the statement field,
-    // except within character literals, then everything after the ! on that
-    // line is a comment.
-
-    // A totally blank line is a comment line as well.
-
     lazy_static! {
         static ref FORTRAN_COMMENT_CHAR_SET: HashSet<char> =
             HashSet::from(['c', 'C', 'd', 'D', '*', '!']);
@@ -27,17 +26,16 @@ pub fn line_is_comment(line: &String) -> bool {
     }
 }
 
+/// Indicates whether a line in the program is the first line of a subprogram
+/// definition.
+///
+/// # Arguments
+///
+/// * `line` - The line of code to analyze
+///Returns:
+///    (true, f_name) if line begins a definition for subprogram f_name;
+///    (false, None) if line does not begin a subprogram definition.
 pub fn line_starts_subpgm(line: &String) -> (bool, Option<String>) {
-    /// Indicates whether a line in the program is the first line of a subprogram
-    /// definition.
-    ///
-    /// # Arguments
-    ///
-    /// * `line` - The line of code to analyze
-    ///Returns:
-    ///    (true, f_name) if line begins a definition for subprogram f_name;
-    ///    (false, None) if line does not begin a subprogram definition.
-
     lazy_static! {
         static ref RE_SUB_START: Regex = Regex::new(r"\s*subroutine\s+(\w+)\s*\(").unwrap();
         static ref RE_FN_START: Regex =
@@ -65,28 +63,27 @@ pub fn line_ends_subpgm(line: &String) -> bool {
 }
 
 // TODO: Implement a test for the logic of the function below.
+/// From FORTRAN 77 Language Reference
+/// (https://docs.oracle.com/cd/E19957-01/805-4939/6j4m0vn6l/index.html)   }
+///
+/// A statement takes one or more lines; the first line is called the initial
+/// line; the subsequent lines are called the continuation lines.  You can
+/// format a source line in either of two ways: Standard fixed format,
+/// or Tab format.
+///
+/// In Standard Fixed Format, continuation lines are identified by a nonblank,
+/// nonzero in column 6.
+///
+/// Tab-Format source lines are defined as follows: A tab in any of columns
+/// 1 through 6, or an ampersand in column 1, establishes the line as a
+/// tab-format source line.  If the tab is the first nonblank character, the
+/// text following the tab is scanned as if it started in column 7.
+/// Continuation lines are identified by an ampersand (&) in column 1, or a
+/// nonzero digit after the first tab.
+///
+/// Returns true iff line is a continuation line, else False.  Currently this
+/// is used only for fixed-form input files, i.e., extension is in ('.f', '.for')
 pub fn line_is_continuation(line: &String, extension: &str) -> bool {
-    // From FORTRAN 77 Language Reference
-    // (https://docs.oracle.com/cd/E19957-01/805-4939/6j4m0vn6l/index.html)   }
-
-    // A statement takes one or more lines; the first line is called the initial
-    // line; the subsequent lines are called the continuation lines.  You can
-    // format a source line in either of two ways: Standard fixed format,
-    // or Tab format.
-
-    // In Standard Fixed Format, continuation lines are identified by a nonblank,
-    // nonzero in column 6.
-
-    // Tab-Format source lines are defined as follows: A tab in any of columns
-    // 1 through 6, or an ampersand in column 1, establishes the line as a
-    // tab-format source line.  If the tab is the first nonblank character, the
-    // text following the tab is scanned as if it started in column 7.
-    // Continuation lines are identified by an ampersand (&) in column 1, or a
-    // nonzero digit after the first tab.
-
-    // Returns true iff line is a continuation line, else False.  Currently this
-    // is used only for fixed-form input files, i.e., extension is in ('.f', '.for')
-
     if line_is_comment(&line) {
         return false;
     }
