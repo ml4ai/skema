@@ -3,7 +3,6 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
 use serde_json::Value; // for json
 use std::string::ToString;
-use strum_macros::Display; // used for macro on enums // used for macro on enums
 
 /******** AST for the Gromet Data Structure ********/
 #[derive(Deserialize, Serialize, Debug)]
@@ -287,27 +286,27 @@ mod tests {
 
     #[test]
     fn de_ser_exp0() {
-        test_roundtrip_serialization("../../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json");
+        test_roundtrip_serialization("../../../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json");
     }
 
     #[test]
     fn de_ser_exp2() {
-        test_roundtrip_serialization("../../data/gromet/examples/exp2/exp2--Gromet-FN-auto.json");
+        test_roundtrip_serialization("../../../data/gromet/examples/exp2/exp2--Gromet-FN-auto.json");
     }
 
     #[test]
     fn de_ser_fun3() {
-        test_roundtrip_serialization("../../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json");
+        test_roundtrip_serialization("../../../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json");
     }
 
     #[test]
     fn de_ser_while2() {
-        test_roundtrip_serialization("../../data/gromet/examples/while2/while2--Gromet-FN-auto.json");
+        test_roundtrip_serialization("../../../data/gromet/examples/while2/while2--Gromet-FN-auto.json");
     }
 
     #[test]
     fn de_ser_chime() {
-        let path_example = "../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
+        let path_example = "../../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
         let mut data = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
