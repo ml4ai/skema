@@ -9,6 +9,7 @@ use clap::Parser;
 use std::path::Path;
 
 use comment_extraction::conventions::dssat::get_comments as get_fortran_comments;
+use comment_extraction::languages::python::get_comments as get_python_comments;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -19,14 +20,25 @@ struct Cli {
 fn main() {
     pretty_env_logger::init();
     let args = Cli::parse();
-    let extension = Path::new(&args.filepath)
+    let filepath = &args.filepath;
+    let extension = Path::new(filepath)
         .extension()
         .expect("Unable to get extension for {args.filepath}!")
         .to_str()
         .expect("Unable to convert extension to a valid string!");
 
-    match get_fortran_comments(args.filepath) {
-        Ok(c) => println!("{}", serde_json::to_string(&c).unwrap()),
-        _ => panic!("Error getting the comments"),
-    };
+    if extension == "f" || extension == "for" {
+        let comments = get_fortran_comments(filepath).expect("Error getting the comments!");
+        println!(
+            "{}",
+            serde_json::to_string(&comments).expect("Error serializing the comments to JSON!")
+        );
+    } else if extension == "py" {
+        get_python_comments(filepath);
+    } else {
+        panic!(
+            "Unable to infer programming language for file \"{filepath}\"! \
+            File extension must be one of the following: {{\".py\", \".f\", \".for\"}}"
+        )
+    }
 }

@@ -28,7 +28,7 @@ pub struct Comments {
     subprograms: HashMap<String, SubprogramComments>,
 }
 
-pub fn get_comments(src_file_name: String) -> Result<Comments, Box<dyn Error + 'static>> {
+pub fn get_comments(src_file_name: &str) -> Result<Comments, Box<dyn Error + 'static>> {
     let mut curr_comment: Vec<String> = Vec::new();
     let mut curr_fn: Option<String> = None;
     let mut prev_fn: Option<String> = None;

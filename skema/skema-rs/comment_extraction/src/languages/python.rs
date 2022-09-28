@@ -119,13 +119,17 @@ fn parse(input: Span) -> IResult<Span, Comments> {
     Ok((remaining_input, matched))
 }
 
-#[test]
-fn test_parser() {
-    let contents = std::fs::read_to_string("tests/data/CHIME_SIR.py").unwrap();
+pub fn get_comments(src_file_path: &str) {
+    let contents = std::fs::read_to_string(src_file_path).unwrap();
     let span = Span::new(&contents);
     let result = comments(span);
     match result {
         Ok((_, c)) => println!("{}", serde_json::to_string(&c).unwrap()),
         _ => panic!("Error getting the comments"),
     };
+}
+
+#[test]
+fn test_parser() {
+    get_comments("tests/data/CHIME_SIR.py");
 }
