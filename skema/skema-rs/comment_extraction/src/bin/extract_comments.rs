@@ -1,13 +1,13 @@
-// Program to get comments from a source code file.
-// Original version for handling Fortran code written by Saumya Debray in Python for the AutoMATES
-// project (https://ml4ai.github.io/automates)
-// This Rust port was written by Adarsh Pyarelal for the SKEMA project.
+//! Program to get comments from a source code file.
+//! Original logic for handling Fortran code was implemented by Saumya Debray in Python for the
+//! AutoMATES project (https://ml4ai.github.io/automates), and ported over to this Rust version by
+//! Adarsh Pyarelal for the SKEMA project.
 
 use pretty_env_logger;
 
 use clap::Parser;
-use std::path::Path;
 use std::fs::write;
+use std::path::Path;
 
 use comment_extraction::conventions::dssat::get_comments as get_fortran_comments;
 use comment_extraction::languages::python::get_comments as get_python_comments;
@@ -17,8 +17,9 @@ struct Cli {
     /// Path to input source code file
     input: String,
 
-    /// Path to output file
-    output: String,
+    /// Optional path to output file. If this is not specified, the program will print the
+    /// output to the standard output instead of writing to a file.
+    output: Option<String>,
 }
 
 fn main() {
@@ -34,11 +35,20 @@ fn main() {
     if extension == "f" || extension == "for" {
         let comments = get_fortran_comments(input).unwrap();
         let comments = serde_json::to_string(&comments).unwrap();
-        write(&args.output, comments).expect("Unable to write to file!");
+
+        if let Some(path) = args.output {
+            write(path, comments).expect("Unable to write to file!");
+        } else {
+            println!("{}", comments);
+        }
     } else if extension == "py" {
         let comments = get_python_comments(input);
         let comments = serde_json::to_string(&comments).unwrap();
-        write(&args.output, comments).expect("Unable to write to file!");
+        if let Some(path) = args.output {
+            write(path, comments).expect("Unable to write to file!");
+        } else {
+            println!("{}", comments);
+        }
     } else {
         panic!(
             "Unable to infer programming language for file \"{input}\"! \
