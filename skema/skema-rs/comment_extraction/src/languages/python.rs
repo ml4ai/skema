@@ -10,7 +10,6 @@ use nom::{
 };
 use nom_locate::{position, LocatedSpan};
 use serde::{Deserialize, Serialize};
-use serde_json;
 use std::collections::HashMap;
 
 type Span<'a> = LocatedSpan<&'a str>;
@@ -109,14 +108,11 @@ fn comments(input: Span) -> IResult<Span, Comments> {
     })(input)
 }
 
-pub fn get_comments(src_file_path: &str) {
+pub fn get_comments(src_file_path: &str) -> Comments {
     let contents = std::fs::read_to_string(src_file_path).unwrap();
     let span = Span::new(&contents);
-    let result = comments(span);
-    match result {
-        Ok((_, c)) => println!("{}", serde_json::to_string(&c).unwrap()),
-        _ => panic!("Error getting the comments"),
-    };
+    let (_, result) = comments(span).unwrap();
+    result
 }
 
 #[test]
