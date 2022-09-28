@@ -54,7 +54,7 @@ pub struct GrometBox {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -66,7 +66,7 @@ pub struct GrometPort {
     #[serde(rename = "box")]
     pub r#box: u8,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>, // pof: 473, 582, b: 685, 702, 719, 736, most b's
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -76,7 +76,7 @@ pub struct GrometWire {
     pub src: u8,
     pub tgt: u8,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -84,13 +84,13 @@ pub struct GrometBoxLoop {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub condition: Option<i32>,
+    pub condition: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub init: Option<i32>,
+    pub init: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub body: Option<i32>,
+    pub body: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
 }
 // condition, body_if, and body_else don't match online documentation
 // They are vecs of gromet boxes not integers...
@@ -99,15 +99,15 @@ pub struct GrometBoxConditional {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub condition: Option<i32>,
+    pub condition: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub body: Option<i32>, // This exist is CHIME v2, but not in documentation...
+    pub body: Option<u32>, // This exist is CHIME v2, but not in documentation...
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub body_if: Option<i32>,
+    pub body_if: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub body_else: Option<i32>,
+    pub body_else: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -216,6 +216,8 @@ pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata_type: Option<String>, // Could be enum?
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_version: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>, // only in highest meta
     #[serde(skip_serializing_if = "Option::is_none")]
     pub global_reference_id: Option<String>, // only in highest meta
@@ -243,12 +245,16 @@ pub struct Metadata {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Gromet {
+    pub schema: String,
+    pub schema_version: String,
     pub name: String,
     #[serde(rename = "fn")]
     pub r#fn: FunctionNet,
     pub attributes: Vec<Attribute>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata_collection: Option<Vec<Vec<Metadata>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<u32>,
 }
 
 // Methods
@@ -257,6 +263,7 @@ pub struct Gromet {
 fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Error> {
     Ok(match Value::deserialize(deserializer)? {
         Value::Number(num) => num.to_string(),
+        // Need to add support for a list of values...
         _ => return Err(de::Error::custom("wrong type")),
     })
 }
@@ -290,52 +297,47 @@ mod tests {
         let mut file_contents = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&file_contents).expect("Unable to parse");
-        let res_serialized = serde_json::to_string(&res).unwrap();
+        let mut res_serialized = serde_json::to_string(&res).unwrap();
 
         // processing the imported data
         file_contents = file_contents.replace("\n", "").replace(" ", "");
+        res_serialized = res_serialized.replace("\n", "").replace(" ", "");
 
         assert_eq!(res_serialized, file_contents);
     }
 
     #[test]
     fn de_ser_exp0() {
-        test_roundtrip_serialization("../../data/gromet/examples/exp0/exp0--Gromet-FN-auto.json");
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/exp0/FN_0.1.4/exp0--Gromet-FN-auto.json",
+        );
     }
 
     #[test]
     fn de_ser_exp2() {
-        test_roundtrip_serialization("../../data/gromet/examples/exp2/exp2--Gromet-FN-auto.json");
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/exp2/FN_0.1.4/exp2--Gromet-FN-auto.json",
+        );
     }
 
     #[test]
     fn de_ser_fun3() {
-        test_roundtrip_serialization("../../data/gromet/examples/fun3/fun3--Gromet-FN-auto.json");
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/fun3/FN_0.1.4/fun3--Gromet-FN-auto.json",
+        );
     }
 
     #[test]
     fn de_ser_while2() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/while2/while2--Gromet-FN-auto.json",
+            "../../data/gromet/examples/while2/FN_0.1.4/while2--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_chime() {
-        let path_example = "../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.2/CHIME_SIR_while_loop--Gromet-FN-auto_v2.json";
-        let mut data = fs::read_to_string(path_example).expect("Unable to read file");
-
-        let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
-        let mut res_serialized = serde_json::to_string(&res).unwrap();
-
-        // processing serialized data
-        res_serialized = res_serialized.replace("\n", "");
-        res_serialized = res_serialized.replace(" ", "");
-
-        // processing the imported data
-        data = data.replace("\n", "");
-        data = data.replace(" ", "");
-
-        assert_eq!(res_serialized, data);
+        test_roundtrip_serialization(
+            "../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.4/CHIME_SIR_while_loop--Gromet-FN-auto.json",
+        );
     }
 }
