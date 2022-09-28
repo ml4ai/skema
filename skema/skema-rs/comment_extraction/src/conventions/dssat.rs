@@ -31,7 +31,7 @@ pub struct Comments {
 pub fn get_comments(src_file_name: &str) -> Result<Comments, Box<dyn Error + 'static>> {
     let mut curr_comment: Vec<String> = Vec::new();
     let mut curr_fn: Option<String> = None;
-    let mut prev_fn: Option<String> = None;
+    let mut prev_fn: Option<String>;
     let mut in_neck = false;
     let mut comments = Comments::default();
     let extension = Path::new(&src_file_name)
@@ -110,5 +110,5 @@ pub fn get_comments(src_file_name: &str) -> Result<Comments, Box<dyn Error + 'st
 
 #[test]
 fn test_get_comments() {
-    get_comments("../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.for".to_string());
+    get_comments("../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.for");
 }

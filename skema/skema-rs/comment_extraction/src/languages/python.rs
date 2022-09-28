@@ -1,24 +1,21 @@
 use nom::{
     branch::alt,
-    bytes::complete::{is_not, tag, take_until, take_while},
+    bytes::complete::{tag, take_until, take_while},
     character::complete::{
-        alpha1, alphanumeric0, anychar, line_ending, none_of, not_line_ending, space0,
+        line_ending, not_line_ending, space0,
     },
-    character::is_alphanumeric,
-    combinator::{not, opt, recognize, value},
-    multi::{fold_many0, many0},
-    sequence::{delimited, pair, preceded, tuple},
+    multi::fold_many0,
+    sequence::{delimited, tuple},
     IResult,
 };
 use nom_locate::{position, LocatedSpan};
 use serde::{Deserialize, Serialize};
 use serde_json;
 use std::collections::HashMap;
-use strum_macros::Display; // used for macro on enums // used for macro on enums
 
 type Span<'a> = LocatedSpan<&'a str>;
 
-#[derive(Debug, Display, Clone, Serialize, Deserialize)]
+#[derive(Debug, strum_macros::Display, Clone, Serialize, Deserialize)]
 enum Statement {
     WholeLineComment(u32, String),
     Docstring {
@@ -53,13 +50,13 @@ pub struct Comments {
 /// Whole line comments
 fn whole_line_comment(input: Span) -> IResult<Span, Statement> {
     let (s, x) = delimited(tuple((space0, tag("#"))), not_line_ending, line_ending)(input)?;
-    let (s, pos) = position(s)?;
+    let (_, pos) = position(s)?;
     let line = pos.location_line() - 1;
     Ok((s, Statement::WholeLineComment(line, x.to_string())))
 }
 
 fn docstring(input: Span) -> IResult<Span, Statement> {
-    let mut func_declaration = delimited(
+    let func_declaration = delimited(
         tuple((space0, tag("def "))),
         name,
         tuple((tag("("), take_until("):"), tag("):"), line_ending, space0)),
@@ -110,13 +107,6 @@ fn comments(input: Span) -> IResult<Span, Comments> {
         }
         acc
     })(input)
-}
-
-fn parse(input: Span) -> IResult<Span, Comments> {
-    let (remaining_input, matched) = comments(input)?;
-    let (s, pos) = position(remaining_input)?;
-
-    Ok((remaining_input, matched))
 }
 
 pub fn get_comments(src_file_path: &str) {
