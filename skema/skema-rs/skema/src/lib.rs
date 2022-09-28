@@ -3,7 +3,6 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
 use serde_json::Value; // for json
 use std::string::ToString;
-use strum_macros::Display; // used for macro on enums // used for macro on enums
 
 /******** AST for the Gromet Data Structure ********/
 #[derive(Deserialize, Serialize, Debug)]
@@ -311,105 +310,105 @@ mod tests {
     #[test]
     fn de_ser_cond1() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/cond1/FN_0.1.4/cond1--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/cond1/FN_0.1.4/cond1--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_dict1() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/dict1/FN_0.1.4/dict1--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/dict1/FN_0.1.4/dict1--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_exp0() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/exp0/FN_0.1.4/exp0--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/exp0/FN_0.1.4/exp0--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_exp1() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/exp1/FN_0.1.4/exp1--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/exp1/FN_0.1.4/exp1--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_exp2() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/exp2/FN_0.1.4/exp2--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/exp2/FN_0.1.4/exp2--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_for1() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/for1/FN_0.1.4/for1--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/for1/FN_0.1.4/for1--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_fun1() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/fun1/FN_0.1.4/fun1--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/fun1/FN_0.1.4/fun1--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_fun2() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/fun2/FN_0.1.4/fun2--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/fun2/FN_0.1.4/fun2--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_fun3() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/fun3/FN_0.1.4/fun3--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/fun3/FN_0.1.4/fun3--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_fun4() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/fun4/FN_0.1.4/fun4--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/fun4/FN_0.1.4/fun4--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_while1() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/while1/FN_0.1.4/while1--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/while1/FN_0.1.4/while1--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_while2() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/while2/FN_0.1.4/while2--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/while2/FN_0.1.4/while2--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_while3() {
         test_roundtrip_serialization(
-            "../../data/gromet/examples/while3/FN_0.1.4/while3--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/while3/FN_0.1.4/while3--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_chime() {
         test_roundtrip_serialization(
-            "../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.4/CHIME_SIR_while_loop--Gromet-FN-auto.json",
+            "../../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.4/CHIME_SIR_while_loop--Gromet-FN-auto.json",
         );
     }
 
     #[test]
     fn de_ser_chime_sviivr() {
         test_roundtrip_serialization(
-            "../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.4/CHIME_SVIIvR--Gromet-FN-auto.json",
+            "../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.4/CHIME_SVIIvR--Gromet-FN-auto.json",
         );
     }
 }
