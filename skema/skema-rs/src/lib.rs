@@ -263,7 +263,9 @@ pub struct Gromet {
 fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Error> {
     Ok(match Value::deserialize(deserializer)? {
         Value::Number(num) => num.to_string(),
-        // Need to add support for a list of values...
+        // Need to add support for List types (SVIIvR) --- This one is nontrivial...
+        // Need to add support for Boolean type (for1) --- This will need to get parsed into a string and serialized into a boolean
+        // Need to add support for Map types (dict1) --- This is already a string and will just stay as one
         _ => return Err(de::Error::custom("wrong type")),
     })
 }
@@ -307,9 +309,30 @@ mod tests {
     }
 
     #[test]
+    fn de_ser_cond1() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/cond1/FN_0.1.4/cond1--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_dict1() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/dict1/FN_0.1.4/dict1--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
     fn de_ser_exp0() {
         test_roundtrip_serialization(
             "../../data/gromet/examples/exp0/FN_0.1.4/exp0--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_exp1() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/exp1/FN_0.1.4/exp1--Gromet-FN-auto.json",
         );
     }
 
@@ -321,9 +344,44 @@ mod tests {
     }
 
     #[test]
+    fn de_ser_for1() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/for1/FN_0.1.4/for1--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_fun1() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/fun1/FN_0.1.4/fun1--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_fun2() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/fun2/FN_0.1.4/fun2--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
     fn de_ser_fun3() {
         test_roundtrip_serialization(
             "../../data/gromet/examples/fun3/FN_0.1.4/fun3--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_fun4() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/fun4/FN_0.1.4/fun4--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_while1() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/while1/FN_0.1.4/while1--Gromet-FN-auto.json",
         );
     }
 
@@ -335,9 +393,23 @@ mod tests {
     }
 
     #[test]
+    fn de_ser_while3() {
+        test_roundtrip_serialization(
+            "../../data/gromet/examples/while3/FN_0.1.4/while3--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
     fn de_ser_chime() {
         test_roundtrip_serialization(
             "../../data/epidemiology/CHIME/CHIME_SIR_model/gromet/FN_0.1.4/CHIME_SIR_while_loop--Gromet-FN-auto.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_chime_sviivr() {
+        test_roundtrip_serialization(
+            "../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.4/CHIME_SVIIvR--Gromet-FN-auto.json",
         );
     }
 }
