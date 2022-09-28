@@ -14,6 +14,7 @@ ThisBuild / crossScalaVersions := Seq(scala12, scala11, scala13, scala3)
 ThisBuild / scalaVersion := crossScalaVersions.value.head
 
 resolvers ++= Seq(
+  ("Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release").withAllowInsecureProtocol(true)
 //  Resolvers.localResolver,  // Reserve for Two Six.
 //  Resolvers.clulabResolver, // glove
 //  Resolvers.jitpackResolver // Ontologies
@@ -35,7 +36,9 @@ libraryDependencies ++= {
     "com.typesafe"                % "config"                  % "1.4.1",        // as of 2021-12-31 up to 1.4.1
     // scala
     "org.scala-lang.modules"     %% "scala-collection-compat" % "2.6.0",        // as of 2021-12-31 up to 2.6.0
-    "org.scalatest"              %% "scalatest"               % "3.2.10" % Test // as of 2021-12-31 up to 3.2.10
+    "org.scalatest"              %% "scalatest"               % "3.2.10" % Test, // as of 2021-12-31 up to 3.2.10
+    "org.clulab"                 %% "processors-main"         % "8.5.2",
+    "com.lihaoyi"                %% "ujson"                   % "2.0.0"
   ) ++ parallelLibraries
 }
 
