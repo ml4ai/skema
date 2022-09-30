@@ -251,11 +251,22 @@ fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Err
         Value::Number(num) => num.to_string(),
         Value::Bool(boo) => boo.to_string(),
         //Value::Array(vl) => vl.to_string(),
-        //Value::Object(map) => map.as_str(),
-        Value::String(strng) => String::from(strng),
+        Value::Object(map) => format!("{:?}", map),
+        Value::String(strng) => {
+            let mut it = strng.chars().peekable();
+            let c = if let Some(&c) = it.peek() { c } else { '_' };
+            match c {
+                '{' => {
+                    format!("{}", strng)
+                }
+                _ => {
+                    println!("{:?}", strng);
+                    format!("{:?}", strng)
+                }
+            }
+            // Add conditional that will takes maps starting with '{' and format {} but for other strings format as {:?} to parse later as '"'
+        }
         // Need to add support for List types (SVIIvR) --- This one is nontrivial...
-        // Need to add support for Boolean type (for1) --- This will need to get parsed into a string and serialized into a boolean
-        // Need to add support for Map types (dict1) --- This is already a string and will just stay as one
         _ => return Err(de::Error::custom("Not Recognized Type")),
     })
 }
@@ -271,6 +282,11 @@ where
     let mut it = x.chars().peekable();
     let c = if let Some(&c) = it.peek() { c } else { 'x' };
     match c {
+        '{' => s.serialize_str(x),
+        '"' => {
+            let char_vec: Vec<char> = x.chars().collect();
+            s.serialize_char(char_vec[1])
+        }
         't' | 'f' => {
             let parse_bool: bool = x.parse().unwrap();
             s.serialize_bool(parse_bool)
@@ -320,7 +336,7 @@ mod tests {
     #[test]
     fn de_ser_dict1() {
         test_roundtrip_serialization(
-            "../../../data/gromet/examples/dict1/FN_0.1.4/dict1--Gromet-FN-auto.json",
+            "../../../data/gromet/examples/dict1/FN_0.1.4/dict1--Gromet-FN-auto-meta.json",
         );
     }
 
