@@ -100,7 +100,8 @@ fn main() {
                             indexes: vec![
                                 idxs[entry.value.bl.as_ref().unwrap()[0].condition.unwrap()
                                     as usize],
-                                idxs[entry.value.bl.as_ref().unwrap()[0].body.unwrap() as usize],
+                                idxs[(entry.value.bl.as_ref().unwrap()[0].body.unwrap() - 1)
+                                    as usize],
                             ],
                         };
                         let uf = Subroutine {

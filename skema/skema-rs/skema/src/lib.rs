@@ -8,16 +8,6 @@ use std::string::ToString;
 #[derive(Deserialize, Serialize, Debug)]
 #[serde(rename_all = "UPPERCASE")] // Allows variants to match to uppercase json values
 #[derive(strum_macros::Display)] // Allows variants to be printed as strings if needed
-pub enum Label {
-    // This is the enum of types of labels we can assign to the Gromet
-    PreProcess,
-    Model,
-    PostProcess,
-}
-
-#[derive(Deserialize, Serialize, Debug)]
-#[serde(rename_all = "UPPERCASE")] // Allows variants to match to uppercase json values
-#[derive(strum_macros::Display)] // Allows variants to be printed as strings if needed
 pub enum FnType {
     Fn,
     Import,
@@ -187,9 +177,6 @@ pub struct Attribute {
     pub index: Option<u8>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    // This is for labeling the parts of the function network.
-    pub label: Option<Label>, // Right now we are doing this at the attribute level.
 }
 
 #[derive(Deserialize, Serialize, Debug)]
@@ -262,10 +249,14 @@ pub struct Gromet {
 fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Error> {
     Ok(match Value::deserialize(deserializer)? {
         Value::Number(num) => num.to_string(),
+        Value::Bool(boo) => boo.to_string(),
+        //Value::Array(vl) => vl.to_string(),
+        //Value::Object(map) => map.as_str(),
+        Value::String(strng) => String::from(strng),
         // Need to add support for List types (SVIIvR) --- This one is nontrivial...
         // Need to add support for Boolean type (for1) --- This will need to get parsed into a string and serialized into a boolean
         // Need to add support for Map types (dict1) --- This is already a string and will just stay as one
-        _ => return Err(de::Error::custom("wrong type")),
+        _ => return Err(de::Error::custom("Not Recognized Type")),
     })
 }
 
@@ -275,16 +266,28 @@ fn se_value<S>(x: &str, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
-    // This is an interim solution for numerics, non numerics will require custom serialization for entire ValueL struct.
-    let mut parse_f32: f32 = x.parse().unwrap();
+    // Having to implement a custom parser based on the first character of the strings.
+    // t | f for bools, else for numbers, should be able to extend to { for maps and [ for lists
+    let mut it = x.chars().peekable();
+    let c = if let Some(&c) = it.peek() { c } else { 'x' };
+    match c {
+        't' | 'f' => {
+            let parse_bool: bool = x.parse().unwrap();
+            s.serialize_bool(parse_bool)
+        }
+        _ => {
+            // This is an interim solution for numerics, non numerics will require custom serialization for entire ValueL struct.
+            let mut parse_f32: f32 = x.parse().unwrap();
 
-    if parse_f32 == parse_f32.round() {
-        // if the float can be truncated without percision loss, truncate
-        s.serialize_i32(parse_f32 as i32)
-    } else {
-        // else include up to 7 digits for now, as per GroMEt specs
-        parse_f32 = (parse_f32 * 10_000_000.0).round() / 10_000_000.0;
-        s.serialize_f32(parse_f32)
+            if parse_f32 == parse_f32.round() {
+                // if the float can be truncated without percision loss, truncate
+                s.serialize_i32(parse_f32 as i32)
+            } else {
+                // else include up to 7 digits for now, as per GroMEt specs
+                parse_f32 = (parse_f32 * 10_000_000.0).round() / 10_000_000.0;
+                s.serialize_f32(parse_f32)
+            }
+        }
     }
 }
 
@@ -408,7 +411,7 @@ mod tests {
     #[test]
     fn de_ser_chime_sviivr() {
         test_roundtrip_serialization(
-            "../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.4/CHIME_SVIIvR--Gromet-FN-auto.json",
+            "../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.4/CHIME_SVIIvR--Gromet-FN-auto-no_lists.json",
         );
     }
 }
