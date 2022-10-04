@@ -250,17 +250,23 @@ fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Err
     Ok(match Value::deserialize(deserializer)? {
         Value::Number(num) => num.to_string(),
         Value::Bool(boo) => boo.to_string(),
-        //Value::Array(vl) => vl.to_string(),
-        Value::Object(map) => format!("{:?}", map),
+        Value::Array(vl) => {
+            // need to construct an instance of the vector here then stringify it
+            let vals = serde_json::to_string(&vl).unwrap();
+            format!("{}", vals)
+        } // this will encode the vector as a string, re-serializing will be more difficult though
+        Value::Object(map) => {
+            let f = format!("{:?}", map);
+            format!("{}", f)
+        } // this handles if the map is encoded as a map, make sure this still works with character matching..
         Value::String(strng) => {
             let mut it = strng.chars().peekable();
             let c = if let Some(&c) = it.peek() { c } else { '_' };
             match c {
                 '{' => {
-                    format!("{}", strng)
+                    format!("{}", strng) // This handles if the map is encoded as a string
                 }
                 _ => {
-                    println!("{:?}", strng);
                     format!("{:?}", strng)
                 }
             }
@@ -272,17 +278,22 @@ fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Err
 }
 
 // This is a custom serialization of the value field in the Value struct.
-// Currently only for numerical values, as gromets develope will need maintaince. Ideally we could run match control flow to determine the type and how to parse, similar to the deserialization for this field.
 fn se_value<S>(x: &str, s: S) -> Result<S::Ok, S::Error>
 where
     S: Serializer,
 {
     // Having to implement a custom parser based on the first character of the strings.
     // t | f for bools, else for numbers, should be able to extend to { for maps and [ for lists
-    let mut it = x.chars().peekable();
+    let mut it = x.chars().peekable(); // characterization allows for handling most edge cases, (strings named after primatives)
     let c = if let Some(&c) = it.peek() { c } else { 'x' };
+    // we run a match on the first character because otherwise we would need to know every possible string if we run it on the full words.
+    // 't' and 'f' are unique as characters are encoded as "t" so if there is a character "t" it will be parsed correctly
     match c {
-        '{' => s.serialize_str(x),
+        '[' => {
+            let vals: Vec<ValueL> = serde_json::from_str(x).unwrap();
+            s.collect_seq(vals.iter()) // This is to serialize a vector, WARNING: serde is only implemented for vecs up to length 32 by default.
+        } // now to serialize the array of vectors that is encoded as a string
+        '{' => s.serialize_str(x), // This is just if maps are serialized as strings, change if that changes
         '"' => {
             let char_vec: Vec<char> = x.chars().collect();
             s.serialize_char(char_vec[1])
@@ -428,6 +439,13 @@ mod tests {
     fn de_ser_chime_sviivr() {
         test_roundtrip_serialization(
             "../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.4/CHIME_SVIIvR--Gromet-FN-auto-no_lists.json",
+        );
+    }
+
+    #[test]
+    fn de_ser_chime_sviivr_lists() {
+        test_roundtrip_serialization(
+            "../../../data/epidemiology/CHIME/CHIME_SVIIvR_model/gromet/FN_0.1.4/CHIME_SVIIvR--Gromet-FN-auto.json",
         );
     }
 }

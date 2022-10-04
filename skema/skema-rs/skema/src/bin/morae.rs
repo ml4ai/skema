@@ -50,6 +50,8 @@ fn main() {
     let data = fs::read_to_string(path).expect("Unable to read file");
     let res: Gromet = serde_json::from_str(&data).expect("Unable to parse");
 
+    let _res_serial = serde_json::to_string(&res).unwrap();
+
     let mut subroutines: Vec<Subroutine> = vec![];
     let mut idx = 1;
     // iterate through the attributes
@@ -212,15 +214,15 @@ fn main() {
     }
 
     // we now perform a check to make sure every entry in attributes has been captured and there are no duplicates
-    let mut tot = 0; // This starting at 1 is because main is not counted as a dependency
+    //let mut tot = 0; // This starting at 1 is because main is not counted as a dependency
     for i in 0..subroutines_contracted.len() {
         subroutines_contracted[i].indexes.sort();
         subroutines_contracted[i].indexes.dedup();
-        tot += subroutines_contracted[i].indexes.len();
+        //tot += subroutines_contracted[i].indexes.len();
     }
 
     // we now label each function, for coarse grain labeling
-    if tot == res.attributes.len() {
+    /*if tot == res.attributes.len() {
         println!("All attributes accounted for!");
     } else {
         println!(
@@ -228,7 +230,7 @@ fn main() {
             tot,
             res.attributes.len()
         );
-    }
+    }*/
 
     // now for the implementation of the heuristics for labeling, note we have the contracted, trimmed subroutines and the raw uncontracted and untrimmed subroutines to work with.
 
@@ -317,7 +319,7 @@ fn main() {
 
     // printing results
     // println!("{:?}", subroutines);
-    println!("{:?}", subroutines_contracted);
-    println!("{:?}", roles);
+    println!("\n{:?}\n", subroutines_contracted);
+    println!("{:?}\n", roles);
     // let res_serialized = serde_json::to_string_pretty(&res).unwrap();
 }
