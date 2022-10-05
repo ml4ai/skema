@@ -1,0 +1,33 @@
+graph G {
+	subgraph clusterA {
+		subgraph clusterC {
+			node [shape=box]
+			x
+		}
+	}
+	subgraph clusterB {
+		node [shape=box]
+		"opo-1" [fontcolor=white]
+		subgraph "cluster-2" {
+			label=2
+			node [shape=box]
+			"pof-1" [fontcolor=white]
+		}
+		subgraph "cluster-3" {
+			label=3
+			node [shape=box]
+			"pof-2" [fontcolor=white]
+		}
+		subgraph "cluster-+" {
+			label="+"
+			node [shape=box]
+			"pif-1" [fontcolor=white]
+			"pif-2" [fontcolor=white]
+			"pof-3" [fontcolor=white]
+		}
+	}
+	"pif-1" -- "pof-1"
+	"pif-2" -- "pof-2"
+	"opo-1" -- "pof-3"
+	clusterC -- clusterB
+}
