@@ -7,7 +7,7 @@ package org.ml4ai.grounding
  * @param description of the concept
  * @param synonyms Optional list of synonyms
  */
-case class GroundingConcept(id:String, name:String, description:Option[String], synonyms:Option[Seq[String]]) {
+case class GroundingConcept(id:String, name:String, description:Option[String], synonyms:Option[Seq[String]], embedding:Option[Array[Float]]) {
   override def equals( arg:Any): Boolean = arg match {
     case other:GroundingConcept => other.id == this.id
     case _ => false
