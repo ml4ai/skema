@@ -60,4 +60,10 @@ object MiraEmbeddingsGrounder{
    */
   def apply(miraJsonFile:File, wordEmbeddingsFile:File) =
     new MiraEmbeddingsGrounder(parseMiraJson(miraJsonFile), loadWordEmbeddings(wordEmbeddingsFile))
+
+  // TODO: Pre-process the embedidngs for the ontology offline
+  def createOntologyEmbeddings(concepts:Seq[GroundingConcept]):IndexedSeq[GroundingConcept] = ???
+
+  // TODO: Deserialize the ontology with the pre-processed embeddings
+  def loadPreProcessedOntology(path:File):IndexedSeq[GroundingConcept] = ???
 }
