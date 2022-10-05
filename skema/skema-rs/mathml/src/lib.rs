@@ -1,51 +1,75 @@
+// The line below is required for recursive enum definitions to work.
+#![cfg(feature = "alloc")]
+
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    combinator::value,
     multi::many0,
-    sequence::delimited,
+    sequence::{delimited, pair},
     IResult,
 };
 use nom_locate::{position, LocatedSpan};
 
 type Span<'a> = LocatedSpan<&'a str>;
 
-#[derive(Debug, PartialEq)]
-struct Mi(String);
-
-#[derive(Debug, PartialEq)]
-struct Mo(String);
-
+fn test_equality<P, O>(input: &str, parser: P, output: O) {
+    assert_eq!(P(Span::new("<mo>=</mo>")).unwrap().1, O);
+}
 #[derive(Debug, PartialEq)]
 enum MathExpression {
-    Mi(Mi),
-    Mo(Mo),
+    Mi(String),
+    Mo(String),
+    Mrow(Vec<MathExpression>),
+    Mfrac(MathExpression, MathExpression),
+    Msub(MathExpression, MathExpression),
 }
 
-fn mi(input: Span) -> IResult<Span, Mi> {
+fn mi(input: Span) -> IResult<Span, MathExpression> {
     let (s, element) = delimited(tag("<mi>"), take_until("</mi>"), tag("</mi>"))(input)?;
     let element = element.to_string();
-    Ok((s, Mi(element)))
+    Ok((s, MathExpression::Mi(element)))
 }
 
 #[test]
 fn test_mi() {
-    assert_eq!(mi(Span::new("<mi>x</mi>")).unwrap().1, Mi("x".to_string()));
+    //assert_eq!(
+    //mi(Span::new("<mi>x</mi>")).unwrap().1,
+    //MathExpression::Mi("x".to_string())
+    //);
+    test_equality(mi, "<mi>x</mi>", MathExpression::Mi("x".to_string()));
 }
 
-fn mo(input: Span) -> IResult<Span, Mo> {
+fn mo(input: Span) -> IResult<Span, MathExpression> {
     let (s, element) = delimited(tag("<mo>"), take_until("</mo>"), tag("</mo>"))(input)?;
     let element = element.to_string();
-    Ok((s, Mo(element)))
+    Ok((s, MathExpression::Mo(element)))
+}
+
+fn math_expression(input: Span) -> IResult<Span, MathExpression> {
+    alt((mi, mo))(input)
 }
 
 #[test]
 fn test_mo() {
-    assert_eq!(mo(Span::new("<mo>=</mo>")).unwrap().1, Mo("=".to_string()));
+    assert_eq!(
+        mo(Span::new("<mo>=</mo>")).unwrap().1,
+        MathExpression::Mo("=".to_string())
+    );
 }
 
-#[derive(Debug, PartialEq)]
-struct Mrow(Vec<MathExpression>);
+fn mrow(input: Span) -> IResult<Span, MathExpression> {
+    let (s, elements) = delimited(tag("<mrow>"), many0(math_expression), tag("</mrow>"))(input)?;
+    Ok((s, MathExpression::Mrow(elements)))
+}
+
+fn mfrac(input: Span) -> IResult<Span, MathExpression> {
+    let (s, (numerator, denominator)) = delimited(
+        tag("<mfrac>"),
+        pair(math_expression, math_expression),
+        tag("</mfrac>"),
+    )(input)?;
+    Ok((s, MathExpression::Mfrac(numerator, denominator)))
+}
 
 #[derive(Debug, PartialEq)]
 struct Math {
