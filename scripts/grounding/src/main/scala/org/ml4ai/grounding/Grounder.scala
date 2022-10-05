@@ -11,7 +11,7 @@ trait Grounder {
    * @param k number of max candidates to return
    * @return ranked list with the top k candidates
    */
-  def groundingCandidates(text:String, k:Int = 1): Seq[GroundingCandidate]
+  def groundingCandidates(text:String, k:Int = 1): List[GroundingCandidate]
 
   /**
    * Returns the top-ranked grounding candidate
@@ -19,7 +19,12 @@ trait Grounder {
    * @return Some grounding concept if matched, None if didn't match any element of the ontology
    */
   def ground(text:String): Option[GroundingConcept] = groundingCandidates(text) match {
-    case GroundingCandidate(topChoice, _)::_ => Some(topChoice)
-    case _ => None
+    case GroundingCandidate(topChoice, _)::_ => {
+      val x = 0
+      Some(topChoice)
+    }
+    case y => {
+      None
+    }
   }
 }

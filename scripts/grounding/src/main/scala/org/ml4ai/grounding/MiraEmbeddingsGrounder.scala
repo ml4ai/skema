@@ -18,7 +18,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
    * @param k    number of max candidates to return
    * @return ranked list with the top k candidates
    */
-  override def groundingCandidates(text: String, k: Int = 1): Seq[GroundingCandidate] = {
+  override def groundingCandidates(text: String, k: Int = 1): List[GroundingCandidate] = {
     // Generate the embedding of text
     val thisTextEmbedding = generateEmbedding(text, embeddingsModel)
     // Loop over the grounding concepts and get cosine similarity between input embedding and each concept
@@ -40,7 +40,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     val topKindices = sortedIndices.take(k)
     val topSimilarities = sortedCosineSimilarities.take(k)
     val topConcepts = topKindices.map(groundingConcepts)
-    topConcepts.zip(topSimilarities).map{case (concept, similarity) => GroundingCandidate(concept, similarity)}
+    topConcepts.zip(topSimilarities).map{case (concept, similarity) => GroundingCandidate(concept, similarity)}.toList
   }
 }
 
@@ -117,7 +117,7 @@ object MiraEmbeddingsGrounder{
 
   def generateEmbedding(name: String, embeddings: WordEmbeddingMap): Array[Float] = {
     // Tokenize the string
-    val tokens = processor.mkDocument(name).sentences.head.words
+    val tokens = processor.mkDocument(name.toLowerCase).sentences.head.words
 
     val OOV = Array.fill(embeddings.dim)(0.0f)
 
@@ -132,15 +132,15 @@ object MiraEmbeddingsGrounder{
   def addEmbeddingToConcept(concept: GroundingConcept, embeddingsModel: WordEmbeddingMap): GroundingConcept = {
 
 
-    val embedding = generateEmbedding(concept.name, embeddingsModel)
+    val embedding = generateEmbedding(concept.name.toLowerCase, embeddingsModel)
 
     val descEmbeddings = concept.description match {
-      case Some(description) => List(generateEmbedding(description, embeddingsModel))
+      case Some(description) => List(generateEmbedding(description.toLowerCase, embeddingsModel))
       case None => Nil
     }
 
     val synEmbeddings = concept.synonyms match {
-      case Some(synonyms) => synonyms.map(s => generateEmbedding(s, embeddingsModel))
+      case Some(synonyms) => synonyms.map(s => generateEmbedding(s.toLowerCase, embeddingsModel))
       case None => Nil
     }
 
