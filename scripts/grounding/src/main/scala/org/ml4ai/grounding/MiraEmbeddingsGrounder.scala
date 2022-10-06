@@ -99,11 +99,12 @@ object MiraEmbeddingsGrounder{
    * @param ontologyFile file containing the json file with MIRA concepts
    * @param wordEmbeddingsFile file containing the word embedding model
    */
-  def apply(ontologyFile:File, wordEmbeddingsFile:File): MiraEmbeddingsGrounder = {
+  def apply(ontologyFile:File, wordEmbeddingsFile:Option[File] = None): MiraEmbeddingsGrounder = {
 
-    // Uncomment to load embeddings from file
-    // val embeddingsModel = loadWordEmbeddingsFromTextFile(wordEmbeddingsFile)
-    val embeddingsModel = loadWordEmbeddingsFromResource("/org/clulab/epimodel/model_streamed_trigram.ser")
+    val embeddingsModel = wordEmbeddingsFile match {
+      case Some(file) => loadWordEmbeddingsFromTextFile(file)
+      case None => loadWordEmbeddingsFromResource("/org/clulab/epimodel/model_streamed_trigram.ser")
+    }
 
     val ontology =
       if(ontologyFile.getName.endsWith(".ser")){
@@ -113,7 +114,6 @@ object MiraEmbeddingsGrounder{
         // If this was not ser, assume it is json
         val ontology = parseMiraJson(ontologyFile)
         val ontologyWithEmbeddings = createOntologyEmbeddings(ontology, embeddingsModel)
-        // TODO save serialized file
         val newFileName = ontologyFile.getAbsolutePath + ".ser"
         Serializer.save(ontologyWithEmbeddings, newFileName)
         ontologyWithEmbeddings
@@ -174,11 +174,7 @@ object MiraEmbeddingsGrounder{
     )
   }
 
-  // TODO: Pre-process the embeddings for the ontology offline
   def createOntologyEmbeddings(concepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap):Seq[GroundingConcept] = {
     concepts.map(concept => addEmbeddingToConcept(concept, embeddingsModel))
   }
-
-  // TODO: Deserialize the ontology with the pre-processed embeddings
-  def loadPreProcessedOntology(path:File):IndexedSeq[GroundingConcept] = ???
 }

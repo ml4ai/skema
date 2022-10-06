@@ -21,9 +21,9 @@ class TestMiraEmbeddingsGrounder extends Test {
   val miraEmbeddingsGrounder: MiraEmbeddingsGrounder = {
     val config = ConfigFactory.load().getConfig("Grounding")
     val ontologyPath = config.getString("ontologyPath")
-    val embeddingsPath = config.getString("embeddingsPath")
+//    val embeddingsPath = config.getString("embeddingsPath")
 
-    MiraEmbeddingsGrounder(new File(ontologyPath), new File(embeddingsPath))
+    MiraEmbeddingsGrounder(new File(ontologyPath), None)
   }
 
 
