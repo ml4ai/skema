@@ -1,22 +1,35 @@
-// The line below is required for recursive enum definitions to work.
-#![cfg(feature = "alloc")]
+//#![cfg(feature = "alloc")]
 
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    multi::many0,
-    sequence::{delimited, pair},
-    IResult,
+    character::complete::{anychar, char, multispace0, none_of},
+    combinator::{map, map_opt, map_res, value, verify},
+    error::ParseError,
+    multi::{fold_many0, separated_list0},
+    number::complete::double,
+    sequence::{delimited, preceded, separated_pair},
+    IResult, Parser,
 };
+use nom::{multi::many0, sequence::pair};
 use nom_locate::{position, LocatedSpan};
+
+use std::collections::HashMap;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
-fn test_equality<P, O>(input: &str, parser: P, output: O) {
-    assert_eq!(P(Span::new("<mo>=</mo>")).unwrap().1, O);
+#[derive(Debug, PartialEq, Clone)]
+pub enum JsonValue {
+    Null,
+    Bool(bool),
+    Str(String),
+    Num(f64),
+    Array(Vec<JsonValue>),
+    Object(HashMap<String, JsonValue>),
 }
-#[derive(Debug, PartialEq)]
-enum MathExpression {
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum MathExpression {
     Mi(String),
     Mo(String),
     Mrow(Vec<MathExpression>),
@@ -32,11 +45,11 @@ fn mi(input: Span) -> IResult<Span, MathExpression> {
 
 #[test]
 fn test_mi() {
-    //assert_eq!(
-    //mi(Span::new("<mi>x</mi>")).unwrap().1,
-    //MathExpression::Mi("x".to_string())
-    //);
-    test_equality(mi, "<mi>x</mi>", MathExpression::Mi("x".to_string()));
+    assert_eq!(
+        mi(Span::new("<mi>x</mi>")).unwrap().1,
+        MathExpression::Mi("x".to_string())
+    );
+    //test_equality(mi, "<mi>x</mi>", MathExpression::Mi("x".to_string()));
 }
 
 fn mo(input: Span) -> IResult<Span, MathExpression> {
