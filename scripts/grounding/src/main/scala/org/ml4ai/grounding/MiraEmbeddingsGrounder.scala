@@ -3,7 +3,7 @@ package org.ml4ai.grounding
 import org.clulab.embeddings.{ExplicitWordEmbeddingMap, WordEmbeddingMap}
 import org.clulab.processors.clu.CluProcessor
 import org.clulab.utils.{InputStreamer, Serializer}
-import org.ml4ai.grounding.MiraEmbeddingsGrounder.generateEmbedding
+import org.ml4ai.grounding.MiraEmbeddingsGrounder.generateNormalizedEmbedding
 import org.clulab.embeddings.CompactWordEmbeddingMap
 import ujson.Arr
 
@@ -18,29 +18,28 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
    * @param k    number of max candidates to return
    * @return ranked list with the top k candidates
    */
-  override def groundingCandidates(text: String, k: Int = 1): List[GroundingCandidate] = {
+  override def groundingCandidates(text: String, k: Int = 5): Seq[GroundingCandidate] = {
     // Generate the embedding of text
-    val thisTextEmbedding = generateEmbedding(text, embeddingsModel)
+    val queryEmbedding = generateNormalizedEmbedding(text, embeddingsModel)
+    // Normalize the query embedding to speed up the cosine similarity computation
+    WordEmbeddingMap.norm(queryEmbedding)
+
     // Loop over the grounding concepts and get cosine similarity between input embedding and each concept
     val cosineSimilarities =
-    for (groundingConcept <- groundingConcepts)  yield {
-      // clone groundingConcept's embedding and normalize it
-      // normalize text embedding
-      // compute dot product
-      val normalizedConceptEmbedding = groundingConcept.embedding.get.clone()
-      WordEmbeddingMap.norm(normalizedConceptEmbedding)
-      WordEmbeddingMap.norm(thisTextEmbedding)
-      WordEmbeddingMap.dotProduct(normalizedConceptEmbedding, thisTextEmbedding)
-    }
+      for (groundingConcept <- groundingConcepts) yield {
+        WordEmbeddingMap.dotProduct(groundingConcept.embedding.get, queryEmbedding)
+      }
     // Choose the top k and return GroundingCandidates
-    // val (addSorted, indices) = arr.zipWithIndex.sorted.unzip
+    // The sorted values are reversed to have it on decreasing size
     val (sortedCosineSimilarities, sortedIndices) = cosineSimilarities.zipWithIndex.sorted.reverse.unzip
-//    sortedCosineSimilarities[sortedIndices[1:k]]
 
-    val topKindices = sortedIndices.take(k)
+
+    val topKIndices = sortedIndices.take(k)
     val topSimilarities = sortedCosineSimilarities.take(k)
-    val topConcepts = topKindices.map(groundingConcepts)
-    topConcepts.zip(topSimilarities).map{case (concept, similarity) => GroundingCandidate(concept, similarity)}.toList
+    val topConcepts = topKIndices.map(groundingConcepts)
+    (topConcepts zip topSimilarities) map {
+      case (concept, similarity) => GroundingCandidate(concept, similarity)
+    }
   }
 }
 
@@ -130,7 +129,7 @@ object MiraEmbeddingsGrounder{
     embeddingsSum.map(_ / size)
   }
 
-  def generateEmbedding(name: String, embeddings: WordEmbeddingMap): Array[Float] = {
+  def generateNormalizedEmbedding(name: String, embeddings: WordEmbeddingMap): Array[Float] = {
     // Tokenize the string
     val tokens = processor.mkDocument(name.toLowerCase).sentences.head.words
 
@@ -147,22 +146,24 @@ object MiraEmbeddingsGrounder{
   def addEmbeddingToConcept(concept: GroundingConcept, embeddingsModel: WordEmbeddingMap): GroundingConcept = {
 
 
-    val embedding = generateEmbedding(concept.name.toLowerCase, embeddingsModel)
+    val embedding = generateNormalizedEmbedding(concept.name.toLowerCase, embeddingsModel)
 
     val descEmbeddings = concept.description match {
-      case Some(description) => List(generateEmbedding(description.toLowerCase, embeddingsModel))
+      case Some(description) => List(generateNormalizedEmbedding(description.toLowerCase, embeddingsModel))
       case None => Nil
     }
 
     val synEmbeddings = concept.synonyms match {
-      case Some(synonyms) => synonyms.map(s => generateEmbedding(s.toLowerCase, embeddingsModel))
+      case Some(synonyms) => synonyms.map(s => generateNormalizedEmbedding(s.toLowerCase, embeddingsModel))
       case None => Nil
     }
 
-    val allEmbeddings = (List(embedding) ++ descEmbeddings ++synEmbeddings).toArray
+    val allEmbeddings = (List(embedding) /*++ descEmbeddings */ ++ synEmbeddings ).toArray
 
     val avgEmbedding = averageEmbeddings(allEmbeddings)
 
+    // Normalize the averaged embedding to speed up the cosine similarity computation
+    WordEmbeddingMap.norm(avgEmbedding)
 
     GroundingConcept(
       id = concept.id,
