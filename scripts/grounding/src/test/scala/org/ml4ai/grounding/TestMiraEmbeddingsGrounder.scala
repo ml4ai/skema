@@ -1,11 +1,10 @@
 package org.ml4ai.grounding
 
 import com.typesafe.config.ConfigFactory
-import org.ml4ai.grounding.common.utils.{BuildUtils, Sourcer, Test}
+import org.ml4ai.grounding.common.utils.{Sourcer, Test}
+import org.scalatest.OptionValues._
 
 import java.io.File
-import java.nio.file.Path
-import org.scalatest.OptionValues._
 
 class TestMiraEmbeddingsGrounder extends Test {
 

@@ -2,12 +2,12 @@ package org.ml4ai.grounding
 
 import org.clulab.embeddings.{ExplicitWordEmbeddingMap, WordEmbeddingMap}
 import org.clulab.processors.clu.CluProcessor
-import org.clulab.utils.Serializer
+import org.clulab.utils.{InputStreamer, Serializer}
 import org.ml4ai.grounding.MiraEmbeddingsGrounder.generateEmbedding
+import org.clulab.embeddings.CompactWordEmbeddingMap
 import ujson.Arr
 
 import java.io.File
-import scala.::
 
 class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap) extends Grounder {
 
@@ -26,7 +26,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     for (groundingConcept <- groundingConcepts)  yield {
       // clone groundingConcept's embedding and normalize it
       // normalize text embedding
-      // compute dot procuct
+      // compute dot product
       val normalizedConceptEmbedding = groundingConcept.embedding.get.clone()
       WordEmbeddingMap.norm(normalizedConceptEmbedding)
       WordEmbeddingMap.norm(thisTextEmbedding)
@@ -79,7 +79,20 @@ object MiraEmbeddingsGrounder{
    * @param path to the file containing the embeddings
    * @return a WordEmbeddingMap instance
    */
-  def loadWordEmbeddings(path:File): WordEmbeddingMap = ExplicitWordEmbeddingMap(path.getPath, resource = false)
+  def loadWordEmbeddingsFromTextFile(path:File): WordEmbeddingMap = ExplicitWordEmbeddingMap(path.getPath, resource = false)
+
+
+  /**
+   * Loads a word embeddings model from a resource
+   * @param resourcePath to the serialized model
+   * @return a WordEmbeddingMap instance
+   */
+  def loadWordEmbeddingsFromResource(resourcePath:String): WordEmbeddingMap = {
+    val inputStreamer = new InputStreamer(this)
+    val inputStream = inputStreamer.getResourceAsStream(resourcePath)
+    val buildType = CompactWordEmbeddingMap.loadSer(inputStream)
+    new CompactWordEmbeddingMap(buildType)
+  }
 
 
   /**
@@ -87,9 +100,11 @@ object MiraEmbeddingsGrounder{
    * @param ontologyFile file containing the json file with MIRA concepts
    * @param wordEmbeddingsFile file containing the word embedding model
    */
-  def apply(ontologyFile:File, wordEmbeddingsFile:File) = {
+  def apply(ontologyFile:File, wordEmbeddingsFile:File): MiraEmbeddingsGrounder = {
 
-    val embeddingsModel = loadWordEmbeddings(wordEmbeddingsFile)
+    // Uncomment to load embeddings from file
+    // val embeddingsModel = loadWordEmbeddingsFromTextFile(wordEmbeddingsFile)
+    val embeddingsModel = loadWordEmbeddingsFromResource("/org/clulab/epimodel/model_streamed_trigram.ser")
 
     val ontology =
       if(ontologyFile.getName.endsWith(".ser")){
@@ -110,7 +125,7 @@ object MiraEmbeddingsGrounder{
   }
 
   def averageEmbeddings(wordEmbeddings: Array[Array[Float]]): Array[Float] = {
-    val size = wordEmbeddings.size
+    val size = wordEmbeddings.length
     val embeddingsSum = wordEmbeddings.reduce((a, b) => a.zip(b).map(x => x._1 + x._2))
     embeddingsSum.map(_ / size)
   }
@@ -158,7 +173,7 @@ object MiraEmbeddingsGrounder{
     )
   }
 
-  // TODO: Pre-process the embedidngs for the ontology offline
+  // TODO: Pre-process the embeddings for the ontology offline
   def createOntologyEmbeddings(concepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap):Seq[GroundingConcept] = {
     concepts.map(concept => addEmbeddingToConcept(concept, embeddingsModel))
   }
