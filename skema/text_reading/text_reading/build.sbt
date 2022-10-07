@@ -1,5 +1,5 @@
 
-name := "automates_text_reading"
+name := "skema_text_reading"
 organization := "org.clulab"
 
 scalaVersion := "2.12.4"
@@ -38,9 +38,12 @@ libraryDependencies ++= {
 
 libraryDependencies += guice
 
-lazy val core = project in file(".")
+
+lazy val root = (project in file(".")).aggregate(grounding).dependsOn(grounding)
+
+lazy val grounding = project.in(file("grounding"))
 
 lazy val webapp = project
   .enablePlugins(PlayScala)
-  .aggregate(core)
-  .dependsOn(core)
+  .aggregate(root)
+  .dependsOn(root)
