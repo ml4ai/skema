@@ -2,7 +2,9 @@ package org.clulab.aske.automates.attachments
 
 import org.clulab.aske.automates.quantities.Interval
 import org.clulab.odin.Attachment
+import org.ml4ai.grounding.GroundingCandidate
 import play.api.libs.json.{JsValue, Json}
+import ujson.Value
 
 abstract class AutomatesAttachment extends Attachment with Serializable {
 
@@ -11,6 +13,26 @@ abstract class AutomatesAttachment extends Attachment with Serializable {
 
   def toUJson: ujson.Value
 
+}
+
+class GroundingAttachment(candidates:Seq[GroundingCandidate]) extends AutomatesAttachment {
+
+  override def toJson: JsValue = Json.arr(candidates map {
+    c => Json.obj(
+      "name" -> c.concept.name,
+      "id" -> c.concept.id,
+      "score" -> c.score
+    )
+  })
+
+  override def toUJson: Value = ujson.Arr(candidates map {
+    c =>
+      ujson.Obj(
+        "name" -> c.concept.name,
+        "id" -> c.concept.id,
+        "score" -> c.score
+      )
+  })
 }
 
 class MentionLocationAttachment(filename: String, pageNum: Seq[Int], blockIdx: Seq[Int], attType: String) extends AutomatesAttachment {

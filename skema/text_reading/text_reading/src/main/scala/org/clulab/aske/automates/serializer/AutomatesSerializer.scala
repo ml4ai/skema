@@ -1,7 +1,7 @@
 package org.clulab.aske.automates.serializer
 
 
-import org.clulab.aske.automates.attachments.{ContextAttachment, DiscontinuousCharOffsetAttachment, FunctionAttachment, MentionLocationAttachment, ParamSetAttachment, ParamSettingIntAttachment, UnitAttachment}
+import org.clulab.aske.automates.attachments.{ContextAttachment, DiscontinuousCharOffsetAttachment, FunctionAttachment, GroundingAttachment, MentionLocationAttachment, ParamSetAttachment, ParamSettingIntAttachment, UnitAttachment}
 import org.clulab.odin
 import org.clulab.odin.{Attachment, EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.processors.{Document, Sentence}
@@ -305,7 +305,7 @@ object AutomatesJSONSerializer {
       case a: UnitAttachment => a.toUJson
       case a: ContextAttachment => a.toUJson
       case a: FunctionAttachment => a.toUJson
-      case _ => ???
+      case a: GroundingAttachment => a.toUJson
     }
   }
 

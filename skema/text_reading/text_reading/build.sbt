@@ -41,7 +41,7 @@ libraryDependencies ++= {
 libraryDependencies += guice
 
 
-lazy val root = (project in file("."))
+lazy val root = (project in file(".")).aggregate(grounding).dependsOn(grounding)
 
 lazy val grounding = project.in(file("grounding"))
 
