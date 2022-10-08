@@ -37,9 +37,10 @@ libraryDependencies ++= {
     // scala
     "org.scala-lang.modules"     %% "scala-collection-compat" % "2.6.0",        // as of 2021-12-31 up to 2.6.0
     "org.scalatest"              %% "scalatest"               % "3.2.10" % Test, // as of 2021-12-31 up to 3.2.10
-    "org.clulab"                 %% "processors-main"         % "8.5.2",
+    "org.clulab"                 %% "processors-main"         % "7.5.1",//"8.5.2",
     "org.clulab"                 %% "model-streamed-trigram-ser" % "1.0.0",
-    "com.lihaoyi"                %% "ujson"                   % "2.0.0"
+    "com.lihaoyi"                %% "ujson"                   % "2.0.0",
+    "com.esotericsoftware"        % "kryo"                     % "5.1.1",
   ) ++ parallelLibraries
 }
 
