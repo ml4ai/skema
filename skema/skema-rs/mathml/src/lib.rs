@@ -1,106 +1,104 @@
-//#![cfg(feature = "alloc")]
-
+pub mod ast;
+use ast::{
+    Math, MathExpression,
+    MathExpression::{Mfrac, Mi, Mo, Mrow, Msub},
+};
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{anychar, char, multispace0, none_of},
-    combinator::{map, map_opt, map_res, value, verify},
-    error::ParseError,
-    multi::{fold_many0, separated_list0},
-    number::complete::double,
-    sequence::{delimited, preceded, separated_pair},
-    IResult, Parser,
+    combinator::map,
+    multi::many0,
+    sequence::{delimited, pair, preceded},
+    IResult,
 };
-use nom::{multi::many0, sequence::pair};
 use nom_locate::{position, LocatedSpan};
 
 use std::collections::HashMap;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
-#[derive(Debug, PartialEq, Clone)]
-pub enum JsonValue {
-    Null,
-    Bool(bool),
-    Str(String),
-    Num(f64),
-    Array(Vec<JsonValue>),
-    Object(HashMap<String, JsonValue>),
-}
-
-#[derive(Debug, PartialEq, Clone)]
-pub enum MathExpression {
-    Mi(String),
-    Mo(String),
-    Mrow(Vec<MathExpression>),
-    Mfrac(MathExpression, MathExpression),
-    Msub(MathExpression, MathExpression),
-}
-
 fn mi(input: Span) -> IResult<Span, MathExpression> {
     let (s, element) = delimited(tag("<mi>"), take_until("</mi>"), tag("</mi>"))(input)?;
-    let element = element.to_string();
-    Ok((s, MathExpression::Mi(element)))
-}
-
-#[test]
-fn test_mi() {
-    assert_eq!(
-        mi(Span::new("<mi>x</mi>")).unwrap().1,
-        MathExpression::Mi("x".to_string())
-    );
-    //test_equality(mi, "<mi>x</mi>", MathExpression::Mi("x".to_string()));
+    //let element = element.to_string();
+    Ok((s, Mi(&element)))
 }
 
 fn mo(input: Span) -> IResult<Span, MathExpression> {
     let (s, element) = delimited(tag("<mo>"), take_until("</mo>"), tag("</mo>"))(input)?;
-    let element = element.to_string();
-    Ok((s, MathExpression::Mo(element)))
-}
-
-fn math_expression(input: Span) -> IResult<Span, MathExpression> {
-    alt((mi, mo))(input)
-}
-
-#[test]
-fn test_mo() {
-    assert_eq!(
-        mo(Span::new("<mo>=</mo>")).unwrap().1,
-        MathExpression::Mo("=".to_string())
-    );
+    //let element = element.to_string();
+    Ok((s, Mo(&element)))
 }
 
 fn mrow(input: Span) -> IResult<Span, MathExpression> {
     let (s, elements) = delimited(tag("<mrow>"), many0(math_expression), tag("</mrow>"))(input)?;
-    Ok((s, MathExpression::Mrow(elements)))
+    Ok((s, Mrow(elements)))
+}
+
+fn math_expression(input: Span) -> IResult<Span, MathExpression> {
+    alt((mi, mo, mrow))(input)
 }
 
 fn mfrac(input: Span) -> IResult<Span, MathExpression> {
-    let (s, (numerator, denominator)) = delimited(
-        tag("<mfrac>"),
-        pair(math_expression, math_expression),
-        tag("</mfrac>"),
+    let (s, result) = map(
+        delimited(
+            tag("<mfrac>"),
+            pair(math_expression, math_expression),
+            tag("</mfrac>"),
+        ),
+        |(numerator, denominator)| Mfrac(Box::new(numerator), Box::new(denominator)),
     )(input)?;
-    Ok((s, MathExpression::Mfrac(numerator, denominator)))
-}
-
-#[derive(Debug, PartialEq)]
-struct Math {
-    content: String,
+    Ok((s, result))
 }
 
 fn math(input: Span) -> IResult<Span, Math> {
-    let (s, element) = delimited(tag("<math>"), take_until("</math>"), tag("</math>"))(input)?;
-    let element = element.to_string();
-    Ok((s, Math { content: element }))
+    let (s, elements) = delimited(tag("<math>"), many0(math_expression), tag("</math>"))(input)?;
+    Ok((s, Math { content: elements }))
+}
+
+fn parse(input: &str) -> IResult<Span, Math> {
+    let span = Span::new(input);
+    let (remaining, math) = math(span)?;
+    Ok((remaining, math))
 }
 
 #[test]
-fn test_math() {
+fn test_mi() {
+    assert_eq!(mi(Span::new("<mi>x</mi>")).unwrap().1, Mi("x"));
+}
+
+#[test]
+fn test_mo() {
+    assert_eq!(mo(Span::new("<mo>=</mo>")).unwrap().1, Mo("="));
+}
+
+#[test]
+fn test_mrow() {
     assert_eq!(
-        math(Span::new("<math>Content</math>")).unwrap().1,
+        mrow(Span::new("<mrow><mo>-</mo><mi>b</mi></mrow>"))
+            .unwrap()
+            .1,
+        Mrow(vec![Mo("-"), Mi("b")])
+    )
+}
+
+#[test]
+fn test_math_expression() {
+    assert_eq!(
+        math_expression(Span::new("<mrow><mo>-</mo><mi>b</mi></mrow>"))
+            .unwrap()
+            .1,
+        Mrow(vec![Mo("-"), Mi("b")])
+    )
+}
+
+#[test]
+fn test_parser() {
+    assert_eq!(
+        parse("<math><mrow><mo>-</mo><mi>b</mi></mrow></math>")
+            .unwrap()
+            .1,
         Math {
-            content: "Content".to_string()
+            content: vec![Mrow(vec![Mo("-"), Mi("b")])]
         }
-    );
+    )
 }
