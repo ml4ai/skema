@@ -64,7 +64,10 @@ object MiraEmbeddingsGrounder{
               case _ => None
             },
             i.obj.get("synonyms") match {
-              case Some(syns) => Some(syns.arr map (_.str))
+              case Some(syns) => Some(syns.arr map {
+                case s:ujson.Obj => s.obj.get("value").toString
+                case s:ujson.Value => s.toString
+              })
               case _ => None
             },
             embedding = None
