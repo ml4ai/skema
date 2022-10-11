@@ -1,5 +1,7 @@
 pub mod ast;
+pub mod graph;
 pub mod parsing;
+
 use parsing::parse;
 
 #[test]

@@ -7,22 +7,6 @@ pub enum MathExpression<'a> {
     Msub(Box<MathExpression<'a>>, Box<MathExpression<'a>>),
 }
 
-impl<'a> MathExpression<'a> {
-    pub fn traverse(&self) {
-        match self {
-            MathExpression::Mi(_) => {
-                dbg!(self);
-            }
-            MathExpression::Mrow(xs) => {
-                for elem in xs {
-                    dbg!(elem);
-                }
-            }
-            _ => (),
-        }
-    }
-}
-
 #[derive(Debug, PartialEq)]
 pub struct Math<'a> {
     pub content: Vec<MathExpression<'a>>,
