@@ -120,32 +120,39 @@ pub fn parse(input: &str) -> IResult<Math> {
     Ok((remaining, math))
 }
 
+/// A generic helper function for testing individual parsers
+fn test_parser<'a, P, O>(input: &'a str, mut parser: P, output: O)
+where
+    P: FnMut(Span<'a>) -> IResult<'a, O>,
+    O: std::cmp::PartialEq + std::fmt::Debug,
+{
+    assert_eq!(parser(Span::new(input)).unwrap().1, output);
+}
+
 #[test]
 fn test_mi() {
-    assert_eq!(mi(Span::new("<mi>x</mi>")).unwrap().1, Mi("x"));
+    test_parser("<mi>x</mi>", mi, Mi("x"))
 }
 
 #[test]
 fn test_mo() {
-    assert_eq!(mo(Span::new("<mo>=</mo>")).unwrap().1, Mo("="));
+    test_parser("<mo>=</mo>", mo, Mo("="))
 }
 
 #[test]
 fn test_mrow() {
-    assert_eq!(
-        mrow(Span::new("<mrow><mo>-</mo><mi>b</mi></mrow>"))
-            .unwrap()
-            .1,
-        Mrow(vec![Mo("-"), Mi("b")])
+    test_parser(
+        "<mrow><mo>-</mo><mi>b</mi></mrow>",
+        mrow,
+        Mrow(vec![Mo("-"), Mi("b")]),
     )
 }
 
 #[test]
 fn test_math_expression() {
-    assert_eq!(
-        math_expression(Span::new("<mrow><mo>-</mo><mi>b</mi></mrow>"))
-            .unwrap()
-            .1,
-        Mrow(vec![Mo("-"), Mi("b")])
+    test_parser(
+        "<mrow><mo>-</mo><mi>b</mi></mrow>",
+        math_expression,
+        Mrow(vec![Mo("-"), Mi("b")]),
     )
 }
