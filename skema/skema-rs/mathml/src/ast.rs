@@ -7,6 +7,15 @@ pub enum MathExpression<'a> {
     Msub(Box<MathExpression<'a>>, Box<MathExpression<'a>>),
 }
 
+//impl Iterator for MathExpression {
+    //type Item = MathExpression;
+
+    //fn next(&mut self) -> Option<Self::Item> {
+        //match 
+
+    //}
+//}
+
 #[derive(Debug, PartialEq)]
 pub struct Math<'a> {
     pub content: Vec<MathExpression<'a>>,
