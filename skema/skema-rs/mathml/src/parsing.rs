@@ -154,5 +154,9 @@ fn test_math_expression() {
         "<mrow><mo>-</mo><mi>b</mi></mrow>",
         math_expression,
         Mrow(vec![Mo("-"), Mi("b")]),
-    )
+    );
+    let mathexp = math_expression(Span::new("<mrow><mo>-</mo><mi>b</mi></mrow>"))
+        .unwrap()
+        .1;
+    mathexp.traverse();
 }
