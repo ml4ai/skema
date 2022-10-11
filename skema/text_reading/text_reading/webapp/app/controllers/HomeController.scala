@@ -248,7 +248,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val mentions = for (tf <- textsAndFilenames) yield {
       val Array(text, filename) = tf.split("<::>")
       // Extract mentions and apply grounding
-      ieSystem.extractFromText(text, keepText = true, Some(filename)) map {
+      ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
         case tbm:TextBoundMention => {
           val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter{
             case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
@@ -261,7 +261,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
             tbm
         }
         case m => m
-      }
+      }.seq
     }
 
     // store location information from cosmos as an attachment for each mention

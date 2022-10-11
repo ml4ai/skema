@@ -26,9 +26,9 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
 
     // Loop over the grounding concepts and get cosine similarity between input embedding and each concept
     val cosineSimilarities =
-      (for (groundingConcept <- groundingConcepts.par) yield {
+      (for (groundingConcept <- groundingConcepts) yield {
         WordEmbeddingMap.dotProduct(groundingConcept.embedding.get, queryEmbedding)
-      }).seq
+      })
     // Choose the top k and return GroundingCandidates
     // The sorted values are reversed to have it on decreasing size
     val (sortedCosineSimilarities, sortedIndices) = cosineSimilarities.zipWithIndex.sorted.reverse.unzip
