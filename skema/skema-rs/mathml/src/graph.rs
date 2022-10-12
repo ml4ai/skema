@@ -48,6 +48,16 @@ impl<'a> MathExpression<'a> {
                 superscript.add_to_graph(graph, parent_index);
             }
 
+            Msub(base, subscript) => {
+                let node_index = graph.add_node("msub");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                base.add_to_graph(graph, parent_index);
+                subscript.add_to_graph(graph, parent_index);
+            }
+
             Mfrac(numerator, denominator) => {
                 let node_index = graph.add_node("mfrac");
                 if let Some(p) = parent_index {
@@ -81,11 +91,4 @@ impl<'a> Math<'a> {
         }
         g
     }
-}
-
-#[test]
-fn test_graph_building() {
-    let mut g = MathMLGraph::new();
-    let m = Mrow(vec![Mo("-"), Mi("b")]);
-    m.add_to_graph(&mut g);
 }

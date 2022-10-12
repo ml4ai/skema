@@ -6,7 +6,7 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::multispace0,
-    combinator::map,
+    combinator::{map, value},
     multi::many0,
     sequence::{delimited, pair, preceded},
 };
@@ -62,12 +62,16 @@ impl<'a> nom::error::ContextError<Span<'a>> for ParseError<'a> {
 pub type IResult<'a, O> = nom::IResult<Span<'a>, O, ParseError<'a>>;
 
 /// A combinator that takes a parser `inner` and produces a parser that also consumes both leading
-/// and trailing whitespace, returning the output of `inner`.
+/// and trailing whitespace and comments, returning the output of `inner`.
 fn ws<'a, F: 'a, O>(inner: F) -> impl FnMut(Span<'a>) -> IResult<O>
 where
     F: FnMut(Span<'a>) -> IResult<O>,
 {
     delimited(multispace0, inner, multispace0)
+}
+
+pub fn comment(input: Span) -> IResult<Span> {
+    ws(delimited(tag("<!--"), take_until("-->"), tag("-->")))(input)
 }
 
 fn mi(input: Span) -> IResult<MathExpression> {
@@ -118,6 +122,18 @@ fn msup(input: Span) -> IResult<MathExpression> {
     Ok((s, expression))
 }
 
+fn msub(input: Span) -> IResult<MathExpression> {
+    let (s, expression) = map(
+        ws(delimited(
+            tag("<msub>"),
+            pair(math_expression, math_expression),
+            tag("</msub>"),
+        )),
+        |(base, subscript)| Msub(Box::new(base), Box::new(subscript)),
+    )(input)?;
+    Ok((s, expression))
+}
+
 fn msqrt(input: Span) -> IResult<MathExpression> {
     let (s, expression) = map(
         ws(delimited(tag("<msqrt>"), math_expression, tag("</msqrt>"))),
@@ -127,7 +143,7 @@ fn msqrt(input: Span) -> IResult<MathExpression> {
 }
 
 fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((mi, mo, mn, msup, msqrt, mfrac, mrow)))(input)
+    ws(alt((mi, mo, mn, msup, msub, msqrt, mfrac, mrow)))(input)
 }
 
 fn math(input: Span) -> IResult<Math> {
