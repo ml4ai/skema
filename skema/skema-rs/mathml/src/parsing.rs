@@ -1,6 +1,6 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msub},
+    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup},
 };
 use nom::{
     branch::alt,
@@ -106,8 +106,28 @@ fn mfrac(input: Span) -> IResult<MathExpression> {
     Ok((s, frac))
 }
 
+fn msup(input: Span) -> IResult<MathExpression> {
+    let (s, expression) = map(
+        ws(delimited(
+            tag("<msup>"),
+            pair(math_expression, math_expression),
+            tag("</msup>"),
+        )),
+        |(base, superscript)| Msup(Box::new(base), Box::new(superscript)),
+    )(input)?;
+    Ok((s, expression))
+}
+
+fn msqrt(input: Span) -> IResult<MathExpression> {
+    let (s, expression) = map(
+        ws(delimited(tag("<msqrt>"), math_expression, tag("</msqrt>"))),
+        |contents| Msqrt(Box::new(contents)),
+    )(input)?;
+    Ok((s, expression))
+}
+
 fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((mi, mo, mn, mfrac, mrow)))(input)
+    ws(alt((mi, mo, mn, msup, msqrt, mfrac, mrow)))(input)
 }
 
 fn math(input: Span) -> IResult<Math> {

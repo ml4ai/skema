@@ -1,32 +1,70 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mo, Mrow, Msub},
+    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup},
 };
 
-use petgraph::Graph;
+use petgraph::{graph::NodeIndex, Graph};
 
-pub type MathMLGraph<'a> = Graph<&'a str, &'a str>;
+pub type MathMLGraph<'a> = Graph<&'a str, u32>;
 
 impl<'a> MathExpression<'a> {
-    pub fn add_to_graph(&self, graph: &mut MathMLGraph<'a>) {
+    pub fn add_to_graph(&self, graph: &mut MathMLGraph<'a>, mut parent_index: Option<NodeIndex>) {
         match self {
-            MathExpression::Mi(x) => {
-                graph.add_node(x);
+            Mi(x) => {
+                let node_index = graph.add_node(x);
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
             }
-            MathExpression::Mo(x) => {
-                graph.add_node(x);
+            Mo(x) => {
+                let node_index = graph.add_node(x);
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
             }
-            MathExpression::Mn(x) => {
-                graph.add_node(x);
+            Mn(x) => {
+                let node_index = graph.add_node(x);
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
             }
 
-            MathExpression::Mfrac(numerator, denominator) => {
-                numerator.add_to_graph(graph);
-                denominator.add_to_graph(graph);
+            Msqrt(contents) => {
+                let node_index = graph.add_node("msqrt");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                contents.add_to_graph(graph, parent_index);
             }
-            MathExpression::Mrow(xs) => {
-                for x in xs {
-                    x.add_to_graph(graph);
+
+            Msup(base, superscript) => {
+                let node_index = graph.add_node("msup");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                base.add_to_graph(graph, parent_index);
+                superscript.add_to_graph(graph, parent_index);
+            }
+
+            Mfrac(numerator, denominator) => {
+                let node_index = graph.add_node("mfrac");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                numerator.add_to_graph(graph, parent_index);
+                denominator.add_to_graph(graph, parent_index);
+            }
+            Mrow(elements) => {
+                let node_index = graph.add_node("mrow");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                for element in elements {
+                    element.add_to_graph(graph, parent_index);
                 }
             }
             _ => (panic!("Unhandled type!")),
@@ -37,8 +75,9 @@ impl<'a> MathExpression<'a> {
 impl<'a> Math<'a> {
     pub fn to_graph(&self) -> MathMLGraph {
         let mut g = MathMLGraph::new();
+        let root_index = g.add_node("root");
         for element in &self.content {
-            element.add_to_graph(&mut g);
+            element.add_to_graph(&mut g, Some(root_index));
         }
         g
     }
@@ -46,7 +85,7 @@ impl<'a> Math<'a> {
 
 #[test]
 fn test_graph_building() {
-    let mut G = MathMLGraph::new();
+    let mut g = MathMLGraph::new();
     let m = Mrow(vec![Mo("-"), Mi("b")]);
-    m.add_to_graph(&mut G);
+    m.add_to_graph(&mut g);
 }
