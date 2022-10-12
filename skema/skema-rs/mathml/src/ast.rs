@@ -2,6 +2,7 @@
 pub enum MathExpression<'a> {
     Mi(&'a str),
     Mo(&'a str),
+    Mn(&'a str),
     Mrow(Vec<MathExpression<'a>>),
     Mfrac(Box<MathExpression<'a>>, Box<MathExpression<'a>>),
     Msub(Box<MathExpression<'a>>, Box<MathExpression<'a>>),

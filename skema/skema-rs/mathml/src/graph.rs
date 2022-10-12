@@ -7,28 +7,40 @@ use petgraph::Graph;
 
 pub type MathMLGraph<'a> = Graph<&'a str, &'a str>;
 
-//impl Math {
-    //for element in math.content {
-        //element.to_graph(&mut G);
-    //}
-//}
-
 impl<'a> MathExpression<'a> {
-    pub fn to_graph(&self, G: &mut MathMLGraph<'a>) {
+    pub fn add_to_graph(&self, graph: &mut MathMLGraph<'a>) {
         match self {
             MathExpression::Mi(x) => {
-                G.add_node(x);
+                graph.add_node(x);
             }
             MathExpression::Mo(x) => {
-                G.add_node(x);
+                graph.add_node(x);
+            }
+            MathExpression::Mn(x) => {
+                graph.add_node(x);
+            }
+
+            MathExpression::Mfrac(numerator, denominator) => {
+                numerator.add_to_graph(graph);
+                denominator.add_to_graph(graph);
             }
             MathExpression::Mrow(xs) => {
                 for x in xs {
-                    x.to_graph(G);
+                    x.add_to_graph(graph);
                 }
             }
-            _ => (),
+            _ => (panic!("Unhandled type!")),
         }
+    }
+}
+
+impl<'a> Math<'a> {
+    pub fn to_graph(&self) -> MathMLGraph {
+        let mut g = MathMLGraph::new();
+        for element in &self.content {
+            element.add_to_graph(&mut g);
+        }
+        g
     }
 }
 
@@ -36,5 +48,5 @@ impl<'a> MathExpression<'a> {
 fn test_graph_building() {
     let mut G = MathMLGraph::new();
     let m = Mrow(vec![Mo("-"), Mi("b")]);
-    m.to_graph(G);
+    m.add_to_graph(&mut G);
 }

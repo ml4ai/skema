@@ -1,6 +1,6 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mo, Mrow, Msub},
+    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msub},
 };
 use nom::{
     branch::alt,
@@ -75,6 +75,11 @@ fn mi(input: Span) -> IResult<MathExpression> {
     Ok((s, Mi(&element)))
 }
 
+fn mn(input: Span) -> IResult<MathExpression> {
+    let (s, element) = ws(delimited(tag("<mn>"), take_until("</mn>"), tag("</mn>")))(input)?;
+    Ok((s, Mn(&element)))
+}
+
 fn mo(input: Span) -> IResult<MathExpression> {
     let (s, element) = ws(delimited(tag("<mo>"), take_until("</mo>"), tag("</mo>")))(input)?;
     Ok((s, Mo(&element)))
@@ -89,12 +94,8 @@ fn mrow(input: Span) -> IResult<MathExpression> {
     Ok((s, Mrow(elements)))
 }
 
-fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((mi, mo, mrow)))(input)
-}
-
 fn mfrac(input: Span) -> IResult<MathExpression> {
-    let (s, result) = map(
+    let (s, frac) = map(
         ws(delimited(
             tag("<mfrac>"),
             pair(math_expression, math_expression),
@@ -102,7 +103,11 @@ fn mfrac(input: Span) -> IResult<MathExpression> {
         )),
         |(numerator, denominator)| Mfrac(Box::new(numerator), Box::new(denominator)),
     )(input)?;
-    Ok((s, result))
+    Ok((s, frac))
+}
+
+fn math_expression(input: Span) -> IResult<MathExpression> {
+    ws(alt((mi, mo, mn, mfrac, mrow)))(input)
 }
 
 fn math(input: Span) -> IResult<Math> {
@@ -140,12 +145,25 @@ fn test_mo() {
 }
 
 #[test]
+fn test_mn() {
+    test_parser("<mn>1</mn>", mn, Mn("1"));
+}
+
+#[test]
 fn test_mrow() {
     test_parser(
         "<mrow><mo>-</mo><mi>b</mi></mrow>",
         mrow,
         Mrow(vec![Mo("-"), Mi("b")]),
     )
+}
+
+#[test]
+fn test_mfrac() {
+    let frac = mfrac(Span::new("<mfrac><mn>1</mn><mn>2</mn></mfrac>"))
+        .unwrap()
+        .1;
+    assert_eq!(frac, Mfrac(Box::new(Mn("1")), Box::new(Mn("2"))),)
 }
 
 #[test]
