@@ -1,3 +1,5 @@
+//! Library for MathML parsing
+
 pub mod ast;
 pub mod graph;
 pub mod parsing;
