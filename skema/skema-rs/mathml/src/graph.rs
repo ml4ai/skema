@@ -5,19 +5,26 @@ use crate::ast::{
 
 use petgraph::Graph;
 
-type MathMLGraph<'a> = Graph<&'a str, &'a str>;
+pub type MathMLGraph<'a> = Graph<&'a str, &'a str>;
+
+//impl Math {
+    //for element in math.content {
+        //element.to_graph(&mut G);
+    //}
+//}
 
 impl<'a> MathExpression<'a> {
-    pub fn traverse(&self, mut G: MathMLGraph<'a>) {
+    pub fn to_graph(&self, G: &mut MathMLGraph<'a>) {
         match self {
             MathExpression::Mi(x) => {
-                let g = G.add_node(x);
                 G.add_node(x);
-                dbg!(G);
+            }
+            MathExpression::Mo(x) => {
+                G.add_node(x);
             }
             MathExpression::Mrow(xs) => {
-                for elem in xs {
-                    dbg!(elem);
+                for x in xs {
+                    x.to_graph(G);
                 }
             }
             _ => (),
@@ -29,5 +36,5 @@ impl<'a> MathExpression<'a> {
 fn test_graph_building() {
     let mut G = MathMLGraph::new();
     let m = Mrow(vec![Mo("-"), Mi("b")]);
-    m.traverse(G);
+    m.to_graph(G);
 }
