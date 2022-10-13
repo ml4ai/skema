@@ -16,5 +16,5 @@ fn main() {
     let contents = std::fs::read_to_string(input).expect("Unable to read file {input}!");
     let (remaining_input, math) = parse(&contents).expect("Unable to parse file {input}!");
     let G = math.to_graph();
-    println!("{:?}", Dot::with_config(&G, &[Config::EdgeNoLabel]));
+    println!("{}", Dot::with_config(&G, &[Config::EdgeNoLabel]));
 }
