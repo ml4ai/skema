@@ -20,6 +20,7 @@ pub struct ParseError<'a> {
     message: String,
 }
 
+/// We implement the ParseError trait here to support the Span type.
 impl<'a> ParseError<'a> {
     pub fn new(message: String, span: Span<'a>) -> Self {
         Self { message, span }
@@ -74,71 +75,84 @@ pub fn comment(input: Span) -> IResult<Span> {
     ws(delimited(tag("<!--"), take_until("-->"), tag("-->")))(input)
 }
 
+/// A macro to help build tag parsers
+macro_rules! tag_parser {
+    ($tag:expr, $parser:expr) => {{
+        let tag_start = concat!("<", $tag, ">");
+        let tag_end = concat!("</", $tag, ">");
+        ws(delimited(tag(tag_start), $parser, tag(tag_end)))
+    }};
+}
+
+/// A macro to help build parsers for simple MathML elements (i.e., without further nesting).
+macro_rules! elem0 {
+    ($tag:expr) => {{
+        let tag_end = concat!("</", $tag, ">");
+        tag_parser!($tag, take_until(tag_end))
+    }};
+}
+
+/// A macro to help build parsers for MathML elements with 1 argument.
+macro_rules! elem1 {
+    ($tag:expr, $t:ident) => {{
+        map(tag_parser!($tag, math_expression), |x| $t(Box::new(x)))
+    }};
+}
+
+/// A macro to help build parsers for MathML elements with 2 arguments.
+macro_rules! elem2 {
+    ($tag:expr, $t:ident) => {{
+        map(
+            tag_parser!($tag, pair(math_expression, math_expression)),
+            |(x, y)| $t(Box::new(x), Box::new(y)),
+        )
+    }};
+}
+
+/// A macro to help build parsers for MathML elements with zero or more arguments.
+macro_rules! elem_many0 {
+    ($tag:expr) => {{
+        tag_parser!($tag, many0(math_expression))
+    }};
+}
+
 fn mi(input: Span) -> IResult<MathExpression> {
-    let (s, element) = ws(delimited(tag("<mi>"), take_until("</mi>"), tag("</mi>")))(input)?;
+    let (s, element) = elem0!("mi")(input)?;
     Ok((s, Mi(&element)))
 }
 
 fn mn(input: Span) -> IResult<MathExpression> {
-    let (s, element) = ws(delimited(tag("<mn>"), take_until("</mn>"), tag("</mn>")))(input)?;
+    let (s, element) = elem0!("mn")(input)?;
     Ok((s, Mn(&element)))
 }
 
 fn mo(input: Span) -> IResult<MathExpression> {
-    let (s, element) = ws(delimited(tag("<mo>"), take_until("</mo>"), tag("</mo>")))(input)?;
+    let (s, element) = elem0!("mo")(input)?;
     Ok((s, Mo(&element)))
 }
 
 fn mrow(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = ws(delimited(
-        tag("<mrow>"),
-        many0(math_expression),
-        tag("</mrow>"),
-    ))(input)?;
+    let (s, elements) = elem_many0!("mrow")(input)?;
     Ok((s, Mrow(elements)))
 }
 
 fn mfrac(input: Span) -> IResult<MathExpression> {
-    let (s, frac) = map(
-        ws(delimited(
-            tag("<mfrac>"),
-            pair(math_expression, math_expression),
-            tag("</mfrac>"),
-        )),
-        |(numerator, denominator)| Mfrac(Box::new(numerator), Box::new(denominator)),
-    )(input)?;
+    let (s, frac) = elem2!("mfrac", Mfrac)(input)?;
     Ok((s, frac))
 }
 
 fn msup(input: Span) -> IResult<MathExpression> {
-    let (s, expression) = map(
-        ws(delimited(
-            tag("<msup>"),
-            pair(math_expression, math_expression),
-            tag("</msup>"),
-        )),
-        |(base, superscript)| Msup(Box::new(base), Box::new(superscript)),
-    )(input)?;
+    let (s, expression) = elem2!("msup", Msup)(input)?;
     Ok((s, expression))
 }
 
 fn msub(input: Span) -> IResult<MathExpression> {
-    let (s, expression) = map(
-        ws(delimited(
-            tag("<msub>"),
-            pair(math_expression, math_expression),
-            tag("</msub>"),
-        )),
-        |(base, subscript)| Msub(Box::new(base), Box::new(subscript)),
-    )(input)?;
+    let (s, expression) = elem2!("msub", Msub)(input)?;
     Ok((s, expression))
 }
 
 fn msqrt(input: Span) -> IResult<MathExpression> {
-    let (s, expression) = map(
-        ws(delimited(tag("<msqrt>"), math_expression, tag("</msqrt>"))),
-        |contents| Msqrt(Box::new(contents)),
-    )(input)?;
+    let (s, expression) = elem1!("msqrt", Msqrt)(input)?;
     Ok((s, expression))
 }
 
@@ -147,11 +161,7 @@ fn math_expression(input: Span) -> IResult<MathExpression> {
 }
 
 fn math(input: Span) -> IResult<Math> {
-    let (s, elements) = ws(delimited(
-        tag("<math>"),
-        many0(math_expression),
-        tag("</math>"),
-    ))(input)?;
+    let (s, elements) = elem_many0!("math")(input)?;
     Ok((s, Math { content: elements }))
 }
 
