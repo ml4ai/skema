@@ -14,7 +14,7 @@ use nom_locate::LocatedSpan;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ParseError<'a> {
     span: Span<'a>,
     message: String,
