@@ -4,11 +4,12 @@ pub mod ast;
 pub mod graph;
 pub mod parsing;
 
-use parsing::parse;
-
 #[test]
 fn test_parser() {
-    use crate::ast::{Math, MathExpression::*};
+    use crate::{
+        ast::{Math, MathExpression::*},
+        parsing::parse,
+    };
     assert_eq!(
         parse(
             "<math>

@@ -67,6 +67,7 @@ impl<'a> MathExpression<'a> {
                 numerator.add_to_graph(graph, parent_index);
                 denominator.add_to_graph(graph, parent_index);
             }
+
             Mrow(elements) => {
                 let node_index = graph.add_node("mrow");
                 if let Some(p) = parent_index {
@@ -77,7 +78,6 @@ impl<'a> MathExpression<'a> {
                     element.add_to_graph(graph, parent_index);
                 }
             }
-            _ => (panic!("Unhandled type!")),
         }
     }
 }

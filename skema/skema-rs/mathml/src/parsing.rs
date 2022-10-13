@@ -6,9 +6,9 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::multispace0,
-    combinator::{map, value},
+    combinator::map,
     multi::many0,
-    sequence::{delimited, pair, preceded},
+    sequence::{delimited, pair},
 };
 use nom_locate::LocatedSpan;
 
@@ -162,6 +162,7 @@ pub fn parse(input: &str) -> IResult<Math> {
 }
 
 /// A generic helper function for testing individual parsers
+#[cfg(test)]
 fn test_parser<'a, P, O>(input: &'a str, mut parser: P, output: O)
 where
     P: FnMut(Span<'a>) -> IResult<'a, O>,
