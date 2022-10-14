@@ -16,7 +16,6 @@ libraryDependencies ++= {
   val json4sVersion = "3.5.2"
 
   Seq(
-    guice,
     "org.clulab"                 %% "processors-main"          % procVer,
     "org.clulab"                 %% "processors-corenlp"       % procVer,
     "org.clulab"                 %% "processors-odin"          % procVer,
@@ -38,9 +37,10 @@ libraryDependencies ++= {
     "com.typesafe.play"          %% "play-json"                % "2.7.0",
     "org.json4s"                 %% "json4s-jackson"           % "0.1.0",
     "org.scala-lang.modules"     %% "scala-xml"                % "1.0.2",
-    "org.apache.commons"          % "commons-text"             % "1.4"
+    "org.apache.commons"          % "commons-text"             % "1.4",
     // The library below can be used in the future for in-memory caching of wikidata results.
-//  "com.github.blemale"         %% "scaffeine"                % "4.0.2" % "compile"
+//  "com.github.blemale"         %% "scaffeine"                % "4.0.2" % "compile",
+    guice
   )
 }
 
