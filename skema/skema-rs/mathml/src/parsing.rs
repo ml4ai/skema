@@ -5,7 +5,7 @@ use crate::ast::{
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alpha1, multispace0},
+    character::complete::{alpha1, alphanumeric1, multispace0},
     combinator::map,
     multi::many0,
     sequence::{delimited, pair, separated_pair, tuple},
@@ -71,18 +71,24 @@ where
     delimited(multispace0, inner, multispace0)
 }
 
+///Quoted string
+fn quoted_string(input: Span) -> IResult<Span> {
+    delimited(tag("\""), take_until("\""), tag("\""))(input)
+}
+
 ///XML-style comments
 fn comment(input: Span) -> IResult<Span> {
     delimited(tag("<!--"), take_until("-->"), tag("-->"))(input)
 }
 
-fn attribute(input: Span) -> IResult<(Span, Span)> {
-    ws(separated_pair(alpha1, tag("="), alpha1))(input)
+fn attribute(input: Span) -> IResult<(&str, &str)> {
+    let (s, (key, value)) = ws(separated_pair(alphanumeric1, ws(tag("=")), quoted_string))(input)?;
+    Ok((s, (&key, &value)))
 }
 
 macro_rules! stag {
     ($tag:expr) => {{
-        tuple((tag("<"), tag($tag), many0(alpha1), tag(">")))
+        tuple((tag("<"), tag($tag), many0(attribute), tag(">")))
     }};
 }
 
@@ -199,7 +205,7 @@ where
 
 #[test]
 fn test_mi() {
-    test_parser("<mi>x</mi>", mi, Mi("x"))
+    test_parser("<mi k=\"v\" m1=\"n\">x</mi>", mi, Mi("x"))
 }
 
 #[test]
@@ -221,14 +227,10 @@ fn test_mrow() {
     )
 }
 
-//#[test]
-//fn test_attribute() {
-//test_parser(
-//"<mrow><mo>-</mo><mi>b</mi></mrow>",
-//mrow,
-//Mrow(vec![Mo("-"), Mi("b")]),
-//)
-//}
+#[test]
+fn test_attribute() {
+    test_parser("key=\"value\"", attribute, ("key", "value"))
+}
 
 #[test]
 fn test_mfrac() {
