@@ -8,7 +8,7 @@ use nom::{
     character::complete::{alpha1, multispace0},
     combinator::map,
     multi::many0,
-    sequence::{delimited, pair, tuple},
+    sequence::{delimited, pair, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
 
@@ -72,8 +72,12 @@ where
 }
 
 ///XML-style comments
-pub fn comment(input: Span) -> IResult<Span> {
+fn comment(input: Span) -> IResult<Span> {
     delimited(tag("<!--"), take_until("-->"), tag("-->"))(input)
+}
+
+fn attribute(input: Span) -> IResult<(Span, Span)> {
+    ws(separated_pair(alpha1, tag("="), alpha1))(input)
 }
 
 macro_rules! stag {
@@ -216,6 +220,15 @@ fn test_mrow() {
         Mrow(vec![Mo("-"), Mi("b")]),
     )
 }
+
+//#[test]
+//fn test_attribute() {
+//test_parser(
+//"<mrow><mo>-</mo><mi>b</mi></mrow>",
+//mrow,
+//Mrow(vec![Mo("-"), Mi("b")]),
+//)
+//}
 
 #[test]
 fn test_mfrac() {
