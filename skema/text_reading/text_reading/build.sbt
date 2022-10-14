@@ -7,6 +7,9 @@ val json4sVersion = "3.5.2"
 
 //EclipseKeys.withSource := true
 
+// This provides access to regextools straight from github.
+resolvers += "jitpack" at "https://jitpack.io"
+
 libraryDependencies ++= {
   val procVer = "7.5.1"
 //  val uJsonVer = "0.7.0"
@@ -19,7 +22,8 @@ libraryDependencies ++= {
     "org.clulab"    %% "processors-modelsmain"    % procVer,
     "org.clulab"    %% "processors-modelscorenlp" % procVer,
     "ai.lum"        %% "common"                   % "0.0.10",
-    "ai.lum"        %% "regextools"               % "0.1.0-SNAPSHOT",
+//  "ai.lum"        %% "regextools"               % "0.1.0-SNAPSHOT",  // locally published version
+    "com.github.lum-ai"        % "regextools"               % "ee64b773a6", // github version
     "com.lihaoyi"   %% "ujson"                    % uJsonVer,
     "com.lihaoyi"   %% "requests"                 % "0.5.1",
     "com.lihaoyi"   %% "upickle"                  % uJsonVer,
