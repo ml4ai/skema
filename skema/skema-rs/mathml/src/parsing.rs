@@ -76,11 +76,6 @@ fn quoted_string(input: Span) -> IResult<Span> {
     delimited(tag("\""), take_until("\""), tag("\""))(input)
 }
 
-///XML-style comments
-fn comment(input: Span) -> IResult<Span> {
-    delimited(tag("<!--"), take_until("-->"), tag("-->"))(input)
-}
-
 fn attribute(input: Span) -> IResult<(&str, &str)> {
     let (s, (key, value)) = ws(separated_pair(alphanumeric1, ws(tag("=")), quoted_string))(input)?;
     Ok((s, (&key, &value)))
@@ -143,57 +138,67 @@ fn mi(input: Span) -> IResult<MathExpression> {
     Ok((s, Mi(&element)))
 }
 
+/// Numbers
 fn mn(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mn")(input)?;
     Ok((s, Mn(&element)))
 }
 
+/// Operators
 fn mo(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mo")(input)?;
     Ok((s, Mo(&element)))
 }
 
+/// Rows
 fn mrow(input: Span) -> IResult<MathExpression> {
     let (s, elements) = elem_many0!("mrow")(input)?;
     Ok((s, Mrow(elements)))
 }
 
+/// Fractions
 fn mfrac(input: Span) -> IResult<MathExpression> {
     let (s, frac) = elem2!("mfrac", Mfrac)(input)?;
     Ok((s, frac))
 }
 
+/// Superscripts
 fn msup(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem2!("msup", Msup)(input)?;
     Ok((s, expression))
 }
 
+/// Subscripts
 fn msub(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem2!("msub", Msub)(input)?;
     Ok((s, expression))
 }
 
+/// Square roots
 fn msqrt(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem1!("msqrt", Msqrt)(input)?;
     Ok((s, expression))
 }
 
+/// Math expressions
 fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((mi, mo, mn, msup, msub, msqrt, mfrac, mrow)))(input)
 }
 
+/// MathML documents
 fn math(input: Span) -> IResult<Math> {
     let (s, elements) = elem_many0!("math")(input)?;
     Ok((s, Math { content: elements }))
 }
 
+/// The `parse` function is part of the public API. It takes a string and returns a Math object.
 pub fn parse(input: &str) -> IResult<Math> {
     let span = Span::new(input);
     let (remaining, math) = math(span)?;
     Ok((remaining, math))
 }
 
-/// A generic helper function for testing individual parsers
+/// A generic helper function for testing individual parsers.
 #[cfg(test)]
 fn test_parser<'a, P, O>(input: &'a str, mut parser: P, output: O)
 where
@@ -246,5 +251,21 @@ fn test_math_expression() {
         "<mrow><mo>-</mo><mi>b</mi></mrow>",
         math_expression,
         Mrow(vec![Mo("-"), Mi("b")]),
+    )
+}
+
+#[test]
+fn test_math() {
+    test_parser(
+        "<math>
+                <mrow>
+                    <mo>-</mo>
+                    <mi>b</mi>
+                </mrow>
+            </math>",
+        math,
+        Math {
+            content: vec![Mrow(vec![Mo("-"), Mi("b")])],
+        },
     )
 }
