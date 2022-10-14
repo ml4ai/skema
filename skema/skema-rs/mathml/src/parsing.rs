@@ -5,10 +5,10 @@ use crate::ast::{
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::multispace0,
+    character::complete::{alpha1, multispace0},
     combinator::map,
     multi::many0,
-    sequence::{delimited, pair},
+    sequence::{delimited, pair, tuple},
 };
 use nom_locate::LocatedSpan;
 
@@ -63,7 +63,7 @@ impl<'a> nom::error::ContextError<Span<'a>> for ParseError<'a> {
 pub type IResult<'a, O> = nom::IResult<Span<'a>, O, ParseError<'a>>;
 
 /// A combinator that takes a parser `inner` and produces a parser that also consumes both leading
-/// and trailing whitespace and comments, returning the output of `inner`.
+/// and trailing whitespace, returning the output of `inner`.
 fn ws<'a, F: 'a, O>(inner: F) -> impl FnMut(Span<'a>) -> IResult<O>
 where
     F: FnMut(Span<'a>) -> IResult<O>,
@@ -71,16 +71,27 @@ where
     delimited(multispace0, inner, multispace0)
 }
 
+///XML-style comments
 pub fn comment(input: Span) -> IResult<Span> {
-    ws(delimited(tag("<!--"), take_until("-->"), tag("-->")))(input)
+    delimited(tag("<!--"), take_until("-->"), tag("-->"))(input)
+}
+
+macro_rules! stag {
+    ($tag:expr) => {{
+        tuple((tag("<"), tag($tag), many0(alpha1), tag(">")))
+    }};
+}
+
+macro_rules! etag {
+    ($tag:expr) => {{
+        delimited(tag("</"), tag($tag), tag(">"))
+    }};
 }
 
 /// A macro to help build tag parsers
 macro_rules! tag_parser {
     ($tag:expr, $parser:expr) => {{
-        let tag_start = concat!("<", $tag, ">");
-        let tag_end = concat!("</", $tag, ">");
-        ws(delimited(tag(tag_start), $parser, tag(tag_end)))
+        ws(delimited(stag!($tag), $parser, etag!($tag)))
     }};
 }
 
@@ -116,6 +127,7 @@ macro_rules! elem_many0 {
     }};
 }
 
+/// Identifiers
 fn mi(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mi")(input)?;
     Ok((s, Mi(&element)))
