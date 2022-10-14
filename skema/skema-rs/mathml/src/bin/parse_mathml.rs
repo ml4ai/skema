@@ -13,8 +13,9 @@ struct Cli {
 fn main() {
     let args = Cli::parse();
     let input = &args.input;
-    let contents = std::fs::read_to_string(input).expect("Unable to read file {input}!");
-    let (_, math) = parse(&contents).expect("Unable to parse file {input}!");
+    let contents =
+        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
+    let (_, math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
     let g = math.to_graph();
     println!("{}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
 }

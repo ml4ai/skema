@@ -5,7 +5,7 @@ use crate::ast::{
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alpha1, alphanumeric1, multispace0},
+    character::complete::{alphanumeric1, multispace0},
     combinator::map,
     multi::many0,
     sequence::{delimited, pair, separated_pair, tuple},
