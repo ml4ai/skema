@@ -39,6 +39,7 @@ impl<'a> ParseError<'a> {
     }
 }
 
+/// Further trait implementation for Span
 impl<'a> nom::error::ParseError<Span<'a>> for ParseError<'a> {
     fn from_error_kind(input: Span<'a>, kind: nom::error::ErrorKind) -> Self {
         Self::new(format!("Parse error {:?}", kind), input)
@@ -53,6 +54,7 @@ impl<'a> nom::error::ParseError<Span<'a>> for ParseError<'a> {
     }
 }
 
+/// Implementing ContextError to support Span
 impl<'a> nom::error::ContextError<Span<'a>> for ParseError<'a> {
     fn add_context(input: Span<'a>, ctx: &'static str, other: Self) -> Self {
         let message = format!("{}: {}", ctx, other.message);
@@ -60,7 +62,8 @@ impl<'a> nom::error::ContextError<Span<'a>> for ParseError<'a> {
     }
 }
 
-pub type IResult<'a, O> = nom::IResult<Span<'a>, O, ParseError<'a>>;
+/// Redefine IResult, filling in the first generic type parameter with Span, for increased brevity.
+type IResult<'a, O> = nom::IResult<Span<'a>, O, ParseError<'a>>;
 
 /// A combinator that takes a parser `inner` and produces a parser that also consumes both leading
 /// and trailing whitespace, returning the output of `inner`.
