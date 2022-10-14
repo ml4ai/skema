@@ -1,9 +1,7 @@
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_until, take_while, is_not},
-    character::complete::{
-        line_ending, not_line_ending, space0, char, multispace0
-    },
+    bytes::complete::{is_not, tag, take_until, take_while},
+    character::complete::{char, line_ending, multispace0, not_line_ending, space0},
     multi::fold_many0,
     sequence::{delimited, tuple},
     IResult,
@@ -16,7 +14,10 @@ type Span<'a> = LocatedSpan<&'a str>;
 
 #[derive(Debug, strum_macros::Display, Clone, Serialize, Deserialize)]
 enum Statement {
-    Comment { line_number: u32, contents: String },
+    Comment {
+        line_number: u32,
+        contents: String,
+    },
     Docstring {
         object_name: String,
         contents: Vec<String>,
@@ -48,20 +49,37 @@ pub struct Comments {
 
 /// Whole line comments
 fn whole_line_comment(input: Span) -> IResult<Span, Statement> {
-    let (s, x) = delimited(tuple((multispace0, char('#'))), not_line_ending, line_ending)(input)?;
+    let (s, x) = delimited(
+        tuple((multispace0, char('#'))),
+        not_line_ending,
+        line_ending,
+    )(input)?;
     let (_, pos) = position(s)?;
     let line_number = pos.location_line() - 1;
     let contents = x.to_string();
-    Ok((s, Statement::Comment{line_number, contents}))
+    Ok((
+        s,
+        Statement::Comment {
+            line_number,
+            contents,
+        },
+    ))
 }
 
 /// Partial line comments
 fn partial_line_comment(input: Span) -> IResult<Span, Statement> {
-    let (s, (_, _, x, _)) = tuple((is_not("#\n\r"), char('#'), not_line_ending, line_ending))(input)?;
+    let (s, (_, _, x, _)) =
+        tuple((is_not("#\n\r"), char('#'), not_line_ending, line_ending))(input)?;
     let (_, pos) = position(s)?;
     let line_number = pos.location_line() - 1;
     let contents = x.to_string();
-    Ok((s, Statement::Comment{line_number, contents}))
+    Ok((
+        s,
+        Statement::Comment {
+            line_number,
+            contents,
+        },
+    ))
 }
 
 fn docstring(input: Span) -> IResult<Span, Statement> {
@@ -103,7 +121,10 @@ fn statement(input: Span) -> IResult<Span, Statement> {
 fn comments(input: Span) -> IResult<Span, Comments> {
     fold_many0(statement, Comments::default, |mut acc: Comments, item| {
         match item {
-            Statement::Comment{line_number, contents} => {
+            Statement::Comment {
+                line_number,
+                contents,
+            } => {
                 acc.comments.push((line_number, contents));
             }
             Statement::Docstring {
