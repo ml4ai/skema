@@ -1,6 +1,6 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup},
+    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup, Munder, Mover, Msubsup, Mtext},
 };
 
 use petgraph::{graph::NodeIndex, Graph};
@@ -78,6 +78,48 @@ impl<'a> MathExpression<'a> {
                     element.add_to_graph(graph, parent_index);
                 }
             }
+	    
+	    Munder(elements) => {
+                let node_index = graph.add_node("munder");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                for element in elements {
+                    element.add_to_graph(graph, parent_index);
+                }
+            }
+
+	     Mover(elements) => {
+                let node_index = graph.add_node("mover");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                for element in elements {
+                    element.add_to_graph(graph, parent_index);
+                }
+            }
+
+	    Msubsup(elements) => {
+                let node_index = graph.add_node("msubsup");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                for element in elements {
+                    element.add_to_graph(graph, parent_index);
+                }
+            }
+
+	    Mtext(x) => {
+                let node_index = graph.add_node(x);
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+            }
+
+	    _=> (),
         }
     }
 }

@@ -1,6 +1,6 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup},
+    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup, Munder, Mover, Msubsup, Mtext},
 };
 use nom::{
     branch::alt,
@@ -96,6 +96,23 @@ macro_rules! etag {
     }};
 }
 
+
+// Trying to include a tag for <?xml......> with no end tag </ >
+//macro_rules! newtag {
+//    ($tag:expr) => {{
+//        delimited(tag("<?"), tag($tag), tag("?>"))
+//    }};
+//}
+
+/// A macro to help build tag parsers
+//macro_rules! new_tag_parser {
+//    ($tag:expr, $parser:expr) => {{
+//        ws(delimited(newtag!($tag), $parser, tag("<")))
+//    }};
+//}
+
+
+
 /// A macro to help build tag parsers
 macro_rules! tag_parser {
     ($tag:expr, $parser:expr) => {{
@@ -183,16 +200,59 @@ fn msqrt(input: Span) -> IResult<MathExpression> {
     Ok((s, expression))
 }
 
+// Underscripts
+fn munder(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("munder")(input)?;
+    Ok((s, Munder(elements)))
+}    
+
+// Overscipts
+fn mover(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("mover")(input)?;
+    Ok((s, Mover(elements)))
+}
+
+// Subscript-superscript Pair
+fn msubsup(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("msubsup")(input)?;
+    Ok((s, Msubsup(elements)))
+}
+
+
+//Text
+fn mtext(input: Span) -> IResult<MathExpression> {
+    let (s, element) = elem0!("mtext")(input)?;
+    Ok((s, Mtext(&element)))
+}
+
+// function for xml
+//fn xml(input: Span) -> IResult<MathExpression> {
+//    let (s, elements) = new_elem_many0!("xml")(input)?;
+//    Ok((s, Xml(&elements)))
+//}
+
 /// Math expressions
 fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((mi, mo, mn, msup, msub, msqrt, mfrac, mrow)))(input)
+    ws(alt((mi, mo, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext)))(input)
 }
 
 /// MathML documents
+//fn math(input: Span) -> IResult<Math> {
+//    let (s, elements) = elem_many0!("math")(input)?;
+//    Ok((s, Math { content: elements }))
+//}
+
+/// testing MathML documents
 fn math(input: Span) -> IResult<Math> {
     let (s, elements) = elem_many0!("math")(input)?;
     Ok((s, Math { content: elements }))
 }
+
+
+
+
+
+
 
 /// The `parse` function is part of the public API. It takes a string and returns a Math object.
 pub fn parse(input: &str) -> IResult<Math> {
@@ -200,6 +260,9 @@ pub fn parse(input: &str) -> IResult<Math> {
     let (remaining, math) = math(span)?;
     Ok((remaining, math))
 }
+
+
+
 
 /// A generic helper function for testing individual parsers.
 #[cfg(test)]
