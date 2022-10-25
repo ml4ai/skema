@@ -1,14 +1,16 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup, Munder, Mover, Msubsup, Mtext},
+    MathExpression::{
+        Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msub, Msubsup, Msup, Mtext, Munder, Mspace,
+    },
 };
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0},
-    combinator::map,
+    combinator::{map,opt},
     multi::many0,
-    sequence::{delimited, pair, separated_pair, tuple},
+    sequence::{delimited, pair, separated_pair, tuple, preceded},
 };
 use nom_locate::LocatedSpan;
 
@@ -95,23 +97,6 @@ macro_rules! etag {
         delimited(tag("</"), tag($tag), tag(">"))
     }};
 }
-
-
-// Trying to include a tag for <?xml......> with no end tag </ >
-//macro_rules! newtag {
-//    ($tag:expr) => {{
-//        delimited(tag("<?"), tag($tag), tag("?>"))
-//    }};
-//}
-
-/// A macro to help build tag parsers
-//macro_rules! new_tag_parser {
-//    ($tag:expr, $parser:expr) => {{
-//        ws(delimited(newtag!($tag), $parser, tag("<")))
-//    }};
-//}
-
-
 
 /// A macro to help build tag parsers
 macro_rules! tag_parser {
@@ -204,7 +189,7 @@ fn msqrt(input: Span) -> IResult<MathExpression> {
 fn munder(input: Span) -> IResult<MathExpression> {
     let (s, elements) = elem_many0!("munder")(input)?;
     Ok((s, Munder(elements)))
-}    
+}
 
 // Overscipts
 fn mover(input: Span) -> IResult<MathExpression> {
@@ -218,7 +203,6 @@ fn msubsup(input: Span) -> IResult<MathExpression> {
     Ok((s, Msubsup(elements)))
 }
 
-
 //Text
 fn mtext(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mtext")(input)?;
@@ -226,14 +210,34 @@ fn mtext(input: Span) -> IResult<MathExpression> {
 }
 
 // function for xml
-//fn xml(input: Span) -> IResult<MathExpression> {
-//    let (s, elements) = new_elem_many0!("xml")(input)?;
-//    Ok((s, Xml(&elements)))
-//}
+fn xml_declaration(input: Span) -> IResult<()> {
+    let (s, contents) = ws(delimited(tag("<?"), take_until("?>"), tag("?>")))(input)?;
+    Ok((s, ()))
+}
+
+//mspace
+fn mspace(input: Span) -> IResult<MathExpression> {
+    let (s, element) = ws(delimited(tag("<mspace"), take_until("width=\"1em\"/>"), tag("width=\"1em\"/>")))(input)?;
+    Ok((s, Mspace(&element)))
+}
 
 /// Math expressions
 fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((mi, mo, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext)))(input)
+    ws(alt((
+        mi,
+        mo,
+        mn,
+        msup,
+        msub,
+        msqrt,
+        mfrac,
+        mrow,
+        munder,
+        mover,
+        msubsup,
+        mtext,
+        mspace,
+    )))(input)
 }
 
 /// MathML documents
@@ -244,15 +248,10 @@ fn math_expression(input: Span) -> IResult<MathExpression> {
 
 /// testing MathML documents
 fn math(input: Span) -> IResult<Math> {
-    let (s, elements) = elem_many0!("math")(input)?;
+    //let (s, elements) = elem_many0!("math")(input)?;
+    let (s, elements) = preceded(opt(xml_declaration), elem_many0!("math"))(input)?;
     Ok((s, Math { content: elements }))
 }
-
-
-
-
-
-
 
 /// The `parse` function is part of the public API. It takes a string and returns a Math object.
 pub fn parse(input: &str) -> IResult<Math> {
@@ -260,9 +259,6 @@ pub fn parse(input: &str) -> IResult<Math> {
     let (remaining, math) = math(span)?;
     Ok((remaining, math))
 }
-
-
-
 
 /// A generic helper function for testing individual parsers.
 #[cfg(test)]
@@ -333,5 +329,14 @@ fn test_math() {
         Math {
             content: vec![Mrow(vec![Mo("-"), Mi("b")])],
         },
+    )
+}
+
+#[test]
+fn test_xml_header() {
+    test_parser(
+        "<?xml version=\"1.0\" ?>",
+        xml_declaration,
+        XmlDeclaration("xml version=\"1.0\" "),
     )
 }
