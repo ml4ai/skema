@@ -13,7 +13,6 @@ from automates.program_analysis.CAST2GrFN.model.cast import (
     BinaryOperator,
     Boolean,
     Call,
-    ClassDef,
     Dict,
     Expr,
     FunctionDef,
@@ -23,10 +22,12 @@ from automates.program_analysis.CAST2GrFN.model.cast import (
     ModelBreak,
     ModelContinue,
     ModelIf,
+    ModelImport,
     ModelReturn,
     Module,
     Name,
     Number,
+    RecordDef,
     ScalarType,
     Set,
     String,
@@ -319,8 +320,8 @@ class CASTToAGraphVisitor(CASTVisitor):
         return node_uid
 
     @visit.register
-    def _(self, node: ClassDef):
-        """Visits ClassDef nodes. We visit all fields and functions
+    def _(self, node: RecordDef):
+        """Visits RecordDef nodes. We visit all fields and functions
         of the class definition, and connect them to this node.
         This node's UID is returned."""
         # TODO: Where should bases field be used?
@@ -331,7 +332,7 @@ class CASTToAGraphVisitor(CASTVisitor):
         if len(node.fields) > 0:
             fields = self.visit_list(node.fields)
         node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Class: " + node.name)
+        self.G.add_node(node_uid, label="Record: " + node.name)
 
         # Add attributes to the graph
         attr_uid = uuid.uuid4()
@@ -350,8 +351,8 @@ class CASTToAGraphVisitor(CASTVisitor):
         return node_uid
 
     @visit.register
-    def _(self, node: AnnCastClassDef):
-        """Visits ClassDef nodes. We visit all fields and functions
+    def _(self, node: AnnCastRecordDef):
+        """Visits RecordDef nodes. We visit all fields and functions
         of the class definition, and connect them to this node.
         This node's UID is returned."""
         # TODO: Where should bases field be used?
@@ -577,7 +578,11 @@ class CASTToAGraphVisitor(CASTVisitor):
             return node_uid
         elif node.value_type == StructureType.LIST:
             node_uid = uuid.uuid4()
-            self.G.add_node(node_uid, label=f"List: [...]")
+            self.G.add_node(node_uid, label=f"List (str or list): [...]")
+            return node_uid
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label="Dict: {...}")
             return node_uid
         elif node.value_type == "List[Any]":
             node_uid = uuid.uuid4()
@@ -593,7 +598,10 @@ class CASTToAGraphVisitor(CASTVisitor):
 
                 #self.G.add_node(node_uid, label=f"List: Init_Val: [{init_val}], Size: {size} ")
                 self.G.add_node(node_uid, label=f"List: [{init_val}] {op} {size} (id: {id})")
-
+            return node_uid
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f"Dict: {node.value}")
             return node_uid
         else:
             assert False, f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
@@ -614,7 +622,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             return node_uid
         elif node.value_type == StructureType.LIST:
             node_uid = uuid.uuid4()
-            self.G.add_node(node_uid, label=f"List: [...]")
+            self.G.add_node(node_uid, label=f"List (str or list): [...]")
             return node_uid
         elif node.value_type == "List[Any]":
             node_uid = uuid.uuid4()
@@ -630,7 +638,9 @@ class CASTToAGraphVisitor(CASTVisitor):
 
                 #self.G.add_node(node_uid, label=f"List: Init_Val: [{init_val}], Size: {size} ")
                 self.G.add_node(node_uid, label=f"List: [{init_val}] {op} {size} (id: {id})")
-
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f"Dict: {node.value}")
             return node_uid
         else:
             assert False, f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
@@ -731,6 +741,34 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         for n in orelse:
             self.G.add_edge(orelse_uid, n)
+
+        return node_uid
+    
+    @visit.register
+    def _(self, node: AnnCastModelImport):
+        """Visits a ModelImport (Import statement) node.
+        name, alias, symbol, all
+
+        The node's UID is returned."""
+
+        node_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(node_uid, label=f"Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}")
+
+        return node_uid
+    
+    @visit.register
+    def _(self, node: ModelImport):
+        """Visits a ModelImport (Import statement) node.
+        name, alias, symbol, all
+
+        The node's UID is returned."""
+
+        node_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(node_uid, label=f"Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}")
 
         return node_uid
 
@@ -867,7 +905,7 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         class_init = False
         for n in self.cast.nodes[0].body:
-            if isinstance(n,ClassDef) and n.name == node.name:
+            if isinstance(n,RecordDef) and n.name == node.name:
                 class_init = True
                 self.G.add_node(node_uid, label=node.name + " Init()")
                 break
@@ -893,7 +931,7 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         class_init = False
         for n in self.cast.nodes[0].body:
-            if isinstance(n,ClassDef) and n.name == node.name:
+            if isinstance(n,RecordDef) and n.name == node.name:
                 class_init = True
                 self.G.add_node(node_uid, label=node.name + " Init()")
                 break

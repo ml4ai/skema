@@ -425,7 +425,7 @@ class GrfnVarCreationPass:
         self.visit(node.right)
         # The AnnCastTuple is added to handle scenarios where an assignment
         # is made by assigning to a tuple of values, as opposed to one singular value
-        assert isinstance(node.left, AnnCastVar) or isinstance(node.left, AnnCastTuple), f"container_scope: visit_assigment: node.left is not AnnCastVar or AnnCastTuple it is {type(node.left)}"
+        assert isinstance(node.left, AnnCastVar) or isinstance(node.left, AnnCastTuple) or isinstance(node.left, AnnCastAttribute), f"container_scope: visit_assigment: node.left is not AnnCastVar or AnnCastTuple it is {type(node.left)}"
         self.visit(node.left)
 
     @_visit.register
@@ -462,7 +462,7 @@ class GrfnVarCreationPass:
         self.visit_function_def_copy(node.func_def_copy)
 
     @_visit.register
-    def visit_class_def(self, node: AnnCastClassDef):
+    def visit_record_def(self, node: AnnCastRecordDef):
         pass
 
     @_visit.register
@@ -510,6 +510,8 @@ class GrfnVarCreationPass:
     @_visit.register
     def visit_loop(self, node: AnnCastLoop):
         self.create_grfn_vars_loop(node)
+        #if len(node.init) > 0:
+         #   self.alias_loop_init_highest_vers(node)
         self.alias_loop_expr_highest_vers(node)
         self.alias_loop_body_highest_vers(node)
         # visit children
@@ -525,6 +527,10 @@ class GrfnVarCreationPass:
 
     @_visit.register
     def visit_model_continue(self, node: AnnCastModelContinue):
+        pass
+
+    @_visit.register
+    def visit_model_import(self, node: AnnCastModelImport):
         pass
 
     @_visit.register

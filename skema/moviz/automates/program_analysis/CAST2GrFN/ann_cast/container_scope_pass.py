@@ -234,7 +234,7 @@ class ContainerScopePass:
         right_src_ref = self.visit(node.right, base_func_scopestr, enclosing_con_scope, AssignSide.RIGHT)
         # The AnnCastTuple is added to handle scenarios where an assignment
         # is made by assigning to a tuple of values, as opposed to one singular value
-        assert isinstance(node.left, AnnCastVar) or isinstance(node.left, AnnCastTuple), f"container_scope: visit_assigment: node.left is not AnnCastVar or AnnCastTuple it is {type(node.left)}"
+        assert isinstance(node.left, AnnCastVar) or isinstance(node.left, AnnCastTuple) or isinstance(node.left, AnnCastAttribute), f"container_scope: visit_assigment: node.left is {type(node.left)}"
         left_src_ref = self.visit(node.left, base_func_scopestr, enclosing_con_scope, AssignSide.LEFT)
 
         return combine_grfn_con_src_refs([right_src_ref, left_src_ref])
@@ -259,7 +259,7 @@ class ContainerScopePass:
 
     @_visit.register
     def visit_call(self, node: AnnCastCall, base_func_scopestr, enclosing_con_scope, assign_side):
-        assert isinstance(node.func, AnnCastName)
+        assert isinstance(node.func, AnnCastName) or isinstance(node.func, AnnCastAttribute)
         # if this call is on the RHS of an assignment, then it should have a ret val
         # FUTURE: this logic is not sufficient to determine 
         # all cases that a Call node should have a ret val
@@ -307,12 +307,12 @@ class ContainerScopePass:
 
     # FUTURE: decide how to handle a ClassDef's accessed, modified, and used variables
     @_visit.register
-    def visit_class_def(self, node: AnnCastClassDef, base_func_scopestr, enclosing_con_scope, assign_side):
+    def visit_record_def(self, node: AnnCastRecordDef, base_func_scopestr, enclosing_con_scope, assign_side):
         # we believe the start of the container should not be on either side of an assignment
         assert(assign_side == AssignSide.NEITHER)
         # we do not visit the name because it is a string
         assert isinstance(node.name, str)
-        classscope = enclosing_con_scope + [node.name]
+        classscope = enclosing_con_scope # + [node.name]
         # NOTE:
         # node.bases is a list of strings
         # node.funcs is a list of Vars
@@ -395,7 +395,8 @@ class ContainerScopePass:
     @_visit.register
     def visit_loop(self, node: AnnCastLoop, base_func_scopestr, enclosing_con_scope, assign_side):
         # we believe the start of the container should not be on either side of an assignment
-        assert(assign_side == AssignSide.NEITHER)
+        # (NOTE: In the case of list/dict comprehensions, they could be on the right hand side)
+        assert(assign_side == AssignSide.NEITHER or assign_side == AssignSide.RIGHT)
         # store the base_func_scopestr for this container
         node.base_func_scopestr = base_func_scopestr
 
@@ -436,9 +437,14 @@ class ContainerScopePass:
         pass
 
     @_visit.register
+    def visit_model_import(self, node: AnnCastModelImport, base_func_scopestr, enclosing_con_scope, assign_side):
+        pass
+
+    @_visit.register
     def visit_model_if(self, node: AnnCastModelIf, base_func_scopestr, enclosing_con_scope, assign_side):
         # we believe the start of the container should not be on either side of an assignment
-        assert(assign_side == AssignSide.NEITHER)
+        # (NOTE: In the case of list/dict comprehensions, they could be on the right hand side)
+        assert(assign_side == AssignSide.NEITHER or assign_side == AssignSide.RIGHT)
         # store the base_func_scopestr for this container
         node.base_func_scopestr = base_func_scopestr
         # want orig enclosing
@@ -540,7 +546,7 @@ class ContainerScopePass:
         pass
 
     @_visit.register
-    def visit_subscript(self, node: AnnCastSubscript, assign_side):
+    def visit_subscript(self, node: AnnCastSubscript, base_func_scoptr, enclosing_con_scope, assign_side):
         pass
 
     @_visit.register

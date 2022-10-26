@@ -1,0 +1,34 @@
+graph G {
+	subgraph clusterA {
+		subgraph "cluster_expr_fn-bf-1" {
+			node [shape=box]
+			x
+		}
+		subgraph "cluster_expr_fn-bf-2" {
+			node [shape=box]
+			y
+			node [shape=box]
+			"pif-fn-bf-2-1" [fontcolor=white]
+		}
+	}
+	"pif-fn-bf-2-1" -- x [fontcolor=white]
+	subgraph "cluster_expr_attr-b-1-1" {
+		node [shape=box]
+		"opo-attr-b-1-1" [fontcolor=white]
+		subgraph cluster_2 {
+			label=2
+			node [shape=box]
+			node [shape=box]
+			"pof-attr-bf-1-1" [fontcolor=white]
+		}
+	}
+	"opo-attr-b-1-1" -- "pof-attr-bf-1-1" [fontcolor=white]
+	subgraph "cluster_expr_attr-b-2-1" {
+		node [shape=box]
+		"opo-attr-b-2-1" [fontcolor=white]
+		node [shape=box]
+		"opi-attr-b-2-1" [fontcolor=white]
+	}
+	"cluster_expr_fn-bf-1" -- "cluster_expr_attr-b-1-1"
+	"cluster_expr_fn-bf-2" -- "cluster_expr_attr-b-2-1"
+}

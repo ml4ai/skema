@@ -8,7 +8,6 @@ from automates.program_analysis.CAST2GrFN.model.cast import (
     BinaryOp,
     Boolean,
     Call,
-    ClassDef,
     Dict,
     Expr,
     FunctionDef,
@@ -23,6 +22,7 @@ from automates.program_analysis.CAST2GrFN.model.cast import (
     Name,
     Number,
 #    ScalarType,
+    RecordDef,
     Set,
     String,
     Subscript,
@@ -33,6 +33,7 @@ from automates.program_analysis.CAST2GrFN.model.cast import (
 )    
 
 from automates.model_assembly.networks import GroundedFunctionNetwork, VariableNode
+from automates.program_analysis.CAST2GrFN.model.cast.model_import import ModelImport
 
 class PipelineState:
     def __init__(self, ann_nodes: typing.List, grfn2_2: bool):
@@ -509,7 +510,7 @@ class AnnCastList(AnnCastNode):
     def __str__(self):
         return List.__str__(self)
 
-class AnnCastClassDef(AnnCastNode):
+class AnnCastRecordDef(AnnCastNode):
     def __init__(self, name, bases, funcs, fields, source_refs):
         super().__init__(self)
         self.name = name
@@ -524,12 +525,12 @@ class AnnCastClassDef(AnnCastNode):
         return result
 
     def equiv(self, other):
-        if not isinstance(other, AnnCastClassDef):
+        if not isinstance(other, AnnCastRecordDef):
             return False
         return self.to_dict() == other.to_dict()
         
     def __str__(self):
-        return ClassDef.__str__(self)
+        return RecordDef.__str__(self)
 
 class AnnCastLiteralValue(AnnCastNode):
     def __init__(self, value_type, value, source_code_data_type, source_refs):
@@ -658,6 +659,27 @@ class AnnCastModelContinue(AnnCastNode):
         
     def __str__(self):
         return ModelContinue.__str__(self)
+
+class AnnCastModelImport(AnnCastNode):
+    def __init__(self, node: ModelImport):
+        super().__init__(self)
+        self.name = node.name
+        self.alias = node.alias
+        self.symbol = node.symbol
+        self.all = node.all
+        self.source_refs = node.source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelImport):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelImport.__str__(self)
 
 class AnnCastModelIf(AnnCastNode):
     def __init__(self, expr, body, orelse, source_refs):
