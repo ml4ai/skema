@@ -1,7 +1,7 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msub, Msubsup, Msup, Mtext, Munder, Mspace,
+        Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msub, Msubsup, Msup, Mtext, Mstyle, Munder, Mspace, MoLine,
     },
 };
 
@@ -121,7 +121,26 @@ impl<'a> MathExpression<'a> {
                 }
             }
 
+	    
+	    Mstyle(elements) => {
+                let node_index = graph.add_node("mrow");
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+                parent_index = Some(node_index);
+                for element in elements {
+                    element.add_to_graph(graph, parent_index);
+                }
+            }
+	    
 	    Mspace(x) => {
+                let node_index = graph.add_node(x);
+                if let Some(p) = parent_index {
+                    graph.add_edge(p, node_index, 1);
+                }
+            }
+
+	    MoLine(x) => {
                 let node_index = graph.add_node(x);
                 if let Some(p) = parent_index {
                     graph.add_edge(p, node_index, 1);

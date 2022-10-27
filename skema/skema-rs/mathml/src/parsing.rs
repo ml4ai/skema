@@ -1,7 +1,7 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msub, Msubsup, Msup, Mtext, Munder, Mspace,
+        Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msub, Msubsup, Msup, Mtext, Mstyle, Munder, Mspace, MoLine,
     },
 };
 use nom::{
@@ -209,16 +209,28 @@ fn mtext(input: Span) -> IResult<MathExpression> {
     Ok((s, Mtext(&element)))
 }
 
+//mstyle
+fn mstyle(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("mstyle")(input)?;
+    Ok((s, Mstyle(elements)))
+}
+
 // function for xml
 fn xml_declaration(input: Span) -> IResult<()> {
-    let (s, contents) = ws(delimited(tag("<?"), take_until("?>"), tag("?>")))(input)?;
+    let (s, _contents) = ws(delimited(tag("<?"), take_until("?>"), tag("?>")))(input)?;
     Ok((s, ()))
 }
 
 //mspace
 fn mspace(input: Span) -> IResult<MathExpression> {
-    let (s, element) = ws(delimited(tag("<mspace"), take_until("width=\"1em\"/>"), tag("width=\"1em\"/>")))(input)?;
+    let (s, element) = ws(delimited(tag("<mspace"), take_until("/>"), tag("/>")))(input)?;
     Ok((s, Mspace(&element)))
+}
+
+// Some xml have <mo .../>
+fn mo_line(input: Span) -> IResult<MathExpression> {
+    let (s, element) = ws(delimited(tag("<mo"), take_until("/>"), tag("/>")))(input)?;
+    Ok((s, MoLine(&element)))
 }
 
 /// Math expressions
@@ -236,7 +248,9 @@ fn math_expression(input: Span) -> IResult<MathExpression> {
         mover,
         msubsup,
         mtext,
+	mstyle,
         mspace,
+	mo_line,
     )))(input)
 }
 

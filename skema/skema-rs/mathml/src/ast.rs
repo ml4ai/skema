@@ -12,7 +12,9 @@ pub enum MathExpression<'a> {
     Mover(Vec<MathExpression<'a>>),
     Msubsup(Vec<MathExpression<'a>>),
     Mtext(&'a str),
+    Mstyle(Vec<MathExpression<'a>>),
     Mspace(&'a str),
+    MoLine(&'a str),
 }
 
 #[derive(Debug, PartialEq)]
