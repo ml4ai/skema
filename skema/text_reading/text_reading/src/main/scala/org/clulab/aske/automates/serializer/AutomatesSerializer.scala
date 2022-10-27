@@ -236,7 +236,8 @@ object AutomatesJSONSerializer {
   def toDirectedGraph(edgesAndRoots: ujson.Value): DirectedGraph[String] = {
     val edges = edgesAndRoots.obj("edges").arr.map(item => new Edge(item.obj("source").num.toInt, item.obj("destination").num.toInt, item.obj("relation").str))
     val roots = edgesAndRoots.obj("roots").arr.map(_.num.toInt).toSet
-    new DirectedGraph[String](edges.toList, roots)
+    assert(roots.size == 1)
+    new DirectedGraph[String](edges.toList, Some(roots.head))
   }
 
   // Serialization

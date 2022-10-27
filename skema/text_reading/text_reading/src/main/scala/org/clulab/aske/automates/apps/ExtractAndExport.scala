@@ -10,11 +10,11 @@ import org.clulab.aske.automates.attachments.{AutomatesAttachment, MentionLocati
 import org.clulab.aske.automates.cosmosjson.CosmosJsonProcessor
 import org.clulab.aske.automates.mentions.CrossSentenceEventMention
 import org.clulab.aske.automates.serializer.AutomatesJSONSerializer
-import org.clulab.utils.{DisplayUtils, FileUtils, Serializer}
+import org.clulab.aske.automates.utils.AlignmentJsonUtils.GlobalVariable
 import org.clulab.odin.Mention
 import org.clulab.odin.serialization.json.JSONSerializer
-import org.clulab.utils.AlignmentJsonUtils.GlobalVariable
-import org.clulab.utils.MentionUtils.{getMentionsWithLocations, getMentionsWithoutLocations}
+import org.clulab.aske.automates.utils.{DisplayUtils, MentionUtils}
+import org.clulab.utils.{FileUtils, Serializer}
 import org.json4s.jackson.JsonMethods._
 
 import scala.collection.mutable.ArrayBuffer
@@ -63,10 +63,10 @@ object ExtractAndExport extends App {
     // 3. Extract causal mentions from the texts
     val mentions = if (file.getName.contains("COSMOS")) {
       // cosmos json
-      getMentionsWithLocations(texts, file, reader)
+      MentionUtils.getMentionsWithLocations(texts, file, reader)
     } else {
       // other file types---those don't have locations
-      getMentionsWithoutLocations(texts, file, reader)
+      MentionUtils.getMentionsWithoutLocations(texts, file, reader)
     }
     //The version of mention that includes routing between text vs. comment
     //    val mentions = texts.flatMap(text => textRouter.route(text).extractFromText(text, filename = Some(file.getName))).seq

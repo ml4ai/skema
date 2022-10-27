@@ -1,11 +1,11 @@
 package org.clulab.aske.automates.data
 
 import java.io.File
-
 import ai.lum.common.StringUtils._
 import org.clulab.aske.automates.scienceparse.ScienceParseClient
-import org.clulab.utils.FileUtils.getTextFromFile
 import org.clulab.aske.automates.cosmosjson._
+import org.clulab.utils.FileUtils
+
 import scala.util.matching.Regex
 
 
@@ -119,7 +119,7 @@ class PlainTextDataLoader extends DataLoader {
     * @param f the File being loaded
     * @return string content of file (wrapped in sequence)
     */
-  def loadFile(f: File): Seq[String] = Seq(getTextFromFile(f))
+  def loadFile(f: File): Seq[String] = Seq(FileUtils.getTextFromFile(f))
   override val extension: String = "txt"
 }
 
@@ -131,7 +131,7 @@ class MarkdownTextDataLoader extends DataLoader {
     * @param f the File being loaded
     * @return string content of file (wrapped in sequence)
     */
-  def loadFile(f: File): Seq[String] = getTextFromFile(f).split("\n").filter(_.nonEmpty).map(t=>t.replace("`", ""))
+  def loadFile(f: File): Seq[String] = FileUtils.getTextFromFile(f).split("\n").filter(_.nonEmpty).map(t=>t.replace("`", ""))
   override val extension: String = "md"
 }
 
@@ -145,7 +145,7 @@ class TokenizedLatexDataLoader extends DataLoader {
     * @return chunked latex tokens from equations
     */
   def loadFile(f: File): Seq[String] = {
-    getTextFromFile(f).split("\n")
+    FileUtils.getTextFromFile(f).split("\n")
   }
   override val extension: String = "txt"
 

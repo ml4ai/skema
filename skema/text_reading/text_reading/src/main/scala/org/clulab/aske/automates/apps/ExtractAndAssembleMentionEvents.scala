@@ -8,9 +8,9 @@ import org.clulab.aske.automates.OdinEngine
 import org.clulab.aske.automates.apps.ExtractAndAlign.{getGlobalVars, returnAttachmentOfAGivenTypeOption}
 import org.clulab.aske.automates.attachments.{MentionLocationAttachment, ParamSettingIntAttachment}
 import org.clulab.aske.automates.mentions.CrossSentenceEventMention
-import org.clulab.utils.{FileUtils, Serializer}
+import org.clulab.aske.automates.utils.MentionUtils
 import org.clulab.odin.{EventMention, Mention}
-import org.clulab.utils.MentionUtils.{distinctByText, getMentionsWithLocations, getMentionsWithoutLocations, getTriggerText}
+import org.clulab.utils.FileUtils
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -54,10 +54,10 @@ object ExtractAndAssembleMentionEvents extends App {
     val texts = dataLoader.loadFile(file)
     val mentions = if (file.getName.contains("COSMOS")) {
       // cosmos json
-      getMentionsWithLocations(texts, file, reader)
+      MentionUtils.getMentionsWithLocations(texts, file, reader)
     } else {
       // other file types---those don't have locations
-      getMentionsWithoutLocations(texts, file, reader)
+      MentionUtils.getMentionsWithoutLocations(texts, file, reader)
     }
 
     fileExt match {
@@ -68,8 +68,8 @@ object ExtractAndAssembleMentionEvents extends App {
     }
   }
 
-  val distinctTextMention = distinctByText(textMentions.distinct)
-  val distinctMdMentions = distinctByText(mdMentions.distinct)
+  val distinctTextMention = MentionUtils.distinctByText(textMentions.distinct)
+  val distinctMdMentions = MentionUtils.distinctByText(mdMentions.distinct)
   val obj = assembleMentions(distinctTextMention, distinctMdMentions)
 
   writeJsonToFile(obj, outputDir, "assembledMentions.json")
@@ -85,7 +85,7 @@ object ExtractAndAssembleMentionEvents extends App {
         case "CommandSequence" => {
           val modelObjs = new ArrayBuffer[ujson.Value]()
           for (m <- g._2) {
-            val trigger = getTriggerText(m)
+            val trigger = MentionUtils.getTriggerText(m)
             val oneModel = ujson.Obj(
               "text" -> m.text,
               "command" -> trigger
@@ -129,7 +129,7 @@ object ExtractAndAssembleMentionEvents extends App {
         case "ModelDescr" => {
           val modelObjs = new ArrayBuffer[ujson.Value]()
           for (m <- g._2) {
-            val trigger = getTriggerText(m)
+            val trigger = MentionUtils.getTriggerText(m)
             val oneModel = ujson.Obj(
               "name" -> m.arguments("modelName").head.text,
               "description" -> m.arguments("modelDescr").head.text,
@@ -142,7 +142,7 @@ object ExtractAndAssembleMentionEvents extends App {
         case "ModelLimitation" => {
           val modelObjs = new ArrayBuffer[ujson.Value]()
           for (m <- g._2) {
-            val trigger = getTriggerText(m)
+            val trigger = MentionUtils.getTriggerText(m)
             val oneModel = ujson.Obj(
               "name" -> m.arguments("modelName").head.text,
               "limitation" -> m.arguments("modelDescr").head.text,

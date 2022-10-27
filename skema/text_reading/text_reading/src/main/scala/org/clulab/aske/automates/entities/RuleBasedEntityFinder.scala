@@ -5,9 +5,8 @@ import com.typesafe.scalalogging.LazyLogging
 import org.clulab.odin.{ExtractorEngine, Mention, State, TextBoundMention}
 import org.clulab.processors.{Document, Sentence}
 import org.clulab.struct.Interval
-import org.clulab.utils.FileUtils
 import ai.lum.common.ConfigUtils._
-
+import org.clulab.utils.FileUtils
 
 import scala.annotation.tailrec
 

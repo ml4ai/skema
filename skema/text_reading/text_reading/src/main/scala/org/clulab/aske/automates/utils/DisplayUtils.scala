@@ -1,4 +1,4 @@
-package org.clulab.utils
+package org.clulab.aske.automates.utils
 
 import java.io.PrintWriter
 import org.clulab.aske.automates.attachments.{AutomatesAttachment, DiscontinuousCharOffsetAttachment}

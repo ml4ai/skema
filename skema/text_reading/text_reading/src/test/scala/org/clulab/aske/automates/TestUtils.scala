@@ -8,11 +8,10 @@ import org.clulab.aske.automates.OdinEngine._
 import org.clulab.aske.automates.apps.{AlignmentBaseline, ExtractAndAlign}
 import org.clulab.aske.automates.apps.ExtractAndAlign.{GLOBAL_VAR_TO_UNIT_VIA_CONCEPT, allLinkTypes, whereIsGlobalVar, whereIsNotGlobalVar}
 import org.clulab.aske.automates.attachments.AutomatesAttachment
+import org.clulab.aske.automates.utils.MentionUtils
 import org.clulab.processors.Document
 import org.clulab.serialization.json.JSONSerializer
-import org.clulab.utils.MentionUtils
 import org.json4s.jackson.JsonMethods._
-import play.libs.F.Tuple
 import ujson.Value
 
 import scala.collection.mutable.ArrayBuffer
@@ -360,7 +359,7 @@ object TestUtils {
     // INDIRECT LINK TESTS
 
     def topIndirectLinkTest(idf: String, desired: String, inDirectLinks: Map[String,
-      Seq[Tuple[String, Double]]],
+      Seq[(String, Double)]],
                             linkType: String, status: String): Unit = {
       // todo: use threshold here now that we are saving it
       val threshold = allLinkTypes("indirect").obj(linkType).num
@@ -378,7 +377,7 @@ object TestUtils {
     }
 
 
-    def negativeIndirectLinkTest(idf: String, indirectLinks: Map[String, Seq[Tuple[String, Double]]],
+    def negativeIndirectLinkTest(idf: String, indirectLinks: Map[String, Seq[(String, Double)]],
                                  linkType: String): Unit = {
       it should s"have NO ${linkType} link for global var $idf" in {
 
@@ -406,9 +405,8 @@ object TestUtils {
 
     // return indirect links of a given type as a list of strings per each intermediate node
     def findIndirectLinks(allDirectVarLinks: Seq[Value], allLinks: Seq[Value], linkTypeToBuildOffOf: String,
-                          indirectLinkType: String, nIndirectLinks: Int): Map[String, Seq[Tuple[String, Double]]] =
-    {
-      val indirectLinkEndNodes = new ArrayBuffer[Tuple[String,Double]]()
+        indirectLinkType: String, nIndirectLinks: Int): Map[String, Seq[(String, Double)]] = {
+      val indirectLinkEndNodes = new ArrayBuffer[(String,Double)]()
       val allIndirectLinks = new ArrayBuffer[Value]()
       // we have links for some var, e.g., I(t)
       // through one of the existing links, we can get to another type of node
@@ -455,7 +453,7 @@ object TestUtils {
         for (j <- 0 until sortedIntermNodeNames.length) {
           val intermNodeName = sortedIntermNodeNames(j)
 
-          val endNode = groupedByElement2(intermNodeName).map(l => Tuple(l.obj("element_1").str, l.obj("score").num))
+          val endNode = groupedByElement2(intermNodeName).map(l => (l.obj("element_1").str, l.obj("score").num))
           if (endNode.length > i) {
             indirectLinkEndNodes.append(endNode(i))
           }
@@ -482,10 +480,7 @@ object TestUtils {
       }
     }
 
-    def getLinksForGvar(idfr: String, allLinks: Seq[Value]): (Map[String, Seq[Value]], Map[String, Seq[Tuple[String,
-      Double]]])
-    = {
-
+    def getLinksForGvar(idfr: String, allLinks: Seq[Value]): (Map[String, Seq[Value]], Map[String, Seq[(String, Double)]]) = {
       val maybeGreek = AlignmentBaseline.replaceGreekWithWord(idfr, AlignmentBaseline.greek2wordDict.toMap).replace("\\\\", "")
       // links are returned as maps from link types to a) full links for direct links and b) sequences of elements linked indirectly to the global var
       // sorted by score based on the two edges in the indirect link
@@ -546,12 +541,8 @@ object TestUtils {
     }
 
 
-    def runAllAlignTests(variable: String, directLinks: Map[String, Seq[Value]], indirectLinks: Map[String,
-      Seq[Tuple[String,
-      Double]]],
-                         directDesired: Map[String, Tuple2[String, String]], indirectDesired: Map[String, Tuple2[String, String]])
-    : Unit
-    = {
+    def runAllAlignTests(variable: String, directLinks: Map[String, Seq[Value]], indirectLinks: Map[String, Seq[(String, Double)]],
+        directDesired: Map[String, Tuple2[String, String]], indirectDesired: Map[String, Tuple2[String, String]]): Unit = {
       for (dl <- directDesired) {
         val desired = dl._2._1
         val linkType = dl._1

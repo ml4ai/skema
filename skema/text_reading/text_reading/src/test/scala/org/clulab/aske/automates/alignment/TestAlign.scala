@@ -4,11 +4,12 @@ import java.io.File
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.clulab.aske.automates.apps.{AlignmentArguments, ExtractAndAlign}
-import org.clulab.utils.{AlignmentJsonUtils, Sourcer}
 import ai.lum.common.FileUtils._
 import org.clulab.aske.automates.TestUtils.TestAlignment
 import org.clulab.aske.automates.apps.ExtractAndAlign.{COMMENT_TO_GLOBAL_VAR, EQN_TO_GLOBAL_VAR, GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT, GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER, GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT, GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER, GLOBAL_VAR_TO_UNIT_VIA_CONCEPT, GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER, SRC_TO_COMMENT, allLinkTypes}
-import org.clulab.embeddings.word2vec.Word2Vec
+import org.clulab.aske.automates.utils.AlignmentJsonUtils
+import org.clulab.embeddings.SanitizedWordEmbeddingMap
+import org.clulab.utils.Sourcer
 
 /* Tests the alignment payload created based on the toy double-epidemic-and-chime files in /test/resources;
   should changes need to be made to the toy document, the latex template is stored under /test/resources/toy_document_tex;
@@ -24,7 +25,7 @@ class TestAlign extends TestAlignment {
 
   val config: Config = ConfigFactory.load("test.conf")
   val vectors: String = config[String]("alignment.w2vPath")
-  val w2v = new Word2Vec(Sourcer.sourceFromResource(vectors), None)
+  val w2v = new SanitizedWordEmbeddingMap(Sourcer.sourceFromResource(vectors), None, false)
   val relevantArgs: List[String] = config[List[String]]("alignment.relevantArgs")
   val alignmentHandler = new AlignmentHandler(w2v, relevantArgs.toSet)
   // get general configs

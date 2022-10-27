@@ -1,4 +1,4 @@
-package org.clulab.utils
+package org.clulab.aske.automates.utils
 
 import org.clulab.processors.corenlp.CoreNLPDocument
 import org.clulab.processors.shallownlp.ShallowNLPProcessor
@@ -31,7 +31,7 @@ class FilterByLength(processor: Processor, cutoff: Int = 200) extends DocumentFi
     val sanitizedText = sanitizeText(doc)
     val kept = doc.sentences.filter(s => s.words.length < cutoff)
     val skipped = doc.sentences.size - kept.size
-    val newDoc = Document(doc.id, kept, doc.coreferenceChains, doc.discourseTree, sanitizedText)
+    val newDoc = Document(doc.id, kept, doc.coreferenceChains, sanitizedText)
 //    val newDoc = Document(doc.id, kept, doc.coreferenceChains, doc.discourseTree, doc.text)
     val newerDoc = // This is a hack for lack of copy constructor for CoreNLPDocument
       if (doc.isInstanceOf[CoreNLPDocument])

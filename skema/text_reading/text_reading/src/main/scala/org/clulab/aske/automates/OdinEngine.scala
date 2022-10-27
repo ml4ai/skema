@@ -6,11 +6,12 @@ import com.typesafe.config.ConfigValueFactory
 import org.clulab.odin.{ExtractorEngine, Mention, State}
 import org.clulab.processors.{Document, Processor}
 import org.clulab.processors.fastnlp.FastNLPProcessor
-import org.clulab.aske.automates.entities.{EntityFinder,StringMatchEntityFinder}
-import org.clulab.utils.{DocumentFilter, FileUtils, FilterByLength, PassThroughFilter}
+import org.clulab.aske.automates.entities.{EntityFinder, StringMatchEntityFinder}
 import org.slf4j.LoggerFactory
 import ai.lum.common.ConfigUtils._
 import org.clulab.aske.automates.data.{EdgeCaseParagraphPreprocessor, LightPreprocessor, PassThroughPreprocessor, Preprocessor}
+import org.clulab.aske.automates.utils.{DocumentFilter, FilterByLength, PassThroughFilter, TsvUtils}
+import org.clulab.utils.FileUtils
 
 
 class OdinEngine(
@@ -219,7 +220,7 @@ object OdinEngine {
     // expansion: used to optionally expand mentions in certain situations to get more complete text spans
     val validArgs: List[String] = odinConfig[List[String]]("validArgs")
     val enableExpansion: Boolean = odinConfig[Boolean]("enableExpansion")
-    val freqWords = FileUtils.loadFromOneColumnTSV(odinConfig[String]("freqWordsPath"))
+    val freqWords = TsvUtils.loadFromOneColumnTSV(odinConfig[String]("freqWordsPath"))
 
     new OdinEngine(proc, masterRulesPath, taxonomyPath, entityFinders, enableExpansion, validArgs, freqWords, filterType, preprocessorType)
   }

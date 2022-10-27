@@ -4,21 +4,21 @@ package org.clulab.aske.automates.alignment
 import ai.lum.common.ConfigFactory
 import com.typesafe.config.Config
 import ai.lum.common.ConfigUtils._
-import org.clulab.embeddings.word2vec.Word2Vec
+import org.clulab.embeddings.SanitizedWordEmbeddingMap
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.apache.commons.text.similarity.LevenshteinDistance
 import org.clulab.aske.automates.apps.AlignmentBaseline
+import org.clulab.aske.automates.utils.AlignmentJsonUtils.GlobalVariable
+import org.clulab.aske.automates.utils.TsvUtils
 import org.clulab.odin.impl.OdinConfig
-import org.clulab.utils.AlignmentJsonUtils.GlobalVariable
-import org.clulab.utils.{FileUtils, Sourcer}
 
 import scala.collection.mutable.ArrayBuffer
 
 case class AlignmentHandler(editDistance: VariableEditDistanceAligner, w2v: PairwiseW2VAligner) {
 
   def this(w2vPath: String, relevantArgs: Set[String]) =
-    this(new VariableEditDistanceAligner(), new PairwiseW2VAligner(new Word2Vec(w2vPath), relevantArgs))
-  def this(w2v: Word2Vec, relevantArgs: Set[String]) =
+    this(new VariableEditDistanceAligner(), new PairwiseW2VAligner(new SanitizedWordEmbeddingMap(w2vPath), relevantArgs))
+  def this(w2v: SanitizedWordEmbeddingMap, relevantArgs: Set[String]) =
     this(new VariableEditDistanceAligner(), new PairwiseW2VAligner(w2v, relevantArgs))
   def this(config: Config) = this(config[String]("w2vPath"), config[List[String]]("relevantArgs").toSet)
 }
@@ -106,11 +106,11 @@ class VariableEditDistanceAligner(relevantArgs: Set[String] = Set("variable"))  
   * @param w2v
   * @param relevantArgs a Set of the string argument names that you want to include in the similarity (e.g., "variable" or "description")
   */
-class PairwiseW2VAligner(val w2v: Word2Vec, val relevantArgs: Set[String]) extends Aligner {
+class PairwiseW2VAligner(val w2v: SanitizedWordEmbeddingMap, val relevantArgs: Set[String]) extends Aligner {
 
-  val stopWords = FileUtils.loadFromOneColumnTSV("src/main/resources/stopWords.tsv")
+  val stopWords = TsvUtils.loadFromOneColumnTSV("src/main/resources/stopWords.tsv")
 
-  def this(w2vPath: String, relevantArgs: Set[String]) = this(new Word2Vec(w2vPath), relevantArgs)
+  def this(w2vPath: String, relevantArgs: Set[String]) = this(new SanitizedWordEmbeddingMap(w2vPath), relevantArgs)
 
   def getBigrams(textStrings: Seq[String]): Seq[String] = {
     val bigrams = new ArrayBuffer[String]()
@@ -227,7 +227,7 @@ class PairwiseW2VAligner(val w2v: Word2Vec, val relevantArgs: Set[String]) exten
 object PairwiseW2VAligner {
   def fromConfig(config: Config): Aligner = {
     val w2vPath: String = config[String]("w2vPath")
-    val w2v = new Word2Vec(w2vPath)
+    val w2v = new SanitizedWordEmbeddingMap(w2vPath)
     val relevantArgs: List[String] = config[List[String]]("relevantArgs")
 
     new PairwiseW2VAligner(w2v, relevantArgs.toSet)

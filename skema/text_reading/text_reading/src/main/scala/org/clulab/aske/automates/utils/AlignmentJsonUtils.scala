@@ -1,4 +1,4 @@
-package org.clulab.utils
+package org.clulab.aske.automates.utils
 
 import java.io.File
 import ai.lum.common.FileUtils._

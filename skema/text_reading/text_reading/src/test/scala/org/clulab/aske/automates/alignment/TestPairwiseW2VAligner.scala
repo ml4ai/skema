@@ -3,21 +3,21 @@ package org.clulab.aske.automates.alignment
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import org.clulab.aske.automates.TestUtils
-import org.clulab.embeddings.word2vec.Word2Vec
 import org.clulab.odin.{RelationMention, TextBoundMention}
 import org.clulab.odin.impl.{OdinCompileException, TokenPattern}
 import org.clulab.processors.Document
 import org.clulab.processors.fastnlp.FastNLPProcessor
-import org.clulab.utils.{FileUtils, Sourcer}
 import org.clulab.aske.automates.TestUtils.jsonStringToDocument
+import org.clulab.embeddings.SanitizedWordEmbeddingMap
 import org.clulab.struct.Interval
+import org.clulab.utils.Sourcer
 import org.scalatest.{FlatSpec, Matchers}
 
 class TestPairwiseW2VAligner extends FlatSpec with Matchers {
 
   val config: Config = ConfigFactory.load("test.conf")
   val vectors: String = config[String]("alignment.w2vPath")
-  val w2v = new Word2Vec(Sourcer.sourceFromResource(vectors), None)
+  val w2v = new SanitizedWordEmbeddingMap(Sourcer.sourceFromResource(vectors), None, false)
 
   lazy val proc = TestUtils.newOdinSystem(ConfigFactory.load("test.conf")).proc
 

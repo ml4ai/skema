@@ -1,4 +1,4 @@
-package org.clulab.utils
+package org.clulab.aske.automates.utils
 
 import org.clulab.aske.automates.OdinEngine
 
