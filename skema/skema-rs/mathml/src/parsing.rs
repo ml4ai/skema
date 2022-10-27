@@ -346,11 +346,3 @@ fn test_math() {
     )
 }
 
-#[test]
-fn test_xml_header() {
-    test_parser(
-        "<?xml version=\"1.0\" ?>",
-        xml_declaration,
-        XmlDeclaration("xml version=\"1.0\" "),
-    )
-}
