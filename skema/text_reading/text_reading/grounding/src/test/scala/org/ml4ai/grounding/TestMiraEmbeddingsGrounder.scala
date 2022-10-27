@@ -1,20 +1,13 @@
 package org.ml4ai.grounding
 
 import com.typesafe.config.ConfigFactory
-import org.ml4ai.grounding.common.utils.{Sourcer, Test}
+import org.clulab.utils.{FileUtils, Sourcer}
+import org.ml4ai.grounding.common.utils.Test
 import org.scalatest.OptionValues._
 
 import java.io.File
 
 class TestMiraEmbeddingsGrounder extends Test {
-
-  def getTextFromResource(path: String): String = {
-    val source = Sourcer.sourceFromResource(path)
-    val text = source.mkString
-
-    source.close
-    text
-  }
 
   // Lazily load the grounder. We assume it's state and behavior is immutable
   // So we can build it once and reuse it as necessary in the suite
@@ -54,7 +47,7 @@ class TestMiraEmbeddingsGrounder extends Test {
     val groundingTargets = {
       val targets = {
         // Drop the first line that is the header
-        getTextFromResource("/grounding_tests.tsv").split("\n").drop(1) map {
+        FileUtils.getTextFromResource("/grounding_tests.tsv").split("\n").drop(1) map {
           l =>
             val tokens = l.split("\t")
             (tokens(0), tokens(1))

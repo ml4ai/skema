@@ -2,9 +2,9 @@ package org.ml4ai.grounding
 
 import org.clulab.embeddings.{ExplicitWordEmbeddingMap, WordEmbeddingMap}
 import org.clulab.processors.clu.CluProcessor
-import org.clulab.utils.{InputStreamer, Serializer}
 import org.ml4ai.grounding.MiraEmbeddingsGrounder.generateNormalizedEmbedding
 import org.clulab.embeddings.CompactWordEmbeddingMap
+import org.clulab.utils.{InputStreamer, Serializer}
 import ujson.Arr
 
 import java.io.File
