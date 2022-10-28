@@ -13,6 +13,7 @@ use nom::{
     sequence::{delimited, pair, separated_pair, tuple, preceded},
 };
 use nom_locate::LocatedSpan;
+use std::fs;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
@@ -254,12 +255,6 @@ fn math_expression(input: Span) -> IResult<MathExpression> {
     )))(input)
 }
 
-/// MathML documents
-//fn math(input: Span) -> IResult<Math> {
-//    let (s, elements) = elem_many0!("math")(input)?;
-//    Ok((s, Math { content: elements }))
-//}
-
 /// testing MathML documents
 fn math(input: Span) -> IResult<Math> {
     //let (s, elements) = elem_many0!("math")(input)?;
@@ -331,6 +326,58 @@ fn test_math_expression() {
 }
 
 #[test]
+fn test_mover() {
+    test_parser(
+        "<mover><mi>x</mi><mo>¯</mo></mover>",
+        mover,
+        Mover(vec![Mi("x"), Mo("¯")]),
+    )
+}
+
+#[test]
+fn test_munder() {
+    test_parser(
+        "<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
+        munder,
+        Munder(vec![Mo("inf"), Mn("0"), Mo("≤"), Mi("t"), Mo("≤")]),
+    )
+}
+
+#[test]
+fn test_msubsup() {
+    test_parser(
+	"<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
+        msubsup,
+        Msubsup(vec![Mi("L"), Mi("t"), Mi("∞")]),
+    )
+}
+
+#[test]
+fn test_mtext() {
+    test_parser("<mtext>if</mtext>", mtext, Mtext("if"));
+}
+
+#[test]
+fn test_mstyle() {
+    test_parser(
+	"<mstyle><mo>∑</mo><mi>I</mi></mstyle>",
+        mstyle,
+        Mstyle(vec![Mo("∑"), Mi("I")]),
+    )
+}
+
+#[test]
+fn test_mspace() {
+    test_parser("<mspace width=\"1em\"/>", mspace, Mspace(" width=\"1em\""));
+}
+
+#[test]
+fn test_moline() {
+    test_parser("<mo fence=\"true\" stretchy=\"true\" symmetric=\"true\"/>", mo_line, MoLine(" fence=\"true\" stretchy=\"true\" symmetric=\"true\""));
+}
+
+
+#[test]
 fn test_math() {
     test_parser(
         "<math>
@@ -346,3 +393,14 @@ fn test_math() {
     )
 }
 
+#[test]
+fn test_mathml_parser(){
+    let path = fs::read_to_string("../tests/sir.xml");
+    test_parser(
+	"path",
+    	math,
+    	Math{
+	    content: vec![path],
+        },
+    )
+}
