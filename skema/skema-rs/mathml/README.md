@@ -7,7 +7,7 @@ outputs a graph representation of the document in the Graphviz DOT format.
 
 ## `parse_mathml`
 
-The `extract_comments` program produces a DOT representation of a MathML
+The `parse_mathml` program produces a DOT representation of a MathML
 document.
 
 Invocation:
