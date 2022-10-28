@@ -23,8 +23,7 @@ libraryDependencies ++= {
     "com.lihaoyi"                %% "ujson-json4s"       % uJsonVer,
     "com.lihaoyi"                %% "ujson-play"         % uJsonVer,
     "com.lihaoyi"                %% "requests"           % "0.7.1",
-    "com.typesafe.scala-logging" %% "scala-logging"      % "3.9.4",
-    "com.typesafe.play"          %% "play-json"          % "2.7.0",
+    "com.typesafe.play"          %% "play-json"          % "2.9.3",
     "org.scala-lang.modules"     %% "scala-xml"          % "1.0.6", // 2.1.0",
     "org.scalatest"              %% "scalatest"          % "3.0.9" % "test"
   )
