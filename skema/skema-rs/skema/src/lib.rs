@@ -245,7 +245,6 @@ pub struct Gromet {
 
 // Methods
 // This is a custom deserialization of the value field in the Value struct.
-// Currently only for numerical values, as gromets develope will need maintaince.
 fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Error> {
     Ok(match Value::deserialize(deserializer)? {
         Value::Number(num) => num.to_string(),
@@ -292,7 +291,7 @@ where
         '[' => {
             let vals: Vec<ValueL> = serde_json::from_str(x).unwrap();
             s.collect_seq(vals.iter()) // This is to serialize a vector, WARNING: serde is only implemented for vecs up to length 32 by default.
-        } // now to serialize the array of vectors that is encoded as a string
+        }
         '{' => s.serialize_str(x), // This is just if maps are serialized as strings, change if that changes
         '"' => {
             let char_vec: Vec<char> = x.chars().collect();
