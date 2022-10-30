@@ -1,6 +1,6 @@
 graph G {
 	subgraph clusterA {
-		subgraph "cluster_lit_fn-bf-1" {
+		subgraph "cluster_lit_2_fn-bf-1" {
 			label=2
 			node [shape=box]
 			node [shape=box]
@@ -12,7 +12,7 @@ graph G {
 			node [shape=box]
 			"pif-fn-bf-2-1" [fontcolor=white]
 		}
-		subgraph "cluster_lit_fn-bf-3" {
+		subgraph "cluster_lit_3_fn-bf-3" {
 			label=3
 			node [shape=box]
 			node [shape=box]
@@ -25,21 +25,21 @@ graph G {
 			"pif-fn-bf-4-1" [fontcolor=white]
 		}
 	}
-	"pif-fn-bf-2-1" -- "pof-fn-bf-1" [fontcolor=white]
-	"pif-fn-bf-4-1" -- "pof-fn-bf-3" [fontcolor=white]
+	"pif-fn-bf-2-1" -- "pof-fn-bf-1"
+	"pif-fn-bf-4-1" -- "pof-fn-bf-3"
 	subgraph "cluster_func_attr-b-1-1" {
 		label=foo
 		node [shape=box]
 		"opo-attr-b-1-1" [fontcolor=white]
 		node [shape=box]
 		"opi-attr-b-1-1-x" [label=x]
-		subgraph cluster_3 {
+		subgraph "cluster_lit_3_attr-bf-1-1" {
 			label=3
 			node [shape=box]
 			node [shape=box]
 			"pof-attr-bf-1-1" [fontcolor=white]
 		}
-		subgraph "cluster_+" {
+		subgraph "cluster_prim_+_attr-bf-1-2" {
 			label="+"
 			node [shape=box]
 			node [shape=box]
@@ -50,8 +50,9 @@ graph G {
 			"pof-attr-bf-1-2" [fontcolor=white]
 		}
 	}
-	"pif-attr-bf-1-2-2" -- "pof-attr-bf-1-1" [fontcolor=white]
-	"opo-attr-b-1-1" -- "pof-attr-bf-1-2" [fontcolor=white]
-	"opi-attr-b-1-1-x" -- "pif-attr-bf-1-2-1" [fontcolor=white]
-	"cluster_lit_fn-bf-1" -- "cluster_func_attr-b-1-1"
+	"pif-attr-bf-1-2-2" -- "pof-attr-bf-1-1"
+	"opo-attr-b-1-1" -- "pof-attr-bf-1-2"
+	"opi-attr-b-1-1-x" -- "pif-attr-bf-1-2-1"
+	"cluster_func_fn-bf-2" -- "cluster_func_attr-b-1-1"
+	"cluster_func_fn-bf-4" -- "cluster_func_attr-b-1-1"
 }

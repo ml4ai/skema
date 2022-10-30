@@ -1,118 +1,10 @@
 import json
 import graphviz
+from utils.helper_functions import drawOPO, drawOPI, drawWFF, drawBF, drawWFOPO, drawWFOPI, drawWOPIO
 
 from utils.init import init
 
-def drawPOF(bf, c, data):
-    if data.get('pof') != None:
-        for pof in data['pof']:
-            index = bf['box'].split('-')
-            if str(pof['box']) == str(index[-1]):
-                c.attr('node', shape = 'box')
-                if pof.get('name') != None:
-                    pof['node'] = str(pof.get('name'))
-                    c.node(name = str(pof['name']))
-                else: 
-                    pof['node'] = f"pof-{bf['box']}"
-                    c.node(name = f"pof-{bf['box']}", fontcolor = "white")
-        print(data.get('pof'))
-
-def drawPIF(bf, c, data):
-    if data.get('pif') != None:
-        i = 1
-        index = bf.get('box').split('-')
-        for pif in data['pif']:
-            if str(pif['box']) == str(index[-1]):
-                c.attr('node', shape = 'box')
-                pif['node'] = f"pif-{bf.get('box')}-{i}"
-                c.node(name = f"pif-{bf.get('box')}-{i}", fontcolor = "white")
-                i += 1
-            # print(pif)
-
-def drawOPO(b, c, data):
-    if data.get('opo') != None:
-        for opo in data['opo']:
-            index = b.get('box').split('-')
-            if str(opo.get('box')) ==  index[-1]:
-                opo['node'] = f"opo-{b.get('box')}"                  
-                c.attr('node', shape='box')
-                c.node(name = f"opo-{b.get('box')}", fontcolor = "white")
-
-def drawOPI(b, c, data):
-    if data.get('opi') != None:
-        for opi in data['opi']:
-            index = b.get('box').split('-')
-            if str(opi.get('box')) ==  index[-1]:
-                if opi.get('name') != None:
-                    opi['node'] = f"opi-{b.get('box')}-{str(opi.get('name'))}"
-                    c.attr('node', shape='box')
-                    c.node(name = f"opi-{b.get('box')}-{str(opi.get('name'))}", label=str(opi.get('name')))
-                else:
-                    opi['node'] = f"opi-{b.get('box')}"                  
-                    c.attr('node', shape='box')
-                    c.node(name = f"opi-{b.get('box')}", fontcolor = "white")
-
-def drawWFF(data, g):
-    if data.get('wff') != None:
-        for wff in data['wff']:
-            for pif in data['pif']:
-                for pof in data['pof']:
-                    # print(pif.get('node'), pof.get('node'))
-                    if wff['src'] == pif['id'] and wff['tgt'] == pof['id']:
-                        g.edge(pif.get('node'), pof.get('node'), fontcolor = "white")
-
-def drawWFOPO(data, g):
-        if data.get('wfopo') != None:
-            for wfopo in data.get('wfopo'):
-                if data.get('opo') != None:
-                    for opo in data.get('opo'):
-                        for pof in data.get('pof'):
-                            if wfopo['src'] == opo['id'] and wfopo['tgt'] == pof['id']:
-                                g.edge(opo['node'], pof['node'], fontcolor = "white")
-
-def drawWFOPI(data, g):
-    if data.get('wfopi') != None:
-        for wfopi in data.get('wfopi'):
-            if data.get('opi') != None:
-                for opi in data.get('opi'):
-                    for pif in data.get('pif'):
-                        if wfopi['src'] == opi['id'] and wfopi['tgt'] == pif['id']:
-                            g.edge(opi['node'], pif['node'], fontcolor = "white")
-
-def drawBF(data, a):
-    if data.get('bf') != None:
-        for bf in data.get('bf'):
-            if bf.get('function_type') == 'EXPRESSION':
-                with a.subgraph(name=f"cluster_expr_{bf['box']}") as b: 
-                    bf['node'] = f"cluster_expr_{bf['box']}"
-                    b.attr('node', shape='box')
-                    drawPIF(bf, b, data)
-                    drawPOF(bf, b, data)
-            if bf.get('function_type') == 'LITERAL':
-                literal = str(bf.get('value').get('value'))
-                with a.subgraph(name=f"cluster_lit_{literal}") as c: 
-                    bf['node'] = f"cluster_lit_{bf['box']}"
-                    c.attr(label=literal)
-                    c.attr('node', shape='box')
-                    drawPIF(bf, c, data)
-                    drawPOF(bf, c, data)
-            if bf['function_type'] == 'PRIMITIVE':
-                primitive = str(bf['name'])
-                with a.subgraph(name=f"cluster_prim_{primitive}") as d: 
-                    bf['node'] = f"cluster_prim_{bf['box']}"
-                    d.attr(label=primitive)
-                    d.attr('node', shape='box')
-                    drawPIF(bf, d, data)
-                    drawPOF(bf, d, data)
-            if bf.get('function_type') == 'FUNCTION':
-                with a.subgraph(name=f"cluster_func_{bf['box']}") as e: #function
-                    bf['node'] = f"cluster_func_{bf['box']}"                        
-                    drawPOF(bf, e, data)
-                    drawPIF(bf, e, data)    
-
-
 # def drawWOPIO(data, g):
-
 
 def draw_graph(PROGRAM_NAME):
     f = open (f"data/{PROGRAM_NAME}--Gromet-FN-auto.json", "r")
@@ -128,35 +20,62 @@ def draw_graph(PROGRAM_NAME):
             with g.subgraph(name='clusterA') as a: 
                 drawBF(data.get('fn'), a)
 
-
     drawWFF(data['fn'], g)
-
     #RHS
     for attribute in data.get('attributes'):
-        for b in attribute.get('value').get('b'):
-            if b.get('function_type') == 'EXPRESSION':
-                with g.subgraph(name=f"cluster_expr_{b.get('box')}") as a:
-                    b['node'] = f"cluster_expr_{b.get('box')}"
-                    drawOPO(b, a, attribute.get('value'))
-                    drawOPI(b, a, attribute.get('value'))
-                    drawBF(attribute.get('value'), a)
-            if b.get('function_type') == 'FUNCTION':
-                with g.subgraph(name=f"cluster_func_{b.get('box')}") as a:
-                    a.attr(label = str(b.get('name')))
-                    b['node'] = f"cluster_func_{b.get('box')}"
-                    drawOPO(b, a, attribute.get('value'))
-                    drawOPI(b, a, attribute.get('value'))
-                    drawBF(attribute.get('value'), a)
-        drawWFF(attribute.get('value'), g)  
-        drawWFOPO(attribute.get('value'), g)
-        drawWFOPI(attribute.get('value'), g)
+        if attribute.get('type') == "FN":
+            if attribute.get('value').get('b') != None:
+                for b in attribute.get('value').get('b'):
+                    if b.get('function_type') == 'EXPRESSION':
+                        with g.subgraph(name=f"cluster_expr_{b.get('box')}") as a:
+                            b['node'] = f"cluster_expr_{b.get('box')}"
+                            drawOPO(b, a, attribute.get('value'))
+                            drawOPI(b, a, attribute.get('value'))
+                            drawBF(attribute.get('value'), a)
+                    if b.get('function_type') == 'FUNCTION':
+                        with g.subgraph(name=f"cluster_func_{b.get('box')}") as a:
+                            if b.get('name') != None:
+                                a.attr(label = str(b.get('name')))
+                            b['node'] = f"cluster_func_{b.get('box')}"
+                            drawOPO(b, a, attribute.get('value'))
+                            drawOPI(b, a, attribute.get('value'))
+                            drawBF(attribute.get('value'), a)
+                    if b.get('function_type') == 'PREDICATE':
+                        with g.subgraph(name=f"cluster_pred_{b.get('box')}") as a:
+                            a.attr(label = str(b.get('name')))
+                            b['node'] = f"cluster_pred_{b.get('box')}"
+                            drawOPO(b, a, attribute.get('value'))
+                            drawOPI(b, a, attribute.get('value'))
+                            drawBF(attribute.get('value'), a)
+                drawWFF(attribute.get('value'), g)  
+                drawWFOPO(attribute.get('value'), g)
+                drawWFOPI(attribute.get('value'), g)
+                drawWOPIO(attribute.get('value'), g)
+        if attribute.get('value').get('type') == 'IMPORT':
+            with g.subgraph(name=f"cluster_import_{attribute.index()}") as b:
+                b.attr(label = str(attribute))
 
     #connecting LHS and RHS
     for bf in data.get('fn').get('bf'):
-        for attribute in data.get('attributes'):
-            for b in attribute.get('value').get('b'):
-                index = b.get('box').split('-')
-                if index[2] == str(bf['contents']):
-                    g.edge(bf['node'], b['node'])
+        # for attribute in data.get('attributes'):
+        if bf.get('contents') != None:
+            attribute = data.get('attributes')[bf.get('contents')-1]
+            if attribute.get('value').get('b') != None:
+                for b in attribute.get('value').get('b'):        
+                        for b in attribute.get('value').get('b'):
+                            print(bf.get('node'), b.get('node'))
+                            g.edge(bf.get('node'), b.get('node'))
+    
+    #edges between the different attributes in RHS
+    for attribute in data.get('attributes'):
+        if attribute.get('value').get('bf') != None:
+            for bf in attribute.get('value').get('bf'):
+                if bf.get('contents') != None:
+                    attr = data.get('attributes')[bf.get('contents')-1]
+                    if attr.get('value').get('b') != None:
+                        for b in attr.get('value').get('b'):
+                            g.edge(bf['node'], b.get('node'))
 
-    # g.view()
+
+
+    g.view()

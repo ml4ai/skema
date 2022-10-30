@@ -1,0 +1,83 @@
+{
+    "schema": "FN",
+    "schema_version": "0.1.4",
+    "name": "import3",
+    "fn": {
+        "b": [{"function_type":"MODULE","name":"module","metadata":2}],
+        "bf": [
+            {"function_type":"LITERAL","value":{"value_type":"List","value":[{"value_type":"Integer","value":1,"source_code_data_type":["Python","3.8","<class 'int'>"],"source_refs":[{"source_file_name":"import3","col_start":11,"col_end":12,"row_start":8,"row_end":8}]},{"value_type":"Integer","value":2,"source_code_data_type":["Python","3.8","<class 'int'>"],"source_refs":[{"source_file_name":"import3","col_start":14,"col_end":15,"row_start":8,"row_end":8}]},{"value_type":"Integer","value":3,"source_code_data_type":["Python","3.8","<class 'int'>"],"source_refs":[{"source_file_name":"import3","col_start":17,"col_end":18,"row_start":8,"row_end":8}]}]},"metadata":3},
+            {"function_type":"FUNCTION","contents":1,"metadata":4},
+            {"function_type":"LITERAL","value":{"value_type":"List","value":[{"value_type":"Integer","value":4,"source_code_data_type":["Python","3.8","<class 'int'>"],"source_refs":[{"source_file_name":"import3","col_start":11,"col_end":12,"row_start":9,"row_end":9}]},{"value_type":"Integer","value":5,"source_code_data_type":["Python","3.8","<class 'int'>"],"source_refs":[{"source_file_name":"import3","col_start":14,"col_end":15,"row_start":9,"row_end":9}]},{"value_type":"Integer","value":6,"source_code_data_type":["Python","3.8","<class 'int'>"],"source_refs":[{"source_file_name":"import3","col_start":17,"col_end":18,"row_start":9,"row_end":9}]}]},"metadata":6},
+            {"function_type":"FUNCTION","contents":2,"metadata":7},
+            {"function_type":"FUNCTION","contents":3,"metadata":9}
+        ],
+        "pif": [{"id":1,"box":2},{"id":1,"box":4},{"id":1,"box":5}],
+        "pof": [{"id":1,"box":1},{"id":1,"name":"x","box":2,"metadata":5},{"id":1,"box":3},{"id":1,"name":"y","box":4,"metadata":8},{"id":1,"name":"z","box":5,"metadata":10}],
+        "wff": [{"src":1,"tgt":1},{"src":2,"tgt":3},{"src":3,"tgt":2},{"src":3,"tgt":4}]
+    },
+    "attributes": [
+        {
+            "type": "IMPORT",
+            "value": {
+                "name": "numpy.array",
+                "src_language": "Python",
+                "type": "OTHER",
+                "version": "3.8"
+            }
+        },
+        {
+            "type": "IMPORT",
+            "value": {
+                "name": "numpy.array",
+                "src_language": "Python",
+                "type": "OTHER",
+                "version": "3.8"
+            }
+        },
+        {
+            "type": "IMPORT",
+            "value": {
+                "name": "numpy.concatenate",
+                "src_language": "Python",
+                "type": "OTHER",
+                "version": "3.8"
+            }
+        }
+    ],
+    "metadata_collection": [
+        [
+            {"metadata_type":"source_code_collection","name":"","global_reference_id":"","files":[{"uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","name":"import3","path":""}],"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.179773"}},
+            {"metadata_type":"gromet_creation","gromet_version":"0.1.4","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.179870"}}
+        ],
+        [
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":1,"line_end":1,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.179905"}}
+        ],
+        [
+            {"metadata_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"List","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180061"}},
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":8,"line_end":8,"col_begin":10,"col_end":19,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180051"}}
+        ],
+        [
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":8,"line_end":8,"col_begin":4,"col_end":20,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180201"}}
+        ],
+        [
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":8,"line_end":8,"col_begin":0,"col_end":1,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180276"}}
+        ],
+        [
+            {"metadata_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"List","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180373"}},
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":9,"line_end":9,"col_begin":10,"col_end":19,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180364"}}
+        ],
+        [
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":9,"line_end":9,"col_begin":4,"col_end":20,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180423"}}
+        ],
+        [
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":9,"line_end":9,"col_begin":0,"col_end":1,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180454"}}
+        ],
+        [
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":10,"line_end":10,"col_begin":4,"col_end":23,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180540"}}
+        ],
+        [
+            {"metadata_type":"source_code_reference","code_file_reference_uid":"ebb4124c-0cb5-a901-32f6-26442b1d5125","line_begin":10,"line_end":10,"col_begin":0,"col_end":1,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-10-28 01:57:12.180579"}}
+        ]
+    ],
+    "metadata": 1
+}

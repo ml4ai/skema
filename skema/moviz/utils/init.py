@@ -44,7 +44,14 @@ def init(data):
                 pof_dict['id'] =  j
                 j += 1
     
-    i = 1
-    for bf in data.get('fn').get('bf'):
-        bf['contents'] = i
-        i += 1
+    for attribute in data['attributes']:
+        j = 1
+        if attribute.get('value').get('pif') != None: 
+            pif_list = attribute.get('value').get('pif')
+            for pif_dict in pif_list:
+                pif_dict['id'] =  j
+                j += 1
+    # i = 1
+    # for bf in data.get('fn').get('bf'):
+    #     bf['contents'] = i
+    #     i += 1

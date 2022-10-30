@@ -14,9 +14,8 @@ app = Flask(__name__)
 @app.route("/index")
 def execute():
 
-    PYTHON_SOURCE_FILE = "inputs/fun3.py"
+    PYTHON_SOURCE_FILE = "inputs/cond1.py"
     PROGRAM_NAME = PYTHON_SOURCE_FILE.rsplit(".")[0].rsplit("/")[-1]
-    print(PROGRAM_NAME)
 
     run_pipeline_export_gromet(PYTHON_SOURCE_FILE, PROGRAM_NAME)
     
@@ -32,6 +31,7 @@ def execute():
     draw_graph(PROGRAM_NAME)
     full_filename = os.path.join('static', f"{PROGRAM_NAME}.png")
 
+    # print(full_filename)
     # if os.path.exists(os.path.join(dest, f"{PROGRAM_NAME}--Gromet-FN-auto.json")):
     #     os.remove(os.path.join(dest, f"{PROGRAM_NAME}--Gromet-FN-auto.json"))
 

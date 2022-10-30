@@ -1,20 +1,21 @@
 graph G {
 	subgraph clusterA {
-		subgraph "cluster_fn-bf-1" {
+		subgraph "cluster_expr_fn-bf-1" {
+			node [shape=box]
 			node [shape=box]
 			x
 		}
 	}
-	subgraph "cluster_attr-b-1-1" {
+	subgraph "cluster_expr_attr-b-1-1" {
 		node [shape=box]
 		"opo-attr-b-1-1" [fontcolor=white]
-		subgraph cluster_2 {
+		subgraph "cluster_lit_2_attr-bf-1-1" {
 			label=2
 			node [shape=box]
 			node [shape=box]
 			"pof-attr-bf-1-1" [fontcolor=white]
 		}
 	}
-	"opo-attr-b-1-1" -- "pof-attr-bf-1-1" [fontcolor=white]
-	"cluster_fn-bf-1" -- "cluster_attr-b-1-1"
+	"opo-attr-b-1-1" -- "pof-attr-bf-1-1"
+	"cluster_expr_fn-bf-1" -- "cluster_expr_attr-b-1-1"
 }
