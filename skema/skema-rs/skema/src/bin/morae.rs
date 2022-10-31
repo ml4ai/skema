@@ -221,17 +221,6 @@ fn main() {
         //tot += subroutines_contracted[i].indexes.len();
     }
 
-    // we now label each function, for coarse grain labeling
-    /*if tot == res.attributes.len() {
-        println!("All attributes accounted for!");
-    } else {
-        println!(
-            "ERROR: Missing Attributes! \n {}, {}",
-            tot,
-            res.attributes.len()
-        );
-    }*/
-
     // now for the implementation of the heuristics for labeling, note we have the contracted, trimmed subroutines and the raw uncontracted and untrimmed subroutines to work with.
 
     let mut roles: Vec<Role> = vec![];
