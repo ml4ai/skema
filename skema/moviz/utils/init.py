@@ -51,7 +51,12 @@ def init(data):
             for pif_dict in pif_list:
                 pif_dict['id'] =  j
                 j += 1
-    # i = 1
-    # for bf in data.get('fn').get('bf'):
-    #     bf['contents'] = i
-    #     i += 1
+
+    if data.get('fn').get('bc') != None:
+        i = 1
+        for bc in data.get('fn').get('bc'):
+            bc['box'] = f"fn-bc-{i}"
+
+    if data.get('fn').get('wfc') != None:
+        for wfc in data.get('fn').get('wfc'):
+            wfc['src'] = 1
