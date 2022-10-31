@@ -73,7 +73,8 @@ def draw_graph(PROGRAM_NAME):
             with g.subgraph(name=f"cluster_import_{attribute.index()}") as b:
                 b.attr(label = str(attribute))
 
-    print(data.get('fn').get('bf'))
+    print("hi")
+    print(data.get('fn').get('pof'))
     #connecting LHS and RHS
     for bf in data.get('fn').get('bf'):
         # for attribute in data.get('attributes'):

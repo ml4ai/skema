@@ -106,7 +106,7 @@ def drawWFF(data, g):
             for pif in data['pif']:
                 for pof in data['pof']:
                     if wff['src'] == pif['id'] and wff['tgt'] == pof['id']:
-                        # print(pif.get('node'), pof.get('node'))
+                        print(pif.get('node'), pof.get('node'))
                         g.edge(pif.get('node'), pof.get('node'))
 
 def drawWFC(data, g):
