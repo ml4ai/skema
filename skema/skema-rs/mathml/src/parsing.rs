@@ -1,16 +1,19 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msub, Msup},
+    MathExpression::{
+        Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msub, Msubsup, Msup, Mtext, Mstyle, Munder, Mspace, MoLine,
+    },
 };
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0},
-    combinator::map,
+    combinator::{map,opt},
     multi::many0,
-    sequence::{delimited, pair, separated_pair, tuple},
+    sequence::{delimited, pair, separated_pair, tuple, preceded},
 };
 use nom_locate::LocatedSpan;
+use std::fs;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
@@ -183,14 +186,79 @@ fn msqrt(input: Span) -> IResult<MathExpression> {
     Ok((s, expression))
 }
 
-/// Math expressions
-fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((mi, mo, mn, msup, msub, msqrt, mfrac, mrow)))(input)
+// Underscripts
+fn munder(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("munder")(input)?;
+    Ok((s, Munder(elements)))
 }
 
-/// MathML documents
+// Overscipts
+fn mover(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("mover")(input)?;
+    Ok((s, Mover(elements)))
+}
+
+// Subscript-superscript Pair
+fn msubsup(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("msubsup")(input)?;
+    Ok((s, Msubsup(elements)))
+}
+
+//Text
+fn mtext(input: Span) -> IResult<MathExpression> {
+    let (s, element) = elem0!("mtext")(input)?;
+    Ok((s, Mtext(&element)))
+}
+
+//mstyle
+fn mstyle(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = elem_many0!("mstyle")(input)?;
+    Ok((s, Mstyle(elements)))
+}
+
+// function for xml
+fn xml_declaration(input: Span) -> IResult<()> {
+    let (s, _contents) = ws(delimited(tag("<?"), take_until("?>"), tag("?>")))(input)?;
+    Ok((s, ()))
+}
+
+//mspace
+fn mspace(input: Span) -> IResult<MathExpression> {
+    let (s, element) = ws(delimited(tag("<mspace"), take_until("/>"), tag("/>")))(input)?;
+    Ok((s, Mspace(&element)))
+}
+
+// Some xml have <mo .../>
+fn mo_line(input: Span) -> IResult<MathExpression> {
+    let (s, element) = ws(delimited(tag("<mo"), take_until("/>"), tag("/>")))(input)?;
+    Ok((s, MoLine(&element)))
+}
+
+/// Math expressions
+fn math_expression(input: Span) -> IResult<MathExpression> {
+    ws(alt((
+        mi,
+        mo,
+        mn,
+        msup,
+        msub,
+        msqrt,
+        mfrac,
+        mrow,
+        munder,
+        mover,
+        msubsup,
+        mtext,
+	mstyle,
+        mspace,
+	mo_line,
+    )))(input)
+}
+
+/// testing MathML documents
 fn math(input: Span) -> IResult<Math> {
-    let (s, elements) = elem_many0!("math")(input)?;
+    //let (s, elements) = elem_many0!("math")(input)?;
+    let (s, elements) = preceded(opt(xml_declaration), elem_many0!("math"))(input)?;
     Ok((s, Math { content: elements }))
 }
 
@@ -258,6 +326,58 @@ fn test_math_expression() {
 }
 
 #[test]
+fn test_mover() {
+    test_parser(
+        "<mover><mi>x</mi><mo>¯</mo></mover>",
+        mover,
+        Mover(vec![Mi("x"), Mo("¯")]),
+    )
+}
+
+#[test]
+fn test_munder() {
+    test_parser(
+        "<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
+        munder,
+        Munder(vec![Mo("inf"), Mn("0"), Mo("≤"), Mi("t"), Mo("≤")]),
+    )
+}
+
+#[test]
+fn test_msubsup() {
+    test_parser(
+	"<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
+        msubsup,
+        Msubsup(vec![Mi("L"), Mi("t"), Mi("∞")]),
+    )
+}
+
+#[test]
+fn test_mtext() {
+    test_parser("<mtext>if</mtext>", mtext, Mtext("if"));
+}
+
+#[test]
+fn test_mstyle() {
+    test_parser(
+	"<mstyle><mo>∑</mo><mi>I</mi></mstyle>",
+        mstyle,
+        Mstyle(vec![Mo("∑"), Mi("I")]),
+    )
+}
+
+#[test]
+fn test_mspace() {
+    test_parser("<mspace width=\"1em\"/>", mspace, Mspace(" width=\"1em\""));
+}
+
+#[test]
+fn test_moline() {
+    test_parser("<mo fence=\"true\" stretchy=\"true\" symmetric=\"true\"/>", mo_line, MoLine(" fence=\"true\" stretchy=\"true\" symmetric=\"true\""));
+}
+
+
+#[test]
 fn test_math() {
     test_parser(
         "<math>
@@ -272,3 +392,23 @@ fn test_math() {
         },
     )
 }
+
+#[test]
+fn test_mathml_parser(){
+    let eqn = fs::read_to_string("tests/test01.xml").unwrap();
+    test_parser(
+	&eqn,
+    	math,
+    	Math{
+	    content: vec![Munder( vec![Mo("sup"), Mrow(vec![Mn("0"), Mo("≤"), Mi("t"), Mo("≤"), Msub(Box::new(Mi("T")),Box::new(Mn("0")) ) ]) ]  ) ,
+	    	          Mo("‖"),
+			  Msup(Box::new(Mrow(vec![Mover(vec![Mi("ρ"), Mo("~")])])),Box::new(Mi("R")) ),
+			  Msup(Box::new(Mrow(vec![Mover(vec![Mi("x"), Mo("¯")])])),Box::new(Mi("a")) ),
+			  Msub(Box::new(Mo("‖")),Box::new(Mrow(vec![Msup(Box::new(Mi("L")),Box::new(Mn("1"))), Mo("∩"), Msup(Box::new(Mi("L")),Box::new(Mi("∞")))]))), 
+			  Mo("≤"),
+			  Mi("C"),
+			 ],
+        },
+    )
+}
+
