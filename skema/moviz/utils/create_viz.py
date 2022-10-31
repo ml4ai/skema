@@ -1,6 +1,6 @@
 import json
 import graphviz
-from utils.helper_functions import drawBC, drawOPO, drawOPI, drawWFC, drawWFF, drawBF, drawWFOPO, drawWFOPI, drawWOPIO
+from utils.helper_functions import drawBC, drawBL, drawOPO, drawOPI, drawWFC, drawWFF, drawBF, drawWFL, drawWFOPO, drawWFOPI, drawWOPIO
 
 from utils.init import init
 
@@ -20,11 +20,15 @@ def draw_graph(PROGRAM_NAME):
             with g.subgraph(name='clusterA') as a: 
                 if data.get('fn').get('bc') != None:
                     drawBC(data.get('fn'), a)
+                if data.get('fn').get('bl') != None:
+                    print("here")
+                    drawBL(data.get('fn'), a)
                 else:
-                    if data.get('bf') != None:
-                        for bf in data.get('bf'):
+                    if data.get('fn').get('bf') != None:
+                        for bf in data.get('fn').get('bf'):
                             drawBF(data.get('fn'), a, bf)
-    drawWFC(data['fn'], g) 
+    drawWFC(data['fn'], g)
+    drawWFL(data['fn'], g) 
     drawWFF(data['fn'], g)
 
     #RHS
@@ -69,6 +73,7 @@ def draw_graph(PROGRAM_NAME):
             with g.subgraph(name=f"cluster_import_{attribute.index()}") as b:
                 b.attr(label = str(attribute))
 
+    print(data.get('fn').get('bf'))
     #connecting LHS and RHS
     for bf in data.get('fn').get('bf'):
         # for attribute in data.get('attributes'):
@@ -79,6 +84,7 @@ def draw_graph(PROGRAM_NAME):
                         for b in attribute.get('value').get('b'):
                             print(bf.get('node'), b.get('node'))
                             g.edge(bf.get('node'), b.get('node'))
+    
     
     #edges between the different attributes in RHS
     for attribute in data.get('attributes'):

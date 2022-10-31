@@ -1,0 +1,149 @@
+graph G {
+	subgraph clusterA {
+		subgraph "cluster_fn-bl-1" {
+			subgraph "cluster_pred_fn-bf-3" {
+				node [shape=box]
+				"pif-fn-bf-3-1" [fontcolor=white]
+				node [shape=box]
+				"pof-fn-bf-3" [label=c]
+			}
+			node [shape=box]
+			"pil-fn-bl-1" [label=x]
+			node [shape=box]
+			"pil-fn-bl-1" [label=y]
+			node [shape=box]
+			"pol-fn-bl-1" [label=x]
+			node [shape=box]
+			"pol-fn-bl-1" [label=y]
+		}
+		subgraph "cluster_fn-bl-1" {
+			subgraph "cluster_func_fn-bf-4" {
+				node [shape=box]
+				"pof-fn-bf-4" [label=x]
+				node [shape=box]
+				"pof-fn-bf-4" [label=y]
+				node [shape=box]
+				"pif-fn-bf-4-1" [fontcolor=white]
+				node [shape=box]
+				"pif-fn-bf-4-2" [fontcolor=white]
+			}
+			node [shape=box]
+			"pil-fn-bl-1" [label=x]
+			node [shape=box]
+			"pil-fn-bl-1" [label=y]
+			node [shape=box]
+			"pol-fn-bl-1" [label=x]
+			node [shape=box]
+			"pol-fn-bl-1" [label=y]
+		}
+		subgraph "cluster_expr_fn-bf-1" {
+			node [shape=box]
+			node [shape=box]
+			"pof-fn-bf-1" [label=x]
+		}
+		subgraph "cluster_expr_fn-bf-2" {
+			node [shape=box]
+			node [shape=box]
+			"pof-fn-bf-2" [label=y]
+		}
+	}
+	"pil-fn-bl-1" -- "pof-fn-bf-1"
+	"pil-fn-bl-1" -- "pof-fn-bf-2"
+	subgraph "cluster_expr_attr-b-1-1" {
+		node [shape=box]
+		"opo-attr-b-1-1" [fontcolor=white]
+		subgraph "cluster_lit_2_attr-bf-1-1" {
+			label=2
+			node [shape=box]
+			node [shape=box]
+			"pof-attr-bf-1-1" [fontcolor=white]
+		}
+	}
+	"opo-attr-b-1-1" -- "pof-attr-bf-1-1"
+	subgraph "cluster_expr_attr-b-2-1" {
+		node [shape=box]
+		"opo-attr-b-2-1" [fontcolor=white]
+		subgraph "cluster_lit_3_attr-bf-2-1" {
+			label=3
+			node [shape=box]
+			node [shape=box]
+			"pof-attr-bf-2-1" [fontcolor=white]
+		}
+	}
+	"opo-attr-b-2-1" -- "pof-attr-bf-2-1"
+	subgraph "cluster_pred_attr-b-3-1" {
+		label=None
+		node [shape=box]
+		"opo-attr-b-3-1" [fontcolor=white]
+		node [shape=box]
+		"opi-attr-b-3-1" [fontcolor=white]
+		subgraph "cluster_lit_5_attr-bf-3-1" {
+			label=5
+			node [shape=box]
+			node [shape=box]
+			"pof-attr-bf-3-1" [fontcolor=white]
+		}
+		subgraph "cluster_prim_<_attr-bf-3-2" {
+			label="<"
+			node [shape=box]
+			node [shape=box]
+			"pif-attr-bf-3-2-1" [fontcolor=white]
+			node [shape=box]
+			"pif-attr-bf-3-2-2" [fontcolor=white]
+			node [shape=box]
+			"pof-attr-bf-3-2" [fontcolor=white]
+		}
+	}
+	"pif-attr-bf-3-2-2" -- "pof-attr-bf-3-1"
+	"opo-attr-b-3-1" -- "pof-attr-bf-3-2"
+	"opi-attr-b-3-1" -- "pif-attr-bf-3-2-1"
+	subgraph "cluster_func_attr-b-4-1" {
+		node [shape=box]
+		"opo-attr-b-4-1" [fontcolor=white]
+		node [shape=box]
+		"opo-attr-b-4-1" [fontcolor=white]
+		node [shape=box]
+		"opi-attr-b-4-1-x" [label=x]
+		node [shape=box]
+		"opi-attr-b-4-1-y" [label=y]
+		subgraph "cluster_expr_attr-bf-4-1" {
+			node [shape=box]
+			node [shape=box]
+			"pif-attr-bf-4-1-1" [fontcolor=white]
+			node [shape=box]
+			"pif-attr-bf-4-1-2" [fontcolor=white]
+			node [shape=box]
+			"pof-attr-bf-4-1" [label=x]
+		}
+	}
+	"opo-attr-b-4-1" -- "pof-attr-bf-4-1"
+	"opi-attr-b-4-1-x" -- "pif-attr-bf-4-1-1"
+	"opi-attr-b-4-1-y" -- "pif-attr-bf-4-1-2"
+	"opo-attr-b-4-1" -- "opi-attr-b-4-1-y"
+	subgraph "cluster_expr_attr-b-5-1" {
+		node [shape=box]
+		"opo-attr-b-5-1" [fontcolor=white]
+		node [shape=box]
+		"opi-attr-b-5-1" [fontcolor=white]
+		node [shape=box]
+		"opi-attr-b-5-1" [fontcolor=white]
+		subgraph "cluster_prim_+_attr-bf-5-1" {
+			label="+"
+			node [shape=box]
+			node [shape=box]
+			"pif-attr-bf-5-1-1" [fontcolor=white]
+			node [shape=box]
+			"pif-attr-bf-5-1-2" [fontcolor=white]
+			node [shape=box]
+			"pof-attr-bf-5-1" [fontcolor=white]
+		}
+	}
+	"opo-attr-b-5-1" -- "pof-attr-bf-5-1"
+	"opi-attr-b-5-1" -- "pif-attr-bf-5-1-1"
+	"opi-attr-b-5-1" -- "pif-attr-bf-5-1-2"
+	"cluster_expr_fn-bf-1" -- "cluster_expr_attr-b-1-1"
+	"cluster_expr_fn-bf-2" -- "cluster_expr_attr-b-2-1"
+	"cluster_pred_fn-bf-3" -- "cluster_pred_attr-b-3-1"
+	"cluster_func_fn-bf-4" -- "cluster_func_attr-b-4-1"
+	"cluster_expr_attr-bf-4-1" -- "cluster_expr_attr-b-5-1"
+}

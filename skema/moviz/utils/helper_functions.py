@@ -74,6 +74,32 @@ def drawPOC(data, bc, c):
                 else:
                     c.node(name = f"poc-{bc['box']}", fontcolor = "white")    
 
+def drawPIL(data, bl, c):
+    if data.get('pil') != None:
+        for pil in data.get('pil'):
+            index = bl['box'].split('-')
+            c.attr('node', shape = 'box')
+            if str(pil['box']) == str(index[-1]):
+                if pil.get('name') != None:
+                    pil['node'] = f"pil-{bl['box']}"
+                    c.node(name = f"pil-{bl['box']}", label = str(pil.get('name')))
+                else:
+                    pil['node'] = f"pil-{bl['box']}"
+                    c.node(name = f"pil-{bl['box']}", fontcolor = "white")   
+
+def drawPOL(data, bl, c):
+    if data.get('pol') != None:
+        for pol in data.get('pol'):
+            index = bl['box'].split('-')
+            c.attr('node', shape = 'box')
+            if str(pol['box']) == str(index[-1]):
+                if pol.get('name') != None:
+                    pol['node'] = f"pol-{bl['box']}"
+                    c.node(name = f"pol-{bl['box']}", label = str(pol.get('name')))
+                else:
+                    pol['node'] = f"pol-{bl['box']}"
+                    c.node(name = f"pol-{bl['box']}", fontcolor = "white")   
+
 def drawWFF(data, g):
     if data.get('wff') != None:
         for wff in data['wff']:
@@ -89,8 +115,17 @@ def drawWFC(data, g):
             for pof in data.get('pof'):
                 for pic in data.get('pic'):
                     if wfc['src'] == pic['id'] and wfc['tgt'] == pof['id']:
-                        print("here: ",pic.get('node'), pof.get('node'))
+                        # print("here: ",pic.get('node'), pof.get('node'))
                         g.edge(pic.get('node'), pof.get('node'))
+
+def drawWFL(data, g):
+    if data.get('wfl') != None:
+        for wfc in data.get('wfl'):
+            for pof in data.get('pof'):
+                for pil in data.get('pil'):
+                    if wfc['src'] == pil['id'] and wfc['tgt'] == pof['id']:
+                        # print("here: ",pil.get('node'), pof.get('node'))
+                        g.edge(pil.get('node'), pof.get('node'))
 
 def drawWFOPO(data, g):
     if data.get('wfopo') != None:
@@ -184,6 +219,26 @@ def drawBC(data, a):
                         bf_dict[value] = 1
                         drawPIC(data, bc, c)
                         drawPOC(data, bc, c)                       
+
+    for k in bf_dict.keys():
+        if bf_dict.get(k) == 0:
+            drawBF(data, a, data.get('bf')[k-1])
+
+def drawBL(data, a):
+    bf_dict = {}
+    for bf in data.get('bf'):
+        bf_dict[int(bf.get('box').split('-')[-1])] = 0
+
+    for bl in data.get('bl'):
+        for key, value in bl.items():
+            if key != 'metadata' and key!= 'box':
+                if value in bf_dict:
+                    with a.subgraph(name = f"cluster_{bl['box']}") as c:
+                        # print("if: ", data.get('bf')[value-1])
+                        drawBF(data, c, data.get('bf')[value-1])
+                        bf_dict[value] = 1
+                        drawPIL(data, bl, c)
+                        drawPOL(data, bl, c)                       
 
     for k in bf_dict.keys():
         if bf_dict.get(k) == 0:

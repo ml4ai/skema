@@ -14,7 +14,7 @@ app = Flask(__name__)
 @app.route("/index")
 def execute():
 
-    PYTHON_SOURCE_FILE = "inputs/cond1.py"
+    PYTHON_SOURCE_FILE = "inputs/while3.py"
     PROGRAM_NAME = PYTHON_SOURCE_FILE.rsplit(".")[0].rsplit("/")[-1]
 
     run_pipeline_export_gromet(PYTHON_SOURCE_FILE, PROGRAM_NAME)

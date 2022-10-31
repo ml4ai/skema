@@ -57,6 +57,11 @@ def init(data):
         for bc in data.get('fn').get('bc'):
             bc['box'] = f"fn-bc-{i}"
 
+    if data.get('fn').get('bl') != None:
+        i = 1
+        for bl in data.get('fn').get('bl'):
+            bl['box'] = f"fn-bl-{i}"
+
     if data.get('fn').get('wfc') != None:
         for wfc in data.get('fn').get('wfc'):
             wfc['src'] = 1
