@@ -1,8 +1,5 @@
 import numpy as np
-from np import (
-    array,
-    concatenate
-)
+from np import array, concatenate
 
 
 x = array([1, 2, 3])
