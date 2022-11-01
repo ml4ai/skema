@@ -1,19 +1,19 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msub, Msubsup, Msup, Mtext, Mstyle, Munder, Mspace, MoLine,
+        Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
+        Munder,
     },
 };
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0},
-    combinator::{map,opt},
+    combinator::{map, opt},
     multi::many0,
-    sequence::{delimited, pair, separated_pair, tuple, preceded},
+    sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
-use std::fs;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
@@ -237,21 +237,8 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
 /// Math expressions
 fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        mi,
-        mo,
-        mn,
-        msup,
-        msub,
-        msqrt,
-        mfrac,
-        mrow,
-        munder,
-        mover,
-        msubsup,
-        mtext,
-	mstyle,
-        mspace,
-	mo_line,
+        mi, mo, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext, mstyle, mspace,
+        mo_line,
     )))(input)
 }
 
@@ -346,7 +333,7 @@ fn test_munder() {
 #[test]
 fn test_msubsup() {
     test_parser(
-	"<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
+        "<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
         msubsup,
         Msubsup(vec![Mi("L"), Mi("t"), Mi("∞")]),
     )
@@ -360,7 +347,7 @@ fn test_mtext() {
 #[test]
 fn test_mstyle() {
     test_parser(
-	"<mstyle><mo>∑</mo><mi>I</mi></mstyle>",
+        "<mstyle><mo>∑</mo><mi>I</mi></mstyle>",
         mstyle,
         Mstyle(vec![Mo("∑"), Mi("I")]),
     )
@@ -373,9 +360,12 @@ fn test_mspace() {
 
 #[test]
 fn test_moline() {
-    test_parser("<mo fence=\"true\" stretchy=\"true\" symmetric=\"true\"/>", mo_line, MoLine(" fence=\"true\" stretchy=\"true\" symmetric=\"true\""));
+    test_parser(
+        "<mo fence=\"true\" stretchy=\"true\" symmetric=\"true\"/>",
+        mo_line,
+        MoLine(" fence=\"true\" stretchy=\"true\" symmetric=\"true\""),
+    );
 }
-
 
 #[test]
 fn test_math() {
@@ -394,21 +384,43 @@ fn test_math() {
 }
 
 #[test]
-fn test_mathml_parser(){
-    let eqn = fs::read_to_string("tests/test01.xml").unwrap();
+fn test_mathml_parser() {
+    let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
     test_parser(
-	&eqn,
-    	math,
-    	Math{
-	    content: vec![Munder( vec![Mo("sup"), Mrow(vec![Mn("0"), Mo("≤"), Mi("t"), Mo("≤"), Msub(Box::new(Mi("T")),Box::new(Mn("0")) ) ]) ]  ) ,
-	    	          Mo("‖"),
-			  Msup(Box::new(Mrow(vec![Mover(vec![Mi("ρ"), Mo("~")])])),Box::new(Mi("R")) ),
-			  Msup(Box::new(Mrow(vec![Mover(vec![Mi("x"), Mo("¯")])])),Box::new(Mi("a")) ),
-			  Msub(Box::new(Mo("‖")),Box::new(Mrow(vec![Msup(Box::new(Mi("L")),Box::new(Mn("1"))), Mo("∩"), Msup(Box::new(Mi("L")),Box::new(Mi("∞")))]))), 
-			  Mo("≤"),
-			  Mi("C"),
-			 ],
+        &eqn,
+        math,
+        Math {
+            content: vec![
+                Munder(vec![
+                    Mo("sup"),
+                    Mrow(vec![
+                        Mn("0"),
+                        Mo("≤"),
+                        Mi("t"),
+                        Mo("≤"),
+                        Msub(Box::new(Mi("T")), Box::new(Mn("0"))),
+                    ]),
+                ]),
+                Mo("‖"),
+                Msup(
+                    Box::new(Mrow(vec![Mover(vec![Mi("ρ"), Mo("~")])])),
+                    Box::new(Mi("R")),
+                ),
+                Msup(
+                    Box::new(Mrow(vec![Mover(vec![Mi("x"), Mo("¯")])])),
+                    Box::new(Mi("a")),
+                ),
+                Msub(
+                    Box::new(Mo("‖")),
+                    Box::new(Mrow(vec![
+                        Msup(Box::new(Mi("L")), Box::new(Mn("1"))),
+                        Mo("∩"),
+                        Msup(Box::new(Mi("L")), Box::new(Mi("∞"))),
+                    ])),
+                ),
+                Mo("≤"),
+                Mi("C"),
+            ],
         },
     )
 }
-
