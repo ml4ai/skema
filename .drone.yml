@@ -1,0 +1,10 @@
+kind: pipeline
+name: default
+
+steps:
+- name: test
+  image: rust:latest
+  commands:
+  - cd skema/skema-rs
+  - cargo test --verbose --all
+
