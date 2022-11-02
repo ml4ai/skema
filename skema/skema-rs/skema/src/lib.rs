@@ -1,3 +1,6 @@
+// Inclusion of additional modules
+pub mod gromet_graph;
+
 // Stub for SKEMA library
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 use serde_json;
