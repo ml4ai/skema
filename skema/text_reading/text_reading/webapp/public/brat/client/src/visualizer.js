@@ -1398,6 +1398,11 @@ Util.profileStart('init');
           dispatcher.post('doneRendering', [coll, doc, args]);
           return;
         }
+        if (!sourceData || !sourceData.text || !sourceData.text.length) {
+          $svgDiv.hide();
+          dispatcher.post('doneRendering', [coll, doc, args]);
+          return;
+        }
         $svgDiv.show();
         if ((sourceData && sourceData.collection && (sourceData.document !== doc || sourceData.collection !== coll)) || drawing) {
           redraw = true;
