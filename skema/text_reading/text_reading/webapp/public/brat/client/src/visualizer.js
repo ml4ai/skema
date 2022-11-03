@@ -192,6 +192,8 @@ var Visualizer = (function($, window, undefined) {
 
     // A naive whitespace tokeniser
     var tokenise = function(text) {
+      if (!text)
+        text = "";
       var tokenOffsets = [];
       var tokenStart = null;
       var lastCharPos = null;
@@ -221,6 +223,8 @@ var Visualizer = (function($, window, undefined) {
 
     // A naive newline sentence splitter
     var sentenceSplit = function(text) {
+      if (!text)
+        text = "";
       var sentenceOffsets = [];
       var sentStart = null;
       var lastCharPos = null;
