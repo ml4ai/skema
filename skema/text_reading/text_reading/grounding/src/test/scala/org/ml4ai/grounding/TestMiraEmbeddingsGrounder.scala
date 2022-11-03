@@ -1,6 +1,7 @@
 package org.ml4ai.grounding
 
 import com.typesafe.config.ConfigFactory
+import org.clulab.utils.Closer.AutoCloser
 import org.clulab.utils.{FileUtils, Sourcer}
 import org.ml4ai.grounding.common.utils.Test
 import org.scalatest.OptionValues._
@@ -16,7 +17,7 @@ class TestMiraEmbeddingsGrounder extends Test {
     val ontologyPath = config.getString("ontologyPath")
 //    val embeddingsPath = config.getString("embeddingsPath")
 
-    MiraEmbeddingsGrounder(new File(ontologyPath), None)
+    MiraEmbeddingsGrounder(ontologyPath, None)
   }
 
 

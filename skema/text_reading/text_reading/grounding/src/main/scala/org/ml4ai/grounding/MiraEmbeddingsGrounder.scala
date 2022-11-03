@@ -4,10 +4,11 @@ import org.clulab.embeddings.{ExplicitWordEmbeddingMap, WordEmbeddingMap}
 import org.clulab.processors.clu.CluProcessor
 import org.ml4ai.grounding.MiraEmbeddingsGrounder.generateNormalizedEmbedding
 import org.clulab.embeddings.CompactWordEmbeddingMap
-import org.clulab.utils.{InputStreamer, Serializer}
+import org.clulab.utils.Closer.AutoCloser
+import org.clulab.utils.{ClassLoaderObjectInputStream, FileUtils, InputStreamer, Serializer}
 import ujson.Arr
 
-import java.io.File
+import java.io.{BufferedInputStream, File}
 
 class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap) extends Grounder {
 
@@ -52,8 +53,9 @@ object MiraEmbeddingsGrounder{
    * @param path to the json file with the ontology
    * @return sequence with the in-memory concepts
    */
-  def parseMiraJson(path:File): IndexedSeq[GroundingConcept] = {
-    ujson.read(path) match {
+  def parseMiraJson(pathName: String): IndexedSeq[GroundingConcept] = {
+    val json = FileUtils.getTextFromResource(pathName)
+    ujson.read(json) match {
       case Arr(value) => value.map{
         i =>
           GroundingConcept(
@@ -93,6 +95,7 @@ object MiraEmbeddingsGrounder{
     val inputStreamer = new InputStreamer(this)
     val inputStream = inputStreamer.getResourceAsStream(resourcePath)
     val buildType = CompactWordEmbeddingMap.loadSer(inputStream)
+
     new CompactWordEmbeddingMap(buildType)
   }
 
@@ -102,7 +105,7 @@ object MiraEmbeddingsGrounder{
    * @param ontologyFile file containing the json file with MIRA concepts
    * @param wordEmbeddingsFile file containing the word embedding model
    */
-  def apply(ontologyFile:File, wordEmbeddingsFile:Option[File] = None): MiraEmbeddingsGrounder = {
+  def apply(ontologyPath: String, wordEmbeddingsFile:Option[File] = None): MiraEmbeddingsGrounder = {
 
     val embeddingsModel = wordEmbeddingsFile match {
       case Some(file) => loadWordEmbeddingsFromTextFile(file)
@@ -110,15 +113,16 @@ object MiraEmbeddingsGrounder{
     }
 
     val ontology =
-      if(ontologyFile.getName.endsWith(".ser")){
-        Serializer.load[Seq[GroundingConcept]](ontologyFile)
+      if(ontologyPath.endsWith(".ser")){
+        null
+//        Serializer.load[Seq[GroundingConcept]](new File(ontologyResourceName))
       }
-      else{
+      else {
         // If this was not ser, assume it is json
-        val ontology = parseMiraJson(ontologyFile)
+        val ontology = parseMiraJson(ontologyPath)
         val ontologyWithEmbeddings = createOntologyEmbeddings(ontology, embeddingsModel)
-        val newFileName = ontologyFile.getAbsolutePath + ".ser"
-        Serializer.save(ontologyWithEmbeddings, newFileName)
+//        val newFileName = ontologyPath.getAbsolutePath + ".ser"
+//        Serializer.save(ontologyWithEmbeddings, newFileName)
         ontologyWithEmbeddings
       }
 
