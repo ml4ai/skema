@@ -53,8 +53,7 @@ object MiraEmbeddingsGrounder{
    * @param path to the json file with the ontology
    * @return sequence with the in-memory concepts
    */
-  def parseMiraJson(pathName: String): IndexedSeq[GroundingConcept] = {
-    val json = FileUtils.getTextFromResource(pathName)
+  def parseMiraJson(json: String): IndexedSeq[GroundingConcept] = {
     ujson.read(json) match {
       case Arr(value) => value.map{
         i =>
@@ -75,6 +74,7 @@ object MiraEmbeddingsGrounder{
             embedding = None
           )
       }
+      case _ => ??? // Suppress warning and throw exception.
     }
   }
 
@@ -114,12 +114,13 @@ object MiraEmbeddingsGrounder{
 
     val ontology =
       if(ontologyPath.endsWith(".ser")){
-        null
-//        Serializer.load[Seq[GroundingConcept]](new File(ontologyResourceName))
+        // TODO: Loading from a file should only be used for testing.
+        Serializer.load[Seq[GroundingConcept]](new File(ontologyPath))
       }
       else {
         // If this was not ser, assume it is json
-        val ontology = parseMiraJson(ontologyPath)
+        val json = FileUtils.getTextFromResource(ontologyPath)
+        val ontology = parseMiraJson(json)
         val ontologyWithEmbeddings = createOntologyEmbeddings(ontology, embeddingsModel)
 //        val newFileName = ontologyPath.getAbsolutePath + ".ser"
 //        Serializer.save(ontologyWithEmbeddings, newFileName)

@@ -70,7 +70,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(new File(ontologyFilePath), None)
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None)
   logger.info("Completed Initialization ...")
   // -------------------------------------------------
 
