@@ -108,7 +108,7 @@ class VariableEditDistanceAligner(relevantArgs: Set[String] = Set("variable"))  
   */
 class PairwiseW2VAligner(val w2v: SanitizedWordEmbeddingMap, val relevantArgs: Set[String]) extends Aligner {
 
-  val stopWords = TsvUtils.loadFromOneColumnTSV("src/main/resources/stopWords.tsv")
+  val stopWords = TsvUtils.loadFromOneColumnTSV("/stopWords.tsv")
 
   def this(w2vPath: String, relevantArgs: Set[String]) = this(new SanitizedWordEmbeddingMap(w2vPath), relevantArgs)
 

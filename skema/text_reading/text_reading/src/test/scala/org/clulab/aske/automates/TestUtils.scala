@@ -36,7 +36,7 @@ object TestUtils {
 
   protected var mostRecentOdinEngine: Option[OdinEngine] = None
   protected var mostRecentConfig: Option[Config] = None
-  val extractorAligner = ExtractAndAlign
+  lazy val extractorAligner = ExtractAndAlign
 
   // This is the standard way to extract mentions for testing
   def extractMentions(ieSystem: OdinEngine, text: String): Seq[Mention] = {

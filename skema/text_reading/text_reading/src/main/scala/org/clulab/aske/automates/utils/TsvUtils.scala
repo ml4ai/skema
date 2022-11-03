@@ -1,11 +1,11 @@
 package org.clulab.aske.automates.utils
 
-import scala.io.Source
+import org.clulab.utils.Sourcer
 
 object TsvUtils {
 
   def loadFromOneColumnTSV(resourcePath: String): Array[String] = {
-    val bufferedSource = Source.fromFile(resourcePath)
+    val bufferedSource = Sourcer.sourceFromResource(resourcePath)
     val freqWordsIter = for (
       line <- bufferedSource.getLines
     ) yield line.trim

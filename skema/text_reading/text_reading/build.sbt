@@ -25,7 +25,8 @@ libraryDependencies ++= {
     "com.lihaoyi"                %% "requests"           % "0.7.1",
     "com.typesafe.play"          %% "play-json"          % "2.9.3",
     "org.scala-lang.modules"     %% "scala-xml"          % "1.0.6", // 2.1.0",
-    "org.scalatest"              %% "scalatest"          % "3.0.9" % "test"
+    "org.clulab"                 %  "glove-840b-300d"    % "0.1.0" % Test,
+    "org.scalatest"              %% "scalatest"          % "3.0.9" % Test
   )
 }
 
@@ -37,7 +38,7 @@ lazy val grounding = project.in(file("grounding"))
 
  lazy val webapp = project
    .enablePlugins(PlayScala)
-   .aggregate(root)
+//   .aggregate(root)
    .dependsOn(root)
 
 //EclipseKeys.withSource := true
