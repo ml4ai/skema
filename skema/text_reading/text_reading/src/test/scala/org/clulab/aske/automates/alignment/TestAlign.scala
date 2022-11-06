@@ -5,7 +5,7 @@ import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.clulab.aske.automates.apps.{AlignmentArguments, ExtractAndAlign}
 import ai.lum.common.FileUtils._
-import org.clulab.aske.automates.TestUtils.TestAlignment
+import org.clulab.aske.automates.TestAlignment
 import org.clulab.aske.automates.apps.ExtractAndAlign.{COMMENT_TO_GLOBAL_VAR, EQN_TO_GLOBAL_VAR, GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT, GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER, GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT, GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER, GLOBAL_VAR_TO_UNIT_VIA_CONCEPT, GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER, SRC_TO_COMMENT, allLinkTypes}
 import org.clulab.aske.automates.utils.AlignmentJsonUtils
 import org.clulab.embeddings.SanitizedWordEmbeddingMap

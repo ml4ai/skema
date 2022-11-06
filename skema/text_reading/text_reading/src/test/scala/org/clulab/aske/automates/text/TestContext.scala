@@ -1,7 +1,7 @@
 package org.clulab.aske.automates.text
 
+import org.clulab.aske.automates.ExtractionTest
 import org.clulab.aske.automates.OdinEngine.CONTEXT_LABEL
-import org.clulab.aske.automates.TestUtils._
 
 class TestContext extends ExtractionTest{
 

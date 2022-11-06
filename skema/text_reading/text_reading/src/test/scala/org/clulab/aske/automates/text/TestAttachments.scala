@@ -1,7 +1,7 @@
 package org.clulab.aske.automates.text
 
 import org.clulab.aske.automates.OdinEngine.{CONJ_DESCRIPTION_LABEL, CONJ_DESCRIPTION_TYPE2_LABEL, DESCRIPTION_LABEL}
-import org.clulab.aske.automates.TestUtils._
+import org.clulab.aske.automates.ExtractionTest
 
 class TestAttachments extends ExtractionTest{
 

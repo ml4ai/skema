@@ -1,5 +1,6 @@
 package org.clulab.aske.automates.text
 
+import org.clulab.aske.automates.ExtractionTest
 import org.clulab.aske.automates.TestUtils._
 
 class TestFunctions extends ExtractionTest {

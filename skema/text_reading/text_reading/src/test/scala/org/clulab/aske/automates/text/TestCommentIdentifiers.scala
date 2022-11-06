@@ -1,5 +1,6 @@
 package org.clulab.aske.automates.text
 
+import org.clulab.aske.automates.ExtractionFromCommentsTest
 import org.clulab.aske.automates.OdinEngine.IDENTIFIER_LABEL
 import org.clulab.aske.automates.TestUtils._
 

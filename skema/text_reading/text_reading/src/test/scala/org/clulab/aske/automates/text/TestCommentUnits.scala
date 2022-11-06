@@ -1,6 +1,6 @@
 package org.clulab.aske.automates.text
 
-import org.clulab.aske.automates.TestUtils._
+import org.clulab.aske.automates.ExtractionFromCommentsTest
 
 class TestCommentUnits extends ExtractionFromCommentsTest {
 
