@@ -3,7 +3,7 @@ taxonomy: org/clulab/aske_automates/grammars/entities/grammar/taxonomy.yml
 rules:
   - name: simple-np
     label: Phrase
-    priority: 1
+    priority: "1"
     type: token
     pattern: |
       # avoids event triggers, coordinations, refs, etc.
@@ -21,14 +21,14 @@ rules:
 
   - name: simple-np-with-slash
     label: Phrase
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       @Phrase "/" @Phrase
 
   - name: single_VP # note: edited the pattern to include single lower case VPs as well. changing pattern didn't break more rules, but needs to check if this cause any errors.
     label: Phrase
-    priority: 1
+    priority: "1"
     type: token
     pattern: |
       [chunk=/B-VP|I-VP/ & tag = /VB/ & !outgoing = /^nsubj/]
@@ -38,35 +38,35 @@ rules:
 
   - name: single_VP_for_modelDescr
     label: VerbPhrase
-    priority: 1
+    priority: "1"
     type: token
     pattern: |
       [chunk=/B-VP|I-VP/ & tag = /VB/]
 
   - name: single_adjP # note: added due to def test t1k. needs to check if this cause any errors.
     label: Phrase
-    priority: 1
+    priority: "1"
     type: token
     pattern: |
       [chunk='I-ADJP' & tag = "NN" & !mention=Avoid & !word = /\(|\)|,|=|\[|\]/]
 
   - name: participle_or_adj
     label: Phrase
-    priority: 1
+    priority: "1"
     type: token
     pattern: |
       [tag=/VBN|JJ/]
 
   - name: single_capital_VP
     label: Phrase
-    priority: 1
+    priority: "1"
     type: token
     pattern: |
       [chunk='B-VP' & word = /[A-Z]/]
 
 #  - name: simple-vp
 #    label: Phrase
-#    priority: 1
+#    priority: "1"
 #    type: token
 #    pattern: |
 #      # avoids event triggers, coordinations, refs, etc.
@@ -78,7 +78,7 @@ rules:
 #might be necessary for processing glossary of terms, e.g., p. 56 of 2005 2005-THE ASCE STANDARDIZED REFERENCE EVAPOTRANSPIRATION EQUATION
 #  - name: adj_mascarading_for_noun
 #    label: Phrase
-#    priority: 1
+#    priority: "1"
 #    type: token
 #    example: "Cd denominator constant that changes with reference type and calculation time step (s m-1)"
 #    pattern: |
