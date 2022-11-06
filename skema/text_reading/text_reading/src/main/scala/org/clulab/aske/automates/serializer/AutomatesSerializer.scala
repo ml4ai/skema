@@ -237,7 +237,7 @@ object AutomatesJSONSerializer {
     val edges = edgesAndRoots.obj("edges").arr.map(item => new Edge(item.obj("source").num.toInt, item.obj("destination").num.toInt, item.obj("relation").str))
     val roots = edgesAndRoots.obj("roots").arr.map(_.num.toInt).toSet
     assert(roots.size == 1)
-    new DirectedGraph[String](edges.toList, Some(roots.head))
+    new DirectedGraph[String](edges.toList, None, Some(roots))
   }
 
   // Serialization
