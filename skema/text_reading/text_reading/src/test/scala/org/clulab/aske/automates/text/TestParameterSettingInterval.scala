@@ -1,6 +1,6 @@
 package org.clulab.aske.automates.text
 
-import org.clulab.aske.automates.ExtractionTest
+import org.ml4ai.skema.test.ExtractionTest
 
 class TestParameterSettingEventInterval  extends ExtractionTest {
 

@@ -2,15 +2,15 @@ package org.clulab.aske.automates.alignment
 
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
-import org.clulab.aske.automates.TestUtils
 import org.clulab.odin.{RelationMention, TextBoundMention}
 import org.clulab.odin.impl.{OdinCompileException, TokenPattern}
 import org.clulab.processors.Document
 import org.clulab.processors.fastnlp.FastNLPProcessor
-import org.clulab.aske.automates.TestUtils.jsonStringToDocument
+import org.ml4ai.skema.test.TestUtils.jsonStringToDocument
 import org.clulab.embeddings.SanitizedWordEmbeddingMap
 import org.clulab.struct.Interval
 import org.clulab.utils.Sourcer
+import org.ml4ai.skema.test.TestUtils
 import org.scalatest.{FlatSpec, Matchers}
 
 class TestPairwiseW2VAligner extends FlatSpec with Matchers {

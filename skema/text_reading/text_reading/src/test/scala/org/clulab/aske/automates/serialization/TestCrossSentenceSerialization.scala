@@ -1,11 +1,10 @@
 package org.clulab.aske.automates.serialization
 
-
-import org.clulab.aske.automates.ExtractionTest
 import org.clulab.aske.automates.mentions.CrossSentenceEventMention
 import org.clulab.aske.automates.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.test.ExtractionTest
 
-  class TestCrossSentenceSerialization extends ExtractionTest {
+class TestCrossSentenceSerialization extends ExtractionTest {
 
     val textToTest = "Rn depends on RS, but also on T and RH. The only additional parameter appearing in the suggested formula is the extraterrestrial radiation, RA."
     passingTest should s"serialize and deserialize the mention successfully: ${textToTest}" taggedAs (Somebody) in {

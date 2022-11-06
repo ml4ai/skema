@@ -1,7 +1,7 @@
 package org.clulab.aske.automates.text
 
-import org.clulab.aske.automates.ExtractionTest
 import org.clulab.aske.automates.OdinEngine.IDENTIFIER_LABEL
+import org.ml4ai.skema.test.ExtractionTest
 
 class TestIdentifiers extends ExtractionTest {
 

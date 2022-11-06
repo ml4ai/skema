@@ -5,11 +5,11 @@ import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.clulab.aske.automates.apps.{AlignmentArguments, ExtractAndAlign}
 import ai.lum.common.FileUtils._
-import org.clulab.aske.automates.TestAlignment
 import org.clulab.aske.automates.apps.ExtractAndAlign.{COMMENT_TO_GLOBAL_VAR, EQN_TO_GLOBAL_VAR, GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT, GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER, GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT, GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER, GLOBAL_VAR_TO_UNIT_VIA_CONCEPT, GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER, SRC_TO_COMMENT, allLinkTypes}
 import org.clulab.aske.automates.utils.AlignmentJsonUtils
 import org.clulab.embeddings.SanitizedWordEmbeddingMap
 import org.clulab.utils.Sourcer
+import org.ml4ai.skema.test.TestAlignment
 
 /* Tests the alignment payload created based on the toy double-epidemic-and-chime files in /test/resources;
   should changes need to be made to the toy document, the latex template is stored under /test/resources/toy_document_tex;
@@ -90,18 +90,18 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("microbes per year::mm", passingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("m2/year", passingTest),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("2.71", passingTest),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("100", passingTest),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER ->("1", passingTest),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT ->("0.5||1", passingTest),
-      EQN_TO_GLOBAL_VAR -> ("R_0", passingTest),
-      COMMENT_TO_GLOBAL_VAR -> ("Rb", passingTest)
+      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("microbes per year::mm", passingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("m2/year", passingTestString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("2.71", passingTestString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("100", passingTestString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER ->("1", passingTestString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT ->("0.5||1", passingTestString),
+      EQN_TO_GLOBAL_VAR -> ("R_0", passingTestString),
+      COMMENT_TO_GLOBAL_VAR -> ("Rb", passingTestString)
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("Rb",passingTest)
+      SRC_TO_COMMENT -> ("Rb",passingTestString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -114,15 +114,15 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      EQN_TO_GLOBAL_VAR -> ("", failingNegative),
-      COMMENT_TO_GLOBAL_VAR -> ("", failingNegative)
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      EQN_TO_GLOBAL_VAR -> ("", failingNegativeString),
+      COMMENT_TO_GLOBAL_VAR -> ("", failingNegativeString)
     )
 
     val indirectDesired = Map(//Map.empty[String, (String, String)]
-      SRC_TO_COMMENT -> ("", failingNegative)
+      SRC_TO_COMMENT -> ("", failingNegativeString)
     )
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
     runAllAlignTests(idfr, directLinks, indirLinks, directDesired, indirectDesired)
@@ -133,15 +133,15 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      EQN_TO_GLOBAL_VAR -> ("beta", passingTest),
-      COMMENT_TO_GLOBAL_VAR -> ("beta", failingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative)
+      EQN_TO_GLOBAL_VAR -> ("beta", passingTestString),
+      COMMENT_TO_GLOBAL_VAR -> ("beta", failingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString)
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("beta",failingTest)
+      SRC_TO_COMMENT -> ("beta",failingTestString)
     )
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
     runAllAlignTests(idfr, directLinks, indirLinks, directDesired, indirectDesired)
@@ -153,15 +153,15 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      EQN_TO_GLOBAL_VAR -> ("gamma", passingTest),
-      COMMENT_TO_GLOBAL_VAR -> ("gamma", failingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative)
+      EQN_TO_GLOBAL_VAR -> ("gamma", passingTestString),
+      COMMENT_TO_GLOBAL_VAR -> ("gamma", failingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString)
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("gamma", failingTest)
+      SRC_TO_COMMENT -> ("gamma", failingTestString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -173,17 +173,17 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(//Map.empty[String, (String, String)]
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      COMMENT_TO_GLOBAL_VAR -> ("", failingNegative)
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      COMMENT_TO_GLOBAL_VAR -> ("", failingNegativeString)
 
 
     )
 
     val indirectDesired = Map(//Map.empty[String, (String, String)]
-      SRC_TO_COMMENT -> ("", failingNegative)
+      SRC_TO_COMMENT -> ("", failingNegativeString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -196,16 +196,16 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("2/3::3", passingTest),
-      EQN_TO_GLOBAL_VAR -> ("a", passingTest),
-      COMMENT_TO_GLOBAL_VAR -> ("a", passingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("2/3::3", passingTestString),
+      EQN_TO_GLOBAL_VAR -> ("a", passingTestString),
+      COMMENT_TO_GLOBAL_VAR -> ("a", passingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("a",passingTest)
+      SRC_TO_COMMENT -> ("a",passingTestString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -218,18 +218,18 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("germs per second", passingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("germs per second", passingTest),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("65::9.788 × 10-8", passingTest),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("0.5", passingTest),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER ->("negative", failingTest), // need processing for word param settings
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT ->("0.2||5.6", passingTest),
-      EQN_TO_GLOBAL_VAR -> ("r", passingTest),
-      COMMENT_TO_GLOBAL_VAR -> ("inc_inf", failingTest) // got misaligned to 'removal rate of infectives'
+      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("germs per second", passingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("germs per second", passingTestString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("65::9.788 × 10-8", passingTestString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("0.5", passingTestString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER ->("negative", failingTestString), // need processing for word param settings
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT ->("0.2||5.6", passingTestString),
+      EQN_TO_GLOBAL_VAR -> ("r", passingTestString),
+      COMMENT_TO_GLOBAL_VAR -> ("inc_inf", failingTestString) // got misaligned to 'removal rate of infectives'
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("inc_inf",failingTest)
+      SRC_TO_COMMENT -> ("inc_inf",failingTestString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -243,18 +243,18 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("individuals", failingTest),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("10", passingTest),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER ->("0", failingTest),// in text it's "positive", need something for word to param setting conversion + need to test intervals better, e.g., the first one in tuple is lower bound and second is upper OR it does not matter for align - quality of extractions is in param setting testing; here, the important part is being linked properly
-      EQN_TO_GLOBAL_VAR -> ("I", failingTest), // I is not in eq but there's I(0), I(t), and I_P; what to align? Or nothing?
-      COMMENT_TO_GLOBAL_VAR -> ("I", failingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT ->("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT ->("", failingNegative),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT ->("", failingNegative)
+      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("individuals", failingTestString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("10", passingTestString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_IDENTIFIER ->("0", failingTestString),// in text it's "positive", need something for word to param setting conversion + need to test intervals better, e.g., the first one in tuple is lower bound and second is upper OR it does not matter for align - quality of extractions is in param setting testing; here, the important part is being linked properly
+      EQN_TO_GLOBAL_VAR -> ("I", failingTestString), // I is not in eq but there's I(0), I(t), and I_P; what to align? Or nothing?
+      COMMENT_TO_GLOBAL_VAR -> ("I", failingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT ->("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT ->("", failingNegativeString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT ->("", failingNegativeString)
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("I",failingTest)
+      SRC_TO_COMMENT -> ("I",failingTestString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -267,17 +267,17 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      EQN_TO_GLOBAL_VAR -> ("R", failingTest),
-      COMMENT_TO_GLOBAL_VAR -> ("R", failingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("", failingNegative),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("", failingNegative),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
-      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative),
+      EQN_TO_GLOBAL_VAR -> ("R", failingTestString),
+      COMMENT_TO_GLOBAL_VAR -> ("R", failingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
+      GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString),
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("R", failingTest)
+      SRC_TO_COMMENT -> ("R", failingTestString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -290,16 +290,16 @@ class TestAlign extends TestAlignment {
     behavior of idfr
 
     val directDesired = Map(
-      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("mm", passingTest),
-      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("mm::millimeters", passingTest), // both values possible
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("450", passingTest),
-      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("32", passingTest),
-      EQN_TO_GLOBAL_VAR -> ("tau", passingTest),
-      COMMENT_TO_GLOBAL_VAR -> ("t_a", passingTest)
+      GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("mm", passingTestString),
+      GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("mm::millimeters", passingTestString), // both values possible
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("450", passingTestString),
+      GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("32", passingTestString),
+      EQN_TO_GLOBAL_VAR -> ("tau", passingTestString),
+      COMMENT_TO_GLOBAL_VAR -> ("t_a", passingTestString)
     )
 
     val indirectDesired = Map(
-      SRC_TO_COMMENT -> ("t_a",passingTest)
+      SRC_TO_COMMENT -> ("t_a",passingTestString)
     )
 
     val (directLinks, indirLinks) = getLinksForGvar(idfr, links)
@@ -312,17 +312,17 @@ class TestAlign extends TestAlignment {
       behavior of idfr
 
       val directDesired = Map(
-        GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("people", failingTest),
-        GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("6.8 millions", failingTest),
-        GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("4.5 million", failingTest), //fixme: how did 6.8 get attached to S?
-        EQN_TO_GLOBAL_VAR -> ("S", passingTest),
-        COMMENT_TO_GLOBAL_VAR -> ("S", failingTest),
-        GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegative),
-        GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegative)
+        GLOBAL_VAR_TO_UNIT_VIA_IDENTIFIER -> ("people", failingTestString),
+        GLOBAL_VAR_TO_PARAM_SETTING_VIA_IDENTIFIER -> ("6.8 millions", failingTestString),
+        GLOBAL_VAR_TO_PARAM_SETTING_VIA_CONCEPT -> ("4.5 million", failingTestString), //fixme: how did 6.8 get attached to S?
+        EQN_TO_GLOBAL_VAR -> ("S", passingTestString),
+        COMMENT_TO_GLOBAL_VAR -> ("S", failingTestString),
+        GLOBAL_VAR_TO_UNIT_VIA_CONCEPT -> ("", failingNegativeString),
+        GLOBAL_VAR_TO_INT_PARAM_SETTING_VIA_CONCEPT -> ("", failingNegativeString)
       )
 
       val indirectDesired = Map(
-        SRC_TO_COMMENT -> ("S", failingTest)
+        SRC_TO_COMMENT -> ("S", failingTestString)
       )
 
       val (directLinks, indirLinks) = getLinksForGvar(idfr, links)

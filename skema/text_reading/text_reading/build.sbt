@@ -32,7 +32,7 @@ libraryDependencies ++= {
 
 lazy val root = (project in file("."))
   .aggregate(grounding)
-  .dependsOn(grounding)
+  .dependsOn(grounding % "compile -> compile; test -> test")
 
 lazy val grounding = project.in(file("grounding"))
 

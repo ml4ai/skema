@@ -2,7 +2,7 @@ package org.ml4ai.grounding
 
 import com.typesafe.config.ConfigFactory
 import org.clulab.utils.FileUtils
-import org.ml4ai.grounding.common.utils.Test
+import org.ml4ai.skema.common.test.Test
 
 import org.scalatest.OptionValues._
 

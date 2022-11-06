@@ -1,7 +1,7 @@
 package org.clulab.aske.automates.text
 
 import edu.stanford.nlp.ie.machinereading.structure.EventMention
-import org.clulab.aske.automates.ExtractionTest
+import org.ml4ai.skema.test.ExtractionTest
 
 class TestFunctionFragments extends ExtractionTest {
 

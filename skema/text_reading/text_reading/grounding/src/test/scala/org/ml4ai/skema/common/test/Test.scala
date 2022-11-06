@@ -1,9 +1,7 @@
-package org.ml4ai.grounding.common.utils
+package org.ml4ai.skema.common.test
 
 import org.scalactic.source.Position
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
-import org.scalatest.Tag
+import org.scalatest.{FlatSpec, Matchers, Tag}
 
 class TesterTag extends Tag("TesterTag")
 

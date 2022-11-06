@@ -1,14 +1,14 @@
 package org.clulab.aske.automates.serialization
 
-import org.clulab.aske.automates.ExtractionTest
 import org.clulab.aske.automates.attachments.AutomatesAttachment
 import org.clulab.aske.automates.mentions.CrossSentenceEventMention
 import org.clulab.aske.automates.serializer.AutomatesJSONSerializer
 import org.clulab.odin.serialization.json.MentionOps
 import org.clulab.odin.{Attachment, EventMention, Mention, RelationMention, TextBoundMention}
+import org.ml4ai.skema.test.ExtractionTest
 
 
-   // first, let's make crossSentenceMentions to export to JSON file
+// first, let's make crossSentenceMentions to export to JSON file
 
 class TestConjDescrSerialization extends ExtractionTest {
 

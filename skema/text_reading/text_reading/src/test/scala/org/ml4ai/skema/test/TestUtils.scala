@@ -1,8 +1,9 @@
-package org.clulab.aske.automates
+package org.ml4ai.skema.test
 
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
+import org.clulab.aske.automates.OdinEngine
+import org.clulab.aske.automates.apps.ExtractAndAlign
 import org.clulab.odin.Mention
-import org.clulab.aske.automates.apps.{AlignmentBaseline, ExtractAndAlign}
 import org.clulab.processors.Document
 import org.clulab.serialization.json.JSONSerializer
 import org.json4s.jackson.JsonMethods._
