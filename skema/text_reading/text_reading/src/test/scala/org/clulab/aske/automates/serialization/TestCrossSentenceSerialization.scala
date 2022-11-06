@@ -1,7 +1,7 @@
 package org.clulab.aske.automates.serialization
 
 
-import org.clulab.aske.automates.TestUtils.{ExtractionTest, Somebody}
+import org.clulab.aske.automates.TestUtils.ExtractionTest
 import org.clulab.aske.automates.mentions.CrossSentenceEventMention
 import org.clulab.aske.automates.serializer.AutomatesJSONSerializer
 

@@ -12,6 +12,7 @@ import org.clulab.aske.automates.utils.MentionUtils
 import org.clulab.processors.Document
 import org.clulab.serialization.json.JSONSerializer
 import org.json4s.jackson.JsonMethods._
+import org.ml4ai.grounding.common.utils.Test
 import ujson.Value
 
 import scala.collection.mutable.ArrayBuffer
@@ -21,16 +22,6 @@ object TestUtils {
 
   // From Processors -- I couldn't import it for some reason
   def jsonStringToDocument(jsonstr: String): Document = JSONSerializer.toDocument(parse(jsonstr))
-
-  class TesterTag extends Tag("TesterTag")
-
-  object Nobody   extends TesterTag
-  object Somebody extends TesterTag
-  object Andrew   extends TesterTag
-  object Becky    extends TesterTag
-  object Masha    extends TesterTag
-  object Interval extends TesterTag
-  object DiscussWithModelers extends TesterTag // i.e., Clay and Adarsh
 
   val successful = Seq()
 
@@ -52,14 +43,6 @@ object TestUtils {
     mostRecentOdinEngine = Some(readingSystem)
     mostRecentConfig = Some(config)
     readingSystem
-  }
-
-  class Test extends FlatSpec with Matchers {
-    val passingTest = it
-    val failingTest = ignore
-    val brokenSyntaxTest = ignore
-    val toDiscuss = ignore
-
   }
 
   class ExtractionTest(val ieSystem: OdinEngine) extends Test {
