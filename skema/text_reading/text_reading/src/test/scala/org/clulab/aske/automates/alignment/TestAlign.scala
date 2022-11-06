@@ -10,6 +10,7 @@ import org.clulab.aske.automates.utils.AlignmentJsonUtils
 import org.clulab.embeddings.SanitizedWordEmbeddingMap
 import org.clulab.utils.Sourcer
 import org.ml4ai.skema.test.TestAlignment
+import ujson.Value
 
 /* Tests the alignment payload created based on the toy double-epidemic-and-chime files in /test/resources;
   should changes need to be made to the toy document, the latex template is stored under /test/resources/toy_document_tex;
@@ -23,12 +24,24 @@ import org.ml4ai.skema.test.TestAlignment
  */
 class TestAlign extends TestAlignment {
 
+  // This is a failingTest.  It requires Python and external files.
+  val enabled = false
   val config: Config = ConfigFactory.load("test.conf")
+
+  // Try to load this huge thing just once.
   val w2vPath: String = config[String]("alignment.w2vPath")
-  val vectors = Sourcer.sourceFromResource(w2vPath)
-  val w2v = new SanitizedWordEmbeddingMap(vectors, None, false)
+  lazy val w2v =
+      if (w2vPath == ExtractAndAlign.w2vPath)
+        ExtractAndAlign.w2v
+      else {
+        val vectors = Sourcer.sourceFromResource(w2vPath)
+        val w2v = new SanitizedWordEmbeddingMap(vectors, None, false)
+
+        w2v
+      }
+
   val relevantArgs: List[String] = config[List[String]]("alignment.relevantArgs")
-  val alignmentHandler = new AlignmentHandler(w2v, relevantArgs.toSet)
+  lazy val alignmentHandler = new AlignmentHandler(w2v, relevantArgs.toSet)
   // get general configs
   val serializerName: String = config[String]("apps.serializerName")
   val numAlignments: Int = config[Int]("apps.numAlignments")
@@ -51,7 +64,7 @@ class TestAlign extends TestAlignment {
 
   val argsForGrounding: AlignmentArguments = AlignmentJsonUtils.getArgsForAlignment(payloadPath, jsonObj, groundToSVO, groundToWiki, serializerName)
 
-  val groundings: ujson.Value = ExtractAndAlign.groundMentions(
+  lazy val groundings: ujson.Value = ExtractAndAlign.groundMentions(
     payloadJson,
     argsForGrounding.identifierNames,
     argsForGrounding.identifierShortNames,
@@ -75,17 +88,23 @@ class TestAlign extends TestAlignment {
     debug
   )
 
-  val links = groundings.obj("links").arr
-  val extractedLinkTypes = links.map(_.obj("link_type").str).distinct
+  lazy val links = groundings.obj("links").arr
+  lazy val extractedLinkTypes = links.map(_.obj("link_type").str).distinct
 
-  it should "have all the link types" in {
+  failingTest should "have all the link types" in {
     val allLinksTypesFlat = allLinkTypes.obj.filter(_._1 != "disabled").obj.flatMap(obj => obj._2.obj.keySet).toSeq
     val overlap = extractedLinkTypes.intersect(allLinksTypesFlat)
     overlap.length == extractedLinkTypes.length  shouldBe true
     overlap.length == allLinksTypesFlat.length shouldBe true
   }
 
+  override def runAllAlignTests(variable: String, directLinks: Map[String, Seq[Value]], indirectLinks: Map[String, Seq[(String, Double)]],
+      directDesired: Map[String, Tuple2[String, String]], indirectDesired: Map[String, Tuple2[String, String]]): Unit = {
+    if (enabled)
+      super.runAllAlignTests(variable, directLinks, indirectLinks, directDesired, indirectDesired)
+  }
 
+  if (enabled)
   {
     val idfr = "R0" // basic reproduction number
     behavior of idfr
@@ -110,6 +129,7 @@ class TestAlign extends TestAlignment {
 
   }
 
+  if (enabled)
   {
     val idfr = "c" // number of people exposed
     behavior of idfr
@@ -129,6 +149,8 @@ class TestAlign extends TestAlignment {
     runAllAlignTests(idfr, directLinks, indirLinks, directDesired, indirectDesired)
 
   }
+
+  if (enabled)
   {
     val idfr = "β" //fixme: maybe if there is very little text for variable, make aligner depend more on the variable?
     behavior of idfr
@@ -148,7 +170,7 @@ class TestAlign extends TestAlignment {
     runAllAlignTests(idfr, directLinks, indirLinks, directDesired, indirectDesired)
   }
 
-
+  if(enabled)
   {
     val idfr = "γ"
     behavior of idfr
@@ -169,6 +191,7 @@ class TestAlign extends TestAlignment {
     runAllAlignTests(idfr, directLinks, indirLinks, directDesired, indirectDesired)
   }
 
+  if (enabled)
   {
     val idfr = "A" // virus
     behavior of idfr
@@ -192,6 +215,7 @@ class TestAlign extends TestAlignment {
 
   }
 
+  if (enabled)
   {
     val idfr = "a" // removal rate of infectives
     behavior of idfr
@@ -214,6 +238,7 @@ class TestAlign extends TestAlignment {
 
   }
 
+  if (enabled)
   {
     val idfr = "r" // infection rate
     behavior of idfr
@@ -238,6 +263,8 @@ class TestAlign extends TestAlignment {
 
   }
 
+
+  if (enabled)
   {
 
     val idfr = "I" // infected
@@ -263,6 +290,7 @@ class TestAlign extends TestAlignment {
 
   }
 
+  if (enabled)
   {
     val idfr = "R"
     behavior of idfr
@@ -286,6 +314,7 @@ class TestAlign extends TestAlignment {
 
   }
 
+  if (enabled)
   {
     val idfr = "τ"
     behavior of idfr
@@ -307,6 +336,8 @@ class TestAlign extends TestAlignment {
     runAllAlignTests(idfr, directLinks, indirLinks, directDesired, indirectDesired)
 
   }
+
+  if (enabled)
 
     {
       val idfr = "S"
@@ -334,13 +365,13 @@ class TestAlign extends TestAlignment {
   /* INDIRECT LINK TESTS
   for now, the only indirect link is source to comment
    */
-  val src_comment_links = links.filter(_.obj("link_type").str == SRC_TO_COMMENT)
+  lazy val src_comment_links = links.filter(_.obj("link_type").str == SRC_TO_COMMENT)
 
-  it should "have a src to comment element for source variable a" in {
+  failingTest should "have a src to comment element for source variable a" in {
     src_comment_links.exists(l => l.obj("element_1").str.split("::").last == "a" & l.obj("element_2").str.split("::").last == "a" && l.obj("score").num == 1) shouldBe true
   }
 
-  it should "have a src to comment element for source variable gamma" in {
+  failingTest should "have a src to comment element for source variable gamma" in {
     src_comment_links.exists(l => l.obj("element_1").str.split("::").last == "gamma" & l.obj("element_2").str.split("::").last == "gamma" && l.obj("score").num == 1) shouldBe true
   }
 

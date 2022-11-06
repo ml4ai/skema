@@ -129,8 +129,11 @@ object ExtractAndAlign {
   val pdfAlignDir: String = config[String]("apps.pdfalignDir")
   val numOfWikiGroundings: Int = config[Int]("apps.numOfWikiGroundings")
   val w2vPath: String = config[String]("alignment.w2vPath")
-  val vectors = Sourcer.sourceFromResource(w2vPath)
-  val w2v = new SanitizedWordEmbeddingMap(vectors, None, false)
+  lazy val w2v = {
+    val vectors = Sourcer.sourceFromResource(w2vPath)
+
+    new SanitizedWordEmbeddingMap(vectors, None, false)
+  }
 
   def parseDouble(s: String): Option[Double] = Try { s.toDouble }.toOption
 
