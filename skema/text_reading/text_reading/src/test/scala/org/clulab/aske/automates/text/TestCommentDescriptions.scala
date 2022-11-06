@@ -1,6 +1,5 @@
 package org.clulab.aske.automates.text
 
-import org.ml4ai.skema.test.TestUtils._
 import org.ml4ai.skema.test.ExtractionFromCommentsTest
 
 class TestCommentDescriptions extends ExtractionFromCommentsTest {

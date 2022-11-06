@@ -42,3 +42,6 @@ lazy val grounding = project.in(file("grounding"))
    .dependsOn(root)
 
 //EclipseKeys.withSource := true
+
+ThisBuild / Test / fork := true // also forces sequential operation
+ThisBuild / Test / parallelExecution := false // keeps groups in their order

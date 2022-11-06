@@ -477,7 +477,7 @@ class TestDescriptions extends ExtractionTest {
   }
 
   val t11f = "The number of patients currently hospitalized with COVID-19 at your hospital(s)."
-  passingTest should s"find NO descriptions from t11f: ${t11f}" taggedAs(Somebody) in {
+  failingTest should s"find NO descriptions from t11f: ${t11f}" taggedAs(Somebody) in {
     val desired =  Seq.empty[(String, Seq[String])]
     val mentions = extractMentions(t11f)
     testDescriptionEvent(mentions, desired)
@@ -720,7 +720,7 @@ class TestDescriptions extends ExtractionTest {
   }
 
     val t4l = "e°(Tmax) = saturation vapor pressure at daily maximum temperature [kPa]"
-  passingTest should s"find descriptions from t4l: ${t4l}" taggedAs(Somebody) in {
+  failingTest should s"find descriptions from t4l: ${t4l}" taggedAs(Somebody) in {
     val desired =  Seq(
       "e°(Tmax)" -> Seq("= saturation vapor pressure at daily maximum temperature") // can't remove expansion on amod, so have to make peace with the = in the def
     )

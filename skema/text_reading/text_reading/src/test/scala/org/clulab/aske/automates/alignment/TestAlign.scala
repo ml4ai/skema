@@ -24,8 +24,9 @@ import org.ml4ai.skema.test.TestAlignment
 class TestAlign extends TestAlignment {
 
   val config: Config = ConfigFactory.load("test.conf")
-  val vectors: String = config[String]("alignment.w2vPath")
-  val w2v = new SanitizedWordEmbeddingMap(Sourcer.sourceFromResource(vectors), None, false)
+  val w2vPath: String = config[String]("alignment.w2vPath")
+  val vectors = Sourcer.sourceFromResource(w2vPath)
+  val w2v = new SanitizedWordEmbeddingMap(vectors, None, false)
   val relevantArgs: List[String] = config[List[String]]("alignment.relevantArgs")
   val alignmentHandler = new AlignmentHandler(w2v, relevantArgs.toSet)
   // get general configs

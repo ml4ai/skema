@@ -16,8 +16,9 @@ import org.scalatest.{FlatSpec, Matchers}
 class TestPairwiseW2VAligner extends FlatSpec with Matchers {
 
   val config: Config = ConfigFactory.load("test.conf")
-  val vectors: String = config[String]("alignment.w2vPath")
-  val w2v = new SanitizedWordEmbeddingMap(Sourcer.sourceFromResource(vectors), None, false)
+  val w2vPath: String = config[String]("alignment.w2vPath")
+  val vectors = Sourcer.sourceFromResource(w2vPath)
+  val w2v = new SanitizedWordEmbeddingMap(vectors, None, false)
 
   lazy val proc = TestUtils.newOdinSystem(ConfigFactory.load("test.conf")).proc
 

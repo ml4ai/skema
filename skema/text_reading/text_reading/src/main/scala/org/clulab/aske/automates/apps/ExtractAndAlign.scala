@@ -25,7 +25,7 @@ import org.clulab.aske.automates.attachments.AutomatesAttachment
 import org.clulab.aske.automates.utils.{AlignmentJsonUtils, MentionUtils}
 import org.clulab.embeddings.{SanitizedWordEmbeddingMap, WordEmbeddingMap}
 import org.clulab.grounding.SVOGrounder.getTerms
-import org.clulab.utils.FileUtils
+import org.clulab.utils.{FileUtils, Sourcer}
 import upickle.default.write
 
 import scala.collection.mutable
@@ -128,8 +128,9 @@ object ExtractAndAlign {
   val config: Config = ConfigFactory.load()
   val pdfAlignDir: String = config[String]("apps.pdfalignDir")
   val numOfWikiGroundings: Int = config[Int]("apps.numOfWikiGroundings")
-  val vectors: String = config[String]("alignment.w2vPath")
-  val w2v = new SanitizedWordEmbeddingMap(vectors, None)
+  val w2vPath: String = config[String]("alignment.w2vPath")
+  val vectors = Sourcer.sourceFromResource(w2vPath)
+  val w2v = new SanitizedWordEmbeddingMap(vectors, None, false)
 
   def parseDouble(s: String): Option[Double] = Try { s.toDouble }.toOption
 

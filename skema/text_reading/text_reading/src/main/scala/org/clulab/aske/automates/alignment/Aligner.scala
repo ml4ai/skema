@@ -11,13 +11,14 @@ import org.clulab.aske.automates.apps.AlignmentBaseline
 import org.clulab.aske.automates.utils.AlignmentJsonUtils.GlobalVariable
 import org.clulab.aske.automates.utils.TsvUtils
 import org.clulab.odin.impl.OdinConfig
+import org.clulab.utils.Sourcer
 
 import scala.collection.mutable.ArrayBuffer
 
 case class AlignmentHandler(editDistance: VariableEditDistanceAligner, w2v: PairwiseW2VAligner) {
 
   def this(w2vPath: String, relevantArgs: Set[String]) =
-    this(new VariableEditDistanceAligner(), new PairwiseW2VAligner(new SanitizedWordEmbeddingMap(w2vPath), relevantArgs))
+    this(new VariableEditDistanceAligner(), new PairwiseW2VAligner(new SanitizedWordEmbeddingMap(Sourcer.sourceFromResource(w2vPath), None, false), relevantArgs))
   def this(w2v: SanitizedWordEmbeddingMap, relevantArgs: Set[String]) =
     this(new VariableEditDistanceAligner(), new PairwiseW2VAligner(w2v, relevantArgs))
   def this(config: Config) = this(config[String]("w2vPath"), config[List[String]]("relevantArgs").toSet)
@@ -110,7 +111,7 @@ class PairwiseW2VAligner(val w2v: SanitizedWordEmbeddingMap, val relevantArgs: S
 
   val stopWords = TsvUtils.loadFromOneColumnTSV("/stopWords.tsv")
 
-  def this(w2vPath: String, relevantArgs: Set[String]) = this(new SanitizedWordEmbeddingMap(w2vPath), relevantArgs)
+  def this(w2vPath: String, relevantArgs: Set[String]) = this(new SanitizedWordEmbeddingMap(Sourcer.sourceFromResource(w2vPath), None, false), relevantArgs)
 
   def getBigrams(textStrings: Seq[String]): Seq[String] = {
     val bigrams = new ArrayBuffer[String]()
@@ -227,7 +228,8 @@ class PairwiseW2VAligner(val w2v: SanitizedWordEmbeddingMap, val relevantArgs: S
 object PairwiseW2VAligner {
   def fromConfig(config: Config): Aligner = {
     val w2vPath: String = config[String]("w2vPath")
-    val w2v = new SanitizedWordEmbeddingMap(w2vPath)
+    val vectors = Sourcer.sourceFromResource(w2vPath)
+    val w2v = new SanitizedWordEmbeddingMap(vectors, None, false)
     val relevantArgs: List[String] = config[List[String]]("relevantArgs")
 
     new PairwiseW2VAligner(w2v, relevantArgs.toSet)
