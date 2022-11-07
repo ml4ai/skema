@@ -38,7 +38,7 @@ lazy val grounding = project.in(file("grounding"))
 
  lazy val webapp = project
    .enablePlugins(PlayScala)
-//   .aggregate(root)
+   .aggregate(root)
    .dependsOn(root)
 
 //EclipseKeys.withSource := true
