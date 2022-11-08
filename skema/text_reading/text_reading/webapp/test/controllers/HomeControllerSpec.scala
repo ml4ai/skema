@@ -12,6 +12,7 @@ import play.api.test.Helpers._
  * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
  */
 class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
+  val expectedString = "ASKE AutoMATES Odin Visualizer"
 
   "HomeController GET" should {
 
@@ -21,7 +22,8 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
 
       status(home) mustBe OK
       contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
+      val actualString = contentAsString(home)
+      actualString must include (expectedString)
     }
 
     "render the index page from the application" in {
@@ -30,7 +32,8 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
 
       status(home) mustBe OK
       contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
+      val actualString = contentAsString(home)
+      actualString must include (expectedString)
     }
 
     "render the index page from the router" in {
@@ -39,7 +42,8 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
 
       status(home) mustBe OK
       contentType(home) mustBe Some("text/html")
-      contentAsString(home) must include ("Welcome to Play")
+      val actualString = contentAsString(home)
+      actualString must include (expectedString)
     }
   }
 }

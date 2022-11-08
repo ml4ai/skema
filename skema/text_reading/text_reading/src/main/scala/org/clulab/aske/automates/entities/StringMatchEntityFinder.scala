@@ -8,9 +8,9 @@ import ai.lum.common.FileUtils._
 import ai.lum.regextools.RegexBuilder
 import com.typesafe.config.Config
 import org.clulab.aske.automates.grfn.{GrFNDocument, GrFNParser}
+import org.clulab.aske.automates.utils.AlignmentJsonUtils
 import org.clulab.odin.{ExtractorEngine, Mention}
 import org.clulab.processors.Document
-import org.clulab.utils.AlignmentJsonUtils
 
 class StringMatchEntityFinder(strings: Set[String], label: String, taxonomyPath: String) extends EntityFinder {
   println(s"from StringMatchEntityFinder: $strings")

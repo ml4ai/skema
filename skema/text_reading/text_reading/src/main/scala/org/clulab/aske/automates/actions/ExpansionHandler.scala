@@ -8,7 +8,7 @@ import org.clulab.odin._
 import org.clulab.processors.Sentence
 import org.clulab.struct.Interval
 import org.clulab.aske.automates.actions.ExpansionHandler._
-import org.clulab.utils.DisplayUtils
+import org.clulab.aske.automates.utils.DisplayUtils
 
 import scala.annotation.tailrec
 import scala.collection.mutable.ArrayBuffer

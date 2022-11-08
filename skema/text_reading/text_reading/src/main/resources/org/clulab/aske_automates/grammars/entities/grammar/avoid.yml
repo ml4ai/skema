@@ -4,7 +4,7 @@ rules:
 
   - name: "coordinations"
     label: Avoid
-    priority: 1
+    priority: "1"
     type: token
     pattern: |
       # avoid coordinations
@@ -16,7 +16,7 @@ rules:
 ##   the chunker is wont to gobble up verbs with clear arguments as part of NPs, hence this rule
 #  - name: "verbs-with-args"
 #    label: Avoid
-#    priority: 1
+#    priority: "1"
 #    example: "X HINDERS Y."
 #    type: token
 #    pattern: |
@@ -25,7 +25,7 @@ rules:
 
   - name: "references-et-al"
     label: Avoid
-    priority: 3
+    priority: "3"
     type: token
     pattern: |
       # avoid xrefs
@@ -33,7 +33,7 @@ rules:
 
   - name: "et-al"
     label: Avoid
-    priority: 3
+    priority: "3"
     type: token
     pattern: |
       # avoid xrefs
@@ -41,7 +41,7 @@ rules:
 
   - name: "references-name-year"
     label: Avoid
-    priority: 3
+    priority: "3"
     type: token
     pattern: |
       # avoid xrefs
@@ -50,7 +50,7 @@ rules:
 
   - name: "equal_sign"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       #avoids equal signs
@@ -58,7 +58,7 @@ rules:
 
   - name: "figure-equation-ref"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       #avoids pointers to equations/figures as those are frequently found as identifiers
@@ -69,7 +69,7 @@ rules:
   # todo: verify there are no expansion ramifications due to Avoid label
   - name: "prev_found_identifier"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       #avoids previously found Variables
@@ -77,21 +77,21 @@ rules:
 
   - name: "YEAR"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
      (?=[tag = /IN/]) [entity="DATE"]
 
   - name: "ie"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [word="i.e"] | [word="i.e."]
 
   - name: "proper_noun" #eliminating a stand-alone 'person' doesn't work bc Kcbmin is found as PERSON
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [entity=/PERSON|ORGANIZATION/]{2,4} #note: adjusted {2,3} -> {2,4} to account for more cases. Can we adjust the number to {3,4}? (i.e. Mainland China, Hong Kong not captured as a phrase due to this rule)
@@ -100,7 +100,7 @@ rules:
 
   - name: "person_2authors"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [entity="PERSON"] [word="and"] [entity="PERSON"]
@@ -109,7 +109,7 @@ rules:
       
   - name: "person_titles"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [word = /\b(Ms|Mrs?)\b/] (?=[entity="PERSON"])
@@ -117,84 +117,84 @@ rules:
 
   - name: "determiners"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [lemma = /\b(this|the)\b/]
 
   - name: "eg"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [lemma = "e.g"]
 
   - name: "etc"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [word = /\b(etc|ETC|etc\.|ETC\.)\b|et cetera/]
 
   - name: "email"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [lemma = /.*@.*\..*/]
 
   - name: "pages"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [word = "pp"] (?<=[tag=/CD|:|./]+)
 
   - name: "paren_plural"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [tag = "NN"] "(" [word = "s" & tag = "NNS"] ")"
 
   - name: "states"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       (?<= [entity="LOCATION"]) [word=","] [word=/[A-Z]/]
 
   - name: "for_this_research"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       (?<= [word="For"] [word="this"]) [word="research"]
 
   - name: "apostrophe_s"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       (?<= [word="'"]) [word="s"]
 
   - name: "in_addition"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       (?<= [lemma="in"]) [word="addition"]
 
   - name: "Git"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       [lemma=/[Gg]it|github/]
 
   - name: "re-verb"
     label: Avoid
-    priority: 2
+    priority: "2"
     type: token
     pattern: |
       "(" "re" ")" (?=[tag = /^V/])

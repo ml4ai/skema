@@ -6,10 +6,10 @@ import org.clulab.odin.{Mention, RelationMention, TextBoundMention, mkTokenInter
 import org.clulab.processors.Document
 import org.clulab.processors.fastnlp.FastNLPProcessor
 import org.clulab.struct.{Interval => TokenInterval}
-import org.clulab.utils.DisplayUtils
 import ai.lum.common.ConfigUtils._
 import org.clulab.odin.impl.Taxonomy
 import org.clulab.aske.automates.OdinActions
+import org.clulab.aske.automates.utils.DisplayUtils
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable.ArrayBuffer

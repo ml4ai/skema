@@ -11,8 +11,8 @@ import scala.sys.process.Process
 import upickle.default.{ReadWriter, macroRW}
 import ai.lum.common.ConfigUtils._
 import org.clulab.aske.automates.apps.{ExtractAndAlign, JSONDocExporter}
-import org.clulab.embeddings.word2vec.Word2Vec
-import org.clulab.utils.FileUtils
+import org.clulab.aske.automates.utils.TsvUtils
+import org.clulab.embeddings.SanitizedWordEmbeddingMap
 
 import scala.concurrent.duration.DurationInt
 
@@ -38,10 +38,10 @@ object WikidataGrounder {
 
   val config: Config = ConfigFactory.load()
   val sparqlDir: String = config[String]("grounding.sparqlDir")
-  val stopWords = FileUtils.loadFromOneColumnTSV("src/main/resources/stopWords.tsv")
+  val stopWords = TsvUtils.loadFromOneColumnTSV("/stopWords.tsv")
   val exporter = JSONDocExporter()
 
-def groundTermsToWikidataRanked(variable: String, terms_with_underscores: Seq[String], sentence: Seq[String], w2v: Word2Vec, k: Int): Option[Seq[sparqlWikiResult]] = {
+def groundTermsToWikidataRanked(variable: String, terms_with_underscores: Seq[String], sentence: Seq[String], w2v: SanitizedWordEmbeddingMap, k: Int): Option[Seq[sparqlWikiResult]] = {
 
   val cacheFilePath: String = config[String]("grounding.WikiCacheFilePath")
   val file = new File(cacheFilePath)

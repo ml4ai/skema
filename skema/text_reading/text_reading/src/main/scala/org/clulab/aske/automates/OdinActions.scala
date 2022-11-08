@@ -4,18 +4,18 @@ package org.clulab.aske.automates
 import com.typesafe.scalalogging.LazyLogging
 import edu.stanford.nlp.dcoref.Dictionaries.MentionType
 import org.clulab.aske.automates.actions.ExpansionHandler
-import org.clulab.odin.{Mention, _}
+import org.clulab.odin._
 import org.clulab.odin.impl.Taxonomy
-import org.clulab.utils.FileUtils
 import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import org.clulab.aske.automates.OdinEngine._
 import org.clulab.aske.automates.attachments.{ContextAttachment, DiscontinuousCharOffsetAttachment, FunctionAttachment, ParamSetAttachment, ParamSettingIntAttachment, UnitAttachment}
 import org.clulab.aske.automates.mentions.CrossSentenceEventMention
+import org.clulab.aske.automates.utils.MentionUtils
 import org.clulab.processors.Document
 import org.clulab.processors.fastnlp.FastNLPProcessor
 import org.clulab.struct.Interval
-import org.clulab.utils.MentionUtils.distinctByText
+import org.clulab.utils.FileUtils
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -559,7 +559,7 @@ class OdinActions(val taxonomy: Taxonomy, expansionHandler: Option[ExpansionHand
       for (gv <- groupedByVar) {
         // if there are more than two in a group that are distinct by text, that means we can assemble them into an event
         val mentionsInGroup = gv._2
-        if (distinctByText(mentionsInGroup).length > 1) {
+        if (MentionUtils.distinctByText(mentionsInGroup).length > 1) {
           // do not exclude component events (param settings and units) from output
           for (v <- mentionsInGroup) toReturn.append(v)
           val newArgs = mutable.Map[String, Seq[Mention]]()

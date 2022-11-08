@@ -1,6 +1,6 @@
 package org.clulab.aske.automates.entities
 
-import org.clulab.aske.automates.TestUtils.jsonStringToDocument
+import org.ml4ai.skema.test.TestUtils.jsonStringToDocument
 import org.scalatest.{FlatSpec, Matchers}
 
 class TestStringMatchEntityFinder extends FlatSpec with Matchers {

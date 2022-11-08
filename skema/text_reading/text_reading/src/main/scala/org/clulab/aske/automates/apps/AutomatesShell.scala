@@ -6,7 +6,7 @@ import jline.console.history.FileHistory
 import org.clulab.aske.automates.OdinEngine
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
-import org.clulab.utils.DisplayUtils._
+import org.clulab.aske.automates.utils.DisplayUtils
 
 object AutomatesShell extends App {
 
@@ -46,7 +46,7 @@ object AutomatesShell extends App {
       case text =>
         val doc = ieSystem.annotate(text)
         val mentions = ieSystem.extractFrom(doc)
-        displayMentions(mentions, doc, true)
+        DisplayUtils.displayMentions(mentions, doc, true)
     }
   }
 

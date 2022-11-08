@@ -1,17 +1,16 @@
 package org.clulab.aske.automates.apps
 import org.clulab.serialization.json._
+
 import java.io.File
 import java.io.FileWriter
 import java.io.BufferedWriter
 import org.clulab.processors.fastnlp.FastNLPProcessor
-
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.clulab.aske.automates.data.DataLoader
 import org.clulab.aske.automates.OdinEngine
-import org.clulab.utils.FileUtils
-
 import org.clulab.serialization.DocumentSerializer
+import org.clulab.utils.FileUtils
 
 /**
   * App used to create and export serialized json file of the processors Document

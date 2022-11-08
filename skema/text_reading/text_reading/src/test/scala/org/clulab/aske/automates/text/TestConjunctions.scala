@@ -1,6 +1,6 @@
 package org.clulab.aske.automates.text
 
-import org.clulab.aske.automates.TestUtils._
+import org.ml4ai.skema.test.ExtractionTest
 
 class TestConjunctions extends ExtractionTest {
 
@@ -68,7 +68,7 @@ class TestConjunctions extends ExtractionTest {
   }
 
   val t6 = "where H(x) and H(y) are entropies of x and y,respectively."
-  passingTest should s"find descriptions from t5: ${t6}" taggedAs (Somebody) in {
+  failingTest should s"find descriptions from t5: ${t6}" taggedAs (Somebody) in {
 
     val desired = Seq(
       "H(x)" -> Seq("entropies of x"), //fixme: ideally, should be entropy

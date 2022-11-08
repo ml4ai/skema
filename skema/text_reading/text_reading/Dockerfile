@@ -57,7 +57,7 @@ WORKDIR /automates/automates/text_reading
 RUN pip install -r requirements.txt
 
 # In order for the test suite to work, you need vector files. Run the following to get them:
-RUN wget http://vanga.sista.arizona.edu/automates_data/vectors.txt -O /automates/automates/text_reading/src/test/resources/vectors.txt
+# RUN wget http://vanga.sista.arizona.edu/automates_data/vectors.txt -O /automates/automates/text_reading/src/test/resources/vectors.txt
 RUN sbt -Dapps.projectDir=/automates test
 # =============================================================================
 

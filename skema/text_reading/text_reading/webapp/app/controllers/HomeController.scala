@@ -16,6 +16,7 @@ import org.clulab.aske.automates.data.CosmosJsonDataLoader
 import org.clulab.aske.automates.data.ScienceParsedDataLoader
 import org.clulab.aske.automates.scienceparse.ScienceParseClient
 import org.clulab.aske.automates.serializer.AutomatesJSONSerializer
+import org.clulab.aske.automates.utils.{AlignmentJsonUtils, DisplayUtils}
 import org.clulab.grounding.{SVOGrounder, WikidataGrounder, sparqlWikiResult}
 import org.clulab.odin.serialization.json.JSONSerializer
 import upickle.default._
@@ -25,8 +26,6 @@ import ujson.json4s.Json4sJson
 import ujson.play.PlayJson
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.processors.{Document, Sentence}
-import org.clulab.utils.AlignmentJsonUtils.SeqOfGlobalVariables
-import org.clulab.utils.{AlignmentJsonUtils, DisplayUtils}
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
 import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder}
@@ -71,7 +70,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(new File(ontologyFilePath), None)
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None)
   logger.info("Completed Initialization ...")
   // -------------------------------------------------
 

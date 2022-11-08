@@ -1,7 +1,8 @@
 package org.clulab.aske.automates.text
 
 import org.clulab.aske.automates.OdinEngine.IDENTIFIER_LABEL
-import org.clulab.aske.automates.TestUtils._
+import org.ml4ai.skema.test.TestUtils._
+import org.ml4ai.skema.test.ExtractionFromCommentsTest
 
 class TestCommentIdentifiers extends ExtractionFromCommentsTest {
 

@@ -1,14 +1,14 @@
 package org.clulab.aske.automates.apps
+
 import ai.lum.common.FileUtils._
+
 import java.io.{File, PrintWriter}
 import java.nio.file.{Files, Paths}
-
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.clulab.aske.automates.data.DataLoader
 import org.clulab.odin.Mention
 import org.clulab.processors.fastnlp.FastNLPProcessor
-import org.clulab.utils.FileUtils._
 
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -16,8 +16,7 @@ import scala.io.Source
 import sys.process._
 import scala.io.StdIn.readLine
 import org.clulab.aske.automates.apps.ExtractAndExport.getExporter
-import org.clulab.utils.DisplayUtils
-import org.clulab.utils.Serializer._
+import org.clulab.aske.automates.utils.{DisplayUtils, StringsUtils}
 
 import scala.collection.parallel.ParSeq
 
@@ -50,11 +49,11 @@ class AlignmentBaseline() {
   val eqFile = config[String]("apps.eqnPredFile")
 
   //these will be deleted from the latex equation to get to the values; not currently used
-  val mathSymbolsFile = loadStringsFromResource("/AlignmentBaseline/mathSymbols.tsv")
+  val mathSymbolsFile = StringsUtils.loadStringsFromResource("/AlignmentBaseline/mathSymbols.tsv")
   val mathSymbols = mathSymbolsFile.filter(_.length > 0).sortBy(_.length).reverse
 
   //get the greek letters and their names
-  val greekLetterLines = loadStringsFromResource("/AlignmentBaseline/greek2words.tsv")
+  val greekLetterLines = StringsUtils.loadStringsFromResource("/AlignmentBaseline/greek2words.tsv")
 
   //these will be used to map greek letters to words and back
   //    val greek2wordDict = mutable.Map[String, String]()
@@ -76,8 +75,8 @@ class AlignmentBaseline() {
   val outDir = config[String]("apps.baselineOutputDirectory")
 
   //all equations from file
-  val eqn_ids = loadStrings(eqSrcFile).map(_.replace(".png", ""))
-  val eqLines = loadStrings(eqFile)
+  val eqn_ids = StringsUtils.loadStrings(eqSrcFile).map(_.replace(".png", ""))
+  val eqLines = StringsUtils.loadStrings(eqFile)
 
   def customRender(cand: String): String = {
     render(replaceWordWithGreek(cand, word2greekDict.toMap), pdfalignDir).replaceAll("\\s", "")
@@ -521,7 +520,7 @@ class AlignmentBaseline() {
 object AlignmentBaseline {
   val config: Config = ConfigFactory.load()
   val pdfalignDir = config[String]("apps.pdfalignDir")
-  val greekLetterLines = loadStringsFromResource("/AlignmentBaseline/greek2words.tsv")
+  val greekLetterLines = StringsUtils.loadStringsFromResource("/AlignmentBaseline/greek2words.tsv")
   //these will be used to map greek letters to words and back
   val word2greekDict = mutable.Map[String, String]()
   val greek2wordDict = mutable.Map[String, String]()

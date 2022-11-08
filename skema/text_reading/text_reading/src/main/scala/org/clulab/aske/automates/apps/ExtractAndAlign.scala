@@ -1,10 +1,10 @@
 package org.clulab.aske.automates.apps
 
 import ai.lum.common.ConfigFactory
+import org.clulab.aske.automates.utils.AlignmentJsonUtils.{GlobalEquationVariable, GlobalSrcVariable, GlobalVariable}
 
 import java.io.{File, PrintWriter}
 import java.util.UUID
-import org.clulab.utils.MentionUtils._
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.FileUtils._
 import com.typesafe.config.Config
@@ -15,17 +15,17 @@ import org.clulab.aske.automates.OdinEngine
 import org.clulab.aske.automates.apps.AlignmentBaseline.{greek2wordDict, word2greekDict}
 import org.clulab.aske.automates.grfn.GrFNParser
 import org.clulab.odin.{Attachment, Mention}
-import org.clulab.utils.{AlignmentJsonUtils, FileUtils}
 import org.slf4j.LoggerFactory
 import ujson.{Obj, Value}
 import org.clulab.grounding.{SVOGrounder, SeqOfWikiGroundings, WikiGrounding, WikidataGrounder, sparqlResult, sparqlWikiResult}
 import org.clulab.odin.serialization.json.JSONSerializer
 
 import java.util.UUID.randomUUID
-import org.clulab.utils.AlignmentJsonUtils.{GlobalEquationVariable, GlobalSrcVariable, GlobalVariable, getGlobalEqVars, getGlobalSrcVars, getSrcLinkElements, mkGlobalEqVarLinkElement, mkGlobalSrcVarLinkElement, mkGlobalVarLinkElement}
 import org.clulab.aske.automates.attachments.AutomatesAttachment
-import org.clulab.embeddings.word2vec.Word2Vec
+import org.clulab.aske.automates.utils.{AlignmentJsonUtils, MentionUtils}
+import org.clulab.embeddings.{SanitizedWordEmbeddingMap, WordEmbeddingMap}
 import org.clulab.grounding.SVOGrounder.getTerms
+import org.clulab.utils.{FileUtils, Sourcer}
 import upickle.default.write
 
 import scala.collection.mutable
@@ -128,8 +128,12 @@ object ExtractAndAlign {
   val config: Config = ConfigFactory.load()
   val pdfAlignDir: String = config[String]("apps.pdfalignDir")
   val numOfWikiGroundings: Int = config[Int]("apps.numOfWikiGroundings")
-  val vectors: String = config[String]("alignment.w2vPath")
-  val w2v = new Word2Vec(vectors, None)
+  val w2vPath: String = config[String]("alignment.w2vPath")
+  lazy val w2v = {
+    val vectors = Sourcer.sourceFromResource(w2vPath)
+
+    new SanitizedWordEmbeddingMap(vectors, None, false)
+  }
 
   def parseDouble(s: String): Option[Double] = Try { s.toDouble }.toOption
 
@@ -188,9 +192,9 @@ object ExtractAndAlign {
 //      "\n=========\n")
 
     val (eqLinkElements, fullEquations) = if (equationChunksAndSource.nonEmpty) getEquationLinkElements(equationChunksAndSource.get) else (Seq.empty, Seq.empty)
-    val globalEqVariables = if (eqLinkElements.nonEmpty) getGlobalEqVars(eqLinkElements) else Seq.empty
-    val srcLinkElements = if (variableNames.nonEmpty) getSrcLinkElements(variableNames.get) else Seq.empty
-    val globalSrcVars = if (srcLinkElements.nonEmpty) getGlobalSrcVars(srcLinkElements) else Seq.empty
+    val globalEqVariables = if (eqLinkElements.nonEmpty) AlignmentJsonUtils.getGlobalEqVars(eqLinkElements) else Seq.empty
+    val srcLinkElements = if (variableNames.nonEmpty) AlignmentJsonUtils.getSrcLinkElements(variableNames.get) else Seq.empty
+    val globalSrcVars = if (srcLinkElements.nonEmpty) AlignmentJsonUtils.getGlobalSrcVars(srcLinkElements) else Seq.empty
 
     // =============================================
     // Alignment
@@ -216,10 +220,10 @@ object ExtractAndAlign {
     val linkElements = getLinkElements(grfn, allGlobalVars, allCommentGlobalVars, equationChunksAndSource, variableNames, parameterSettingMention, intervalParameterSettingMentions,  unitMentions)
 
     linkElements(SOURCE) = srcLinkElements.map(_.toString())
-    linkElements(GLOBAL_SRC_VAR) = globalSrcVars.map(glv => mkGlobalSrcVarLinkElement(glv))
+    linkElements(GLOBAL_SRC_VAR) = globalSrcVars.map(glv => AlignmentJsonUtils.mkGlobalSrcVarLinkElement(glv))
     linkElements(FULL_TEXT_EQUATION) = fullEquations
     linkElements(EQUATION) = eqLinkElements.map(_.toString())
-    linkElements(GLOBAL_EQ_VAR) = globalEqVariables.map(glv => mkGlobalEqVarLinkElement(glv))
+    linkElements(GLOBAL_EQ_VAR) = globalEqVariables.map(glv => AlignmentJsonUtils.mkGlobalEqVarLinkElement(glv))
 
     for (le <- linkElements.keys) {
       outputJson(le) = linkElements(le).map{element => rehydrateLinkElement(element, groundToSVO, maxSVOgroundingsPerVar, false)}
@@ -251,7 +255,7 @@ object ExtractAndAlign {
 //      println("IDENTIFIER: " + identifier)
 
       val textVarObjs = gr._2.map(m => mentionToIDedObjString(m, TEXT_VAR))
-      val textFromAllDescrs = gr._2.map(m => getMentionText(m.arguments("description").head)).distinct ++ identifierComponents
+      val textFromAllDescrs = gr._2.map(m => MentionUtils.getMentionText(m.arguments("description").head)).distinct ++ identifierComponents
       val terms = gr._2.flatMap(g => getTerms(g)).distinct
       val groundings = if (groundToWiki) {
         // if there are no existing wikigroundings, ground
@@ -612,7 +616,7 @@ object ExtractAndAlign {
   def makeArgObject(mention: Mention, page: Seq[Int], block: Seq[Int], argType: String): ujson.Obj = {
     ujson.Obj(
       "name" -> argType,
-      "text" -> getMentionText(mention),
+      "text" -> MentionUtils.getMentionText(mention),
       "spans" -> makeLocationObj(mention, Some(page), Some(block))
     )
   }
@@ -781,13 +785,13 @@ object ExtractAndAlign {
     val linkElements = scala.collection.mutable.HashMap[String, Seq[String]]()
 
     if (allGlobalVars.nonEmpty) {
-      linkElements(GLOBAL_VAR) = allGlobalVars.map(glv => mkGlobalVarLinkElement(glv))
+      linkElements(GLOBAL_VAR) = allGlobalVars.map(glv => AlignmentJsonUtils.mkGlobalVarLinkElement(glv))
       linkElements(TEXT_VAR) = allGlobalVars.flatMap(_.textVarObjStrings)
     }
 
     if (allCommentGlobalVars.nonEmpty) {
       linkElements(COMMENT) = allCommentGlobalVars.flatMap(_.textVarObjStrings)
-      linkElements(GLOBAL_COMMENT) = allCommentGlobalVars.map(glv => mkGlobalVarLinkElement(glv))
+      linkElements(GLOBAL_COMMENT) = allCommentGlobalVars.map(glv => AlignmentJsonUtils.mkGlobalVarLinkElement(glv))
       }
 
     if (intervalParameterSettingMentions.isDefined) {
