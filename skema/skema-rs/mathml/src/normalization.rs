@@ -36,7 +36,7 @@ impl MathExpression {
                 .collect::<Vec<String>>()
                 .join(""),
             _ => {
-                panic!("Unhandled type!");
+                panic!("The method 'get_string_repr' for the MathExpression enum only handles the following MathML element types: [mi, mo, mn, mrow]!");
             }
         }
     }
