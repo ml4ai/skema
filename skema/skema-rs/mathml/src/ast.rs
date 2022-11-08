@@ -21,4 +21,3 @@ pub enum MathExpression {
 pub struct Math {
     pub content: Vec<MathExpression>,
 }
-

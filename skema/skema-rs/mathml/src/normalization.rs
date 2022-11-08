@@ -1,3 +1,5 @@
+/// Functionality for normalizing MathExpression enums.
+
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{Mi, Mn, Mo, Mrow, Msub},
