@@ -50,7 +50,7 @@ fn add_to_graph_many0<'a>(
     graph: &mut MathMLGraph<'a>,
     parent_index: Option<NodeIndex>,
     elem_type: &'a str,
-    elements: &Vec<MathExpression<'a>>,
+    elements: &'a Vec<MathExpression>,
 ) {
     let parent_index = update_parent(graph, parent_index, elem_type);
     for element in elements {
@@ -58,8 +58,8 @@ fn add_to_graph_many0<'a>(
     }
 }
 
-impl<'a> MathExpression<'a> {
-    pub fn add_to_graph(&self, graph: &mut MathMLGraph<'a>, parent_index: Option<NodeIndex>) {
+impl MathExpression {
+    pub fn add_to_graph<'a>(&'a self, graph: &mut MathMLGraph<'a>, parent_index: Option<NodeIndex>) {
         match self {
             Mi(x) => add_to_graph_0(graph, parent_index, x),
             Mo(x) => add_to_graph_0(graph, parent_index, x),
@@ -80,7 +80,7 @@ impl<'a> MathExpression<'a> {
     }
 }
 
-impl<'a> Math<'a> {
+impl Math {
     pub fn to_graph(&self) -> MathMLGraph {
         let mut g = MathMLGraph::new();
         let root_index = g.add_node("root");
