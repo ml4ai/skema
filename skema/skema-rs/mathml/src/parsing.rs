@@ -300,7 +300,10 @@ fn test_mfrac() {
     let frac = mfrac(Span::new("<mfrac><mn>1</mn><mn>2</mn></mfrac>"))
         .unwrap()
         .1;
-    assert_eq!(frac, Mfrac(Box::new(Mn("1".to_string())), Box::new(Mn("2".to_string()))),)
+    assert_eq!(
+        frac,
+        Mfrac(Box::new(Mn("1".to_string())), Box::new(Mn("2".to_string()))),
+    )
 }
 
 #[test]
@@ -326,7 +329,13 @@ fn test_munder() {
     test_parser(
         "<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
         munder,
-        Munder(vec![Mo("inf".to_string()), Mn("0".to_string()), Mo("≤".to_string()), Mi("t".to_string()), Mo("≤".to_string())]),
+        Munder(vec![
+            Mo("inf".to_string()),
+            Mn("0".to_string()),
+            Mo("≤".to_string()),
+            Mi("t".to_string()),
+            Mo("≤".to_string()),
+        ]),
     )
 }
 
@@ -335,7 +344,11 @@ fn test_msubsup() {
     test_parser(
         "<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
         msubsup,
-        Msubsup(vec![Mi("L".to_string()), Mi("t".to_string()), Mi("∞".to_string())]),
+        Msubsup(vec![
+            Mi("L".to_string()),
+            Mi("t".to_string()),
+            Mi("∞".to_string()),
+        ]),
     )
 }
 
@@ -355,7 +368,11 @@ fn test_mstyle() {
 
 #[test]
 fn test_mspace() {
-    test_parser("<mspace width=\"1em\"/>", mspace, Mspace(" width=\"1em\"".to_string()));
+    test_parser(
+        "<mspace width=\"1em\"/>",
+        mspace,
+        Mspace(" width=\"1em\"".to_string()),
+    );
 }
 
 #[test]
@@ -385,7 +402,7 @@ fn test_math() {
 
 #[test]
 fn test_mathml_parser() {
-    let eqn = std::fs::read_to_string("tests/test01.xml".to_string()).unwrap();
+    let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
     test_parser(
         &eqn,
         math,
@@ -403,11 +420,17 @@ fn test_mathml_parser() {
                 ]),
                 Mo("‖".to_string()),
                 Msup(
-                    Box::new(Mrow(vec![Mover(vec![Mi("ρ".to_string()), Mo("~".to_string())])])),
+                    Box::new(Mrow(vec![Mover(vec![
+                        Mi("ρ".to_string()),
+                        Mo("~".to_string()),
+                    ])])),
                     Box::new(Mi("R".to_string())),
                 ),
                 Msup(
-                    Box::new(Mrow(vec![Mover(vec![Mi("x".to_string()), Mo("¯".to_string())])])),
+                    Box::new(Mrow(vec![Mover(vec![
+                        Mi("x".to_string()),
+                        Mo("¯".to_string()),
+                    ])])),
                     Box::new(Mi("a".to_string())),
                 ),
                 Msub(
