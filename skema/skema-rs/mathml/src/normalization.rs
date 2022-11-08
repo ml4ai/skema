@@ -1,11 +1,7 @@
-use crate::parsing::parse;
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{
-        Mi, Mn, Mo, Mrow, Msub,
-    },
+    MathExpression::{Mi, Mn, Mo, Mrow, Msub},
 };
-
 
 impl MathExpression {
     /// Collapse subscripts
@@ -22,18 +18,6 @@ impl MathExpression {
             Mrow(xs) => {
                 for x in xs {
                     x.collapse_subscripts();
-                }
-            }
-            _ => (),
-        }
-    }
-
-    /// Collapse mrow elements that only have one child element.
-    fn collapse_mrows(&mut self) {
-        match self {
-            Mrow(xs) => {
-                if xs.len() == 1 {
-                    *self = xs[0].clone();
                 }
             }
             _ => (),
@@ -60,11 +44,9 @@ impl MathExpression {
 
 impl Math {
     /// Normalize the math expression, performing the following steps:
-    /// 1. Collapse mrows containing only one child element.
-    /// 2. Collapse subscripts assuming we don't need their substructure.
+    /// 1. Collapse subscripts assuming we don't need their substructure.
     pub fn normalize(&mut self) {
         for expr in &mut self.content {
-            expr.collapse_mrows();
             expr.collapse_subscripts();
         }
     }
@@ -95,6 +77,7 @@ fn test_subscript_collapsing() {
 
 #[test]
 fn test_normalize() {
+    use crate::parsing::parse;
     let contents = std::fs::read_to_string("tests/sir.xml").unwrap();
     let (_, mut math) = parse(&contents).unwrap();
     math.normalize();
