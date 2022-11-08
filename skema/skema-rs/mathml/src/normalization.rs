@@ -10,14 +10,13 @@ use crate::ast::{
 use std::rc::Rc;
 
 
-impl<'a> MathExpression<'a> {
-    fn collapse_subscripts(&self, storage: &mut Vec<Rc<String>>) -> Option<MathExpression> {
+impl MathExpression {
+    fn collapse_subscripts(&self) -> Option<MathExpression> {
         match self {
             Msub(base, subscript) => {
-                let mut combined = Rc::new(String::from(&base.get_string_repr()));
+                let mut combined = String::from(&base.get_string_repr());
                 combined.push_str(&subscript.get_string_repr());
-                storage.push(Rc::clone(&combined));
-                Some(Mi(&combined))
+                Some(Mi(combined))
             }
             _ => None
         }
@@ -40,8 +39,8 @@ impl<'a> MathExpression<'a> {
 
 fn normalize(math: Math) {
     for mut expr in math.content {
-        let mut storage = Vec::<Rc<String>>::new();
-        if let Some(e) = &mut expr.collapse_subscripts(&mut storage) {
+        let mut storage = Vec::<String>::new();
+        if let Some(e) = &mut expr.collapse_subscripts() {
             expr = *e;
         }
     }
@@ -49,14 +48,14 @@ fn normalize(math: Math) {
 
 #[test]
 fn test_get_string_repr() {
-    assert_eq!(Mi("t").get_string_repr(), "t");
-    assert_eq!(Mo("+").get_string_repr(), "+");
-    assert_eq!(Mrow(vec![Mi("t".into()), Mo("+".into()), Mi("1")]).get_string_repr(), "t+1");
+    assert_eq!(Mi("t".to_string()).get_string_repr(), "t".to_string());
+    assert_eq!(Mo("+".to_string()).get_string_repr(), "+".to_string());
+    assert_eq!(Mrow(vec![Mi("t".into()), Mo("+".into()), Mi("1".to_string())]).get_string_repr(), "t+1".to_string());
 }
 
 #[test]
 fn test_subscript_collapsing() {
-    let expr = Msub(Box::new(Mi("S")), Box::new(Mrow(vec![Mi("t"), Mo("+"), Mi("1")])));
-    let mut storage = Vec::<Rc<String>>::new();
-    assert_eq!(expr.collapse_subscripts(&mut storage).unwrap(), Mi("St+1"));
+    let expr = Msub(Box::new(Mi("S".to_string())), Box::new(Mrow(vec![Mi("t".to_string()), Mo("+".to_string()), Mi("1".to_string())])));
+    let mut storage = Vec::<String>::new();
+    assert_eq!(expr.collapse_subscripts().unwrap(), Mi("St+1".to_string()));
 }
