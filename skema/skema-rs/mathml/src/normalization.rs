@@ -1,11 +1,11 @@
+use crate::parsing::parse;
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
-        Munder,
+        Mi, Mn, Mo, Mrow, Msub,
     },
 };
-use crate::parsing::parse;
+
 
 impl MathExpression {
     /// Collapse subscripts
@@ -15,7 +15,7 @@ impl MathExpression {
                 let mut combined = String::from(&base.get_string_repr());
                 combined.push_str("_{");
                 combined.push_str(&subscript.get_string_repr());
-                combined.push_str("}");
+                combined.push('}');
                 *self = Mi(combined);
             }
 
