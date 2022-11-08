@@ -13,7 +13,7 @@ pub type MathMLGraph<'a> = Graph<&'a str, u32>;
 fn add_node_and_edge<'a>(
     graph: &mut MathMLGraph<'a>,
     parent_index: Option<NodeIndex>,
-    x: &str,
+    x: &'a str,
 ) -> NodeIndex {
     let node_index = graph.add_node(x);
     if let Some(p) = parent_index {
@@ -22,7 +22,7 @@ fn add_node_and_edge<'a>(
     node_index
 }
 
-fn add_to_graph_0<'a>(graph: &mut MathMLGraph, parent_index: Option<NodeIndex>, x: &str) {
+fn add_to_graph_0<'a>(graph: &mut MathMLGraph<'a>, parent_index: Option<NodeIndex>, x: &'a str) {
     add_node_and_edge(graph, parent_index, x);
 }
 
@@ -30,7 +30,7 @@ fn add_to_graph_0<'a>(graph: &mut MathMLGraph, parent_index: Option<NodeIndex>, 
 fn update_parent<'a>(
     graph: &mut MathMLGraph<'a>,
     mut parent_index: Option<NodeIndex>,
-    x: &str,
+    x: &'a str,
 ) -> Option<NodeIndex> {
     let node_index = add_node_and_edge(graph, parent_index, x);
     parent_index = Some(node_index);
@@ -49,8 +49,8 @@ macro_rules! add_to_graph_n {
 fn add_to_graph_many0<'a>(
     graph: &mut MathMLGraph<'a>,
     parent_index: Option<NodeIndex>,
-    elem_type: &str,
-    elements: &Vec<MathExpression>,
+    elem_type: &'a str,
+    elements: &Vec<MathExpression<'a>>,
 ) {
     let parent_index = update_parent(graph, parent_index, elem_type);
     for element in elements {

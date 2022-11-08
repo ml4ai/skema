@@ -10,12 +10,11 @@ use crate::ast::{
 
 
 impl<'a> MathExpression<'a> {
-    fn collapse_subscripts(&self) -> Option<MathExpression> {
+    fn collapse_subscripts(&self, storage: &'a str) -> Option<MathExpression> {
         match self {
             Msub(base, subscript) => {
-                let storage = String::new();
-                storage.push_str(&base.get_string_repr());
-                storage.push_str(&subscript.get_string_repr());
+                storage.to_owned().push_str(&base.get_string_repr());
+                storage.to_owned().push_str(&subscript.get_string_repr());
                 Some(Mi(storage))
             }
             _ => None
@@ -57,5 +56,5 @@ fn test_get_string_repr() {
 fn test_subscript_collapsing() {
     let expr = Msub(Box::new(Mi("S")), Box::new(Mrow(vec![Mi("t"), Mo("+"), Mi("1")])));
     let mut storage = String::new();
-    assert_eq!(expr.collapse_subscripts().unwrap(), Mi("St+1"));
+    assert_eq!(expr.collapse_subscripts(&storage).unwrap(), Mi("St+1"));
 }
