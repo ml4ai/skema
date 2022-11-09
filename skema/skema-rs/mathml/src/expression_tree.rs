@@ -14,7 +14,7 @@ enum Atom {
 #[derive(Debug, PartialEq, Clone)]
 enum Expr {
     Atom(Atom),
-    Expression(Operator, Vec<Expr>),
+    Expression { op: Operator, args: Vec<Expr> },
 }
 
 impl MathExpression {
@@ -22,13 +22,32 @@ impl MathExpression {
         match self {
             Mi(x) => Expr::Atom(Atom::Identifier(x.clone())),
             Mo(x) => Expr::Atom(Atom::Operator(x.clone())),
-            Mrow(xs) => {
-                Expr::Expression(Operator::Add)
-
+            Mrow(xs) => Expr::Expression {
+                op: Operator::Add,
+                args: Vec::<Expr>::new(),
+            },
+            _ => {
+                panic!("Unhandled type!");
             }
         }
     }
 }
 
 #[test]
-fn test_to_expr() {}
+fn test_to_expr() {
+    let math_expression = Mrow(vec![
+        Mi("a".to_string()),
+        Mo(Operator::Add),
+        Mi("b".to_string()),
+    ]);
+    assert_eq!(
+        math_expression.to_expr(),
+        Expr::Expression {
+            op: Operator::Add,
+            args: vec![
+                Expr::Atom(Atom::Identifier("a".to_string())),
+                Expr::Atom(Atom::Identifier("b".to_string()))
+            ]
+        }
+    );
+}
