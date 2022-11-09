@@ -172,14 +172,14 @@ fn equals(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-//fn operator_other(input: Span) -> IResult<Operator> {
-//let (s, consumed) = recognize(not_line_ending)(input)?;
-//let op = Operator::Other(consumed.to_string());
-//Ok((s, op))
-//}
+fn operator_other(input: Span) -> IResult<Operator> {
+    let (s, consumed) = recognize(not_line_ending)(input)?;
+    let op = Operator::Other(consumed.to_string());
+    Ok((s, op))
+}
 
 fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((add, subtract, equals))(input)?;
+    let (s, op) = alt((add, subtract, equals, operator_other))(input)?;
     Ok((s, op))
 }
 
@@ -196,13 +196,11 @@ fn mo(input: Span) -> IResult<MathExpression> {
         map_parser(recognize(take_until("</mo>")), operator),
         tag("</mo>"),
     ))(input)?;
-    dbg!(&op);
     Ok((s, Mo(op)))
 }
 
 /// Rows
 fn mrow(input: Span) -> IResult<MathExpression> {
-    //let (s, elements) = elem_many0!("mrow")(input)?;
     let (s, elements) = ws(delimited(
         tag("<mrow>"),
         many0(math_expression),
@@ -237,13 +235,21 @@ fn msqrt(input: Span) -> IResult<MathExpression> {
 
 // Underscripts
 fn munder(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = elem_many0!("munder")(input)?;
+    let (s, elements) = ws(delimited(
+        tag("<munder>"),
+        many0(math_expression),
+        tag("</munder>"),
+    ))(input)?;
     Ok((s, Munder(elements)))
 }
 
 // Overscipts
 fn mover(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = elem_many0!("mover")(input)?;
+    let (s, elements) = ws(delimited(
+        tag("<mover>"),
+        many0(math_expression),
+        tag("</mover>"),
+    ))(input)?;
     Ok((s, Mover(elements)))
 }
 
@@ -333,10 +339,11 @@ fn test_mn() {
 
 #[test]
 fn test_mrow() {
-    //let expr = Mrow(vec![Mo(Operator::Subtract), Mi("b".to_string())]);
-    let (_, result) = mrow(Span::new("<mrow><mo>-</mo></mrow>")).unwrap();
-    dbg!(&result);
-    //test_parser("<mrow><mo>-</mo><mi>b</mi></mrow>", mrow, result);
+    test_parser(
+        "<mrow><mo>-</mo><mi>b</mi></mrow>",
+        mrow,
+        Mrow(vec![Mo(Operator::Subtract), Mi("b".to_string())]),
+    );
 }
 
 #[test]
@@ -378,16 +385,17 @@ fn test_mover() {
 
 #[test]
 fn test_munder() {
+    let expr = Munder(vec![
+        Mo(Operator::Other("inf".to_string())),
+        Mn("0".to_string()),
+        Mo(Operator::Other("≤".to_string())),
+        Mi("t".to_string()),
+        Mo(Operator::Other("≤".to_string())),
+    ]);
     test_parser(
         "<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
         munder,
-        Munder(vec![
-            Mo(Operator::Other("inf".to_string())),
-            Mn("0".to_string()),
-            Mo(Operator::Other("≤".to_string())),
-            Mi("t".to_string()),
-            Mo(Operator::Other("≤".to_string())),
-        ]),
+        expr,
     )
 }
 
