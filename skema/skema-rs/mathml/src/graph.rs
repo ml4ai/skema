@@ -8,14 +8,14 @@ use crate::ast::{
 
 use petgraph::{graph::NodeIndex, Graph};
 
-pub type MathMLGraph<'a> = Graph<&'a str, u32>;
+pub type MathMLGraph<'a> = Graph<String, u32>;
 
 fn add_node_and_edge<'a>(
     graph: &mut MathMLGraph<'a>,
     parent_index: Option<NodeIndex>,
     x: &'a str,
 ) -> NodeIndex {
-    let node_index = graph.add_node(x);
+    let node_index = graph.add_node(x.to_string());
     if let Some(p) = parent_index {
         graph.add_edge(p, node_index, 1);
     }
@@ -59,10 +59,14 @@ fn add_to_graph_many0<'a>(
 }
 
 impl MathExpression {
-    pub fn add_to_graph<'a>(&'a self, graph: &mut MathMLGraph<'a>, parent_index: Option<NodeIndex>) {
+    pub fn add_to_graph<'a>(
+        &'a self,
+        graph: &mut MathMLGraph<'a>,
+        parent_index: Option<NodeIndex>,
+    ) {
         match self {
             Mi(x) => add_to_graph_0(graph, parent_index, x),
-            Mo(x) => add_to_graph_0(graph, parent_index, x),
+            Mo(x) => add_to_graph_0(graph, parent_index, &x.to_string()),
             Mn(x) => add_to_graph_0(graph, parent_index, x),
             Msqrt(x) => add_to_graph_n!(graph, parent_index, "msqrt", x),
             Msup(x1, x2) => add_to_graph_n!(graph, parent_index, "msup", x1, x2),
@@ -83,7 +87,7 @@ impl MathExpression {
 impl Math {
     pub fn to_graph(&self) -> MathMLGraph {
         let mut g = MathMLGraph::new();
-        let root_index = g.add_node("root");
+        let root_index = g.add_node("root".to_string());
         for element in &self.content {
             element.add_to_graph(&mut g, Some(root_index));
         }

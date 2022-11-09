@@ -1,8 +1,8 @@
 /// Functionality for normalizing MathExpression enums.
-
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{Mi, Mn, Mo, Mrow, Msub},
+    Operator,
 };
 
 impl MathExpression {
@@ -27,7 +27,7 @@ impl MathExpression {
     }
 
     /// Get the string representation of a MathExpression
-    fn get_string_repr(&self) -> String {
+    pub fn get_string_repr(&self) -> String {
         match self {
             Mi(x) => x.to_string(),
             Mo(x) => x.to_string(),
@@ -53,12 +53,13 @@ impl Math {
         }
     }
 }
+
 #[test]
 fn test_get_string_repr() {
     assert_eq!(Mi("t".to_string()).get_string_repr(), "t".to_string());
-    assert_eq!(Mo("+".to_string()).get_string_repr(), "+".to_string());
+    assert_eq!(Mo(Operator::Add).get_string_repr(), "+");
     assert_eq!(
-        Mrow(vec![Mi("t".into()), Mo("+".into()), Mi("1".to_string())]).get_string_repr(),
+        Mrow(vec![Mi("t".into()), Mo(Operator::Add), Mi("1".to_string())]).get_string_repr(),
         "t+1".to_string()
     );
 }
@@ -69,7 +70,7 @@ fn test_subscript_collapsing() {
         Box::new(Mi("S".to_string())),
         Box::new(Mrow(vec![
             Mi("t".to_string()),
-            Mo("+".to_string()),
+            Mo(Operator::Add),
             Mi("1".to_string()),
         ])),
     );
@@ -87,9 +88,9 @@ fn test_normalize() {
         &math.content[0],
         &Mrow(vec![
             Mi("S_{t+1}".to_string()),
-            Mo("=".to_string()),
+            Mo(Operator::Equals),
             Mi("S_{t}".to_string()),
-            Mo("-".to_string()),
+            Mo(Operator::Subtract),
             Mi("β".to_string()),
             Mi("S_{t}".to_string()),
             Mi("I_{t}".to_string()),

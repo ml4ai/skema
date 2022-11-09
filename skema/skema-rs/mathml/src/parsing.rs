@@ -4,12 +4,13 @@ use crate::ast::{
         Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
         Munder,
     },
+    Operator,
 };
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, multispace0},
-    combinator::{map, opt},
+    character::complete::{alphanumeric1, multispace0, not_line_ending},
+    combinator::{map, map_parser, opt, recognize, value},
     multi::many0,
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
@@ -150,15 +151,63 @@ fn mn(input: Span) -> IResult<MathExpression> {
     Ok((s, Mn(element.to_string())))
 }
 
+fn add(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Add, tag("+"))(input)?;
+    Ok((s, op))
+}
+
+fn subtract(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Subtract, tag("-"))(input)?;
+    Ok((s, op))
+}
+
+#[test]
+fn test_subtract() {
+    let (s, result) = subtract(Span::new("-")).unwrap();
+    assert_eq!(result, Operator::Subtract);
+}
+
+fn equals(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Equals, tag("="))(input)?;
+    Ok((s, op))
+}
+
+//fn operator_other(input: Span) -> IResult<Operator> {
+//let (s, consumed) = recognize(not_line_ending)(input)?;
+//let op = Operator::Other(consumed.to_string());
+//Ok((s, op))
+//}
+
+fn operator(input: Span) -> IResult<Operator> {
+    let (s, op) = alt((add, subtract, equals))(input)?;
+    Ok((s, op))
+}
+
+#[test]
+fn test_operator() {
+    let (s, op) = operator(Span::new("-")).unwrap();
+    assert_eq!(op, Operator::Subtract);
+}
+
 /// Operators
 fn mo(input: Span) -> IResult<MathExpression> {
-    let (s, element) = elem0!("mo")(input)?;
-    Ok((s, Mo(element.to_string())))
+    let (s, op) = ws(delimited(
+        tag("<mo>"),
+        map_parser(recognize(take_until("</mo>")), operator),
+        tag("</mo>"),
+    ))(input)?;
+    dbg!(&op);
+    Ok((s, Mo(op)))
 }
 
 /// Rows
 fn mrow(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = elem_many0!("mrow")(input)?;
+    //let (s, elements) = elem_many0!("mrow")(input)?;
+    let (s, elements) = ws(delimited(
+        tag("<mrow>"),
+        many0(math_expression),
+        tag("</mrow>"),
+    ))(input)?;
     Ok((s, Mrow(elements)))
 }
 
@@ -237,14 +286,13 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
 /// Math expressions
 fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        mi, mo, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext, mstyle, mspace,
-        mo_line,
+        mi, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext, mstyle, mspace,
+        mo_line, mo,
     )))(input)
 }
 
 /// testing MathML documents
 fn math(input: Span) -> IResult<Math> {
-    //let (s, elements) = elem_many0!("math")(input)?;
     let (s, elements) = preceded(opt(xml_declaration), elem_many0!("math"))(input)?;
     Ok((s, Math { content: elements }))
 }
@@ -273,7 +321,9 @@ fn test_mi() {
 
 #[test]
 fn test_mo() {
-    test_parser("<mo>=</mo>", mo, Mo("=".to_string()))
+    test_parser("<mo>=</mo>", mo, Mo(Operator::Equals));
+    test_parser("<mo>+</mo>", mo, Mo(Operator::Add));
+    test_parser("<mo>-</mo>", mo, Mo(Operator::Subtract));
 }
 
 #[test]
@@ -283,11 +333,10 @@ fn test_mn() {
 
 #[test]
 fn test_mrow() {
-    test_parser(
-        "<mrow><mo>-</mo><mi>b</mi></mrow>",
-        mrow,
-        Mrow(vec![Mo("-".to_string()), Mi("b".to_string())]),
-    )
+    //let expr = Mrow(vec![Mo(Operator::Subtract), Mi("b".to_string())]);
+    let (_, result) = mrow(Span::new("<mrow><mo>-</mo></mrow>")).unwrap();
+    dbg!(&result);
+    //test_parser("<mrow><mo>-</mo><mi>b</mi></mrow>", mrow, result);
 }
 
 #[test]
@@ -311,7 +360,7 @@ fn test_math_expression() {
     test_parser(
         "<mrow><mo>-</mo><mi>b</mi></mrow>",
         math_expression,
-        Mrow(vec![Mo("-".to_string()), Mi("b".to_string())]),
+        Mrow(vec![Mo(Operator::Subtract), Mi("b".to_string())]),
     )
 }
 
@@ -320,7 +369,10 @@ fn test_mover() {
     test_parser(
         "<mover><mi>x</mi><mo>¯</mo></mover>",
         mover,
-        Mover(vec![Mi("x".to_string()), Mo("¯".to_string())]),
+        Mover(vec![
+            Mi("x".to_string()),
+            Mo(Operator::Other("¯".to_string())),
+        ]),
     )
 }
 
@@ -330,11 +382,11 @@ fn test_munder() {
         "<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
         munder,
         Munder(vec![
-            Mo("inf".to_string()),
+            Mo(Operator::Other("inf".to_string())),
             Mn("0".to_string()),
-            Mo("≤".to_string()),
+            Mo(Operator::Other("≤".to_string())),
             Mi("t".to_string()),
-            Mo("≤".to_string()),
+            Mo(Operator::Other("≤".to_string())),
         ]),
     )
 }
@@ -362,7 +414,10 @@ fn test_mstyle() {
     test_parser(
         "<mstyle><mo>∑</mo><mi>I</mi></mstyle>",
         mstyle,
-        Mstyle(vec![Mo("∑".to_string()), Mi("I".to_string())]),
+        Mstyle(vec![
+            Mo(Operator::Other("∑".to_string())),
+            Mi("I".to_string()),
+        ]),
     )
 }
 
@@ -388,14 +443,14 @@ fn test_moline() {
 fn test_math() {
     test_parser(
         "<math>
-                <mrow>
-                    <mo>-</mo>
-                    <mi>b</mi>
-                </mrow>
-            </math>",
+            <mrow>
+                <mo>-</mo>
+                <mi>b</mi>
+            </mrow>
+        </math>",
         math,
         Math {
-            content: vec![Mrow(vec![Mo("-".to_string()), Mi("b".to_string())])],
+            content: vec![Mrow(vec![Mo(Operator::Subtract), Mi("b".to_string())])],
         },
     )
 }
@@ -409,39 +464,39 @@ fn test_mathml_parser() {
         Math {
             content: vec![
                 Munder(vec![
-                    Mo("sup".to_string()),
+                    Mo(Operator::Other("sup".to_string())),
                     Mrow(vec![
                         Mn("0".to_string()),
-                        Mo("≤".to_string()),
+                        Mo(Operator::Other("≤".to_string())),
                         Mi("t".to_string()),
-                        Mo("≤".to_string()),
+                        Mo(Operator::Other("≤".to_string())),
                         Msub(Box::new(Mi("T".to_string())), Box::new(Mn("0".to_string()))),
                     ]),
                 ]),
-                Mo("‖".to_string()),
+                Mo(Operator::Other("‖".to_string())),
                 Msup(
                     Box::new(Mrow(vec![Mover(vec![
                         Mi("ρ".to_string()),
-                        Mo("~".to_string()),
+                        Mo(Operator::Other("~".to_string())),
                     ])])),
                     Box::new(Mi("R".to_string())),
                 ),
                 Msup(
                     Box::new(Mrow(vec![Mover(vec![
                         Mi("x".to_string()),
-                        Mo("¯".to_string()),
+                        Mo(Operator::Other("¯".to_string())),
                     ])])),
                     Box::new(Mi("a".to_string())),
                 ),
                 Msub(
-                    Box::new(Mo("‖".to_string())),
+                    Box::new(Mo(Operator::Other("‖".to_string()))),
                     Box::new(Mrow(vec![
                         Msup(Box::new(Mi("L".to_string())), Box::new(Mn("1".to_string()))),
-                        Mo("∩".to_string()),
+                        Mo(Operator::Other("∩".to_string())),
                         Msup(Box::new(Mi("L".to_string())), Box::new(Mi("∞".to_string()))),
                     ])),
                 ),
-                Mo("≤".to_string()),
+                Mo(Operator::Other("≤".to_string())),
                 Mi("C".to_string()),
             ],
         },
