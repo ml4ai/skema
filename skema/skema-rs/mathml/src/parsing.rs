@@ -161,12 +161,6 @@ fn subtract(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-#[test]
-fn test_subtract() {
-    let (s, result) = subtract(Span::new("-")).unwrap();
-    assert_eq!(result, Operator::Subtract);
-}
-
 fn equals(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Equals, tag("="))(input)?;
     Ok((s, op))
@@ -185,7 +179,7 @@ fn operator(input: Span) -> IResult<Operator> {
 
 #[test]
 fn test_operator() {
-    let (s, op) = operator(Span::new("-")).unwrap();
+    let (_, op) = operator(Span::new("-")).unwrap();
     assert_eq!(op, Operator::Subtract);
 }
 
