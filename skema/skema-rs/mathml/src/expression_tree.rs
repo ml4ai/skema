@@ -1,15 +1,8 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{Mi, Mn, Mo, Mrow, Msub},
+    Operator,
 };
-
-#[derive(Debug, PartialEq, Clone)]
-enum Operator {
-    Add,
-    Subtract,
-    Equals,
-    Other(String),
-}
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -24,19 +17,18 @@ enum Expr {
     Expression(Operator, Vec<Expr>),
 }
 
-//impl MathExpression {
-//fn to_operator(&self) -> Option<Operator> {
-//match self {
-//Mo(x) => match x {
-//"=".to_string() => Some(Operator::Equals),
-//"+".to_string() => Some(Operator::Add),
-//"-".to_string() => Some(Operator::Subtract),
-//other => Some(Operator::Other(other)),
-//},
-//_ => None,
-//}
-//}
-//}
+impl MathExpression {
+    fn to_expr(&self) -> Expr {
+        match self {
+            Mi(x) => Expr::Atom(Atom::Identifier(x.clone())),
+            Mo(x) => Expr::Atom(Atom::Operator(x.clone())),
+            Mrow(xs) => {
+                Expr::Expression(Operator::Add)
+
+            }
+        }
+    }
+}
 
 #[test]
 fn test_to_expr() {}
