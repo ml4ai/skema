@@ -192,7 +192,7 @@ fn test_operator() {
 /// Operators
 fn mo(input: Span) -> IResult<MathExpression> {
     let (s, op) = ws(delimited(
-        tag("<mo>"),
+        stag!("mo"),
         map_parser(recognize(take_until("</mo>")), operator),
         tag("</mo>"),
     ))(input)?;
