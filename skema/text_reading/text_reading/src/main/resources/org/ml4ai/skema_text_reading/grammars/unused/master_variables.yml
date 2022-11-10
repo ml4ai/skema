@@ -1,0 +1,13 @@
+taxonomy: "org/ml4ai/skema_text_reading/grammars/taxonomy.yml"
+
+vars: "org/ml4ai/skema_text_reading/grammars/triggers.yml"
+
+rules:
+
+  - import: "org/ml4ai/skema_text_reading/grammars/entities.yml"
+    vars:
+      priority: "1"
+
+  - import: "org/ml4ai/skema_text_reading/grammars/descriptions.yml"
+    vars:
+      priority: "2"

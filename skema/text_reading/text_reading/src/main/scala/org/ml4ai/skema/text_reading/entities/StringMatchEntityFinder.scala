@@ -46,7 +46,7 @@ object StringMatchEntityFinder {
     * @param validLabels
     * @return
     */
-  def apply(ms: Seq[Mention], validLabels: Seq[String], label: String, taxonomy: String = "org/ml4ai/skema_textreading/grammars/taxonomy.yml"): StringMatchEntityFinder = {
+  def apply(ms: Seq[Mention], validLabels: Seq[String], label: String, taxonomy: String = "org/ml4ai/skema_text_reading/grammars/taxonomy.yml"): StringMatchEntityFinder = {
     val strings = for {
       m <- ms
       m2 <- Seq(m) ++ m.arguments.valuesIterator.flatten
@@ -55,7 +55,7 @@ object StringMatchEntityFinder {
     new StringMatchEntityFinder(strings.toSet, label, taxonomy)
   }
 
-  def fromStrings(ss: Seq[String], label: String, taxonomy: String = "org/ml4ai/skema_textreading/grammars/taxonomy.yml"): StringMatchEntityFinder = new StringMatchEntityFinder(ss.toSet, label, taxonomy)
+  def fromStrings(ss: Seq[String], label: String, taxonomy: String = "org/ml4ai/skema_text_reading/grammars/taxonomy.yml"): StringMatchEntityFinder = new StringMatchEntityFinder(ss.toSet, label, taxonomy)
 }
 
 object GrFNEntityFinder {
