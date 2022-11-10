@@ -12,7 +12,7 @@ import play.api.test.Helpers._
  * For more information, see https://www.playframework.com/documentation/latest/ScalaTestingWithScalaTest
  */
 class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting {
-  val expectedString = "ASKE AutoMATES Odin Visualizer"
+  val expectedString = "SKEMA TextReading Odin Visualizer"
 
   "HomeController GET" should {
 

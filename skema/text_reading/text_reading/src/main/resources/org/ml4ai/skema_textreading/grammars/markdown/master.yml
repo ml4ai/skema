@@ -1,0 +1,43 @@
+taxonomy: "org/ml4ai/skema_textreading/grammars/taxonomy.yml"
+
+vars: "org/ml4ai/skema_textreading/grammars/triggers.yml"
+
+rules:
+
+  - import: "org/ml4ai/skema_textreading/grammars/entities.yml"
+    vars:
+      priority1: 1
+      priority2: 2
+      priority3: 3
+
+  - import: "org/ml4ai/skema_textreading/grammars/functions.yml"
+    vars:
+      priority: "7"
+      action: functionActionFlow
+
+  - import: "org/ml4ai/skema_textreading/grammars/parameterSettings.yml"
+    vars:
+      priority: "6"
+      paramSetAction: processParamSetting
+      paramIntAction: processParamSettingInt
+
+  - import: "org/ml4ai/skema_textreading/grammars/units.yml"
+    vars:
+      priority: "4"
+
+  - import: "org/ml4ai/skema_textreading/grammars/unitRels.yml"
+    vars:
+      priority: "5"
+      action: unitActionFlow
+
+  - import: "org/ml4ai/skema_textreading/grammars/markdown/commands.yml"
+    vars:
+      priority: "1"
+
+#  - import: "org/ml4ai/skema_textreading/grammars/context.yml"
+#    vars:
+#      priority: "4"
+#
+#  - import: "org/ml4ai/skema_textreading/grammars/contextualizedEvents.yml"
+#    vars:
+#      priority: "10"

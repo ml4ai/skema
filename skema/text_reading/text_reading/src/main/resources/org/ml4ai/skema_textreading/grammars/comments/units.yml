@@ -1,0 +1,14 @@
+vars: org/ml4ai/skema_textreading/grammars/vars.yml
+
+rules:
+
+  ####UNITS####
+
+  - name: comment_identifier_unit
+    label: UnitRelation
+    priority: ${priority}
+    type: token
+    example: "EEQ Equilibrium evaporation (mm/d)"
+    action: looksLikeAUnit
+    pattern: |
+      @variable:Identifier ([word = /.*/ & !word=/-LRB-|\(/]+) ([word=/-LRB-|\(/]) (?<unit> [word=/.*/]+) ([word=/\)|-RRB-/])

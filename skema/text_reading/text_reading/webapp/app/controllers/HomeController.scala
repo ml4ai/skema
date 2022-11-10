@@ -6,18 +6,7 @@ import ai.lum.common.FileUtils._
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 
 import javax.inject._
-import org.clulab.aske.automates.OdinEngine
-import org.clulab.aske.automates.alignment.{Aligner, AlignmentHandler}
-import org.clulab.aske.automates.apps.ExtractAndAlign.config
-import org.clulab.aske.automates.apps.{AutomatesExporter, ExtractAndAlign}
-import org.clulab.aske.automates.attachments.{GroundingAttachment, MentionLocationAttachment}
-import org.clulab.aske.automates.cosmosjson.CosmosJsonProcessor
-import org.clulab.aske.automates.data.CosmosJsonDataLoader
-import org.clulab.aske.automates.data.ScienceParsedDataLoader
-import org.clulab.aske.automates.scienceparse.ScienceParseClient
-import org.clulab.aske.automates.serializer.AutomatesJSONSerializer
-import org.clulab.aske.automates.utils.{AlignmentJsonUtils, DisplayUtils}
-import org.clulab.grounding.{SVOGrounder, WikidataGrounder, sparqlWikiResult}
+import org.ml4ai.skema.text_reading.apps.ExtractAndAlign.config
 import org.clulab.odin.serialization.json.JSONSerializer
 import upickle.default._
 
@@ -28,7 +17,16 @@ import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention
 import org.clulab.processors.{Document, Sentence}
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
-import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder}
+import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder, sparqlWikiResult}
+import org.ml4ai.skema.text_reading.OdinEngine
+import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
+import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
+import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
+import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
+import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
+import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
+import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
 //import org.ml4ai.grounding.MiraEmbeddingsGrounder
 import play.api.mvc._
 import play.api.libs.json._
@@ -482,7 +480,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     (doc, sorted)
   }
 
-  // Method where aske reader processing for webservice happens
+  // Method where skema reader processing for webservice happens
   def getOdinJsonMentions(ieSystem: OdinEngine, text: String, gazetteer: Option[Seq[String]] = None): org.json4s.JsonAST.JValue = {
 
     // preprocessing

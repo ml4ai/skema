@@ -1,4 +1,4 @@
-# ASKE AutoMATES Text Reading project
+# SKEMA TextReading Text Reading project
 
 Using Processors, Odin and a webapp, this project is read scientific papers and
 extract information about models, variables, and related concepts.
@@ -18,7 +18,7 @@ As an alternative to the webapp, you can see the results of extraction using the
 ```
 or 
 ```
-> sbt 'runMain org.clulab.aske.automates.apps.AutomatesShell'
+> sbt 'runMain org.ml4ai.skema.text_reading.apps.AutomatesShell'
 ```
 and enter the text to process at the prompt to see the extracted event mentions (including semantic and syntactic heads for each) along with the tokens, part of speech tags, and syntactic dependencies for each sentence. 
 
