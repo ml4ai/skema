@@ -1,8 +1,8 @@
 package org.ml4ai.skema.test
 
-import org.clulab.aske.automates.apps.AlignmentBaseline
-import org.clulab.aske.automates.apps.ExtractAndAlign.{allLinkTypes, whereIsGlobalVar, whereIsNotGlobalVar}
+import org.ml4ai.skema.text_reading.apps.ExtractAndAlign.{allLinkTypes, whereIsGlobalVar, whereIsNotGlobalVar}
 import org.ml4ai.skema.common.test.Test
+import org.ml4ai.skema.text_reading.apps.AlignmentBaseline
 import ujson.Value
 
 import scala.collection.mutable.ArrayBuffer

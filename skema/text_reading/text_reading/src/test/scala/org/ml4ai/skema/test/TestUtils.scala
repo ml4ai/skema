@@ -1,12 +1,12 @@
 package org.ml4ai.skema.test
 
 import com.typesafe.config.Config
-import org.clulab.aske.automates.OdinEngine
-import org.clulab.aske.automates.apps.ExtractAndAlign
 import org.clulab.odin.Mention
 import org.clulab.processors.Document
 import org.clulab.serialization.json.JSONSerializer
 import org.json4s.jackson.JsonMethods._
+import org.ml4ai.skema.text_reading.OdinEngine
+import org.ml4ai.skema.text_reading.apps.ExtractAndAlign
 
 object TestUtils {
 

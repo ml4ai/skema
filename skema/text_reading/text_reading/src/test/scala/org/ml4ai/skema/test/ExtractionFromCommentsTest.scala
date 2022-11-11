@@ -2,10 +2,10 @@ package org.ml4ai.skema.test
 
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
-import org.clulab.aske.automates.OdinEngine
-import org.clulab.aske.automates.OdinEngine._
+import org.ml4ai.skema.text_reading.OdinEngine._
 import org.clulab.odin.Mention
 import org.ml4ai.skema.common.test.Test
+import org.ml4ai.skema.text_reading.OdinEngine
 
 class ExtractionFromCommentsTest(val ieSystem: OdinEngine) extends Test {
   def this(config: Config = ConfigFactory.load("test")) = this(TestUtils.newOdinSystem(config[Config]("CommentEngine")))
