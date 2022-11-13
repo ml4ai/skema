@@ -1,5 +1,5 @@
 // Inclusion of additional modules
-pub mod gromet_graph;
+pub mod gromet_memgraph;
 
 // Stub for SKEMA library
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
