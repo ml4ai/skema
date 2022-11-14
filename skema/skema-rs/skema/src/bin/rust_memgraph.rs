@@ -1,5 +1,6 @@
 use serde_json;
-use skema::{execute_query, parse_gromet_queries, Gromet};
+use skema::gromet_memgraph::{execute_query, parse_gromet_queries};
+use skema::Gromet;
 use std::env;
 use std::fs;
 

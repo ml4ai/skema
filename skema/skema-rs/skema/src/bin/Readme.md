@@ -18,6 +18,6 @@ Once Memgraph is up and running you can open your web browser and go to [`localh
 ## Troubleshooting
 All this information for Memgraph and more can be found here: https://memgraph.com/docs/memgraph/tutorials/first-steps-with-memgraph 
 # Using the parser
-The parser can be run using the standard rust lingo. Namely, `cargo run rust_memgraph ./gromet.json` where you have to specify the directory to the GroMEt json you want to parse into the database.  
+The parser can be run using the standard rust lingo. Namely, `cargo run --bin rust_memgraph ../../../data/gromet/examples/exp2/FN_0.1.4/exp2--Gromet-FN-auto.json` where you have to specify the directory to the GroMEt json you want to parse into the database.  
 
 

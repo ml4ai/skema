@@ -1,7 +1,7 @@
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 
-use skema::FunctionType;
-use skema::Gromet;
+use crate::FunctionType;
+use crate::Gromet;
 use std::process::Termination;
 
 pub enum NodeType {
