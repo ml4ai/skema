@@ -29,9 +29,10 @@ pub struct Node {
     pub value: Option<String>,
     pub name: Option<String>,
     pub node_id: String,
-    pub out_idx: Option<Vec<u32>>, // opo or pof index, directly matching the wff, wfopo, or wfopi src/tgt notation
+    pub out_idx: Option<Vec<u32>>, // opo or pof index, directly matching the wire src/tgt notation
     pub in_indx: Option<Vec<u32>>, // opi or pif index
-    pub contents: u32, // This indexes which index this node has inside the attribute list, will be used for wiring between attribute level boxes, namely wff at the module level
+    pub contents: u32, // This indexes which index this node has inside the attribute list,
+                       // will be used for wiring between attribute level boxes, namely wff at the module level
 }
 
 #[derive(Debug, Clone)]
@@ -123,7 +124,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
     // fully internally wire each branch
     let mut bf_counter: u8 = 1;
     for boxf in gromet.r#fn.bf.as_ref().unwrap().iter() {
-        // construct first the sub module level boxes along with their metadata and connection to module
+        // construct the sub module level boxes along with their metadata and connection to module
         match boxf.function_type {
             FunctionType::Expression => {
                 let n1 = Node {
@@ -154,7 +155,8 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 nodes.push(n1.clone());
                 egdes.push(e1);
 
-                // now travel to contents index of the attribute list (note it is 1 index, so contents=1 => attribute[0])
+                // now travel to contents index of the attribute list (note it is 1 index,
+                // so contents=1 => attribute[0])
                 // create nodes and edges for this entry, include opo's and opi's
                 start += 1;
                 let idx = boxf.contents.unwrap() - 1;
@@ -163,7 +165,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 // construct opo nodes, if not none
                 // NOTE::: edges shouls go from opo to expression !!!!!
                 if !eboxf.value.opo.clone().is_none() {
-                    // grab name which is one level up and based on indexing because most frustrating that way
+                    // grab name which is one level up and based on indexing
                     let mut opo_name = "un-named";
                     for port in gromet.r#fn.pof.as_ref().unwrap().iter() {
                         if port.r#box == bf_counter {
@@ -383,7 +385,9 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     start += 1;
                 }
                 // Now we perform the internal wiring of this branch
-                // first lets wire the wfopi, note we need to first limit ourselves to only nodes in the current attribute by checking the contents field and then we run find the ports that match the wire src and tgt.
+                // first lets wire the wfopi, note we need to first limit ourselves
+                // to only nodes in the current attribute by checking the contents field
+                // and then we run find the ports that match the wire src and tgt.
                 // wfopi: pif -> opi
                 // wff: pif -> pof
                 // wfopo: opo -> pof
@@ -547,8 +551,9 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
         bf_counter += 1;
     }
 
-    // add wires for inbetween attribute level boxes, so opo's and opi's between attributes get wired through module level wff field, will require reading through node list to match contents field to box field on wff entries
-    // assume pof and pif order matches directly to opo and opi order in sub modules
+    // add wires for inbetween attribute level boxes, so opo's and opi's between attributes
+    // get wired through module level wff field, will require reading through node list to
+    // match contents field to box field on wff entries
     if !gromet.r#fn.wff.as_ref().is_none() {
         for wire in gromet.r#fn.wff.as_ref().unwrap().iter() {
             let src_idx = wire.src;
