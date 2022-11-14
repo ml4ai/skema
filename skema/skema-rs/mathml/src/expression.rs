@@ -18,9 +18,11 @@ enum Expr {
 }
 
 impl MathExpression {
-    fn to_expr(&self) -> Expr {
+    fn to_expr(&self, &mut pre: &mut Expr) -> Expr {
         match self {
-            Mi(x) => Expr::Atom(Atom::Identifier(x.clone())),
+            Mi(x) => {
+                Expr::Atom(Atom::Identifier(x.clone()))
+            },
             Mo(x) => Expr::Atom(Atom::Operator(x.clone())),
             Mrow(xs) => Expr::Expression {
                 op: Operator::Add,
@@ -42,14 +44,22 @@ fn test_to_expr() {
         Mo(Operator::Add),
         Mi("b".to_string()),
     ]);
+    let mut pre_exp = Expr::Expression {
+        op: Operator::Other("".to_string()),
+        args: Vec::<Expr>::new(),
+    };
+    match pre_exp {
+        Expr::Expression(ref op1, ref args) => println!("value!"),
+        _ => println!("Something else"),
+    }
     assert_eq!(
-        math_expression.to_expr(),
+        math_expression.to_expr(&mut pre_exp),
         Expr::Expression {
             op: Operator::Add,
             args: vec![
                 Expr::Atom(Atom::Identifier("a".to_string())),
-                Expr::Atom(Atom::Identifier("b".to_string()))
-            ]
+                Expr::Atom(Atom::Identifier("b".to_string())),
+            ],
         }
     );
 }
