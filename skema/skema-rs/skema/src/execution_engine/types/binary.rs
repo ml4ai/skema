@@ -1,5 +1,6 @@
 use crate::execution_engine::types::defined_types::Field;
 use num::complex::Complex;
+use std::collections::HashMap;
 
 enum Number {
     Int(isize),
@@ -11,9 +12,11 @@ enum Number {
 }
 
 trait Operator {
+    fn source_language_name() -> HashMap<&'static str, &'static str>;
+    fn inputs() -> Vec<Field>;
+    fn outputs() -> Vec<Field>;
     fn shorthand() -> &'static str;
     fn documentation() -> &'static str;
-    fn outputs() -> Vec<Field>;
 }
 
 struct Add {}
@@ -29,17 +32,27 @@ impl Add {
 }
 
 impl Operator for Add {
-    fn shorthand() -> &'static str {
-        "+"
+    fn source_language_name() -> HashMap<&'static str, &'static str> {
+        HashMap::from([("Python", "Add"), ("GCC", "plus_expr"), ("CAST", "Add")])
     }
-    fn documentation() -> &'static str {
-        "Add is the numerical addition operator. For a general addition operation (For example, the case of concatanation with +) see GenAdd."
-    }
-    fn outputs() -> Vec<Field> {
+
+    fn inputs() -> Vec<Field> {
         vec![
             Field::new("augend", "Number"),
             Field::new("addend", "Number"),
         ]
+    }
+
+    fn outputs() -> Vec<Field> {
+        vec![Field::new("sum", "Number")]
+    }
+
+    fn shorthand() -> &'static str {
+        "+"
+    }
+
+    fn documentation() -> &'static str {
+        "Add is the numerical addition operator. For a general addition operation (For example, the case of concatanation with +) see GenAdd."
     }
 }
 
@@ -61,7 +74,7 @@ fn test_add() {
     assert_eq!(Add::shorthand(), "+");
     assert_eq!(Add::documentation(),"Add is the numerical addition operator. For a general addition operation (For example, the case of concatanation with +) see GenAdd.");
     assert_eq!(
-        Add::outputs(),
+        Add::inputs(),
         vec![
             Field::new("augend", "Number"),
             Field::new("addend", "Number"),
