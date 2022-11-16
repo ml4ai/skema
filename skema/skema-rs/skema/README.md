@@ -16,7 +16,7 @@ Docker container for Memgraph:
 your machine.)
 
 ## Using Memgraph Lab
-If you wise to visualize or run live queries on your local database you 
+If you wish to visualize or run live queries on your local database you 
 can use Memgraph Lab.
 
 Once Memgraph is up and running you can open your web browser and go to 
