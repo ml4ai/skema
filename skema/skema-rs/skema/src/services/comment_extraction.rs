@@ -5,18 +5,18 @@ use comment_extraction::languages::python::get_comments_from_string as get_pytho
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CommentExtractionRequest {
     pub language: String,
-    pub source_code: String,
+    pub code: String,
 }
 
 impl CommentExtractionRequest {
-    pub fn new(language: &str, source_code: String) -> Self {
+    pub fn new(language: &str, code: String) -> Self {
         Self {
             language: language.to_string(),
-            source_code
+            code
         }
     }
 }
 pub async fn get_comments(payload: web::Json<CommentExtractionRequest>) -> HttpResponse {
-    HttpResponse::Ok().json(web::Json(get_python_comments(&payload.source_code)))
+    HttpResponse::Ok().json(web::Json(get_python_comments(&payload.code)))
 }
 
