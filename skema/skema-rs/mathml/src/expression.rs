@@ -32,6 +32,12 @@ impl MathExpression {
                 }
                 pre.args.push(Expr::Atom(Atom::Identifier(x.to_string())));
             }
+            Mn(x) => {
+                if pre.args.len() > pre.op.len() {
+                    pre.op.push(Operator::Multiply); // deal with the invisible multiply operator
+                }
+                pre.args.push(Expr::Atom(Atom::Number(x.to_string())));
+            }
             Mo(x) => {
                 match x {
                     // Operator::Other(_) => { pre.op = x.clone(); }
@@ -81,7 +87,6 @@ fn test_to_expr() {
     }
 }
 
-
 #[test]
 #[ignore]
 fn test_to_expr2() {
@@ -90,7 +95,7 @@ fn test_to_expr2() {
         Mo(Operator::Add),
         Mi("b".to_string()),
         Mo(Operator::Subtract),
-        Mrow(vec![Mi("c".to_string()), Mi("d".to_string())]),
+        Mrow(vec![Mn("4".to_string()), Mi("c".to_string()), Mi("d".to_string())]),
     ]);
     let mut pre_exp = PreExp {
         op: Vec::<Operator>::new(),
@@ -110,8 +115,10 @@ fn test_to_expr2() {
                 Expr::Atom(_) => {},
                 Expr::Expression {op, args} => {
                     assert_eq!(op[0], Operator::Multiply);
-                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("c".to_string())));
-                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("d".to_string())));
+                    assert_eq!(op[1], Operator::Multiply);
+                    assert_eq!(args[0], Expr::Atom(Atom::Number("4".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
+                    assert_eq!(args[2], Expr::Atom(Atom::Identifier("d".to_string())));
                 }
             }
             println!("Success!");
