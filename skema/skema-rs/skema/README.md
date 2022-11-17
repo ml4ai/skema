@@ -14,7 +14,7 @@ cargo run --bin skema_service
 Currently, there is one API endpoint implemented: comment extraction. To get
 comments for a piece of source code (currently, only a limited subset of Python
 is supported), send an HTTP GET request to the service (by default, it will run
-at `localhost:8080`), with a JSON payload that looks like the following:
+at `localhost:8080`), with a JSON payload that looks like the following
 
 ```json
 {
@@ -22,3 +22,5 @@ at `localhost:8080`), with a JSON payload that looks like the following:
     "code" "...the source code you wish to process"
 }
 ```
+
+to the `/get_comments` endpoint.
