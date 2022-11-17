@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use actix_web::{get, web, Responder, Result, HttpResponse};
+use actix_web::{web, HttpResponse};
 use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -12,7 +12,7 @@ impl CommentExtractionRequest {
     pub fn new(language: &str, source_code: String) -> Self {
         Self {
             language: language.to_string(),
-            source_code: source_code
+            source_code
         }
     }
 }
