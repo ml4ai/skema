@@ -16,7 +16,7 @@ pub enum FnType {
     Import,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
 #[serde(rename_all = "UPPERCASE")]
 #[derive(strum_macros::Display)]
 pub enum FunctionType {
