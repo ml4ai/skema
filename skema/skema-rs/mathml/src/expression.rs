@@ -14,12 +14,12 @@ enum Atom {
 #[derive(Debug, PartialEq, Clone)]
 enum Expr {
     Atom(Atom),
-    Expression { op: Operator, args: Vec<Expr> },
+    Expression { op: Vec<Operator>, args: Vec<Expr> },
 }
 
 #[derive(Debug, PartialEq, Clone)]
 struct PreExp {
-    op: Operator,
+    op: Vec<Operator>,
     args: Vec<Expr>,
 }
 
@@ -27,17 +27,20 @@ impl MathExpression {
     fn to_expr(self, mut pre: &mut PreExp) {
         match self {
             Mi(x) => {
+                if pre.args.len() > pre.op.len() {
+                    pre.op.push(Operator::Multiply); // deal with the invisible multiply operator
+                }
                 pre.args.push(Expr::Atom(Atom::Identifier(x.to_string())));
             }
             Mo(x) => {
                 match x {
                     // Operator::Other(_) => { pre.op = x.clone(); }
-                    _ => { pre.op = x.clone(); }
+                    _ => { pre.op.push(x.clone()); }
                 }
             }
             Mrow(xs) => {
                 let mut pre_exp = PreExp {
-                    op: Operator::Other("".to_string()),
+                    op: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
                 };
                 for mut x in xs {
@@ -52,7 +55,6 @@ impl MathExpression {
     }
 }
 
-// TODO: Fix the test below.
 #[test]
 #[ignore]
 fn test_to_expr() {
@@ -62,29 +64,57 @@ fn test_to_expr() {
         Mi("b".to_string()),
     ]);
     let mut pre_exp = PreExp {
-        op: Operator::Other("root".to_string()),
+        op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
     };
 
     math_expression.to_expr(&mut pre_exp);
+
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
         Expr::Expression { op, args } => {
-            assert_eq!(op, &Operator::Add);
+            assert_eq!(op[0], Operator::Add);
             assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
             assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
             println!("Success!");
         }
     }
+}
 
-    // assert_eq!(
-    //     pre_exp.args[1],
-    //     Expr::Expression {
-    //         op: Operator::Add,
-    //         args: vec![
-    //             Expr::Atom(Atom::Identifier("a".to_string())),
-    //             Expr::Atom(Atom::Identifier("b".to_string())),
-    //         ],
-    //     }
-    // );
+
+#[test]
+#[ignore]
+fn test_to_expr2() {
+    let math_expression = Mrow(vec![
+        Mi("a".to_string()),
+        Mo(Operator::Add),
+        Mi("b".to_string()),
+        Mo(Operator::Subtract),
+        Mrow(vec![Mi("c".to_string()), Mi("d".to_string())]),
+    ]);
+    let mut pre_exp = PreExp {
+        op: Vec::<Operator>::new(),
+        args: Vec::<Expr>::new(),
+    };
+
+    math_expression.to_expr(&mut pre_exp);
+
+    match &pre_exp.args[0] {
+        Expr::Atom(_) => {},
+        Expr::Expression { op, args } => {
+            assert_eq!(op[0], Operator::Add);
+            assert_eq!(op[1], Operator::Subtract);
+            assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
+            assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
+            match &args[2]{
+                Expr::Atom(_) => {},
+                Expr::Expression {op, args} => {
+                    assert_eq!(op[0], Operator::Multiply);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("c".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("d".to_string())));
+                }
+            }
+            println!("Success!");
+        }
+    }
 }
