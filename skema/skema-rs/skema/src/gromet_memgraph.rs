@@ -1,8 +1,8 @@
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 
-use crate::Attribute;
 use crate::FunctionType;
 use crate::Gromet;
+use crate::{Attribute, GrometBox};
 use std::process::Termination;
 
 pub enum NodeType {
@@ -307,135 +307,41 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                                 prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
                             };
                             edges.push(e4);
-                        } else {
                         }
                         edges.push(e3);
                         start += 1;
                         iport += 1;
                     }
-                } else {
                 }
-                // now to construct the nodes inside the expression
+                // now to construct the nodes inside the expression, Literal and Primitives
                 let mut box_counter: u8 = 1;
                 for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
                     match sboxf.function_type {
                         FunctionType::Literal => {
-                            // first find the pof's for box
-                            let mut pof: Vec<u32> = vec![];
-                            if !eboxf.value.pof.clone().is_none() {
-                                let mut po_idx: u32 = 1;
-                                for port in eboxf.value.pof.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pof.push(po_idx);
-                                    } else {
-                                    }
-                                    po_idx += 1;
-                                }
-                            } else {
-                            }
-                            // then find pif's for box
-                            let mut pif: Vec<u32> = vec![];
-                            if !eboxf.value.pif.clone().is_none() {
-                                let mut pi_idx: u32 = 1;
-                                for port in eboxf.value.pif.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pif.push(pi_idx);
-                                    } else {
-                                    }
-                                    pi_idx += 1;
-                                }
-                            } else {
-                            }
-                            // now make the node with the port information
-                            let n3 = Node {
-                                n_type: String::from("Literal"),
-                                value: Some(format!("{:?}", sboxf.value.clone().as_ref().unwrap())),
-                                name: None,
-                                node_id: format!("n{}", start),
-                                out_idx: Some(pof),
-                                in_indx: Some(pif),
-                                contents: idx + 1,
-                                nbox: bf_counter,
-                            };
-                            nodes.push(n3.clone());
-                            // make edge connecting to expression
-                            let e4 = Edge {
-                                src: n1.node_id.clone(),
-                                tgt: n3.node_id.clone(),
-                                e_type: String::from("Contains"),
-                                prop: None,
-                            };
-                            edges.push(e4);
-                            // now add a metadata edge
-                            if !sboxf.metadata.is_none() {
-                                let e5 = Edge {
-                                    src: n3.node_id,
-                                    tgt: String::from("meta"),
-                                    e_type: String::from("Metadata"),
-                                    prop: sboxf.metadata.clone(),
-                                };
-                                edges.push(e5);
-                            } else {
-                            }
+                            (nodes, edges) = create_att_literal(
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
                         }
                         FunctionType::Primitive => {
-                            // first find the pof's for box
-                            let mut pof: Vec<u32> = vec![];
-                            if !eboxf.value.pof.clone().is_none() {
-                                let mut po_idx: u32 = 1;
-                                for port in eboxf.value.pof.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pof.push(po_idx);
-                                    } else {
-                                    }
-                                    po_idx += 1;
-                                }
-                            } else {
-                            }
-                            // then find pif's for box
-                            let mut pif: Vec<u32> = vec![];
-                            if !eboxf.value.pif.clone().is_none() {
-                                let mut pi_idx: u32 = 1;
-                                for port in eboxf.value.pif.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pif.push(pi_idx);
-                                    } else {
-                                    }
-                                    pi_idx += 1;
-                                }
-                            } else {
-                            }
-                            // now make the node with the port information
-                            let n3 = Node {
-                                n_type: String::from("Primitive"),
-                                value: None,
-                                name: sboxf.name.clone(),
-                                node_id: format!("n{}", start),
-                                out_idx: Some(pof),
-                                in_indx: Some(pif),
-                                contents: idx + 1,
-                                nbox: bf_counter,
-                            };
-                            nodes.push(n3.clone());
-                            // make edge connecting to expression
-                            let e4 = Edge {
-                                src: n1.node_id.clone(),
-                                tgt: n3.node_id.clone(),
-                                e_type: String::from("Contains"),
-                                prop: None,
-                            };
-                            edges.push(e4);
-                            // now add a metadata edge
-                            if !sboxf.metadata.clone().is_none() {
-                                let e5 = Edge {
-                                    src: n3.node_id.clone(),
-                                    tgt: String::from("meta"),
-                                    e_type: String::from("Metadata"),
-                                    prop: sboxf.metadata.clone(),
-                                };
-                                edges.push(e5);
-                            } else {
-                            }
+                            (nodes, edges) = create_att_primitive(
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
                         }
                         _ => {}
                     }
@@ -443,7 +349,13 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     start += 1;
                 }
                 // Now we perform the internal wiring of this branch
-                edges = internal_wiring(eboxf.clone(), nodes.clone(), edges, idx.clone());
+                edges = internal_wiring(
+                    eboxf.clone(),
+                    nodes.clone(),
+                    edges,
+                    idx.clone(),
+                    bf_counter.clone(),
+                );
             }
             FunctionType::Function => {
                 let n1 = Node {
@@ -590,129 +502,50 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         start += 1;
                         iport += 1;
                     }
-                } else {
                 }
-                // now to construct the nodes inside the expression
+                // now to construct the nodes inside the function, currently supported Literals and Primitives
+                // first include an Expression for increased depth
                 let mut box_counter: u8 = 1;
                 for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
                     match sboxf.function_type {
+                        FunctionType::Expression => {
+                            (nodes, edges) = create_att_expression(
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
+                        }
                         FunctionType::Literal => {
-                            // first find the pof's for box
-                            let mut pof: Vec<u32> = vec![];
-                            if !eboxf.value.pof.clone().is_none() {
-                                let mut po_idx: u32 = 1;
-                                for port in eboxf.value.pof.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pof.push(po_idx);
-                                    } else {
-                                    }
-                                    po_idx += 1;
-                                }
-                            } else {
-                            }
-                            // then find pif's for box
-                            let mut pif: Vec<u32> = vec![];
-                            if !eboxf.value.pif.clone().is_none() {
-                                let mut pi_idx: u32 = 1;
-                                for port in eboxf.value.pif.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pif.push(pi_idx);
-                                    } else {
-                                    }
-                                    pi_idx += 1;
-                                }
-                            } else {
-                            }
-                            // now make the node with the port information
-                            let n3 = Node {
-                                n_type: String::from("Literal"),
-                                value: Some(format!("{:?}", sboxf.value.clone().as_ref().unwrap())),
-                                name: None,
-                                node_id: format!("n{}", start),
-                                out_idx: Some(pof),
-                                in_indx: Some(pif), // literals should only have out ports
-                                contents: idx + 1,
-                                nbox: bf_counter,
-                            };
-                            nodes.push(n3.clone());
-                            // make edge connecting to expression
-                            let e4 = Edge {
-                                src: n1.node_id.clone(),
-                                tgt: n3.node_id.clone(),
-                                e_type: String::from("Contains"),
-                                prop: None,
-                            };
-                            edges.push(e4);
-                            // now add a metadata edge
-                            if !sboxf.metadata.is_none() {
-                                let e5 = Edge {
-                                    src: n3.node_id,
-                                    tgt: String::from("meta"),
-                                    e_type: String::from("Metadata"),
-                                    prop: sboxf.metadata.clone(),
-                                };
-                                edges.push(e5);
-                            } else {
-                            }
+                            (nodes, edges) = create_att_literal(
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
                         }
                         FunctionType::Primitive => {
-                            // first find the pof's for box
-                            let mut pof: Vec<u32> = vec![];
-                            if !eboxf.value.pof.clone().is_none() {
-                                let mut po_idx: u32 = 1;
-                                for port in eboxf.value.pof.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pof.push(po_idx);
-                                    } else {
-                                    }
-                                    po_idx += 1;
-                                }
-                            } else {
-                            }
-                            // then find pif's for box
-                            let mut pif: Vec<u32> = vec![];
-                            if !eboxf.value.pif.clone().is_none() {
-                                let mut pi_idx: u32 = 1;
-                                for port in eboxf.value.pif.clone().unwrap().iter() {
-                                    if port.r#box == box_counter {
-                                        pif.push(pi_idx);
-                                    } else {
-                                    }
-                                    pi_idx += 1;
-                                }
-                            } else {
-                            }
-                            // now make the node with the port information
-                            let n3 = Node {
-                                n_type: String::from("Primitive"),
-                                value: None,
-                                name: sboxf.name.clone(),
-                                node_id: format!("n{}", start),
-                                out_idx: Some(pof),
-                                in_indx: Some(pif),
-                                contents: idx + 1,
-                                nbox: bf_counter,
-                            };
-                            nodes.push(n3.clone());
-                            // make edge connecting to expression
-                            let e4 = Edge {
-                                src: n1.node_id.clone(),
-                                tgt: n3.node_id.clone(),
-                                e_type: String::from("Contains"),
-                                prop: None,
-                            };
-                            edges.push(e4);
-                            // now add a metadata edge
-                            if !sboxf.metadata.clone().is_none() {
-                                let e5 = Edge {
-                                    src: n3.node_id.clone(),
-                                    tgt: String::from("meta"),
-                                    e_type: String::from("Metadata"),
-                                    prop: sboxf.metadata.clone(),
-                                };
-                                edges.push(e5);
-                            } else {
-                            }
+                            (nodes, edges) = create_att_primitive(
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
                         }
                         _ => {}
                     }
@@ -721,7 +554,13 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 }
 
                 // Now we perform the internal wiring of this branch
-                edges = internal_wiring(eboxf.clone(), nodes.clone(), edges, idx.clone());
+                edges = internal_wiring(
+                    eboxf.clone(),
+                    nodes.clone(),
+                    edges,
+                    idx.clone(),
+                    bf_counter.clone(),
+                );
             }
             _ => {}
         }
@@ -773,28 +612,172 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
     }
     return queries;
 }
+
+pub fn create_att_expression(
+    eboxf: Attribute,
+    sboxf: GrometBox,
+    mut nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    parent_node: Node,
+    idx: u32,
+    box_counter: u8,
+    bf_counter: u8,
+    start: u32,
+) -> (Vec<Node>, Vec<Edge>) {
+    return (nodes, edges);
+}
+
+pub fn create_att_literal(
+    eboxf: Attribute,
+    sboxf: GrometBox,
+    mut nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    parent_node: Node,
+    idx: u32,
+    box_counter: u8,
+    bf_counter: u8,
+    start: u32,
+) -> (Vec<Node>, Vec<Edge>) {
+    // first find the pof's for box
+    let mut pof: Vec<u32> = vec![];
+    if !eboxf.value.pof.clone().is_none() {
+        let mut po_idx: u32 = 1;
+        for port in eboxf.value.pof.clone().unwrap().iter() {
+            if port.r#box == box_counter {
+                pof.push(po_idx);
+            } else {
+            }
+            po_idx += 1;
+        }
+    }
+    // now make the node with the port information
+    let n3 = Node {
+        n_type: String::from("Literal"),
+        value: Some(format!("{:?}", sboxf.value.clone().as_ref().unwrap())),
+        name: None,
+        node_id: format!("n{}", start),
+        out_idx: Some(pof),
+        in_indx: None, // literals should only have out ports
+        contents: idx + 1,
+        nbox: bf_counter,
+    };
+    nodes.push(n3.clone());
+    // make edge connecting to expression
+    let e4 = Edge {
+        src: parent_node.node_id.clone(),
+        tgt: n3.node_id.clone(),
+        e_type: String::from("Contains"),
+        prop: None,
+    };
+    edges.push(e4);
+    // now add a metadata edge
+    if !sboxf.metadata.is_none() {
+        let e5 = Edge {
+            src: n3.node_id,
+            tgt: String::from("meta"),
+            e_type: String::from("Metadata"),
+            prop: sboxf.metadata.clone(),
+        };
+        edges.push(e5);
+    }
+    return (nodes, edges);
+}
+
+pub fn create_att_primitive(
+    eboxf: Attribute,
+    sboxf: GrometBox,
+    mut nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    parent_node: Node,
+    idx: u32,
+    box_counter: u8,
+    bf_counter: u8,
+    start: u32,
+) -> (Vec<Node>, Vec<Edge>) {
+    // first find the pof's for box
+    let mut pof: Vec<u32> = vec![];
+    if !eboxf.value.pof.clone().is_none() {
+        let mut po_idx: u32 = 1;
+        for port in eboxf.value.pof.clone().unwrap().iter() {
+            if port.r#box == box_counter {
+                pof.push(po_idx);
+            }
+            po_idx += 1;
+        }
+    } else {
+    }
+    // then find pif's for box
+    let mut pif: Vec<u32> = vec![];
+    if !eboxf.value.pif.clone().is_none() {
+        let mut pi_idx: u32 = 1;
+        for port in eboxf.value.pif.clone().unwrap().iter() {
+            if port.r#box == box_counter {
+                pif.push(pi_idx);
+            }
+            pi_idx += 1;
+        }
+    } else {
+    }
+    // now make the node with the port information
+    let n3 = Node {
+        n_type: String::from("Primitive"),
+        value: None,
+        name: sboxf.name.clone(),
+        node_id: format!("n{}", start),
+        out_idx: Some(pof),
+        in_indx: Some(pif),
+        contents: idx + 1,
+        nbox: bf_counter,
+    };
+    nodes.push(n3.clone());
+    // make edge connecting to expression
+    let e4 = Edge {
+        src: parent_node.node_id.clone(),
+        tgt: n3.node_id.clone(),
+        e_type: String::from("Contains"),
+        prop: None,
+    };
+    edges.push(e4);
+    // now add a metadata edge
+    if !sboxf.metadata.clone().is_none() {
+        let e5 = Edge {
+            src: n3.node_id.clone(),
+            tgt: String::from("meta"),
+            e_type: String::from("Metadata"),
+            prop: sboxf.metadata.clone(),
+        };
+        edges.push(e5);
+    }
+    return (nodes, edges);
+}
 pub fn wfopi_wiring(
     eboxf: Attribute,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
+    bf_counter: u8,
 ) -> Vec<Edge> {
     // iterate through all wires of type
     for wire in eboxf.value.wfopi.unwrap().iter() {
         let mut wfopi_src_tgt: Vec<String> = vec![];
         // find the src node
+        // ******* is this getting 2 hits and so filling the vector with these hits?? *******
+        // add a box check?
         for node in nodes.iter() {
-            // make sure only looking in current attribute nodes for srcs and tgts
-            if (idx + 1) == node.contents {
-                // only include nodes with pifs
-                if !node.in_indx.is_none() {
-                    // exclude opi's
-                    if node.n_type != "Opi" {
-                        // iterate through port to check for src
-                        for p in node.in_indx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
-                            if (wire.src as u32) == *p {
-                                wfopi_src_tgt.push(node.node_id.clone());
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only include nodes with pifs
+                    if !node.in_indx.is_none() {
+                        // exclude opi's
+                        if node.n_type != "Opi" {
+                            // iterate through port to check for src
+                            for p in node.in_indx.as_ref().unwrap().iter() {
+                                // push the src first, being pif
+                                if (wire.src as u32) == *p {
+                                    wfopi_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
@@ -803,15 +786,18 @@ pub fn wfopi_wiring(
         }
         // find the tgt node
         for node in nodes.iter() {
-            // make sure only looking in current attribute nodes for srcs and tgts
-            if (idx + 1) == node.contents {
-                // only opi's
-                if node.n_type == "Opi" {
-                    // iterate through port to check for tgt
-                    for p in node.in_indx.as_ref().unwrap().iter() {
-                        // push the src first, being pif
-                        if (wire.tgt as u32) == *p {
-                            wfopi_src_tgt.push(node.node_id.clone());
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only opi's
+                    if node.n_type == "Opi" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (wire.tgt as u32) == *p {
+                                wfopi_src_tgt.push(node.node_id.clone());
+                            }
                         }
                     }
                 }
@@ -833,21 +819,25 @@ pub fn wfopo_wiring(
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
+    bf_counter: u8,
 ) -> Vec<Edge> {
     // iterate through all wires of type
     for wire in eboxf.value.wfopo.unwrap().iter() {
         let mut wfopo_src_tgt: Vec<String> = vec![];
         // find the src node
         for node in nodes.iter() {
-            // make sure only looking in current attribute nodes for srcs and tgts
-            if (idx + 1) == node.contents {
-                // only opo's
-                if node.n_type == "Opo" {
-                    // iterate through port to check for tgt
-                    for p in node.out_idx.as_ref().unwrap().iter() {
-                        // push the src first, being pif
-                        if (wire.src as u32) == *p {
-                            wfopo_src_tgt.push(node.node_id.clone());
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (wire.src as u32) == *p {
+                                wfopo_src_tgt.push(node.node_id.clone());
+                            }
                         }
                     }
                 }
@@ -855,17 +845,20 @@ pub fn wfopo_wiring(
         }
         // finding the tgt node
         for node in nodes.iter() {
-            // make sure only looking in current attribute nodes for srcs and tgts
-            if (idx + 1) == node.contents {
-                // only include nodes with pofs
-                if !node.out_idx.is_none() {
-                    // exclude opo's
-                    if node.n_type != "Opo" {
-                        // iterate through port to check for src
-                        for p in node.out_idx.as_ref().unwrap().iter() {
-                            // push the tgt
-                            if (wire.tgt as u32) == *p {
-                                wfopo_src_tgt.push(node.node_id.clone());
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only include nodes with pofs
+                    if !node.out_idx.is_none() {
+                        // exclude opo's
+                        if node.n_type != "Opo" {
+                            // iterate through port to check for src
+                            for p in node.out_idx.as_ref().unwrap().iter() {
+                                // push the tgt
+                                if (wire.tgt as u32) == *p {
+                                    wfopo_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
@@ -882,24 +875,32 @@ pub fn wfopo_wiring(
     }
     return edges;
 }
-
-pub fn wff_wiring(eboxf: Attribute, nodes: Vec<Node>, mut edges: Vec<Edge>, idx: u32) -> Vec<Edge> {
+pub fn wff_wiring(
+    eboxf: Attribute,
+    nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    idx: u32,
+    bf_counter: u8,
+) -> Vec<Edge> {
     // iterate through all wires of type
     for wire in eboxf.value.wff.unwrap().iter() {
         let mut wff_src_tgt: Vec<String> = vec![];
         // find the src node
         for node in nodes.iter() {
-            // make sure only looking in current attribute nodes for srcs and tgts
-            if (idx + 1) == node.contents {
-                // only include nodes with pifs
-                if !node.in_indx.is_none() {
-                    // exclude opo's
-                    if node.n_type != "Opi" {
-                        // iterate through port to check for src
-                        for p in node.in_indx.as_ref().unwrap().iter() {
-                            // push the tgt
-                            if (wire.src as u32) == *p {
-                                wff_src_tgt.push(node.node_id.clone());
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only include nodes with pifs
+                    if !node.in_indx.is_none() {
+                        // exclude opo's
+                        if node.n_type != "Opi" {
+                            // iterate through port to check for src
+                            for p in node.in_indx.as_ref().unwrap().iter() {
+                                // push the tgt
+                                if (wire.src as u32) == *p {
+                                    wff_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
@@ -908,17 +909,20 @@ pub fn wff_wiring(eboxf: Attribute, nodes: Vec<Node>, mut edges: Vec<Edge>, idx:
         }
         // finding the tgt node
         for node in nodes.iter() {
-            // make sure only looking in current attribute nodes for srcs and tgts
-            if (idx + 1) == node.contents {
-                // only include nodes with pofs
-                if !node.out_idx.is_none() {
-                    // exclude opo's
-                    if node.n_type != "Opo" {
-                        // iterate through port to check for tgt
-                        for p in node.out_idx.as_ref().unwrap().iter() {
-                            // push the tgt
-                            if (wire.tgt as u32) == *p {
-                                wff_src_tgt.push(node.node_id.clone());
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only include nodes with pofs
+                    if !node.out_idx.is_none() {
+                        // exclude opo's
+                        if node.n_type != "Opo" {
+                            // iterate through port to check for tgt
+                            for p in node.out_idx.as_ref().unwrap().iter() {
+                                // push the tgt
+                                if (wire.tgt as u32) == *p {
+                                    wff_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
@@ -940,6 +944,7 @@ pub fn internal_wiring(
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
+    bf_counter: u8,
 ) -> Vec<Edge> {
     // first lets wire the wfopi, note we need to first limit ourselves
     // to only nodes in the current attribute by checking the contents field
@@ -950,35 +955,55 @@ pub fn internal_wiring(
 
     // check if wire exists, wfopi
     if !eboxf.value.wfopi.clone().is_none() {
-        edges = wfopi_wiring(eboxf.clone(), nodes.clone(), edges, idx.clone());
+        edges = wfopi_wiring(
+            eboxf.clone(),
+            nodes.clone(),
+            edges,
+            idx.clone(),
+            bf_counter.clone(),
+        );
     }
 
     // check if wire exists, wfopo
     if !eboxf.value.wfopo.is_none() {
-        edges = wfopo_wiring(eboxf.clone(), nodes.clone(), edges, idx.clone());
+        edges = wfopo_wiring(
+            eboxf.clone(),
+            nodes.clone(),
+            edges,
+            idx.clone(),
+            bf_counter.clone(),
+        );
     }
 
     // check if wire exists, wff
     if !eboxf.value.wff.is_none() {
-        edges = wff_wiring(eboxf.clone(), nodes.clone(), edges, idx.clone());
+        edges = wff_wiring(
+            eboxf.clone(),
+            nodes.clone(),
+            edges,
+            idx.clone(),
+            bf_counter.clone(),
+        );
     }
     return edges;
 }
 
-// This has a problem for the fun2 gromet. Namely the function being called twice is duplicating some wires and incorrectly matching them
+// external wiring is the wiring between boxes at the module level
 pub fn external_wiring(gromet: &Gromet, nodes: Vec<Node>, mut edges: Vec<Edge>) -> Vec<Edge> {
     if !gromet.r#fn.wff.as_ref().is_none() {
         for wire in gromet.r#fn.wff.as_ref().unwrap().iter() {
-            let src_idx = wire.src;
-            let tgt_idx = wire.tgt;
+            println!("{:?}", wire);
+            let src_idx = wire.src; // pif wire connects to
+            let tgt_idx = wire.tgt; // pof wire connects to
             let src_id = gromet.r#fn.pif.as_ref().unwrap()[(src_idx - 1) as usize]
                 .id
-                .unwrap();
-            let src_box = gromet.r#fn.pif.as_ref().unwrap()[(src_idx - 1) as usize].r#box;
+                .unwrap(); // pif id
+            let src_box = gromet.r#fn.pif.as_ref().unwrap()[(src_idx - 1) as usize].r#box; // pif box
             let tgt_id = gromet.r#fn.pof.as_ref().unwrap()[(tgt_idx - 1) as usize]
                 .id
-                .unwrap();
-            let tgt_box = gromet.r#fn.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].r#box;
+                .unwrap(); // pof id
+            let tgt_box = gromet.r#fn.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].r#box; // pof box
+            println!("src_id: {}, tgt_id: {}", src_id.clone(), tgt_id.clone());
             let mut wff_src_tgt: Vec<String> = vec![];
             // find the src
             for node in nodes.iter() {
@@ -996,11 +1021,36 @@ pub fn external_wiring(gromet: &Gromet, nodes: Vec<Node>, mut edges: Vec<Edge>) 
             // find the tgt
             for node in nodes.iter() {
                 // check this field
-                if node.n_type == "Opo" || node.n_type == "Literal" {
+                if node.n_type == "Opo" {
+                    println!("tgt type check pass");
                     if node.nbox == tgt_box {
+                        println!("tgt box check pass");
                         for p in node.out_idx.as_ref().unwrap().iter() {
-                            // push the src
+                            // push the tgt
+                            println!("tgt_id: {}, p: {}", tgt_id.clone(), p.clone());
                             if (tgt_id as u32) == *p {
+                                println!(
+                                    "tgt: Type: {}, Id: {}",
+                                    node.n_type.clone(),
+                                    node.node_id.clone()
+                                );
+                                wff_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                } else if node.n_type == "Literal" {
+                    println!("tgt type check pass");
+                    if node.nbox == tgt_box {
+                        println!("tgt box check pass");
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the tgt
+                            println!("tgt_id: {}, p: {}", tgt_id.clone(), p.clone());
+                            if (tgt_box as u32) == *p {
+                                println!(
+                                    "tgt: Type: {}, Id: {}",
+                                    node.n_type.clone(),
+                                    node.node_id.clone()
+                                );
                                 wff_src_tgt.push(node.node_id.clone());
                             }
                         }
