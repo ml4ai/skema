@@ -2,7 +2,7 @@ use serde::{Deserialize, Serialize};
 use actix_web::{get, web, HttpResponse};
 use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
 use comment_extraction::languages::python::Comments;
-use utoipa::{ToSchema, IntoParams};
+use utoipa::{ToSchema};
 use utoipa;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
@@ -40,11 +40,11 @@ impl CommentExtractionResponse {
         }
         let mut docstrings = Vec::new();
         for (object_name, contents) in comments.docstrings {
-            docstrings.push(Docstring {object_name: object_name, contents: contents});
+            docstrings.push(Docstring {object_name, contents});
         }
         Self {
-            single_line_comments: single_line_comments,
-            docstrings: docstrings
+            single_line_comments,
+            docstrings
         }
     }
 }

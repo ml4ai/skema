@@ -1,4 +1,4 @@
-use actix_web::{web, App, HttpServer};
+use actix_web::{App, HttpServer};
 use skema::services::comment_extraction::{get_comments, CommentExtractionRequest, CommentExtractionResponse, SingleLineComment, Docstring};
 use utoipa_swagger_ui::SwaggerUi;
 use utoipa::OpenApi;
