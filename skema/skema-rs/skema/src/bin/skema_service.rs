@@ -29,7 +29,7 @@ async fn main() -> std::io::Result<()> {
     let openapi = ApiDoc::openapi();
     HttpServer::new(move || {
         App::new().service(get_comments).service(
-            SwaggerUi::new("/swagger-ui/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
+            SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
         )
     })
     .bind(("127.0.0.1", 8080))?
