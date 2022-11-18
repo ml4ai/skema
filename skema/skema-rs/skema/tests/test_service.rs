@@ -1,4 +1,4 @@
-use actix_web::{test, web, App};
+use actix_web::{test, App};
 use skema::services::comment_extraction::{get_comments, CommentExtractionRequest, Language};
 
 #[actix_web::test]
