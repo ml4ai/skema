@@ -1,4 +1,4 @@
-// for json
+use serde_json; // for json
 
 use std::env;
 use std::fs;
@@ -180,7 +180,7 @@ fn main() {
     // we lose the information about loops of un-named functions in this contraction for now.
     for i in (0..subroutines.len()).rev() {
         // find un-named subroutines
-        if subroutines[i].name == *"un-named" {
+        if subroutines[i].name == String::from("un-named") {
             // intialize a counter
             // iterate through other functions
             for j in 0..subroutines.len() {
@@ -203,7 +203,7 @@ fn main() {
 
     let mut m = 0;
     for func in subroutines.iter() {
-        if func.name == *"un-named" {
+        if func.name == String::from("un-named") {
             unnamed.push(m);
         }
         m += 1;
@@ -228,57 +228,59 @@ fn main() {
     let name_top = &subroutines_contracted[(subroutines_contracted.len() - 1)].name;
 
     for i in (0..subroutines.len()).rev() {
-        if *name_top == subroutines[i].name && subroutines[i].loops.is_some() {
-            // collect relevant loop deps
-            let loop_start = subroutines[i].loops.as_ref().unwrap().indexes[0];
-            let loop_end = subroutines[i].loops.as_ref().unwrap().indexes[1];
-            // collect all deps for function
-            let top_dep = subroutines[i].indexes.to_vec();
-            // grab deps of the loop
-            let mut loop_dep: Vec<u32> = vec![];
-            for j in (i + 1)..subroutines.len() {
-                if subroutines[j].att_idx == loop_start {
-                    let mut idx_temp = subroutines[j].indexes.to_vec();
-                    loop_dep.append(&mut idx_temp);
+        if *name_top == subroutines[i].name {
+            if !subroutines[i].loops.is_none() {
+                // collect relevant loop deps
+                let loop_start = subroutines[i].loops.as_ref().unwrap().indexes[0];
+                let loop_end = subroutines[i].loops.as_ref().unwrap().indexes[1];
+                // collect all deps for function
+                let top_dep = subroutines[i].indexes.to_vec();
+                // grab deps of the loop
+                let mut loop_dep: Vec<u32> = vec![];
+                for j in (i + 1)..subroutines.len() {
+                    if subroutines[j].att_idx == loop_start {
+                        let mut idx_temp = subroutines[j].indexes.to_vec();
+                        loop_dep.append(&mut idx_temp);
+                    }
                 }
-            }
-            // constructing first label, core_dynamics
-            let mut core_dep: Vec<u32> = vec![];
-            // this finds all the additional deps beyond the loop end
-            let mut count = 0;
-            for j in (0..subroutines[i].indexes.len()).rev() {
-                if subroutines[i].indexes[j] == loop_end {
-                    count = subroutines[i].indexes.len() - j;
+                // constructing first label, core_dynamics
+                let mut core_dep: Vec<u32> = vec![];
+                // this finds all the additional deps beyond the loop end
+                let mut count = 0;
+                for j in (0..subroutines[i].indexes.len()).rev() {
+                    if subroutines[i].indexes[j] == loop_end {
+                        count = subroutines[i].indexes.len() - j;
+                    }
                 }
+                let core_dep_count = count - loop_dep.len() - 1;
+                core_dep.push(loop_end);
+                if core_dep_count != 0 {
+                    let bot = subroutines[i].indexes.len() - core_dep_count;
+                    let mut new_deps = subroutines[i].indexes[bot..].to_vec();
+                    core_dep.append(&mut new_deps);
+                }
+                // now to construct all the roles
+                loop_dep.push(loop_start);
+                let init_end = top_dep.len() - core_dep.len() - loop_dep.len();
+                let core = Role {
+                    role: String::from("Core_Dynamics"),
+                    indexes: core_dep,
+                    lines: vec![0],
+                };
+                let prep = Role {
+                    role: String::from("Preprocessing"),
+                    indexes: loop_dep,
+                    lines: vec![0],
+                };
+                let init = Role {
+                    role: String::from("Initialization"),
+                    indexes: top_dep[..init_end].to_vec(),
+                    lines: vec![0],
+                };
+                roles.push(core);
+                roles.push(prep);
+                roles.push(init);
             }
-            let core_dep_count = count - loop_dep.len() - 1;
-            core_dep.push(loop_end);
-            if core_dep_count != 0 {
-                let bot = subroutines[i].indexes.len() - core_dep_count;
-                let mut new_deps = subroutines[i].indexes[bot..].to_vec();
-                core_dep.append(&mut new_deps);
-            }
-            // now to construct all the roles
-            loop_dep.push(loop_start);
-            let init_end = top_dep.len() - core_dep.len() - loop_dep.len();
-            let core = Role {
-                role: String::from("Core_Dynamics"),
-                indexes: core_dep,
-                lines: vec![0],
-            };
-            let prep = Role {
-                role: String::from("Preprocessing"),
-                indexes: loop_dep,
-                lines: vec![0],
-            };
-            let init = Role {
-                role: String::from("Initialization"),
-                indexes: top_dep[..init_end].to_vec(),
-                lines: vec![0],
-            };
-            roles.push(core);
-            roles.push(prep);
-            roles.push(init);
         }
     }
 
