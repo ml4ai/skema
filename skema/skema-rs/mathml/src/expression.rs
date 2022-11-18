@@ -95,7 +95,7 @@ fn test_to_expr() {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
     };
-
+    pre_exp.op.push( Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
 
     match &pre_exp.args[0] {
@@ -126,7 +126,7 @@ fn test_to_expr2() {
     };
 
     math_expression.to_expr(&mut pre_exp);
-
+    pre_exp.op.push( Operator::Other("root".to_string()));
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
         Expr::Expression { op, args } => {
@@ -162,7 +162,7 @@ fn test_to_expr3() {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
     };
-
+    pre_exp.op.push( Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
 
     match &pre_exp.args[0] {
@@ -194,7 +194,7 @@ fn test_to_expr4() {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
     };
-
+    pre_exp.op.push( Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
 
     match &pre_exp.args[0] {
