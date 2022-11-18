@@ -16,6 +16,7 @@ pub struct CommentExtractionRequest {
     pub code: String,
 }
 
+/// A single line comment
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SingleLineComment {
     line: u32,
