@@ -11,6 +11,7 @@ async fn main() -> std::io::Result<()> {
     #[derive(OpenApi)]
     #[openapi(
         paths(skema::services::comment_extraction::get_comments),
+        paths(skema::services::mathml::visualize_xml),
         components(
             schemas(
                 Language,
