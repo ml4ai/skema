@@ -141,7 +141,11 @@ fn comments(input: Span) -> IResult<Span, Comments> {
 
 pub fn get_comments(src_file_path: &str) -> Comments {
     let contents = std::fs::read_to_string(src_file_path).unwrap();
-    let span = Span::new(&contents);
+    get_comments_from_string(&contents)
+}
+
+pub fn get_comments_from_string(source_code: &str) -> Comments {
+    let span = Span::new(&source_code);
     let (_, result) = comments(span).unwrap();
     result
 }

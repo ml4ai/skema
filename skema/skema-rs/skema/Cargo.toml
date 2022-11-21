@@ -14,3 +14,7 @@ serde = { version = "1.0.1", features = ["derive"] }
 strum = "0.24"
 strum_macros = "0.24"
 rsmgclient = { git = "https://github.com/ml4ai/rsmgclient" }
+actix-web = "4.2.1"
+comment_extraction = { path = "../comment_extraction" }
+utoipa = { version = "2.3.0", features = ["actix_extras", "yaml", "debug"] }
+utoipa-swagger-ui = { version = "2", features = ["actix-web"] }

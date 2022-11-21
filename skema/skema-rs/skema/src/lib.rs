@@ -1,9 +1,10 @@
 // Inclusion of additional modules
 pub mod gromet_memgraph;
+pub mod services;
 
 // Stub for SKEMA library
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-use serde_json;
+
 use serde_json::Value; // for json
 use std::string::ToString;
 
@@ -255,18 +256,18 @@ fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Err
         Value::Array(vl) => {
             // need to construct an instance of the vector here then stringify it
             let vals = serde_json::to_string(&vl).unwrap();
-            format!("{}", vals)
+            vals
         } // this will encode the vector as a string, re-serializing will be more difficult though
         Value::Object(map) => {
             let f = format!("{:?}", map);
-            format!("{}", f)
+            f
         } // this handles if the map is encoded as a map, make sure this still works with character matching..
         Value::String(strng) => {
             let mut it = strng.chars().peekable();
             let c = if let Some(&c) = it.peek() { c } else { '_' };
             match c {
                 '{' => {
-                    format!("{}", strng) // This handles if the map is encoded as a string
+                    strng.to_string() // This handles if the map is encoded as a string
                 }
                 _ => {
                     format!("{:?}", strng)
@@ -326,15 +327,15 @@ mod tests {
     use super::*;
     use std::fs;
 
-    fn test_roundtrip_serialization(path_example: &str) -> () {
+    fn test_roundtrip_serialization(path_example: &str) {
         let mut file_contents = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: Gromet = serde_json::from_str(&file_contents).expect("Unable to parse");
         let mut res_serialized = serde_json::to_string(&res).unwrap();
 
         // processing the imported data
-        file_contents = file_contents.replace("\n", "").replace(" ", "");
-        res_serialized = res_serialized.replace("\n", "").replace(" ", "");
+        file_contents = file_contents.replace('\n', "").replace(' ', "");
+        res_serialized = res_serialized.replace('\n', "").replace(' ', "");
 
         assert_eq!(res_serialized, file_contents);
     }
