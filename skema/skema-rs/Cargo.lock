@@ -342,13 +342,13 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.0.14"
+version = "4.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6ea54a38e4bce14ff6931c72e5b3c43da7051df056913d4e7e1fcdb1c03df69d"
+checksum = "2148adefda54e14492fb9bddcc600b4344c5d1a3123bd666dcb939c6f0e0e57e"
 dependencies = [
  "atty",
  "bitflags",
- "clap_derive 4.0.13",
+ "clap_derive 4.0.21",
  "clap_lex 0.3.0",
  "once_cell",
  "strsim",
@@ -370,9 +370,9 @@ dependencies = [
 
 [[package]]
 name = "clap_derive"
-version = "4.0.13"
+version = "4.0.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c42f169caba89a7d512b5418b09864543eeb4d497416c917d7137863bd2076ad"
+checksum = "0177313f9f02afc995627906bbd8967e2be069f5261954222dac78290c2b9014"
 dependencies = [
  "heck",
  "proc-macro-error",
@@ -783,7 +783,7 @@ dependencies = [
 name = "mathml"
 version = "0.1.0"
 dependencies = [
- "clap 4.0.14",
+ "clap 4.0.26",
  "nom",
  "nom_locate",
  "petgraph",
@@ -1247,6 +1247,7 @@ name = "skema"
 version = "0.1.0"
 dependencies = [
  "actix-web",
+ "clap 4.0.26",
  "comment_extraction",
  "serde",
  "serde_json",
