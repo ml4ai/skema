@@ -171,6 +171,181 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 nodes.push(n1.clone());
                 edges.push(e1);
             }
+            FunctionType::Predicate => {
+                let n1 = Node {
+                    n_type: String::from("Predicate"),
+                    value: None,
+                    name: Some(format!("Predicate{}", start)),
+                    node_id: format!("n{}", start),
+                    out_idx: None,
+                    in_indx: None,
+                    contents: boxf.contents.unwrap(),
+                    nbox: bf_counter,
+                };
+                let e1 = Edge {
+                    src: String::from("mod"),
+                    tgt: format!("n{}", start),
+                    e_type: String::from("Contains"),
+                    prop: boxf.contents,
+                };
+                if !boxf.metadata.as_ref().is_none() {
+                    let e2 = Edge {
+                        src: format!("n{}", start),
+                        tgt: String::from("meta"),
+                        e_type: String::from("Metadata"),
+                        prop: boxf.metadata,
+                    };
+                    edges.push(e2);
+                } else {
+                }
+                nodes.push(n1.clone());
+                edges.push(e1);
+
+                // now travel to contents index of the attribute list (note it is 1 index,
+                // so contents=1 => attribute[0])
+                // create nodes and edges for this entry, include opo's and opi's
+                start += 1;
+                let idx = boxf.contents.unwrap() - 1;
+
+                let eboxf = gromet.attributes[idx as usize].clone();
+                // construct opo nodes, if not none
+                if !eboxf.value.opo.clone().is_none() {
+                    // grab name which is one level up and based on indexing
+                    let mut opo_name = "un-named";
+                    for port in gromet.r#fn.pof.as_ref().unwrap().iter() {
+                        if port.r#box == bf_counter {
+                            if !port.name.is_none() {
+                                opo_name = port.name.as_ref().unwrap();
+                            }
+                        }
+                    }
+                    let mut oport: u32 = 0;
+                    for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+                        let n2 = Node {
+                            n_type: String::from("Opo"),
+                            value: None,
+                            name: Some(String::from(opo_name)),
+                            node_id: format!("n{}", start),
+                            out_idx: Some([oport + 1].to_vec()),
+                            in_indx: None,
+                            contents: idx + 1,
+                            nbox: bf_counter,
+                        };
+                        nodes.push(n2.clone());
+                        // construct edge: expression -> Opo
+                        let e3 = Edge {
+                            src: n1.node_id.clone(),
+                            tgt: n2.node_id.clone(),
+                            e_type: String::from("Port_Of"),
+                            prop: None,
+                        };
+                        edges.push(e3);
+                        // construct any metadata edges
+                        if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                            .metadata
+                            .clone()
+                            .as_ref()
+                            .is_none()
+                        {
+                            let e4 = Edge {
+                                src: n2.node_id.clone(),
+                                tgt: String::from("meta"),
+                                e_type: String::from("Metadata"),
+                                prop: eboxf.value.opo.clone().unwrap()[oport as usize]
+                                    .metadata
+                                    .clone(),
+                            };
+                            edges.push(e4);
+                        } else {
+                        }
+                        start += 1;
+                        oport += 1;
+                    }
+                }
+                // construct opi nodes, in not none
+                if !eboxf.value.opi.clone().is_none() {
+                    // grab name which is NOT one level up as in opo and based on indexing
+                    let mut opi_name = "un-named";
+                    for port in eboxf.value.opi.as_ref().unwrap().iter() {
+                        if port.r#box == bf_counter {
+                            if !port.name.is_none() {
+                                opi_name = port.name.as_ref().unwrap();
+                            }
+                        }
+                    }
+                    let mut iport: u32 = 0;
+                    for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+                        let n2 = Node {
+                            n_type: String::from("Opi"),
+                            value: None,
+                            name: Some(String::from(opi_name)), // I think this naming will get messed up if there are multiple ports...
+                            node_id: format!("n{}", start),
+                            out_idx: None,
+                            in_indx: Some([iport + 1].to_vec()),
+                            contents: idx + 1,
+                            nbox: bf_counter,
+                        };
+                        nodes.push(n2.clone());
+                        // construct edge: expression -> Opo
+                        let e3 = Edge {
+                            src: n2.node_id.clone(),
+                            tgt: n1.node_id.clone(),
+                            e_type: String::from("Port_Of"),
+                            prop: None,
+                        };
+                        // construct metadata edge
+                        if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+                            .metadata
+                            .as_ref()
+                            .is_none()
+                        {
+                            let e4 = Edge {
+                                src: n2.node_id,
+                                tgt: String::from("meta"),
+                                e_type: String::from("Metadata"),
+                                prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
+                            };
+                            edges.push(e4);
+                        }
+                        edges.push(e3);
+                        start += 1;
+                        iport += 1;
+                    }
+                }
+                // now to construct the nodes inside the expression, Literal and Primitives
+                let mut box_counter: u8 = 1;
+                for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+                    match sboxf.function_type {
+                        FunctionType::Literal => {
+                            (nodes, edges) = create_att_literal(
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
+                        }
+                        FunctionType::Primitive => {
+                            (nodes, edges) = create_att_primitive(
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
+                        }
+                        _ => {}
+                    }
+                }
+            }
             FunctionType::Expression => {
                 let n1 = Node {
                     n_type: String::from("Expression"),
@@ -196,7 +371,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         prop: boxf.metadata,
                     };
                     edges.push(e2);
-                } else {
                 }
                 nodes.push(n1.clone());
                 edges.push(e1);
@@ -508,6 +682,20 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 let mut box_counter: u8 = 1;
                 for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
                     match sboxf.function_type {
+                        FunctionType::Predicate => {
+                            (nodes, edges, start) = create_att_predicate(
+                                &gromet.clone(),
+                                eboxf.clone(),
+                                sboxf.clone(),
+                                nodes.clone(),
+                                edges.clone(),
+                                n1.clone(),
+                                idx.clone(),
+                                box_counter.clone(),
+                                bf_counter.clone(),
+                                start.clone(),
+                            );
+                        }
                         FunctionType::Expression => {
                             (nodes, edges, start) = create_att_expression(
                                 &gromet.clone(),
@@ -638,6 +826,205 @@ pub fn create_att_expression(
         n_type: String::from("Expression"),
         value: None,
         name: Some(format!("Expression{}", start)),
+        node_id: format!("n{}", start),
+        out_idx: None,
+        in_indx: None,
+        contents: idx_in + 1,
+        nbox: bf_counter,
+    };
+    let e1 = Edge {
+        src: parent_node.node_id.clone(),
+        tgt: format!("n{}", start),
+        e_type: String::from("Contains"),
+        prop: Some(idx_in + 1),
+    };
+    if !ssboxf.metadata.as_ref().is_none() {
+        let e2 = Edge {
+            src: format!("n{}", start),
+            tgt: String::from("meta"),
+            e_type: String::from("Metadata"),
+            prop: ssboxf.metadata,
+        };
+        edges.push(e2);
+    } else {
+    }
+    nodes.push(n1.clone());
+    edges.push(e1);
+
+    // now travel to contents index of the attribute list (note it is 1 index,
+    // so contents=1 => attribute[0])
+    // create nodes and edges for this entry, include opo's and opi's
+    start += 1;
+    let idx = ssboxf.contents.unwrap() - 1;
+
+    let eboxf = gromet.attributes[idx as usize].clone();
+    // construct opo nodes, if not none
+    if !eboxf.value.opo.clone().is_none() {
+        // grab name which is one level up and based on indexing /* not supported yet */
+        let mut opo_name = "un-named";
+        /*for port in gromet.r#fn.pof.as_ref().unwrap().iter() {
+            if port.r#box == bf_counter {
+                if !port.name.is_none() {
+                    opo_name = port.name.as_ref().unwrap();
+                }
+            }
+        }*/
+        let mut oport: u32 = 0;
+        for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+            let n2 = Node {
+                n_type: String::from("Opo"),
+                value: None,
+                name: Some(String::from(opo_name)),
+                node_id: format!("n{}", start),
+                out_idx: Some([oport + 1].to_vec()),
+                in_indx: None,
+                contents: idx + 1,
+                nbox: bf_counter,
+            };
+            nodes.push(n2.clone());
+            // construct edge: expression -> Opo
+            let e3 = Edge {
+                src: n1.node_id.clone(),
+                tgt: n2.node_id.clone(),
+                e_type: String::from("Port_Of"),
+                prop: None,
+            };
+            edges.push(e3);
+            // construct any metadata edges
+            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                .metadata
+                .clone()
+                .as_ref()
+                .is_none()
+            {
+                let e4 = Edge {
+                    src: n2.node_id.clone(),
+                    tgt: String::from("meta"),
+                    e_type: String::from("Metadata"),
+                    prop: eboxf.value.opo.clone().unwrap()[oport as usize]
+                        .metadata
+                        .clone(),
+                };
+                edges.push(e4);
+            } else {
+            }
+            start += 1;
+            oport += 1;
+        }
+    }
+    // construct opi nodes, in not none
+    if !eboxf.value.opi.clone().is_none() {
+        // grab name which is NOT one level up as in opo and based on indexing
+        let mut opi_name = "un-named";
+        for port in eboxf.value.opi.as_ref().unwrap().iter() {
+            if port.r#box == bf_counter {
+                if !port.name.is_none() {
+                    opi_name = port.name.as_ref().unwrap();
+                }
+            }
+        }
+        let mut iport: u32 = 0;
+        for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+            let n2 = Node {
+                n_type: String::from("Opi"),
+                value: None,
+                name: Some(String::from(opi_name)), // I think this naming will get messed up if there are multiple ports...
+                node_id: format!("n{}", start),
+                out_idx: None,
+                in_indx: Some([iport + 1].to_vec()),
+                contents: idx + 1,
+                nbox: bf_counter,
+            };
+            nodes.push(n2.clone());
+            // construct edge: expression -> Opo
+            let e3 = Edge {
+                src: n2.node_id.clone(),
+                tgt: n1.node_id.clone(),
+                e_type: String::from("Port_Of"),
+                prop: None,
+            };
+            // construct metadata edge
+            if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+                .metadata
+                .as_ref()
+                .is_none()
+            {
+                let e4 = Edge {
+                    src: n2.node_id,
+                    tgt: String::from("meta"),
+                    e_type: String::from("Metadata"),
+                    prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
+                };
+                edges.push(e4);
+            }
+            edges.push(e3);
+            start += 1;
+            iport += 1;
+        }
+    }
+    // now to construct the nodes inside the expression, Literal and Primitives
+    let mut box_counter: u8 = 1;
+    for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+        match sboxf.function_type {
+            FunctionType::Literal => {
+                (nodes, edges) = create_att_literal(
+                    eboxf.clone(),
+                    sboxf.clone(),
+                    nodes.clone(),
+                    edges.clone(),
+                    n1.clone(),
+                    idx.clone(),
+                    box_counter.clone(),
+                    bf_counter.clone(),
+                    start.clone(),
+                );
+            }
+            FunctionType::Primitive => {
+                (nodes, edges) = create_att_primitive(
+                    eboxf.clone(),
+                    sboxf.clone(),
+                    nodes.clone(),
+                    edges.clone(),
+                    n1.clone(),
+                    idx.clone(),
+                    box_counter.clone(),
+                    bf_counter.clone(),
+                    start.clone(),
+                );
+            }
+            _ => {}
+        }
+        box_counter += 1;
+        start += 1;
+    }
+    // Now we perform the internal wiring of this branch
+    println!("made it internal wiring in attribute expression");
+    edges = internal_wiring(
+        eboxf.clone(),
+        nodes.clone(),
+        edges,
+        idx.clone(),
+        bf_counter.clone(),
+    );
+    return (nodes, edges, start);
+}
+
+pub fn create_att_predicate(
+    gromet: &Gromet,
+    eeboxf: Attribute,
+    ssboxf: GrometBox,
+    mut nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    parent_node: Node,
+    idx_in: u32,
+    box_counter: u8,
+    bf_counter: u8,
+    mut start: u32,
+) -> (Vec<Node>, Vec<Edge>, u32) {
+    let n1 = Node {
+        n_type: String::from("Predicate"),
+        value: None,
+        name: Some(format!("Predicate{}", start)),
         node_id: format!("n{}", start),
         out_idx: None,
         in_indx: None,
@@ -1253,63 +1640,71 @@ pub fn wfopi_cross_att_wiring(
         let src_pif = eboxf.value.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
         let src_opi_idx = src_pif.id.unwrap().clone(); // index of opi port in opi list in src sub module (also opi node in_indx value)
         let src_box = src_pif.r#box.clone(); // src sub module box number
-        let src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
-            .contents
-            .unwrap()
-            .clone(); // attribute index of submodule (also opi contents value)
-        let src_nbox = bf_counter; // nbox value of src opi
-                                   // collect information to identify the opi target node
-        let tgt_opi_idx = wire.tgt; // index of opi port in tgt function
-        let tgt_att = idx + 1; // attribute index of function
-        let tgt_nbox = bf_counter; // nbox value of tgt opi
 
-        // now to construct the wire
-        let mut wfopi_src_tgt: Vec<String> = vec![];
-        // find the src node
-        for node in nodes.iter() {
-            // make sure in correct box
-            if src_nbox == node.nbox {
-                // make sure only looking in current attribute nodes for srcs and tgts
-                if src_att == node.contents {
-                    // only opo's
-                    if node.n_type == "Opi" {
-                        // iterate through port to check for tgt
-                        for p in node.in_indx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
-                            if (src_opi_idx as u32) == *p {
-                                wfopi_src_tgt.push(node.node_id.clone());
+        // make sure it's a cross attributal wire and not internal
+        if !eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+            .contents
+            .clone()
+            .is_none()
+        {
+            let src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+                .contents
+                .unwrap()
+                .clone(); // attribute index of submodule (also opi contents value)
+            let src_nbox = bf_counter; // nbox value of src opi
+                                       // collect information to identify the opi target node
+            let tgt_opi_idx = wire.tgt; // index of opi port in tgt function
+            let tgt_att = idx + 1; // attribute index of function
+            let tgt_nbox = bf_counter; // nbox value of tgt opi
+
+            // now to construct the wire
+            let mut wfopi_src_tgt: Vec<String> = vec![];
+            // find the src node
+            for node in nodes.iter() {
+                // make sure in correct box
+                if src_nbox == node.nbox {
+                    // make sure only looking in current attribute nodes for srcs and tgts
+                    if src_att == node.contents {
+                        // only opo's
+                        if node.n_type == "Opi" {
+                            // iterate through port to check for tgt
+                            for p in node.in_indx.as_ref().unwrap().iter() {
+                                // push the src first, being pif
+                                if (src_opi_idx as u32) == *p {
+                                    wfopi_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        for node in nodes.iter() {
-            // make sure in correct box
-            if tgt_nbox == node.nbox {
-                // make sure only looking in current attribute nodes for srcs and tgts
-                if tgt_att == node.contents {
-                    // only opo's
-                    if node.n_type == "Opi" {
-                        // iterate through port to check for tgt
-                        for p in node.in_indx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
-                            if (tgt_opi_idx as u32) == *p {
-                                wfopi_src_tgt.push(node.node_id.clone());
+            for node in nodes.iter() {
+                // make sure in correct box
+                if tgt_nbox == node.nbox {
+                    // make sure only looking in current attribute nodes for srcs and tgts
+                    if tgt_att == node.contents {
+                        // only opo's
+                        if node.n_type == "Opi" {
+                            // iterate through port to check for tgt
+                            for p in node.in_indx.as_ref().unwrap().iter() {
+                                // push the src first, being pif
+                                if (tgt_opi_idx as u32) == *p {
+                                    wfopi_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        if wfopi_src_tgt.len() == 2 {
-            let e8 = Edge {
-                src: wfopi_src_tgt[0].clone(),
-                tgt: wfopi_src_tgt[1].clone(),
-                e_type: String::from("Wire"),
-                prop: None,
-            };
-            edges.push(e8);
+            if wfopi_src_tgt.len() == 2 {
+                let e8 = Edge {
+                    src: wfopi_src_tgt[0].clone(),
+                    tgt: wfopi_src_tgt[1].clone(),
+                    e_type: String::from("Wire"),
+                    prop: None,
+                };
+                edges.push(e8);
+            }
         }
     }
     return edges;
@@ -1329,63 +1724,71 @@ pub fn wfopo_cross_att_wiring(
         let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
         let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
         let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
-        let tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
-            .contents
-            .unwrap()
-            .clone(); // attribute index of submodule (also opo contents value)
-        let tgt_nbox = bf_counter; // nbox value of tgt opo
-                                   // collect information to identify the opo src node
-        let src_opo_idx = wire.src; // index of opo port in src function
-        let src_att = idx + 1; // attribute index of function
-        let src_nbox = bf_counter; // nbox value of tgt opo
 
-        // now to construct the wire
-        let mut wfopo_src_tgt: Vec<String> = vec![];
-        // find the src node
-        for node in nodes.iter() {
-            // make sure in correct box
-            if src_nbox == node.nbox {
-                // make sure only looking in current attribute nodes for srcs and tgts
-                if src_att == node.contents {
-                    // only opo's
-                    if node.n_type == "Opo" {
-                        // iterate through port to check for tgt
-                        for p in node.out_idx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
-                            if (src_opo_idx as u32) == *p {
-                                wfopo_src_tgt.push(node.node_id.clone());
+        // make sure its a cross attributal wiring and not an internal one
+        if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+            .contents
+            .clone()
+            .is_none()
+        {
+            let tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                .contents
+                .unwrap()
+                .clone(); // attribute index of submodule (also opo contents value)
+            let tgt_nbox = bf_counter; // nbox value of tgt opo
+                                       // collect information to identify the opo src node
+            let src_opo_idx = wire.src; // index of opo port in src function
+            let src_att = idx + 1; // attribute index of function
+            let src_nbox = bf_counter; // nbox value of tgt opo
+
+            // now to construct the wire
+            let mut wfopo_src_tgt: Vec<String> = vec![];
+            // find the src node
+            for node in nodes.iter() {
+                // make sure in correct box
+                if src_nbox == node.nbox {
+                    // make sure only looking in current attribute nodes for srcs and tgts
+                    if src_att == node.contents {
+                        // only opo's
+                        if node.n_type == "Opo" {
+                            // iterate through port to check for tgt
+                            for p in node.out_idx.as_ref().unwrap().iter() {
+                                // push the src first, being pif
+                                if (src_opo_idx as u32) == *p {
+                                    wfopo_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        for node in nodes.iter() {
-            // make sure in correct box
-            if tgt_nbox == node.nbox {
-                // make sure only looking in current attribute nodes for srcs and tgts
-                if tgt_att == node.contents {
-                    // only opo's
-                    if node.n_type == "Opo" {
-                        // iterate through port to check for tgt
-                        for p in node.out_idx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
-                            if (tgt_opo_idx as u32) == *p {
-                                wfopo_src_tgt.push(node.node_id.clone());
+            for node in nodes.iter() {
+                // make sure in correct box
+                if tgt_nbox == node.nbox {
+                    // make sure only looking in current attribute nodes for srcs and tgts
+                    if tgt_att == node.contents {
+                        // only opo's
+                        if node.n_type == "Opo" {
+                            // iterate through port to check for tgt
+                            for p in node.out_idx.as_ref().unwrap().iter() {
+                                // push the src first, being pif
+                                if (tgt_opo_idx as u32) == *p {
+                                    wfopo_src_tgt.push(node.node_id.clone());
+                                }
                             }
                         }
                     }
                 }
             }
-        }
-        if wfopo_src_tgt.len() == 2 {
-            let e8 = Edge {
-                src: wfopo_src_tgt[0].clone(),
-                tgt: wfopo_src_tgt[1].clone(),
-                e_type: String::from("Wire"),
-                prop: None,
-            };
-            edges.push(e8);
+            if wfopo_src_tgt.len() == 2 {
+                let e8 = Edge {
+                    src: wfopo_src_tgt[0].clone(),
+                    tgt: wfopo_src_tgt[1].clone(),
+                    e_type: String::from("Wire"),
+                    prop: None,
+                };
+                edges.push(e8);
+            }
         }
     }
     return edges;
@@ -1405,69 +1808,85 @@ pub fn wff_cross_att_wiring(
         let src_pif = eboxf.value.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
         let src_opi_idx = src_pif.id.unwrap().clone(); // index of opi port in opi list in src sub module (also opi node in_indx value)
         let src_box = src_pif.r#box.clone(); // src sub module box number
-        let src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
-            .contents
-            .unwrap()
-            .clone(); // attribute index of submodule (also opi contents value)
-        let src_nbox = bf_counter; // nbox value of src opi
-                                   // collect info to identify the opo tgt node
-        let tgt_idx = wire.tgt; // port index
-        let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
-        let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
-        let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
-        let tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
-            .contents
-            .unwrap()
-            .clone(); // attribute index of submodule (also opo contents value)
-        let tgt_nbox = bf_counter; // nbox value of tgt opo
 
-        // now to construct the wire
-        let mut wff_src_tgt: Vec<String> = vec![];
-        // find the src node
-        for node in nodes.iter() {
-            // make sure in correct box
-            if src_nbox == node.nbox {
-                // make sure only looking in current attribute nodes for srcs and tgts
-                if src_att == node.contents {
-                    // only opo's
-                    if node.n_type == "Opi" {
-                        // iterate through port to check for tgt
-                        for p in node.in_indx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
-                            if (src_opi_idx as u32) == *p {
-                                wff_src_tgt.push(node.node_id.clone());
+        // make sure its a cross attributal wiring and not an internal wire
+        if !eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+            .contents
+            .clone()
+            .is_none()
+        {
+            let src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+                .contents
+                .unwrap()
+                .clone(); // attribute index of submodule (also opi contents value)
+            let src_nbox = bf_counter; // nbox value of src opi
+                                       // collect info to identify the opo tgt node
+            let tgt_idx = wire.tgt; // port index
+            let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+            let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
+            let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
+
+            // make sure its a cross attributal wiring and not an internal wire
+            if eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                .contents
+                .clone()
+                .is_none()
+            {
+                let tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                    .contents
+                    .unwrap()
+                    .clone(); // attribute index of submodule (also opo contents value)
+                let tgt_nbox = bf_counter; // nbox value of tgt opo
+
+                // now to construct the wire
+                let mut wff_src_tgt: Vec<String> = vec![];
+                // find the src node
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if src_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if src_att == node.contents {
+                            // only opo's
+                            if node.n_type == "Opi" {
+                                // iterate through port to check for tgt
+                                for p in node.in_indx.as_ref().unwrap().iter() {
+                                    // push the src first, being pif
+                                    if (src_opi_idx as u32) == *p {
+                                        wff_src_tgt.push(node.node_id.clone());
+                                    }
+                                }
                             }
                         }
                     }
                 }
-            }
-        }
-        for node in nodes.iter() {
-            // make sure in correct box
-            if tgt_nbox == node.nbox {
-                // make sure only looking in current attribute nodes for srcs and tgts
-                if tgt_att == node.contents {
-                    // only opo's
-                    if node.n_type == "Opo" {
-                        // iterate through port to check for tgt
-                        for p in node.out_idx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
-                            if (tgt_opo_idx as u32) == *p {
-                                wff_src_tgt.push(node.node_id.clone());
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if tgt_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if tgt_att == node.contents {
+                            // only opo's
+                            if node.n_type == "Opo" {
+                                // iterate through port to check for tgt
+                                for p in node.out_idx.as_ref().unwrap().iter() {
+                                    // push the src first, being pif
+                                    if (tgt_opo_idx as u32) == *p {
+                                        wff_src_tgt.push(node.node_id.clone());
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                if wff_src_tgt.len() == 2 {
+                    let e8 = Edge {
+                        src: wff_src_tgt[0].clone(),
+                        tgt: wff_src_tgt[1].clone(),
+                        e_type: String::from("Wire"),
+                        prop: None,
+                    };
+                    edges.push(e8);
+                }
             }
-        }
-        if wff_src_tgt.len() == 2 {
-            let e8 = Edge {
-                src: wff_src_tgt[0].clone(),
-                tgt: wff_src_tgt[1].clone(),
-                e_type: String::from("Wire"),
-                prop: None,
-            };
-            edges.push(e8);
         }
     }
     return edges;
