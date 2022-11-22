@@ -2,7 +2,7 @@ use rsmgclient::{ConnectParams, Connection, MgError, Value};
 
 use crate::FunctionType;
 use crate::Gromet;
-use crate::{Attribute, GrometBox};
+use crate::{Attribute, FunctionNet, GrometBox};
 use std::process::Termination;
 
 pub enum NodeType {
@@ -344,7 +344,17 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         }
                         _ => {}
                     }
+                    box_counter += 1;
+                    start += 1;
                 }
+                // Now we perform the internal wiring of this branch
+                edges = internal_wiring(
+                    eboxf.clone(),
+                    nodes.clone(),
+                    edges,
+                    idx.clone(),
+                    bf_counter.clone(),
+                );
             }
             FunctionType::Expression => {
                 let n1 = Node {
@@ -771,12 +781,39 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
     // match contents field to box field on wff entries
     edges = external_wiring(&gromet, nodes.clone(), edges);
 
+    if !gromet.r#fn.bc.as_ref().is_none() {
+        let mut cond_counter = 0;
+        let temp_mod_node = Node {
+            n_type: String::from("module"),
+            value: None,
+            name: None, // I think this naming will get messed up if there are multiple ports...
+            node_id: format!("mod"),
+            out_idx: None,
+            in_indx: None,
+            contents: 0,
+            nbox: 0,
+        };
+        for cond in gromet.r#fn.bc.as_ref().unwrap().iter() {
+            // now lets check for and setup any conditionals at this level
+            (nodes, edges, start) = create_conditional(
+                gromet.r#fn.clone(), // This is gromet but is more generalizable based on scope
+                nodes.clone(),
+                edges.clone(),
+                temp_mod_node.clone(),
+                0,            // because top level
+                cond_counter, // This indexes the conditional in the list of conditionals (bc)
+                0,            // because top level
+                start.clone(),
+            );
+            cond_counter += 1;
+        }
+    }
     // convert every node object into a node query
     let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
         let mut value = String::from("b");
-
+        // println!("{:?}", node.clone());
         if node.name.is_none() {
             name = node.n_type.clone();
         } else {
@@ -808,6 +845,304 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
         }
     }
     return queries;
+}
+// this creates the framework for conditionals, including the conditional node, the pic and poc nodes and the cond, body_if and body_else edges
+// The iterator through the conditionals will need to be outside this funtion
+// currently crashing on making the conditional node
+pub fn create_conditional(
+    function_net: FunctionNet, // This is gromet but is more generalizable based on scope
+    mut nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    parent_node: Node,
+    idx_in: u32,       // This will index the attribute the conditional is in, if any
+    cond_counter: u32, // This indexes the conditional in the list of conditionals (bc)
+    bf_counter: u8,    // This indexes which box the conditional is under, if any
+    mut start: u32,
+) -> (Vec<Node>, Vec<Edge>, u32) {
+    let n1 = Node {
+        n_type: String::from("Conditional"),
+        value: None,
+        name: Some(format!("Conditional{}", start)),
+        node_id: format!("n{}", start),
+        out_idx: None,
+        in_indx: None,
+        contents: idx_in + 1,
+        nbox: bf_counter,
+    };
+    let e1 = Edge {
+        src: parent_node.node_id.clone(),
+        tgt: format!("n{}", start),
+        e_type: String::from("Contains"),
+        prop: Some(cond_counter),
+    };
+    if !function_net.bc.as_ref().unwrap()[cond_counter as usize]
+        .metadata
+        .as_ref()
+        .is_none()
+    {
+        let e2 = Edge {
+            src: format!("n{}", start),
+            tgt: String::from("meta"),
+            e_type: String::from("Metadata"),
+            prop: function_net.bc.as_ref().unwrap()[cond_counter as usize].metadata,
+        };
+        edges.push(e2);
+    }
+    nodes.push(n1.clone());
+    edges.push(e1);
+
+    start += 1;
+
+    // now we make the pic and poc ports and connect them to the conditional node
+    if !function_net.pic.is_none() {
+        let mut port_count = 1;
+        for pic in function_net.pic.as_ref().unwrap().iter() {
+            // grab name if it exists
+            let mut pic_name = String::from("Pic");
+            if !pic.name.as_ref().is_none() {
+                pic_name = pic.name.clone().unwrap();
+            }
+            // make the node
+            // get the input ports
+            let n2 = Node {
+                n_type: String::from("Pic"),
+                value: None,
+                name: Some(pic_name),
+                node_id: format!("n{}", start),
+                out_idx: None,
+                in_indx: Some([port_count].to_vec()),
+                contents: idx_in + 1,
+                nbox: bf_counter,
+            };
+            let e3 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("n{}", start),
+                e_type: String::from("Port_of"),
+                prop: None,
+            };
+            if !pic.metadata.as_ref().is_none() {
+                let e4 = Edge {
+                    src: format!("n{}", start),
+                    tgt: String::from("meta"),
+                    e_type: String::from("Metadata"),
+                    prop: pic.metadata,
+                };
+                edges.push(e4);
+            }
+            nodes.push(n2.clone());
+            edges.push(e3);
+
+            port_count += 1;
+            start += 1;
+        }
+    }
+    if !function_net.poc.is_none() {
+        let mut port_count = 1;
+        for poc in function_net.poc.as_ref().unwrap().iter() {
+            // grab name if it exists
+            let mut poc_name = String::from("Poc");
+            if !poc.name.as_ref().is_none() {
+                poc_name = poc.name.clone().unwrap();
+            }
+            // make the node
+            let n3 = Node {
+                n_type: String::from("Poc"),
+                value: None,
+                name: Some(poc_name),
+                node_id: format!("n{}", start),
+                out_idx: Some([port_count].to_vec()),
+                in_indx: None,
+                contents: idx_in + 1,
+                nbox: bf_counter,
+            };
+            let e5 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("n{}", start),
+                e_type: String::from("Port_of"),
+                prop: None,
+            };
+            if !poc.metadata.as_ref().is_none() {
+                let e6 = Edge {
+                    src: format!("n{}", start),
+                    tgt: String::from("meta"),
+                    e_type: String::from("Metadata"),
+                    prop: poc.metadata,
+                };
+                edges.push(e6);
+            }
+            nodes.push(n3.clone());
+            edges.push(e5);
+
+            port_count += 1;
+            start += 1;
+        }
+    }
+
+    // Now let's create the edges for the conditional condition and it's bodies
+    // find the nodes
+    // the contents is the node's attribute reference, so need to pull off of box's contents value
+    let mut condition_id = String::from("temp");
+    let mut body_if_id = String::from("temp");
+    let mut body_else_id = String::from("temp");
+    let cond_box = function_net.bc.as_ref().unwrap()[cond_counter as usize]
+        .condition
+        .clone()
+        .unwrap();
+    let body_if_box = function_net.bc.as_ref().unwrap()[cond_counter as usize]
+        .body_if
+        .clone()
+        .unwrap();
+    let body_else_box = function_net.bc.as_ref().unwrap()[cond_counter as usize]
+        .body_else
+        .clone()
+        .unwrap();
+    for node in nodes.clone() {
+        // make sure the node is in the same attribute as conditional
+        if node.contents.clone()
+            == function_net.bf.as_ref().unwrap()[(cond_box.clone() - 1) as usize]
+                .contents
+                .clone()
+                .unwrap()
+        {
+            // make sure box matches correctly
+            if (node.nbox.clone() as u32) == cond_box.clone() {
+                // make sure we don't pick up ports by only getting the predicate
+                if node.n_type == String::from("Predicate") {
+                    condition_id = node.node_id.clone();
+                }
+            }
+        }
+        if node.contents.clone()
+            == function_net.bf.as_ref().unwrap()[(body_if_box.clone() - 1) as usize]
+                .contents
+                .clone()
+                .unwrap()
+        {
+            // make sure box matches correctly
+            if (node.nbox.clone() as u32) == body_if_box.clone() {
+                // make sure we don't pick up ports by only getting the predicate
+                if node.n_type == String::from("Function") {
+                    body_if_id = node.node_id.clone();
+                }
+            }
+        }
+        if node.contents.clone()
+            == function_net.bf.as_ref().unwrap()[(body_else_box.clone() - 1) as usize]
+                .contents
+                .clone()
+                .unwrap()
+        {
+            // make sure box matches correctly
+            if (node.nbox.clone() as u32) == body_else_box.clone() {
+                // make sure we don't pick up ports by only getting the predicate
+                if node.n_type == String::from("Function") {
+                    body_else_id = node.node_id.clone();
+                }
+            }
+        }
+    }
+
+    // now we construct the edges
+    let e7 = Edge {
+        src: n1.node_id.clone(),
+        tgt: condition_id,
+        e_type: String::from("Condition"),
+        prop: None,
+    };
+    edges.push(e7);
+    let e8 = Edge {
+        src: n1.node_id.clone(),
+        tgt: body_if_id,
+        e_type: String::from("Body_if"),
+        prop: None,
+    };
+    edges.push(e8);
+    let e9 = Edge {
+        src: n1.node_id.clone(),
+        tgt: body_else_id,
+        e_type: String::from("Body_else"),
+        prop: None,
+    };
+    edges.push(e9);
+
+    // Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
+    for wire in function_net.wfc.as_ref().unwrap().iter() {
+        // collect info to identify the opi src node
+        let src_idx = wire.src; // port index
+        let src_att = idx_in + 1; // attribute index of submodule (also opi contents value)
+        let src_nbox = bf_counter; // nbox value of src opi
+        let src_pic_idx = src_idx;
+
+        let tgt_idx = wire.tgt; // port index
+        let tgt_pof = function_net.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+        let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
+        let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
+
+        let tgt_att = function_net.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+            .contents
+            .unwrap()
+            .clone(); // attribute index of submodule (also opo contents value)
+        let tgt_nbox = tgt_box; // nbox value of tgt opo
+                                // collect information to identify the opo src node
+
+        // now to construct the wire
+        let mut wfc_src_tgt: Vec<String> = vec![];
+        // find the src node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if src_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if src_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Pic" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_pic_idx as u32) == *p {
+                                wfc_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // missing the opo
+        println!(
+            "tgt_nbox: {}, tgt_att: {}, tgt_opo_idx: {}",
+            tgt_nbox, tgt_att, tgt_opo_idx
+        );
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_opo_idx as u32) == *p {
+                                wfc_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        println!("{:?}", wfc_src_tgt);
+        if wfc_src_tgt.len() == 2 {
+            let e8 = Edge {
+                src: wfc_src_tgt[0].clone(),
+                tgt: wfc_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e8);
+        }
+    }
+    // now to perform the wl_cargs wiring which is a connection from the condition's pof/opo to the pic
+
+    return (nodes, edges, start);
 }
 
 pub fn create_att_expression(
@@ -846,7 +1181,6 @@ pub fn create_att_expression(
             prop: ssboxf.metadata,
         };
         edges.push(e2);
-    } else {
     }
     nodes.push(n1.clone());
     edges.push(e1);
@@ -998,7 +1332,6 @@ pub fn create_att_expression(
         start += 1;
     }
     // Now we perform the internal wiring of this branch
-    println!("made it internal wiring in attribute expression");
     edges = internal_wiring(
         eboxf.clone(),
         nodes.clone(),
@@ -1124,7 +1457,7 @@ pub fn create_att_predicate(
         }
         let mut iport: u32 = 0;
         for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
-            let n2 = Node {
+            let n3 = Node {
                 n_type: String::from("Opi"),
                 value: None,
                 name: Some(String::from(opi_name)), // I think this naming will get messed up if there are multiple ports...
@@ -1134,10 +1467,10 @@ pub fn create_att_predicate(
                 contents: idx + 1,
                 nbox: bf_counter,
             };
-            nodes.push(n2.clone());
+            nodes.push(n3.clone());
             // construct edge: expression -> Opo
             let e3 = Edge {
-                src: n2.node_id.clone(),
+                src: n3.node_id.clone(),
                 tgt: n1.node_id.clone(),
                 e_type: String::from("Port_Of"),
                 prop: None,
@@ -1149,7 +1482,7 @@ pub fn create_att_predicate(
                 .is_none()
             {
                 let e4 = Edge {
-                    src: n2.node_id,
+                    src: n3.node_id,
                     tgt: String::from("meta"),
                     e_type: String::from("Metadata"),
                     prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
@@ -1161,11 +1494,13 @@ pub fn create_att_predicate(
             iport += 1;
         }
     }
-    // now to construct the nodes inside the expression, Literal and Primitives
+    // now to construct the nodes inside the predicate, Literal and Primitives
+    println!("{}", start);
     let mut box_counter: u8 = 1;
     for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
         match sboxf.function_type {
             FunctionType::Literal => {
+                println!("Predicate Literal: {}", start);
                 (nodes, edges) = create_att_literal(
                     eboxf.clone(),
                     sboxf.clone(),
@@ -1177,8 +1512,10 @@ pub fn create_att_predicate(
                     bf_counter.clone(),
                     start.clone(),
                 );
+                start += 1;
             }
             FunctionType::Primitive => {
+                println!("Predicate Primitive: {}", start);
                 (nodes, edges) = create_att_primitive(
                     eboxf.clone(),
                     sboxf.clone(),
@@ -1190,6 +1527,7 @@ pub fn create_att_predicate(
                     bf_counter.clone(),
                     start.clone(),
                 );
+                start += 1;
             }
             _ => {}
         }
@@ -1197,7 +1535,6 @@ pub fn create_att_predicate(
         start += 1;
     }
     // Now we perform the internal wiring of this branch
-    println!("made it internal wiring in attribute expression");
     edges = internal_wiring(
         eboxf.clone(),
         nodes.clone(),
@@ -1359,7 +1696,6 @@ pub fn wfopi_wiring(
                             for p in node.in_indx.as_ref().unwrap().iter() {
                                 // push the src first, being pif
                                 if (wire.src as u32) == *p {
-                                    println!("{:?}", node.clone());
                                     wfopi_src_tgt.push(node.node_id.clone());
                                 }
                             }
