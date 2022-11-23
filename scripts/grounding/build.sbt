@@ -15,9 +15,6 @@ ThisBuild / scalaVersion := crossScalaVersions.value.head
 
 resolvers ++= Seq(
   ("Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release").withAllowInsecureProtocol(true)
-//  Resolvers.localResolver,  // Reserve for Two Six.
-//  Resolvers.clulabResolver, // glove
-//  Resolvers.jitpackResolver // Ontologies
 )
 
 libraryDependencies ++= {
