@@ -1,8 +1,10 @@
+# Continuous integration
+
 kind: pipeline
 name: skema-rs
 
 steps:
-- name: test_rust
+- name: test_rust_components
   image: rust:latest
   commands:
   - cd skema/skema-rs

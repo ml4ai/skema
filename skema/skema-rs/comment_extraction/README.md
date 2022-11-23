@@ -1,4 +1,4 @@
-[Comment](Comment) extraction
+Comment extraction
 ==================
 
 This crate provides a library (`comment_extraction`) as well as a program
