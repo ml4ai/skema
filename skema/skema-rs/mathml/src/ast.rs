@@ -7,6 +7,7 @@ pub enum Operator {
     Equals,
     Divide,
     Subtract,
+    Sqrt,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -19,6 +20,7 @@ impl fmt::Display for Operator {
             Operator::Equals => write!(f, "{}", "="),
             Operator::Divide => write!(f, "{}", "/"),
             Operator::Subtract => write!(f, "{}", "-"),
+            Operator::Sqrt => write!(f, "{}", "√"),
             Operator::Other(op) => write!(f, "{}", op),
         }
     }
