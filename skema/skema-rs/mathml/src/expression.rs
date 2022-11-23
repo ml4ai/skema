@@ -88,7 +88,7 @@ impl Expr {
     fn group_expr(&mut self) {
         match self {
             Expr::Atom(_) => {}
-            Expr::Expression {op, args } => {
+            Expr::Expression { op, args } => {
                 let mut removed_idx = Vec::new();
                 let mut op_copy = op.clone();
                 let mut args_copy = args.clone();
@@ -352,6 +352,69 @@ fn test_to_expr5() {
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
+                }
+            }
+            println!("Success!");
+        }
+    }
+}
+
+#[test]
+#[ignore]
+fn test_to_expr6() {
+    let math_expression = Mrow(vec![
+        Mi("a".to_string()),
+        Mo(Operator::Add),
+        Mi("b".to_string()),
+        Mo(Operator::Multiply),
+        Mi("c".to_string()),
+        Mo(Operator::Multiply),
+        Mi("d".to_string()),
+        Mo(Operator::Divide),
+        Mi("e".to_string()),
+        Mo(Operator::Subtract),
+        Mi("f".to_string()),
+        Mo(Operator::Multiply),
+        Mi("g".to_string()),
+        Mo(Operator::Subtract),
+        Mi("h".to_string()),
+    ]);
+    let mut pre_exp = PreExp {
+        op: Vec::<Operator>::new(),
+        args: Vec::<Expr>::new(),
+    };
+    pre_exp.op.push(Operator::Other("root".to_string()));
+    math_expression.to_expr(&mut pre_exp);
+    pre_exp.group_expr();
+    println!();
+    match &pre_exp.args[0] {
+        Expr::Atom(_) => {}
+        Expr::Expression { op, args } => {
+            assert_eq!(op[0], Operator::Other("".to_string()));
+            assert_eq!(op[1], Operator::Add);
+            assert_eq!(op[2], Operator::Subtract);
+            assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
+            assert_eq!(args[3], Expr::Atom(Atom::Identifier("h".to_string())));
+            match &args[1] {
+                Expr::Atom(_) => {}
+                Expr::Expression { op, args } => {
+                    assert_eq!(op[0], Operator::Other("".to_string()));
+                    assert_eq!(op[1], Operator::Multiply);
+                    assert_eq!(op[2], Operator::Multiply);
+                    assert_eq!(op[3], Operator::Divide);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
+                    assert_eq!(args[2], Expr::Atom(Atom::Identifier("d".to_string())));
+                    assert_eq!(args[3], Expr::Atom(Atom::Identifier("e".to_string())));
+                }
+            }
+            match &args[2] {
+                Expr::Atom(_) => {}
+                Expr::Expression { op, args } => {
+                    assert_eq!(op[0], Operator::Other("".to_string()));
+                    assert_eq!(op[1], Operator::Multiply);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("f".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("g".to_string())));
                 }
             }
             println!("Success!");
