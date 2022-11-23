@@ -34,6 +34,7 @@ pub struct Node {
     pub in_indx: Option<Vec<u32>>, // opi or pif index
     pub contents: u32, // This indexes which index this node has inside the attribute list,
     pub nbox: u8,
+    pub metadata: Option<String>,
     // will be used for wiring between attribute level boxes, namely wff at the module level
 }
 
@@ -96,21 +97,17 @@ fn create_module(gromet: &Gromet) -> Vec<String> {
     let schema_version = format!("schema_version:{:?}", gromet.schema_version);
     let filename = format!("filename:{:?}", gromet.name);
     let name = format!("name:{:?}", gromet.r#fn.b[0].name.as_ref().unwrap());
+    let metadata_idx = gromet.r#fn.b[0].metadata.as_ref().unwrap();
+    let metadata = format!(
+        "{:?}",
+        gromet.metadata_collection.as_ref().unwrap()[(metadata_idx.clone() - 1) as usize][0]
+    );
 
     let node_query = format!(
-        "{} ({} {{{},{},{},{}}})",
-        create, node_label, schema, schema_version, filename, name
+        "{} ({} {{{},{},{},{},metadata:{:?}}})",
+        create, node_label, schema, schema_version, filename, name, metadata
     );
     queries.push(node_query);
-
-    let metadata_con = format!("{} (mod)-[mod1:Metadata]->(meta)", create);
-    queries.push(metadata_con);
-
-    let metadata_con_prop = format!(
-        "set mod1.index={:?}",
-        gromet.r#fn.b[0].metadata.as_ref().unwrap()
-    );
-    queries.push(metadata_con_prop);
 
     return queries;
 }
@@ -142,6 +139,15 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     }
                 } else {
                 }
+                let mut metadata = None;
+                if !boxf.metadata.as_ref().is_none() {
+                    let metadata_idx = boxf.metadata;
+                    metadata = Some(format!(
+                        "{:?}",
+                        gromet.metadata_collection.as_ref().unwrap()
+                            [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                    ));
+                }
                 let n1 = Node {
                     n_type: String::from("Literal"),
                     value: Some(format!("{:?}", boxf.value.clone().as_ref().unwrap())),
@@ -151,6 +157,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     in_indx: None,
                     contents: 0,
                     nbox: bf_counter,
+                    metadata: metadata,
                 };
                 let e1 = Edge {
                     src: String::from("mod"),
@@ -158,20 +165,19 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     e_type: String::from("Contains"),
                     prop: boxf.contents,
                 };
-                if !boxf.metadata.as_ref().is_none() {
-                    let e2 = Edge {
-                        src: format!("n{}", start),
-                        tgt: String::from("meta"),
-                        e_type: String::from("Metadata"),
-                        prop: boxf.metadata,
-                    };
-                    edges.push(e2);
-                } else {
-                }
                 nodes.push(n1.clone());
                 edges.push(e1);
             }
             FunctionType::Predicate => {
+                let mut metadata = None;
+                if !boxf.metadata.as_ref().is_none() {
+                    let metadata_idx = boxf.metadata;
+                    metadata = Some(format!(
+                        "{:?}",
+                        gromet.metadata_collection.as_ref().unwrap()
+                            [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                    ));
+                }
                 let n1 = Node {
                     n_type: String::from("Predicate"),
                     value: None,
@@ -181,6 +187,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     in_indx: None,
                     contents: boxf.contents.unwrap(),
                     nbox: bf_counter,
+                    metadata: metadata,
                 };
                 let e1 = Edge {
                     src: String::from("mod"),
@@ -188,16 +195,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     e_type: String::from("Contains"),
                     prop: boxf.contents,
                 };
-                if !boxf.metadata.as_ref().is_none() {
-                    let e2 = Edge {
-                        src: format!("n{}", start),
-                        tgt: String::from("meta"),
-                        e_type: String::from("Metadata"),
-                        prop: boxf.metadata,
-                    };
-                    edges.push(e2);
-                } else {
-                }
                 nodes.push(n1.clone());
                 edges.push(e1);
 
@@ -221,6 +218,22 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     }
                     let mut oport: u32 = 0;
                     for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+                        let mut metadata = None;
+                        if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                            .metadata
+                            .clone()
+                            .as_ref()
+                            .is_none()
+                        {
+                            let metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                                .metadata
+                                .clone();
+                            metadata = Some(format!(
+                                "{:?}",
+                                gromet.metadata_collection.as_ref().unwrap()
+                                    [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                            ));
+                        }
                         let n2 = Node {
                             n_type: String::from("Opo"),
                             value: None,
@@ -230,6 +243,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             in_indx: None,
                             contents: idx + 1,
                             nbox: bf_counter,
+                            metadata: metadata,
                         };
                         nodes.push(n2.clone());
                         // construct edge: expression -> Opo
@@ -241,23 +255,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         };
                         edges.push(e3);
                         // construct any metadata edges
-                        if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
-                            .metadata
-                            .clone()
-                            .as_ref()
-                            .is_none()
-                        {
-                            let e4 = Edge {
-                                src: n2.node_id.clone(),
-                                tgt: String::from("meta"),
-                                e_type: String::from("Metadata"),
-                                prop: eboxf.value.opo.clone().unwrap()[oport as usize]
-                                    .metadata
-                                    .clone(),
-                            };
-                            edges.push(e4);
-                        } else {
-                        }
                         start += 1;
                         oport += 1;
                     }
@@ -275,6 +272,22 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     }
                     let mut iport: u32 = 0;
                     for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+                        let mut metadata = None;
+                        if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+                            .metadata
+                            .clone()
+                            .as_ref()
+                            .is_none()
+                        {
+                            let metadata_idx = eboxf.value.opi.clone().unwrap()[iport as usize]
+                                .metadata
+                                .clone();
+                            metadata = Some(format!(
+                                "{:?}",
+                                gromet.metadata_collection.as_ref().unwrap()
+                                    [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                            ));
+                        }
                         let n2 = Node {
                             n_type: String::from("Opi"),
                             value: None,
@@ -284,6 +297,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             in_indx: Some([iport + 1].to_vec()),
                             contents: idx + 1,
                             nbox: bf_counter,
+                            metadata: metadata,
                         };
                         nodes.push(n2.clone());
                         // construct edge: expression -> Opo
@@ -294,19 +308,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             prop: None,
                         };
                         // construct metadata edge
-                        if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
-                            .metadata
-                            .as_ref()
-                            .is_none()
-                        {
-                            let e4 = Edge {
-                                src: n2.node_id,
-                                tgt: String::from("meta"),
-                                e_type: String::from("Metadata"),
-                                prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
-                            };
-                            edges.push(e4);
-                        }
                         edges.push(e3);
                         start += 1;
                         iport += 1;
@@ -318,6 +319,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     match sboxf.function_type {
                         FunctionType::Literal => {
                             (nodes, edges) = create_att_literal(
+                                &gromet.clone(),
                                 eboxf.clone(),
                                 sboxf.clone(),
                                 nodes.clone(),
@@ -331,6 +333,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         }
                         FunctionType::Primitive => {
                             (nodes, edges) = create_att_primitive(
+                                &gromet.clone(),
                                 eboxf.clone(),
                                 sboxf.clone(),
                                 nodes.clone(),
@@ -357,6 +360,15 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 );
             }
             FunctionType::Expression => {
+                let mut metadata = None;
+                if !boxf.metadata.as_ref().is_none() {
+                    let metadata_idx = boxf.metadata;
+                    metadata = Some(format!(
+                        "{:?}",
+                        gromet.metadata_collection.as_ref().unwrap()
+                            [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                    ));
+                }
                 let n1 = Node {
                     n_type: String::from("Expression"),
                     value: None,
@@ -366,6 +378,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     in_indx: None,
                     contents: boxf.contents.unwrap(),
                     nbox: bf_counter,
+                    metadata: metadata,
                 };
                 let e1 = Edge {
                     src: String::from("mod"),
@@ -373,15 +386,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     e_type: String::from("Contains"),
                     prop: boxf.contents,
                 };
-                if !boxf.metadata.as_ref().is_none() {
-                    let e2 = Edge {
-                        src: format!("n{}", start),
-                        tgt: String::from("meta"),
-                        e_type: String::from("Metadata"),
-                        prop: boxf.metadata,
-                    };
-                    edges.push(e2);
-                }
                 nodes.push(n1.clone());
                 edges.push(e1);
 
@@ -405,6 +409,22 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     }
                     let mut oport: u32 = 0;
                     for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+                        let mut metadata = None;
+                        if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                            .metadata
+                            .clone()
+                            .as_ref()
+                            .is_none()
+                        {
+                            let metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                                .metadata
+                                .clone();
+                            metadata = Some(format!(
+                                "{:?}",
+                                gromet.metadata_collection.as_ref().unwrap()
+                                    [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                            ));
+                        }
                         let n2 = Node {
                             n_type: String::from("Opo"),
                             value: None,
@@ -414,6 +434,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             in_indx: None,
                             contents: idx + 1,
                             nbox: bf_counter,
+                            metadata: metadata,
                         };
                         nodes.push(n2.clone());
                         // construct edge: expression -> Opo
@@ -425,27 +446,9 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         };
                         edges.push(e3);
                         // construct any metadata edges
-                        if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
-                            .metadata
-                            .clone()
-                            .as_ref()
-                            .is_none()
-                        {
-                            let e4 = Edge {
-                                src: n2.node_id.clone(),
-                                tgt: String::from("meta"),
-                                e_type: String::from("Metadata"),
-                                prop: eboxf.value.opo.clone().unwrap()[oport as usize]
-                                    .metadata
-                                    .clone(),
-                            };
-                            edges.push(e4);
-                        } else {
-                        }
                         start += 1;
                         oport += 1;
                     }
-                } else {
                 }
                 // construct opi nodes, in not none
                 if !eboxf.value.opi.clone().is_none() {
@@ -460,6 +463,22 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     }
                     let mut iport: u32 = 0;
                     for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+                        let mut metadata = None;
+                        if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+                            .metadata
+                            .clone()
+                            .as_ref()
+                            .is_none()
+                        {
+                            let metadata_idx = eboxf.value.opi.clone().unwrap()[iport as usize]
+                                .metadata
+                                .clone();
+                            metadata = Some(format!(
+                                "{:?}",
+                                gromet.metadata_collection.as_ref().unwrap()
+                                    [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                            ));
+                        }
                         let n2 = Node {
                             n_type: String::from("Opi"),
                             value: None,
@@ -469,6 +488,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             in_indx: Some([iport + 1].to_vec()),
                             contents: idx + 1,
                             nbox: bf_counter,
+                            metadata: metadata,
                         };
                         nodes.push(n2.clone());
                         // construct edge: expression -> Opo
@@ -479,19 +499,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             prop: None,
                         };
                         // construct metadata edge
-                        if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
-                            .metadata
-                            .as_ref()
-                            .is_none()
-                        {
-                            let e4 = Edge {
-                                src: n2.node_id,
-                                tgt: String::from("meta"),
-                                e_type: String::from("Metadata"),
-                                prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
-                            };
-                            edges.push(e4);
-                        }
                         edges.push(e3);
                         start += 1;
                         iport += 1;
@@ -503,6 +510,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     match sboxf.function_type {
                         FunctionType::Literal => {
                             (nodes, edges) = create_att_literal(
+                                &gromet.clone(),
                                 eboxf.clone(),
                                 sboxf.clone(),
                                 nodes.clone(),
@@ -516,6 +524,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         }
                         FunctionType::Primitive => {
                             (nodes, edges) = create_att_primitive(
+                                &gromet.clone(),
                                 eboxf.clone(),
                                 sboxf.clone(),
                                 nodes.clone(),
@@ -542,6 +551,15 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 );
             }
             FunctionType::Function => {
+                let mut metadata = None;
+                if !boxf.metadata.as_ref().is_none() {
+                    let metadata_idx = boxf.metadata;
+                    metadata = Some(format!(
+                        "{:?}",
+                        gromet.metadata_collection.as_ref().unwrap()
+                            [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                    ));
+                }
                 let n1 = Node {
                     n_type: String::from("Function"),
                     value: None,
@@ -551,6 +569,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     in_indx: None,
                     contents: boxf.contents.unwrap(),
                     nbox: bf_counter,
+                    metadata: metadata,
                 };
                 let e1 = Edge {
                     src: String::from("mod"),
@@ -558,16 +577,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     e_type: String::from("Contains"),
                     prop: boxf.contents,
                 };
-                if !boxf.metadata.as_ref().is_none() {
-                    let e2 = Edge {
-                        src: format!("n{}", start),
-                        tgt: String::from("meta"),
-                        e_type: String::from("Metadata"),
-                        prop: boxf.metadata,
-                    };
-                    edges.push(e2);
-                } else {
-                }
                 nodes.push(n1.clone());
                 edges.push(e1);
 
@@ -591,6 +600,22 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     }
                     let mut oport: u32 = 0;
                     for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+                        let mut metadata = None;
+                        if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                            .metadata
+                            .clone()
+                            .as_ref()
+                            .is_none()
+                        {
+                            let metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                                .metadata
+                                .clone();
+                            metadata = Some(format!(
+                                "{:?}",
+                                gromet.metadata_collection.as_ref().unwrap()
+                                    [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                            ));
+                        }
                         let n2 = Node {
                             n_type: String::from("Opo"),
                             value: None,
@@ -600,6 +625,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             in_indx: None,
                             contents: idx + 1,
                             nbox: bf_counter,
+                            metadata: metadata,
                         };
                         nodes.push(n2.clone());
                         // construct edge: expression -> Opo
@@ -611,23 +637,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         };
                         edges.push(e3);
                         // construct any metadata edges
-                        if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
-                            .metadata
-                            .clone()
-                            .as_ref()
-                            .is_none()
-                        {
-                            let e4 = Edge {
-                                src: n2.node_id.clone(),
-                                tgt: String::from("meta"),
-                                e_type: String::from("Metadata"),
-                                prop: eboxf.value.opo.clone().unwrap()[oport as usize]
-                                    .metadata
-                                    .clone(),
-                            };
-                            edges.push(e4);
-                        } else {
-                        }
                         start += 1;
                         oport += 1;
                     }
@@ -649,6 +658,22 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     }
                     let mut iport: u32 = 0;
                     for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+                        let mut metadata = None;
+                        if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+                            .metadata
+                            .clone()
+                            .as_ref()
+                            .is_none()
+                        {
+                            let metadata_idx = eboxf.value.opi.clone().unwrap()[iport as usize]
+                                .metadata
+                                .clone();
+                            metadata = Some(format!(
+                                "{:?}",
+                                gromet.metadata_collection.as_ref().unwrap()
+                                    [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                            ));
+                        }
                         let n2 = Node {
                             n_type: String::from("Opi"),
                             value: None,
@@ -658,6 +683,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             in_indx: Some([iport + 1].to_vec()),
                             contents: idx + 1,
                             nbox: bf_counter,
+                            metadata: metadata,
                         };
                         nodes.push(n2.clone());
                         // construct edge: expression -> Opo
@@ -668,20 +694,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                             prop: None,
                         };
                         // construct metadata edge
-                        if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
-                            .metadata
-                            .as_ref()
-                            .is_none()
-                        {
-                            let e4 = Edge {
-                                src: n2.node_id,
-                                tgt: String::from("meta"),
-                                e_type: String::from("Metadata"),
-                                prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
-                            };
-                            edges.push(e4);
-                        } else {
-                        }
                         edges.push(e3);
                         start += 1;
                         iport += 1;
@@ -722,6 +734,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         }
                         FunctionType::Literal => {
                             (nodes, edges) = create_att_literal(
+                                &gromet.clone(),
                                 eboxf.clone(),
                                 sboxf.clone(),
                                 nodes.clone(),
@@ -735,6 +748,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         }
                         FunctionType::Primitive => {
                             (nodes, edges) = create_att_primitive(
+                                &gromet.clone(),
                                 eboxf.clone(),
                                 sboxf.clone(),
                                 nodes.clone(),
@@ -792,10 +806,12 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
             in_indx: None,
             contents: 0,
             nbox: 0,
+            metadata: None,
         };
         for cond in gromet.r#fn.bc.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
             (nodes, edges, start) = create_conditional(
+                &gromet.clone(),
                 gromet.r#fn.clone(), // This is gromet but is more generalizable based on scope
                 nodes.clone(),
                 edges.clone(),
@@ -813,6 +829,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
     for node in nodes.iter() {
         let mut name = String::from("a");
         let mut value = String::from("b");
+        let mut metadata = String::from("c");
         // println!("{:?}", node.clone());
         if node.name.is_none() {
             name = node.n_type.clone();
@@ -824,9 +841,14 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
         } else {
             value = format!("{}", node.value.as_ref().unwrap());
         }
+        if node.metadata.is_none() {
+            metadata = String::from("None");
+        } else {
+            metadata = format!("{}", node.metadata.as_ref().unwrap());
+        }
         let node_query = format!(
-            "{} ({}:{} {{name:{:?},value:{:?}}})",
-            create, node.node_id, node.n_type, name, value
+            "{} ({}:{} {{name:{:?},value:{:?},metadata:{:?}}})",
+            create, node.node_id, node.n_type, name, value, metadata
         );
         queries.push(node_query);
     }
@@ -850,6 +872,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
 // The iterator through the conditionals will need to be outside this funtion
 // currently crashing on making the conditional node
 pub fn create_conditional(
+    gromet: &Gromet,
     function_net: FunctionNet, // This is gromet but is more generalizable based on scope
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -859,6 +882,19 @@ pub fn create_conditional(
     bf_counter: u8,    // This indexes which box the conditional is under, if any
     mut start: u32,
 ) -> (Vec<Node>, Vec<Edge>, u32) {
+    let mut metadata = None;
+    if !function_net.bc.as_ref().unwrap()[cond_counter as usize]
+        .metadata
+        .as_ref()
+        .is_none()
+    {
+        let metadata_idx = function_net.bc.as_ref().unwrap()[cond_counter as usize].metadata;
+        metadata = Some(format!(
+            "{:?}",
+            gromet.metadata_collection.as_ref().unwrap()
+                [(metadata_idx.unwrap().clone() - 1) as usize][0]
+        ));
+    }
     let n1 = Node {
         n_type: String::from("Conditional"),
         value: None,
@@ -868,6 +904,7 @@ pub fn create_conditional(
         in_indx: None,
         contents: idx_in + 1,
         nbox: bf_counter,
+        metadata: metadata,
     };
     let e1 = Edge {
         src: parent_node.node_id.clone(),
@@ -875,19 +912,6 @@ pub fn create_conditional(
         e_type: String::from("Contains"),
         prop: Some(cond_counter),
     };
-    if !function_net.bc.as_ref().unwrap()[cond_counter as usize]
-        .metadata
-        .as_ref()
-        .is_none()
-    {
-        let e2 = Edge {
-            src: format!("n{}", start),
-            tgt: String::from("meta"),
-            e_type: String::from("Metadata"),
-            prop: function_net.bc.as_ref().unwrap()[cond_counter as usize].metadata,
-        };
-        edges.push(e2);
-    }
     nodes.push(n1.clone());
     edges.push(e1);
 
@@ -904,6 +928,15 @@ pub fn create_conditional(
             }
             // make the node
             // get the input ports
+            let mut metadata = None;
+            if !pic.metadata.as_ref().is_none() {
+                let metadata_idx = pic.metadata;
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
             let n2 = Node {
                 n_type: String::from("Pic"),
                 value: None,
@@ -913,6 +946,7 @@ pub fn create_conditional(
                 in_indx: Some([port_count].to_vec()),
                 contents: idx_in + 1,
                 nbox: bf_counter,
+                metadata: metadata,
             };
             let e3 = Edge {
                 src: n1.node_id.clone(),
@@ -920,15 +954,6 @@ pub fn create_conditional(
                 e_type: String::from("Port_of"),
                 prop: None,
             };
-            if !pic.metadata.as_ref().is_none() {
-                let e4 = Edge {
-                    src: format!("n{}", start),
-                    tgt: String::from("meta"),
-                    e_type: String::from("Metadata"),
-                    prop: pic.metadata,
-                };
-                edges.push(e4);
-            }
             nodes.push(n2.clone());
             edges.push(e3);
 
@@ -945,6 +970,15 @@ pub fn create_conditional(
                 poc_name = poc.name.clone().unwrap();
             }
             // make the node
+            let mut metadata = None;
+            if !poc.metadata.as_ref().is_none() {
+                let metadata_idx = poc.metadata;
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
             let n3 = Node {
                 n_type: String::from("Poc"),
                 value: None,
@@ -954,6 +988,7 @@ pub fn create_conditional(
                 in_indx: None,
                 contents: idx_in + 1,
                 nbox: bf_counter,
+                metadata: metadata,
             };
             let e5 = Edge {
                 src: n1.node_id.clone(),
@@ -961,15 +996,6 @@ pub fn create_conditional(
                 e_type: String::from("Port_of"),
                 prop: None,
             };
-            if !poc.metadata.as_ref().is_none() {
-                let e6 = Edge {
-                    src: format!("n{}", start),
-                    tgt: String::from("meta"),
-                    e_type: String::from("Metadata"),
-                    prop: poc.metadata,
-                };
-                edges.push(e6);
-            }
             nodes.push(n3.clone());
             edges.push(e5);
 
@@ -1464,6 +1490,15 @@ pub fn create_att_expression(
     bf_counter: u8,
     mut start: u32,
 ) -> (Vec<Node>, Vec<Edge>, u32) {
+    let mut metadata = None;
+    if !ssboxf.metadata.as_ref().is_none() {
+        let metadata_idx = ssboxf.metadata;
+        metadata = Some(format!(
+            "{:?}",
+            gromet.metadata_collection.as_ref().unwrap()
+                [(metadata_idx.unwrap().clone() - 1) as usize][0]
+        ));
+    }
     let n1 = Node {
         n_type: String::from("Expression"),
         value: None,
@@ -1473,6 +1508,7 @@ pub fn create_att_expression(
         in_indx: None,
         contents: idx_in + 1,
         nbox: bf_counter,
+        metadata: metadata,
     };
     let e1 = Edge {
         src: parent_node.node_id.clone(),
@@ -1480,15 +1516,6 @@ pub fn create_att_expression(
         e_type: String::from("Contains"),
         prop: Some(idx_in + 1),
     };
-    if !ssboxf.metadata.as_ref().is_none() {
-        let e2 = Edge {
-            src: format!("n{}", start),
-            tgt: String::from("meta"),
-            e_type: String::from("Metadata"),
-            prop: ssboxf.metadata,
-        };
-        edges.push(e2);
-    }
     nodes.push(n1.clone());
     edges.push(e1);
 
@@ -1512,6 +1539,22 @@ pub fn create_att_expression(
         }*/
         let mut oport: u32 = 0;
         for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+            let mut metadata = None;
+            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                .metadata
+                .clone()
+                .as_ref()
+                .is_none()
+            {
+                let metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                    .metadata
+                    .clone();
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
             let n2 = Node {
                 n_type: String::from("Opo"),
                 value: None,
@@ -1521,6 +1564,7 @@ pub fn create_att_expression(
                 in_indx: None,
                 contents: idx + 1,
                 nbox: bf_counter,
+                metadata: metadata,
             };
             nodes.push(n2.clone());
             // construct edge: expression -> Opo
@@ -1532,23 +1576,6 @@ pub fn create_att_expression(
             };
             edges.push(e3);
             // construct any metadata edges
-            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
-                .metadata
-                .clone()
-                .as_ref()
-                .is_none()
-            {
-                let e4 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: String::from("meta"),
-                    e_type: String::from("Metadata"),
-                    prop: eboxf.value.opo.clone().unwrap()[oport as usize]
-                        .metadata
-                        .clone(),
-                };
-                edges.push(e4);
-            } else {
-            }
             start += 1;
             oport += 1;
         }
@@ -1566,6 +1593,22 @@ pub fn create_att_expression(
         }
         let mut iport: u32 = 0;
         for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+            let mut metadata = None;
+            if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+                .metadata
+                .clone()
+                .as_ref()
+                .is_none()
+            {
+                let metadata_idx = eboxf.value.opi.clone().unwrap()[iport as usize]
+                    .metadata
+                    .clone();
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
             let n2 = Node {
                 n_type: String::from("Opi"),
                 value: None,
@@ -1575,6 +1618,7 @@ pub fn create_att_expression(
                 in_indx: Some([iport + 1].to_vec()),
                 contents: idx + 1,
                 nbox: bf_counter,
+                metadata: metadata,
             };
             nodes.push(n2.clone());
             // construct edge: expression -> Opo
@@ -1584,20 +1628,6 @@ pub fn create_att_expression(
                 e_type: String::from("Port_Of"),
                 prop: None,
             };
-            // construct metadata edge
-            if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
-                .metadata
-                .as_ref()
-                .is_none()
-            {
-                let e4 = Edge {
-                    src: n2.node_id,
-                    tgt: String::from("meta"),
-                    e_type: String::from("Metadata"),
-                    prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
-                };
-                edges.push(e4);
-            }
             edges.push(e3);
             start += 1;
             iport += 1;
@@ -1609,6 +1639,7 @@ pub fn create_att_expression(
         match sboxf.function_type {
             FunctionType::Literal => {
                 (nodes, edges) = create_att_literal(
+                    &gromet.clone(),
                     eboxf.clone(),
                     sboxf.clone(),
                     nodes.clone(),
@@ -1622,6 +1653,7 @@ pub fn create_att_expression(
             }
             FunctionType::Primitive => {
                 (nodes, edges) = create_att_primitive(
+                    &gromet.clone(),
                     eboxf.clone(),
                     sboxf.clone(),
                     nodes.clone(),
@@ -1661,6 +1693,15 @@ pub fn create_att_predicate(
     bf_counter: u8,
     mut start: u32,
 ) -> (Vec<Node>, Vec<Edge>, u32) {
+    let mut metadata = None;
+    if !ssboxf.metadata.as_ref().is_none() {
+        let metadata_idx = ssboxf.metadata;
+        metadata = Some(format!(
+            "{:?}",
+            gromet.metadata_collection.as_ref().unwrap()
+                [(metadata_idx.unwrap().clone() - 1) as usize][0]
+        ));
+    }
     let n1 = Node {
         n_type: String::from("Predicate"),
         value: None,
@@ -1670,6 +1711,7 @@ pub fn create_att_predicate(
         in_indx: None,
         contents: idx_in + 1,
         nbox: bf_counter,
+        metadata: metadata,
     };
     let e1 = Edge {
         src: parent_node.node_id.clone(),
@@ -1677,16 +1719,6 @@ pub fn create_att_predicate(
         e_type: String::from("Contains"),
         prop: Some(idx_in + 1),
     };
-    if !ssboxf.metadata.as_ref().is_none() {
-        let e2 = Edge {
-            src: format!("n{}", start),
-            tgt: String::from("meta"),
-            e_type: String::from("Metadata"),
-            prop: ssboxf.metadata,
-        };
-        edges.push(e2);
-    } else {
-    }
     nodes.push(n1.clone());
     edges.push(e1);
 
@@ -1710,6 +1742,22 @@ pub fn create_att_predicate(
         }*/
         let mut oport: u32 = 0;
         for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+            let mut metadata = None;
+            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                .metadata
+                .clone()
+                .as_ref()
+                .is_none()
+            {
+                let metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                    .metadata
+                    .clone();
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
             let n2 = Node {
                 n_type: String::from("Opo"),
                 value: None,
@@ -1719,6 +1767,7 @@ pub fn create_att_predicate(
                 in_indx: None,
                 contents: idx + 1,
                 nbox: bf_counter,
+                metadata: metadata,
             };
             nodes.push(n2.clone());
             // construct edge: expression -> Opo
@@ -1729,24 +1778,6 @@ pub fn create_att_predicate(
                 prop: None,
             };
             edges.push(e3);
-            // construct any metadata edges
-            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
-                .metadata
-                .clone()
-                .as_ref()
-                .is_none()
-            {
-                let e4 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: String::from("meta"),
-                    e_type: String::from("Metadata"),
-                    prop: eboxf.value.opo.clone().unwrap()[oport as usize]
-                        .metadata
-                        .clone(),
-                };
-                edges.push(e4);
-            } else {
-            }
             start += 1;
             oport += 1;
         }
@@ -1764,6 +1795,22 @@ pub fn create_att_predicate(
         }
         let mut iport: u32 = 0;
         for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+            let mut metadata = None;
+            if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+                .metadata
+                .clone()
+                .as_ref()
+                .is_none()
+            {
+                let metadata_idx = eboxf.value.opi.clone().unwrap()[iport as usize]
+                    .metadata
+                    .clone();
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
             let n3 = Node {
                 n_type: String::from("Opi"),
                 value: None,
@@ -1773,6 +1820,7 @@ pub fn create_att_predicate(
                 in_indx: Some([iport + 1].to_vec()),
                 contents: idx + 1,
                 nbox: bf_counter,
+                metadata: metadata,
             };
             nodes.push(n3.clone());
             // construct edge: expression -> Opo
@@ -1782,20 +1830,6 @@ pub fn create_att_predicate(
                 e_type: String::from("Port_Of"),
                 prop: None,
             };
-            // construct metadata edge
-            if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
-                .metadata
-                .as_ref()
-                .is_none()
-            {
-                let e4 = Edge {
-                    src: n3.node_id,
-                    tgt: String::from("meta"),
-                    e_type: String::from("Metadata"),
-                    prop: eboxf.value.opi.clone().unwrap()[iport as usize].metadata,
-                };
-                edges.push(e4);
-            }
             edges.push(e3);
             start += 1;
             iport += 1;
@@ -1809,6 +1843,7 @@ pub fn create_att_predicate(
             FunctionType::Literal => {
                 println!("Predicate Literal: {}", start);
                 (nodes, edges) = create_att_literal(
+                    &gromet.clone(),
                     eboxf.clone(),
                     sboxf.clone(),
                     nodes.clone(),
@@ -1824,6 +1859,7 @@ pub fn create_att_predicate(
             FunctionType::Primitive => {
                 println!("Predicate Primitive: {}", start);
                 (nodes, edges) = create_att_primitive(
+                    &gromet.clone(),
                     eboxf.clone(),
                     sboxf.clone(),
                     nodes.clone(),
@@ -1853,6 +1889,7 @@ pub fn create_att_predicate(
 }
 
 pub fn create_att_literal(
+    gromet: &Gromet,
     eboxf: Attribute,
     sboxf: GrometBox,
     mut nodes: Vec<Node>,
@@ -1876,6 +1913,15 @@ pub fn create_att_literal(
         }
     }
     // now make the node with the port information
+    let mut metadata = None;
+    if !sboxf.metadata.is_none() {
+        let metadata_idx = sboxf.metadata.clone();
+        metadata = Some(format!(
+            "{:?}",
+            gromet.metadata_collection.as_ref().unwrap()
+                [(metadata_idx.unwrap().clone() - 1) as usize][0]
+        ));
+    }
     let n3 = Node {
         n_type: String::from("Literal"),
         value: Some(format!("{:?}", sboxf.value.clone().as_ref().unwrap())),
@@ -1885,6 +1931,7 @@ pub fn create_att_literal(
         in_indx: None, // literals should only have out ports
         contents: idx + 1,
         nbox: bf_counter,
+        metadata: metadata,
     };
     nodes.push(n3.clone());
     // make edge connecting to expression
@@ -1895,20 +1942,12 @@ pub fn create_att_literal(
         prop: None,
     };
     edges.push(e4);
-    // now add a metadata edge
-    if !sboxf.metadata.is_none() {
-        let e5 = Edge {
-            src: n3.node_id,
-            tgt: String::from("meta"),
-            e_type: String::from("Metadata"),
-            prop: sboxf.metadata.clone(),
-        };
-        edges.push(e5);
-    }
+
     return (nodes, edges);
 }
 
 pub fn create_att_primitive(
+    gromet: &Gromet,
     eboxf: Attribute,
     sboxf: GrometBox,
     mut nodes: Vec<Node>,
@@ -1944,6 +1983,15 @@ pub fn create_att_primitive(
     } else {
     }
     // now make the node with the port information
+    let mut metadata = None;
+    if !sboxf.metadata.is_none() {
+        let metadata_idx = sboxf.metadata.clone();
+        metadata = Some(format!(
+            "{:?}",
+            gromet.metadata_collection.as_ref().unwrap()
+                [(metadata_idx.unwrap().clone() - 1) as usize][0]
+        ));
+    }
     let n3 = Node {
         n_type: String::from("Primitive"),
         value: None,
@@ -1953,6 +2001,7 @@ pub fn create_att_primitive(
         in_indx: Some(pif),
         contents: idx + 1,
         nbox: bf_counter,
+        metadata: metadata,
     };
     nodes.push(n3.clone());
     // make edge connecting to expression
@@ -1963,16 +2012,6 @@ pub fn create_att_primitive(
         prop: None,
     };
     edges.push(e4);
-    // now add a metadata edge
-    if !sboxf.metadata.clone().is_none() {
-        let e5 = Edge {
-            src: n3.node_id.clone(),
-            tgt: String::from("meta"),
-            e_type: String::from("Metadata"),
-            prop: sboxf.metadata.clone(),
-        };
-        edges.push(e5);
-    }
     return (nodes, edges);
 }
 
@@ -2643,7 +2682,7 @@ pub fn parse_gromet_queries(gromet: Gromet) -> Vec<String> {
 
     let mut start: u32 = 0;
 
-    queries.append(&mut create_metadata_node(&gromet));
+    // queries.append(&mut create_metadata_node(&gromet));
     queries.append(&mut create_module(&gromet));
     queries.append(&mut create_function_net(&gromet, start));
 
