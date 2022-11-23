@@ -795,6 +795,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
     // match contents field to box field on wff entries
     edges = external_wiring(&gromet, nodes.clone(), edges);
 
+    // make conditionals if they exist
     if !gromet.r#fn.bc.as_ref().is_none() {
         let mut cond_counter = 0;
         let temp_mod_node = Node {
@@ -822,6 +823,36 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 start.clone(),
             );
             cond_counter += 1;
+        }
+    }
+    // make conditionals if they exist
+    if !gromet.r#fn.bl.as_ref().is_none() {
+        let mut while_counter = 0;
+        let temp_mod_node = Node {
+            n_type: String::from("module"),
+            value: None,
+            name: None, // I think this naming will get messed up if there are multiple ports...
+            node_id: format!("mod"),
+            out_idx: None,
+            in_indx: None,
+            contents: 0,
+            nbox: 0,
+            metadata: None,
+        };
+        for while_l in gromet.r#fn.bl.as_ref().unwrap().iter() {
+            // now lets check for and setup any conditionals at this level
+            (nodes, edges, start) = create_while_loop(
+                &gromet.clone(),
+                gromet.r#fn.clone(), // This is gromet but is more generalizable based on scope
+                nodes.clone(),
+                edges.clone(),
+                temp_mod_node.clone(),
+                0,             // because top level
+                while_counter, // This indexes the conditional in the list of conditionals (bc)
+                0,             // because top level
+                start.clone(),
+            );
+            while_counter += 1;
         }
     }
     // convert every node object into a node query
@@ -870,7 +901,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
 }
 // this creates the framework for conditionals, including the conditional node, the pic and poc nodes and the cond, body_if and body_else edges
 // The iterator through the conditionals will need to be outside this funtion
-// currently crashing on making the conditional node
 pub fn create_conditional(
     gromet: &Gromet,
     function_net: FunctionNet, // This is gromet but is more generalizable based on scope
@@ -1470,6 +1500,495 @@ pub fn create_conditional(
                 prop: None,
             };
             edges.push(e13);
+        }
+        poc_counter += 1;
+    }
+    // might still need pass through wiring??
+
+    return (nodes, edges, start);
+}
+
+pub fn create_while_loop(
+    gromet: &Gromet,
+    function_net: FunctionNet, // This is gromet but is more generalizable based on scope
+    mut nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    parent_node: Node,
+    idx_in: u32,       // This will index the attribute the conditional is in, if any
+    cond_counter: u32, // This indexes the conditional in the list of conditionals (bc)
+    bf_counter: u8,    // This indexes which box the conditional is under, if any
+    mut start: u32,
+) -> (Vec<Node>, Vec<Edge>, u32) {
+    let mut metadata = None;
+    if !function_net.bl.as_ref().unwrap()[cond_counter as usize]
+        .metadata
+        .as_ref()
+        .is_none()
+    {
+        let metadata_idx = function_net.bl.as_ref().unwrap()[cond_counter as usize].metadata;
+        metadata = Some(format!(
+            "{:?}",
+            gromet.metadata_collection.as_ref().unwrap()
+                [(metadata_idx.unwrap().clone() - 1) as usize][0]
+        ));
+    }
+    let n1 = Node {
+        n_type: String::from("While_Loop"),
+        value: None,
+        name: Some(format!("While{}", start)),
+        node_id: format!("n{}", start),
+        out_idx: None,
+        in_indx: None,
+        contents: idx_in + 1,
+        nbox: bf_counter,
+        metadata: metadata,
+    };
+    let e1 = Edge {
+        src: parent_node.node_id.clone(),
+        tgt: format!("n{}", start),
+        e_type: String::from("Contains"),
+        prop: Some(cond_counter),
+    };
+    nodes.push(n1.clone());
+    edges.push(e1);
+
+    start += 1;
+
+    // now we make the pic and poc ports and connect them to the conditional node
+    if !function_net.pil.is_none() {
+        let mut port_count = 1;
+        for pic in function_net.pil.as_ref().unwrap().iter() {
+            // grab name if it exists
+            let mut pic_name = String::from("Pil");
+            if !pic.name.as_ref().is_none() {
+                pic_name = pic.name.clone().unwrap();
+            }
+            // make the node
+            // get the input ports
+            let mut metadata = None;
+            if !pic.metadata.as_ref().is_none() {
+                let metadata_idx = pic.metadata;
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
+            let n2 = Node {
+                n_type: String::from("Pil"),
+                value: None,
+                name: Some(pic_name),
+                node_id: format!("n{}", start),
+                out_idx: None,
+                in_indx: Some([port_count].to_vec()),
+                contents: idx_in + 1,
+                nbox: bf_counter,
+                metadata: metadata,
+            };
+            let e3 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("n{}", start),
+                e_type: String::from("Port_of"),
+                prop: None,
+            };
+            nodes.push(n2.clone());
+            edges.push(e3);
+
+            port_count += 1;
+            start += 1;
+        }
+    }
+    if !function_net.pol.is_none() {
+        let mut port_count = 1;
+        for poc in function_net.pol.as_ref().unwrap().iter() {
+            // grab name if it exists
+            let mut poc_name = String::from("Pol");
+            if !poc.name.as_ref().is_none() {
+                poc_name = poc.name.clone().unwrap();
+            }
+            // make the node
+            let mut metadata = None;
+            if !poc.metadata.as_ref().is_none() {
+                let metadata_idx = poc.metadata;
+                metadata = Some(format!(
+                    "{:?}",
+                    gromet.metadata_collection.as_ref().unwrap()
+                        [(metadata_idx.unwrap().clone() - 1) as usize][0]
+                ));
+            }
+            let n3 = Node {
+                n_type: String::from("Pol"),
+                value: None,
+                name: Some(poc_name),
+                node_id: format!("n{}", start),
+                out_idx: Some([port_count].to_vec()),
+                in_indx: None,
+                contents: idx_in + 1,
+                nbox: bf_counter,
+                metadata: metadata,
+            };
+            let e5 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("n{}", start),
+                e_type: String::from("Port_of"),
+                prop: None,
+            };
+            nodes.push(n3.clone());
+            edges.push(e5);
+
+            port_count += 1;
+            start += 1;
+        }
+    }
+
+    // Now let's create the edges for the conditional condition and it's bodies
+    // find the nodes
+    // the contents is the node's attribute reference, so need to pull off of box's contents value
+    let mut condition_id = String::from("temp");
+    let mut body_if_id = String::from("temp");
+    let cond_box = function_net.bl.as_ref().unwrap()[cond_counter as usize]
+        .condition
+        .clone()
+        .unwrap();
+    let body_if_box = function_net.bl.as_ref().unwrap()[cond_counter as usize]
+        .body
+        .clone()
+        .unwrap();
+    for node in nodes.clone() {
+        // make sure the node is in the same attribute as conditional
+        if node.contents.clone()
+            == function_net.bf.as_ref().unwrap()[(cond_box.clone() - 1) as usize]
+                .contents
+                .clone()
+                .unwrap()
+        {
+            // make sure box matches correctly
+            if (node.nbox.clone() as u32) == cond_box.clone() {
+                // make sure we don't pick up ports by only getting the predicate
+                if node.n_type == String::from("Predicate") {
+                    condition_id = node.node_id.clone();
+                }
+            }
+        }
+        if node.contents.clone()
+            == function_net.bf.as_ref().unwrap()[(body_if_box.clone() - 1) as usize]
+                .contents
+                .clone()
+                .unwrap()
+        {
+            // make sure box matches correctly
+            if (node.nbox.clone() as u32) == body_if_box.clone() {
+                // make sure we don't pick up ports by only getting the predicate
+                if node.n_type == String::from("Function") {
+                    body_if_id = node.node_id.clone();
+                }
+            }
+        }
+    }
+
+    // now we construct the edges
+    let e7 = Edge {
+        src: n1.node_id.clone(),
+        tgt: condition_id,
+        e_type: String::from("Condition"),
+        prop: None,
+    };
+    edges.push(e7);
+    let e8 = Edge {
+        src: n1.node_id.clone(),
+        tgt: body_if_id,
+        e_type: String::from("Body"),
+        prop: None,
+    };
+    edges.push(e8);
+
+    // Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
+    for wire in function_net.wfl.as_ref().unwrap().iter() {
+        // collect info to identify the opi src node
+        let src_idx = wire.src; // port index
+        let src_att = idx_in + 1; // attribute index of submodule (also opi contents value)
+        let src_nbox = bf_counter; // nbox value of src opi
+        let src_pil_idx = src_idx;
+
+        let tgt_idx = wire.tgt; // port index
+        let tgt_pof = function_net.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+        let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
+        let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
+
+        let tgt_att = function_net.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+            .contents
+            .unwrap()
+            .clone(); // attribute index of submodule (also opo contents value)
+        let tgt_nbox = tgt_box; // nbox value of tgt opo
+                                // collect information to identify the opo src node
+
+        // now to construct the wire
+        let mut wfl_src_tgt: Vec<String> = vec![];
+        // find the src node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if src_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if src_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Pil" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_pil_idx as u32) == *p {
+                                wfl_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_opo_idx as u32) == *p {
+                                wfl_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if wfl_src_tgt.len() == 2 {
+            let e8 = Edge {
+                src: wfl_src_tgt[0].clone(),
+                tgt: wfl_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e8);
+        }
+    }
+    // now to perform the wl_cargs wiring which is a connection from the condition's pif/opi to the pic
+    for wire in function_net.wl_cargs.as_ref().unwrap().iter() {
+        // collect info to identify the opi src node
+        let src_idx = wire.src; // port index, this points into bc I think
+        let src_pif = function_net.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // attribute index of submodule (also opi contents value)
+        let src_opi_idx = src_pif.id.unwrap().clone();
+        let src_box = src_pif.r#box.clone(); // nbox value of src opi
+        let src_att = function_net.bf.as_ref().unwrap()[(src_box - 1) as usize]
+            .contents
+            .unwrap()
+            .clone();
+        let src_nbox = src_box;
+
+        let tgt_idx = wire.tgt; // port index
+        let tgt_pil = function_net.pil.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+        let tgt_box = bf_counter; // tgt sub module box number
+
+        let tgt_att = idx_in + 1; // attribute index of submodule (also opo contents value)
+        let tgt_nbox = tgt_box; // nbox value of tgt opo
+        let tgt_pil_idx = tgt_idx;
+
+        // now to construct the wire
+        let mut wl_cargs_src_tgt: Vec<String> = vec![];
+        // find the src node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if src_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if src_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Opi" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_opi_idx as u32) == *p {
+                                wl_cargs_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Pil" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_pil_idx as u32) == *p {
+                                wl_cargs_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if wl_cargs_src_tgt.len() == 2 {
+            let e9 = Edge {
+                src: wl_cargs_src_tgt[0].clone(),
+                tgt: wl_cargs_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e9);
+        }
+    }
+
+    // now to make the implicit wires that go from pics -> pifs/opis and pofs/opos -> pocs.
+    // first we will iterate through the pics
+    let mut pic_counter = 1;
+    for pic in function_net.pil.as_ref().unwrap().iter() {
+        // collect info to identify the opi src node
+        // Each pic is the target there will then be 2 srcs one for each wire, one going to "if" and one to "else"
+
+        // first up we setup the if wire
+        let src_if_box = function_net.bl.as_ref().unwrap()[0].body.unwrap().clone(); // get the box in the body if statement
+        let src_if_att = function_net.bf.as_ref().unwrap()[(src_if_box - 1) as usize]
+            .contents
+            .unwrap()
+            .clone(); // get the attribute this box lives in
+        let src_if_nbox = src_if_box;
+        let src_if_pif = function_net.pif.as_ref().unwrap()[(pic_counter - 1) as usize].clone(); // grab the pif that matches the pic were are on
+        let src_if_opi_idx = src_if_pif.id.unwrap().clone();
+
+        // setting up the pic is straight forward
+        let tgt_idx = pic_counter; // port index
+        let tgt_box = bf_counter; // tgt sub module box number
+        let tgt_att = idx_in + 1; // attribute index of submodule (also opo contents value)
+        let tgt_nbox = tgt_box; // nbox value of tgt opo
+        let tgt_pil_idx = tgt_idx;
+
+        // now to construct the if wire
+        let mut if_pil_src_tgt: Vec<String> = vec![];
+        // find the src if node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if src_if_nbox == (node.nbox as u32) {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if src_if_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Opi" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_if_opi_idx as u32) == *p {
+                                if_pil_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // find the tgt pic that is the same for both wires
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Pil" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_pil_idx as u32) == *p {
+                                if_pil_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if if_pil_src_tgt.len() == 2 {
+            let e10 = Edge {
+                src: if_pil_src_tgt[0].clone(),
+                tgt: if_pil_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e10);
+        }
+        pic_counter += 1;
+    }
+
+    // now we construct the output wires for the bodies
+    let mut poc_counter = 1;
+    for poc in function_net.pol.as_ref().unwrap().iter() {
+        // collect info to identify the opi src node
+        // Each pic is the target there will then be 2 srcs one for each wire, one going to "if" and one to "else"
+
+        // first up we setup the if wire
+        let tgt_if_box = function_net.bl.as_ref().unwrap()[0].body.unwrap().clone(); // get the box in the body if statement
+        let tgt_if_att = function_net.bf.as_ref().unwrap()[(tgt_if_box - 1) as usize]
+            .contents
+            .unwrap()
+            .clone(); // get the attribute this box lives in
+        let tgt_if_nbox = tgt_if_box;
+        let tgt_if_pof = function_net.pof.as_ref().unwrap()[(pic_counter - 1) as usize].clone(); // grab the pif that matches the pic were are on
+        let tgt_if_opo_idx = tgt_if_pof.id.unwrap().clone();
+
+        // setting up the pic is straight forward
+        let src_idx = poc_counter; // port index
+        let src_box = bf_counter; // tgt sub module box number
+        let src_att = idx_in + 1; // attribute index of submodule (also opo contents value)
+        let src_nbox = src_box; // nbox value of tgt opo
+        let src_pol_idx = src_idx;
+
+        // now to construct the if wire
+        let mut if_pol_src_tgt: Vec<String> = vec![];
+        // find the src if node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if src_nbox == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if src_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Pol" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_pol_idx as u32) == *p {
+                                if_pol_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // find the tgt node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_if_nbox == (node.nbox as u32) {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_if_att == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_if_opo_idx as u32) == *p {
+                                if_pol_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if if_pol_src_tgt.len() == 2 {
+            let e12 = Edge {
+                src: if_pol_src_tgt[0].clone(),
+                tgt: if_pol_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e12);
         }
         poc_counter += 1;
     }
