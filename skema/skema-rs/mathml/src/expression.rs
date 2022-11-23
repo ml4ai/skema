@@ -4,6 +4,7 @@ use crate::ast::{
     Operator,
 };
 use crate::ast::MathExpression::{Mfrac, Msqrt};
+use std::cmp::Reverse;
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -87,37 +88,82 @@ impl Expr {
     fn group_expr(mut self) {
         match self {
             Expr::Atom(_) => {}
-            Expr::Expression { op, args } => {
-                let mut md_op_idx: Vec<usize> = Vec::new();
-                if op.len() > 1 {
-                    for o in 0..=self.op.len() {
-                        if self.op[o] == Operator::Multiply || self.op[o] == Operator::Divide {
-                            md_op_idx.push(o);
-                        }
-                    }
-                    let mut op_copy = op.clone();
-                    let mut args_copy = args.clone();
-                    // combine consecutive * / terms as a new expression term
-                    let mut pre_moi = -1;
+            Expr::Expression { mut op, mut args } => {
+                let mut removed_idx = Vec::new();
+                let mut op_copy = op.clone();
+                let mut args_copy = args.clone();
+                if op.len() > 2 {
+                    let mut start_idx: i32 = -1;
+                    let mut end_idx: i32 = -1;
                     let mut new_exp = Expr::Expression {
-                                op: Vec::<Operator>::new(),
-                                args: Vec::<Expr>::new(),
-                            };
-                    for moi in md_op_idx {
-                        if moi == -1 || (moi != -1 && moi - pre_moi > 1) {
-                            new_exp = Expr::Expression {
-                                op: Vec::<Operator>::new(),
-                                args: Vec::<Expr>::new(),
-                            };
-                        }
-                        pre_moi = moi;
-                        match &mut new_exp {
-                            Expr::Atom(_) => {}
-                            Expr::Expression { op, args } => {
-                                op.push(op_copy[moi].clone());
-                                args.push(args_copy[moi].clone());
+                        op: vec![Operator::Other("".to_string())],
+                        args: Vec::<Expr>::new(),
+                    };
+                    for o in 0..=op.len() - 1 {
+                        if op[o] == Operator::Multiply || op[o] == Operator::Divide {
+                            removed_idx.push(o.clone());
+                            if start_idx == -1 {
+                                start_idx = o as i32;
+                                end_idx = o as i32;
+                                match &mut new_exp {
+                                    Expr::Atom(_) => {}
+                                    Expr::Expression { op, args } => {
+                                        op.push(op_copy[o].clone());
+                                        args.push(args_copy[o - 1].clone());
+                                        args.push(args_copy[o].clone());
+                                    }
+                                }
+                            } else if o as i32 - end_idx == 1 {
+                                end_idx = o as i32;
+                                match &mut new_exp {
+                                    Expr::Atom(_) => {}
+                                    Expr::Expression { op, args } => {
+                                        op.push(op_copy[o].clone());
+                                        args.push(args_copy[o].clone())
+                                    }
+                                }
+                            } else {
+                                args[start_idx as usize - 1] = new_exp.clone();
+                                new_exp = Expr::Expression {
+                                    op: vec![Operator::Other("".to_string())],
+                                    args: Vec::<Expr>::new(),
+                                };
+                                match &mut new_exp {
+                                    Expr::Atom(_) => {}
+                                    Expr::Expression { op, args } => {
+                                        op.push(op_copy[o].clone());
+                                        args.push(args_copy[o - 1].clone());
+                                        args.push(args_copy[o].clone());
+                                    }
+                                }
+                                start_idx = o as i32;
+                                end_idx = o as i32;
                             }
                         }
+                    }
+
+                    if removed_idx.len() == op.len() - 1 {
+                        return;
+                    }
+
+                    match &mut new_exp {
+                        Expr::Atom(_) => {}
+                        Expr::Expression { op, .. } => {
+                            if op.len() != 0 {
+                                args[start_idx as usize - 1] = new_exp.clone();
+                            }
+                        }
+                    }
+                    for ri in removed_idx.iter().rev() {
+                        op.remove(*ri);
+                        args.remove(*ri);
+                    }
+                }
+
+                for mut arg in args {
+                    match arg {
+                        Expr::Atom(_) => {}
+                        Expr::Expression { .. } => { arg.group_expr(); }
                     }
                 }
             }
@@ -127,21 +173,12 @@ impl Expr {
 
 impl PreExp {
     fn group_expr(mut self) {
-        let mut md_op_idx: Vec<usize> = Vec::new();
-        if self.op.len() > 1 {
-            for o in 0..=self.op.len() {
-                if self.op[o] == Operator::Multiply || self.op[o] == Operator::Divide {
-                    md_op_idx.push(o);
-                }
+        for mut arg in self.args {
+            match arg {
+                Expr::Atom(_) => {}
+                Expr::Expression { .. } => { arg.group_expr(); }
             }
-            // combine consecutive * / terms as a new expression term
         }
-
-
-        match &self.args[0] {
-            Expr::Atom(_) => {}
-            Expr::Expression { op, args } => {}
-        };
     }
 }
 
@@ -300,17 +337,18 @@ fn test_to_expr5() {
     };
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
-
-    match &pre_exp.args[0] {
-        Expr::Atom(_) => {}
-        Expr::Expression { op, args } => {
-            assert_eq!(op[0], Operator::Other("".to_string()));
-            assert_eq!(op[1], Operator::Add);
-            assert_eq!(op[2], Operator::Multiply);
-            assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
-            assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
-            assert_eq!(args[2], Expr::Atom(Atom::Identifier("c".to_string())));
-            println!("Success!");
-        }
-    }
+    pre_exp.group_expr();
+    println!();
+    // match &pre_exp.args[0] {
+    //     Expr::Atom(_) => {}
+    //     Expr::Expression { op, args } => {
+    //         assert_eq!(op[0], Operator::Other("".to_string()));
+    //         assert_eq!(op[1], Operator::Add);
+    //         assert_eq!(op[2], Operator::Multiply);
+    //         assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
+    //         assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
+    //         assert_eq!(args[2], Expr::Atom(Atom::Identifier("c".to_string())));
+    //         println!("Success!");
+    //     }
+    // }
 }
