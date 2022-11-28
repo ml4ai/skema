@@ -585,19 +585,11 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 // create nodes and edges for this entry, include opo's and opi's
                 start += 1;
                 let idx = boxf.contents.unwrap() - 1;
-                // opi not wiring to internal literal
                 let eboxf = gromet.attributes[idx as usize].clone();
                 // construct opo nodes, if not none
                 if !eboxf.value.opo.clone().is_none() {
                     // grab name which is one level up and based on indexing
                     let mut opo_name = "un-named";
-                    for port in gromet.r#fn.pof.as_ref().unwrap().iter() {
-                        if port.r#box == bf_counter {
-                            if !port.name.is_none() {
-                                opo_name = port.name.as_ref().unwrap();
-                            }
-                        }
-                    }
                     let mut oport: u32 = 0;
                     for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
                         let mut metadata = None;
@@ -615,6 +607,15 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                                 gromet.metadata_collection.as_ref().unwrap()
                                     [(metadata_idx.unwrap().clone() - 1) as usize][0]
                             ));
+                        }
+                        for port in gromet.r#fn.pof.as_ref().unwrap().iter() {
+                            if port.r#box == bf_counter {
+                                if oport == (port.id.unwrap() as u32 - 1) {
+                                    if !port.name.is_none() {
+                                        opo_name = port.name.as_ref().unwrap();
+                                    }
+                                }
+                            }
                         }
                         let n2 = Node {
                             n_type: String::from("Opo"),
@@ -640,22 +641,12 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                         start += 1;
                         oport += 1;
                     }
-                } else {
                 }
                 // construct opi nodes, in not none
                 if !eboxf.value.opi.clone().is_none() {
                     // grab name which is NOT one level up as in opo and based on indexing
                     let mut opi_name = "un-named";
                     let mut port_count: usize = 0;
-                    for port in eboxf.value.opi.as_ref().unwrap().iter() {
-                        if gromet.r#fn.pif.as_ref().unwrap()[port_count].r#box.clone() == bf_counter
-                        {
-                            if !port.name.is_none() {
-                                opi_name = port.name.as_ref().unwrap();
-                            }
-                        }
-                        port_count += 1;
-                    }
                     let mut iport: u32 = 0;
                     for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
                         let mut metadata = None;
@@ -673,6 +664,15 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                                 gromet.metadata_collection.as_ref().unwrap()
                                     [(metadata_idx.unwrap().clone() - 1) as usize][0]
                             ));
+                        }
+                        for port in gromet.r#fn.pif.as_ref().unwrap().iter() {
+                            if port.r#box == bf_counter {
+                                if iport == (port.id.unwrap() as u32 - 1) {
+                                    if !port.name.is_none() {
+                                        opi_name = port.name.as_ref().unwrap();
+                                    }
+                                }
+                            }
                         }
                         let n2 = Node {
                             n_type: String::from("Opi"),
@@ -1278,7 +1278,12 @@ pub fn create_conditional(
             .unwrap()
             .clone(); // get the attribute this box lives in
         let src_if_nbox = src_if_box;
-        let src_if_pif = function_net.pif.as_ref().unwrap()[(pic_counter - 1) as usize].clone(); // grab the pif that matches the pic were are on
+        let src_if_pif = gromet.attributes[(src_if_att - 1) as usize]
+            .value
+            .opi
+            .as_ref()
+            .unwrap()[(pic_counter - 1) as usize]
+            .clone(); // grab the pif that matches the pic were are on
         let src_if_opi_idx = src_if_pif.id.unwrap().clone();
 
         // now we setup the else wire
@@ -1399,7 +1404,12 @@ pub fn create_conditional(
             .unwrap()
             .clone(); // get the attribute this box lives in
         let tgt_if_nbox = tgt_if_box;
-        let tgt_if_pof = function_net.pof.as_ref().unwrap()[(pic_counter - 1) as usize].clone(); // grab the pif that matches the pic were are on
+        let tgt_if_pof = gromet.attributes[(tgt_if_att - 1) as usize]
+            .value
+            .opo
+            .as_ref()
+            .unwrap()[(poc_counter - 1) as usize]
+            .clone(); // grab the pif that matches the pic were are on
         let tgt_if_opo_idx = tgt_if_pof.id.unwrap().clone();
 
         // now we setup the else wire
@@ -1856,7 +1866,12 @@ pub fn create_while_loop(
             .unwrap()
             .clone(); // get the attribute this box lives in
         let src_if_nbox = src_if_box;
-        let src_if_pif = function_net.pif.as_ref().unwrap()[(pic_counter - 1) as usize].clone(); // grab the pif that matches the pic were are on
+        let src_if_pif = gromet.attributes[(src_if_att - 1) as usize]
+            .value
+            .opi
+            .as_ref()
+            .unwrap()[(pic_counter - 1) as usize]
+            .clone(); // grab the pif that matches the pic were are on
         let src_if_opi_idx = src_if_pif.id.unwrap().clone();
 
         // setting up the pic is straight forward
@@ -1931,7 +1946,12 @@ pub fn create_while_loop(
             .unwrap()
             .clone(); // get the attribute this box lives in
         let tgt_if_nbox = tgt_if_box;
-        let tgt_if_pof = function_net.pof.as_ref().unwrap()[(pic_counter - 1) as usize].clone(); // grab the pif that matches the pic were are on
+        let tgt_if_pof = gromet.attributes[(tgt_if_att - 1) as usize]
+            .value
+            .opo
+            .as_ref()
+            .unwrap()[(poc_counter - 1) as usize]
+            .clone(); // grab the pif that matches the pic were are on
         let tgt_if_opo_idx = tgt_if_pof.id.unwrap().clone();
 
         // setting up the pic is straight forward
@@ -2730,6 +2750,70 @@ pub fn wff_wiring(
     }
     return edges;
 }
+
+pub fn wopio_wiring(
+    eboxf: Attribute,
+    nodes: Vec<Node>,
+    mut edges: Vec<Edge>,
+    idx: u32,
+    bf_counter: u8,
+) -> Vec<Edge> {
+    // iterate through all wires of type
+    for wire in eboxf.value.wopio.unwrap().iter() {
+        let mut wopio_src_tgt: Vec<String> = vec![];
+        // find the src node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (wire.src as u32) == *p {
+                                wopio_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        // finding the tgt node
+        for node in nodes.iter() {
+            // make sure in correct box
+            if bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if (idx + 1) == node.contents {
+                    // only include nodes with pofs
+                    if node.out_idx.is_none() {
+                        // only opi's
+                        if node.n_type == "Opi" {
+                            // iterate through port to check for src
+                            for p in node.in_indx.as_ref().unwrap().iter() {
+                                // push the tgt
+                                if (wire.tgt as u32) == *p {
+                                    wopio_src_tgt.push(node.node_id.clone());
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if wopio_src_tgt.len() == 2 {
+            let e7 = Edge {
+                src: wopio_src_tgt[0].clone(),
+                tgt: wopio_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e7);
+        }
+    }
+    return edges;
+}
 pub fn internal_wiring(
     eboxf: Attribute,
     nodes: Vec<Node>,
@@ -2743,6 +2827,7 @@ pub fn internal_wiring(
     // wfopi: pif -> opi
     // wff: pif -> pof
     // wfopo: opo -> pof
+    // wopio: opo -> opi
 
     // check if wire exists, wfopi
     if !eboxf.value.wfopi.clone().is_none() {
@@ -2776,6 +2861,18 @@ pub fn internal_wiring(
             bf_counter.clone(),
         );
     }
+
+    // check if wire exists, wopio
+    if !eboxf.value.wopio.is_none() {
+        edges = wopio_wiring(
+            eboxf.clone(),
+            nodes.clone(),
+            edges,
+            idx.clone(),
+            bf_counter.clone(),
+        );
+    }
+
     return edges;
 }
 pub fn cross_att_wiring(
