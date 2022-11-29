@@ -3094,7 +3094,7 @@ pub fn wfopo_cross_att_wiring(
 // this will construct connections from the sub function modules opi's to another sub module opo's, tracing data inside the function
 // opi(sub)->opo(sub)
 pub fn wff_cross_att_wiring(
-    eboxf: Attribute, // This is the current attribute
+    eboxf: Attribute, // This is the current attribute, should be the function if in a function
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,       // this +1 is the current attribute index
@@ -3106,8 +3106,7 @@ pub fn wff_cross_att_wiring(
         let src_pif = eboxf.value.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
         let src_opi_idx = src_pif.id.unwrap().clone(); // index of opi port in opi list in src sub module (also opi node in_indx value)
         let src_box = src_pif.r#box.clone(); // src sub module box number
-
-        // make sure its a cross attributal wiring and not an internal wire
+                                             // make sure its a cross attributal wiring and not an internal wire
         if !eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
             .contents
             .clone()
@@ -3123,9 +3122,8 @@ pub fn wff_cross_att_wiring(
             let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
             let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
             let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
-
-            // make sure its a cross attributal wiring and not an internal wire
-            if eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                                                 // make sure its a cross attributal wiring and not an internal wire
+            if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                 .contents
                 .clone()
                 .is_none()
@@ -3135,8 +3133,7 @@ pub fn wff_cross_att_wiring(
                     .unwrap()
                     .clone(); // attribute index of submodule (also opo contents value)
                 let tgt_nbox = bf_counter; // nbox value of tgt opo
-
-                // now to construct the wire
+                                           // now to construct the wire
                 let mut wff_src_tgt: Vec<String> = vec![];
                 // find the src node
                 for node in nodes.iter() {
