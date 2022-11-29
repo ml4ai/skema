@@ -1,10 +1,14 @@
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mi, Mn, Mo, Mrow, Msub},
+    MathExpression::{Mi, Mn, Mo, Mrow, Msub, Mfrac, Msqrt},
     Operator,
 };
-use crate::ast::MathExpression::{Mfrac, Msqrt};
 use std::cmp::Reverse;
+use std::ptr::null_mut;
+use petgraph::{graph::NodeIndex, Graph};
+// use derive_builder::Builder;
+
+pub type MathMLGraph<'a> = Graph<String, String>;
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -16,13 +20,18 @@ enum Atom {
 #[derive(Debug, PartialEq, Clone)]
 enum Expr {
     Atom(Atom),
-    Expression { op: Vec<Operator>, args: Vec<Expr> },
+    Expression {
+        op: Vec<Operator>,
+        args: Vec<Expr>,
+        name: String,
+    },
 }
 
 #[derive(Debug, PartialEq, Clone)]
 struct PreExp {
     op: Vec<Operator>,
     args: Vec<Expr>,
+    name: String,
 }
 
 impl MathExpression {
@@ -50,32 +59,35 @@ impl MathExpression {
                 let mut pre_exp = PreExp {
                     op: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
+                    name: "".to_string(),
                 };
                 pre_exp.op.push(Operator::Other("".to_string()));
                 for mut x in xs {
                     &x.to_expr(&mut pre_exp);
                 }
-                pre.args.push(Expr::Expression { op: pre_exp.op, args: pre_exp.args }.clone());
+                pre.args.push(Expr::Expression { op: pre_exp.op, args: pre_exp.args, name: "".to_string() }.clone());
             }
             Msqrt(xs) => {
                 let mut pre_exp = PreExp {
                     op: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
+                    name: "".to_string(),
                 };
                 pre_exp.op.push(Operator::Sqrt);
                 &xs.to_expr(&mut pre_exp);
-                pre.args.push(Expr::Expression { op: pre_exp.op, args: pre_exp.args }.clone());
+                pre.args.push(Expr::Expression { op: pre_exp.op, args: pre_exp.args, name: "".to_string() }.clone());
             }
             Mfrac(xs1, xs2) => {
                 let mut pre_exp = PreExp {
                     op: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
+                    name: "".to_string(),
                 };
                 pre_exp.op.push(Operator::Other("".to_string()));
                 &xs1.to_expr(&mut pre_exp);
                 pre_exp.op.push(Operator::Divide);
                 &xs2.to_expr(&mut pre_exp);
-                pre.args.push(Expr::Expression { op: pre_exp.op, args: pre_exp.args }.clone());
+                pre.args.push(Expr::Expression { op: pre_exp.op, args: pre_exp.args, name: "".to_string() }.clone());
             }
             _ => {
                 panic!("Unhandled type!");
@@ -88,7 +100,7 @@ impl Expr {
     fn group_expr(&mut self) {
         match self {
             Expr::Atom(_) => {}
-            Expr::Expression { op, args } => {
+            Expr::Expression { op, args, .. } => {
                 let mut removed_idx = Vec::new();
                 let mut op_copy = op.clone();
                 let mut args_copy = args.clone();
@@ -98,6 +110,7 @@ impl Expr {
                     let mut new_exp = Expr::Expression {
                         op: vec![Operator::Other("".to_string())],
                         args: Vec::<Expr>::new(),
+                        name: "".to_string(),
                     };
                     for o in 0..=op.len() - 1 {
                         if op[o] == Operator::Multiply || op[o] == Operator::Divide {
@@ -107,7 +120,7 @@ impl Expr {
                                 end_idx = o as i32;
                                 match &mut new_exp {
                                     Expr::Atom(_) => {}
-                                    Expr::Expression { op, args } => {
+                                    Expr::Expression { op, args, .. } => {
                                         op.push(op_copy[o].clone());
                                         args.push(args_copy[o - 1].clone());
                                         args.push(args_copy[o].clone());
@@ -117,7 +130,7 @@ impl Expr {
                                 end_idx = o as i32;
                                 match &mut new_exp {
                                     Expr::Atom(_) => {}
-                                    Expr::Expression { op, args } => {
+                                    Expr::Expression { op, args, .. } => {
                                         op.push(op_copy[o].clone());
                                         args.push(args_copy[o].clone())
                                     }
@@ -127,10 +140,11 @@ impl Expr {
                                 new_exp = Expr::Expression {
                                     op: vec![Operator::Other("".to_string())],
                                     args: Vec::<Expr>::new(),
+                                    name: "".to_string(),
                                 };
                                 match &mut new_exp {
                                     Expr::Atom(_) => {}
-                                    Expr::Expression { op, args } => {
+                                    Expr::Expression { op, args, .. } => {
                                         op.push(op_copy[o].clone());
                                         args.push(args_copy[o - 1].clone());
                                         args.push(args_copy[o].clone());
@@ -169,6 +183,30 @@ impl Expr {
             }
         }
     }
+
+    fn get_names(&mut self) -> String {
+        match self {
+            Expr::Atom(_) => { return "".to_string(); }
+            Expr::Expression { op, args, name } => {
+                for i in 0..=op.len() - 1 {
+                    name.push_str(&op[i].to_string().clone());
+                    match &mut args[i] {
+                        Expr::Atom(x) => {
+                            match x {
+                                Atom::Number(x) => { name.push_str(&x.to_string().clone()); }
+                                Atom::Identifier(x) => { name.push_str(&x.to_string().clone()); }
+                                Atom::Operator(_) => {}
+                            }
+                        }
+                        Expr::Expression { .. } => {
+                            name.push_str(args[i].get_names().as_str().clone());
+                        }
+                    }
+                }
+                return name.to_string();
+            }
+        }
+    }
 }
 
 impl PreExp {
@@ -180,6 +218,24 @@ impl PreExp {
             }
         }
     }
+
+    fn get_names(&mut self) {
+        for mut arg in &mut self.args {
+            match &mut arg {
+                Expr::Atom(_) => {}
+                Expr::Expression { .. } => { arg.get_names(); }
+            }
+        }
+    }
+}
+
+pub fn exist_node_name(graph: &MathMLGraph, name: String) -> bool {
+    for n in graph.raw_nodes() {
+        if name == n.weight {
+            return true;
+        }
+    }
+    return false;
 }
 
 #[test]
@@ -193,13 +249,14 @@ fn test_to_expr() {
     let mut pre_exp = PreExp {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
+        name: "".to_string(),
     };
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
 
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
-        Expr::Expression { op, args } => {
+        Expr::Expression { op, args, .. } => {
             assert_eq!(op[0], Operator::Other("".to_string()));
             assert_eq!(op[1], Operator::Add);
             assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
@@ -222,13 +279,14 @@ fn test_to_expr2() {
     let mut pre_exp = PreExp {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
+        name: "".to_string(),
     };
 
     math_expression.to_expr(&mut pre_exp);
     pre_exp.op.push(Operator::Other("root".to_string()));
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
-        Expr::Expression { op, args } => {
+        Expr::Expression { op, args, .. } => {
             assert_eq!(op[0], Operator::Other("".to_string()));
             assert_eq!(op[1], Operator::Add);
             assert_eq!(op[2], Operator::Subtract);
@@ -236,7 +294,7 @@ fn test_to_expr2() {
             assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
             match &args[2] {
                 Expr::Atom(_) => {}
-                Expr::Expression { op, args } => {
+                Expr::Expression { op, args, .. } => {
                     assert_eq!(op[0], Operator::Other("".to_string()));
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(op[2], Operator::Multiply);
@@ -260,17 +318,18 @@ fn test_to_expr3() {
     let mut pre_exp = PreExp {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
+        name: "".to_string(),
     };
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
 
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
-        Expr::Expression { op, args } => {
+        Expr::Expression { op, args, .. } => {
             assert_eq!(op[0], Operator::Sqrt);
             match &args[0] {
                 Expr::Atom(_) => {}
-                Expr::Expression { op, args } => {
+                Expr::Expression { op, args, .. } => {
                     assert_eq!(op[0], Operator::Other("".to_string()));
                     assert_eq!(op[1], Operator::Add);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
@@ -292,18 +351,19 @@ fn test_to_expr4() {
     let mut pre_exp = PreExp {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
+        name: "".to_string(),
     };
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
 
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
-        Expr::Expression { op, args } => {
+        Expr::Expression { op, args, .. } => {
             assert_eq!(op[0], Operator::Other("".to_string()));
             assert_eq!(op[1], Operator::Divide);
             match &args[0] {
                 Expr::Atom(_) => {}
-                Expr::Expression { op, args } => {
+                Expr::Expression { op, args, .. } => {
                     assert_eq!(op[0], Operator::Other("".to_string()));
                     assert_eq!(op[1], Operator::Add);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
@@ -314,7 +374,7 @@ fn test_to_expr4() {
                 Expr::Atom(x) => {
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
                 }
-                Expr::Expression { op, args } => {}
+                Expr::Expression { op, args, .. } => {}
             }
             println!("Success!");
         }
@@ -334,20 +394,21 @@ fn test_to_expr5() {
     let mut pre_exp = PreExp {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
+        name: "".to_string(),
     };
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    println!();
+
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
-        Expr::Expression { op, args } => {
+        Expr::Expression { op, args, .. } => {
             assert_eq!(op[0], Operator::Other("".to_string()));
             assert_eq!(op[1], Operator::Add);
             assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
             match &args[1] {
                 Expr::Atom(_) => {}
-                Expr::Expression { op, args } => {
+                Expr::Expression { op, args, .. } => {
                     assert_eq!(op[0], Operator::Other("".to_string()));
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
@@ -382,14 +443,15 @@ fn test_to_expr6() {
     let mut pre_exp = PreExp {
         op: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
+        name: "".to_string(),
     };
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    println!();
+
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
-        Expr::Expression { op, args } => {
+        Expr::Expression { op, args, .. } => {
             assert_eq!(op[0], Operator::Other("".to_string()));
             assert_eq!(op[1], Operator::Add);
             assert_eq!(op[2], Operator::Subtract);
@@ -397,7 +459,7 @@ fn test_to_expr6() {
             assert_eq!(args[3], Expr::Atom(Atom::Identifier("h".to_string())));
             match &args[1] {
                 Expr::Atom(_) => {}
-                Expr::Expression { op, args } => {
+                Expr::Expression { op, args, .. } => {
                     assert_eq!(op[0], Operator::Other("".to_string()));
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(op[2], Operator::Multiply);
@@ -410,11 +472,121 @@ fn test_to_expr6() {
             }
             match &args[2] {
                 Expr::Atom(_) => {}
-                Expr::Expression { op, args } => {
+                Expr::Expression { op, args, .. } => {
                     assert_eq!(op[0], Operator::Other("".to_string()));
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("f".to_string())));
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("g".to_string())));
+                }
+            }
+            println!("Success!");
+        }
+    }
+}
+
+#[test]
+#[ignore]
+fn test_to_expr7() {
+    let math_expression = Mrow(vec![
+        Mi("a".to_string()),
+        Mo(Operator::Add),
+        Mi("b".to_string()),
+        Mo(Operator::Multiply),
+        Mi("c".to_string()),
+    ]);
+    let mut pre_exp = PreExp {
+        op: Vec::<Operator>::new(),
+        args: Vec::<Expr>::new(),
+        name: "root".to_string(),
+    };
+    pre_exp.op.push(Operator::Other("root".to_string()));
+    math_expression.to_expr(&mut pre_exp);
+    pre_exp.group_expr();
+    pre_exp.get_names();
+
+    match &pre_exp.args[0] {
+        Expr::Atom(_) => {}
+        Expr::Expression { op, args, name } => {
+            assert_eq!(op[0], Operator::Other("".to_string()));
+            assert_eq!(op[1], Operator::Add);
+            assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
+            assert_eq!(name, "a+b*c");
+            match &args[1] {
+                Expr::Atom(_) => {}
+                Expr::Expression { op, args, name } => {
+                    assert_eq!(op[0], Operator::Other("".to_string()));
+                    assert_eq!(op[1], Operator::Multiply);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
+                    assert_eq!(name, "b*c");
+                }
+            }
+            println!("Success!");
+        }
+    }
+}
+
+#[test]
+#[ignore]
+fn test_to_expr8() {
+    let math_expression = Mrow(vec![
+        Mi("a".to_string()),
+        Mo(Operator::Add),
+        Mi("b".to_string()),
+        Mo(Operator::Multiply),
+        Mi("c".to_string()),
+        Mo(Operator::Multiply),
+        Mi("d".to_string()),
+        Mo(Operator::Divide),
+        Mi("e".to_string()),
+        Mo(Operator::Subtract),
+        Mi("f".to_string()),
+        Mo(Operator::Multiply),
+        Mi("g".to_string()),
+        Mo(Operator::Subtract),
+        Mi("h".to_string()),
+    ]);
+    let mut pre_exp = PreExp {
+        op: Vec::<Operator>::new(),
+        args: Vec::<Expr>::new(),
+        name: "".to_string(),
+    };
+    pre_exp.op.push(Operator::Other("root".to_string()));
+    math_expression.to_expr(&mut pre_exp);
+    pre_exp.group_expr();
+    pre_exp.get_names();
+
+    match &pre_exp.args[0] {
+        Expr::Atom(_) => {}
+        Expr::Expression { op, args, name } => {
+            assert_eq!(op[0], Operator::Other("".to_string()));
+            assert_eq!(op[1], Operator::Add);
+            assert_eq!(op[2], Operator::Subtract);
+            assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
+            assert_eq!(args[3], Expr::Atom(Atom::Identifier("h".to_string())));
+            assert_eq!(name, "a+b*c*d/e-f*g-h");
+            match &args[1] {
+                Expr::Atom(_) => {}
+                Expr::Expression { op, args, name } => {
+                    assert_eq!(op[0], Operator::Other("".to_string()));
+                    assert_eq!(op[1], Operator::Multiply);
+                    assert_eq!(op[2], Operator::Multiply);
+                    assert_eq!(op[3], Operator::Divide);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
+                    assert_eq!(args[2], Expr::Atom(Atom::Identifier("d".to_string())));
+                    assert_eq!(args[3], Expr::Atom(Atom::Identifier("e".to_string())));
+                    assert_eq!(name, "b*c*d/e");
+                }
+            }
+            match &args[2] {
+                Expr::Atom(_) => {}
+                Expr::Expression { op, args, name } => {
+                    assert_eq!(op[0], Operator::Other("".to_string()));
+                    assert_eq!(op[1], Operator::Multiply);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("f".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("g".to_string())));
+                    assert_eq!(name, "f*g");
                 }
             }
             println!("Success!");
