@@ -43,7 +43,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     // Using breeze
     val modDistances =  DenseVector.ones[Float]{normalizedEditDistances.length}.-:-(normalizedEditDistances)
     val cosine_sim_alpha = cosineSimilarities.*:*(DenseVector.fill(cosineSimilarities.length){alpha})
-    val similarities = cosine_sim_alpha.+(modDistances.*:*(DenseVector(1-alpha)) )
+    val similarities = cosine_sim_alpha.+(modDistances.*:*(DenseVector.fill(modDistances.length){1-alpha}) )
     println(DenseVector(similarities))
 
     // Choose the top k and return GroundingCandidates
