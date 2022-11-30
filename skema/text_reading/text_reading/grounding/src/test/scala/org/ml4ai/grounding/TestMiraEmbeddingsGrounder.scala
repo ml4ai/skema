@@ -2,20 +2,22 @@ package org.ml4ai.grounding
 
 import com.typesafe.config.ConfigFactory
 import org.clulab.utils.FileUtils
+import org.json4s.JsonDSL.boolean2jvalue
 import org.ml4ai.skema.common.test.Test
-
 import org.scalatest.OptionValues._
 
 class TestMiraEmbeddingsGrounder extends Test {
 
   // Lazily load the grounder. We assume it's state and behavior is immutable
   // So we can build it once and reuse it as necessary in the suite
+  val lambda = 10
+  val alpha = 0.25.toFloat
   val miraEmbeddingsGrounder: MiraEmbeddingsGrounder = {
     val config = ConfigFactory.load().getConfig("Grounding")
     val ontologyPath = config.getString("ontologyPath")
     // val embeddingsPath = config.getString("embeddingsPath")
 
-    MiraEmbeddingsGrounder(ontologyPath, None)
+    MiraEmbeddingsGrounder(ontologyPath, None, lambda, alpha)
   }
 
   def correctGrounding(shouldable: Shouldable, text:String, groundingID:String): Unit = {
@@ -64,6 +66,22 @@ class TestMiraEmbeddingsGrounder extends Test {
       val accuracy = predictions.count(identity).floatValue() / predictions.length
 
       accuracy should be >= 0.65f // TODO: .7f is the goal
+
+      val predictions1 =
+        for {
+          (text, groundingId) <- targets
+        } yield miraEmbeddingsGrounder.ground(text) match {
+          case Some(concept) => concept.id + "," + groundingId + "," + concept.name + "," + concept.synonyms.map(_.toString) + "," + (concept.id == groundingId).toString
+          case None => "none" + text
+        }
+
+      val this_preds = predictions.map {
+        _.productIterator.map(_.toString)
+      }.mkString("\n")
+      println(this_preds)
+      predictions.foreach(println)
+      predictions1.foreach(println)
+
     }
   }
 }
