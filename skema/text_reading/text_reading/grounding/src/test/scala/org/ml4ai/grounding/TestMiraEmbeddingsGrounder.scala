@@ -72,10 +72,10 @@ class TestMiraEmbeddingsGrounder extends Test {
     }
   }
 
-  // Gridsearch - bruteforce
+  // Grid search - bruteforce
   var hyperparam_size :Int = 2;
-  val lambdas = Uniform(10, 1000).samplesVector(hyperparam_size)
-  val alphas = Gaussian(0.0.toFloat, 1.0.toFloat).samplesVector(hyperparam_size).toDenseVector
+  val lambdas = DenseVector(1, 10,100) //Uniform(10, 1000).samplesVector(hyperparam_size)
+  val alphas = DenseVector(0.25, 0.5, 0.75) //Gaussian(0.0.toFloat, 1.0.toFloat).samplesVector(hyperparam_size).toDenseVector
 
   val acc_map = new scala.collection.mutable.HashMap[(Float, Float), Float]()
 
@@ -91,7 +91,6 @@ class TestMiraEmbeddingsGrounder extends Test {
       val config = ConfigFactory.load().getConfig("Grounding")
       val ontologyPath = config.getString("ontologyPath")
       // val embeddingsPath = config.getString("embeddingsPath")
-
       MiraEmbeddingsGrounder(ontologyPath, None, lambda, alpha)
     }
 
