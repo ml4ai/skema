@@ -4,7 +4,7 @@ use mathml::parsing::parse;
 use serde::{Deserialize, Serialize};
 use utoipa;
 use utoipa::ToSchema;
-use petgraph::dot::{Config, Dot, Graph};
+use petgraph::dot::{Config, Dot};
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct MathmlParseRequest {
@@ -21,17 +21,17 @@ impl MathmlParseRequest {
 #[utoipa::path(
     request_body = MatmlVisualizeRequest,
     responses(
-        (status = 200, description = "Visualize XML", body = Dot<&Graph<String, u32>>)
+        (status = 200, description = "Visualize XML", body = String)
     )
 )]
 #[get("/mathml_parse")]
-pub async fn visualize_xml(payload: web::Json<MathmlParseRequest>) -> HttpResponse {
+pub async fn mathml_parse(payload: web::Json<MathmlParseRequest>) -> HttpResponse {
     let contents = &payload.input;
     let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {contents}!").as_str());
     math.normalize();
 
     let g = math.to_graph(); 
-    let dotRepresentation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
+    let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
     
-    return HttpResponse::Ok().json(web::Json(dotRepresentation));
+    return HttpResponse::Ok().body(dot_representation.to_string());
 }

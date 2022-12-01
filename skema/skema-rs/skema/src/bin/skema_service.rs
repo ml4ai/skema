@@ -3,6 +3,10 @@ use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
+use skema::services::mathml::{
+    mathml_parse, MathmlParseRequest
+};
+
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -11,7 +15,7 @@ async fn main() -> std::io::Result<()> {
     #[derive(OpenApi)]
     #[openapi(
         paths(skema::services::comment_extraction::get_comments),
-        paths(skema::services::mathml::visualize_xml),
+        paths(skema::services::mathml::mathml_parse),
         components(
             schemas(
                 Language,
@@ -19,6 +23,7 @@ async fn main() -> std::io::Result<()> {
                 SingleLineComment,
                 Docstring,
                 CommentExtractionResponse,
+                MathmlParseRequest
             )
         ),
         tags(
