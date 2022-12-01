@@ -35,7 +35,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     val cosineSimilarities: DenseVector[Float] = DenseVector( tempVal.toArray)
 
     // Using breeze
-    val _temp = for (groundingConcept <- groundingConcepts) yield {
+    val _temp = for (groundingConcept <- groundingConcepts.par) yield {
       getNormalizedDistance(text, groundingConcept.name).floatValue()
     }
     val normalizedEditDistances: DenseVector[Float] = DenseVector(_temp.toArray )
@@ -44,7 +44,6 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     val modDistances =  DenseVector.ones[Float]{normalizedEditDistances.length}.-:-(normalizedEditDistances)
     val cosine_sim_alpha = cosineSimilarities.*:*(DenseVector.fill(cosineSimilarities.length){alpha})
     val similarities = cosine_sim_alpha.+(modDistances.*:*(DenseVector.fill(modDistances.length){1-alpha}) )
-
 
     // Choose the top k and return GroundingCandidates
     // The sorted values are reversed to have it on decreasing size
@@ -172,7 +171,6 @@ object MiraEmbeddingsGrounder{
   }
 
   def addEmbeddingToConcept(concept: GroundingConcept, embeddingsModel: WordEmbeddingMap, lambda : Float): GroundingConcept = {
-
 
     val embedding = generateNormalizedEmbedding(concept.name.toLowerCase, embeddingsModel)
 
