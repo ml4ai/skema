@@ -59,7 +59,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
 
   def getNormalizedDistance(text:String, name:String): Float = {
     def getDistance(source: String, target: String) = MED(source, target, allowSubstitute = false, allowTranspose = false, allowCapitalize = false).getDistance
-    return getDistance(text, name)/text.length().max(name.length())
+    return getDistance(text.toLowerCase(), name.toLowerCase())/text.length().max(name.length())
   }
 }
 
