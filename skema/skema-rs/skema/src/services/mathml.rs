@@ -1,4 +1,4 @@
-use actix_web::{get, web, HttpResponse};
+use actix_web::{put, web, HttpResponse};
 use std::string::String;
 use mathml::parsing::parse;
 use serde::{Deserialize, Serialize};
@@ -24,11 +24,10 @@ impl MathmlParseRequest {
         (status = 200, description = "Visualize XML", body = String)
     )
 )]
-#[get("/mathml_parse")]
+#[put("/mathml_parse")]
 pub async fn mathml_parse(payload: web::Json<MathmlParseRequest>) -> HttpResponse {
     let contents = &payload.input;
     let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {contents}!").as_str());
-    math.normalize();
 
     let g = math.to_graph(); 
     let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
