@@ -34,7 +34,7 @@ async fn main() -> std::io::Result<()> {
 
     let openapi = ApiDoc::openapi();
     HttpServer::new(move || {
-        App::new().service(get_comments).service(
+        App::new().service(get_comments).service(mathml_parse).service(
             SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
         )
     })
