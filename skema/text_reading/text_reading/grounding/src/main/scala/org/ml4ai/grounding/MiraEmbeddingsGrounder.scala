@@ -44,12 +44,12 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     val modDistances =  DenseVector.ones[Float]{normalizedEditDistances.length}.-:-(normalizedEditDistances)
     val cosine_sim_alpha = cosineSimilarities.*:*(DenseVector.fill(cosineSimilarities.length){alpha})
     val similarities = cosine_sim_alpha.+(modDistances.*:*(DenseVector.fill(modDistances.length){1-alpha}) )
-    println(DenseVector(similarities))
+
 
     // Choose the top k and return GroundingCandidates
     // The sorted values are reversed to have it on decreasing size
     val (sortedCosineSimilarities, sortedIndices) = similarities.toArray.zipWithIndex.sorted.reverse.unzip
-    println(sortedCosineSimilarities)
+
     val topKIndices = sortedIndices.take(k)
     val topSimilarities = sortedCosineSimilarities.take(k)
     val topConcepts = topKIndices.map(groundingConcepts)
