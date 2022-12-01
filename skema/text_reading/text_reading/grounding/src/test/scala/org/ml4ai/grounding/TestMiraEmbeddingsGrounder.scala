@@ -81,12 +81,12 @@ class TestMiraEmbeddingsGrounder extends Test {
 
   for (lambda <- lambdas.toScalaVector().par) yield {
     for (alpha <- alphas.toScalaVector().par) yield {
-      val this_acc = DenseVector[Float](getAccuracyForThisHyperParams(lambda.toFloat, alpha.toFloat))
+      val this_acc = getAccuracyForThisHyperParams(lambda.toFloat, alpha.toFloat)
       acc_map.update((lambda.toFloat, alpha.toFloat), this_acc)
     }
   }
 
-  def getAccuracyForThisHyperParams(lambda: Float, alpha: Float) {
+  def getAccuracyForThisHyperParams(lambda: Float, alpha: Float) : Float = {
     val miraEmbeddingsGrounderGS: MiraEmbeddingsGrounder = {
       val config = ConfigFactory.load().getConfig("Grounding")
       val ontologyPath = config.getString("ontologyPath")
@@ -111,7 +111,8 @@ class TestMiraEmbeddingsGrounder extends Test {
           case None => false
         }
       val accuracy = (predictions.count(identity).floatValue() / predictions.length).floatValue()
-      accuracy
+      val acc = accuracy.toFloat
+    acc
   }
 
 
