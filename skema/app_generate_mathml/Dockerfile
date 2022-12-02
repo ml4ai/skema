@@ -1,11 +1,15 @@
-FROM python python:3.8
+FROM python:3.8
 
-WORKDIR /skema/skema/app_generate_mathml
+WORKDIR /code
 
-COPY ./requirements.txt
+COPY ./requirements.txt /code
 
 RUN pip install -r requirements.txt
 
-COPY ./generate_mathml /skema/skema/app_generate_mathml/generate_mathml
+COPY ./generate_mathml /code/generate_mathml
 
-CMD ["uvicorn", "generate_mathml.translate:app", "--host", "0.0.0.0", "--port", "80"]
+EXPOSE 8000
+
+CMD ["uvicorn", "generate_mathml.translate:app", "--host=0.0.0.0", "--reload"]
+
+#CMD ["uvicorn", "generate_mathml.translate:app", "--host", "0.0.0.0", "--port", "80"]
