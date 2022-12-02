@@ -1,33 +1,27 @@
 use actix_web::{put, web, HttpResponse};
 use std::string::String;
 use mathml::parsing::parse;
-use serde::{Deserialize, Serialize};
 use utoipa;
 use utoipa::ToSchema;
 use petgraph::dot::{Config, Dot};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
-pub struct MathmlParseRequest {
+pub struct MathMLParseRequest {
     pub input: String,
-}
-
-impl MathmlParseRequest {
-    pub fn new(input: String) -> Self {
-        Self { input }
-    }
 }
 
 
 #[utoipa::path(
-    request_body = MatmlVisualizeRequest,
+    request_body = MathMLParseRequest,
     responses(
-        (status = 200, description = "Visualize XML", body = String)
+        (status = 200, description = "Parse MathML and return a DOT representation", body = String)
     )
 )]
-#[put("/mathml_parse")]
-pub async fn mathml_parse(payload: web::Json<MathmlParseRequest>) -> HttpResponse {
+#[put("/parse-mathml")]
+pub async fn parse_mathml(payload: web::Json<MathMLParseRequest>) -> HttpResponse {
     let contents = &payload.input;
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {contents}!").as_str());
+    let (_, math) = parse(&contents).expect(format!("Unable to parse payload!").as_str());
 
     let g = math.to_graph(); 
     let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
