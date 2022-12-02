@@ -97,6 +97,20 @@ impl MathExpression {
             }
         }
     }
+
+    fn to_graph(self) -> MathMLGraph<'static>{
+        let mut pre_exp = PreExp {
+        op: Vec::<Operator>::new(),
+        args: Vec::<Expr>::new(),
+        name: "root".to_string(),
+        };
+        pre_exp.op.push(Operator::Other("root".to_string()));
+        self.to_expr(&mut pre_exp);
+        pre_exp.group_expr();
+        pre_exp.get_names();
+        let g = pre_exp.to_graph();
+        return g;
+    }
 }
 
 impl Expr {
@@ -999,5 +1013,16 @@ fn test_to_expr15() {
     pre_exp.group_expr();
     pre_exp.get_names();
     let g = pre_exp.to_graph();
+    println!("{}", Dot::new(&g));
+}
+
+#[test]
+#[ignore]
+fn test_to_expr16() {
+    let math_expression = Msqrt(Box::from(Mrow(vec![Mi("a".to_string()), Mo(Operator::Subtract),
+                                                    Mi("b".to_string()), Mo(Operator::Multiply),
+                                                    Mrow(vec![Mi("a".to_string()), Mo(Operator::Subtract), Mi("b".to_string())])]),
+    ));
+    let g = math_expression.to_graph();
     println!("{}", Dot::new(&g));
 }
