@@ -4,6 +4,7 @@ from typing import Any, Union
 from collections import defaultdict
 from gensim.models import KeyedVectors
 import numpy as np
+import itertools as it
 
 class TextReadingLinker:
 	""" Encapsulates the logic of the linker to text reading mentions """
@@ -15,7 +16,8 @@ class TextReadingLinker:
 		self._model = KeyedVectors.load(embeddings_path)
 
 		# Read the mentions
-		raw_mentions = self._read_text_mentions(mentions_path)
+		raw_mentions, documents = self._read_text_mentions(mentions_path)
+		self._docs = documents
 		self._mentions = defaultdict(list)
 		
 		for m in raw_mentions:
@@ -78,7 +80,7 @@ class TextReadingLinker:
 			context = ' '.join(sent['raw'])
 			m['context'] = context
 
-		return relevant_mentions
+		return relevant_mentions, docs
 
 	def _average_vector(self, words:list[str]):
 		""" Precomputes and l2 normalizes the average vector of the requested word embeddings """
@@ -97,8 +99,13 @@ class TextReadingLinker:
 			if k > self._vectors.shape[0]:
 				k = self._vectors.shape[0]
 			topk = np.argsort(-1*similarities)[:k]
-			chosen_mentions = [self._mentions[self._keys[i]] for i in topk]
+			chosen_mentions = list(it.chain.from_iterable(self._mentions[self._keys[i]] for i in topk))
 			scores = similarities[topk]
 			return [(m, k) for m, k in zip(chosen_mentions, scores)]
 		else:
 			return []
+
+
+	@property
+	def documents(self):
+		return self._docs

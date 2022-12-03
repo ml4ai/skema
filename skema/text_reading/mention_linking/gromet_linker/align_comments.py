@@ -8,7 +8,7 @@ from typing import NamedTuple, Optional
 from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 
 from .mention_linking import TextReadingLinker
-from .utils import get_code_file_ref, get_element_line_numbers, build_comment_metadata, build_tr_mention_metadata
+from .utils import get_code_file_ref, get_element_line_numbers, build_comment_metadata, build_tr_mention_metadata, get_doc_file_ref
 
 import re
 
@@ -132,7 +132,8 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: Sour
 		build_comment_metadata(d, code_file_ref, attr, fn)
 	# linked text reading mentions
 	for m in aligned_mentions:
-		build_tr_mention_metadata(m, attr, fn)
+		doc_file_ref = get_doc_file_ref(m, linker, fn)
+		build_tr_mention_metadata(m, doc_file_ref, attr, fn)
 
 	if len(aligned_docstring + aligned_comments) > 0:
 		print("===================")
@@ -141,7 +142,7 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: Sour
 		print("\n".join(aligned_docstring))
 		print("\n".join(c[1] if type(c) == tuple else c for c in aligned_comments))
 		if len(aligned_mentions) > 0:
-			print("Aligned mentions:" + '\n'.join(f"{s}: {m[0]['text']}" for m, s in aligned_mentions))
+			print("Aligned mentions:" + '\n'.join(f"{s}: {m['text']}" for m, s in aligned_mentions))
 		print()
 
 	
