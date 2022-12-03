@@ -125,42 +125,54 @@ def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , el
 
 	attach_metadata(md, element, gromet)
 
-def build_tr_mention_metadata(mention, doc_file_ref: str, element, gromet):
+def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet):
+
+	mention, score = scored_mention
 
 	provenance = Provenance(
 		"embedding_similarity_1.0",
 		str(datetime.datetime.now())
 	)
 
-	# TODO
+	page_num, block = None, None
+	for attachment in mention['attachments']:
+		if 'pageNum' in attachment:
+			page_num = attachment['pageNum'][0]
+		if 'blockIdx' in attachment:
+			block = attachment['blockIdx'][0]
+
 	text_extraction = TextExtraction(
 		document_reference_uid= doc_file_ref,
+		page= page_num,
+		block= block,
+		char_begin= mention['characterStartOffset'],
+		char_end= mention['characterEndOffset']
 	)
 
-	extraction, score = mention
+	
 
-	if 'value' in extraction['arguments'] and 'variable' in extraction['arguments']:
+	if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
 		md = TextLiteralValue(
 			provenance = provenance,
 			text_extraction= text_extraction,
-			value= extraction['arguments']['value'][0]['text'],
-			variable_identifier= extraction['arguments']['variable'][0]['text']
+			value= mention['arguments']['value'][0]['text'],
+			variable_identifier= mention['arguments']['variable'][0]['text']
 		)
-	elif 'variable' in extraction['arguments']:
+	elif 'variable' in mention['arguments']:
 		# unit, description
 		# Candidate definition argument names
 		candidates = {"unit", "description"}
 		definition_name = None
 		for c in candidates:
-			if c in extraction['arguments']:
+			if c in mention['arguments']:
 				definition_name = c
 				break
 
 		md = TextDescription(
 			provenance = provenance,
 			text_extraction= text_extraction,
-			variable_identifier= extraction['arguments']['variable'][0]['text'],
-			variable_definition= extraction['arguments'][definition_name][0]['text']
+			variable_identifier= mention['arguments']['variable'][0]['text'],
+			variable_definition= mention['arguments'][definition_name][0]['text']
 		)
 		
 	else:
