@@ -3,7 +3,7 @@ use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
-use skema::services::mathml::parse_mathml;
+use skema::services::mathml::get_ast_graph;
 
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -20,6 +20,7 @@ struct Cli {
     port: u16
 }
 
+/// This endpoint can be used to check the health of the service.
 #[utoipa::path(
     responses(
         (status = 200, description = "Ping")
@@ -34,8 +35,11 @@ pub async fn ping() -> HttpResponse {
 async fn main() -> std::io::Result<()> {
     #[derive(OpenApi)]
     #[openapi(
-        paths(skema::services::comment_extraction::get_comments),
-        paths(skema::services::mathml::parse_mathml),
+        paths(
+            skema::services::comment_extraction::get_comments,
+            skema::services::mathml::get_ast_graph,
+            ping
+        ),
         components(
             schemas(
                 Language,
@@ -57,7 +61,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
         .service(get_comments)
-        .service(parse_mathml)
+        .service(get_ast_graph)
         .service(
             SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
         )
