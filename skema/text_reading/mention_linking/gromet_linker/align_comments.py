@@ -5,11 +5,8 @@ import json
 from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 from automates.gromet.fn.gromet_fn_module import GrometFNModule
 
-
-from automates.utils.fold import dictionary_to_gromet_json, del_nulls
-
-from mention_linking import TextReadingLinker
-from comment_utils import get_element_line_numbers, get_element_metadata, build_comment_metadata, build_tr_mention_metadata
+from .mention_linking import TextReadingLinker
+from .comment_utils import get_element_line_numbers, get_element_metadata, build_comment_metadata, build_tr_mention_metadata
 
 import re
 import itertools as it
@@ -175,15 +172,3 @@ def align_comments(gromet_path:str, comments_path:str, extractions_path:str, emb
 	
 
 	return fn
-
-
-if __name__ == "__main__":
-	gromet_path = "gromet/CHIME_SIR--Gromet-FN-auto.json"
-	comments_path = "comments/CHIME_SIR_comments.jsonl"
-	extractions_path = 'extractions/CHIME_SIR.json'
-	embeddings_path = "/data/covid_comments_models/xdd_covid_19_1x_word2vec/alternate/embeddings.kv"
-	enriched_gromet = align_comments(gromet_path, comments_path, extractions_path, embeddings_path)
-
-	# Save gromet file with the new metadata aligned
-	with open("test.json", 'w') as f:
-		f.write(dictionary_to_gromet_json(del_nulls(enriched_gromet.to_dict())))
