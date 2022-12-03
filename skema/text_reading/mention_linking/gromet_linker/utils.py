@@ -1,6 +1,6 @@
 import datetime
 from typing import Optional, Tuple
-from automates.gromet.metadata import SourceCodeComment, Provenance, TextExtraction, TextDefinition, TextParameter, TextualDocumentCollection, TextualDocumentReference
+from automates.gromet.metadata import SourceCodeComment, Provenance, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference
 
 from gromet_linker.mention_linking import TextReadingLinker
 
@@ -140,7 +140,7 @@ def build_tr_mention_metadata(mention, doc_file_ref: str, element, gromet):
 	extraction, score = mention
 
 	if 'value' in extraction['arguments'] and 'variable' in extraction['arguments']:
-		md = TextParameter(
+		md = TextLiteralValue(
 			provenance = provenance,
 			text_extraction= text_extraction,
 			value= extraction['arguments']['value'][0]['text'],
@@ -156,7 +156,7 @@ def build_tr_mention_metadata(mention, doc_file_ref: str, element, gromet):
 				definition_name = c
 				break
 
-		md = TextDefinition(
+		md = TextDescription(
 			provenance = provenance,
 			text_extraction= text_extraction,
 			variable_identifier= extraction['arguments']['variable'][0]['text'],
