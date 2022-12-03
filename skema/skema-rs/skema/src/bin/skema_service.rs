@@ -3,10 +3,11 @@ use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
+use skema::services::mathml::get_ast_graph;
+
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use clap::Parser;
-use std::net::{IpAddr, Ipv4Addr};
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -19,12 +20,12 @@ struct Cli {
     port: u16
 }
 
+/// This endpoint can be used to check the health of the service.
 #[utoipa::path(
     responses(
         (status = 200, description = "Ping")
     )
 )]
-
 #[get("/ping")]
 pub async fn ping() -> HttpResponse {
     HttpResponse::Ok().body("The SKEMA Rust web services are running.")
@@ -32,10 +33,13 @@ pub async fn ping() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
     #[derive(OpenApi)]
     #[openapi(
-        paths(skema::services::comment_extraction::get_comments),
+        paths(
+            skema::services::comment_extraction::get_comments,
+            skema::services::mathml::get_ast_graph,
+            ping
+        ),
         components(
             schemas(
                 Language,
@@ -56,11 +60,12 @@ async fn main() -> std::io::Result<()> {
     let args = Cli::parse();
     HttpServer::new(move || {
         App::new()
-            .service(get_comments)
-            .service(
-                SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
-            )
-            .service(ping)
+        .service(get_comments)
+        .service(get_ast_graph)
+        .service(
+            SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
+        )
+        .service(ping)
     })
     .bind((args.host, args.port))?
     .run()
