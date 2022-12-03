@@ -4,7 +4,7 @@ use skema::services::comment_extraction::{
     SingleLineComment,
 };
 use skema::services::mathml::{
-    mathml_parse, MathmlParseRequest
+    parse_mathml, MathMLParseRequest
 };
 
 use utoipa::OpenApi;
@@ -37,7 +37,7 @@ async fn main() -> std::io::Result<()> {
     #[derive(OpenApi)]
     #[openapi(
         paths(skema::services::comment_extraction::get_comments),
-        paths(skema::services::mathml::mathml_parse),
+        paths(skema::services::mathml::parse_mathml),
         components(
             schemas(
                 Language,
@@ -45,7 +45,7 @@ async fn main() -> std::io::Result<()> {
                 SingleLineComment,
                 Docstring,
                 CommentExtractionResponse,
-                MathmlParseRequest
+                MathMLParseRequest
             )
         ),
         tags(
@@ -60,7 +60,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
         .service(get_comments)
-        .service(mathml_parse)
+        .service(parse_mathml)
         .service(
             SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
         )
