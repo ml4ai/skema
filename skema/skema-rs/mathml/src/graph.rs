@@ -8,6 +8,8 @@ use crate::ast::{
 
 use petgraph::{graph::NodeIndex, Graph};
 
+/// A graph representation of the MathML abstract syntax tree (AST), for easier inspection,
+/// visualization, and debugging.
 pub type ASTGraph<'a> = Graph<String, u32>;
 
 fn add_node_and_edge<'a>(
