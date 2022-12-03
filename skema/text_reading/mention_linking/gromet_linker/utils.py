@@ -85,8 +85,7 @@ def get_doc_file_ref(scored_mention, linker:TextReadingLinker, gromet) -> Option
 
 		# Create a new TextDocumentReference if it doesn't exist yet
 		if not doc_ref:
-			# TODO
-			# Figure out all the correct values here
+			# TODO Figure out all the correct values here
 			doc_ref = TextualDocumentReference(
 				uid = str(hash(doc_id)),
 				global_reference_id= "TBD",

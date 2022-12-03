@@ -142,7 +142,7 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: Sour
 		print("\n".join(aligned_docstring))
 		print("\n".join(c[1] if type(c) == tuple else c for c in aligned_comments))
 		if len(aligned_mentions) > 0:
-			print("Aligned mentions:" + '\n'.join(f"{s}: {m['text']}" for m, s in aligned_mentions))
+			print("Aligned mentions:\n" + '\n'.join(f"{s}: {m['text']}" for m, s in aligned_mentions))
 		print()
 
 	

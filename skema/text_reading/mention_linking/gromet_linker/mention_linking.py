@@ -19,14 +19,26 @@ class TextReadingLinker:
 		raw_mentions, documents = self._read_text_mentions(mentions_path)
 		self._docs = documents
 		self._mentions = defaultdict(list)
+
+		linkable_mentions = [m for m in raw_mentions if any('variable' in a for a in m['arguments'])]
+		self._linkable_variables = defaultdict(list)
+		self._linkable_descriptions = dict()
 		
-		for m in raw_mentions:
-			if len(self._preprocess(m['text'])) > 0:
-				self._mentions[m['text']].append(m)
+		for m in linkable_mentions:
+			var = m['arguments']['variable'][0]['text']
+			if len(self._preprocess(var)) > 0:
+				self._linkable_variables[var].append(m)
+
+			# This is a level of indirection in which we also look at the variable descriptions for linking
+			if 'description' in m['arguments']:
+				desc = m['arguments']['description'][0]['text']
+				if len(self._preprocess(desc)) > 0:
+					self._linkable_descriptions[desc] = var # We resolve to the variable name, which will use later to do the "graph" linking
+
 
 		# Preprocess the vectors for each mention text
 		keys, vectors = list(), list()
-		for k in self._mentions:
+		for k in it.chain(self._linkable_variables, self._linkable_descriptions):
 			keys.append(k)
 			vectors.append(self._average_vector(self._preprocess(k)))
 
@@ -99,9 +111,22 @@ class TextReadingLinker:
 			if k > self._vectors.shape[0]:
 				k = self._vectors.shape[0]
 			topk = np.argsort(-1*similarities)[:k]
-			chosen_mentions = list(it.chain.from_iterable(self._mentions[self._keys[i]] for i in topk))
-			scores = similarities[topk]
-			return [(m, k) for m, k in zip(chosen_mentions, scores)]
+			# We have to account for variables and descriptions
+			chosen_mentions = list()
+			for i in topk:
+				key = self._keys[i]
+				score = similarities[i]
+				if key in self._linkable_variables:
+					var = key
+				else:
+					var = self._linkable_descriptions[key]
+				for m in self._linkable_variables[var]:
+					chosen_mentions.append((m, score))
+			return chosen_mentions
+
+			# chosen_mentions = list(it.chain.from_iterable(self._linkable_variables[self._keys[i]] for i in topk))
+			# scores = similarities[topk]
+			# return [(m, k) for m, k in zip(chosen_mentions, scores)]
 		else:
 			return []
 
