@@ -1,26 +1,47 @@
 """ Aligns source code comments to Gromet function networks """
 
+from dataclasses import dataclass
 import json
+from pathlib import Path
+from typing import NamedTuple, Optional
 
 from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from automates.gromet.fn.gromet_fn_module import GrometFNModule
 
 from .mention_linking import TextReadingLinker
-from .comment_utils import get_element_line_numbers, get_element_metadata, build_comment_metadata, build_tr_mention_metadata
+from .utils import get_code_file_ref, get_element_line_numbers, build_comment_metadata, build_tr_mention_metadata
 
 import re
-import itertools as it
 
-def parse_comments(comments_path:str):
-	""" Reads the automatically extracted comments from the jsonl file """
+	
+@dataclass
+class SourceComments:
+	path:Path
+	line_comments:dict[int, str]
+	doc_strings:dict[str, str]
 
-	with open(comments_path) as f:
-		all_comments = json.load(f)
+	@property
+	def file_name(self) -> str:
+		return self.path.name
 
-	line_comments = {l[0]:l[1] for l in all_comments['comments']}
-	doc_strings = all_comments['docstrings']
+	@property
+	def file_path(self) -> str:
+		return str(self.path.absolute)
 
-	return line_comments, doc_strings
+	@staticmethod
+	def from_file(comments_path:str) -> "SourceComments":
+		""" Reads the automatically extracted comments from the json file """
+
+		with open(comments_path) as f:
+			all_comments = json.load(f)
+
+		line_comments = {l[0]:l[1] for l in all_comments['comments']}
+		doc_strings = all_comments['docstrings']
+
+		return SourceComments(
+			path = Path(comments_path),
+			line_comments= line_comments,
+			doc_strings= doc_strings
+		)
 
 
 def get_function_comments(box, fn,  line_comments):
@@ -58,7 +79,7 @@ def match_variable_name(name, comments):
 				
 
 
-def enhance_attribute_with_comments(attr, attr_type, box, fn, line_comments, doc_strings, linker):
+def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: SourceComments, linker):
 	# Identify the variables with the same name to each output port
 	  # In case of a tie, resolve the correct variable using the containing line spans
 
@@ -68,7 +89,7 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, line_comments, doc
 
 	# Get docstring, if any
 	if box and box.function_type == "FUNCTION":
-		docstring = doc_strings.get(box.name)
+		docstring = src_comments.doc_strings.get(box.name)
 	else:
 		docstring = None
 
@@ -81,8 +102,8 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, line_comments, doc
 		if attr.function_type not in {"PRIMITIVE", "LITERAL"}:
 			start, end = line_range
 			for line_num in range(start, end+1):
-				if line_num in line_comments:
-					aligned_comments.append((line_num, line_comments[line_num]))
+				if line_num in src_comments.line_comments:
+					aligned_comments.append((line_num, src_comments.line_comments[line_num]))
 
 	# Second, get subsection of docstring, if present. If current attr is the containing box itself, then get the complete docstring
 	if docstring:
@@ -93,20 +114,22 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, line_comments, doc
 
 	# Third, comments not in the same line, but likely of the container function
 	if name:
-		function_comments = get_function_comments(box, fn, line_comments)
+		function_comments = get_function_comments(box, fn, src_comments.line_comments)
 		aligned_comments.extend(match_variable_name(name, function_comments))
 
 	# Build new metadata object and append it to the metadata list of each port
 	comments = [name] if name else [] + aligned_docstring + [c if type(c) == str else c[1] for c in aligned_comments]
 	aligned_mentions = linker.align_to_comments(comments)
 
-	#TODO Build metadata object for each comments aligned
+	## Build metadata object for each comments aligned
+	# Get the comment reference
+	code_file_ref = get_code_file_ref(src_comments.file_name, fn)
 	# aligned_comments
 	for c in aligned_comments:
-		build_comment_metadata(c, attr, fn)
+		build_comment_metadata(c, code_file_ref, attr, fn)
 	# aligned docstring
 	for d in aligned_docstring:
-		build_comment_metadata(d, attr, fn)
+		build_comment_metadata(d, code_file_ref, attr, fn)
 	# linked text reading mentions
 	for m in aligned_mentions:
 		build_tr_mention_metadata(m, attr, fn)
@@ -121,9 +144,6 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, line_comments, doc
 			print("Aligned mentions:" + '\n'.join(f"{s}: {m[0]['text']}" for m, s in aligned_mentions))
 		print()
 
-	# Get the metadata, if exists
-	metadata = get_element_metadata(attr, fn)
-
 	
 
 
@@ -131,7 +151,7 @@ def align_comments(gromet_path:str, comments_path:str, extractions_path:str, emb
 	# Read the function network
 	fn = json_to_gromet(gromet_path)
 	# Parse the comments
-	line_comments, doc_strings = parse_comments(comments_path)
+	src_comments = SourceComments.from_file(comments_path)
 
 	# TODO: Add the codefile references
 	# Build the TR linking engine
@@ -151,18 +171,18 @@ def align_comments(gromet_path:str, comments_path:str, extractions_path:str, emb
 			for b in v.b:
 				container_box = b
 				if b.name:
-					enhance_attribute_with_comments(b, "b", container_box, fn, line_comments, doc_strings, linker)
+					enhance_attribute_with_comments(b, "b", container_box, fn, src_comments, linker)
 			if v.opi:
 				for opi in v.opi:
 					if opi.name:
-						enhance_attribute_with_comments(opi, "opi", container_box, fn, line_comments, doc_strings, linker)
+						enhance_attribute_with_comments(opi, "opi", container_box, fn, src_comments, linker)
 			if v.pof:
 				for pof in v.pof:
 					if pof.name:
-						enhance_attribute_with_comments(pof, "pof", container_box, fn, line_comments, doc_strings, linker)
+						enhance_attribute_with_comments(pof, "pof", container_box, fn, src_comments, linker)
 			if v.bf:
 				for bf in v.bf:
-					enhance_attribute_with_comments(bf, "bf", container_box, fn, line_comments, doc_strings, linker)
+					enhance_attribute_with_comments(bf, "bf", container_box, fn, src_comments, linker)
 			# TODO: Is this redundant?
 			# for poc in v.poc:
 			# 	if poc.name:

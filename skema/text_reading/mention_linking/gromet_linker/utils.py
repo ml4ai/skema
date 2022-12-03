@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional, Tuple
 from automates.gromet.metadata import SourceCodeComment, Provenance, TextExtraction, TextDefinition, TextParameter
 
 def get_element_metadata(elem, fn):
@@ -22,8 +23,30 @@ def get_element_line_numbers(elem, fn):
 		
 	return None
 
+def get_code_file_ref(comments_file_name: str, gromet) -> Optional[str]:
+	""" Fetches the UUID of the code_file_reference that matches the one from the comments file """
 
-def build_comment_metadata(comment, element, gromet):
+	mdc = get_element_metadata(gromet, gromet)
+	code_collection = None
+	uid = None
+
+	for md in mdc:
+		if md.metadata_type == "source_code_collection":
+			code_collection = md
+			break
+
+	if code_collection:
+		prefix = ".".join(comments_file_name.split(".")[:-1])
+		
+		for file in code_collection.files:
+			if file.name.startswith(prefix):
+				uid = file.uid
+				break
+
+	return uid
+
+
+def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , element, gromet):
 
 	# TODO: Differientiate between line comments and docstrings
 
@@ -39,6 +62,7 @@ def build_comment_metadata(comment, element, gromet):
 
 	md = SourceCodeComment(
 		provenance=provenance,
+		code_file_reference_uid= code_file_ref,
 		comment=text,
 		line_begin= line,
 		line_end=line, # TODO Should it be +1?
