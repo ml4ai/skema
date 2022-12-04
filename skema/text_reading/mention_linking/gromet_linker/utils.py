@@ -1,8 +1,16 @@
 import datetime
 from typing import Optional, Tuple
-from automates.gromet.metadata import SourceCodeComment, Provenance, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference
+from automates.gromet.metadata import SourceCodeComment, Provenance, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
 
 from gromet_linker.mention_linking import TextReadingLinker
+
+import itertools as it
+
+def build_provenance(method:str) -> Provenance:
+	return Provenance(
+		method,
+		str(datetime.datetime.now())
+	)
 
 def get_element_metadata(elem, fn):
 	# Get the metadata, if exists
@@ -63,10 +71,7 @@ def get_doc_file_ref(scored_mention, linker:TextReadingLinker, gromet) -> Option
 	# If the text doc collection doesn't exist, then add it
 	if not text_collection:
 		text_collection = TextualDocumentCollection(
-			provenance = Provenance(
-				"embedding_similarity_1.0",
-				str(datetime.datetime.now())
-			),
+			provenance = build_provenance("embedding_similarity_1.0"),
 			documents= list()
 		)
 
@@ -110,13 +115,8 @@ def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , el
 	else:
 		line, text = None, comment
 
-	provenance = Provenance(
-		"heuristic_1.0",
-		str(datetime.datetime.now())
-	)
-
 	md = SourceCodeComment(
-		provenance=provenance,
+		provenance= build_provenance("heuristic_1.0"),
 		code_file_reference_uid= code_file_ref,
 		comment=text,
 		line_begin= line,
@@ -128,11 +128,6 @@ def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , el
 def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet):
 
 	mention, score = scored_mention
-
-	provenance = Provenance(
-		"embedding_similarity_1.0",
-		str(datetime.datetime.now())
-	)
 
 	page_num, block = None, None
 	for attachment in mention['attachments']:
@@ -151,35 +146,63 @@ def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet
 
 	
 
-	if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
+	# if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
+	if mention['labels'][0] == "ParameterSetting":
+		# ParameterSetting
 		md = TextLiteralValue(
-			provenance = provenance,
+			provenance = build_provenance("embedding_similarity_1.0"),
 			text_extraction= text_extraction,
 			value= mention['arguments']['value'][0]['text'],
 			variable_identifier= mention['arguments']['variable'][0]['text']
 		)
-	elif 'variable' in mention['arguments']:
-		# unit, description
+	# elif 'variable' in mention['arguments']:
+	elif mention['labels'][0] == "ParamAndUnit":
+		# UnitRelation, ParamAndUnit
 		# Candidate definition argument names
-		candidates = {"unit", "description"}
-		definition_name = None
-		for c in candidates:
-			if c in mention['arguments']:
-				definition_name = c
-				break
 
 		md = TextDescription(
-			provenance = provenance,
+			provenance = build_provenance("embedding_similarity_1.0"),
 			text_extraction= text_extraction,
 			variable_identifier= mention['arguments']['variable'][0]['text'],
-			variable_definition= mention['arguments'][definition_name][0]['text']
+			variable_definition= mention['arguments']['description'][0]['text']
 		)
-		
+	elif mention['labels'][0] == "UnitRelation":
+		# UnitRelation, ParamAndUnit
+		# Candidate definition argument names
+
+		md = TextUnits(
+			provenance = build_provenance("embedding_similarity_1.0"),
+			text_extraction= text_extraction,
+			variable_identifier= mention['arguments']['variable'][0]['text'],
+			unit_type= mention['arguments']["unit"][0]['text']
+		)
 	else:
 		md = None
 
 	if md:
+		md.score = score
+		# Metametadata, the metadata of the metadata
+		# TODO Add context field
+		# TODO Expand the grounding type from string to (arg name, id, text, score)
+
+		# Generate the groundings
+		groundings = list()
+		for arg_name, arg in mention['arguments'].items():
+			for attachment in arg[0]['attachments']:
+				if type(attachment) == list:
+					for g in attachment[0]:
+						groundings.append(f"{arg_name}\t{g['id']}\t{g['name']}\t{g['score']}")
+
+		mmd = TextExtractionMetadata(
+			provenance= build_provenance("embedding_similarity_1.0"),
+
+		)
+
+		# Attach the tr linking metadata to the gromet element
 		attach_metadata(md, element, gromet)
+		# Attach the metametadata
+		# attach_metadata(mmd, text_extraction, gromet)
+
 
 def attach_metadata(new_metadata, element, gromet):
 

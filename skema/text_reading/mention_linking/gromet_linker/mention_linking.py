@@ -16,11 +16,12 @@ class TextReadingLinker:
 		self._model = KeyedVectors.load(embeddings_path)
 
 		# Read the mentions
-		raw_mentions, documents = self._read_text_mentions(mentions_path)
+		raw_mentions, tb_mentions, documents = self._read_text_mentions(mentions_path)
 		self._docs = documents
-		self._mentions = defaultdict(list)
+		self._tb_mentions = tb_mentions
 
 		linkable_mentions = [m for m in raw_mentions if any('variable' in a for a in m['arguments'])]
+		self._linkable_mentions = linkable_mentions
 		self._linkable_variables = defaultdict(list)
 		self._linkable_descriptions = dict()
 		
@@ -46,6 +47,9 @@ class TextReadingLinker:
 
 		self._keys = keys
 		self._vectors = vectors
+
+		# TODO Remove after this is fixed in TR
+		self._fix_groundings()
 
 
 
@@ -83,6 +87,8 @@ class TextReadingLinker:
 
 		relevant_mentions = [m for m in data['mentions'] if m['type'] != 'TextBoundMention' and len(set(m['labels']) & relevant_labels) > 0]
 
+		text_bound_mentions = [m for m in data['mentions'] if m['type'] == 'TextBoundMention']
+
 		# Add context to the mentions
 		docs = data['documents']
 		for m in relevant_mentions:
@@ -92,7 +98,7 @@ class TextReadingLinker:
 			context = ' '.join(sent['raw'])
 			m['context'] = context
 
-		return relevant_mentions, docs
+		return relevant_mentions, text_bound_mentions, docs
 
 	def _average_vector(self, words:list[str]):
 		""" Precomputes and l2 normalizes the average vector of the requested word embeddings """
@@ -134,3 +140,19 @@ class TextReadingLinker:
 	@property
 	def documents(self):
 		return self._docs
+
+	def _fix_groundings(self):
+		""" This is a temporary fix to restore the missing groundings on the arguments of the events and relations. This will be obsolete once this issue is fixed in the TR pipeline """
+
+		# Find the text bound mentions
+		tb_mentions = {m["id"]:m for m in self._tb_mentions}
+
+		# Iterate over the arguments and restore the attachments
+		for m in self._linkable_mentions:
+			if m["type"] != "TextBoundMention":
+				for arg in m["arguments"].values():
+					arg = arg[0]
+					id = arg["id"]
+					if id in tb_mentions:
+						tb = tb_mentions[id]
+						arg["attachments"] = tb["attachments"]

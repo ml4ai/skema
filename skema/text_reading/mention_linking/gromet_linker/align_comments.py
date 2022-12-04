@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import json
 from pathlib import Path
 from typing import NamedTuple, Optional
+import itertools
 
 from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 
