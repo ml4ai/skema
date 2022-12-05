@@ -1,0 +1,21 @@
+# Docker Compose file to launch the MemgraphDB platform standalone.
+version: "3"
+services:
+  database:
+    image: "memgraph/memgraph-platform"
+    ports:
+      - "7687:7687"
+      - "3000:3000"
+      - "7444:7444"
+    volumes:
+      - mg_lib:/var/lib/memgraph
+      - mg_log:/var/log/memgraph
+      - mg_etc:/etc/memgraph
+    environment:
+      - MEMGRAPH="--log-level=TRACE"
+    entrypoint: ["/usr/bin/supervisord"]
+
+volumes:
+  mg_lib:
+  mg_log:
+  mg_etc:
