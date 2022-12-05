@@ -582,7 +582,6 @@ fn test_to_expr() {
             assert_eq!(op[1], Operator::Add);
             assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
             assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
-            println!("Success!");
         }
     }
 }
@@ -627,7 +626,6 @@ fn test_to_expr2() {
                     assert_eq!(args[2], Expr::Atom(Atom::Identifier("d".to_string())));
                 }
             }
-            println!("Success!");
         }
     }
 }
@@ -660,7 +658,6 @@ fn test_to_expr3() {
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
                 }
             }
-            println!("Success!");
         }
     }
 }
@@ -703,7 +700,6 @@ fn test_to_expr4() {
                 }
                 Expr::Expression { op, args, .. } => {}
             }
-            println!("Success!");
         }
     }
 }
@@ -741,7 +737,6 @@ fn test_to_expr5() {
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
                 }
             }
-            println!("Success!");
         }
     }
 }
@@ -804,7 +799,6 @@ fn test_to_expr6() {
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("g".to_string())));
                 }
             }
-            println!("Success!");
         }
     }
 }
@@ -845,7 +839,6 @@ fn test_to_expr7() {
                     assert_eq!(name, "b*c");
                 }
             }
-            println!("Success!");
         }
     }
 }
@@ -912,7 +905,6 @@ fn test_to_expr8() {
                     assert_eq!(name, "f*g");
                 }
             }
-            println!("Success!");
         }
     }
 }
@@ -966,7 +958,6 @@ fn test_to_expr9() {
                     }
                 }
             }
-            println!("Success!");
         }
     }
 }
@@ -994,7 +985,6 @@ fn test_to_expr10() {
     pre_exp.group_expr();
     pre_exp.get_names();
     let g = pre_exp.to_graph();
-    println!("{}", Dot::new(&g));
 }
 
 #[test]
