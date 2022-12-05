@@ -6,6 +6,14 @@ import org.clulab.utils.FileUtils
 import org.json4s.JsonDSL.boolean2jvalue
 import breeze.stats.distributions._
 
+/***
+  * HyperParameterSearch : generic, bruteforce Hyper parameter search using breeze (numpy style) calculations.
+  * Follows:
+  * For each concept.name
+  * Find edit distance between text to be grounded and the concept.name
+  * normalized edit distances = Edit distance/length of longest string among (text to be grounded, concept.name)
+  * alpha * cosineSimilarities + (1-alpha) (1-normalized edit distances)
+  */
 class HyperParameterSearch {
   // Grid search -bruteforce
   var hyperparam_size: Int = 2;
@@ -16,6 +24,7 @@ class HyperParameterSearch {
 
   val acc_map = new scala.collection.mutable.HashMap[(Float, Float), Float]()
 
+  // for each lambda, alpha value chosen just for a base case, loop mover to calculate accuracy
   for (lambda <- lambdas.toScalaVector()) yield {
     for (alpha <- alphas.toScalaVector()) yield {
       val this_acc = getAccuracyForThisHyperParams(lambda.toFloat, alpha.toFloat)
@@ -25,6 +34,13 @@ class HyperParameterSearch {
 
   println(acc_map)
 
+  /***
+    * Get accuracy for this lambda, alpha values provided.
+    * MiraEmbeddingsGrounder is initialized for lambda, alpha value.
+    * @param lambda
+    * @param alpha
+    * @return accuracy
+    */
   def getAccuracyForThisHyperParams(lambda: Float, alpha: Float): Float = {
     val miraEmbeddingsGrounderGS: MiraEmbeddingsGrounder = {
       val config = ConfigFactory.load().getConfig("Grounding")
