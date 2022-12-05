@@ -10,6 +10,8 @@ use petgraph::{graph::NodeIndex, Graph};
 use std::cmp::Reverse;
 use std::collections::VecDeque;
 use std::ptr::null_mut;
+use nom::character::complete::i32;
+
 
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
@@ -78,7 +80,7 @@ impl MathExpression {
                         args: pre_exp.args,
                         name: "".to_string(),
                     }
-                    .clone(),
+                        .clone(),
                 );
             }
             Msqrt(xs) => {
@@ -95,7 +97,7 @@ impl MathExpression {
                         args: pre_exp.args,
                         name: "".to_string(),
                     }
-                    .clone(),
+                        .clone(),
                 );
             }
             Mfrac(xs1, xs2) => {
@@ -114,7 +116,7 @@ impl MathExpression {
                         args: pre_exp.args,
                         name: "".to_string(),
                     }
-                    .clone(),
+                        .clone(),
                 );
             }
             _ => {
@@ -245,7 +247,23 @@ impl Expr {
                 }
                 for i in 0..=op.len() - 1 {
                     if i > 0 {
-                        name.push_str(&op[i].to_string().clone());
+                        if op[i] == Operator::Equals {
+                            let mut remove_idx = Vec::new();
+                            let mut x: i32 = (get_str_len(name) - 1) as i32;
+                            if x > 0 {
+                                while x >= 0 {
+                                    if name.chars().nth(x as usize) != Some('(') && name.chars().nth(x as usize) != Some(')') {
+                                        remove_idx.push(x as usize);
+                                    }
+                                    x = x - 1;
+                                }
+                            }
+                            for i in remove_idx.iter() {
+                                name.remove(*i);
+                            }
+                        } else {
+                            name.push_str(&op[i].to_string().clone());
+                        }
                     }
                     match &mut args[i] {
                         Expr::Atom(x) => match x {
@@ -301,29 +319,57 @@ impl Expr {
                             Atom::Number(x) => {
                                 let node_idx = get_node_idx(graph, x);
                                 if i == 0 {
-                                    graph.add_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op[i + 1].to_string(),
-                                    );
+                                    if op_copy.len() > 1 {
+                                        graph.add_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
                                 } else {
-                                    graph.add_edge(node_idx, parent_node_index, op[i].to_string());
+                                    if op_copy[i] == Operator::Equals {
+                                        if i <= op_copy.len() - 2 {
+                                            graph.add_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                op_copy[i + 1].to_string(),
+                                            );
+                                        }
+                                    } else {
+                                        graph.add_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i].to_string(),
+                                        );
+                                    }
                                 }
                             }
                             Atom::Identifier(x) => {
                                 let node_idx = get_node_idx(graph, x);
                                 if i == 0 {
-                                    graph.add_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i + 1].to_string(),
-                                    );
+                                    if op_copy.len() > 1 {
+                                        graph.add_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
                                 } else {
-                                    graph.add_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i].to_string(),
-                                    );
+                                    if op_copy[i] == Operator::Equals {
+                                        if i <= op_copy.len() - 2 {
+                                            graph.add_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                op_copy[i + 1].to_string(),
+                                            );
+                                        }
+                                    } else {
+                                        graph.add_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i].to_string(),
+                                        );
+                                    }
                                 }
                             }
                             Atom::Operator(x) => {}
@@ -340,11 +386,21 @@ impl Expr {
                                         );
                                     }
                                 } else {
-                                    graph.add_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i].to_string(),
-                                    );
+                                    if op_copy[i] == Operator::Equals {
+                                        if i <= op_copy.len() - 2 {
+                                            graph.add_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                op_copy[i + 1].to_string(),
+                                            );
+                                        }
+                                    } else {
+                                        graph.add_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i].to_string(),
+                                        );
+                                    }
                                 }
                             } else {
                                 let mut unitary_name = op[0].to_string();
@@ -361,19 +417,23 @@ impl Expr {
                                             parent_node_index,
                                             op_copy[i + 1].to_string(),
                                         );
+                                    }
+                                } else {
+                                    if op_copy[i] == Operator::Equals {
+                                        if i <= op_copy.len() - 2 {
+                                            graph.add_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                op_copy[i + 1].to_string(),
+                                            );
+                                        }
                                     } else {
                                         graph.add_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op[0].to_string(),
+                                            op_copy[i].to_string(),
                                         );
                                     }
-                                } else {
-                                    graph.add_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i].to_string(),
-                                    );
                                 }
                             }
                             args[i].to_graph(graph);
@@ -961,7 +1021,6 @@ fn test_to_expr11() {
     pre_exp.group_expr();
     pre_exp.get_names();
     let g = pre_exp.to_graph();
-    println!("{}", Dot::new(&g));
 }
 
 #[test]
@@ -993,7 +1052,6 @@ fn test_to_expr12() {
     pre_exp.group_expr();
     pre_exp.get_names();
     let g = pre_exp.to_graph();
-    println!("{}", Dot::new(&g));
 }
 
 #[test]
@@ -1025,7 +1083,6 @@ fn test_to_expr13() {
     pre_exp.group_expr();
     pre_exp.get_names();
     let g = pre_exp.to_graph();
-    println!("{}", Dot::new(&g));
 }
 
 #[test]
@@ -1053,7 +1110,6 @@ fn test_to_expr14() {
     pre_exp.group_expr();
     pre_exp.get_names();
     let g = pre_exp.to_graph();
-    println!("{}", Dot::new(&g));
 }
 
 #[test]
@@ -1081,7 +1137,6 @@ fn test_to_expr15() {
     pre_exp.group_expr();
     pre_exp.get_names();
     let g = pre_exp.to_graph();
-    println!("{}", Dot::new(&g));
 }
 
 #[test]
@@ -1098,5 +1153,44 @@ fn test_to_expr16() {
         ]),
     ])));
     let g = math_expression.to_graph();
-    println!("{}", Dot::new(&g));
+}
+
+#[test]
+fn test_to_expr17() {
+    let math_expression = Mrow(vec![
+        Mi("s".to_string()),
+        Mo(Operator::Equals),
+        Mi("b".to_string()),
+        Mo(Operator::Multiply),
+        Mrow(vec![
+            Mi("a".to_string()),
+            Mo(Operator::Subtract),
+            Mi("b".to_string()),
+        ]),
+    ]);
+    let g = math_expression.to_graph();
+}
+
+#[test]
+fn test_to_expr18() {
+    let math_expression = Mrow(vec![
+        Mi("s".to_string()),
+        Mo(Operator::Equals),
+        Mi("a".to_string()),
+        Mo(Operator::Multiply),
+        Mi("b".to_string()),
+        Mo(Operator::Subtract),
+        Msqrt(Box::from(Mrow(vec![
+            Mi("a".to_string()),
+            Mo(Operator::Subtract),
+            Mi("b".to_string()),
+            Mo(Operator::Multiply),
+            Mrow(vec![
+                Mi("a".to_string()),
+                Mo(Operator::Subtract),
+                Mi("b".to_string()),
+            ]),
+        ]))),
+    ]);
+    let g = math_expression.to_graph();
 }
