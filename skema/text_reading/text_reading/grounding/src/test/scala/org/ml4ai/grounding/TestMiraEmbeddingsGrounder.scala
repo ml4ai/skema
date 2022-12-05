@@ -10,8 +10,8 @@ import breeze.stats.distributions._
 
 class TestMiraEmbeddingsGrounder extends Test {
 
-//  // Lazily load the grounder. We assume it's state and behavior is immutable
-//  // So we can build it once and reuse it as necessary in the suite
+  // Lazily load the grounder. We assume it's state and behavior is immutable
+  // So we can build it once and reuse it as necessary in the suite
 
   val miraEmbeddingsGrounder: MiraEmbeddingsGrounder = {
     val config = ConfigFactory.load().getConfig("Grounding")
@@ -72,47 +72,7 @@ class TestMiraEmbeddingsGrounder extends Test {
     }
   }
 
-  // Grid search - bruteforce
-  var hyperparam_size :Int = 2;
-  val lambdas = DenseVector(1, 10,100) //Uniform(10, 1000).samplesVector(hyperparam_size)
-  val alphas = DenseVector(0.25, 0.5, 0.75) //Gaussian(0.0.toFloat, 1.0.toFloat).samplesVector(hyperparam_size).toDenseVector
-
-  val acc_map = new scala.collection.mutable.HashMap[(Float, Float), Float]()
-
-  for (lambda <- lambdas.toScalaVector().par) yield {
-    for (alpha <- alphas.toScalaVector().par) yield {
-      val this_acc = getAccuracyForThisHyperParams(lambda.toFloat, alpha.toFloat)
-      acc_map.update((lambda.toFloat, alpha.toFloat), this_acc)
-    }
-  }
-
-  def getAccuracyForThisHyperParams(lambda: Float, alpha: Float) : Float = {
-    val miraEmbeddingsGrounderGS: MiraEmbeddingsGrounder = {
-      val config = ConfigFactory.load().getConfig("Grounding")
-      val ontologyPath = config.getString("ontologyPath")
-      // val embeddingsPath = config.getString("embeddingsPath")
-      MiraEmbeddingsGrounder(ontologyPath, None, lambda, alpha)
-    }
-
-
-      val targets = {
-        // Drop the first line that is the header
-        FileUtils.getTextFromResource("/grounding_tests.tsv").split("\n").drop(1) map { line =>
-          val tokens = line.split("\t")
-          (tokens(0), tokens(1))
-        }
-      }
-
-      val predictions =
-        for {(text, groundingId) <- targets
-             } yield miraEmbeddingsGrounderGS.ground(text) match {
-          case Some(concept) => concept.id == groundingId
-          case None => false
-        }
-      val accuracy = (predictions.count(identity).floatValue() / predictions.length).floatValue()
-      val acc = accuracy.toFloat
-    acc
-  }
-
+  //TODO: add more unittests to test hyper parameter search as well as rules - Sushma Akoju (after dec 15th)
+  //val hyperParameterSearch = HyperParameterSearch()
 
 }
