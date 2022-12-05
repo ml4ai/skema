@@ -249,7 +249,7 @@ impl Expr {
                     if i > 0 {
                         if op[i] == Operator::Equals {
                             let mut remove_idx = Vec::new();
-                            let mut x: i32 = (get_str_len(name) - 1) as i32;
+                            let mut x: i32 = (name.chars().count() - 1) as i32;
                             if x > 0 {
                                 while x >= 0 {
                                     if name.chars().nth(x as usize) != Some('(') && name.chars().nth(x as usize) != Some(')') {
@@ -276,14 +276,14 @@ impl Expr {
                             Atom::Operator(_) => {}
                         },
                         Expr::Expression { op, .. } => {
-                            let mut str;
+                            let mut string;
                             if op[0] != Operator::Other("".to_string()) {
-                                str = op[0].to_string();
-                                str.push_str(args[i].get_names().as_str().clone());
+                                string = op[0].to_string();
+                                string.push_str(args[i].get_names().as_str().clone());
                             } else {
-                                str = args[i].get_names().as_str().to_string().clone();
+                                string = args[i].get_names().as_str().to_string().clone();
                             }
-                            name.push_str(&str.clone());
+                            name.push_str(&string.clone());
                         }
                     }
                 }
@@ -445,17 +445,17 @@ impl Expr {
     }
 }
 
-pub fn redundant_paren(str: &String) -> bool {
-    let str_len = get_str_len(str);
-    if str.chars().nth(0) != Some('(') || str.chars().nth(str_len - 1) != Some(')') {
+pub fn redundant_paren(string: &String) -> bool {
+    let str_len = string.chars().count();
+    if string.chars().nth(0) != Some('(') || string.chars().nth(str_len - 1) != Some(')') {
         return false;
     }
     let mut par_stack = VecDeque::new();
     par_stack.push_back("left_par");
     for i in 1..=str_len - 2 {
-        if str.chars().nth(i) == Some('(') {
+        if string.chars().nth(i) == Some('(') {
             par_stack.push_back("par");
-        } else if str.chars().nth(i) == Some(')') {
+        } else if string.chars().nth(i) == Some(')') {
             par_stack.pop_back();
         }
     }
@@ -513,27 +513,12 @@ impl PreExp {
     }
 }
 
-pub fn get_str_len(str: &str) -> usize {
-    let mut count = 0;
-    if str.len() > 0 {
-        for i in 0..=str.len() - 1 {
-            match str.chars().nth(i) {
-                None => {}
-                Some(_) => {
-                    count = count + 1;
-                }
-            }
-        }
+pub fn remove_paren(string: &mut String) -> &mut String {
+    while redundant_paren(string) {
+        string.remove(string.len() - 1);
+        string.remove(0);
     }
-    return count;
-}
-
-pub fn remove_paren(str: &mut String) -> &mut String {
-    while redundant_paren(str) {
-        str.remove(str.len() - 1);
-        str.remove(0);
-    }
-    return str;
+    return string;
 }
 
 /// if exists, return the node index; if no, add a new node and return the node index
