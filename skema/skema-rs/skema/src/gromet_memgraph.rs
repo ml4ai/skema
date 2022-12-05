@@ -63,33 +63,9 @@ pub fn execute_query(query: &str) -> Result<(), MgError> {
     // Create simple graph.
     connection.execute_without_results(query)?;
 
-    // Fetch the graph.
-    /*let columns = connection.execute("MATCH (n)-[r]->(m) RETURN n, r, m;", None)?;
-    println!("Columns: {}", columns.join(", "));
-    for record in connection.fetchall()? {
-        for value in record.values {
-            match value {
-                Value::Node(node) => print!("{}", node),
-                Value::Relationship(edge) => print!("-{}-", edge),
-                value => print!("{}", value),
-            }
-        }
-        println!();
-    }*/
     connection.commit()?;
 
     Ok(())
-}
-
-fn create_metadata_node(gromet: &Gromet) -> Vec<String> {
-    let mut queries: Vec<String> = vec![];
-
-    let mut query = String::from("CREATE");
-    let collection_str = format!("{:?}", gromet.metadata_collection.as_ref().unwrap());
-    let prop = format!(" (meta:Metadata {{collection: {:?}}})", collection_str);
-    query.push_str(&prop);
-    queries.push(query);
-    return queries;
 }
 
 fn create_module(gromet: &Gromet) -> Vec<String> {
@@ -1687,7 +1663,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
         let mut name = String::from("a");
         let mut value = String::from("b");
         let mut metadata = String::from("c");
-        // println!("{:?}", node.clone());
         if node.name.is_none() {
             name = node.n_type.clone();
         } else {
@@ -3201,12 +3176,10 @@ pub fn create_att_predicate(
         }
     }
     // now to construct the nodes inside the predicate, Literal and Primitives
-    println!("{}", start);
     let mut box_counter: u8 = 1;
     for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
         match sboxf.function_type {
             FunctionType::Literal => {
-                println!("Predicate Literal: {}", start);
                 (nodes, edges) = create_att_literal(
                     &gromet.clone(),
                     eboxf.clone(),
@@ -3222,7 +3195,6 @@ pub fn create_att_predicate(
                 start += 1;
             }
             FunctionType::Primitive => {
-                println!("Predicate Primitive: {}", start);
                 (nodes, edges) = create_att_primitive(
                     &gromet.clone(),
                     eboxf.clone(),
@@ -4119,7 +4091,6 @@ pub fn parse_gromet_queries(gromet: Gromet) -> Vec<String> {
 
     let mut start: u32 = 0;
 
-    // queries.append(&mut create_metadata_node(&gromet));
     queries.append(&mut create_module(&gromet));
     queries.append(&mut create_function_net(&gromet, start));
 

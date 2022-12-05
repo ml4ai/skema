@@ -3,6 +3,7 @@ use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
+use skema::queries::{module_request, push_model_request};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 use clap::Parser;
@@ -61,6 +62,8 @@ async fn main() -> std::io::Result<()> {
                 SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
             )
             .service(ping)
+            .service(module_request)
+            .service(push_model_request)
     })
     .bind((args.host, args.port))?
     .run()
