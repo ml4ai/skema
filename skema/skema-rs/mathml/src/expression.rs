@@ -11,7 +11,7 @@ use std::cmp::Reverse;
 use std::collections::VecDeque;
 use std::ptr::null_mut;
 
-pub type MathMLGraph<'a> = Graph<String, String>;
+pub type MathExpressionGraph<'a> = Graph<String, String>;
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -30,31 +30,33 @@ enum Expr {
     },
 }
 
+/// Intermediate data structure to support the generation of graphs of mathematical expressions
 #[derive(Debug, PartialEq, Clone)]
-struct PreExp {
+pub struct PreExp {
     op: Vec<Operator>,
     args: Vec<Expr>,
     name: String,
 }
 
 impl MathExpression {
-    fn to_expr(self, mut pre: &mut PreExp) {
+    pub fn to_expr(self, mut pre: &mut PreExp) {
         match self {
             Mi(x) => {
                 if pre.args.len() >= pre.op.len() {
-                    pre.op.push(Operator::Multiply); // deal with the invisible multiply operator
+                    /// deal with the invisible multiply operator
+                    pre.op.push(Operator::Multiply);
                 }
                 pre.args.push(Expr::Atom(Atom::Identifier(x.to_string())));
             }
             Mn(x) => {
                 if pre.args.len() >= pre.op.len() {
-                    pre.op.push(Operator::Multiply); // deal with the invisible multiply operator
+                    /// deal with the invisible multiply operator
+                    pre.op.push(Operator::Multiply);
                 }
                 pre.args.push(Expr::Atom(Atom::Number(x.to_string())));
             }
             Mo(x) => {
                 match x {
-                    // Operator::Other(_) => { pre.op = x.clone(); }
                     _ => {
                         pre.op.push(x.clone());
                     }
@@ -121,7 +123,7 @@ impl MathExpression {
         }
     }
 
-    fn to_graph(self) -> MathMLGraph<'static> {
+    pub fn to_graph(self) -> MathExpressionGraph<'static> {
         let mut pre_exp = PreExp {
             op: Vec::<Operator>::new(),
             args: Vec::<Expr>::new(),
@@ -259,9 +261,7 @@ impl Expr {
                             let mut str;
                             if op[0] != Operator::Other("".to_string()) {
                                 str = op[0].to_string();
-                                // str.push_str("(");
                                 str.push_str(args[i].get_names().as_str().clone());
-                                // str.push_str(")");
                             } else {
                                 str = args[i].get_names().as_str().to_string().clone();
                             }
@@ -269,16 +269,6 @@ impl Expr {
                         }
                     }
                 }
-                // if op[0] != Operator::Other("".to_string()) || !all_multi_div(op) {
-                //     name.push_str(")");
-                // }
-                // if op[0] == Operator::Other("".to_string()) {
-                //     if !all_multi_div(op) {
-                //         if add_paren{
-                //             name.push_str(")");
-                //         }
-                //     }
-                // }
                 if add_paren {
                     name.push_str(")");
                 }
@@ -289,7 +279,7 @@ impl Expr {
         }
     }
 
-    fn to_graph(&mut self, graph: &mut MathMLGraph) {
+    fn to_graph(&mut self, graph: &mut MathExpressionGraph) {
         match self {
             Expr::Atom(x) => {}
             Expr::Expression { op, args, name } => {
@@ -349,9 +339,6 @@ impl Expr {
                                             op_copy[i + 1].to_string(),
                                         );
                                     }
-                                    // else {
-                                    //     graph.add_edge(node_idx, parent_node_index, op[0].to_string());
-                                    // }
                                 } else {
                                     graph.add_edge(
                                         node_idx,
@@ -452,9 +439,8 @@ impl PreExp {
         }
     }
 
-    fn to_graph(&mut self) -> MathMLGraph {
-        let mut g = MathMLGraph::new();
-        // let root_index = g.add_node("root".to_string());
+    fn to_graph(&mut self) -> MathExpressionGraph {
+        let mut g = MathExpressionGraph::new();
         for mut arg in &mut self.args {
             match &mut arg {
                 Expr::Atom(_) => {}
@@ -490,8 +476,8 @@ pub fn remove_paren(str: &mut String) -> &mut String {
     return str;
 }
 
-// if exists, return the node index; if no, add a new node and return the node index
-pub fn get_node_idx(graph: &mut MathMLGraph, name: &mut String) -> NodeIndex {
+/// if exists, return the node index; if no, add a new node and return the node index
+pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeIndex {
     remove_paren(name);
     if graph.node_count() > 0 {
         for n in 0..=graph.node_count() - 1 {
@@ -788,7 +774,7 @@ fn test_to_expr7() {
             assert_eq!(op[0], Operator::Other("".to_string()));
             assert_eq!(op[1], Operator::Add);
             assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
-            assert_eq!(name, "(a+(b*c))");
+            assert_eq!(name, "(a+b*c)");
             match &args[1] {
                 Expr::Atom(_) => {}
                 Expr::Expression { op, args, name } => {
@@ -796,7 +782,7 @@ fn test_to_expr7() {
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
-                    assert_eq!(name, "(b*c)");
+                    assert_eq!(name, "b*c");
                 }
             }
             println!("Success!");
@@ -841,7 +827,7 @@ fn test_to_expr8() {
             assert_eq!(op[2], Operator::Subtract);
             assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
             assert_eq!(args[3], Expr::Atom(Atom::Identifier("h".to_string())));
-            assert_eq!(name, "(a+(b*c*d/e)-(f*g)-h)");
+            assert_eq!(name, "(a+b*c*d/e-f*g-h)");
             match &args[1] {
                 Expr::Atom(_) => {}
                 Expr::Expression { op, args, name } => {
@@ -853,7 +839,7 @@ fn test_to_expr8() {
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
                     assert_eq!(args[2], Expr::Atom(Atom::Identifier("d".to_string())));
                     assert_eq!(args[3], Expr::Atom(Atom::Identifier("e".to_string())));
-                    assert_eq!(name, "(b*c*d/e)");
+                    assert_eq!(name, "b*c*d/e");
                 }
             }
             match &args[2] {
@@ -863,7 +849,7 @@ fn test_to_expr8() {
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("f".to_string())));
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("g".to_string())));
-                    assert_eq!(name, "(f*g)");
+                    assert_eq!(name, "f*g");
                 }
             }
             println!("Success!");
@@ -900,14 +886,14 @@ fn test_to_expr9() {
             assert_eq!(op[0], Operator::Other("".to_string()));
             assert_eq!(op[1], Operator::Add);
             assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
-            assert_eq!(name, "(a+(b*(c-d)))");
+            assert_eq!(name, "(a+b*(c-d))");
             match &args[1] {
                 Expr::Atom(_) => {}
                 Expr::Expression { op, args, name } => {
                     assert_eq!(op[0], Operator::Other("".to_string()));
                     assert_eq!(op[1], Operator::Multiply);
                     assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
-                    assert_eq!(name, "(b*(c-d))");
+                    assert_eq!(name, "b*(c-d)");
                     match &args[1] {
                         Expr::Atom(_) => {}
                         Expr::Expression { op, args, name } => {
