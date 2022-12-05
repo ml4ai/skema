@@ -45,14 +45,14 @@ impl MathExpression {
         match self {
             Mi(x) => {
                 if pre.args.len() >= pre.op.len() {
-                    /// deal with the invisible multiply operator
+                    // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
                 pre.args.push(Expr::Atom(Atom::Identifier(x.to_string())));
             }
             Mn(x) => {
                 if pre.args.len() >= pre.op.len() {
-                    /// deal with the invisible multiply operator
+                    // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
                 pre.args.push(Expr::Atom(Atom::Number(x.to_string())));
