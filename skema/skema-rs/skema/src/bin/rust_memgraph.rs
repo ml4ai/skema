@@ -14,10 +14,6 @@ fn main() {
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
 
-    for query in queries.clone() {
-        println!("{}", query);
-    }
-
     // need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     let mut full_query = queries[0].clone();
     for i in 1..(queries.len()) {
