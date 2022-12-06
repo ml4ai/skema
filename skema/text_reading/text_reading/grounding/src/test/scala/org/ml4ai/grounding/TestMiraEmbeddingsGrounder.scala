@@ -18,7 +18,7 @@ class TestMiraEmbeddingsGrounder extends Test {
     val ontologyPath = config.getString("ontologyPath")
     // val embeddingsPath = config.getString("embeddingsPath")
 
-    MiraEmbeddingsGrounder(ontologyPath, None, 10, 0.25.toFloat)
+    MiraEmbeddingsGrounder(ontologyPath, None, 10, 0.25f)
   }
 
   def correctGrounding(shouldable: Shouldable, text: String, groundingID: String): Unit = {
