@@ -4,6 +4,7 @@ use skema::services::comment_extraction::{
     SingleLineComment,
 };
 use skema::services::mathml::get_ast_graph;
+use skema::services::math_exp_graph::get_math_exp_graph;
 
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -38,6 +39,7 @@ async fn main() -> std::io::Result<()> {
         paths(
             skema::services::comment_extraction::get_comments,
             skema::services::mathml::get_ast_graph,
+            skema::services::math_exp_graph::get_math_exp_graph,
             ping
         ),
         components(
@@ -62,6 +64,7 @@ async fn main() -> std::io::Result<()> {
         App::new()
         .service(get_comments)
         .service(get_ast_graph)
+        .service(get_math_exp_graph)
         .service(
             SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
         )
