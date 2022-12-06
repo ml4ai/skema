@@ -10,9 +10,6 @@ use petgraph::{graph::NodeIndex, Graph};
 
 use std::collections::VecDeque;
 
-
-
-
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
 #[derive(Debug, PartialEq, Clone)]
@@ -78,7 +75,7 @@ impl MathExpression {
                         args: pre_exp.args,
                         name: "".to_string(),
                     }
-                        ,
+                    ,
                 );
             }
             Msqrt(xs) => {
@@ -95,7 +92,7 @@ impl MathExpression {
                         args: pre_exp.args,
                         name: "".to_string(),
                     }
-                        ,
+                    ,
                 );
             }
             Mfrac(xs1, xs2) => {
@@ -114,7 +111,7 @@ impl MathExpression {
                         args: pre_exp.args,
                         name: "".to_string(),
                     }
-                        ,
+                    ,
                 );
             }
             _ => {
@@ -133,7 +130,7 @@ impl MathExpression {
         self.to_expr(&mut pre_exp);
         pre_exp.group_expr();
         pre_exp.get_names();
-        
+
         pre_exp.to_graph()
     }
 }
@@ -525,7 +522,7 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
             }
         }
     }
-    
+
     graph.add_node(name.to_string())
 }
 
@@ -667,7 +664,7 @@ fn test_to_expr4() {
                 Expr::Atom(_x) => {
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
                 }
-                Expr::Expression {   .. } => {}
+                Expr::Expression { .. } => {}
             }
         }
     }
@@ -1152,4 +1149,16 @@ fn test_to_expr18() {
         ]))),
     ]);
     let _g = math_expression.to_graph();
+}
+
+use crate::parsing::parse;
+
+#[test]
+fn test_to_expr19() {
+    let input = "tests/sir.xml";
+    let contents =
+        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
+    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    math.normalize();
+    let _g = &mut math.content[0].clone().to_graph();
 }
