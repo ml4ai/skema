@@ -3,8 +3,10 @@ use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
-use skema::queries::{module_ping, push_model, module_delete};
-use skema::services::mathml::get_ast_graph;
+use skema::services::{
+    gromet::{module_ping, push_model, module_delete},
+    mathml::get_ast_graph
+};
 
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
