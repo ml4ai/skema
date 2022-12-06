@@ -7,7 +7,7 @@ steps:
 - name: test_rust_components
   image: rust:1.65
   commands:
-  - apt update && apt install cmake openssl libclang-13-dev
+  - apt update && apt install -y cmake openssl libclang-13-dev
   - cd skema/skema-rs
   - cargo test --verbose --all
 
