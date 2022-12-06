@@ -3,7 +3,10 @@ use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
-use skema::services::mathml::{get_ast_graph, get_math_exp_graph};
+use skema::services::{
+    gromet::{get_model_ids, post_model, delete_model},
+    mathml::{get_ast_graph, get_math_exp_graph}
+};
 
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -39,6 +42,9 @@ async fn main() -> std::io::Result<()> {
             skema::services::comment_extraction::get_comments,
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
+            skema::services::gromet::get_model_ids,
+            skema::services::gromet::post_model,
+            skema::services::gromet::delete_model,
             ping
         ),
         components(
@@ -61,13 +67,19 @@ async fn main() -> std::io::Result<()> {
     let args = Cli::parse();
     HttpServer::new(move || {
         App::new()
-        .service(get_comments)
-        .service(get_ast_graph)
-        .service(get_math_exp_graph)
-        .service(
-            SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
-        )
-        .service(ping)
+            .service(get_comments)
+            .service(ping)
+            .service(get_model_ids)
+            .service(post_model)
+            .service(delete_model)
+            .service(get_comments)
+            .service(get_ast_graph)
+            .service(get_math_exp_graph)
+            .service(
+            SwaggerUi::new("/api-docs/{_:.*}")
+                .url("/api-doc/openapi.json", openapi.clone()),
+            )
+            .service(ping)
     })
     .bind((args.host, args.port))?
     .run()
