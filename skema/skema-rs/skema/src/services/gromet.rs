@@ -38,7 +38,7 @@ pub fn delete_module(module_id: u32) -> Result<(),MgError> {
     Ok(())
 }
 
-pub fn module_query() -> Result<String, MgError> {
+pub fn module_query() -> Result<Vec<i64>, MgError> {
     // Connect to Memgraph.
     let connect_params = ConnectParams {
         host: Some(String::from("localhost")),
@@ -47,32 +47,33 @@ pub fn module_query() -> Result<String, MgError> {
     let mut connection = Connection::connect(&connect_params)?;
 
     // Run Query.
-    let columns = connection.execute("MATCH (n:Module) RETURN n;", None)?;
-    let mut result = String::from("Modules:");
-    for record in connection.fetchall()? {
-        for value in record.values {
-            match value {
-                Value::Node(node) => result = format!("{} \n filename: {}, id: {}", result.clone(), node.properties.get("filename").unwrap(), node.id),
-                Value::Relationship(edge) => print!("edge"),
-                value => print!("{}", value),
-            }
-        }
+    connection.execute("MATCH (n:Module) RETURN collect(id(n));", None)?;
+
+    // Check that the first value of the first record is a list
+    let mut ids = Vec::<i64>::new();
+    if let Value::List(xs) = &connection.fetchall()?[0].values[0] {
+        ids = xs.iter().filter_map(|x| match x {
+            Value::Int(x) => Some(x.clone()),
+            _ => None
+        }).collect();
     }
     connection.commit()?;
 
-    Ok(result)
+    Ok(ids)
 }
+
 /// This retrieves the module ids and filename
 #[utoipa::path(
     responses(
         (status = 200, description = "Modules successfully pinged")
     )
 )]
-#[get("/module_ping")]
-pub async fn module_ping() -> HttpResponse {
+#[get("/models")]
+pub async fn get_model_ids() -> HttpResponse {
     let response = module_query().unwrap();
-    HttpResponse::Ok().body(response)
+    HttpResponse::Ok().json(web::Json(response))
 }
+
 /// Pushes a gromet JSON to the Memgraph database
 #[utoipa::path(
     request_body = Gromet,
@@ -80,11 +81,12 @@ pub async fn module_ping() -> HttpResponse {
         (status = 200, description = "Model successfully pushed")
     )
 )]
-#[post("/push_model")]
+#[post("/models")]
 pub async fn push_model(payload: web::Json<Gromet>) -> HttpResponse {
     push_model_to_db(payload.into_inner());
     HttpResponse::Ok().body("Pushed model to Database")
 }
+
 /// This deletes a model from the Memgraph Database instance based on it's id
 #[utoipa::path(
     request_body = ModuleId,
