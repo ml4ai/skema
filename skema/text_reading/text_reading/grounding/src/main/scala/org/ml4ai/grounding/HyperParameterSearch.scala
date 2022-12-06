@@ -14,7 +14,7 @@ import breeze.stats.distributions._
   * normalized edit distances = Edit distance/length of longest string among (text to be grounded, concept.name)
   * alpha * cosineSimilarities + (1-alpha) (1-normalized edit distances)
   */
-class HyperParameterSearch {
+object HyperParameterSearch extends App {
   // Grid search -bruteforce
   var hyperparam_size: Int = 2;
   val lambdas = DenseVector(1, 10, 100) //Uniform(10, 1000).samplesVector(hyperparam_size)
@@ -71,8 +71,3 @@ class HyperParameterSearch {
 
 }
 
-object HyperParameterSearch{
-  def apply() = ???
-
-  new HyperParameterSearch()
-}
