@@ -60,10 +60,10 @@ pub fn module_query() -> Result<String, MgError> {
 
     Ok(result)
 }
-
+/// This retrieves the module ids and filename
 #[utoipa::path(
     responses(
-        (status = 200, description = "Module Ping")
+        (status = 200, description = "Modules successfully pinged")
     )
 )]
 #[get("/module_ping")]
@@ -71,11 +71,11 @@ pub async fn module_ping() -> HttpResponse {
     let response = module_query().unwrap();
     HttpResponse::Ok().body(response)
 }
-
+/// Pushes a gromet JSON to the Memgraph database
 #[utoipa::path(
     request_body = Gromet,
     responses(
-        (status = 200, description = "Pushes Gromet model to DB", body = Gromet)
+        (status = 200, description = "Model successfully pushed")
     )
 )]
 #[post("/push_model")]
@@ -83,11 +83,11 @@ pub async fn push_model(payload: web::Json<Gromet>) -> HttpResponse {
     push_model_to_db(payload.into_inner());
     HttpResponse::Ok().body("Pushed model to Database")
 }
-
+/// This deletes a model from the Memgraph Database instance based on it's id
 #[utoipa::path(
     request_body = ModuleId,
     responses(
-        (status = 200, description = "Deletes the model with the provided id", body = ModuleId)
+        (status = 200, description = "Model Deleted", body = ModuleId)
     )
 )]
 #[get("/module_delete")]
