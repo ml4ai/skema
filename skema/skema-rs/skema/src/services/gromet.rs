@@ -85,7 +85,6 @@ pub async fn post_model(payload: web::Json<Gromet>) -> HttpResponse {
 
 /// Deletes a model from the database based on its id.
 #[utoipa::path(
-    request_body = ModuleId,
     responses(
         (status = 200, description = "Model deleted")
     )
