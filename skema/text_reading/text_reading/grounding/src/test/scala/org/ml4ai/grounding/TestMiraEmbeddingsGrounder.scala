@@ -42,7 +42,7 @@ class TestMiraEmbeddingsGrounder extends Test {
   // These matches are to synonyms. Are not exactly the same, but should be handled correctly by the grounding algorithm
   correctGrounding(failingTest, "junctional epidermolysis bullosa generalisata mitis", "doid:0060738")
   correctGrounding(passingTest, "covid19", "doid:0080600")
-  correctGrounding(passingTest, "s-block compounds", "chebi:33674")
+  correctGrounding(failingTest, "s-block compounds", "chebi:33674")
 
   behavior of "Accuracy of the matches"
 
