@@ -1,6 +1,10 @@
+//! Program for inserting GroMEt models into a database from the command line.
+
 use serde_json;
-use skema::gromet_memgraph::{execute_query, parse_gromet_queries};
-use skema::Gromet;
+use skema::{
+    database::{execute_query, parse_gromet_queries},
+    Gromet,
+};
 use std::env;
 use std::fs;
 

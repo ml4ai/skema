@@ -1,5 +1,5 @@
 // Inclusion of additional modules
-pub mod gromet_memgraph;
+pub mod database;
 pub mod services;
 
 // Stub for SKEMA library

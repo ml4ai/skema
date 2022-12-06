@@ -1,6 +1,6 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 
-use crate::gromet_memgraph::{execute_query, parse_gromet_queries};
+use crate::database::{execute_query, parse_gromet_queries};
 use crate::Gromet;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use serde::{Deserialize, Serialize};
