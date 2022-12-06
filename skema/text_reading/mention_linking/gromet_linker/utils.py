@@ -1,6 +1,6 @@
 import datetime
 from typing import Optional, Tuple
-from automates.gromet.metadata import SourceCodeComment, Provenance, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
+from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
 
 from gromet_linker.mention_linking import TextReadingLinker
 
@@ -182,26 +182,24 @@ def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet
 	if md:
 		md.score = score
 		# Metametadata, the metadata of the metadata
-		# TODO Add context field
-		# TODO Expand the grounding type from string to (arg name, id, text, score)
-
 		# Generate the groundings
 		groundings = list()
 		for arg_name, arg in mention['arguments'].items():
 			for attachment in arg[0]['attachments']:
 				if type(attachment) == list:
 					for g in attachment[0]:
-						groundings.append(f"{arg_name}\t{g['id']}\t{g['name']}\t{g['score']}")
+						grounding = TextGrounding(
+							argument_name= arg_name,
+							id = g['id'],
+							description= g['name'],
+							score= g['score']
+						)
+						groundings.append(grounding)
 
-		mmd = TextExtractionMetadata(
-			provenance= build_provenance("embedding_similarity_1.0"),
-
-		)
+		md.grounding = groundings
 
 		# Attach the tr linking metadata to the gromet element
 		attach_metadata(md, element, gromet)
-		# Attach the metametadata
-		# attach_metadata(mmd, text_extraction, gromet)
 
 
 def attach_metadata(new_metadata, element, gromet):
