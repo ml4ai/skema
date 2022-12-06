@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Operator {
     Add,
     Multiply,
@@ -15,12 +15,12 @@ pub enum Operator {
 impl fmt::Display for Operator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Operator::Add => write!(f, "{}", "+"),
-            Operator::Multiply => write!(f, "{}", "*"),
-            Operator::Equals => write!(f, "{}", "="),
-            Operator::Divide => write!(f, "{}", "/"),
-            Operator::Subtract => write!(f, "{}", "-"),
-            Operator::Sqrt => write!(f, "{}", "√"),
+            Operator::Add => write!(f, "+"),
+            Operator::Multiply => write!(f, "*"),
+            Operator::Equals => write!(f, "="),
+            Operator::Divide => write!(f, "/"),
+            Operator::Subtract => write!(f, "-"),
+            Operator::Sqrt => write!(f, "√"),
             Operator::Other(op) => write!(f, "{}", op),
         }
     }
