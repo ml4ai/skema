@@ -4,7 +4,7 @@ use skema::services::comment_extraction::{
     SingleLineComment,
 };
 use skema::services::{
-    gromet::{get_model_ids, push_model, module_delete},
+    gromet::{get_model_ids, post_model, delete_model},
     mathml::get_ast_graph
 };
 
@@ -42,6 +42,8 @@ async fn main() -> std::io::Result<()> {
             skema::services::comment_extraction::get_comments,
             skema::services::mathml::get_ast_graph,
             skema::services::gromet::get_model_ids,
+            skema::services::gromet::post_model,
+            skema::services::gromet::delete_model,
             ping
         ),
         components(
@@ -70,14 +72,14 @@ async fn main() -> std::io::Result<()> {
             )
             .service(ping)
             .service(get_model_ids)
-            .service(push_model)
+            .service(post_model)
+            .service(delete_model)
             .service(get_comments)
             .service(get_ast_graph)
             .service(
             SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
             )
             .service(ping)
-            .service(module_delete)
     })
     .bind((args.host, args.port))?
     .run()

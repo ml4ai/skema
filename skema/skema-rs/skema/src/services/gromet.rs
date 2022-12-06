@@ -6,7 +6,7 @@ use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use serde::{Deserialize, Serialize};
 use std::process::Termination;
 
-use actix_web::{HttpResponse, get, post, web};
+use actix_web::{HttpResponse, get, post, web, delete};
 use utoipa;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -30,7 +30,7 @@ pub fn push_model_to_db(gromet: Gromet) -> Result<(), MgError> {
     Ok(())
 }
 
-pub fn delete_module(module_id: u32) -> Result<(),MgError> {
+pub fn delete_module(module_id: i64) -> Result<(),MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     let query = format!("MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}\nDETACH DELETE n,m", module_id);
@@ -62,10 +62,10 @@ pub fn module_query() -> Result<Vec<i64>, MgError> {
     Ok(ids)
 }
 
-/// This retrieves the module ids and filename
+/// This retrieves the model IDs.
 #[utoipa::path(
     responses(
-        (status = 200, description = "Modules successfully pinged")
+        (status = 200, description = "Successfully retreived model IDs")
     )
 )]
 #[get("/models")]
@@ -82,20 +82,21 @@ pub async fn get_model_ids() -> HttpResponse {
     )
 )]
 #[post("/models")]
-pub async fn push_model(payload: web::Json<Gromet>) -> HttpResponse {
+pub async fn post_model(payload: web::Json<Gromet>) -> HttpResponse {
     push_model_to_db(payload.into_inner());
     HttpResponse::Ok().body("Pushed model to Database")
 }
 
-/// This deletes a model from the Memgraph Database instance based on it's id
+/// Deletes a model from the database based on its id.
 #[utoipa::path(
     request_body = ModuleId,
     responses(
-        (status = 200, description = "Model Deleted", body = ModuleId)
+        (status = 200, description = "Model deleted", body = ModuleId)
     )
 )]
-#[get("/module_delete")]
-pub async fn module_delete(payload: web::Json<ModuleId>) -> HttpResponse {
-    delete_module(payload.module_id);
-    HttpResponse::Ok().body("Module Deleted")
+#[delete("/models/{id}")]
+pub async fn delete_model(path: web::Path<i64>) -> HttpResponse {
+    let id = path.into_inner();
+    delete_module(id);
+    HttpResponse::Ok().body("Model deleted")
 }
