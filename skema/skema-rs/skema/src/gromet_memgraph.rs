@@ -1,3 +1,6 @@
+//! Interface to the graph database we are using for persisting GroMEt objects and performing
+//! queries on them. We currently use MemgraphDB, an in-memory graph database.
+
 /* Currently 2 cases I don't think there is support for:
 1st being functions of functions, most important case to expand support for
 2nd being for a second function call of the same function which contains an expression,
