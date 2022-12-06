@@ -8,10 +8,12 @@ use crate::ast::{
 
 use petgraph::{graph::NodeIndex, Graph};
 
-pub type MathMLGraph<'a> = Graph<String, u32>;
+/// A graph representation of the MathML abstract syntax tree (AST), for easier inspection,
+/// visualization, and debugging.
+pub type ASTGraph<'a> = Graph<String, u32>;
 
 fn add_node_and_edge<'a>(
-    graph: &mut MathMLGraph<'a>,
+    graph: &mut ASTGraph<'a>,
     parent_index: Option<NodeIndex>,
     x: &'a str,
 ) -> NodeIndex {
@@ -22,13 +24,13 @@ fn add_node_and_edge<'a>(
     node_index
 }
 
-fn add_to_graph_0<'a>(graph: &mut MathMLGraph<'a>, parent_index: Option<NodeIndex>, x: &'a str) {
+fn add_to_graph_0<'a>(graph: &mut ASTGraph<'a>, parent_index: Option<NodeIndex>, x: &'a str) {
     add_node_and_edge(graph, parent_index, x);
 }
 
 /// Update the parent index
 fn update_parent<'a>(
-    graph: &mut MathMLGraph<'a>,
+    graph: &mut ASTGraph<'a>,
     mut parent_index: Option<NodeIndex>,
     x: &'a str,
 ) -> Option<NodeIndex> {
@@ -47,7 +49,7 @@ macro_rules! add_to_graph_n {
 
 /// Function to add elements with a variable number of child elements.
 fn add_to_graph_many0<'a>(
-    graph: &mut MathMLGraph<'a>,
+    graph: &mut ASTGraph<'a>,
     parent_index: Option<NodeIndex>,
     elem_type: &'a str,
     elements: &'a Vec<MathExpression>,
@@ -59,11 +61,7 @@ fn add_to_graph_many0<'a>(
 }
 
 impl MathExpression {
-    pub fn add_to_graph<'a>(
-        &'a self,
-        graph: &mut MathMLGraph<'a>,
-        parent_index: Option<NodeIndex>,
-    ) {
+    pub fn add_to_graph<'a>(&'a self, graph: &mut ASTGraph<'a>, parent_index: Option<NodeIndex>) {
         match self {
             Mi(x) => add_to_graph_0(graph, parent_index, x),
             Mo(x) => add_to_graph_0(graph, parent_index, &x.to_string()),
@@ -85,8 +83,9 @@ impl MathExpression {
 }
 
 impl Math {
-    pub fn to_graph(&self) -> MathMLGraph {
-        let mut g = MathMLGraph::new();
+    /// Create a graph representation of the AST, for easier visualization and debugging.
+    pub fn to_graph(&self) -> ASTGraph {
+        let mut g = ASTGraph::new();
         let root_index = g.add_node("root".to_string());
         for element in &self.content {
             element.add_to_graph(&mut g, Some(root_index));

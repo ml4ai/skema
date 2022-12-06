@@ -2,7 +2,6 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{Mi, Mn, Mo, Mrow, Msub},
-    Operator,
 };
 
 impl MathExpression {
@@ -56,6 +55,7 @@ impl Math {
 
 #[test]
 fn test_get_string_repr() {
+    use crate::ast::Operator;
     assert_eq!(Mi("t".to_string()).get_string_repr(), "t".to_string());
     assert_eq!(Mo(Operator::Add).get_string_repr(), "+");
     assert_eq!(
@@ -66,6 +66,7 @@ fn test_get_string_repr() {
 
 #[test]
 fn test_subscript_collapsing() {
+    use crate::ast::Operator;
     let mut expr = Msub(
         Box::new(Mi("S".to_string())),
         Box::new(Mrow(vec![
@@ -80,6 +81,7 @@ fn test_subscript_collapsing() {
 
 #[test]
 fn test_normalize() {
+    use crate::ast::Operator;
     use crate::parsing::parse;
     let contents = std::fs::read_to_string("tests/sir.xml").unwrap();
     let (_, mut math) = parse(&contents).unwrap();
