@@ -4,17 +4,11 @@ use crate::database::{execute_query, parse_gromet_queries};
 use crate::Gromet;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use serde::{Deserialize, Serialize};
-use std::process::Termination;
 
 use actix_web::{HttpResponse, get, post, web, delete};
 use utoipa;
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ModuleId {
-    pub module_id: u32,
-}
-
-pub fn push_model_to_db(gromet: Gromet) -> Result<(), MgError> {
+pub fn push_model_to_db(gromet: Gromet) -> Result<i64, MgError> {
 
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
@@ -27,7 +21,9 @@ pub fn push_model_to_db(gromet: Gromet) -> Result<(), MgError> {
         full_query.push_str(&temp_str);
     }
     execute_query(&full_query);
-    Ok(())
+    let model_ids = module_query()?;
+    let last_model_id = model_ids[model_ids.len() - 1];
+    Ok(last_model_id)
 }
 
 pub fn delete_module(module_id: i64) -> Result<(),MgError> {
@@ -65,7 +61,7 @@ pub fn module_query() -> Result<Vec<i64>, MgError> {
 /// This retrieves the model IDs.
 #[utoipa::path(
     responses(
-        (status = 200, description = "Successfully retreived model IDs")
+        (status = 200, description = "Successfully retrieved model IDs")
     )
 )]
 #[get("/models")]
@@ -83,15 +79,15 @@ pub async fn get_model_ids() -> HttpResponse {
 )]
 #[post("/models")]
 pub async fn post_model(payload: web::Json<Gromet>) -> HttpResponse {
-    push_model_to_db(payload.into_inner());
-    HttpResponse::Ok().body("Pushed model to Database")
+    let model_id = push_model_to_db(payload.into_inner()).unwrap();
+    HttpResponse::Ok().json(web::Json(model_id))
 }
 
 /// Deletes a model from the database based on its id.
 #[utoipa::path(
     request_body = ModuleId,
     responses(
-        (status = 200, description = "Model deleted", body = ModuleId)
+        (status = 200, description = "Model deleted")
     )
 )]
 #[delete("/models/{id}")]
