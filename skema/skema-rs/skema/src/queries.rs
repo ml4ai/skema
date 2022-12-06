@@ -1,13 +1,18 @@
 use crate::gromet_memgraph::{execute_query, parse_gromet_queries};
 use crate::Gromet;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
-
+use serde::{Deserialize, Serialize};
 use std::process::Termination;
 
 use actix_web::{HttpResponse, get, post, web};
 use utoipa;
 
-pub fn push_model(gromet: Gromet) -> Result<(), MgError> {
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ModuleId {
+    pub module_id: u32,
+}
+
+pub fn push_model_to_db(gromet: Gromet) -> Result<(), MgError> {
 
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
@@ -20,6 +25,14 @@ pub fn push_model(gromet: Gromet) -> Result<(), MgError> {
         full_query.push_str(&temp_str);
     }
     execute_query(&full_query);
+    Ok(())
+}
+
+pub fn delete_module(module_id: u32) -> Result<(),MgError> {
+    // construct the query that will delete the module with a given unique identifier
+
+    let query = format!("MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}\nDETACH DELETE n,m", module_id);
+    execute_query(&query);
     Ok(())
 }
 
@@ -37,7 +50,7 @@ pub fn module_query() -> Result<String, MgError> {
     for record in connection.fetchall()? {
         for value in record.values {
             match value {
-                Value::Node(node) => result = format!("{} \n {}", result.clone(), node.properties.get("filename").unwrap()),
+                Value::Node(node) => result = format!("{} \n filename: {}, id: {}", result.clone(), node.properties.get("filename").unwrap(), node.id),
                 Value::Relationship(edge) => print!("edge"),
                 value => print!("{}", value),
             }
@@ -50,11 +63,11 @@ pub fn module_query() -> Result<String, MgError> {
 
 #[utoipa::path(
     responses(
-        (status = 200, description = "Module Query")
+        (status = 200, description = "Module Ping")
     )
 )]
-#[get("/module_request")]
-pub async fn module_request() -> HttpResponse {
+#[get("/module_ping")]
+pub async fn module_ping() -> HttpResponse {
     let response = module_query().unwrap();
     HttpResponse::Ok().body(response)
 }
@@ -65,8 +78,20 @@ pub async fn module_request() -> HttpResponse {
         (status = 200, description = "Pushes Gromet model to DB", body = Gromet)
     )
 )]
-#[post("/push_model_request")]
-pub async fn push_model_request(payload: web::Json<Gromet>) -> HttpResponse {
-    push_model(payload.into_inner());
+#[post("/push_model")]
+pub async fn push_model(payload: web::Json<Gromet>) -> HttpResponse {
+    push_model_to_db(payload.into_inner());
     HttpResponse::Ok().body("Pushed model to Database")
+}
+
+#[utoipa::path(
+    request_body = ModuleId,
+    responses(
+        (status = 200, description = "Deletes the model with the provided id", body = ModuleId)
+    )
+)]
+#[get("/module_delete")]
+pub async fn module_delete(payload: web::Json<ModuleId>) -> HttpResponse {
+    delete_module(payload.module_id);
+    HttpResponse::Ok().body("Module Deleted")
 }

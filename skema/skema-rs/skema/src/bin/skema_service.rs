@@ -3,7 +3,7 @@ use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
-use skema::queries::{module_request, push_model_request};
+use skema::queries::{module_ping, push_model, module_delete};
 use skema::services::mathml::get_ast_graph;
 
 use utoipa::OpenApi;
@@ -66,14 +66,15 @@ async fn main() -> std::io::Result<()> {
                 SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
             )
             .service(ping)
-            .service(module_request)
-            .service(push_model_request)
+            .service(module_ping)
+            .service(push_model)
             .service(get_comments)
             .service(get_ast_graph)
             .service(
             SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
             )
             .service(ping)
+            .service(module_delete)
     })
     .bind((args.host, args.port))?
     .run()

@@ -9,7 +9,6 @@ use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use crate::FunctionType;
 use crate::Gromet;
 use crate::{Attribute, FunctionNet, GrometBox};
-use std::process::Termination;
 
 pub enum NodeType {
     Function,
@@ -1611,7 +1610,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
             nbox: 0,
             metadata: None,
         };
-        for cond in gromet.r#fn.bc.as_ref().unwrap().iter() {
+        for _cond in gromet.r#fn.bc.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
             (nodes, edges, start) = create_conditional(
                 &gromet.clone(),
@@ -1641,7 +1640,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
             nbox: 0,
             metadata: None,
         };
-        for while_l in gromet.r#fn.bl.as_ref().unwrap().iter() {
+        for _while_l in gromet.r#fn.bl.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
             (nodes, edges, start) = create_while_loop(
                 &gromet.clone(),
@@ -1782,7 +1781,7 @@ pub fn create_conditional(
             let e3 = Edge {
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
-                e_type: String::from("Port_of"),
+                e_type: String::from("Port_Of"),
                 prop: None,
             };
             nodes.push(n2.clone());
@@ -1824,7 +1823,7 @@ pub fn create_conditional(
             let e5 = Edge {
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
-                e_type: String::from("Port_of"),
+                e_type: String::from("Port_Of"),
                 prop: None,
             };
             nodes.push(n3.clone());
@@ -2399,7 +2398,7 @@ pub fn create_while_loop(
             let e3 = Edge {
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
-                e_type: String::from("Port_of"),
+                e_type: String::from("Port_Of"),
                 prop: None,
             };
             nodes.push(n2.clone());
@@ -2441,7 +2440,7 @@ pub fn create_while_loop(
             let e5 = Edge {
                 src: n1.node_id.clone(),
                 tgt: format!("n{}", start),
-                e_type: String::from("Port_of"),
+                e_type: String::from("Port_Of"),
                 prop: None,
             };
             nodes.push(n3.clone());
@@ -2656,7 +2655,7 @@ pub fn create_while_loop(
     // now to make the implicit wires that go from pics -> pifs/opis and pofs/opos -> pocs.
     // first we will iterate through the pics
     let mut pic_counter = 1;
-    for pic in function_net.pil.as_ref().unwrap().iter() {
+    for _pic in function_net.pil.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         // Each pic is the target there will then be 2 srcs one for each wire, one going to "if" and one to "else"
 
@@ -2736,7 +2735,7 @@ pub fn create_while_loop(
 
     // now we construct the output wires for the bodies
     let mut poc_counter = 1;
-    for poc in function_net.pol.as_ref().unwrap().iter() {
+    for _poc in function_net.pol.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         // Each pic is the target there will then be 2 srcs one for each wire, one going to "if" and one to "else"
 
@@ -4040,6 +4039,7 @@ pub fn external_wiring(gromet: &Gromet, nodes: Vec<Node>, mut edges: Vec<Edge>) 
                 }
             }
             // find the tgt
+            let mut tgt_found = false; // for expression wiring the literal and opo's can be double counted sometimes
             for node in nodes.iter() {
                 // check this field
                 if node.n_type == "Opo" {
@@ -4049,6 +4049,7 @@ pub fn external_wiring(gromet: &Gromet, nodes: Vec<Node>, mut edges: Vec<Edge>) 
                                 // push the tgt
                                 if (tgt_id as u32) == *p {
                                     wff_src_tgt.push(node.node_id.clone());
+                                    tgt_found = true;
                                 }
                             }
                         } else {
@@ -4058,12 +4059,13 @@ pub fn external_wiring(gromet: &Gromet, nodes: Vec<Node>, mut edges: Vec<Edge>) 
                                     // push the tgt
                                     if (tgt_id as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
+                                        tgt_found = true;
                                     }
                                 }
                             }
                         }
                     }
-                } else if node.n_type == "Literal" {
+                } else if node.n_type == "Literal" && !tgt_found {
                     if node.nbox == tgt_box {
                         for p in node.out_idx.as_ref().unwrap().iter() {
                             // push the tgt
@@ -4074,13 +4076,15 @@ pub fn external_wiring(gromet: &Gromet, nodes: Vec<Node>, mut edges: Vec<Edge>) 
                     }
                 }
             }
-            let e9 = Edge {
-                src: wff_src_tgt[0].clone(),
-                tgt: wff_src_tgt[1].clone(),
-                e_type: String::from("Wire"),
-                prop: None,
-            };
-            edges.push(e9);
+            if wff_src_tgt.len() == 2 {
+                let e9 = Edge {
+                    src: wff_src_tgt[0].clone(),
+                    tgt: wff_src_tgt[1].clone(),
+                    e_type: String::from("Wire"),
+                    prop: None,
+                };
+                edges.push(e9);
+            }
         }
     }
     return edges;
