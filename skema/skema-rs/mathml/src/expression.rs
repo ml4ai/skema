@@ -664,10 +664,10 @@ fn test_to_expr4() {
                 }
             }
             match &args[1] {
-                Expr::Atom(x) => {
+                Expr::Atom(_x) => {
                     assert_eq!(args[1], Expr::Atom(Atom::Identifier("c".to_string())));
                 }
-                Expr::Expression { op, args, .. } => {}
+                Expr::Expression {   .. } => {}
             }
         }
     }
@@ -953,7 +953,7 @@ fn test_to_expr10() {
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
     pre_exp.get_names();
-    let g = pre_exp.to_graph();
+    let _g = pre_exp.to_graph();
 }
 
 #[test]
@@ -979,7 +979,7 @@ fn test_to_expr11() {
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
     pre_exp.get_names();
-    let g = pre_exp.to_graph();
+    let _g = pre_exp.to_graph();
 }
 
 #[test]
@@ -1010,7 +1010,7 @@ fn test_to_expr12() {
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
     pre_exp.get_names();
-    let g = pre_exp.to_graph();
+    let _g = pre_exp.to_graph();
 }
 
 #[test]
@@ -1041,7 +1041,7 @@ fn test_to_expr13() {
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
     pre_exp.get_names();
-    let g = pre_exp.to_graph();
+    let _g = pre_exp.to_graph();
 }
 
 #[test]
@@ -1068,7 +1068,7 @@ fn test_to_expr14() {
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
     pre_exp.get_names();
-    let g = pre_exp.to_graph();
+    let _g = pre_exp.to_graph();
 }
 
 #[test]
@@ -1095,7 +1095,7 @@ fn test_to_expr15() {
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
     pre_exp.get_names();
-    let g = pre_exp.to_graph();
+    let _g = pre_exp.to_graph();
 }
 
 #[test]
@@ -1111,7 +1111,7 @@ fn test_to_expr16() {
             Mi("b".to_string()),
         ]),
     ])));
-    let g = math_expression.to_graph();
+    let _g = math_expression.to_graph();
 }
 
 #[test]
@@ -1127,7 +1127,7 @@ fn test_to_expr17() {
             Mi("b".to_string()),
         ]),
     ]);
-    let g = math_expression.to_graph();
+    let _g = math_expression.to_graph();
 }
 
 #[test]
@@ -1151,5 +1151,5 @@ fn test_to_expr18() {
             ]),
         ]))),
     ]);
-    let g = math_expression.to_graph();
+    let _g = math_expression.to_graph();
 }
