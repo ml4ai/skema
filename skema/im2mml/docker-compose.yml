@@ -3,6 +3,6 @@ version: "3"
 services:
   im2mml:
     build: .
-    entrypoint: uvicorn translate:app --host=0.0.0.0 --reload
+    entrypoint: uvicorn im2mml:app --host=0.0.0.0 --reload
     ports:
       - "8000:8000"
