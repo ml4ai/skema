@@ -5,8 +5,12 @@ from gromet_linker.align_comments import align_comments
 from automates.utils.fold import dictionary_to_gromet_json, del_nulls
 
 if __name__ == "__main__":
-	gromet_path = "data/gromet/CHIME_SIR--Gromet-FN-auto.json"
-	comments_path = "data/comments/CHIME_SIR.json"
+	# gromet_path = "data/gromet/CHIME_SIR--Gromet-FN-auto.json"
+	# comments_path = "data/comments/CHIME_SIR.json"
+	# extractions_path = 'data/extractions/CHIME_SIR.json'
+
+	gromet_path = "data/gromet/chime_penn--Gromet-FN-auto.json"
+	comments_path = "data/comments/CHIME_full_penn.json"
 	extractions_path = 'data/extractions/CHIME_SIR.json'
 
 	# gromet_path = "data/gromet/bucky_simplified_v1--Gromet-FN-auto.json"

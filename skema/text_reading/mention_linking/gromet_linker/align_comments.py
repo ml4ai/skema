@@ -32,17 +32,25 @@ class SourceComments:
 	def from_file(comments_path:str) -> "SourceComments":
 		""" Reads the automatically extracted comments from the json file """
 
+		def _helper(data):
+			line_comments = {l[0]:l[1] for l in data['comments']}
+			doc_strings = data['docstrings']
+
+			return SourceComments(
+				path = Path(comments_path),
+				line_comments= line_comments,
+				doc_strings= doc_strings
+			)
+
 		with open(comments_path) as f:
-			all_comments = json.load(f)
+			data = json.load(f)
 
-		line_comments = {l[0]:l[1] for l in all_comments['comments']}
-		doc_strings = all_comments['docstrings']
-
-		return SourceComments(
-			path = Path(comments_path),
-			line_comments= line_comments,
-			doc_strings= doc_strings
-		)
+		# Make either a singtle instance or a dictionary of instances in the case of multiple files
+		if "comments" in data:
+			return _helper(data)
+		else:
+			return {k:_helper(v) for k, v in data.items()}
+			
 
 
 def get_function_comments(box, fn,  line_comments):
