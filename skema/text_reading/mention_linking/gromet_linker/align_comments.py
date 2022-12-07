@@ -177,7 +177,7 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: Sour
 	
 
 
-def align_comments(gromet_path:str, comments_path:str, extractions_path:str, embeddings_path:str, debug: bool = False):
+def align_and_link(gromet_path:str, comments_path:str, extractions_path:str, embeddings_path:str, debug: bool = False):
 	# Read the function network
 	fn = json_to_gromet(gromet_path)
 	# Parse the comments
