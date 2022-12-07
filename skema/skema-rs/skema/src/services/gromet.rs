@@ -34,6 +34,68 @@ pub fn delete_module(module_id: i64) -> Result<(),MgError> {
     Ok(())
 }
 
+pub fn named_opi_query(module_id: i64) -> Result<Vec<String>,MgError> {
+    // construct the query that will delete the module with a given unique identifier
+
+    // Connect to Memgraph.
+    let connect_params = ConnectParams {
+        host: Some(String::from("localhost")),
+        ..Default::default()
+    };
+    let mut connection = Connection::connect(&connect_params)?;
+
+    // create query
+    let query = format!("MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}
+        \nwith DISTINCT m\nmatch (m:Opi) where not m.name = 'un-named'\nreturn collect(m.name)", module_id);
+
+
+    // Run Query.
+    connection.execute(&query, None)?;
+
+    // Check that the first value of the first record is a list
+    let mut port_names = Vec::<String>::new();
+    if let Value::List(xs) = &connection.fetchall()?[0].values[0] {
+        port_names = xs.iter().filter_map(|x| match x {
+            Value::String(x) => Some(x.clone()),
+            _ => None
+        }).collect();
+    }
+    connection.commit()?;
+    
+    Ok(port_names)
+}
+
+pub fn named_opo_query(module_id: i64) -> Result<Vec<String>,MgError> {
+    // construct the query that will delete the module with a given unique identifier
+
+    // Connect to Memgraph.
+    let connect_params = ConnectParams {
+        host: Some(String::from("localhost")),
+        ..Default::default()
+    };
+    let mut connection = Connection::connect(&connect_params)?;
+
+    // create query
+    let query = format!("MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}
+        \nwith DISTINCT m\nmatch (m:Opo) where not m.name = 'un-named'\nreturn collect(m.name)", module_id);
+
+
+    // Run Query.
+    connection.execute(&query, None)?;
+
+    // Check that the first value of the first record is a list
+    let mut port_names = Vec::<String>::new();
+    if let Value::List(xs) = &connection.fetchall()?[0].values[0] {
+        port_names = xs.iter().filter_map(|x| match x {
+            Value::String(x) => Some(x.clone()),
+            _ => None
+        }).collect();
+    }
+    connection.commit()?;
+    
+    Ok(port_names)
+}
+
 pub fn module_query() -> Result<Vec<i64>, MgError> {
     // Connect to Memgraph.
     let connect_params = ConnectParams {
@@ -94,4 +156,29 @@ pub async fn delete_model(path: web::Path<i64>) -> HttpResponse {
     let id = path.into_inner();
     delete_module(id);
     HttpResponse::Ok().body("Model deleted")
+}
+
+
+/// This retrieves named Opos based on model id.
+#[utoipa::path(
+    responses(
+        (status = 200, description = "Successfully retrieved named outports")
+    )
+)]
+#[get("/models/{id}/named_opos")]
+pub async fn get_named_opos(path: web::Path<i64>) -> HttpResponse {
+    let response = named_opo_query(path.into_inner()).unwrap();
+    HttpResponse::Ok().json(web::Json(response))
+}
+
+/// This retrieves named Opis based on model id.
+#[utoipa::path(
+    responses(
+        (status = 200, description = "Successfully retrieved named outports")
+    )
+)]
+#[get("/models/{id}/named_opis")]
+pub async fn get_named_opis(path: web::Path<i64>) -> HttpResponse {
+    let response = named_opi_query(path.into_inner()).unwrap();
+    HttpResponse::Ok().json(web::Json(response))
 }
