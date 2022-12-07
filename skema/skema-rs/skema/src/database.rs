@@ -7,7 +7,7 @@
     I believe the wiring will be messed up going into the expression from the second function
  */
 
-use rsmgclient::{ConnectParams, Connection, MgError, Value};
+use rsmgclient::{ConnectParams, Connection, MgError};
 
 use crate::FunctionType;
 use crate::Gromet;
@@ -54,10 +54,10 @@ pub struct Edge {
     pub prop: Option<u32>, // option because of opo's and opi's
 }
 
-pub fn execute_query(query: &str) -> Result<(), MgError> {
+pub fn execute_query(query: &str, host: &str) -> Result<(), MgError> {
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(String::from("localhost")),
+        host: Some(host.to_string()),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;

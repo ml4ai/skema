@@ -26,5 +26,5 @@ fn main() {
         full_query.push_str(&temp_str);
     }
 
-    execute_query(&full_query); // The properties need to have quotes!!
+    execute_query(&full_query, "localhost"); // The properties need to have quotes!!
 }
