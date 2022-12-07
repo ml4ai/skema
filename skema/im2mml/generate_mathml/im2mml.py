@@ -182,7 +182,7 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
 
 app = FastAPI()
 
-@app.put("/get_mml/")
+@app.put("/get-mml")
 async def upload_file(file: bytes = File()):
     '''
     Creates a web app using FastAPI for rendering MathML for an image
