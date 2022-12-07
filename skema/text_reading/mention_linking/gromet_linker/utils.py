@@ -2,7 +2,7 @@ import datetime
 from typing import Optional, Tuple
 from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
 
-from gromet_linker.mention_linking import TextReadingLinker
+from .mention_linking import TextReadingLinker
 
 import itertools as it
 
@@ -209,7 +209,6 @@ def attach_metadata(new_metadata, element, gromet):
 	# First, comments in the same line
 	# Get the line numbers, if available
 	if existing_metadata:
-		assert(type(existing_metadata) == list, "Existing metadata type is not a list")
 		metadata_array = existing_metadata
 	else:
 		# If it doesn't exist, add it

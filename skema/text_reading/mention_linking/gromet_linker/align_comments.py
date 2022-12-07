@@ -1,10 +1,10 @@
 """ Aligns source code comments to Gromet function networks """
 
+from collections import defaultdict
 from dataclasses import dataclass
 import json
 from pathlib import Path
-from typing import NamedTuple, Optional
-import itertools
+from typing import Any, List, Mapping, NamedTuple, Optional, Tuple, Union
 
 from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 
@@ -87,8 +87,27 @@ def match_variable_name(name, comments):
 	return ret
 				
 
+class DebugInfo(NamedTuple):
+	line_range: Optional[Tuple[int]]
+	name: Optional[str]
+	docstring: List[str]
+	comments: List[Union[str, Tuple[int, str]]]
+	mentions: Mapping[str, Any]
 
-def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: SourceComments, linker):
+
+def print_debug_info(info: DebugInfo) -> None:
+	print("===================")
+	print(f"{info.line_range} {info.name if info.name else ''}:")
+	print()
+	print("\n".join(info.docstring))
+	print("\n".join(c[1] if type(c) == tuple else c for c in info.comments))
+	if len(info.mentions) > 0:
+		print("Aligned mentions:\n" + '\n'.join(f"{s}: {m['text']}" for m, s in info.mentions))
+	print()
+
+
+
+def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: SourceComments, linker) -> Optional[DebugInfo]:
 	# Identify the variables with the same name to each output port
 	  # In case of a tie, resolve the correct variable using the containing line spans
 
@@ -145,19 +164,20 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: Sour
 		build_tr_mention_metadata(m, doc_file_ref, attr, fn)
 
 	if len(aligned_docstring + aligned_comments) > 0:
-		print("===================")
-		print(f"{line_range} {name if name else ''}:")
-		print()
-		print("\n".join(aligned_docstring))
-		print("\n".join(c[1] if type(c) == tuple else c for c in aligned_comments))
-		if len(aligned_mentions) > 0:
-			print("Aligned mentions:\n" + '\n'.join(f"{s}: {m['text']}" for m, s in aligned_mentions))
-		print()
+		return DebugInfo(
+			line_range, name,
+			aligned_docstring, aligned_comments, aligned_mentions
+		)
+
+	else:
+		return None
+
+	
 
 	
 
 
-def align_comments(gromet_path:str, comments_path:str, extractions_path:str, embeddings_path:str):
+def align_comments(gromet_path:str, comments_path:str, extractions_path:str, embeddings_path:str, debug: bool = False):
 	# Read the function network
 	fn = json_to_gromet(gromet_path)
 	# Parse the comments
@@ -174,6 +194,7 @@ def align_comments(gromet_path:str, comments_path:str, extractions_path:str, emb
 	##                            value:"poc" with name??
 
 	# Iterate over the attributes of the function network
+	debug_info = list()
 	for attr in fn.attributes:
 		t, v = attr.type, attr.value
 		if t == "FN":
@@ -181,24 +202,44 @@ def align_comments(gromet_path:str, comments_path:str, extractions_path:str, emb
 			for b in v.b:
 				container_box = b
 				if b.name:
-					enhance_attribute_with_comments(b, "b", container_box, fn, src_comments, linker)
+					info = enhance_attribute_with_comments(b, "b", container_box, fn, src_comments, linker)
+					if info:
+						debug_info.append(info)
 			if v.opi:
 				for opi in v.opi:
 					if opi.name:
-						enhance_attribute_with_comments(opi, "opi", container_box, fn, src_comments, linker)
+						info = enhance_attribute_with_comments(opi, "opi", container_box, fn, src_comments, linker)
+						if info:
+							debug_info.append(info)
 			if v.pof:
 				for pof in v.pof:
 					if pof.name:
-						enhance_attribute_with_comments(pof, "pof", container_box, fn, src_comments, linker)
+						info = enhance_attribute_with_comments(pof, "pof", container_box, fn, src_comments, linker)
+						if info:
+							debug_info.append(info)
 			if v.bf:
 				for bf in v.bf:
-					enhance_attribute_with_comments(bf, "bf", container_box, fn, src_comments, linker)
+					info = enhance_attribute_with_comments(bf, "bf", container_box, fn, src_comments, linker)
+					if info:
+						debug_info.append(info)
 			# TODO: Is this redundant?
 			# for poc in v.poc:
 			# 	if poc.name:
 			# 		align_comments(b, fn, line_comments, doc_strings)
-
+			
 	
+	if debug:
+		# Aggregate the debug info per name
+		grouped_info = defaultdict(list)
+		for info in debug_info:
+			key = info.name if info.name else ''
+			grouped_info[key].append(info)
+
+
+		# Print them in lexicographical order
+		for key in sorted(grouped_info):
+			for info in grouped_info[key]:
+				print_debug_info(info)
 	
 
 	return fn
