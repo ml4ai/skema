@@ -460,7 +460,7 @@ fn test_math() {
 
 #[test]
 fn test_mathml_parser() {
-    let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
+    let eqn = fs::read_to_string("tests/test01.xml").unwrap();
     test_parser(
         &eqn,
         math,
@@ -505,23 +505,3 @@ fn test_mathml_parser() {
         },
     )
 }
-
-#[test]
-fn test_mathml_parser(){
-    let eqn = fs::read_to_string("tests/test01.xml").unwrap();
-    test_parser(
-	&eqn,
-    	math,
-    	Math{
-	    content: vec![Munder( vec![Mo("sup"), Mrow(vec![Mn("0"), Mo("≤"), Mi("t"), Mo("≤"), Msub(Box::new(Mi("T")),Box::new(Mn("0")) ) ]) ]  ) ,
-	    	          Mo("‖"),
-			  Msup(Box::new(Mrow(vec![Mover(vec![Mi("ρ"), Mo("~")])])),Box::new(Mi("R")) ),
-			  Msup(Box::new(Mrow(vec![Mover(vec![Mi("x"), Mo("¯")])])),Box::new(Mi("a")) ),
-			  Msub(Box::new(Mo("‖")),Box::new(Mrow(vec![Msup(Box::new(Mi("L")),Box::new(Mn("1"))), Mo("∩"), Msup(Box::new(Mi("L")),Box::new(Mi("∞")))]))), 
-			  Mo("≤"),
-			  Mi("C"),
-			 ],
-        },
-    )
-}
-
