@@ -1,0 +1,24 @@
+# Continuous integration
+
+kind: pipeline
+name: skema-rs
+
+steps:
+- name: test_rust_components
+  image: rust:1.65
+  commands:
+  - apt update && apt install -y cmake openssl libclang-13-dev
+  - cd skema/skema-rs
+  - cargo test --verbose --all
+
+---
+kind: pipeline
+name: skema_tr
+
+steps:
+- name: test_scala
+  image: sbtscala/scala-sbt:openjdk-8u342_1.7.2_2.12.17
+  commands:
+  - cd skema/text_reading/text_reading
+  - export _JAVA_OPTIONS=-Xmx10g
+  - sbt webapp/test
