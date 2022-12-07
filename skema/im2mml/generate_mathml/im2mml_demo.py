@@ -8,6 +8,5 @@ def get_mml(image_path: str) -> str:
         r = requests.put("http://127.0.0.1:8000/get_mml", files = {"file": f})
     return r.text
 
-
-mml = get_mml("images/10.png")
+mml = get_mml("images/sir.png")
 print(mml)
