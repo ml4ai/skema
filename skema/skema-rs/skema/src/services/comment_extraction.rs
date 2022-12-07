@@ -64,6 +64,7 @@ impl CommentExtractionRequest {
     }
 }
 
+/// Get comments for a piece of code.
 #[utoipa::path(
     request_body = CommentExtractionRequest,
     responses(
