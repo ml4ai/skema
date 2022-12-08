@@ -1,4 +1,4 @@
-use actix_web::{App, HttpServer, HttpResponse, get};
+use actix_web::{App, HttpServer, HttpResponse, get, web::Data};
 use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
@@ -7,6 +7,7 @@ use skema::services::{
     gromet::{get_model_ids, post_model, delete_model, get_named_opos, get_named_opis},
     mathml::{get_ast_graph, get_math_exp_graph}
 };
+use skema::config::Config;
 
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -20,7 +21,11 @@ struct Cli {
 
     /// Port
     #[arg(short, long, default_value_t = 8080)]
-    port: u16
+    port: u16,
+
+    /// Database host
+    #[arg(long, default_value_t = String::from("localhost"))]
+    db_host: String
 }
 
 /// This endpoint can be used to check the health of the service.
@@ -67,8 +72,12 @@ async fn main() -> std::io::Result<()> {
     let openapi = ApiDoc::openapi();
 
     let args = Cli::parse();
+
     HttpServer::new(move || {
         App::new()
+            .app_data(Data::new(Config {
+                db_host: args.db_host.clone()
+            }))
             .service(get_comments)
             .service(ping)
             .service(get_model_ids)
