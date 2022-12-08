@@ -89,7 +89,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_ast_graph)
             .service(get_math_exp_graph)
             .service(
-            SwaggerUi::new("/api-docs/{_:.*}")
+            SwaggerUi::new("/docs/{_:.*}")
                 .url("/api-doc/openapi.json", openapi.clone()),
             )
             .service(ping)
