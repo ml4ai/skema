@@ -1,12 +1,13 @@
 use std::fmt;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Operator {
     Add,
     Multiply,
     Equals,
     Divide,
     Subtract,
+    Sqrt,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -14,16 +15,19 @@ pub enum Operator {
 impl fmt::Display for Operator {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            Operator::Add => write!(f, "{}", "+"),
-            Operator::Multiply => write!(f, "{}", "*"),
-            Operator::Equals => write!(f, "{}", "="),
-            Operator::Divide => write!(f, "{}", "/"),
-            Operator::Subtract => write!(f, "{}", "-"),
+            Operator::Add => write!(f, "+"),
+            Operator::Multiply => write!(f, "*"),
+            Operator::Equals => write!(f, "="),
+            Operator::Divide => write!(f, "/"),
+            Operator::Subtract => write!(f, "-"),
+            Operator::Sqrt => write!(f, "√"),
             Operator::Other(op) => write!(f, "{}", op),
         }
     }
 }
 
+/// The MathExpression enum represents the corresponding element type in MathML 3
+/// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialEq, Clone)]
 pub enum MathExpression {
     Mi(String),
@@ -43,7 +47,10 @@ pub enum MathExpression {
     MoLine(String),
 }
 
+/// The Math struct represents the corresponding element type in MathML 3
+/// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_math)
 #[derive(Debug, PartialEq)]
 pub struct Math {
     pub content: Vec<MathExpression>,
 }
+
