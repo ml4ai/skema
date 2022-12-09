@@ -25,3 +25,6 @@ steps:
   - cd skema/text_reading/text_reading
   - export _JAVA_OPTIONS=-Xmx10g
   - sbt webapp/test
+  when:
+    paths:
+      skema/text_reading/text_reading
