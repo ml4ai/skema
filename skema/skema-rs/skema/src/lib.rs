@@ -1,6 +1,7 @@
 // Inclusion of additional modules
 pub mod database;
 pub mod services;
+pub mod config;
 
 // Stub for SKEMA library
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};

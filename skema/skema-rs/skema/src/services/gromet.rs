@@ -2,13 +2,13 @@
 
 use crate::database::{execute_query, parse_gromet_queries};
 use crate::Gromet;
+use crate::config::Config;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
-use serde::{Deserialize, Serialize};
 
 use actix_web::{HttpResponse, get, post, web, delete};
 use utoipa;
 
-pub fn push_model_to_db(gromet: Gromet) -> Result<i64, MgError> {
+pub fn push_model_to_db(gromet: Gromet, host: &str) -> Result<i64, MgError> {
 
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
@@ -20,26 +20,26 @@ pub fn push_model_to_db(gromet: Gromet) -> Result<i64, MgError> {
         let temp_str = &queries[i].clone();
         full_query.push_str(&temp_str);
     }
-    execute_query(&full_query);
-    let model_ids = module_query()?;
+    execute_query(&full_query, host);
+    let model_ids = module_query(host)?;
     let last_model_id = model_ids[model_ids.len() - 1];
     Ok(last_model_id)
 }
 
-pub fn delete_module(module_id: i64) -> Result<(),MgError> {
+pub fn delete_module(module_id: i64, host: &str) -> Result<(),MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     let query = format!("MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}\nDETACH DELETE n,m", module_id);
-    execute_query(&query);
+    execute_query(&query, host);
     Ok(())
 }
 
-pub fn named_opi_query(module_id: i64) -> Result<Vec<String>,MgError> {
+pub fn named_opi_query(module_id: i64, host: &str) -> Result<Vec<String>,MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(String::from("localhost")),
+        host: Some(host.to_string()),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -65,12 +65,12 @@ pub fn named_opi_query(module_id: i64) -> Result<Vec<String>,MgError> {
     Ok(port_names)
 }
 
-pub fn named_opo_query(module_id: i64) -> Result<Vec<String>,MgError> {
+pub fn named_opo_query(module_id: i64, host: &str) -> Result<Vec<String>,MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(String::from("localhost")),
+        host: Some(host.to_string()),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -96,10 +96,10 @@ pub fn named_opo_query(module_id: i64) -> Result<Vec<String>,MgError> {
     Ok(port_names)
 }
 
-pub fn module_query() -> Result<Vec<i64>, MgError> {
+pub fn module_query(host: &str) -> Result<Vec<i64>, MgError> {
     // Connect to Memgraph.
     let connect_params = ConnectParams {
-        host: Some(String::from("localhost")),
+        host: Some(host.to_string()),
         ..Default::default()
     };
     let mut connection = Connection::connect(&connect_params)?;
@@ -127,8 +127,8 @@ pub fn module_query() -> Result<Vec<i64>, MgError> {
     )
 )]
 #[get("/models")]
-pub async fn get_model_ids() -> HttpResponse {
-    let response = module_query().unwrap();
+pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
+    let response = module_query(&config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -140,8 +140,8 @@ pub async fn get_model_ids() -> HttpResponse {
     )
 )]
 #[post("/models")]
-pub async fn post_model(payload: web::Json<Gromet>) -> HttpResponse {
-    let model_id = push_model_to_db(payload.into_inner()).unwrap();
+pub async fn post_model(payload: web::Json<Gromet>, config: web::Data<Config>) -> HttpResponse {
+    let model_id = push_model_to_db(payload.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(model_id))
 }
 
@@ -152,9 +152,9 @@ pub async fn post_model(payload: web::Json<Gromet>) -> HttpResponse {
     )
 )]
 #[delete("/models/{id}")]
-pub async fn delete_model(path: web::Path<i64>) -> HttpResponse {
+pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let id = path.into_inner();
-    delete_module(id);
+    delete_module(id, &config.db_host);
     HttpResponse::Ok().body("Model deleted")
 }
 
@@ -166,8 +166,8 @@ pub async fn delete_model(path: web::Path<i64>) -> HttpResponse {
     )
 )]
 #[get("/models/{id}/named_opos")]
-pub async fn get_named_opos(path: web::Path<i64>) -> HttpResponse {
-    let response = named_opo_query(path.into_inner()).unwrap();
+pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let response = named_opo_query(path.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 
@@ -178,7 +178,7 @@ pub async fn get_named_opos(path: web::Path<i64>) -> HttpResponse {
     )
 )]
 #[get("/models/{id}/named_opis")]
-pub async fn get_named_opis(path: web::Path<i64>) -> HttpResponse {
-    let response = named_opi_query(path.into_inner()).unwrap();
+pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let response = named_opi_query(path.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
