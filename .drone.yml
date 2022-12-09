@@ -10,6 +10,9 @@ steps:
   - apt update && apt install -y cmake openssl libclang-13-dev
   - cd skema/skema-rs
   - cargo test --verbose --all
+  when:
+    paths:
+      skema/skema-rs
 
 ---
 kind: pipeline
