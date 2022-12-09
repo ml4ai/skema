@@ -44,8 +44,8 @@ command:
 docker-compose -f docker-compose.memgraph.yml up -d
 ```
 
-(You can skip the `-d` flag in the above invocation if you want to leave the
-Dockerized Memgraph service in the foreground)
+You can skip the `-d` flag in the above invocation if you want to leave the
+Dockerized Memgraph service in the foreground.
 
 ### Documentation
 
