@@ -109,11 +109,12 @@ class TextReadingLinker:
 		normalized_avg = avg / norm
 		return normalized_avg
 
-	def align_to_comments(self, comments, k = 10):
+	def align_to_comments(self, comments, threshold = 0.5, k = 10):
 		tokens = self._preprocess(comments)
 		if len(tokens) > 0:
 			emb = self._average_vector(tokens)
 			similarities = self._vectors @ emb
+			similarities = similarities[similarities >= threshold]
 			if k > self._vectors.shape[0]:
 				k = self._vectors.shape[0]
 			topk = np.argsort(-1*similarities)[:k]
@@ -130,9 +131,6 @@ class TextReadingLinker:
 					chosen_mentions.append((m, score))
 			return chosen_mentions
 
-			# chosen_mentions = list(it.chain.from_iterable(self._linkable_variables[self._keys[i]] for i in topk))
-			# scores = similarities[topk]
-			# return [(m, k) for m, k in zip(chosen_mentions, scores)]
 		else:
 			return []
 
