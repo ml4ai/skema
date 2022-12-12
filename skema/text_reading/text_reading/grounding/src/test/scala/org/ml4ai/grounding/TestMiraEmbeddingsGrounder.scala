@@ -14,14 +14,6 @@ import scala.collection.immutable.ListMap
 
 class TestMiraEmbeddingsGrounder extends Test {
 
-  // Test HyperParameterSearch
-  //  behavior of "Hyper Parameter Search"
-  //  val sorted_accuracy_map : ListMap[(Float, Float), Float] = HyperParameterSearch.sorted_accuracy_map
-  //
-  //  sorted_accuracy_map should not be empty
-  //  sorted_accuracy_map.size should be >= 9
-  //  sorted_accuracy_map.head._2 should be > 0.0f
-
   // Lazily load the grounder. We assume it's state and behavior is immutable
   // So we can build it once and reuse it as necessary in the suite
 
