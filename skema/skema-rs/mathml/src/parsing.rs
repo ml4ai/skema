@@ -15,6 +15,7 @@ use nom::{
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
+use std::fs;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
@@ -459,7 +460,7 @@ fn test_math() {
 
 #[test]
 fn test_mathml_parser() {
-    let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
+    let eqn = fs::read_to_string("tests/test01.xml").unwrap();
     test_parser(
         &eqn,
         math,

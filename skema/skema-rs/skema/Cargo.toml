@@ -4,12 +4,16 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+name = "skema"
+path = "src/lib.rs"
 
 [dependencies]
 serde_json = "1.0.85"
 serde = { version = "1.0.1", features = ["derive"] }
 strum = "0.24"
 strum_macros = "0.24"
+rsmgclient = { git = "https://github.com/ml4ai/rsmgclient" }
 actix-web = "4.2.1"
 comment_extraction = { path = "../comment_extraction" }
 mathml = { path = "../mathml" }

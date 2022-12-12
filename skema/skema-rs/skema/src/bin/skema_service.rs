@@ -1,10 +1,13 @@
-use actix_web::{App, HttpServer, HttpResponse, get};
+use actix_web::{App, HttpServer, HttpResponse, get, web::Data};
 use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
-use skema::services::mathml::get_ast_graph;
-use skema::services::math_exp_graph::get_math_exp_graph;
+use skema::services::{
+    gromet::{get_model_ids, post_model, delete_model, get_named_opos, get_named_opis},
+    mathml::{get_ast_graph, get_math_exp_graph}
+};
+use skema::config::Config;
 
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -18,7 +21,11 @@ struct Cli {
 
     /// Port
     #[arg(short, long, default_value_t = 8080)]
-    port: u16
+    port: u16,
+
+    /// Database host
+    #[arg(long, default_value_t = String::from("localhost"))]
+    db_host: String
 }
 
 /// This endpoint can be used to check the health of the service.
@@ -39,7 +46,12 @@ async fn main() -> std::io::Result<()> {
         paths(
             skema::services::comment_extraction::get_comments,
             skema::services::mathml::get_ast_graph,
-            skema::services::math_exp_graph::get_math_exp_graph,
+            skema::services::mathml::get_math_exp_graph,
+            skema::services::gromet::get_model_ids,
+            skema::services::gromet::post_model,
+            skema::services::gromet::delete_model,
+            skema::services::gromet::get_named_opos,
+            skema::services::gromet::get_named_opis,
             ping
         ),
         components(
@@ -60,15 +72,27 @@ async fn main() -> std::io::Result<()> {
     let openapi = ApiDoc::openapi();
 
     let args = Cli::parse();
+
     HttpServer::new(move || {
         App::new()
-        .service(get_comments)
-        .service(get_ast_graph)
-        .service(get_math_exp_graph)
-        .service(
-            SwaggerUi::new("/api-docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()),
-        )
-        .service(ping)
+            .app_data(Data::new(Config {
+                db_host: args.db_host.clone()
+            }))
+            .service(get_comments)
+            .service(ping)
+            .service(get_model_ids)
+            .service(post_model)
+            .service(delete_model)
+            .service(get_named_opos)
+            .service(get_named_opis)
+            .service(get_comments)
+            .service(get_ast_graph)
+            .service(get_math_exp_graph)
+            .service(
+            SwaggerUi::new("/docs/{_:.*}")
+                .url("/api-doc/openapi.json", openapi.clone()),
+            )
+            .service(ping)
     })
     .bind((args.host, args.port))?
     .run()

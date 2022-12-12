@@ -1,14 +1,6 @@
-# Docker Compose file for the SKEMA web service
+# Docker Compose file to launch the MemgraphDB platform standalone.
 version: "3"
 services:
-  # The SKEMA web service exposing functionality implemented in Rust.
-  skema:
-    build: .
-    entrypoint: cargo run --release --bin skema_service -- --host 0.0.0.0 --db-host database
-    ports:
-      - "8080:8080"
-
-  # We currently use Memgraph (in-memory graph database).
   database:
     image: "memgraph/memgraph-platform"
     ports:
