@@ -13,27 +13,6 @@ use num_traits::cast::FromPrimitive;
 // 3. Add test cases
 // 4. Figure out mut and pub
 
-/*fn main() {
-    let int_test = Number::Int("100".parse::<BigInt>().unwrap());
-    let complex_test = Number::Complex(Complex::new(1.2, 2.3));
-    let float_test = Number::Float(0.333);
-    println!("{:?}", int_test);
-    println!("{:?}", complex_test);
-    println!("{:?}", float_test);
-}*/
-
-// This is another potential way to have the primitive map represented.
-// However, this makes more sense when we are storing more than just the execution code 
-/*struct Add {}
-impl Add {
-    fn exec(augend: Number, addend: Number) -> Number {
-        augend + addend
-    }
-}
-*/
-
-// This is the specific Number type for the Add operator. 
-// We will later define a GenAdd operator for the general case.
 fn add(x: Number, y: Number) -> Number{ 
     match (x, y) {
         (Number::Int(x_value), Number::Int(y_value)) => Number::Int(x_value + y_value),
@@ -85,19 +64,19 @@ fn floor_div(x: Number, y: Number) -> Number { //TODO: Technically this should r
 }
 
 // TODO: How do we handle the case of something that would overflow in Rust, but wouldn't in Python?
-/*fn pow(x: Number, y: Number) -> Number {
+// TODO: How to handle float arguments while emulating Python behavior?
+fn pow(x: Number, y: Number) -> Number {
     match (x, y) {
-        (Number::Int(x_value), Number::Int(y_value)) => Number::Int(x_value.pow(y_value)),
-        _ => Number::Int(BigInt::from_i64(0).unwrap())  // How to handle floats with pow
+        (Number::Int(x_value), Number::Int(y_value)) => Number::Int(x_value.pow(y_value.to_u32().unwrap())), // BigInt only has pow ^ u32 defined
+        _ => Number::from(0)
     }
-    // TODO: powf, powi, powc?
-}*/
+}
 
-// TODO: Can you mod a float?
-fn r#mod(x: Number, y: Number) -> Number { // TODO: Should probably get rid of raw identifier
+// TODO: How to handle float arguments while emulating Python behavior?
+fn r#mod(x: Number, y: Number) -> Number {
     match (x, y) {
         (Number::Int(x_value), Number::Int(y_value)) => Number::Int(x_value % y_value),
-        _ => Number::Int(BigInt::from_i64(0).unwrap())  // How to handle float with mod
+        _ => Number::from(0) 
     }
 }
 

@@ -1,5 +1,5 @@
 mod defined_types;
-mod binary;
+mod arithmetic;
 
 fn main(){
     
