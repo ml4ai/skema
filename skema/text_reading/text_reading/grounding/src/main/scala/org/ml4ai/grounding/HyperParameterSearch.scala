@@ -37,7 +37,7 @@ object HyperParameterSearch extends App {
 
     val targets = {
       // Drop the first line that is the header
-      FileUtils.getTextFromResource(path = path).split("\n").drop(1) map { line =>
+      FileUtils.getTextFromResource(path = resourcePath).split("\n").drop(1) map { line =>
         val tokens = line.split("\t")
         (tokens(0), tokens(1))
       }
