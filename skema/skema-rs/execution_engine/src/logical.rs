@@ -1,11 +1,19 @@
-use super::defined_types::GrometBool;
-
-fn and(x: GrometBool, y: GrometBool) -> GrometBool{
-    result: bool = x.value && y.value;
-    GrometBool(value: result)
+fn and(x: bool, y: bool) -> bool {
+    x && y
 }
 
-fn or(x: GrometBool, y: GrometBool) -> GrometBool{
-    result: bool = x.value || y.value;
-    GrometBool(value: result)
+fn or(x: bool, y: bool) -> bool {
+    x || y
+}
+
+#[test]
+fn test_and() {
+    assert_eq!(and(true, false), false);
+    assert_eq!(and(true, true), true);
+}
+
+#[test]
+fn test_or() {
+    assert_eq!(or(true, false), true);
+    assert_eq!(or(false, false), false);
 }

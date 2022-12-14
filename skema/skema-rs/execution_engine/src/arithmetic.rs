@@ -2,6 +2,7 @@ use super::defined_types::{GrometInt, GrometNumber, Int};
 
 use std::ops::{Add, Sub};
 
+use float_eq::assert_float_eq;
 use num_bigint::BigInt;
 use num_traits::cast::FromPrimitive;
 use num_traits::cast::ToPrimitive;

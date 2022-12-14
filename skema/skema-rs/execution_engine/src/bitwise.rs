@@ -1,39 +1,36 @@
-use super::defined_types::GrometNumber;
-use super::defined_types::GrometInt;
-use num_bigint::BigInt;
-use num_traits::cast::ToPrimitive;
-use num_traits::cast::FromPrimitive;
+use std::ops::{BitAnd, BitOr, BitXor, Shl, Shr};
 
-// TODO: 
-// 1. Add Unit Tests
-// 2. Research support for float bitwise operators
-// 3. DONE - If only for int, use Int variant as type instead of Number
-
-fn bit_and(x: GrometInt, y: GrometInt) -> GrometInt {
-    let result: BigInt = x.value & y.value;
-    GrometInt{value: result}
+fn bit_and<T: BitAnd<U, Output = V>, U, V>(x: T, y: U) -> V {
+    x & y
 }
 
-fn bit_or(x: GrometInt, y: GrometInt) -> GrometInt {
-    let result: BigInt = x.value | y.value;
-    GrometInt{value: result}
+fn bit_or<T: BitOr<U, Output = V>, U, V>(x: T, y: U) -> V {
+    x | y
 }
 
-fn bit_xor(x: GrometInt, y: GrometInt) -> GrometInt {
-    let result: BigInt = x.value ^ y.value;
-    GrometInt{value: result}
+fn bit_xor<T: BitXor<U, Output = V>, U, V>(x: T, y: U) -> V {
+    x ^ y
 }
 
-fn lshift(x: GrometInt, y: GrometInt) -> GrometInt {
-    // BigInt doesn't support shifting by BigInt, so the shift should be cast to Int. 
-    // Using largest int type posible here - i128
-    let result: BigInt = x.value << y.value.to_i128().unwrap();
-    GrometInt{value: result}
+fn lshift<T: Shl<U, Output = V>, U, V>(x: T, y: U) -> V {
+    x << y
 }
 
-fn rshift(x: GrometInt, y: GrometInt) -> GrometInt {
-    // BigInt doesn't support shifting by BigInt, so the shift should be cast to Int. 
-    // Using largest int type posible here - i128
-    let result: BigInt = x.value >> y.value.to_i128().unwrap();
-    GrometInt{value: result}
+fn rshift<T: Shr<U, Output = V>, U, V>(x: T, y: U) -> V {
+    x >> y
+}
+
+#[test]
+fn test_bit_and() {
+    assert_eq!(bit_and(true, true), true)
+}
+
+#[test]
+fn test_bit_or() {
+    assert_eq!(bit_or(true, true), true)
+}
+
+#[test]
+fn test_bit_xor() {
+    assert_eq!(bit_xor(true, true), false)
 }

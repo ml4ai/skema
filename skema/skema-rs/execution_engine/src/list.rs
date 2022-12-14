@@ -1,9 +1,13 @@
-use crate::execution_engine::types::defined_types::Number;
-use num_bigint::BigInt;
-use num::ToPrimitive;
-use num::FromPrimitive;
+#[macro_export]
+macro_rules! new_List {
+    ( $( $x:expr ),* ) => {
+        {
+            vec![$($x),*]
+        }
+    };
+}
 
-// TODO: Rust does not support variatic arguments, so must build first
-/*fn new_list(elements: Vec<Any>) -> Vec<Any> {
-
-}*/
+#[test]
+fn test_new_List() {
+    assert_eq!(vec![1, 2, 3], new_List![1, 2, 3]);
+}
