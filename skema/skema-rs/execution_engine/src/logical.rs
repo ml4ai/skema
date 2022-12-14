@@ -1,9 +1,11 @@
-use super::defined_types::Bool;
+use super::defined_types::GrometBool;
 
-fn and(x: Bool, y: Bool) -> Bool{
-    Bool(x.0 && y.0)
+fn and(x: GrometBool, y: GrometBool) -> GrometBool{
+    result: bool = x.value && y.value;
+    GrometBool(value: result)
 }
 
-fn or(x: Bool, y: Bool) -> Bool{
-    Bool(x.0 || y.0)
+fn or(x: GrometBool, y: GrometBool) -> GrometBool{
+    result: bool = x.value || y.value;
+    GrometBool(value: result)
 }
