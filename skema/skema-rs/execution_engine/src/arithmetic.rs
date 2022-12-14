@@ -1,5 +1,5 @@
-use super::defined_types::{GrometInt, GrometNumber, Int, Number};
-use float_eq::{assert_float_eq, float_eq};
+use super::defined_types::{GrometInt, GrometNumber, Int};
+
 use std::ops::{Add, Sub};
 
 use num_bigint::BigInt;
@@ -37,7 +37,7 @@ impl Add<f64> for Int {
     fn add(self, augend: f64) -> f64 {
         self.0
             .to_f64()
-            .expect(&format!("Unable to convert {} to f64!", self.0))
+            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", self.0))
             + augend
     }
 }
@@ -48,7 +48,7 @@ impl Add<Int> for f64 {
         self + augend
             .0
             .to_f64()
-            .expect(&format!("Unable to convert {} to f64!", augend.0))
+            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", augend.0))
     }
 }
 
@@ -57,7 +57,7 @@ impl Sub<f64> for Int {
     fn sub(self, subend: f64) -> f64 {
         self.0
             .to_f64()
-            .expect(&format!("Unable to convert {} to f64!", self.0))
+            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", self.0))
             - subend
     }
 }
@@ -68,7 +68,7 @@ impl Sub<Int> for f64 {
         self - subend
             .0
             .to_f64()
-            .expect(&format!("Unable to convert {} to f64!", subend.0))
+            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", subend.0))
     }
 }
 

@@ -1,9 +1,9 @@
-use float_eq::derive_float_eq;
+
 use num_bigint::BigInt;
 use num_traits::cast::FromPrimitive;
-use num_traits::cast::ToPrimitive;
 
-#[derive(Debug, PartialEq)]
+
+#[derive(Debug, PartialEq, Eq)]
 pub struct GrometInt {
     pub value: BigInt,
 }
@@ -36,7 +36,7 @@ impl From<BigInt> for GrometNumber {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct GrometBool {
     pub value: bool,
 }

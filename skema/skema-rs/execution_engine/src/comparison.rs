@@ -1,6 +1,6 @@
-use super::defined_types::{GrometBool, GrometInt, GrometNumber, Int};
-use num_bigint::BigInt;
-use num_traits::cast::FromPrimitive;
+use super::defined_types::{Int};
+
+
 use num_traits::cast::ToPrimitive;
 use std::cmp::{Ordering, PartialEq, PartialOrd};
 
@@ -9,7 +9,7 @@ impl PartialEq<Int> for f64 {
         &other
             .0
             .to_f64()
-            .expect(&format!("Unable to convert {} to f64!", other.0))
+            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", other.0))
             == self
     }
 }
@@ -20,7 +20,7 @@ impl PartialOrd<Int> for f64 {
             &other
                 .0
                 .to_f64()
-                .expect(&format!("Unable to convert {:?} to f64!", &other)),
+                .unwrap_or_else(|| panic!("Unable to convert {:?} to f64!", &other)),
         )
     }
 }
@@ -29,7 +29,7 @@ impl PartialEq<f64> for Int {
     fn eq(&self, other: &f64) -> bool {
         self.0
             .to_f64()
-            .expect(&format!("Unable to convert {} to f64!", self.0))
+            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", self.0))
             == *other
     }
 }
@@ -38,7 +38,7 @@ impl PartialOrd<f64> for Int {
     fn partial_cmp(&self, other: &f64) -> Option<Ordering> {
         self.0
             .to_f64()
-            .expect(&format!("Unable to convert {} to f64!", self.0))
+            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", self.0))
             .partial_cmp(other)
     }
 }
