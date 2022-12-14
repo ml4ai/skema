@@ -20,8 +20,8 @@ object HyperParameterSearch extends App {
   /** *
     * Get accuracy for this lambda, alpha values provided.
     * MiraEmbeddingsGrounder is initialized for lambda, alpha value.
-    * @param lambda
-    * @param alpha
+    * @param lambda contribution of the cosine similarity to the grounding score
+    * @param alpha contribution of edit distance to grounding score
     * @return accuracy
     */
   def getAccuracyForThisHyperParams(lambda: Float, alpha: Float, path: String): Float = {
@@ -39,7 +39,7 @@ object HyperParameterSearch extends App {
         (tokens(0), tokens(1))
       }
     }
-    print(targets)
+
 
     val predictions = {
       for {(text, groundingId) <- targets
@@ -48,40 +48,40 @@ object HyperParameterSearch extends App {
         case None => false
       }
     }
-    print(predictions)
+
     val accuracy = (predictions.count(identity).floatValue() / predictions.length).floatValue()
-    val acc = accuracy.toFloat
-    acc
+    accuracy
   }
 
   // Grid search -bruteforce
-  var hyperparam_size: Int = 2;
+  var hyperParamSize = 2
 
   // Keith's review comment use args.lift for commandline arguments for standalone script
-  val resourcePath = args.lift(0).getOrElse("/grounding_tests.tsv")
-  val isSimulation = args.lift(1).map(_ == "true").getOrElse(false)
-  var lambdas = DenseVector[Float](1f, 10f) //, 100f) //Uniform(10, 1000).samplesVector(hyperparam_size)
-  var alphas = DenseVector[Float](0.25f, 0.5f) //, 0.75f) //Gaussian(0.0.toFloat, 1.0.toFloat).samplesVector(hyperparam_size).toDenseVector
+  val resourcePath = args.headOption.getOrElse("/grounding_tests.tsv")
+  val isSimulation = args.lift(1).contains("true")
+  var lambdas = DenseVector[Float](1f, 10f) //, 100f) //Uniform(10, 1000).samplesVector(hyperParamSize)
+  var alphas = DenseVector[Float](0.25f, 0.5f) //, 0.75f) //Gaussian(0.0.toFloat, 1.0.toFloat).samplesVector(hyperParamSize).toDenseVector
   if (isSimulation) {
-    lambdas = Uniform(10f, 1000f).samplesVector(hyperparam_size).values.map(_.toFloat).toDenseVector
-    alphas = Gaussian(0.0f, 1.0f).samplesVector(hyperparam_size).values.map(_.toFloat).toDenseVector
+    lambdas = Uniform(10f, 1000f).samplesVector(hyperParamSize).values.map(_.toFloat).toDenseVector
+    alphas = Gaussian(0.0f, 1.0f).samplesVector(hyperParamSize).values.map(_.toFloat).toDenseVector
   }
 
-  val acc_map = new scala.collection.mutable.HashMap[(Float, Float), Float]()
+  val accuracyMap = new scala.collection.mutable.HashMap[(Float, Float), Float]()
 
   // for each lambda, alpha value chosen just for a base case, loop mover to calculate accuracy
   // Keith's review comment use flatmap instead of for loop over ScalaVectors for lambda & alpha values
-  val key_accuracy_pairs = lambdas.toScalaVector.flatMap { lambda =>
+  val keyAccuracyPairs = lambdas.toScalaVector.flatMap { lambda =>
     alphas.toScalaVector().map { alpha =>
       (lambda, alpha) -> getAccuracyForThisHyperParams(lambda, alpha, resourcePath)
     }
   }.sortBy(-_._2)
 
-  val sorted_accuracy_map = ListMap(key_accuracy_pairs: _*)
-  println(acc_map)
-  print(sorted_accuracy_map)
-  print(lambdas)
-  (sorted_accuracy_map)
+  val sortedAccuracyMap = ListMap(keyAccuracyPairs: _*)
+
+  println("Hyperparameters' scores")
+  println(sortedAccuracyMap.map{
+    case ((lambda, alpha), accuracy) => s"Lambda: $lambda, Alpha: $alpha\t-\tAccuracy: $accuracy"
+  }.mkString("\n"))
 }
 
 
