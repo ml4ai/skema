@@ -1,6 +1,6 @@
-use super::defined_types::{GrometInt, GrometNumber, Int};
+use super::defined_types::{GrometInt, GrometNumber, Int, Number};
 use num_bigint::BigInt;
-use num_traits::{FromPrimitive, ToPrimitive};
+use num_traits::{FromPrimitive, Pow, ToPrimitive};
 use std::ops::{Add, Div, Mul, Rem, Sub};
 
 // Issues in Rust:
@@ -15,6 +15,7 @@ use std::ops::{Add, Div, Mul, Rem, Sub};
 // 3. Add test cases
 // 4. Figure out mut and pub
 
+/// Macro to simply adding traits from std::ops
 macro_rules! add_impl {
     ($trait: ident, $func: ident, $operator: tt) => {
 
@@ -65,26 +66,28 @@ add_impl!(Rem, rem, %);
 
 // This is called Integer division in Rust. Unlike Python there is no built in // operator.
 // Instead we cast both inputs to an Integer and then perform the operation.
-fn floor_div(x: GrometNumber, y: GrometNumber) -> GrometInt {
-    let x_integer: BigInt = match x {
-        GrometNumber::Int(x_data) => x_data.value,
-        GrometNumber::Float(x_data) => BigInt::from_f64(x_data.value).unwrap(),
-    };
-    let y_integer: BigInt = match y {
-        GrometNumber::Int(x_data) => x_data.value,
-        GrometNumber::Float(x_data) => BigInt::from_f64(x_data.value).unwrap(),
-    };
-
-    let result: BigInt = x_integer / y_integer;
-    GrometInt { value: result }
+fn floor_div(x: Number, y: Number) -> Number {
+    match (x, y) {
+        (Number::Int(m), Number::Int(n)) => Number::Int(m / n),
+        (Number::Float(m), Number::Int(n)) => Number::Float(m / n),
+        (Number::Int(m), Number::Float(n)) => Number::Float(m / n),
+        (Number::Float(m), Number::Float(n)) => Number::Float(m / n),
+    }
 }
 
 // TODO: How do we handle the case of something that would overflow in Rust, but wouldn't in Python?
 // TODO: How to handle float arguments while emulating Python behavior?
-fn pow(x: GrometInt, y: GrometInt) -> GrometInt {
-    let result: BigInt = x.value.pow(y.value.to_u32().unwrap());
-    GrometInt { value: result }
-}
+//fn pow(x: Number, y: Number) -> Number {
+//match (x, y) {
+//(Number::Int(m), Number::Int(n)) => Number::Int(Pow::pow(m.0, n.0)),
+//(Number::Float(m), Number::Int(n)) => Number::Float(m / n),
+//(Number::Int(m), Number::Float(n)) => Number::Float(m / n),
+//(Number::Float(m), Number::Float(n)) => Number::Float(m / n),
+//}
+
+//let result: BigInt = x.value.pow(y.value.to_u32().unwrap());
+//GrometInt { value: result }
+//}
 
 #[test]
 fn test_add_int() {
@@ -121,4 +124,16 @@ fn test_sub_mixed() {
     use float_eq::assert_float_eq;
     // Test mixed subtraction
     assert_float_eq!(sub(1.1, Int::from(1)), 0.1, abs <= 0.00001);
+}
+
+#[test]
+fn test_floor_div() {
+    assert_eq!(
+        floor_div(Number::from(15), Number::from(4)),
+        Number::from(3)
+    );
+    assert_eq!(
+        floor_div(Number::from(15.0), Number::from(4)),
+        Number::from(3.75)
+    );
 }

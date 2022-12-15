@@ -1,7 +1,5 @@
-
 use num_bigint::BigInt;
 use num_traits::cast::FromPrimitive;
-
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct GrometInt {
@@ -54,17 +52,31 @@ pub enum GrometAny {
     Bool(GrometBool),
 }
 
-#[derive(Debug, PartialEq)]
+// We have to define a separate Int struct because we cannot implement traits for types defined
+// outside this crate (i.e., we cannot define traits for BigInt directly.
+#[derive(Debug, Clone, Eq, PartialEq, PartialOrd)]
+pub struct Int(pub BigInt);
+
+#[derive(Debug, Clone, PartialEq)]
 pub enum Number {
-    Int(BigInt),
+    Int(Int),
     Float(f64),
 }
-
-#[derive(Debug, Eq, PartialEq, PartialOrd)]
-pub struct Int(pub BigInt);
 
 impl From<i64> for Int {
     fn from(n: i64) -> Self {
         Int(BigInt::from(n))
+    }
+}
+
+impl From<i64> for Number {
+    fn from(n: i64) -> Self {
+        Number::Int(Int::from(n))
+    }
+}
+
+impl From<f64> for Number {
+    fn from(n: f64) -> Self {
+        Number::Float(n)
     }
 }
