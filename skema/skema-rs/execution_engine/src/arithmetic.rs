@@ -1,11 +1,7 @@
 use super::defined_types::{GrometInt, GrometNumber, Int};
-
-use std::ops::{Add, Sub};
-
-use float_eq::assert_float_eq;
 use num_bigint::BigInt;
-use num_traits::cast::FromPrimitive;
-use num_traits::cast::ToPrimitive;
+use num_traits::{FromPrimitive, ToPrimitive};
+use std::ops::{Add, Div, Mul, Rem, Sub};
 
 // Issues in Rust:
 // 1. Overflow
@@ -19,107 +15,53 @@ use num_traits::cast::ToPrimitive;
 // 3. Add test cases
 // 4. Figure out mut and pub
 
-impl Add for Int {
-    type Output = Self;
-    fn add(self, augend: Self) -> Self {
-        Int(self.0 + augend.0)
-    }
-}
+macro_rules! add_impl {
+    ($trait: ident, $func: ident, $operator: tt) => {
 
-impl Sub for Int {
-    type Output = Self;
-    fn sub(self, subend: Self) -> Self {
-        Int(self.0 - subend.0)
-    }
-}
-
-impl Add<f64> for Int {
-    type Output = f64;
-    fn add(self, augend: f64) -> f64 {
-        self.0
-            .to_f64()
-            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", self.0))
-            + augend
-    }
-}
-
-impl Add<Int> for f64 {
-    type Output = f64;
-    fn add(self, augend: Int) -> f64 {
-        self + augend
-            .0
-            .to_f64()
-            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", augend.0))
-    }
-}
-
-impl Sub<f64> for Int {
-    type Output = f64;
-    fn sub(self, subend: f64) -> f64 {
-        self.0
-            .to_f64()
-            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", self.0))
-            - subend
-    }
-}
-
-impl Sub<Int> for f64 {
-    type Output = f64;
-    fn sub(self, subend: Int) -> f64 {
-        self - subend
-            .0
-            .to_f64()
-            .unwrap_or_else(|| panic!("Unable to convert {} to f64!", subend.0))
-    }
-}
-
-fn add<T, U, V>(x: T, y: U) -> V
-where
-    T: Add<U, Output = V>,
-{
-    x + y
-}
-
-fn sub<T, U, V>(x: T, y: U) -> V
-where
-    T: Sub<U, Output = V>,
-{
-    x - y
-}
-
-fn mult(x: GrometNumber, y: GrometNumber) -> GrometNumber {
-    match (x, y) {
-        (GrometNumber::Int(x_data), GrometNumber::Int(y_data)) => {
-            GrometNumber::from(x_data.value * y_data.value)
+        impl $trait for Int {
+            type Output = Self;
+            fn $func(self, other: Self) -> Self {
+                Int(self.0 $operator other.0)
+            }
         }
-        (GrometNumber::Int(x_data), GrometNumber::Float(y_data)) => {
-            GrometNumber::from(x_data.value.to_f64().unwrap() * y_data.value)
+
+        impl $trait<f64> for Int {
+            type Output = f64;
+
+            fn $func(self, other: f64) -> f64 {
+                self.0
+                    .to_f64()
+                    .unwrap_or_else(|| panic!("Unable to convert {} to f64!", self.0))
+                    + other
+            }
         }
-        (GrometNumber::Float(x_data), GrometNumber::Int(y_data)) => {
-            GrometNumber::from(x_data.value * y_data.value.to_f64().unwrap())
+
+        impl $trait<Int> for f64 {
+            type Output = f64;
+
+            fn $func(self, other: Int) -> f64 {
+                self $operator other
+                    .0
+                    .to_f64()
+                    .unwrap_or_else(|| panic!("Unable to convert {} to f64!", other.0))
+            }
         }
-        (GrometNumber::Float(x_data), GrometNumber::Float(y_data)) => {
-            GrometNumber::from(x_data.value * y_data.value)
+
+        fn $func<T, U, V>(x: T, y: U) -> V
+        where
+            T: $trait<U, Output = V>,
+        {
+            x $operator y
         }
-    }
+
+    };
 }
 
-fn div(x: GrometNumber, y: GrometNumber) -> GrometNumber {
-    match (x, y) {
-        (GrometNumber::Int(x_data), GrometNumber::Int(y_data)) => {
-            GrometNumber::from(x_data.value / y_data.value)
-        }
-        (GrometNumber::Int(x_data), GrometNumber::Float(y_data)) => {
-            GrometNumber::from(x_data.value.to_f64().unwrap() / y_data.value)
-        }
-        (GrometNumber::Float(x_data), GrometNumber::Int(y_data)) => {
-            GrometNumber::from(x_data.value / y_data.value.to_f64().unwrap())
-        }
-        (GrometNumber::Float(x_data), GrometNumber::Float(y_data)) => {
-            GrometNumber::from(x_data.value / y_data.value)
-        }
-    }
-}
+add_impl!(Add, add, +);
+add_impl!(Sub, sub, -);
+add_impl!(Mul, mul, *);
+add_impl!(Div, div, /);
+add_impl!(Rem, rem, %);
 
 // This is called Integer division in Rust. Unlike Python there is no built in // operator.
 // Instead we cast both inputs to an Integer and then perform the operation.
@@ -141,12 +83,6 @@ fn floor_div(x: GrometNumber, y: GrometNumber) -> GrometInt {
 // TODO: How to handle float arguments while emulating Python behavior?
 fn pow(x: GrometInt, y: GrometInt) -> GrometInt {
     let result: BigInt = x.value.pow(y.value.to_u32().unwrap());
-    GrometInt { value: result }
-}
-
-// TODO: How to handle float arguments while emulating Python behavior?
-fn r#mod(x: GrometInt, y: GrometInt) -> GrometInt {
-    let result: BigInt = x.value % y.value;
     GrometInt { value: result }
 }
 
@@ -176,11 +112,13 @@ fn test_sub_int() {
 
 #[test]
 fn test_sub_float() {
+    use float_eq::assert_float_eq;
     // Test floating point subtraction
     assert_float_eq!(sub(2.3, 1.2), 1.1, abs <= 0.00001);
 }
 #[test]
 fn test_sub_mixed() {
+    use float_eq::assert_float_eq;
     // Test mixed subtraction
     assert_float_eq!(sub(1.1, Int::from(1)), 0.1, abs <= 0.00001);
 }
