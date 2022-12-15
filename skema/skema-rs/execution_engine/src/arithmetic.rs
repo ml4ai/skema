@@ -1,19 +1,7 @@
 use super::defined_types::{GrometInt, GrometNumber, Int, Number};
 use num_bigint::BigInt;
-use num_traits::{FromPrimitive, Pow, ToPrimitive};
+use num_traits::{Float, FromPrimitive, Pow, ToPrimitive};
 use std::ops::{Add, Div, Mul, Rem, Sub};
-
-// Issues in Rust:
-// 1. Overflow
-// 2. Variatic functions
-// 3. Errors that would be seen at runtime in Python
-// 4. Calling functions and libraries that come from Python
-
-// Todo:
-// 1. Enum variant as type: FloorDiv
-// 2. Error handling instead of .unwrap
-// 3. Add test cases
-// 4. Figure out mut and pub
 
 /// Macro to simply adding traits from std::ops
 macro_rules! add_impl {
@@ -77,17 +65,22 @@ fn floor_div(x: Number, y: Number) -> Number {
 
 // TODO: How do we handle the case of something that would overflow in Rust, but wouldn't in Python?
 // TODO: How to handle float arguments while emulating Python behavior?
-//fn pow(x: Number, y: Number) -> Number {
-//match (x, y) {
-//(Number::Int(m), Number::Int(n)) => Number::Int(Pow::pow(m.0, n.0)),
-//(Number::Float(m), Number::Int(n)) => Number::Float(m / n),
-//(Number::Int(m), Number::Float(n)) => Number::Float(m / n),
-//(Number::Float(m), Number::Float(n)) => Number::Float(m / n),
-//}
-
-//let result: BigInt = x.value.pow(y.value.to_u32().unwrap());
-//GrometInt { value: result }
-//}
+fn pow(x: Number, y: Number) -> Number {
+    match (x, y) {
+        (Number::Int(m), Number::Int(n)) => Number::Int(Int(m.0.pow(
+            n.0.to_biguint()
+                .expect(&format!("Unable to convert {} to BigUInt!", n.0)),
+        ))),
+        (Number::Float(m), Number::Int(n)) => Number::Float(
+            m.powi(
+                n.0.to_i32()
+                    .expect(&format!("Unable to convert {} to i32!", n.0)),
+            ),
+        ),
+        (Number::Int(m), Number::Float(n)) => Number::Float(m.0.to_f64().unwrap().pow(n)),
+        (Number::Float(m), Number::Float(n)) => Number::Float(m.powf(n)),
+    }
+}
 
 #[test]
 fn test_add_int() {
@@ -136,4 +129,12 @@ fn test_floor_div() {
         floor_div(Number::from(15.0), Number::from(4)),
         Number::from(3.75)
     );
+}
+
+#[test]
+fn test_pow() {
+    assert_eq!(pow(Number::from(2), Number::from(2)), Number::from(4));
+    assert_eq!(pow(Number::from(2.0), Number::from(2)), Number::from(4.0));
+    assert_eq!(pow(Number::from(2), Number::from(2.0)), Number::from(4.0));
+    assert_eq!(pow(Number::from(2.0), Number::from(2.0)), Number::from(4.0));
 }
