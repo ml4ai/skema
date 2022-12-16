@@ -82,6 +82,39 @@ impl MathExpression {
                     ,
                 );
             }
+            Msubsup(xs) => {
+                if xs.len() != 3 {
+                    return;
+                }
+                if pre.args.len() >= pre.op.len() {
+                    // deal with the invisible multiply operator
+                    pre.op.push(Operator::Multiply);
+                }
+                let mut pre_exp = PreExp {
+                    op: Vec::<Operator>::new(),
+                    args: Vec::<Expr>::new(),
+                    name: "".to_string(),
+                };
+                pre_exp.op.push(Operator::Other("".to_string()));
+                let mut idx = 0;
+                for x in xs {
+                    if idx == 0 {
+                        pre_exp.op.push(Operator::Other("_".to_string()));
+                    } else if idx == 1 {
+                        pre_exp.op.push(Operator::Other("^".to_string()));
+                    }
+                    idx = idx + 1;
+                    x.to_expr(&mut pre_exp);
+                }
+                pre.args.push(
+                    Expr::Expression {
+                        op: pre_exp.op,
+                        args: pre_exp.args,
+                        name: "".to_string(),
+                    }
+                    ,
+                );
+            }
             Msqrt(xs) => {
                 if pre.args.len() >= pre.op.len() {
                     // deal with the invisible multiply operator
@@ -237,7 +270,7 @@ impl Expr {
                     match &mut new_exp {
                         Expr::Atom(_) => {}
                         Expr::Expression { op, .. } => {
-                            if !op.is_empty() {
+                            if !op.is_empty() && start_idx > 0 {
                                 args[start_idx as usize - 1] = new_exp.clone();
                             }
                         }
@@ -1274,8 +1307,25 @@ fn test_to_expr22() {
                                         Mo(Operator::Add),
                                         Mi("b".to_string()),
                                     ])),
-                                         Box::from(Mi("c".to_string())),
+                                         Box::from(Mrow(vec![
+                                             Mi("c".to_string()),
+                                             Mo(Operator::Add),
+                                             Mi("d".to_string()),
+                                         ])),
                                     )]);
+    let _g = math_expression.to_graph();
+}
+
+#[test]
+fn test_to_expr23() {
+    let math_expression = Mrow(vec![Msubsup(vec![Mrow(vec![Mi("a".to_string()),
+                                                           Mo(Operator::Add),
+                                                           Mi("b".to_string()), ]),
+                                                 Mrow(vec![Mi("c".to_string()),
+                                                           Mo(Operator::Subtract),
+                                                           Mi("d".to_string()), ]),
+                                                 Mi("c".to_string())]),
+    ]);
     let _g = math_expression.to_graph();
 }
 
