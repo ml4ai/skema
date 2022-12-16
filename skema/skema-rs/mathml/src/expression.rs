@@ -60,6 +60,10 @@ impl MathExpression {
                 }
             }
             Mrow(xs) => {
+                if pre.args.len() >= pre.op.len() {
+                    // deal with the invisible multiply operator
+                    pre.op.push(Operator::Multiply);
+                }
                 let mut pre_exp = PreExp {
                     op: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
@@ -79,6 +83,10 @@ impl MathExpression {
                 );
             }
             Msqrt(xs) => {
+                if pre.args.len() >= pre.op.len() {
+                    // deal with the invisible multiply operator
+                    pre.op.push(Operator::Multiply);
+                }
                 let mut pre_exp = PreExp {
                     op: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
@@ -96,6 +104,10 @@ impl MathExpression {
                 );
             }
             Mfrac(xs1, xs2) => {
+                if pre.args.len() >= pre.op.len() {
+                    // deal with the invisible multiply operator
+                    pre.op.push(Operator::Multiply);
+                }
                 let mut pre_exp = PreExp {
                     op: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
@@ -1161,4 +1173,29 @@ fn test_to_expr19() {
     let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
     math.normalize();
     let _g = &mut math.content[0].clone().to_graph();
+}
+
+#[test]
+fn test_to_expr20() {
+    let math_expression = Mrow(vec![Mi("s".to_string()),
+                                    Mo(Operator::Equals),
+                                    Mfrac(
+                                        Box::from(Mrow(vec![
+                                            Mi("a".to_string()),
+                                            Mo(Operator::Add),
+                                            Mi("b".to_string()),
+                                        ])),
+                                        Box::from(Mrow(vec![
+                                            Mi("a".to_string()),
+                                            Mo(Operator::Multiply),
+                                            Mi("c".to_string()),
+                                            Mi("d".to_string()),
+                                            Msqrt(Box::from(Mrow(vec![
+                                                Mi("a".to_string()),
+                                                Mo(Operator::Add),
+                                                Mi("d".to_string()),
+                                            ]))),
+                                        ]),
+                                        ))]);
+    let _g = math_expression.to_graph();
 }
