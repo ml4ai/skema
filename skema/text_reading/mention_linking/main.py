@@ -3,7 +3,9 @@ import os
 """ Temporary test script for development This will change to unit tests and example usage script """
 
 from automates.utils.fold import dictionary_to_gromet_json, del_nulls
-from skema.text_reading.mention_linking.gromet_linker.align_comments import align_and_link
+from skema.text_reading.mention_linking.gromet_linker.comment_aligner import CommentAligner
+from skema.text_reading.mention_linking.gromet_linker.time_stamper import DebugTimeStamper
+from skema.text_reading.mention_linking.gromet_linker.uid_stamper import DocIdStamper
 
 if __name__ == "__main__":
 	gromet_path = "../../../../mention_linking_files/gromet/CHIME_SIR--Gromet-FN-auto.json"
@@ -29,9 +31,12 @@ if __name__ == "__main__":
 		if not os.path.exists(path):
 			raise Exception(f"A file doesn't seem to exist: {path}")
 
-	enriched_gromet = align_and_link(gromet_path, comments_path, extractions_path, embeddings_path, debug=True)
+	time_stamper = DebugTimeStamper()
+	uid_stamper = DocIdStamper()
+	comment_aligner = CommentAligner(time_stamper, uid_stamper, gromet_path, comments_path, extractions_path, embeddings_path)
+	enriched_gromet = comment_aligner.align(debug=True)
 
 	# Save gromet file with the new metadata aligned
-	with open("test.json", 'w') as f:
-		f.write(dictionary_to_gromet_json(del_nulls(enriched_gromet.to_dict())))
+	with open("test.json", 'w') as file:
+		file.write(dictionary_to_gromet_json(del_nulls(enriched_gromet.to_dict())))
 

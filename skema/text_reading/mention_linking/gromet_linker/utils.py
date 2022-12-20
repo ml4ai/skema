@@ -1,5 +1,5 @@
-from .time_stamper import time_stamper
-from .uid_stamper import uid_stamper
+from .time_stamper import TimeStamper
+from .uid_stamper import UidStamper
 from typing import Optional, Tuple
 from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
 
@@ -7,7 +7,7 @@ from .text_reading_linker import TextReadingLinker
 
 import itertools as it
 
-def build_provenance(method:str) -> Provenance:
+def build_provenance(method:str, time_stamper) -> Provenance:
 	return Provenance(
 		method,
 		time_stamper.stamp()
@@ -56,7 +56,7 @@ def get_code_file_ref(comments_file_name: str, gromet) -> Optional[str]:
 
 	return uid
 
-def get_doc_file_ref(scored_mention, linker:TextReadingLinker, gromet) -> Optional[str]:
+def get_doc_file_ref(time_stamper, uid_stamper, scored_mention, linker:TextReadingLinker, gromet) -> Optional[str]:
 	""" Fetches the UUID of the text doc reference that matches the one from the mention's file """
 
 	mention, _ = scored_mention
@@ -72,7 +72,7 @@ def get_doc_file_ref(scored_mention, linker:TextReadingLinker, gromet) -> Option
 	# If the text doc collection doesn't exist, then add it
 	if not text_collection:
 		text_collection = TextualDocumentCollection(
-			provenance = build_provenance("embedding_similarity_1.0"),
+			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
 			documents= list()
 		)
 
@@ -107,7 +107,7 @@ def get_doc_file_ref(scored_mention, linker:TextReadingLinker, gromet) -> Option
 
 	return uid
 
-def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , element, gromet):
+def build_comment_metadata(time_stamper, comment:Tuple[int, str] | str, code_file_ref:str , element, gromet):
 
 	# TODO: Differientiate between line comments and docstrings
 
@@ -117,7 +117,7 @@ def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , el
 		line, text = None, comment
 
 	md = SourceCodeComment(
-		provenance= build_provenance("heuristic_1.0"),
+		provenance= build_provenance("heuristic_1.0", time_stamper),
 		code_file_reference_uid= code_file_ref,
 		comment=text,
 		line_begin= line,
@@ -126,7 +126,7 @@ def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , el
 
 	attach_metadata(md, element, gromet)
 
-def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet):
+def build_tr_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, element, gromet):
 
 	mention, score = scored_mention
 
@@ -151,7 +151,7 @@ def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet
 	if mention['labels'][0] == "ParameterSetting":
 		# ParameterSetting
 		md = TextLiteralValue(
-			provenance = build_provenance("embedding_similarity_1.0"),
+			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
 			text_extraction= text_extraction,
 			value= mention['arguments']['value'][0]['text'],
 			variable_identifier= mention['arguments']['variable'][0]['text']
@@ -162,7 +162,7 @@ def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet
 		# Candidate definition argument names
 
 		md = TextDescription(
-			provenance = build_provenance("embedding_similarity_1.0"),
+			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
 			text_extraction= text_extraction,
 			variable_identifier= mention['arguments']['variable'][0]['text'],
 			variable_definition= mention['arguments']['description'][0]['text']
@@ -172,7 +172,7 @@ def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet
 		# Candidate definition argument names
 
 		md = TextUnits(
-			provenance = build_provenance("embedding_similarity_1.0"),
+			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
 			text_extraction= text_extraction,
 			variable_identifier= mention['arguments']['variable'][0]['text'],
 			unit_type= mention['arguments']["unit"][0]['text']

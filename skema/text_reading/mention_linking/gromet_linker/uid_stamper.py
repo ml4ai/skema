@@ -12,5 +12,3 @@ class DocIdStamper(UidStamper):
 class HashStamper(UidStamper):
 	def stamp(self, doc_id: str) -> str:
 		return str(hash(doc_id))
-
-uid_stamper = DocIdStamper()

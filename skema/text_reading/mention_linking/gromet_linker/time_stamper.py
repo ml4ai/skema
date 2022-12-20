@@ -11,5 +11,3 @@ class DebugTimeStamper(TimeStamper):
 class NowTimeStamper(TimeStamper):
 	def stamp(self) -> str:
 		return str(datetime.datetime.now())
-
-time_stamper = DebugTimeStamper()
