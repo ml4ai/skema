@@ -2,16 +2,13 @@ from .time_stamper import TimeStamper
 from .uid_stamper import UidStamper
 from typing import Optional, Tuple
 from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
+from .provenance_helper import ProvenanceHelper
 
 from .text_reading_linker import TextReadingLinker
-
+from .time_stamper import DebugTimeStamper
 import itertools as it
 
-def build_provenance(method:str, time_stamper) -> Provenance:
-	return Provenance(
-		method,
-		time_stamper.stamp()
-	)
+provenance_helper = ProvenanceHelper(DebugTimeStamper())
 
 def get_element_metadata(elem, fn):
 	# Get the metadata, if exists
@@ -72,7 +69,7 @@ def get_doc_file_ref(time_stamper, uid_stamper, scored_mention, linker:TextReadi
 	# If the text doc collection doesn't exist, then add it
 	if not text_collection:
 		text_collection = TextualDocumentCollection(
-			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
+			provenance = provenance_helper.build("embedding_similarity_1.0"),
 			documents= list()
 		)
 
@@ -117,7 +114,7 @@ def build_comment_metadata(time_stamper, comment:Tuple[int, str] | str, code_fil
 		line, text = None, comment
 
 	md = SourceCodeComment(
-		provenance= build_provenance("heuristic_1.0", time_stamper),
+		provenance= provenance_helper.build("heuristic_1.0"),
 		code_file_reference_uid= code_file_ref,
 		comment=text,
 		line_begin= line,
@@ -151,7 +148,7 @@ def build_tr_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, e
 	if mention['labels'][0] == "ParameterSetting":
 		# ParameterSetting
 		md = TextLiteralValue(
-			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
+			provenance = provenance_helper.build("embedding_similarity_1.0"),
 			text_extraction= text_extraction,
 			value= mention['arguments']['value'][0]['text'],
 			variable_identifier= mention['arguments']['variable'][0]['text']
@@ -162,7 +159,7 @@ def build_tr_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, e
 		# Candidate definition argument names
 
 		md = TextDescription(
-			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
+			provenance = provenance_helper.build("embedding_similarity_1.0"),
 			text_extraction= text_extraction,
 			variable_identifier= mention['arguments']['variable'][0]['text'],
 			variable_definition= mention['arguments']['description'][0]['text']
@@ -172,7 +169,7 @@ def build_tr_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, e
 		# Candidate definition argument names
 
 		md = TextUnits(
-			provenance = build_provenance("embedding_similarity_1.0", time_stamper),
+			provenance = provenance_helper.build("embedding_similarity_1.0"),
 			text_extraction= text_extraction,
 			variable_identifier= mention['arguments']['variable'][0]['text'],
 			unit_type= mention['arguments']["unit"][0]['text']
