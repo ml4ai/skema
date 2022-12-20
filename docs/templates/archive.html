@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+  $partial("templates/head.html")$
+  <body>
+    $partial("templates/nav.html")$
+    <div class="container">
+      <h1>$title$</h1>
+      <ul>
+        $for(posts)$
+        <li> <a href="$url$">$title$</a></li>
+        $endfor$
+      </ul>
+    </div>
+    </div>
+    $partial("templates/js.html")$
+  </body>
+</html>
