@@ -10,3 +10,5 @@ different media, and the model implementations themselves are often difficult
 to share, extend and maintain.  The Scientific Knowledge Extraction and Model
 Assembly (SKEMA) framework aims to make fundamental contributions to
 machine-assisted knowledge discovery, curation, and modeling.
+
+The SKEMA project is supported by DARPA under contract HR00112290092.
