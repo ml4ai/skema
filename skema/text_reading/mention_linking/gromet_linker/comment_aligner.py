@@ -4,9 +4,10 @@ from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 from collections import defaultdict
 from typing import Optional
 from .debug_info import DebugInfo
+from .gromet_helper import GrometHelper
 from .source_comments import SourceComments
 from .text_reading_linker import TextReadingLinker
-from .utils import get_code_file_ref, get_element_line_numbers, build_comment_metadata, build_tr_mention_metadata, get_doc_file_ref
+from .utils import get_code_file_ref, build_comment_metadata, build_tr_mention_metadata, get_doc_file_ref
 
 import re
 
@@ -91,7 +92,7 @@ class CommentAligner():
 
 		comments = list()
 
-		function_lines = get_element_line_numbers(box, fn)
+		function_lines = GrometHelper.get_element_line_numbers(box, fn)
 		if function_lines:
 			start = function_lines[0]
 			for line_num in range(start-1, 0, -1): # Decreasing line num counter
@@ -139,7 +140,7 @@ class CommentAligner():
 
 		# First, comments in the same line
 		# Get the line numbers, if available
-		line_range = get_element_line_numbers(attr, fn)
+		line_range = GrometHelper.get_element_line_numbers(attr, fn)
 		if line_range and attr_type in {"b", "bf"}:
 			if attr.function_type not in {"PRIMITIVE", "LITERAL"}:
 				start, end = line_range

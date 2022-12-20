@@ -1,8 +1,9 @@
+from .gromet_helper import GrometHelper
+from .provenance_helper import ProvenanceHelper
 from .time_stamper import TimeStamper
 from .uid_stamper import UidStamper
 from typing import Optional, Tuple
 from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
-from .provenance_helper import ProvenanceHelper
 
 from .text_reading_linker import TextReadingLinker
 from .time_stamper import DebugTimeStamper
@@ -10,31 +11,10 @@ import itertools as it
 
 provenance_helper = ProvenanceHelper(DebugTimeStamper())
 
-def get_element_metadata(elem, fn):
-	# Get the metadata, if exists
-	if elem.metadata:
-		metadata = fn.metadata_collection[elem.metadata - 1] # Minus 1 because it is 1-based indexing
-	else:
-		metadata = None
-
-	return metadata
-
-def get_element_line_numbers(elem, fn):
-	metadata = get_element_metadata(elem, fn)
-
-	# First, comments in the same line
-	# Get the line numbers, if available
-	if metadata:
-		for m in metadata:
-			if m.metadata_type == "source_code_reference":
-				return m.line_begin, m.line_end
-		
-	return None
-
 def get_code_file_ref(comments_file_name: str, gromet) -> Optional[str]:
 	""" Fetches the UUID of the code_file_reference that matches the one from the comments file """
 
-	mdc = get_element_metadata(gromet, gromet)
+	mdc = GrometHelper.get_element_metadata(gromet, gromet)
 	code_collection = None
 	uid = None
 
@@ -57,7 +37,7 @@ def get_doc_file_ref(time_stamper, uid_stamper, scored_mention, linker:TextReadi
 	""" Fetches the UUID of the text doc reference that matches the one from the mention's file """
 
 	mention, _ = scored_mention
-	mdc = get_element_metadata(gromet, gromet)
+	mdc = GrometHelper.get_element_metadata(gromet, gromet)
 	text_collection = None
 	uid = None
 
@@ -202,7 +182,7 @@ def build_tr_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, e
 
 def attach_metadata(new_metadata, element, gromet):
 
-	existing_metadata = get_element_metadata(element, gromet)
+	existing_metadata = GrometHelper.get_element_metadata(element, gromet)
 
 	# First, comments in the same line
 	# Get the line numbers, if available
