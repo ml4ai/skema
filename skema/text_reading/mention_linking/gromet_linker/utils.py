@@ -1,15 +1,16 @@
-import datetime
+from .time_stamper import time_stamper
+from .uid_stamper import uid_stamper
 from typing import Optional, Tuple
 from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
 
-from .mention_linking import TextReadingLinker
+from .text_reading_linker import TextReadingLinker
 
 import itertools as it
 
 def build_provenance(method:str) -> Provenance:
 	return Provenance(
 		method,
-		str(datetime.datetime.now())
+		time_stamper.stamp()
 	)
 
 def get_element_metadata(elem, fn):
@@ -92,7 +93,7 @@ def get_doc_file_ref(scored_mention, linker:TextReadingLinker, gromet) -> Option
 		if not doc_ref:
 			# TODO Figure out all the correct values here
 			doc_ref = TextualDocumentReference(
-				uid = str(hash(doc_id)),
+				uid = uid_stamper.stamp(doc_id),
 				global_reference_id= "TBD",
 				cosmos_id= doc_id,
 				cosmos_version_number= 0.1,

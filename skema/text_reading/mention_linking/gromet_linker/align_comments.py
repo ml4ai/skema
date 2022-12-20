@@ -1,57 +1,14 @@
 """ Aligns source code comments to Gromet function networks """
 
-from collections import defaultdict
-from dataclasses import dataclass
-import json
-from pathlib import Path
-from typing import Any, List, Mapping, NamedTuple, Optional, Tuple, Union
-
 from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-
-from .mention_linking import TextReadingLinker
+from collections import defaultdict
+from typing import Optional
+from .debug_info import DebugInfo
+from .source_comments import SourceComments
+from .text_reading_linker import TextReadingLinker
 from .utils import get_code_file_ref, get_element_line_numbers, build_comment_metadata, build_tr_mention_metadata, get_doc_file_ref
 
 import re
-
-	
-@dataclass
-class SourceComments:
-	path:Path
-	line_comments:dict[int, str]
-	doc_strings:dict[str, str]
-
-	@property
-	def file_name(self) -> str:
-		return self.path.name
-
-	@property
-	def file_path(self) -> str:
-		return str(self.path.absolute)
-
-	@staticmethod
-	def from_file(comments_path:str) -> "SourceComments":
-		""" Reads the automatically extracted comments from the json file """
-
-		def _helper(data):
-			line_comments = {l[0]:l[1] for l in data['comments']}
-			doc_strings = data['docstrings']
-
-			return SourceComments(
-				path = Path(comments_path),
-				line_comments= line_comments,
-				doc_strings= doc_strings
-			)
-
-		with open(comments_path) as f:
-			data = json.load(f)
-
-		# Make either a singtle instance or a dictionary of instances in the case of multiple files
-		if "comments" in data:
-			return _helper(data)
-		else:
-			return {k:_helper(v) for k, v in data.items()}
-			
-
 
 def get_function_comments(box, fn,  line_comments):
 	""" Gets the block of comments adjacent to the function's definition """
@@ -86,25 +43,6 @@ def match_variable_name(name, comments):
 
 	return ret
 				
-
-class DebugInfo(NamedTuple):
-	line_range: Optional[Tuple[int]]
-	name: Optional[str]
-	docstring: List[str]
-	comments: List[Union[str, Tuple[int, str]]]
-	mentions: Mapping[str, Any]
-
-
-def print_debug_info(info: DebugInfo) -> None:
-	print("===================")
-	print(f"{info.line_range} {info.name if info.name else ''}:")
-	print()
-	print("\n".join(info.docstring))
-	print("\n".join(c[1] if type(c) == tuple else c for c in info.comments))
-	if len(info.mentions) > 0:
-		print("Aligned mentions:\n" + '\n'.join(f"{s}: {m['text']}" for m, s in info.mentions))
-	print()
-
 
 
 def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: SourceComments, linker) -> Optional[DebugInfo]:
@@ -172,11 +110,6 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: Sour
 	else:
 		return None
 
-	
-
-	
-
-
 def align_and_link(gromet_path:str, comments_path:str, extractions_path:str, embeddings_path:str, debug: bool = False):
 	# Read the function network
 	fn = json_to_gromet(gromet_path)
@@ -239,7 +172,7 @@ def align_and_link(gromet_path:str, comments_path:str, extractions_path:str, emb
 		# Print them in lexicographical order
 		for key in sorted(grouped_info):
 			for info in grouped_info[key]:
-				print_debug_info(info)
+				info.print()
 	
 
 	return fn

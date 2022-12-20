@@ -25,7 +25,7 @@ if __name__ == "__main__":
 	embeddings_path = "../../../../word_embeddings/epi+code_comments/embeddings.kv"
 	# embeddings_path = "/data/covid_comments_models/xdd_covid_19_1x_word2vec/alternate/embeddings.kv"
 
-	for path in [gromet_path, comments_path, extractions_path, embeddings_path]:
+	for path in [gromet_path, comments_path, extractions_path, embeddings_path, embeddings_path + ".vectors.npy"]:
 		if not os.path.exists(path):
 			raise Exception(f"A file doesn't seem to exist: {path}")
 
