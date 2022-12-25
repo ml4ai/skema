@@ -2,24 +2,19 @@ import re
 
 class LanguageMatcher():
 
-	def match(self, name: str, comments):
+	def match(self, name: str, comments: list[str]) -> list[str]:
 		return list()
 
 class PythonMatcher(LanguageMatcher):
+	def __init__(self):
+		self.separator = r"[:,\.\s]"
 
-	def match(self, name: str, comments):
-		result = list()
-		try:
-			pattern = re.compile(r"[:,\.\s]" + name + r"[:,\.\s]")
-		except Exception as	e: # TODO Escape the name.
-			# print(e)
-			pass
-		else:
-			for l in comments:
-				if len(pattern.findall(l)) > 0:
-					result.append(l)
-
-		return result
+	def match(self, name: str, comments: list[str]) -> list[str]:
+		# TODO: Use re.escape() after regression testing
+		# pattern = self.separator + re.escape(name) + self.separator
+		pattern = self.separator + name + self.separator
+		matches = [comment for comment in comments if re.search(pattern, comment)]
+		return matches
 
 class FortranMatcher(LanguageMatcher):
 	pass
@@ -34,5 +29,8 @@ class VariableNameMatcher(LanguageMatcher):
 		else:
 			self.matcher = PythonMatcher() # TODO: raise an exception?
 
-	def match(self, name: str, comments):
-		return self.matcher.match(name, comments)
+	def match(self, name: str, comments: list[str]) -> list[str]:
+		if name:
+			return self.matcher.match(name, comments)
+		else:
+			return list()

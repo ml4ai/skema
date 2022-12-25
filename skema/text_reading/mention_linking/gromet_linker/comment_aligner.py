@@ -3,6 +3,7 @@
 from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 from collections import defaultdict
 from typing import Optional
+
 from .debug_info import DebugInfo
 from .gromet_helper import GrometHelper
 from .source_comments import SourceComments
