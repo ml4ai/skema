@@ -1,7 +1,7 @@
 from typing import Any, List, Mapping, NamedTuple, Optional, Tuple, Union
 
 class DebugInfo(NamedTuple):
-	line_range: Optional[Tuple[int]]
+	line_range: Optional[range]
 	name: Optional[str]
 	docstring: List[str]
 	comments: List[Union[str, Tuple[int, str]]]

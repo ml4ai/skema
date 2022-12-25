@@ -19,6 +19,7 @@ class CommentAligner():
 
 		def debug():
 			pass
+	
 	class FakeDebugger(Debugger):
 		pass
 
@@ -31,13 +32,13 @@ class CommentAligner():
 				self.debug_info.append(info)
 
 		def debug(self):
-			# Aggregate the debug info per name
+			# Aggregate the debug info per name.
 			grouped_info = defaultdict(list)
 			for info in self.debug_info:
 				key = info.name if info.name else ''
 				grouped_info[key].append(info)
 
-			# Print them in lexicographical order
+			# Print them in lexicographical order.
 			for key in sorted(grouped_info):
 				for info in grouped_info[key]:
 					info.print()
@@ -46,25 +47,24 @@ class CommentAligner():
 	def __init__(self, time_stamper, uid_stamper, gromet_path: str, comments_path: str, extractions_path: str, embeddings_path: str):
 		self.time_stamper = time_stamper
 		self.uid_stamper = uid_stamper
-		# Read the function network
 		self.gromet_path = gromet_path
-		# Parse the comments
 		self.src_comments = SourceComments.from_file(comments_path)
-		# TODO: Add the codefile references
-		# Build the TR linking engine
+		# TODO: Add the codefile references.
 		self.linker = TextReadingLinker(extractions_path, embeddings_path)
 		self.variable_name_matcher = VariableNameMatcher("python")
 
-	# Return new fn that has been aligned and linked
+	# Return new gromet_fn_module that has been aligned and linked.
 	def align(self, debug: bool = False):
 		debugger = self.RealDebugger() if debug else self.FakeDebugger()
+		# This is read anew here, because it will be modified before return.
 		gromet_fn_module = json_to_gromet(self.gromet_path)
 
 		container_gromet_box_function = None
 		gromet_fn = None
 
 		def get_info(gromet_object, key):
-			info = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module)
+			line_range, aligned_docstring, aligned_comments = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module)
+			info = self.step2(gromet_object, gromet_fn_module, line_range, aligned_docstring, aligned_comments)
 			debugger.add_info(info)
 
 		# Identify the output ports with variable names
@@ -121,43 +121,48 @@ class CommentAligner():
 		comments.reverse()
 		return comments
 
-	def enhance_attribute_with_comments(self, gromet_object, key, container_box, gromet_fn_module) -> Optional[DebugInfo]:
-		# Identify the variables with the same name to each output port
-		# In case of a tie, resolve the correct variable using the containing line spans
+	# This gromet_object should be either a gromet_box_function or gromet_port.
+	def enhance_attribute_with_comments(self, gromet_object, key, container_gromet_box_function, gromet_fn_module) -> Optional[DebugInfo]:
+		# Identify the variables with the same name to each output port.
+		# In case of a tie, resolve the correct variable using the containing line spans.
 
 		aligned_comments = list()
 		aligned_docstring = list()
 		name = gromet_object.name
 
 		# Get docstring, if any
-		if container_box and container_box.function_type == "FUNCTION":
-			docstring = self.src_comments.doc_strings.get(container_box.name)
+		if container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION":
+			docstring = self.src_comments.doc_strings.get(container_gromet_box_function.name)
 		else:
 			docstring = None
 
-		# First, comments in the same line
-		# Get the line numbers, if available
+		# First, get comments in the same line.  Get the line numbers, if available.
 		line_range = GrometHelper.get_element_line_numbers(gromet_object, gromet_fn_module)
-		if line_range and key in {"b", "bf"}:
-			if gromet_object.function_type not in {"PRIMITIVE", "LITERAL"}:
-				start, end = line_range
-				for line_num in range(start, end+1):
-					if line_num in self.src_comments.line_comments:
-						aligned_comments.append((line_num, self.src_comments.line_comments[line_num]))
+		# So b and bf are special for the boxes.
+		if key in {"b", "bf"} and gromet_object.function_type not in {"PRIMITIVE", "LITERAL"}:
+			for line_num in line_range:
+				if line_num in self.src_comments.line_comments:
+					aligned_comments.append((line_num, self.src_comments.line_comments[line_num]))
 
-		# Second, get subsection of docstring, if present. If current attr is the containing box itself, then get the complete docstring
+		# Second, get subsection of docstring, if present.  If the current gromet_object is the containing
+		# container_gromet_box_function itself, then get the complete docstring.
 		if docstring:
-			if gromet_object == container_box:
+			if gromet_object == container_gromet_box_function:
 				aligned_docstring.extend(docstring)
 			else:
 				aligned_docstring.extend(self.variable_name_matcher.match(name, docstring))
 
-		# Third, comments not in the same line, but likely of the container function
+		# Third, use comments not in the same line, but likely of the container function.
 		if name:
-			function_comments = self.get_function_comments(container_box, gromet_fn_module, self.src_comments.line_comments)
+			function_comments = self.get_function_comments(container_gromet_box_function, gromet_fn_module, self.src_comments.line_comments)
 			aligned_comments.extend(self.variable_name_matcher.match(name, function_comments))
 
-		# Build new metadata object and append it to the metadata list of each port
+		return line_range, aligned_docstring, aligned_comments
+
+	def step2(self, gromet_object, gromet_fn_module, line_range, aligned_docstring, aligned_comments):
+		name = gromet_object.name
+
+		# Build new metadata object and append it to the metadata list of each port.
 		comments = [name] if name else [] + aligned_docstring + [c if type(c) == str else c[1] for c in aligned_comments]
 		aligned_mentions = self.linker.align_to_comments(comments)
 
@@ -175,10 +180,6 @@ class CommentAligner():
 			doc_file_ref = get_doc_file_ref(self.time_stamper, self.uid_stamper, m, self.linker, gromet_fn_module)
 			build_tr_mention_metadata(self.time_stamper, m, doc_file_ref, gromet_object, gromet_fn_module)
 
-		if len(aligned_docstring + aligned_comments) > 0:
-			return DebugInfo(
-				line_range, name,
-				aligned_docstring, aligned_comments, aligned_mentions
-			)
-		else:
-			return None
+		if aligned_docstring or aligned_comments:
+			return DebugInfo(line_range, name, aligned_docstring, aligned_comments, aligned_mentions)
+		return None
