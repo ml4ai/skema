@@ -8,8 +8,7 @@ from .gromet_helper import GrometHelper
 from .source_comments import SourceComments
 from .text_reading_linker import TextReadingLinker
 from .utils import get_code_file_ref, build_comment_metadata, build_tr_mention_metadata, get_doc_file_ref
-
-import re
+from .variable_name_matcher import VariableNameMatcher
 
 class CommentAligner():
 
@@ -53,6 +52,7 @@ class CommentAligner():
 		# TODO: Add the codefile references
 		# Build the TR linking engine
 		self.linker = TextReadingLinker(extractions_path, embeddings_path)
+		self.variable_name_matcher = VariableNameMatcher("python")
 
 	# Return new fn that has been aligned and linked
 	def align(self, debug: bool = False):
@@ -120,21 +120,6 @@ class CommentAligner():
 		comments.reverse()
 		return comments
 
-	def match_variable_name(self, name, comments):
-		ret = list()
-		try:
-			pattern = re.compile(r"[:,\.\s]" + name + r"[:,\.\s]")
-		except Exception as  e:
-			# print(e)
-			pass
-		else:
-			for l in comments:
-				# TODO this can be done more smartly if we assume a specific programming language (i.e. Python)
-				if len(pattern.findall(l)) > 0:
-					ret.append(l)
-
-		return ret
-
 	def enhance_attribute_with_comments(self, gromet_object, key, container_box, gromet_fn_module) -> Optional[DebugInfo]:
 		# Identify the variables with the same name to each output port
 		# In case of a tie, resolve the correct variable using the containing line spans
@@ -164,12 +149,12 @@ class CommentAligner():
 			if gromet_object == container_box:
 				aligned_docstring.extend(docstring)
 			else:
-				aligned_docstring.extend(self.match_variable_name(name, docstring))
+				aligned_docstring.extend(self.variable_name_matcher.match(name, docstring))
 
 		# Third, comments not in the same line, but likely of the container function
 		if name:
 			function_comments = self.get_function_comments(container_box, gromet_fn_module, self.src_comments.line_comments)
-			aligned_comments.extend(self.match_variable_name(name, function_comments))
+			aligned_comments.extend(self.variable_name_matcher.match(name, function_comments))
 
 		# Build new metadata object and append it to the metadata list of each port
 		comments = [name] if name else [] + aligned_docstring + [c if type(c) == str else c[1] for c in aligned_comments]
