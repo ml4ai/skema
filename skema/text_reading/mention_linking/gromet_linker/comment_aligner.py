@@ -63,7 +63,11 @@ class CommentAligner():
 		gromet_fn = None
 
 		def get_info(gromet_object, key):
-			aligned_docstrings = self.step0(gromet_object, container_gromet_box_function)
+			if container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION":
+				docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name)
+			else:
+				docstrings = []
+			aligned_docstrings = self.step0(gromet_object, container_gromet_box_function, docstrings)
 			line_range, aligned_comments = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module)
 			info = self.step2(gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments)
 			debugger.add_info(info)
@@ -105,33 +109,25 @@ class CommentAligner():
 		debugger.debug()
 		return gromet_fn_module
 
-	def get_function_comments(self, box, fn, line_comments):
+	# Get the comments in contiguous lines above the function.
+	def get_function_comments(self, gromet_box_function, gromet_fn_module, line_comments):
 		""" Gets the block of comments adjacent to the function's definition """
-
 		comments = list()
-
-		function_lines = GrometHelper.get_element_line_numbers(box, fn)
-		if function_lines:
-			start = function_lines[0]
-			for line_num in range(start-1, 0, -1): # Decreasing line num counter
-				if line_num in line_comments:
-					comments.append(line_comments[line_num])
-				else:
-					break
-
+		line_numbers = GrometHelper.get_element_line_numbers(gromet_box_function, gromet_fn_module)
+		for line_num in range(line_numbers.start - 1, -1, -1): # decreasing line_num counter
+			if line_num in line_comments:
+				comments.append(line_comments[line_num])
+			else:
+				break
 		comments.reverse()
 		return comments
 
-	def step0(self, gromet_object, container_gromet_box_function) -> list[str]:
-		name = gromet_object.name
-
-		if container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION":
-			docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name)
-			if docstrings:
-				if gromet_object == container_gromet_box_function:
-					return docstrings
-				else:
-					return self.variable_name_matcher.match(name, docstrings)
+	def step0(self, gromet_object, container_gromet_box_function, docstrings) -> list[str]:
+		if docstrings:
+			if gromet_object == container_gromet_box_function:
+				return docstrings
+			else:
+				return self.variable_name_matcher.match(gromet_object.name, docstrings)
 		return []
 
 	# This gromet_object should be either a gromet_box_function or gromet_port.
@@ -141,7 +137,7 @@ class CommentAligner():
 
 		aligned_comments = list()
 
-		# First, get comments in the same line.  Get the line numbers, if available.
+		# Get comments in the same line.  Get the line numbers, if available.
 		line_range = GrometHelper.get_element_line_numbers(gromet_object, gromet_fn_module)
 		# So b and bf are special for the boxes.
 		if key in {"b", "bf"} and gromet_object.function_type not in {"PRIMITIVE", "LITERAL"}:
@@ -149,7 +145,7 @@ class CommentAligner():
 				if line_num in self.src_comments.line_comments:
 					aligned_comments.append((line_num, self.src_comments.line_comments[line_num]))
 
-		# Third, use comments not in the same line, but likely of the container function.
+		# Use comments not in the same line, but likely of the container function.
 		name = gromet_object.name
 		if name:
 			function_comments = self.get_function_comments(container_gromet_box_function, gromet_fn_module, self.src_comments.line_comments)
