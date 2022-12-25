@@ -63,12 +63,15 @@ class CommentAligner():
 		gromet_fn = None
 
 		def get_info(gromet_object, key):
-			if container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION":
-				docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name)
-			else:
-				docstrings = []
-			aligned_docstrings = self.step0(gromet_object, container_gromet_box_function, docstrings)
-			line_range, aligned_comments = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module)
+			condition = container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION"
+			docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name, []) if condition else []
+
+			condition = gromet_object != container_gromet_box_function
+			aligned_docstrings = self.variable_name_matcher.match(gromet_object.name, docstrings) if condition else docstrings
+
+			line_range = GrometHelper.get_element_line_numbers(gromet_object, gromet_fn_module)
+
+			aligned_comments = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module, line_range)
 			info = self.step2(gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments)
 			debugger.add_info(info)
 
@@ -122,23 +125,13 @@ class CommentAligner():
 		comments.reverse()
 		return comments
 
-	def step0(self, gromet_object, container_gromet_box_function, docstrings) -> list[str]:
-		if docstrings:
-			if gromet_object == container_gromet_box_function:
-				return docstrings
-			else:
-				return self.variable_name_matcher.match(gromet_object.name, docstrings)
-		return []
-
 	# This gromet_object should be either a gromet_box_function or gromet_port.
-	def enhance_attribute_with_comments(self, gromet_object, key, container_gromet_box_function, gromet_fn_module) -> Optional[DebugInfo]:
+	def enhance_attribute_with_comments(self, gromet_object, key, container_gromet_box_function, gromet_fn_module, line_range: range) -> Optional[DebugInfo]:
 		# Identify the variables with the same name to each output port.
 		# In case of a tie, resolve the correct variable using the containing line spans.
 
 		aligned_comments = list()
 
-		# Get comments in the same line.  Get the line numbers, if available.
-		line_range = GrometHelper.get_element_line_numbers(gromet_object, gromet_fn_module)
 		# So b and bf are special for the boxes.
 		if key in {"b", "bf"} and gromet_object.function_type not in {"PRIMITIVE", "LITERAL"}:
 			for line_num in line_range:
@@ -151,7 +144,7 @@ class CommentAligner():
 			function_comments = self.get_function_comments(container_gromet_box_function, gromet_fn_module, self.src_comments.line_comments)
 			aligned_comments.extend(self.variable_name_matcher.match(name, function_comments))
 
-		return line_range, aligned_comments
+		return aligned_comments
 
 	def step2(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments):
 		name = gromet_object.name
