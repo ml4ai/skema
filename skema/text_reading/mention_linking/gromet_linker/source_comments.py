@@ -5,9 +5,9 @@ import json
 
 @dataclass
 class SourceComments:
-	path:Path
-	line_comments:dict[int, str]
-	doc_strings:dict[str, str]
+	path: Path
+	line_comments: dict[int, str]
+	doc_strings: dict[str, str]
 
 	@property
 	def file_name(self) -> str:

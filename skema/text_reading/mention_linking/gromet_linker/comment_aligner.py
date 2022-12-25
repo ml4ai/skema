@@ -63,8 +63,9 @@ class CommentAligner():
 		gromet_fn = None
 
 		def get_info(gromet_object, key):
-			line_range, aligned_docstring, aligned_comments = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module)
-			info = self.step2(gromet_object, gromet_fn_module, line_range, aligned_docstring, aligned_comments)
+			aligned_docstrings = self.step0(gromet_object, container_gromet_box_function)
+			line_range, aligned_comments = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module)
+			info = self.step2(gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments)
 			debugger.add_info(info)
 
 		# Identify the output ports with variable names
@@ -121,20 +122,24 @@ class CommentAligner():
 		comments.reverse()
 		return comments
 
+	def step0(self, gromet_object, container_gromet_box_function) -> list[str]:
+		name = gromet_object.name
+
+		if container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION":
+			docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name)
+			if docstrings:
+				if gromet_object == container_gromet_box_function:
+					return docstrings
+				else:
+					return self.variable_name_matcher.match(name, docstrings)
+		return []
+
 	# This gromet_object should be either a gromet_box_function or gromet_port.
 	def enhance_attribute_with_comments(self, gromet_object, key, container_gromet_box_function, gromet_fn_module) -> Optional[DebugInfo]:
 		# Identify the variables with the same name to each output port.
 		# In case of a tie, resolve the correct variable using the containing line spans.
 
 		aligned_comments = list()
-		aligned_docstring = list()
-		name = gromet_object.name
-
-		# Get docstring, if any
-		if container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION":
-			docstring = self.src_comments.doc_strings.get(container_gromet_box_function.name)
-		else:
-			docstring = None
 
 		# First, get comments in the same line.  Get the line numbers, if available.
 		line_range = GrometHelper.get_element_line_numbers(gromet_object, gromet_fn_module)
@@ -144,26 +149,19 @@ class CommentAligner():
 				if line_num in self.src_comments.line_comments:
 					aligned_comments.append((line_num, self.src_comments.line_comments[line_num]))
 
-		# Second, get subsection of docstring, if present.  If the current gromet_object is the containing
-		# container_gromet_box_function itself, then get the complete docstring.
-		if docstring:
-			if gromet_object == container_gromet_box_function:
-				aligned_docstring.extend(docstring)
-			else:
-				aligned_docstring.extend(self.variable_name_matcher.match(name, docstring))
-
 		# Third, use comments not in the same line, but likely of the container function.
+		name = gromet_object.name
 		if name:
 			function_comments = self.get_function_comments(container_gromet_box_function, gromet_fn_module, self.src_comments.line_comments)
 			aligned_comments.extend(self.variable_name_matcher.match(name, function_comments))
 
-		return line_range, aligned_docstring, aligned_comments
+		return line_range, aligned_comments
 
-	def step2(self, gromet_object, gromet_fn_module, line_range, aligned_docstring, aligned_comments):
+	def step2(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments):
 		name = gromet_object.name
 
 		# Build new metadata object and append it to the metadata list of each port.
-		comments = [name] if name else [] + aligned_docstring + [c if type(c) == str else c[1] for c in aligned_comments]
+		comments = [name] if name else [] + aligned_docstrings + [c if type(c) == str else c[1] for c in aligned_comments]
 		aligned_mentions = self.linker.align_to_comments(comments)
 
 		## Build metadata object for each comments aligned
@@ -173,13 +171,13 @@ class CommentAligner():
 		for c in aligned_comments:
 			build_comment_metadata(self.time_stamper, c, code_file_ref, gromet_object, gromet_fn_module)
 		# aligned docstring
-		for d in aligned_docstring:
+		for d in aligned_docstrings:
 			build_comment_metadata(self.time_stamper, d, code_file_ref, gromet_object, gromet_fn_module)
 		# linked text reading mentions
 		for m in aligned_mentions:
 			doc_file_ref = get_doc_file_ref(self.time_stamper, self.uid_stamper, m, self.linker, gromet_fn_module)
 			build_tr_mention_metadata(self.time_stamper, m, doc_file_ref, gromet_object, gromet_fn_module)
 
-		if aligned_docstring or aligned_comments:
-			return DebugInfo(line_range, name, aligned_docstring, aligned_comments, aligned_mentions)
+		if aligned_docstrings or aligned_comments:
+			return DebugInfo(line_range, name, aligned_docstrings, aligned_comments, aligned_mentions)
 		return None
