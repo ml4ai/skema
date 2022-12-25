@@ -13,6 +13,36 @@ import re
 
 class CommentAligner():
 
+	class Debugger():
+		def add_info(self, info):
+			pass
+
+		def debug():
+			pass
+	class FakeDebugger(Debugger):
+		pass
+
+	class RealDebugger(Debugger):
+		def __init__(self):
+			self.debug_info = list()
+
+		def add_info(self, info):
+			if info:
+				self.debug_info.append(info)
+
+		def debug(self):
+			# Aggregate the debug info per name
+			grouped_info = defaultdict(list)
+			for info in self.debug_info:
+				key = info.name if info.name else ''
+				grouped_info[key].append(info)
+
+			# Print them in lexicographical order
+			for key in sorted(grouped_info):
+				for info in grouped_info[key]:
+					info.print()
+
+
 	def __init__(self, time_stamper, uid_stamper, gromet_path: str, comments_path: str, extractions_path: str, embeddings_path: str):
 		self.time_stamper = time_stamper
 		self.uid_stamper = uid_stamper
@@ -26,33 +56,30 @@ class CommentAligner():
 
 	# Return new fn that has been aligned and linked
 	def align(self, debug: bool = False):
+		debugger = self.RealDebugger() if debug else self.FakeDebugger()
 		gromet_fn_module = json_to_gromet(self.gromet_path)
 
-		debug_info = list()
-		container_box = None
+		container_gromet_box_function = None
 		gromet_fn = None
 
 		def get_info(gromet_object, key):
-			info = self.enhance_attribute_with_comments(gromet_object, key, container_box, gromet_fn_module)
-			if info:
-				debug_info.append(info)
+			info = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module)
+			debugger.add_info(info)
 
 		# Identify the output ports with variable names
 		## attributes -> type:"FN" -> value:"b" with name
 		##                            value:"opi" with name
-		##                            value:"pof" with name
+		##                            value:"pof" with [unnecessary] name
 		##                            value:"poc" with name??
-
-		# Iterate over the attributes of the function network
 
 		for attribute in gromet_fn_module.attributes:
 			type, value = attribute.type, attribute.value
 			if type == "FN":
-				gromet_fn = value # It is really just a dict, not a gromet_fn
+				gromet_fn = value # It is really just a dict, not a gromet_fn.
 				
 				if gromet_fn.b:
 					for gromet_box_function in gromet_fn.b:
-						container_box = gromet_box_function
+						container_gromet_box_function = gromet_box_function
 						if gromet_box_function.name:
 							get_info(gromet_box_function, "b")
 				
@@ -73,21 +100,10 @@ class CommentAligner():
 				# 	if poc.name:
 				# 		align_comments(b, fn, line_comments, doc_strings)
 		
-		if debug:
-			# Aggregate the debug info per name
-			grouped_info = defaultdict(list)
-			for info in debug_info:
-				key = info.name if info.name else ''
-				grouped_info[key].append(info)
-
-			# Print them in lexicographical order
-			for key in sorted(grouped_info):
-				for info in grouped_info[key]:
-					info.print()
-
+		debugger.debug()
 		return gromet_fn_module
 
-	def get_function_comments(self, box, fn,  line_comments):
+	def get_function_comments(self, box, fn, line_comments):
 		""" Gets the block of comments adjacent to the function's definition """
 
 		comments = list()
