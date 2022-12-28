@@ -7,7 +7,7 @@ import json
 class SourceComments:
 	path: Path
 	line_comments: dict[int, str]
-	doc_strings: dict[str, str]
+	doc_strings: dict[str, list[str]]
 
 	@property
 	def file_name(self) -> str:

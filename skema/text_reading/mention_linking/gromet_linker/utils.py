@@ -86,7 +86,7 @@ def get_doc_file_ref(time_stamper, uid_stamper, scored_mention, linker:TextReadi
 
 def build_comment_metadata(time_stamper, comment:Tuple[int, str] | str, code_file_ref:str , element, gromet):
 
-	# TODO: Differientiate between line comments and docstrings
+	# TODO: Differentiate between line comments and docstrings
 
 	if type(comment) == tuple:		
 		line, text = comment

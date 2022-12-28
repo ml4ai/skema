@@ -87,8 +87,10 @@ class CommentAligner():
 				gromet_fn = value # It is really just a dict, not a gromet_fn.
 				
 				if gromet_fn.b:
+					# This is sticky.  Attributes are in order and the container function appears before anything contained.
+					assert len(gromet_fn.b) == 1
+					container_gromet_box_function = gromet_fn.b[0]
 					for gromet_box_function in gromet_fn.b:
-						container_gromet_box_function = gromet_box_function
 						if gromet_box_function.name:
 							get_info(gromet_box_function, "b")
 				
