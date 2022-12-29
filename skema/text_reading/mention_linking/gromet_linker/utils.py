@@ -88,7 +88,7 @@ def build_comment_metadata(time_stamper, comment:Tuple[int, str] | str, code_fil
 
 	# TODO: Differentiate between line comments and docstrings
 
-	if type(comment) == tuple:		
+	if type(comment) == tuple:
 		line, text = comment
 	else:
 		line, text = None, comment

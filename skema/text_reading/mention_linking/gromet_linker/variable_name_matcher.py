@@ -5,6 +5,9 @@ class LanguageMatcher():
 	def match(self, name: str, comments: list[str]) -> list[str]:
 		return list()
 
+class FortranMatcher(LanguageMatcher):
+	pass
+
 class PythonMatcher(LanguageMatcher):
 	def __init__(self):
 		self.separator = r"[:,\.\s]"
@@ -15,9 +18,6 @@ class PythonMatcher(LanguageMatcher):
 		pattern = self.separator + name + self.separator
 		matches = [comment for comment in comments if re.search(pattern, comment)]
 		return matches
-
-class FortranMatcher(LanguageMatcher):
-	pass
 
 class VariableNameMatcher(LanguageMatcher):
 
