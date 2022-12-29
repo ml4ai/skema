@@ -36,7 +36,7 @@ class Utils():
 		return uid
 
 	@staticmethod
-	def get_doc_file_ref(time_stamper, uid_stamper, scored_mention, linker:TextReadingLinker, gromet) -> Optional[str]:
+	def get_doc_file_ref(time_stamper, uid_stamper, scored_mention, linker: TextReadingLinker, gromet) -> Optional[str]:
 		""" Fetches the UUID of the text doc reference that matches the one from the mention's file """
 
 		mention, _ = scored_mention

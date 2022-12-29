@@ -28,11 +28,13 @@ class CommentAligner():
 		debugger = CommentDebugger.create(debug)
 		# This is read anew here, because it will be modified before return.
 		gromet_fn_module = GrometHelper.json_to_gromet(self.gromet_path)
+		gromet_fns = [attribute.value for attribute in gromet_fn_module.attributes if attribute.type == "FN"]
 
-		container_gromet_box_function = None
+		container_gromet_box_function = None # The function below uses this mutable value.
 
 		def get_info(gromet_object, key):
 			condition = container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION"
+			# TODO: Why don't docstrings have line numbers?
 			docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name, []) if condition else []
 
 			condition = gromet_object != container_gromet_box_function
@@ -41,8 +43,8 @@ class CommentAligner():
 			line_range = GrometHelper.get_element_line_numbers(gromet_object, gromet_fn_module)
 
 			# Get both kinds?
-			aligned_comments = self.enhance_attribute_with_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module, line_range)
-			info = self.step2(gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments)
+			aligned_comments = self.align_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module, line_range)
+			info = self.align_mentions(gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments)
 			debugger.add_info(info)
 
 		# Identify the output ports with variable names
@@ -51,41 +53,37 @@ class CommentAligner():
 		##                            value:"pof" with [unnecessary] name
 		##                            value:"poc" with name??
 
-		for attribute in gromet_fn_module.attributes:
-			type, value = attribute.type, attribute.value
-			if type == "FN":
-				gromet_fn = value # It is really just a dict, not a gromet_fn.
-				
-				if gromet_fn.b:
-					# This is sticky.  Attributes are in order and the container function appears before anything contained.
-					assert len(gromet_fn.b) == 1
-					container_gromet_box_function = gromet_fn.b[0]
-					for gromet_box_function in gromet_fn.b:
-						if gromet_box_function.name:
-							get_info(gromet_box_function, "b")
-				
-				if gromet_fn.opi:
-					for gromet_port in gromet_fn.opi:
-						if gromet_port.name:
-							get_info(gromet_port, "opi")
-				if gromet_fn.pof:
-					for gromet_port in gromet_fn.pof:
-						if gromet_port.name:
-							get_info(gromet_port, "pof")
-				if gromet_fn.bf:
-					for gromet_box_function in gromet_fn.bf:
-						if True: # A name is not required here.
-							get_info(gromet_box_function, "bf")
-				# TODO: Is this redundant?
-				# for poc in v.poc:
-				# 	if poc.name:
-				# 		align_comments(b, fn, line_comments, doc_strings)
+		for gromet_fn in gromet_fns:
+			if gromet_fn.b:
+				# This is sticky.  Attributes are in order and the container function appears before anything contained.
+				assert len(gromet_fn.b) == 1
+				container_gromet_box_function = gromet_fn.b[0]
+				for gromet_box_function in gromet_fn.b:
+					if gromet_box_function.name:
+						get_info(gromet_box_function, "b")
+			
+			if gromet_fn.opi:
+				for gromet_port in gromet_fn.opi:
+					if gromet_port.name:
+						get_info(gromet_port, "opi")
+			if gromet_fn.pof:
+				for gromet_port in gromet_fn.pof:
+					if gromet_port.name:
+						get_info(gromet_port, "pof")
+			if gromet_fn.bf:
+				for gromet_box_function in gromet_fn.bf:
+					if True: # A name is not required here.
+						get_info(gromet_box_function, "bf")
+			# TODO: Is this redundant?
+			# for poc in v.poc:
+			# 	if poc.name:
+			# 		align_comments(b, fn, line_comments, doc_strings)
 		
 		debugger.debug()
 		return gromet_fn_module
 
 	# Get the comments in contiguous lines above the function.
-	def get_function_comments(self, gromet_box_function, gromet_fn_module, line_comments):
+	def get_function_comments(self, gromet_box_function, gromet_fn_module, line_comments) -> list[str]:
 		""" Gets the block of comments adjacent to the function's definition """
 		comments = list()
 		line_numbers = GrometHelper.get_element_line_numbers(gromet_box_function, gromet_fn_module)
@@ -98,7 +96,7 @@ class CommentAligner():
 		return comments
 
 	# This gromet_object should be either a gromet_box_function or gromet_port.
-	def enhance_attribute_with_comments(self, gromet_object, key, container_gromet_box_function, gromet_fn_module, line_range: range):
+	def align_comments(self, gromet_object, key, container_gromet_box_function, gromet_fn_module, line_range: range):
 		# Identify the variables with the same name to each output port.
 		# In case of a tie, resolve the correct variable using the containing line spans.
 
@@ -118,7 +116,7 @@ class CommentAligner():
 
 		return aligned_comments
 
-	def step2(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments):
+	def align_mentions(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments):
 		name = gromet_object.name
 
 		# Build new metadata object and append it to the metadata list of each port.
@@ -129,15 +127,15 @@ class CommentAligner():
 		# Get the comment reference
 		code_file_ref = Utils.get_code_file_ref(self.src_comments.file_name, gromet_fn_module)
 		# aligned_comments
-		for c in aligned_comments:
-			Utils.build_comment_metadata(self.time_stamper, c, code_file_ref, gromet_object, gromet_fn_module)
+		for comment in aligned_comments:
+			Utils.build_comment_metadata(self.time_stamper, comment, code_file_ref, gromet_object, gromet_fn_module)
 		# aligned docstring
-		for d in aligned_docstrings:
-			Utils.build_comment_metadata(self.time_stamper, d, code_file_ref, gromet_object, gromet_fn_module)
+		for docstring in aligned_docstrings:
+			Utils.build_comment_metadata(self.time_stamper, docstring, code_file_ref, gromet_object, gromet_fn_module)
 		# linked text reading mentions
-		for m in 	aligned_mentions:
-			doc_file_ref = Utils.get_doc_file_ref(self.time_stamper, self.uid_stamper, m, self.linker, gromet_fn_module)
-			Utils.build_tr_mention_metadata(self.time_stamper, m, doc_file_ref, gromet_object, gromet_fn_module)
+		for mention in 	aligned_mentions:
+			doc_file_ref = Utils.get_doc_file_ref(self.time_stamper, self.uid_stamper, mention, self.linker, gromet_fn_module)
+			Utils.build_tr_mention_metadata(self.time_stamper, mention, doc_file_ref, gromet_object, gromet_fn_module)
 
 		if aligned_docstrings or aligned_comments:
 			return DebugInfo(line_range, name, aligned_docstrings, aligned_comments, aligned_mentions)
