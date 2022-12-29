@@ -24,7 +24,7 @@ class RealDebugger(CommentDebugger):
 		self.debug_info = list()
 
 	def add_info(self, info: DebugInfo) -> None:
-		if info:
+		if info.docstring or info.comments:
 			self.debug_info.append(info)
 
 	def debug(self) -> None:

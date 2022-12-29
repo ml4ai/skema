@@ -116,7 +116,7 @@ class CommentAligner():
 
 		return aligned_comments
 
-	def align_mentions(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments):
+	def align_mentions(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments) -> DebugInfo:
 		name = gromet_object.name
 
 		# Build new metadata object and append it to the metadata list of each port.
@@ -137,6 +137,4 @@ class CommentAligner():
 			doc_file_ref = Utils.get_doc_file_ref(self.time_stamper, self.uid_stamper, mention, self.linker, gromet_fn_module)
 			Utils.build_tr_mention_metadata(self.time_stamper, mention, doc_file_ref, gromet_object, gromet_fn_module)
 
-		if aligned_docstrings or aligned_comments:
-			return DebugInfo(line_range, name, aligned_docstrings, aligned_comments, aligned_mentions)
-		return None
+		return DebugInfo(line_range, name, aligned_docstrings, aligned_comments, aligned_mentions)
