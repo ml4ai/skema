@@ -1,20 +1,20 @@
 """ Aligns source code comments to Gromet function networks """
 
-from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from collections import defaultdict
-from typing import Optional
-
 from .comment_debugger import CommentDebugger
 from .debug_info import DebugInfo
 from .gromet_helper import GrometHelper
 from .source_comments import SourceComments
 from .text_reading_linker import TextReadingLinker
-from .utils import get_code_file_ref, build_comment_metadata, build_tr_mention_metadata, get_doc_file_ref
+from .time_stamper import TimeStamper
+from .uid_stamper import UidStamper
+from .utils import Utils
 from .variable_name_matcher import VariableNameMatcher
+
+from automates.gromet.fn import GrometFNModule
 
 class CommentAligner():
 
-	def __init__(self, time_stamper, uid_stamper, gromet_path: str, comments_path: str, extractions_path: str, embeddings_path: str):
+	def __init__(self, time_stamper: TimeStamper, uid_stamper: UidStamper, gromet_path: str, comments_path: str, extractions_path: str, embeddings_path: str):
 		self.time_stamper = time_stamper
 		self.uid_stamper = uid_stamper
 		self.gromet_path = gromet_path
@@ -24,10 +24,10 @@ class CommentAligner():
 		self.variable_name_matcher = VariableNameMatcher("python")
 
 	# Return new gromet_fn_module that has been aligned and linked.
-	def align(self, debug: bool = False):
+	def align(self, debug: bool = False) -> GrometFNModule:
 		debugger = CommentDebugger.create(debug)
 		# This is read anew here, because it will be modified before return.
-		gromet_fn_module = json_to_gromet(self.gromet_path)
+		gromet_fn_module = GrometHelper.json_to_gromet(self.gromet_path)
 
 		container_gromet_box_function = None
 
@@ -127,17 +127,17 @@ class CommentAligner():
 
 		## Build metadata object for each comments aligned
 		# Get the comment reference
-		code_file_ref = get_code_file_ref(self.src_comments.file_name, gromet_fn_module)
+		code_file_ref = Utils.get_code_file_ref(self.src_comments.file_name, gromet_fn_module)
 		# aligned_comments
 		for c in aligned_comments:
-			build_comment_metadata(self.time_stamper, c, code_file_ref, gromet_object, gromet_fn_module)
+			Utils.build_comment_metadata(self.time_stamper, c, code_file_ref, gromet_object, gromet_fn_module)
 		# aligned docstring
 		for d in aligned_docstrings:
-			build_comment_metadata(self.time_stamper, d, code_file_ref, gromet_object, gromet_fn_module)
+			Utils.build_comment_metadata(self.time_stamper, d, code_file_ref, gromet_object, gromet_fn_module)
 		# linked text reading mentions
 		for m in 	aligned_mentions:
-			doc_file_ref = get_doc_file_ref(self.time_stamper, self.uid_stamper, m, self.linker, gromet_fn_module)
-			build_tr_mention_metadata(self.time_stamper, m, doc_file_ref, gromet_object, gromet_fn_module)
+			doc_file_ref = Utils.get_doc_file_ref(self.time_stamper, self.uid_stamper, m, self.linker, gromet_fn_module)
+			Utils.build_tr_mention_metadata(self.time_stamper, m, doc_file_ref, gromet_object, gromet_fn_module)
 
 		if aligned_docstrings or aligned_comments:
 			return DebugInfo(line_range, name, aligned_docstrings, aligned_comments, aligned_mentions)
