@@ -1,6 +1,6 @@
 from typing import Any, List, Mapping, NamedTuple, Optional, Tuple, Union
 
-class DebugInfo(NamedTuple):
+class CommentInfo(NamedTuple):
 	line_range: Optional[range]
 	name: Optional[str]
 	docstring: List[str]

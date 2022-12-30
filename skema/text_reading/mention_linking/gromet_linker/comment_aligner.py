@@ -1,7 +1,7 @@
 """ Aligns source code comments to Gromet function networks """
 
 from .comment_debugger import CommentDebugger
-from .debug_info import DebugInfo
+from .comment_info import CommentInfo
 from .gromet_helper import GrometHelper
 from .source_comments import SourceComments
 from .text_reading_linker import TextReadingLinker
@@ -116,7 +116,7 @@ class CommentAligner():
 
 		return aligned_comments
 
-	def align_mentions(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments) -> DebugInfo:
+	def align_mentions(self, gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments) -> CommentInfo:
 		name = gromet_object.name
 
 		# Build new metadata object and append it to the metadata list of each port.
@@ -133,8 +133,8 @@ class CommentAligner():
 		for docstring in aligned_docstrings:
 			Utils.build_comment_metadata(self.time_stamper, docstring, code_file_ref, gromet_object, gromet_fn_module)
 		# linked text reading mentions
-		for mention in 	aligned_mentions:
+		for mention in aligned_mentions:
 			doc_file_ref = Utils.get_doc_file_ref(self.time_stamper, self.uid_stamper, mention, self.linker, gromet_fn_module)
 			Utils.build_tr_mention_metadata(self.time_stamper, mention, doc_file_ref, gromet_object, gromet_fn_module)
 
-		return DebugInfo(line_range, name, aligned_docstrings, aligned_comments, aligned_mentions)
+		return CommentInfo(line_range, name, aligned_docstrings, aligned_comments, aligned_mentions)

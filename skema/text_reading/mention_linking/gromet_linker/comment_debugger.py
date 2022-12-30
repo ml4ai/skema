@@ -1,9 +1,9 @@
-from .debug_info import DebugInfo
+from .comment_info import CommentInfo
 
 from collections import defaultdict
 
 class CommentDebugger():
-	def add_info(self, info: DebugInfo) -> None:
+	def add_info(self, info: CommentInfo) -> None:
 		pass
 
 	def debug() -> None:
@@ -23,7 +23,7 @@ class RealDebugger(CommentDebugger):
 	def __init__(self):
 		self.debug_info = list()
 
-	def add_info(self, info: DebugInfo) -> None:
+	def add_info(self, info: CommentInfo) -> None:
 		if info.docstring or info.comments:
 			self.debug_info.append(info)
 
