@@ -32,7 +32,22 @@ class CommentAligner():
 
 		container_gromet_box_function = None # The function below uses this mutable value.
 
-		def get_info(gromet_object, key):
+		def get_info_for_gromet_box_function(gromet_object, key):
+			condition = container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION"
+			# TODO: Why don't docstrings have line numbers?
+			docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name, []) if condition else []
+
+			condition = gromet_object != container_gromet_box_function
+			aligned_docstrings = self.variable_name_matcher.match(gromet_object.name, docstrings) if condition else docstrings
+
+			line_range = GrometHelper.get_element_line_numbers(gromet_object, gromet_fn_module)
+
+			# Get both kinds?
+			aligned_comments = self.align_comments(gromet_object, key, container_gromet_box_function, gromet_fn_module, line_range)
+			info = self.align_mentions(gromet_object, gromet_fn_module, line_range, aligned_docstrings, aligned_comments)
+			debugger.add_info(info)
+
+		def get_info_for_gromet_port(gromet_object, key):
 			condition = container_gromet_box_function and container_gromet_box_function.function_type == "FUNCTION"
 			# TODO: Why don't docstrings have line numbers?
 			docstrings = self.src_comments.doc_strings.get(container_gromet_box_function.name, []) if condition else []
@@ -54,26 +69,30 @@ class CommentAligner():
 		##                            value:"poc" with name??
 
 		for gromet_fn in gromet_fns:
+			# b: The FN Outer Box (although not enforced, there is always only 1).
 			if gromet_fn.b:
 				# This is sticky.  Attributes are in order and the container function appears before anything contained.
 				assert len(gromet_fn.b) == 1
 				container_gromet_box_function = gromet_fn.b[0]
 				for gromet_box_function in gromet_fn.b:
 					if gromet_box_function.name:
-						get_info(gromet_box_function, "b")
-			
+						get_info_for_gromet_box_function(gromet_box_function, "b")
+			# opi: The Outer Port Inputs of the FN Outer Box (b)
 			if gromet_fn.opi:
 				for gromet_port in gromet_fn.opi:
 					if gromet_port.name:
-						get_info(gromet_port, "opi")
+						get_info_for_gromet_port(gromet_port, "opi")
+			# pof: The Port Outputs of the GrometBoxFunctions (bf).
 			if gromet_fn.pof:
 				for gromet_port in gromet_fn.pof:
 					if gromet_port.name:
-						get_info(gromet_port, "pof")
+						get_info_for_gromet_port(gromet_port, "pof")
+			# bf: The GrometBoxFunctions within this GrometFN.
 			if gromet_fn.bf:
 				for gromet_box_function in gromet_fn.bf:
 					if True: # A name is not required here.
-						get_info(gromet_box_function, "bf")
+						get_info_for_gromet_box_function(gromet_box_function, "bf")
+			# poc: The Port Outputs of the GrometBoxConditionals (bc)
 			# TODO: Is this redundant?
 			# for poc in v.poc:
 			# 	if poc.name:
