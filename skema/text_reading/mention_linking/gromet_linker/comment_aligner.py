@@ -3,6 +3,7 @@
 from .comment_debugger import CommentDebugger
 from .comment_info import CommentInfo
 from .gromet_helper import GrometHelper
+from .provenance_helper import ProvenanceHelper
 from .source_comments import SourceComments
 from .text_reading_linker import TextReadingLinker
 from .time_stamper import TimeStamper
@@ -16,24 +17,24 @@ class CommentAlignerHelper():
 
 	def __init__(self, debugger: CommentDebugger, time_stamper: TimeStamper, uid_stamper: UidStamper, gromet_fn_module: GrometFNModule, variable_name_matcher: VariableNameMatcher, source_comments: SourceComments, linker: TextReadingLinker):
 		self.debugger = debugger
-		self.time_stamper = time_stamper
 		self.uid_stamper = uid_stamper
 		self.gromet_fn_module = gromet_fn_module
 		self.variable_name_matcher = variable_name_matcher 
 		self.source_comments = source_comments
 		self.linker = linker
+		self.provenance_helper = ProvenanceHelper(time_stamper)
 
 class CommentAligner():
 
 	def __init__(self, comment_aligner_helper: CommentAlignerHelper):
 		self.comment_aligner_helper = comment_aligner_helper
 		self.debugger = comment_aligner_helper.debugger
-		self.time_stamper = comment_aligner_helper.time_stamper
 		self.uid_stamper = comment_aligner_helper.uid_stamper
 		self.gromet_fn_module = comment_aligner_helper.gromet_fn_module
 		self.variable_name_matcher = comment_aligner_helper.variable_name_matcher
 		self.source_comments = comment_aligner_helper.source_comments
 		self.linker = comment_aligner_helper.linker
+		self.provenance_helper = comment_aligner_helper.provenance_helper
 
 	def get_aligned_comments(self, name: str, inner_line_range: range, outer_line_range: range) -> list[tuple[int, str]]:
 		if name:
@@ -68,17 +69,17 @@ class CommentAligner():
 		# aligned_comments, the only ones to include line numbers
 		# TODO: Why should this be different?
 		for comment in aligned_box_comments:
-			Utils.build_line_comment_metadata(self.time_stamper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
+			Utils.build_line_comment_metadata(self.provenance_helper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
 		for _, comment in aligned_comments:
-			Utils.build_comment_metadata(self.time_stamper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
+			Utils.build_comment_metadata(self.provenance_helper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
 		# aligned docstring
 		for _, docstring in aligned_docstrings:
-			Utils.build_comment_metadata(self.time_stamper, docstring, code_file_ref, gromet_object, self.gromet_fn_module)
+			Utils.build_comment_metadata(self.provenance_helper, docstring, code_file_ref, gromet_object, self.gromet_fn_module)
 
 		aligned_mentions = self.linker.align_to_comments(comments)
 		for mention in aligned_mentions:
-			doc_file_ref = Utils.get_doc_file_ref(self.time_stamper, self.uid_stamper, mention, self.linker, self.gromet_fn_module)
-			Utils.build_textreading_mention_metadata(self.time_stamper, mention, doc_file_ref, gromet_object, self.gromet_fn_module)
+			doc_file_ref = Utils.get_doc_file_ref(self.provenance_helper, self.uid_stamper, mention, self.linker, self.gromet_fn_module)
+			Utils.build_textreading_mention_metadata(self.provenance_helper, mention, doc_file_ref, gromet_object, self.gromet_fn_module)
 
 		comment_info = CommentInfo(self.line_range, self.name, aligned_docstrings, aligned_box_comments + aligned_comments, aligned_mentions)
 		self.debugger.add_info(comment_info)
@@ -110,13 +111,19 @@ class OuterGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 	def make_line_docstrings(self) -> list[str]:
 		# docstrings are within the function, just after the signature and before the body.
 		condition = self.gromet_box_function.function_type == "FUNCTION"
-		line_docstrings = self.source_comments.line_docstrings.get(self.gromet_box_function.name, []) if condition else []
+		# This retrieves the docstrings based on the box function's name.  It gets all of them.
+		line_docstrings = self.source_comments.get_line_docstrings(self.gromet_box_function.name) if condition else []
 		return line_docstrings
 
 	def align(self) -> None:
 		if self.name:
+			# This below is all of the docstrings for the function.  The name has already been matched above.
 			aligned_docstrings = self.line_docstrings
+			# This is all the comments within the line_range, independent of the name.
 			aligned_box_comments = self.get_aligned_box_comments(self.line_range)
+			# This is all the comments above the first line range until a line without a comment is encountered
+			# (or the beginning of the file) where the name also matches.
+			# For a box function, these would be comments just before the function definition, which seems reasonable.
 			aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.line_range)
 			self.align_mentions(self.name, self.gromet_box_function, aligned_docstrings, aligned_box_comments, aligned_comments)
 
@@ -128,8 +135,11 @@ class InnerGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 		self.outer_line_range = outer_line_range
 
 	def align(self) -> None:
+		# These are all the docstrings where the name has matched.
 		aligned_docstrings = self.variable_name_matcher.match_line_comment(self.name, self.line_docstrings)
+		# This is all the comments within the line_range, so possibly just the one line, independent of name.
 		aligned_box_comments = self.get_aligned_box_comments(self.line_range)
+		# This is all the comments above the first line range, the outer_line_range, where the name also matches.
 		aligned_comments = self.get_aligned_comments(self.name, self.outer_line_range, self.outer_line_range)
 		self.align_mentions(self.name, self.gromet_box_function, aligned_docstrings, aligned_box_comments, aligned_comments)
 
@@ -144,8 +154,11 @@ class GrometPortCommentAligner(CommentAligner):
 		self.line_range = GrometHelper.get_element_line_numbers(self.gromet_port, self.gromet_fn_module)
 
 	def align(self) -> None:
+		# These are all the docstrings where the name has matched.
 		aligned_docstrings = self.variable_name_matcher.match_line_comment(self.name, self.line_docstrings)
+		# This is completely skipped.
 		aligned_box_comments = []
+		# This is all the comments above the first line range, the outer_line_range, where the name also matches.
 		aligned_comments = self.get_aligned_comments(self.name, self.outer_line_range, self.outer_line_range)
 		self.align_mentions(self.name, self.gromet_port, aligned_docstrings, aligned_box_comments, aligned_comments)
 

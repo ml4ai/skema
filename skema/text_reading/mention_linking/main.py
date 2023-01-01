@@ -61,6 +61,7 @@ if __name__ == "__main__":
 	# The gromet file is version 0.1.5 and can't be read in.
 	# paths2 = Paths(base_path, embeddings_path, "chime_penn--Gromet-FN-auto.json", "CHIME_full_penn.json", "CHIME_SIR.json")
 	paths3 = Paths(base_path, embeddings_path, "bucky_simplified_v1--Gromet-FN-auto.json", "BUCKY.json", "BUCKY.json")
+	# The extraction seems to be incomplete here.
 	# paths4 = Paths(base_path, embeddings_path, "CHIME_SVIIvR--Gromet-FN-auto.json", "CHIME_SVIIvR.json", "CHIME_SViiR.json")
 
 	for path in [paths1, paths3]:

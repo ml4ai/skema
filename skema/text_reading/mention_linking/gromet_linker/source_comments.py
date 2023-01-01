@@ -3,17 +3,25 @@ from pathlib import Path
 import json
 
 class SourceComments():
+	"""
+	line_comments are normal comments that you would find after a # in python.
+	docstrings are comments situated between the function declaration and its body that are usually
+	    triple quoted.  Right now we don't have line numbers for them, so -1 is used.
+	"""
 	
-	def __init__(self, path: Path, line_comments: dict[int, str], doc_strings: dict[str, list[str]]):
+	def __init__(self, path: Path, line_comments: dict[int, str], docstrings: dict[str, list[str]]):
+		"""
+		This is a docstring for the __init__ method.
+		"""
 		self.path = path
 		self.line_comments = line_comments
-		self.doc_strings = doc_strings
+		self.docstrings = docstrings
 		self.line_docstrings = self.make_line_docstrings()
 
 	def make_line_docstrings(self) -> dict[str, list[tuple[int, str]]]:
 
 		# TODO: Until we get the real line numbers, they are all -1 and then filtered out later.
-		return {key: [(-1, value) for value in values] for key, values in self.doc_strings.items()}
+		return {key: [(-1, value) for value in values] for key, values in self.docstrings.items()}
 
 	def file_name(self) -> str:
 		return self.path.name
@@ -21,18 +29,21 @@ class SourceComments():
 	def file_path(self) -> str:
 		return str(self.path.absolute)
 
+	def get_line_docstrings(self, name: str) -> list[tuple[int, str]]:
+		return self.line_docstrings.get(name, [])
+
 	@staticmethod
 	def from_file(comments_path: str) -> "SourceComments":
 		""" Reads the automatically extracted comments from the json file """
 
 		def _helper(data):
 			line_comments = {line_comment[0]: line_comment[1] for line_comment in data['comments']}
-			doc_strings = data['docstrings']
+			docstrings = data['docstrings']
 
 			return SourceComments(
 				path = Path(comments_path),
 				line_comments = line_comments,
-				doc_strings = doc_strings
+				docstrings = docstrings
 			)
 
 		with open(comments_path) as file:

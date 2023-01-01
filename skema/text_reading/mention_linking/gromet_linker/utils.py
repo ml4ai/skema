@@ -1,28 +1,25 @@
 from .gromet_helper import GrometHelper
 from .provenance_helper import ProvenanceHelper
-from .time_stamper import TimeStamper
-from .uid_stamper import UidStamper
-from typing import Optional, Tuple
-from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
-
 from .text_reading_linker import TextReadingLinker
-from .time_stamper import DebugTimeStamper
+from automates.gromet.fn import GrometFNModule
+from automates.gromet.metadata import SourceCodeComment, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits
+from typing import Optional, Tuple
+
 import itertools as it
 
 class Utils():
-	provenance_helper = ProvenanceHelper(DebugTimeStamper())
 
 	@staticmethod
-	def get_code_file_ref(comments_file_name: str, gromet) -> Optional[str]:
+	def get_code_file_ref(comments_file_name: str, gromet_fn_module: GrometFNModule) -> Optional[str]:
 		""" Fetches the UUID of the code_file_reference that matches the one from the comments file """
 
-		mdc = GrometHelper.get_element_metadata(gromet, gromet)
+		metadata_collection = GrometHelper.get_element_metadata(gromet_fn_module, gromet_fn_module)
 		code_collection = None
 		uid = None
 
-		for md in mdc:
-			if md.metadata_type == "source_code_collection":
-				code_collection = md
+		for metadata in metadata_collection:
+			if metadata.metadata_type == "source_code_collection":
+				code_collection = metadata
 				break
 
 		if code_collection:
@@ -36,27 +33,27 @@ class Utils():
 		return uid
 
 	@staticmethod
-	def get_doc_file_ref(time_stamper, uid_stamper, scored_mention, linker: TextReadingLinker, gromet) -> Optional[str]:
+	def get_doc_file_ref(provenance_helper: ProvenanceHelper, uid_stamper, scored_mention, linker: TextReadingLinker, gromet_fn_module: GrometFNModule) -> Optional[str]:
 		""" Fetches the UUID of the text doc reference that matches the one from the mention's file """
 
 		mention, _ = scored_mention
-		mdc = GrometHelper.get_element_metadata(gromet, gromet)
+		metadata_collection = GrometHelper.get_element_metadata(gromet_fn_module, gromet_fn_module)
 		text_collection = None
 		uid = None
 
-		for md in mdc:
-			if md.metadata_type == "textual_document_collection":
-				text_collection = md
+		for metadata in metadata_collection:
+			if metadata.metadata_type == "textual_document_collection":
+				text_collection = metadata
 				break
 
 		# If the text doc collection doesn't exist, then add it
 		if not text_collection:
 			text_collection = TextualDocumentCollection(
-				provenance = Utils.provenance_helper.build("embedding_similarity_1.0"),
+				provenance = provenance_helper.build_embedding(),
 				documents= list()
 			)
 
-			mdc.append(text_collection)
+			metadata_collection.append(text_collection)
 
 		if text_collection:
 			mention_doc = linker.documents[mention['document']]
@@ -84,15 +81,14 @@ class Utils():
 
 			uid = doc_ref.uid
 
-
 		return uid
 
 	@staticmethod
-	def build_comment_metadata(time_stamper, comment: str, code_file_ref: str , element, gromet):
+	def build_comment_metadata(provenance_helper: ProvenanceHelper, comment: str, code_file_ref: str, element, gromet: GrometFNModule):
 		# TODO: Differentiate between line comments and docstrings
 		line, text = None, comment
 		md = SourceCodeComment(
-			provenance = Utils.provenance_helper.build("heuristic_1.0"),
+			provenance = provenance_helper.build_comment(),
 			code_file_reference_uid = code_file_ref,
 			comment = text,
 			line_begin = line,
@@ -101,11 +97,11 @@ class Utils():
 		Utils.attach_metadata(md, element, gromet)
 
 	@staticmethod
-	def build_line_comment_metadata(time_stamper, line_comment: Tuple[int, str], code_file_ref: str , element, gromet):
+	def build_line_comment_metadata(provenance_helper: ProvenanceHelper, line_comment: Tuple[int, str], code_file_ref: str, element, gromet: GrometFNModule):
 		# TODO: Differentiate between line comments and docstrings
 		line, text = line_comment
 		md = SourceCodeComment(
-			provenance = Utils.provenance_helper.build("heuristic_1.0"),
+			provenance = provenance_helper.build_comment(),
 			code_file_reference_uid = code_file_ref,
 			comment = text,
 			line_begin = line,
@@ -115,7 +111,7 @@ class Utils():
 		Utils.attach_metadata(md, element, gromet)
 
 	@staticmethod
-	def build_textreading_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, element, gromet):
+	def build_textreading_mention_metadata(provenance_helper: ProvenanceHelper, scored_mention, doc_file_ref: str, element, gromet: GrometFNModule):
 
 		mention, score = scored_mention
 
@@ -134,13 +130,11 @@ class Utils():
 			char_end= mention['characterEndOffset']
 		)
 
-		
-
 		# if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
 		if mention['labels'][0] == "ParameterSetting":
 			# ParameterSetting
 			md = TextLiteralValue(
-				provenance = Utils.provenance_helper.build("embedding_similarity_1.0"),
+				provenance = provenance_helper.build_embedding(),
 				text_extraction= text_extraction,
 				value= mention['arguments']['value'][0]['text'],
 				variable_identifier= mention['arguments']['variable'][0]['text']
@@ -151,7 +145,7 @@ class Utils():
 			# Candidate definition argument names
 
 			md = TextDescription(
-				provenance = Utils.provenance_helper.build("embedding_similarity_1.0"),
+				provenance = provenance_helper.build_embedding(),
 				text_extraction= text_extraction,
 				variable_identifier= mention['arguments']['variable'][0]['text'],
 				variable_definition= mention['arguments']['description'][0]['text']
@@ -161,7 +155,7 @@ class Utils():
 			# Candidate definition argument names
 
 			md = TextUnits(
-				provenance = Utils.provenance_helper.build("embedding_similarity_1.0"),
+				provenance = provenance_helper.build_embedding(),
 				text_extraction= text_extraction,
 				variable_identifier= mention['arguments']['variable'][0]['text'],
 				unit_type= mention['arguments']["unit"][0]['text']
@@ -193,7 +187,7 @@ class Utils():
 
 
 	@staticmethod
-	def attach_metadata(new_metadata, element, gromet):
+	def attach_metadata(new_metadata, element, gromet: GrometFNModule):
 
 		existing_metadata = GrometHelper.get_element_metadata(element, gromet)
 

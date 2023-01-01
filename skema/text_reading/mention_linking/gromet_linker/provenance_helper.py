@@ -10,3 +10,9 @@ class ProvenanceHelper():
 			method,
 			self.time_stamper.stamp()
 		)
+
+	def build_comment(self, method: str = "heuristic_1.0") -> Provenance:
+		return self.build(method)
+
+	def build_embedding(self, method: str = "embedding_similarity_1.0") -> Provenance:
+		return self.build(method)
