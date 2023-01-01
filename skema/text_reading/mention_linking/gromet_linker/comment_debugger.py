@@ -23,9 +23,9 @@ class RealDebugger(CommentDebugger):
 	def __init__(self):
 		self.debug_info = list()
 
-	def add_info(self, info: CommentInfo) -> None:
-		if info.docstring or info.comments:
-			self.debug_info.append(info)
+	def add_info(self, comment_info: CommentInfo) -> None:
+		if comment_info.line_docstrings or comment_info.comments:
+			self.debug_info.append(comment_info)
 
 	def debug(self) -> None:
 		# Aggregate the debug info per name.

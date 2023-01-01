@@ -57,10 +57,13 @@ class CommentAligner():
 		comments.reverse()
 		return comments
 
+	def get_comments(self, line_comments: list[tuple[int, str]]) -> list[str]:
+		return [comment for _, comment in line_comments]
+
 	# TODO pass in comments, all of them, maybe with line numbers?  Name would be an exception, so apart?
-	def align_mentions(self, name: str, gromet_object, aligned_docstrings: list[str], box_aligned_comments: list[tuple[int, str]], aligned_comments: list[tuple[int, str]]):
+	def align_mentions(self, name: str, gromet_object, aligned_docstrings: list[tuple[int, str]], box_aligned_comments: list[tuple[int, str]], aligned_comments: list[tuple[int, str]]):
 		# Build new metadata object and append it to the metadata list of each port.
-		comments = [name] if name else [] + aligned_docstrings + [comment for _, comment in box_aligned_comments] + [comment for _, comment in aligned_comments]
+		comments = [name] if name else [] + [docstring for _, docstring in aligned_docstrings] + [comment for _, comment in box_aligned_comments] + [comment for _, comment in aligned_comments]
 		aligned_mentions = self.linker.align_to_comments(comments)
 		code_file_ref = Utils.get_code_file_ref(self.source_comments.file_name(), self.gromet_fn_module)
 		# aligned_comments
@@ -69,7 +72,7 @@ class CommentAligner():
 		for _, comment in aligned_comments:
 			Utils.build_comment_metadata(self.time_stamper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
 		# aligned docstring
-		for docstring in aligned_docstrings:
+		for _, docstring in aligned_docstrings:
 			Utils.build_comment_metadata(self.time_stamper, docstring, code_file_ref, gromet_object, self.gromet_fn_module)
 		# linked text reading mentions
 		for mention in aligned_mentions:
@@ -97,32 +100,34 @@ class OuterGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 
 	def __init__(self, gromet_box_function: GrometBoxFunction, comment_aligner_helper: CommentAlignerHelper):
 		super().__init__(gromet_box_function, comment_aligner_helper)
-		self.docstrings = self.calc_docstrings()
+		self.line_docstrings = self.make_line_docstrings()
 
-	def calc_docstrings(self) -> list[str]:
+	def make_line_docstrings(self) -> list[str]:
 		# docstrings are within the function, just after the signature and before the body.
 		condition = self.gromet_box_function.function_type == "FUNCTION"
-		docstrings = self.source_comments.doc_strings.get(self.gromet_box_function.name, []) if condition else []
-		return docstrings
+		line_docstrings = self.source_comments.line_docstrings.get(self.gromet_box_function.name, []) if condition else []
+		return line_docstrings
 
 	def align(self) -> None:
 		if self.name:
-			aligned_docstrings = self.docstrings
+			aligned_docstrings = self.line_docstrings
 			box_aligned_comments = self.get_box_aligned_comments(self.line_range)
 			aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.line_range)
+			comments = [self.name] if self.name else [] + [docstring for _, docstring in aligned_docstrings] + [comment for _, comment in box_aligned_comments] + [comment for _, comment in aligned_comments]
+
 			aligned_mentions = self.align_mentions(self.name, self.gromet_box_function, aligned_docstrings, box_aligned_comments, aligned_comments)
 			info = CommentInfo(self.line_range, self.name, aligned_docstrings, box_aligned_comments + aligned_comments, aligned_mentions)
 			self.debugger.add_info(info)
 
 class InnerGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 
-	def __init__(self, gromet_box_function: GrometBoxFunction, comment_aligner_helper: CommentAlignerHelper, docstrings: list[str], outer_line_range: range):
+	def __init__(self, gromet_box_function: GrometBoxFunction, comment_aligner_helper: CommentAlignerHelper, line_docstrings: list[tuple[int, str]], outer_line_range: range):
 		super().__init__(gromet_box_function, comment_aligner_helper)
-		self.docstrings = docstrings
+		self.line_docstrings = line_docstrings
 		self.outer_line_range = outer_line_range
 
 	def align(self) -> None:
-		aligned_docstrings = self.variable_name_matcher.match_comment(self.name, self.docstrings)
+		aligned_docstrings = self.variable_name_matcher.match_line_comment(self.name, self.line_docstrings)
 		box_aligned_comments = self.get_box_aligned_comments(self.line_range)
 		aligned_comments = self.get_aligned_comments(self.name, self.outer_line_range, self.outer_line_range)
 		aligned_mentions = self.align_mentions(self.name, self.gromet_box_function, aligned_docstrings, box_aligned_comments, aligned_comments)
@@ -131,16 +136,16 @@ class InnerGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 
 class GrometPortCommentAligner(CommentAligner):
 
-	def __init__(self, gromet_port: GrometPort, comment_aligner_helper: CommentAlignerHelper, docstrings: list[str], outer_line_range: range):
+	def __init__(self, gromet_port: GrometPort, comment_aligner_helper: CommentAlignerHelper, line_docstrings: list[tuple[int, str]], outer_line_range: range):
 		super().__init__(comment_aligner_helper)
 		self.gromet_port = gromet_port
-		self.docstrings = docstrings
+		self.line_docstrings = line_docstrings
 		self.name = self.gromet_port.name
 		self.outer_line_range = outer_line_range
 		self.line_range = GrometHelper.get_element_line_numbers(self.gromet_port, self.gromet_fn_module)
 
 	def align(self) -> None:
-		aligned_docstrings = self.variable_name_matcher.match_comment(self.name, self.docstrings)
+		aligned_docstrings = self.variable_name_matcher.match_line_comment(self.name, self.line_docstrings)
 		aligned_comments = self.get_aligned_comments(self.name, self.outer_line_range, self.outer_line_range)
 		aligned_mentions = self.align_mentions(self.name, self.gromet_port, aligned_docstrings, [], aligned_comments)
 		comment_info = CommentInfo(self.line_range, self.name, aligned_docstrings, aligned_comments, aligned_mentions)
@@ -164,25 +169,25 @@ class GrometFNCommentAligner(CommentAligner):
 		##                            value:"poc" with name??
 		outer_gromet_box_function_comment_aligner = OuterGrometBoxFunctionCommentAligner(self.outer_gromet_box_function, self.comment_aligner_helper)
 		outer_gromet_box_function_comment_aligner.align()
-		docstrings = outer_gromet_box_function_comment_aligner.docstrings
+		line_docstrings = outer_gromet_box_function_comment_aligner.line_docstrings
 		outer_line_range = outer_gromet_box_function_comment_aligner.line_range
 
 		# opi: The Outer Port Inputs of the FN Outer Box (b)
 		if self.gromet_fn.opi:
 			for gromet_port in self.gromet_fn.opi:
-				GrometPortCommentAligner(gromet_port, self.comment_aligner_helper, docstrings, outer_line_range).align()
+				GrometPortCommentAligner(gromet_port, self.comment_aligner_helper, line_docstrings, outer_line_range).align()
 		# pof: The Port Outputs of the GrometBoxFunctions (bf).
 		if self.gromet_fn.pof:
 			for gromet_port in self.gromet_fn.pof:
-				GrometPortCommentAligner(gromet_port, self.comment_aligner_helper, docstrings, outer_line_range).align()
+				GrometPortCommentAligner(gromet_port, self.comment_aligner_helper, line_docstrings, outer_line_range).align()
 		# bf: The GrometBoxFunctions within this GrometFN.
 		if self.gromet_fn.bf:
 			for gromet_box_function in self.gromet_fn.bf:
-				InnerGrometBoxFunctionCommentAligner(gromet_box_function, self.comment_aligner_helper, docstrings, outer_line_range).align()
+				InnerGrometBoxFunctionCommentAligner(gromet_box_function, self.comment_aligner_helper, line_docstrings, outer_line_range).align()
 		# poc: The Port Outputs of the GrometBoxConditionals (bc)
 		# TODO: Is this redundant?
 		# for poc in v.poc:
-		# 	GrometPortCommentAligner(gromet_port, self.comment_aligner_helper, docstrings, outer_line_range).align()
+		# 	GrometPortCommentAligner(gromet_port, self.comment_aligner_helper, line_docstrings, outer_line_range).align()
 
 class GrometAttributeCommentAligner(CommentAligner):
 
