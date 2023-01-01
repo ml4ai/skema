@@ -58,7 +58,10 @@ if __name__ == "__main__":
 	# embeddings_path = "/data/covid_comments_models/xdd_covid_19_1x_word2vec/alternate/embeddings.kv"
 
 	paths1 = Paths(base_path, embeddings_path, "CHIME_SIR--Gromet-FN-auto.json", "CHIME_SIR.json", "CHIME_SIR.json")
+	# The gromet file is version 0.1.5 and can't be read in.
 	# paths2 = Paths(base_path, embeddings_path, "chime_penn--Gromet-FN-auto.json", "CHIME_full_penn.json", "CHIME_SIR.json")
-	# paths3 = Paths(base_path, embeddings_path, "bucky_simplified_v1--Gromet-FN-auto.json", "BUCKY.json", "BUCKY.json")
+	paths3 = Paths(base_path, embeddings_path, "bucky_simplified_v1--Gromet-FN-auto.json", "BUCKY.json", "BUCKY.json")
+	# paths4 = Paths(base_path, embeddings_path, "CHIME_SVIIvR--Gromet-FN-auto.json", "CHIME_SVIIvR.json", "CHIME_SViiR.json")
 
-	Tester(paths1).test()
+	for path in [paths1, paths3]:
+		Tester(path).test()
