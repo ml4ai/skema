@@ -3,7 +3,7 @@ from .comment_info import CommentInfo
 from collections import defaultdict
 
 class CommentDebugger():
-	def add_info(self, info: CommentInfo) -> None:
+	def add_info(self, comment_info: CommentInfo) -> None:
 		pass
 
 	def debug() -> None:
@@ -12,14 +12,14 @@ class CommentDebugger():
 	@staticmethod
 	def create(debug: bool):
 		if (debug):
-			return RealDebugger()
+			return RealCommentDebugger()
 		else:
-			return FakeDebugger()
+			return FakeCommentDebugger()
 
-class FakeDebugger(CommentDebugger):
+class FakeCommentDebugger(CommentDebugger):
 	pass
 
-class RealDebugger(CommentDebugger):
+class RealCommentDebugger(CommentDebugger):
 	def __init__(self):
 		self.debug_info = list()
 
