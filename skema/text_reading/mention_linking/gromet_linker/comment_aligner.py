@@ -57,11 +57,11 @@ class CommentAligner():
 		comments.reverse()
 		return comments
 
-	def align_mentions(self, gromet_object, line_range: range, aligned_docstrings: list[str], box_aligned_comments: list[tuple[int, str]], function_aligned_comments: list[tuple[int, str]]) -> CommentInfo:
+	def align_mentions(self, gromet_object, line_range: range, aligned_docstrings: list[str], box_aligned_comments: list[tuple[int, str]], aligned_comments: list[tuple[int, str]]) -> CommentInfo:
 		name = gromet_object.name
 
 		# Build new metadata object and append it to the metadata list of each port.
-		comments = [name] if name else [] + aligned_docstrings + [comment for _, comment in box_aligned_comments] + [comment for _, comment in function_aligned_comments]
+		comments = [name] if name else [] + aligned_docstrings + [comment for _, comment in box_aligned_comments] + [comment for _, comment in aligned_comments]
 		aligned_mentions = self.linker.align_to_comments(comments)
 
 		## Build metadata object for each comments aligned
@@ -70,7 +70,7 @@ class CommentAligner():
 		# aligned_comments
 		for comment in box_aligned_comments:
 			Utils.build_comment_metadata(self.time_stamper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
-		for _, comment in function_aligned_comments:
+		for _, comment in aligned_comments:
 			Utils.build_comment_metadata(self.time_stamper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
 		# aligned docstring
 		for docstring in aligned_docstrings:
@@ -80,7 +80,7 @@ class CommentAligner():
 			doc_file_ref = Utils.get_doc_file_ref(self.time_stamper, self.uid_stamper, mention, self.linker, self.gromet_fn_module)
 			Utils.build_tr_mention_metadata(self.time_stamper, mention, doc_file_ref, gromet_object, self.gromet_fn_module)
 
-		return CommentInfo(line_range, name, aligned_docstrings, box_aligned_comments + function_aligned_comments, aligned_mentions)
+		return CommentInfo(line_range, name, aligned_docstrings, box_aligned_comments + aligned_comments, aligned_mentions)
 
 class GrometBoxFunctionCommentAligner(CommentAligner):
 
@@ -90,10 +90,11 @@ class GrometBoxFunctionCommentAligner(CommentAligner):
 		self.name = self.gromet_box_function.name
 		self.line_range = GrometHelper.get_element_line_numbers(self.gromet_box_function, self.gromet_fn_module)
 
-	def get_box_aligned_comments(self) -> list[tuple[int, str]]:
+	def get_box_aligned_comments(self, line_range: range) -> list[tuple[int, str]]:
+		name = self.name
 		comments = list()
 		if self.gromet_box_function.function_type not in {"PRIMITIVE", "LITERAL"}:
-			for line_num in self.line_range:
+			for line_num in line_range:
 				if line_num in self.source_comments.line_comments:
 					comments.append((line_num, self.source_comments.line_comments[line_num]))
 		return comments
@@ -110,11 +111,12 @@ class OuterGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 		return docstrings
 
 	def align(self) -> None:
-		aligned_docstrings = self.docstrings
-		box_aligned_comments = self.get_box_aligned_comments()
-		aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.line_range)
-		info = self.align_mentions(self.gromet_box_function, self.line_range, aligned_docstrings, box_aligned_comments, aligned_comments)
-		self.debugger.add_info(info)
+		if self.name:
+			aligned_docstrings = self.docstrings
+			box_aligned_comments = self.get_box_aligned_comments(self.line_range)
+			aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.line_range)
+			info = self.align_mentions(self.gromet_box_function, self.line_range, aligned_docstrings, box_aligned_comments, aligned_comments)
+			self.debugger.add_info(info)
 
 class InnerGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 
@@ -125,8 +127,8 @@ class InnerGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 
 	def align(self) -> None:
 		aligned_docstrings = self.variable_name_matcher.match_comment(self.name, self.docstrings)
-		box_aligned_comments = self.get_box_aligned_comments()
-		aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.outer_line_range)
+		box_aligned_comments = self.get_box_aligned_comments(self.line_range)
+		aligned_comments = self.get_aligned_comments(self.name, self.outer_line_range, self.outer_line_range)
 		info = self.align_mentions(self.gromet_box_function, self.line_range, aligned_docstrings, box_aligned_comments, aligned_comments)
 		self.debugger.add_info(info)
 
@@ -142,7 +144,7 @@ class GrometPortCommentAligner(CommentAligner):
 	def align(self) -> None:
 		name = self.gromet_port.name
 		aligned_docstrings = self.variable_name_matcher.match_comment(name, self.docstrings)
-		aligned_comments = self.get_aligned_comments(name, self.line_range, self.outer_line_range)
+		aligned_comments = self.get_aligned_comments(name, self.outer_line_range, self.outer_line_range)
 		info = self.align_mentions(self.gromet_port, self.line_range, aligned_docstrings, [], aligned_comments)
 		self.debugger.add_info(info)
 

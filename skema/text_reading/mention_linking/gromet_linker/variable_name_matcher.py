@@ -44,10 +44,10 @@ class VariableNameMatcher(LanguageMatcher):
 		if name:
 			return self.matcher.match_comment(name, comments)
 		else:
-			return list()
+			return []
 
 	def match_line_comment(self, name: str, line_comments: list[tuple[int, str]]) -> list[tuple[int, str]]:
 		if name:
 			return self.matcher.match_line_comment(name, line_comments)
 		else:
-			return list()
+			return []
