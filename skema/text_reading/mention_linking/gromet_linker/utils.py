@@ -88,7 +88,7 @@ class Utils():
 		return uid
 
 	@staticmethod
-	def build_comment_metadata(time_stamper, comment:Tuple[int, str] | str, code_file_ref:str , element, gromet):
+	def build_comment_metadata(time_stamper, comment: Tuple[int, str] | str, code_file_ref: str , element, gromet):
 
 		# TODO: Differentiate between line comments and docstrings
 
@@ -98,11 +98,11 @@ class Utils():
 			line, text = None, comment
 
 		md = SourceCodeComment(
-			provenance= Utils.provenance_helper.build("heuristic_1.0"),
-			code_file_reference_uid= code_file_ref,
-			comment=text,
-			line_begin= line,
-			line_end=line, # TODO Should it be +1?
+			provenance = Utils.provenance_helper.build("heuristic_1.0"),
+			code_file_reference_uid = code_file_ref,
+			comment = text,
+			line_begin = line,
+			line_end = line # TODO Should it be +1?
 		)
 
 		Utils.attach_metadata(md, element, gromet)
