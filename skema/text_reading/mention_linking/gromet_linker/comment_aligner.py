@@ -57,14 +57,12 @@ class CommentAligner():
 		comments.reverse()
 		return comments
 
+	# TODO pass in comments, all of them, maybe with line numbers?  Name would be an exception, so apart?
 	def align_mentions(self, name: str, gromet_object, aligned_docstrings: list[str], box_aligned_comments: list[tuple[int, str]], aligned_comments: list[tuple[int, str]]):
 		# Build new metadata object and append it to the metadata list of each port.
 		comments = [name] if name else [] + aligned_docstrings + [comment for _, comment in box_aligned_comments] + [comment for _, comment in aligned_comments]
 		aligned_mentions = self.linker.align_to_comments(comments)
-
-		## Build metadata object for each comments aligned
-		# Get the comment reference
-		code_file_ref = Utils.get_code_file_ref(self.source_comments.file_name, self.gromet_fn_module)
+		code_file_ref = Utils.get_code_file_ref(self.source_comments.file_name(), self.gromet_fn_module)
 		# aligned_comments
 		for comment in box_aligned_comments:
 			Utils.build_comment_metadata(self.time_stamper, comment, code_file_ref, gromet_object, self.gromet_fn_module)
@@ -102,6 +100,7 @@ class OuterGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 		self.docstrings = self.calc_docstrings()
 
 	def calc_docstrings(self) -> list[str]:
+		# docstrings are within the function, just after the signature and before the body.
 		condition = self.gromet_box_function.function_type == "FUNCTION"
 		docstrings = self.source_comments.doc_strings.get(self.gromet_box_function.name, []) if condition else []
 		return docstrings
