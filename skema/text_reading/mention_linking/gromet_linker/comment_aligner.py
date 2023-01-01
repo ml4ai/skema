@@ -49,7 +49,6 @@ class CommentAligner():
 		""" Gets the block of comments adjacent to the function's definition """
 		line_comments = self.source_comments.line_comments
 		comments = list()
-		# TODO: This range is likely too wide!  It shouldn't go all the way to the top of the file.
 		for line_num in range(line_range.start - 1, -1, -1): # decreasing line_num counter
 			if line_num in line_comments: # and line_num in outer_line_numbers
 				comments.append((line_num, line_comments[line_num]))
