@@ -108,7 +108,7 @@ class Utils():
 		Utils.attach_metadata(md, element, gromet)
 
 	@staticmethod
-	def build_tr_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, element, gromet):
+	def build_textreading_mention_metadata(time_stamper, scored_mention, doc_file_ref: str, element, gromet):
 
 		mention, score = scored_mention
 
