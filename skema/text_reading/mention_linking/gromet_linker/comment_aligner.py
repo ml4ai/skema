@@ -38,19 +38,19 @@ class CommentAligner():
 
 	def get_aligned_comments(self, name: str, inner_line_range: range, outer_line_range: range) -> list[tuple[int, str]]:
 		if name:
-			inner_comments = self.get_inner_comments(inner_line_range, outer_line_range)
-			aligned_comments = self.variable_name_matcher.match_line_comment(name, inner_comments)
+			leading_comments = self.get_leading_comments(outer_line_range)
+			aligned_comments = self.variable_name_matcher.match_line_comment(name, leading_comments)
 			return aligned_comments
 		else:
 			return []
 
 	# Get the comments in contiguous lines above the function.
-	def get_inner_comments(self, inner_line_range: range, outer_line_range: range) -> list[tuple[int, str]]:
+	def get_leading_comments(self, line_range: range) -> list[tuple[int, str]]:
 		""" Gets the block of comments adjacent to the function's definition """
 		line_comments = self.source_comments.line_comments
 		comments = list()
 		# TODO: This range is likely too wide!  It shouldn't go all the way to the top of the file.
-		for line_num in range(inner_line_range.start - 1, -1, -1): # decreasing line_num counter
+		for line_num in range(line_range.start - 1, -1, -1): # decreasing line_num counter
 			if line_num in line_comments: # and line_num in outer_line_numbers
 				comments.append((line_num, line_comments[line_num]))
 			else:
@@ -121,7 +121,7 @@ class OuterGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 			aligned_docstrings = self.line_docstrings
 			# This is all the comments within the line_range, independent of the name.
 			aligned_box_comments = self.get_aligned_box_comments(self.line_range)
-			# This is all the comments above the first line range until a line without a comment is encountered
+			# This is all the comments above the second line range until a line without a comment is encountered
 			# (or the beginning of the file) where the name also matches.
 			# For a box function, these would be comments just before the function definition, which seems reasonable.
 			aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.line_range)
@@ -139,8 +139,8 @@ class InnerGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
 		aligned_docstrings = self.variable_name_matcher.match_line_comment(self.name, self.line_docstrings)
 		# This is all the comments within the line_range, so possibly just the one line, independent of name.
 		aligned_box_comments = self.get_aligned_box_comments(self.line_range)
-		# This is all the comments above the first line range, the outer_line_range, where the name also matches.
-		aligned_comments = self.get_aligned_comments(self.name, self.outer_line_range, self.outer_line_range)
+		# This is all the comments above the second line range, the outer_line_range, where the name also matches.
+		aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.outer_line_range)
 		self.align_mentions(self.name, self.gromet_box_function, aligned_docstrings, aligned_box_comments, aligned_comments)
 
 class GrometPortCommentAligner(CommentAligner):
@@ -158,8 +158,8 @@ class GrometPortCommentAligner(CommentAligner):
 		aligned_docstrings = self.variable_name_matcher.match_line_comment(self.name, self.line_docstrings)
 		# This is completely skipped.
 		aligned_box_comments = []
-		# This is all the comments above the first line range, the outer_line_range, where the name also matches.
-		aligned_comments = self.get_aligned_comments(self.name, self.outer_line_range, self.outer_line_range)
+		# This is all the comments above the second line range, the outer_line_range, where the name also matches.
+		aligned_comments = self.get_aligned_comments(self.name, self.line_range, self.outer_line_range)
 		self.align_mentions(self.name, self.gromet_port, aligned_docstrings, aligned_box_comments, aligned_comments)
 
 class GrometFNCommentAligner(CommentAligner):
