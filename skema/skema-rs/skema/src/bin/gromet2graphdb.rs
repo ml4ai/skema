@@ -1,18 +1,28 @@
 //! Program for inserting GroMEt models into a database from the command line.
 
+use clap::Parser;
 use serde_json;
 use skema::{
     database::{execute_query, parse_gromet_queries},
     Gromet,
 };
-use std::env;
 use std::fs;
+
+#[derive(Parser, Debug)]
+struct Cli {
+    /// Path to GroMEt JSON file to ingest into database
+    path: String,
+
+    /// Database host
+    #[arg(long, default_value_t = String::from("localhost"))]
+    db_host: String,
+}
 
 fn main() {
     // take in gromet location and deserialize
-    let args: Vec<String> = env::args().collect();
-    let path = &args[1];
-    let data = fs::read_to_string(path).expect("Unable to read file");
+
+    let args = Cli::parse();
+    let data = fs::read_to_string(&args.path).expect("Unable to read file");
     let gromet: Gromet = serde_json::from_str(&data).expect("Unable to parse");
 
     // parse gromet into vec of queries
@@ -26,5 +36,5 @@ fn main() {
         full_query.push_str(&temp_str);
     }
 
-    execute_query(&full_query, "localhost"); // The properties need to have quotes!!
+    execute_query(&full_query, &args.db_host).unwrap() // The properties need to have quotes!!
 }
