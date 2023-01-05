@@ -8,43 +8,19 @@ use nom::{
 };
 use nom_locate::{position, LocatedSpan};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Comment {
+    pub line_number: u32,
+    pub contents: String,
+}
+
 #[derive(Debug, strum_macros::Display, Clone, Serialize, Deserialize)]
 enum Statement {
-    Comment {
-        line_number: u32,
-        contents: String,
-    },
-    Docstring {
-        object_name: String,
-        contents: Vec<String>,
-    },
+    Comment(Comment),
     Other,
-}
-
-/// Triple quoted strings
-fn triple_quoted_string(input: Span) -> IResult<Span, Span> {
-    alt((
-        delimited(tag("'''"), take_until("'''"), tag("'''")),
-        delimited(tag("\"\"\""), take_until("\"\"\""), tag("\"\"\"")),
-    ))(input)
-}
-
-fn is_valid_name_character(c: char) -> bool {
-    c.is_alphanumeric() || c == '_'
-}
-
-fn name(input: Span) -> IResult<Span, Span> {
-    take_while(is_valid_name_character)(input)
-}
-
-#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct Comments {
-    pub comments: Vec<(u32, String)>,
-    pub docstrings: HashMap<String, Vec<String>>,
 }
 
 /// Whole line comments
@@ -59,10 +35,10 @@ fn whole_line_comment(input: Span) -> IResult<Span, Statement> {
     let contents = x.to_string();
     Ok((
         s,
-        Statement::Comment {
+        Statement::Comment(Comment {
             line_number,
             contents,
-        },
+        }),
     ))
 }
 
@@ -75,38 +51,15 @@ fn partial_line_comment(input: Span) -> IResult<Span, Statement> {
     let contents = x.to_string();
     Ok((
         s,
-        Statement::Comment {
+        Statement::Comment(Comment {
             line_number,
             contents,
-        },
-    ))
-}
-
-fn docstring(input: Span) -> IResult<Span, Statement> {
-    let func_declaration = delimited(
-        tuple((space0, tag("def "))),
-        name,
-        tuple((tag("("), take_until("):"), tag("):"), line_ending, space0)),
-    );
-    let (input, (func_name, docstring_contents, _, _)) =
-        tuple((func_declaration, triple_quoted_string, space0, line_ending))(input)?;
-    let object_name = func_name.to_string();
-    let contents: Vec<String> = docstring_contents
-        .to_string()
-        .split('\n')
-        .map(|x| x.to_string())
-        .collect();
-    Ok((
-        input,
-        Statement::Docstring {
-            object_name,
-            contents,
-        },
+        }),
     ))
 }
 
 fn comment(input: Span) -> IResult<Span, Statement> {
-    alt((docstring, whole_line_comment, partial_line_comment))(input)
+    alt((whole_line_comment, partial_line_comment))(input)
 }
 
 fn other(input: Span) -> IResult<Span, Statement> {
@@ -118,33 +71,28 @@ fn statement(input: Span) -> IResult<Span, Statement> {
     alt((comment, other))(input)
 }
 
-fn comments(input: Span) -> IResult<Span, Comments> {
-    fold_many0(statement, Comments::default, |mut acc: Comments, item| {
-        match item {
-            Statement::Comment {
-                line_number,
-                contents,
-            } => {
-                acc.comments.push((line_number, contents));
+fn comments(input: Span) -> IResult<Span, Vec<Comment>> {
+    fold_many0(
+        statement,
+        Vec::<Comment>::new,
+        |mut acc: Vec<Comment>, item| {
+            match item {
+                Statement::Comment(comment) => {
+                    acc.push(comment);
+                }
+                _ => (),
             }
-            Statement::Docstring {
-                object_name,
-                contents,
-            } => {
-                acc.docstrings.insert(object_name, contents);
-            }
-            _ => (),
-        }
-        acc
-    })(input)
+            acc
+        },
+    )(input)
 }
 
-pub fn get_comments(src_file_path: &str) -> Comments {
+pub fn get_comments(src_file_path: &str) -> Vec<Comment> {
     let contents = std::fs::read_to_string(src_file_path).unwrap();
     get_comments_from_string(&contents)
 }
 
-pub fn get_comments_from_string(source_code: &str) -> Comments {
+pub fn get_comments_from_string(source_code: &str) -> Vec<Comment> {
     let span = Span::new(&source_code);
     let (_, result) = comments(span).unwrap();
     result
@@ -152,5 +100,7 @@ pub fn get_comments_from_string(source_code: &str) -> Comments {
 
 #[test]
 fn test_parser() {
+    // Smokescreen test to see if the extraction works without crashing. May want to replace this
+    // with a more rigorous test later.
     get_comments("tests/data/CHIME_SIR.py");
 }
