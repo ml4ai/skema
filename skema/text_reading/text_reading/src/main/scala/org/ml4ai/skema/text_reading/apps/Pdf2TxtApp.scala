@@ -33,7 +33,8 @@ object Pdf2TxtApp extends App {
     "fi rst",
     "Here 's",
     "Let 's",
-    "hospital s"
+    "hospital s",
+    "o ffi cials find sta ffi ng di ffi cult"
   )
 
   rawTexts.foreach { rawText =>
