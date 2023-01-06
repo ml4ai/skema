@@ -18,10 +18,16 @@ setup(name='skema',
       author='Enrique Noriega, Adarsh Pyarelal, Clayton Morrison, Tito Ferra, Vincent Raymond',
       author_email='enoriega@arizona.edu',
       license='MIT',
-    #   packages=find_packages('src'),
-      package_dir={'mention_linking':os.path.join('skema', 'text_reading', 'mention_linking')},
+      packages=find_packages('src'),
+      # package_dir={'mention_linking':os.path.join('skema', 'text_reading', 'mention_linking')},
       install_requires=[
         "gensim",
+        "fastapi",
+        "uvicorn",
+        "dill",
+        "networkx",
+        "requests",
+        "pygraphviz"
         #"automates @ https://github.com/danbryce/automates/archive/e5fb635757aa57007615a75371f55dd4a24851e0.zip#sha1=f9b3c8a7d7fa28864952ccdd3293d02894614e3f"
       ],
       tests_require=["unittest"],
