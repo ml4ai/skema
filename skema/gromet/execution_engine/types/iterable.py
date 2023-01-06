@@ -1,5 +1,5 @@
 from typing import Iterator, Union, Any, List, Dict, Set, Tuple
-from .defined_types import Field, Iterable
+from skema.gromet.execution_engine.types.defined_types import Field, Iterable
 
 
 class Iterable_new_Iterator(object):

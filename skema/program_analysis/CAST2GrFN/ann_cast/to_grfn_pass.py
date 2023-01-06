@@ -16,7 +16,7 @@ from skema.model_assembly.networks import (
 )
 from skema.model_assembly.sandbox import load_lambda_function
 from skema.model_assembly.structures import ContainerIdentifier
-from .ann_cast_helpers import (
+from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
     ELSEBODY,
     IFBODY,
     MODULE_SCOPE,
@@ -27,8 +27,8 @@ from .ann_cast_helpers import (
     is_func_def_main,
     lambda_var_from_fullid,
 )
-from .annotated_cast import *
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2GrFN.model.cast import ( 
     ScalarType,
     ValueConstructor,
 )
@@ -46,7 +46,7 @@ class ToGrfnPass:
         for grfn_var in self.pipeline_state.grfn_id_to_grfn_var.values():
             self.network.add_node(grfn_var, **grfn_var.get_kwargs())
 
-        # the fullid of a AnnCastName node is a string which includes its
+        # the fullid of a AnnCastName node is a string which includes its 
         # variable name, numerical id, version, and scope
         for node in self.pipeline_state.nodes:
             self.visit(node, subgraph=None)
@@ -62,7 +62,7 @@ class ToGrfnPass:
         identifier = ContainerIdentifier(ns, scope, con_name)
 
         # store GrFN in PipelineState
-        self.pipeline_state.grfn = GroundedFunctionNetwork(grfn_uid, identifier, timestamp,
+        self.pipeline_state.grfn = GroundedFunctionNetwork(grfn_uid, identifier, timestamp, 
                                         self.network, self.hyper_edges, self.subgraphs,
                                         type_defs, metadata)
 
@@ -70,7 +70,7 @@ class ToGrfnPass:
         """
         Return the list of GrFN Variables that are associated with the fullids
         from `fullids`
-        Paramters:
+        Paramters:  
             - `fullids`: an iterable of fullids
         """
         grfn_vars = []
@@ -114,14 +114,14 @@ class ToGrfnPass:
         """ Parameters:
               - `inputs` and `outputs` are lists of GrFN VariableNode's
               - `lambda_node` is a GrFN LambdaNode
-
+            
             For each input in `inputs`, adds an edge from input to `lambda_node`
             For each output in `outputs`, adds an edge from `lambda_node` to output
             Adds a `HyperEdge` between `inputs`, `lambda_node`, and `outputs`
         """
-        # build input edge set
+        # build input edge set 
         input_edges = zip(inputs, [lambda_node] * len(inputs))
-        # build output edge set
+        # build output edge set 
         output_edges = zip([lambda_node] * len(outputs), outputs)
         # add edges to network
         self.network.add_edges_from(input_edges)
@@ -144,7 +144,7 @@ class ToGrfnPass:
         inputs = self.grfn_vars_from_fullids(condition_in.values())
         outputs = self.grfn_vars_from_fullids(condition_out.values())
         self.add_grfn_edges(inputs, condition_node, outputs)
-
+            
         # add nodes to subgraph
         subgraph.nodes.extend(inputs + [condition_node] + outputs)
 
@@ -160,7 +160,7 @@ class ToGrfnPass:
                                      lambda_str, lambda_func, lambda_metadata)
         self.network.add_node(decision_node, **decision_node.get_kwargs())
 
-        # FUTURE: modifying the order grfn_vars are added
+        # FUTURE: modifying the order grfn_vars are added 
         # to inputs may be necessary to perform correct execution
         # For now, we are following the pattern in `lambda_for_decision()` of
         # lambda COND, x_if, y_if, x_else, y_else: (x_if, y_if) if COND else (x_else, y_else)
@@ -174,12 +174,12 @@ class ToGrfnPass:
 
         if_body_inputs = self.grfn_vars_from_fullids(if_body_dict.values())
         else_body_inputs = self.grfn_vars_from_fullids(else_body_dict.values())
-
+        
         # concatenate if and else inputs after condition_var input to follow pattern
         inputs = [condition_var] + if_body_inputs + else_body_inputs
         outputs = self.grfn_vars_from_fullids(decision_out.values())
         self.add_grfn_edges(inputs, decision_node, outputs)
-
+            
         # add nodes to subraph
         subgraph.nodes.extend(inputs + [decision_node] + outputs)
 
@@ -202,15 +202,15 @@ class ToGrfnPass:
 
         # add subgraph nodes
         subgraph.nodes.extend(inputs + [assignment_node] + outputs)
-
+        
     def visit(self, node: AnnCastNode, subgraph: GrFNSubgraph):
         """
         External visit that callsthe internal visit
         Useful for debugging/development.  For example,
         printing the nodes that are visited
         """
-        # print current node being visited.
-        # this can be useful for debugging
+        # print current node being visited.  
+        # this can be useful for debugging 
         # class_name = node.__class__.__name__
         # print(f"\nProcessing node type {class_name}")
 
@@ -220,7 +220,7 @@ class ToGrfnPass:
     def visit_node_list(self, node_list: typing.List[AnnCastNode], subgraph: GrFNSubgraph):
         return [self.visit(node, subgraph) for node in node_list]
 
-
+        
     @singledispatchmethod
     def _visit(self, node: AnnCastNode, subgraph: GrFNSubgraph):
         """
@@ -249,11 +249,11 @@ class ToGrfnPass:
     def visit_boolean(self, node: AnnCastBoolean, subgraph: GrFNSubgraph):
         pass
 
-    @_visit.register
+    @_visit.register    
     def visit_call(self, node: AnnCastCall, subgraph: GrFNSubgraph):
         if node.is_grfn_2_2:
             self.visit_call_grfn_2_2(node, subgraph)
-            return
+            return 
 
         self.visit_node_list(node.arguments, subgraph)
         for index, assignment in node.arg_assignments.items():
@@ -303,7 +303,7 @@ class ToGrfnPass:
             # the outputs need to be added to the parent subgraph
             subgraph.nodes.extend(inputs + [bot_interface])
             parent.nodes.extend(outputs)
-
+        
     def visit_call_grfn_2_2(self, node: AnnCastCall, subgraph: GrFNSubgraph):
         # assert isinstance(node.func, AnnCastName)
         self.visit_node_list(node.arguments, subgraph)
@@ -394,7 +394,7 @@ class ToGrfnPass:
         ns = "default-ns"
         scope = con_scope_to_str(node.con_scope)
         basename = node.name.name # was originally assigned to 'scope', changed to node.name.name
-        basename_id = node.name.id # added
+        basename_id = node.name.id # added 
         subgraph = GrFNSubgraph(uid, ns, scope, basename, basename_id,
                                 occs, parent_str, type, border_color, nodes, metadata)
 
@@ -413,7 +413,7 @@ class ToGrfnPass:
             parent.nodes.extend(inputs)
             # add interface node and outputs to subraph
             subgraph.nodes.extend([top_interface] + outputs)
-
+        
         # visit dummy assignments before body
         for dummy_assignment in node.dummy_grfn_assignments:
             self.visit_grfn_assignment(dummy_assignment, subgraph)
@@ -437,7 +437,7 @@ class ToGrfnPass:
 
         self.subgraphs.add_node(subgraph)
         self.subgraphs.add_edge(parent, subgraph)
-
+    
     @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue, subgraph: GrFNSubgraph):
         pass
@@ -476,7 +476,7 @@ class ToGrfnPass:
             self.network.add_node(top_interface, **top_interface.get_kwargs())
             # collect initial GrFN VariableNodes
             grfn_initial = self.grfn_vars_from_fullids(node.top_interface_initial.values())
-            # collect updated GrFN VariableNodes
+            # collect updated GrFN VariableNodes 
             grfn_updated = self.grfn_vars_from_fullids(node.top_interface_updated.values())
             # combine initial and updated for inputs to loop top interface
             inputs = grfn_initial + grfn_updated
@@ -527,7 +527,7 @@ class ToGrfnPass:
         occs = 0
         uid = GenericNode.create_node_id()
         ns = "default-ns"
-        scope = con_scope_to_str(node.con_scope)
+        scope = con_scope_to_str(node.con_scope) 
         basename = "if" # changed from 'scope' to the string 'if'
         basename_id = int(node.con_scope[-1][2:]) # stripping out the word 'if' to obtain a numerical ID
         subgraph = GrFNSubgraph(uid, ns, scope, basename, basename_id,
@@ -553,10 +553,10 @@ class ToGrfnPass:
 
         self.visit_node_list(node.body, subgraph)
         self.visit_node_list(node.orelse, subgraph)
-
+        
         condition_var = node.condition_var
         if len(node.decision_in) > 0:
-            self.create_decision_node(node.decision_in, node.decision_out,
+            self.create_decision_node(node.decision_in, node.decision_out, 
                                   condition_var, node.decision_lambda, subgraph)
 
         # build bot interface

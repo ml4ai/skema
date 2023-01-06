@@ -46,8 +46,8 @@ from CAST2GrFN.ann_cast.to_gromet_pass import (
     ToGrometPass,
 )
 
-from automates.utils.script_functions import ann_cast_pipeline
-from automates.utils.fold import dictionary_to_gromet_json, del_nulls
+from skema.utils.script_functions import ann_cast_pipeline
+from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
 def get_args():

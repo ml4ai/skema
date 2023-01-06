@@ -1,7 +1,7 @@
 from functools import singledispatchmethod
 import typing
 
-from automates.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
 
 
 class AnnCastPass:

@@ -4,7 +4,7 @@ import difflib
 import typing
 import networkx as nx
 
-from .model.cast import (
+from skema.program_analysis.CAST2GrFN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -40,14 +40,16 @@ from .model.cast import (
     Var,
     ValueConstructor
 )
-from .visitors import (
+from skema.program_analysis.CAST2GrFN.visitors import (
     CASTToAIRVisitor,
 )
 from skema.model_assembly.air import AutoMATES_IR
 from skema.model_assembly.networks import GroundedFunctionNetwork
 from skema.model_assembly.structures import (
     GenericContainer,
+    GenericStmt,
     GenericIdentifier,
+    GenericDefinition,
     TypeDefinition,
     VariableDefinition,
 )
@@ -107,6 +109,7 @@ class CASTJsonException(Exception):
     Class used to represent exceptions encountered when encoding/decoding CAST json
     """
 
+    pass
 
 
 class CAST(object):
@@ -145,7 +148,7 @@ class CAST(object):
                 self_lines = str(node).splitlines()
                 other_lines = str(other_node).splitlines()
                 for i, diff in enumerate(difflib.ndiff(self_lines, other_lines)):
-                    if diff[0]==' ':
+                    if diff[0]==' ': 
                         continue
                     print(f"Line {i}: {diff}")
                 return False

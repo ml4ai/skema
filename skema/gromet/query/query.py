@@ -1,14 +1,14 @@
 from typing import List
 import os
 
-from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
+from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 
 
-from automates.gromet.fn import (
+from skema.gromet.fn import (
     GrometFNModule
 )
 
-from automates.gromet.metadata import (
+from skema.gromet.metadata import (
     Metadata,
     SourceCodeReference
 )
@@ -96,7 +96,7 @@ def collect_named_output_ports(module: GrometFNModule):
 
 # -----------------------------------------------------------------------------
 # Development Script
-#   NOTE: this has been replicated in <automates_root>/notebooks/gromet/gromet_query.ipynb
+#   NOTE: this has been replicated in <skema_root>/notebooks/gromet/gromet_query.ipynb
 # -----------------------------------------------------------------------------
 
 LOCAL_SKEMA_GOOGLE_DRIVE_ROOT = "/Users/claytonm/My Drive/"

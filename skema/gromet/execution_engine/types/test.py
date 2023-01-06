@@ -2,7 +2,7 @@ import numpy
 from typing import Union, List, Tuple, Any
 import itertools
 
-from define.types import Field, Sequence
+from defined_types import Field, Sequence
 
 
 class Sequence_concatenate(object): #TODO: Check implementation of *args

@@ -1,6 +1,6 @@
 from typing import Union, Any
 
-from .defined_types import Field
+from skema.gromet.execution_engine.types.defined_types import Field
 
 class Add(object):
     source_language_name = {"Python":"Add", "GCC":"plus_expr", "CAST": "Add"}

@@ -4,8 +4,8 @@ from collections.abc import Iterable
 from datetime import datetime
 
 from .cast_visitor import CASTVisitor
-from . import cast_function_call_visitor as call_order
-from ..model.cast_to_air_model import (
+import skema.program_analysis.CAST2GrFN.visitors.cast_function_call_visitor as call_order
+from skema.program_analysis.CAST2GrFN.model.cast_to_air_model import (
     C2AException,
     C2AState,
     C2ALambdaType,
@@ -25,7 +25,7 @@ from ..model.cast_to_air_model import (
     C2AValueError,
     build_unique_list_with_order,
 )
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -59,7 +59,7 @@ from ..model.cast import (
     var,
 )
 
-from .cast_to_air_function_map import (
+from skema.program_analysis.CAST2GrFN.visitors.cast_to_air_function_map import (
     is_builtin_func,
     get_builtin_func_info,
 )

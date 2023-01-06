@@ -1,9 +1,9 @@
 from functools import singledispatchmethod
 import typing
 
-from ..cast import CAST
+from skema.program_analysis.CAST2GrFN.cast import CAST
 
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -33,7 +33,7 @@ from ..model.cast import (
     Var,
 )
 
-from .annotated_cast import *
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
 
 class CASTTypeError(TypeError):
     """Used to create errors in the visitor, in particular
@@ -68,8 +68,8 @@ class CastToAnnotatedCastVisitor():
         return PipelineState(annotated_cast, grfn_2_2)
 
     def visit(self, node: AstNode) -> AnnCastNode:
-        # print current node being visited.
-        # this can be useful for debugging
+        # print current node being visited.  
+        # this can be useful for debugging 
         #class_name = node.__class__.__name__
         #print(f"\nProcessing node type {class_name}")
         return self._visit(node)
@@ -113,10 +113,9 @@ class CastToAnnotatedCastVisitor():
 
     @_visit.register
     def visit_record_def(self, node: RecordDef):
-        bases = self.visit_node_list(node.bases)
         funcs = self.visit_node_list(node.funcs)
         fields = self.visit_node_list(node.fields)
-        return AnnCastRecordDef(node.name, bases, funcs, fields, node.source_refs)
+        return AnnCastRecordDef(node.name, node.bases, funcs, fields, node.source_refs)
 
     @_visit.register
     def visit_dict(self, node: Dict):
@@ -135,7 +134,7 @@ class CastToAnnotatedCastVisitor():
         args = self.visit_node_list(node.func_args)
         body = self.visit_node_list(node.body)
         return AnnCastFunctionDef(name, args, body, node.source_refs)
-
+        
     @_visit.register
     def visit_list(self, node: List):
         values = self.visit_node_list(node.values)
@@ -182,7 +181,7 @@ class CastToAnnotatedCastVisitor():
     def visit_model_return(self, node: ModelReturn):
         value = self.visit(node.value)
         return AnnCastModelReturn(value, node.source_refs)
-
+        
     @_visit.register
     def visit_module(self, node: Module):
         body = self.visit_node_list(node.body)
@@ -224,8 +223,4 @@ class CastToAnnotatedCastVisitor():
     @_visit.register
     def visit_var(self, node: Var):
         val = self.visit(node.val)
-        if(node.default_value != None):
-            default_value = self.visit(node.default_value)
-        else:
-            default_value = None
-        return AnnCastVar(val, node.type, default_value, node.source_refs)
+        return AnnCastVar(val, node.type, node.source_refs)

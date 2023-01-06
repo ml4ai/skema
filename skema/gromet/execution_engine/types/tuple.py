@@ -1,6 +1,6 @@
 from typing import Any, Tuple
 
-from .defined_types import Field
+from skema.gromet.execution_engine.types.defined_types import Field
 
 class new_Tuple(object):
     source_language_name = {"Python":"new_Tuple"} 

@@ -4,7 +4,7 @@ from collections import defaultdict
 from enum import Enum
 from functools import singledispatchmethod
 
-from .ann_cast_helpers import (
+from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
     CON_STR_SEP,
     ELSEBODY,
     IFBODY,
@@ -21,8 +21,8 @@ from .ann_cast_helpers import (
     func_def_container_name,
     var_dict_to_str,
 )
-from .annotated_cast import *
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2GrFN.model.cast import ( 
     ScalarType,
     ValueConstructor,
 )
@@ -66,7 +66,7 @@ class ContainerScopePass:
 
         # add cached container data to container nodes
         self.add_container_data_to_nodes()
-
+ 
         # save the dict mapping container scope to AnnCastNode
         self.pipeline_state.con_scopestr_to_node = self.con_str_to_node
 
@@ -110,7 +110,7 @@ class ContainerScopePass:
                 container_node.used_vars.update(func_def.used_globals)
                 container_node.modified_vars.update(func_def.modified_globals)
                 container_node.vars_accessed_before_mod.update(func_def.globals_accessed_before_mod)
-
+                
     def add_container_data_to_expr(self, container, data):
         """
         Adds container data to `expr_*_vars` attributes of ModelIf and Loop nodes
@@ -150,7 +150,7 @@ class ContainerScopePass:
                 self.add_container_data_to_expr(loop_container, data)
                 continue
 
-            # otherwise, store container data, in the container nodes
+            # otherwise, store container data, in the container nodes 
             # *_vars attributes
             container = self.con_str_to_node[scopestr]
             container.vars_accessed_before_mod = data.vars_accessed_before_mod
@@ -183,12 +183,12 @@ class ContainerScopePass:
 
         # map con_scopestr to passed in node
         self.con_str_to_node[con_scopestr] = node
-
+        
     def visit(
             self, node: AnnCastNode, base_func_scopestr: str, enclosing_con_scope: typing.List, assign_side: AssignSide
     ):
-        # print current node being visited.
-        # this can be useful for debugging
+        # print current node being visited.  
+        # this can be useful for debugging 
         #class_name = node.__class__.__name__
         #print(f"\nProcessing node type {class_name}")
 
@@ -262,7 +262,7 @@ class ContainerScopePass:
     def visit_call(self, node: AnnCastCall, base_func_scopestr, enclosing_con_scope, assign_side):
         assert isinstance(node.func, AnnCastName) or isinstance(node.func, AnnCastAttribute)
         # if this call is on the RHS of an assignment, then it should have a ret val
-        # FUTURE: this logic is not sufficient to determine
+        # FUTURE: this logic is not sufficient to determine 
         # all cases that a Call node should have a ret val
         if assign_side == AssignSide.RIGHT:
             node.has_ret_val = True
@@ -282,11 +282,11 @@ class ContainerScopePass:
             grfn_src_ref = GrfnContainerSrcRef(line_begin=src_ref.row_start, line_end=src_ref.row_end,
                                                source_file_name=src_ref.source_file_name)
         node.grfn_con_src_ref = grfn_src_ref
-
+        
         # queue node to process globals through interfaces later if we have the associated FunctionDef
         if node.has_func_def:
             self.calls_to_process.append(node)
-
+        
         if isinstance(node.func, AnnCastAttribute):
             self.visit(node.func, base_func_scopestr, enclosing_con_scope, assign_side)
 
@@ -383,9 +383,9 @@ class ContainerScopePass:
             # size - Var node or a LiteralValue node (for number)
             # initial_value - LiteralValue node
             val = node.value
-
+            
             # visit size's anncast name node
-            self.visit(val.size, base_func_scopestr, enclosing_con_scope, assign_side)
+            self.visit(val.size, base_func_scopestr, enclosing_con_scope, assign_side) 
 
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
@@ -408,15 +408,15 @@ class ContainerScopePass:
         # print(f"-----------{loopscope}-----------")
         self.initialize_con_scope_data(loopscope, node)
         node.con_scope = loopscope
-
+        
         if len(node.init) > 0:
             # Additional modifications to support the loop init body
-            loopinitscope = loopscope + [LOOPINIT]
+            loopinitscope = loopscope + [LOOPINIT]        
             # self.initialize_con_scope_data(loopinitscope, node)
             init_src_ref = self.visit_node_list(node.init, base_func_scopestr, loopinitscope, assign_side)
 
         # we store an additional ContainerData for the loop expression, but
-        # we store the Loop node in `self.con_str_to_node`
+        # we store the Loop node in `self.con_str_to_node`         
         loopexprscope = loopscope + [LOOPEXPR]
         self.initialize_con_scope_data(loopexprscope, node)
         expr_src_ref = self.visit(node.expr, base_func_scopestr, loopexprscope, assign_side)
@@ -457,7 +457,7 @@ class ContainerScopePass:
         node.con_scope = ifscope
 
         # we store an additional ContainerData for the if expression, but
-        # we store the ModelIf node in `self.con_str_to_node`
+        # we store the ModelIf node in `self.con_str_to_node`         
         ifexprscope = ifscope + [IFEXPR]
         self.initialize_con_scope_data(ifexprscope, node)
         expr_src_ref = self.visit(node.expr, base_func_scopestr, ifexprscope, assign_side)
@@ -511,12 +511,12 @@ class ContainerScopePass:
         for index, name in enumerate(enclosing_con_scope):
             # add separator between container scope component names
             scopestr = CON_STR_SEP.join(enclosing_con_scope[:index+1])
-
+            
             # if this Name node is a global, or if the scopestr extends base_func_scopestr
             # we will add the node to scopestr's container data
             # otherwise, we skip it
             # we must do a compound check to propagate globals correctly
-            # we would like to stop propagation of variable use at base_func_scopestr, but
+            # we would like to stop propagation of variable use at base_func_scopestr, but  
             # this would only be correct for function locals.  global use must be propagated above
             # base_func_scopestr
             if not (self.pipeline_state.is_global_var(node.id) or scopestr.startswith(base_func_scopestr)):
@@ -529,7 +529,7 @@ class ContainerScopePass:
                 # added to modified vars
                 if assign_side == AssignSide.LEFT:
                     con_data.modified_vars[node.id] = node.name
-                # if this is the first time visiting the variable id in this scope,
+                # if this is the first time visiting the variable id in this scope, 
                 # then it is accessed before modified
                 elif node.id not in con_data.used_vars:
                     con_data.vars_accessed_before_mod[node.id] = node.name
@@ -556,7 +556,7 @@ class ContainerScopePass:
     @_visit.register
     def visit_tuple(self, node: AnnCastTuple, base_func_scopestr, enclosing_con_scope, assign_side):
         self.visit_node_list(node.values, base_func_scopestr, enclosing_con_scope, assign_side)
-
+        
     @_visit.register
     def visit_unary_op(self, node: AnnCastUnaryOp, base_func_scopestr, enclosing_con_scope, assign_side):
         return self.visit(node.value, base_func_scopestr, enclosing_con_scope, assign_side)

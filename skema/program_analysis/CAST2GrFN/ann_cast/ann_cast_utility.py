@@ -1,12 +1,12 @@
 
-from automates.program_analysis.CAST2GrFN.ann_cast.annotated_cast import PipelineState
-from automates.program_analysis.CAST2GrFN.ann_cast.id_collapse_pass import IdCollapsePass
-from automates.program_analysis.CAST2GrFN.ann_cast.container_scope_pass import ContainerScopePass
-from automates.program_analysis.CAST2GrFN.ann_cast.variable_version_pass import VariableVersionPass
-from automates.program_analysis.CAST2GrFN.ann_cast.grfn_var_creation_pass import GrfnVarCreationPass
-from automates.program_analysis.CAST2GrFN.ann_cast.grfn_assignment_pass import GrfnAssignmentPass
-from automates.program_analysis.CAST2GrFN.ann_cast.lambda_expression_pass import LambdaExpressionPass
-from automates.program_analysis.CAST2GrFN.ann_cast.to_grfn_pass import ToGrfnPass
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import PipelineState
+from skema.program_analysis.CAST2GrFN.ann_cast.id_collapse_pass import IdCollapsePass
+from skema.program_analysis.CAST2GrFN.ann_cast.container_scope_pass import ContainerScopePass
+from skema.program_analysis.CAST2GrFN.ann_cast.variable_version_pass import VariableVersionPass
+from skema.program_analysis.CAST2GrFN.ann_cast.grfn_var_creation_pass import GrfnVarCreationPass
+from skema.program_analysis.CAST2GrFN.ann_cast.grfn_assignment_pass import GrfnAssignmentPass
+from skema.program_analysis.CAST2GrFN.ann_cast.lambda_expression_pass import LambdaExpressionPass
+from skema.program_analysis.CAST2GrFN.ann_cast.to_grfn_pass import ToGrfnPass
 
 ANN_CAST_ALL_PASSES = {
         "IdCollapsePass": IdCollapsePass, 

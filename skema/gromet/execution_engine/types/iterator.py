@@ -1,6 +1,6 @@
 from typing import Any, Iterator, Tuple
 
-from .defined_types import Field
+from skema.gromet.execution_engine.types.defined_types import Field
 
 class Iterator_next(object):
     source_language_name = {"Python":"_next"} 

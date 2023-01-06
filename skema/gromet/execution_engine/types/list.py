@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from .defined_types import Field
+from skema.gromet.execution_engine.types.defined_types import Field
 
 class new_List(object):
     source_language_name = {"Python":"new_List"} 

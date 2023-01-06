@@ -4,8 +4,8 @@ from functools import singledispatchmethod
 from skema.utils.misc import uuid
 
 from .cast_visitor import CASTVisitor
-from ..cast import CAST
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.cast import CAST
+from skema.program_analysis.CAST2GrFN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -41,8 +41,8 @@ from ..model.cast import (
     Var,
     ValueConstructor
 )
-from ..ann_cast.annotated_cast import *
-from ..ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
         var_dict_to_str,
         interface_to_str,
         decision_in_to_str,
@@ -327,22 +327,12 @@ class CASTToAGraphVisitor(CASTVisitor):
         # TODO: Where should bases field be used?
         funcs = []
         fields = []
-        bases = []
         if len(node.funcs) > 0:
             funcs = self.visit_list(node.funcs)
         if len(node.fields) > 0:
             fields = self.visit_list(node.fields)
-        if len(node.bases) > 0:
-            bases = self.visit_list(node.bases)
         node_uid = uuid.uuid4()
         self.G.add_node(node_uid, label="Record: " + node.name)
-
-        # Add bases to the graph (currently name nodes)
-        base_uid = uuid.uuid4()
-        self.G.add_node(base_uid, label="Parent Classes (bases)")
-        self.G.add_edge(node_uid, base_uid)
-        for n in bases:
-            self.G.add_edge(base_uid, n)
 
         # Add attributes to the graph
         attr_uid = uuid.uuid4()
@@ -432,7 +422,7 @@ class CASTToAGraphVisitor(CASTVisitor):
         self.G.add_edge(node_uid, expr)
 
         return node_uid
-
+        
     @visit.register
     def _(self, node: AnnCastFunctionDef):
         """Visits FunctionDef nodes. We visit all the arguments, and then
@@ -598,11 +588,11 @@ class CASTToAGraphVisitor(CASTVisitor):
             node_uid = uuid.uuid4()
             if isinstance(node.value, ValueConstructor):
                 op = node.value.operator
-                init_val = node.value.initial_value.value
+                init_val = node.value.initial_value.value 
                 if isinstance(node.value.size, LiteralValue):
                     size = node.value.size.value
                     id = -1
-                else:
+                else: 
                     size = node.value.size.name
                     id = node.value.size.id
 
@@ -638,11 +628,11 @@ class CASTToAGraphVisitor(CASTVisitor):
             node_uid = uuid.uuid4()
             if isinstance(node.value, ValueConstructor):
                 op = node.value.operator
-                init_val = node.value.initial_value.value
+                init_val = node.value.initial_value.value 
                 if isinstance(node.value.size, LiteralValue):
                     size = node.value.size.value
                     id = -1
-                else:
+                else: 
                     size = node.value.size.name
                     id = node.value.size.id
 
@@ -753,7 +743,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             self.G.add_edge(orelse_uid, n)
 
         return node_uid
-
+    
     @visit.register
     def _(self, node: AnnCastModelImport):
         """Visits a ModelImport (Import statement) node.
@@ -767,7 +757,7 @@ class CASTToAGraphVisitor(CASTVisitor):
         self.G.add_node(node_uid, label=f"Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}")
 
         return node_uid
-
+    
     @visit.register
     def _(self, node: ModelImport):
         """Visits a ModelImport (Import statement) node.
@@ -924,7 +914,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             if isinstance(node.con_scope,list):
                 label=node.name  +"\n" + ".".join(node.con_scope)
             else:
-                label=node.name
+                label=node.name 
             label += f"\nver: {str(node.version)}, id: {str(node.id)}"
 
             self.G.add_node(node_uid, label=label)
@@ -947,10 +937,7 @@ class CASTToAGraphVisitor(CASTVisitor):
                 break
 
         if not class_init:
-            if node.name == None:
-                self.G.add_node(node_uid, label="NONAME (id: " + str(node.id)+")")
-            else:
-                self.G.add_node(node_uid, label=node.name + " (id: " + str(node.id)+")")
+            self.G.add_node(node_uid, label=node.name + " (id: " + str(node.id)+")")
 
         return node_uid
 
@@ -1072,12 +1059,5 @@ class CASTToAGraphVisitor(CASTVisitor):
     @visit.register
     def _(self, node: Var):
         """Visits a Var node by visiting its value"""
-        if node.default_value == None:
-            val = self.visit(node.val)
-            return val
-        else:
-            val = self.visit(node.default_value)
-            node_uid = uuid.uuid4()
-            self.G.add_node(node_uid, label=f"{node.val.name} (id: {str(node.val.id)})") # value: {node.default_value.value}")
-            self.G.add_edge(node_uid, val)
-            return node_uid
+        val = self.visit(node.val)
+        return val

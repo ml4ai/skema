@@ -1,9 +1,9 @@
 import typing
 from functools import singledispatchmethod
 
-from .cast_visitor import CASTVisitor
+from skema.program_analysis.CAST2GrFN.visitors.cast_visitor import CASTVisitor
 
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.model.cast import (
     AstNode,
     Assignment,
     Attribute,

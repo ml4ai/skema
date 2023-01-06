@@ -1,3 +1,4 @@
+import re
 import sys
 import typing
 from dataclasses import dataclass, field
@@ -12,45 +13,10 @@ from skema.model_assembly.metadata import (
     VariableCreationReason,
     VariableFromSource,
 )
-from skema.model_assembly.networks import (
-    GenericNode,
-    LambdaNode,
-    VariableNode,
-    PackNode,
-    UnpackNode,
-)
+from skema.model_assembly.networks import GenericNode, LambdaNode, VariableNode, PackNode, UnpackNode
 from skema.model_assembly.structures import VariableIdentifier
-from .annotated_cast import (
-    AnnCastNode,
-    AnnCastAssignment,
-    AnnCastAttribute,
-    AnnCastBinaryOp,
-    AnnCastBoolean,
-    AnnCastCall,
-    AnnCastDict,
-    AnnCastExpr,
-    AnnCastFunctionDef,
-    AnnCastList,
-    AnnCastRecordDef,
-    AnnCastLiteralValue,
-    AnnCastLoop,
-    AnnCastModelBreak,
-    AnnCastModelContinue,
-    AnnCastModelImport,
-    AnnCastModelIf,
-    AnnCastModelReturn,
-    AnnCastModelIf,
-    AnnCastModule,
-    AnnCastName,
-    AnnCastNumber,
-    AnnCastSet,
-    AnnCastString,
-    AnnCastSubscript,
-    AnnCastTuple,
-    AnnCastUnaryOp,
-    AnnCastVar,
-)
-from ..model.cast import SourceRef
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2GrFN.model.cast import SourceRef
 
 # NOTE: the GrFN json loading seems to rely on "." as the separator for container scopes
 # For the Annotated Cast pipeline, it is fine to change these separators as long as they
@@ -73,7 +39,7 @@ MODULE_SCOPE = "module"
 VAR_INIT_VERSION = 0
 VAR_EXIT_VERSION = 1
 
-# the variable versions for loop interface are extended
+# the variable versions for loop interface are extended 
 # to include `LOOP_VAR_UPDATED_VERSION`
 # because the top loop interface has special semantics
 # it chooses between the initial version, or the version
@@ -83,28 +49,24 @@ VAR_EXIT_VERSION = 1
 # with other containers
 LOOP_VAR_UPDATED_VERSION = 2
 
-
 @dataclass
 class GrfnContainerSrcRef:
     """
     Used to track the line begin, line end, and source file for ModelIf and Loop
     Containers.  This data will eventually be added to the containers metadata
     """
-
     line_begin: typing.Optional[int]
     line_end: typing.Optional[int]
     source_file_name: typing.Optional[str]
 
-
 @dataclass
-class GrfnAssignment:
-    assignment_node: LambdaNode
-    assignment_type: LambdaType
-    # inputs and outputs map fullid to GrFN Var uid
-    inputs: typing.Dict[str, str] = field(default_factory=dict)
-    outputs: typing.Dict[str, str] = field(default_factory=dict)
-    lambda_expr: str = ""
-
+class GrfnAssignment():  
+        assignment_node: LambdaNode
+        assignment_type: LambdaType
+        # inputs and outputs map fullid to GrFN Var uid
+        inputs: typing.Dict[str, str] = field(default_factory=dict)
+        outputs: typing.Dict[str, str] = field(default_factory=dict)
+        lambda_expr: str = ""
 
 def cast_op_to_str(op):
     op_map = {
@@ -133,7 +95,6 @@ def cast_op_to_str(op):
     }
     return op_map[op] if op in op_map else None
 
-
 # Metadata functions
 def source_ref_dict(source_ref: SourceRef):
     to_return = dict()
@@ -143,10 +104,9 @@ def source_ref_dict(source_ref: SourceRef):
     to_return["col_end"] = source_ref.col_end
     return to_return
 
-
 def combine_source_refs(source_refs: typing.List[SourceRef]):
     """
-    From a list of SourceRefs return a single SourceRef with
+    From a list of SourceRefs return a single SourceRef with 
     row and column range covering all row/column ranges from the list
     """
     row_start = sys.maxsize
@@ -165,11 +125,9 @@ def combine_source_refs(source_refs: typing.List[SourceRef]):
         if src_ref.col_end is not None and src_ref.col_end > col_end:
             col_end = src_ref.col_end
         if src_ref.source_file_name is not None:
-            assert (
-                source_file_name is None
-                or source_file_name == src_ref.source_file_name
-            )
+            assert(source_file_name is None or source_file_name == src_ref.source_file_name)
             source_file_name = src_ref.source_file_name
+
 
     # use None instead of providing incorrect data
     row_start = None if row_start in [-1, sys.maxsize] else row_start
@@ -179,7 +137,7 @@ def combine_source_refs(source_refs: typing.List[SourceRef]):
 
     # due to incomplete source ref data, it is possible
     # to combine source refs and end up in a situation where we no longer have a valid
-    # range i.e. row_end < row_start.
+    # range i.e. row_end < row_start.  
     # if we run into this, we swap them
     if row_end is not None and row_start is not None and row_end < row_start:
         row_end, row_start = row_start, row_end
@@ -188,41 +146,34 @@ def combine_source_refs(source_refs: typing.List[SourceRef]):
 
     return SourceRef(source_file_name, col_start, col_end, row_start, row_end)
 
-
 def generate_domain_metadata():
-    # FUTURE: this is metadata needs to be updated
-    # This is just default data that is often incorrect.
+    # FUTURE: this is metadata needs to be updated  
+    # This is just default data that is often incorrect.  
     # We borrowed this default from the legacy AIR -> GrFN pipeline
     data = dict()
     data["type"] = "domain"
-    data["provenance"] = ProvenanceData.from_data(
-        {
-            "method": "PROGRAM_ANALYSIS_PIPELINE",
-            "timestamp": datetime.now(),
-        }
-    )
+    data["provenance"] = ProvenanceData.from_data({
+                "method": "PROGRAM_ANALYSIS_PIPELINE",
+                "timestamp": datetime.now(),
+                })
     data["data_type"] = "integer"
     data["measurement_scale"] = "discrete"
     data["elements"] = []
 
     return Domain.from_data(data=data)
 
-
-def generate_from_source_metadata(
-    from_source: bool, reason: VariableCreationReason
-):
+def generate_from_source_metadata(from_source: bool, reason: VariableCreationReason):
     provenance = ProvenanceData(
         MetadataMethod.PROGRAM_ANALYSIS_PIPELINE,
-        ProvenanceData.get_dt_timestamp(),
+        ProvenanceData.get_dt_timestamp()
     )
     data = {
-        "type": "FROM_SOURCE",
-        "provenance": provenance,
-        "from_source": str(from_source),
-        "creation_reason": reason,
-    }
+            "type": "FROM_SOURCE",
+            "provenance": provenance,
+            "from_source": str(from_source),
+            "creation_reason": reason,
+        }
     return VariableFromSource.from_ann_cast_data(data=data)
-
 
 def generate_variable_node_span_metadata(source_refs):
     src_ref_dict = {}
@@ -242,7 +193,6 @@ def generate_variable_node_span_metadata(source_refs):
     }
     return CodeSpanReference.from_air_data(code_span_data)
 
-
 def add_metadata_from_name_node(grfn_var, name_node):
     """
     Adds metadata to the GrFN VariableNode inferred from the (Ann)CAST Name node
@@ -251,22 +201,15 @@ def add_metadata_from_name_node(grfn_var, name_node):
     the from source metadata accordingly.
     """
     from_source = True
-    from_source_mdata = generate_from_source_metadata(
-        from_source, VariableCreationReason.UNKNOWN
-    )
+    from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.UNKNOWN)
     span_mdata = generate_variable_node_span_metadata(name_node.source_refs)
-    add_metadata_to_grfn_var(grfn_var, from_source_mdata, span_mdata)
+    add_metadata_to_grfn_var(grfn_var, from_source_mdata, span_mdata) 
 
-
-def add_metadata_to_grfn_var(
-    grfn_var, from_source_mdata=None, span_mdata=None, domain_mdata=None
-):
+def add_metadata_to_grfn_var(grfn_var, from_source_mdata=None, span_mdata=None, domain_mdata=None):
     if from_source_mdata is None:
         from_source = True
-        from_source_mdata = generate_from_source_metadata(
-            from_source, VariableCreationReason.UNKNOWN
-        )
-
+        from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.UNKNOWN)
+    
     # if this GrFN variable is from source, and we don't have span metadata, create
     # an blank SourceRef for its span metadata
     if from_source_mdata.from_source and span_mdata is None:
@@ -278,7 +221,6 @@ def add_metadata_to_grfn_var(
 
     new_metadata = [from_source_mdata, domain_mdata, span_mdata]
     grfn_var.metadata = new_metadata
-
 
 def create_lambda_node_metadata(source_refs):
     """
@@ -304,7 +246,6 @@ def create_lambda_node_metadata(source_refs):
 
     return metadata
 
-
 def create_container_metadata(grfn_src_ref: GrfnContainerSrcRef):
     src_ref_dict = {}
     src_ref_dict["line_begin"] = grfn_src_ref.line_begin
@@ -319,10 +260,9 @@ def create_container_metadata(grfn_src_ref: GrfnContainerSrcRef):
 
     return metadata
 
-
 def combine_grfn_con_src_refs(source_refs: typing.List[GrfnContainerSrcRef]):
     """
-    From a list of GrfnContainerSrcRef return a single GrfnContainerSrcRef with
+    From a list of GrfnContainerSrcRef return a single GrfnContainerSrcRef with 
     line range covering all line ranges from the list
     """
     line_begin = sys.maxsize
@@ -343,20 +283,15 @@ def combine_grfn_con_src_refs(source_refs: typing.List[GrfnContainerSrcRef]):
 
     # due to incomplete source ref data, it is possible
     # to combine source refs and end up in a situation where we no longer have a valid
-    # range i.e. line_end < line_begin.
+    # range i.e. line_end < line_begin.  
     # if we run into this, we swap them
-    if (
-        line_end is not None
-        and line_begin is not None
-        and line_end < line_begin
-    ):
+    if line_end is not None and line_begin is not None and line_end < line_begin:
         line_end, line_begin = line_begin, line_end
+
 
     return GrfnContainerSrcRef(line_begin, line_end, source_file_name)
 
-
 # End Metadata functions
-
 
 def union_dicts(dict1, dict2):
     """
@@ -369,15 +304,12 @@ def union_dicts(dict1, dict2):
 def con_scope_to_str(scope: typing.List):
     return CON_STR_SEP.join(scope)
 
-
 def var_dict_to_str(str_start, vars):
     vars_id_and_names = [f" {name}: {id}" for id, name in vars.items()]
     return str_start + ", ".join(vars_id_and_names)
 
-
 def interface_to_str(str_start, interface):
     return str_start + ", ".join(interface.values())
-
 
 def decision_in_to_str(str_start, decision):
     if_else_fullids = []
@@ -388,14 +320,12 @@ def decision_in_to_str(str_start, decision):
 
     return str_start + ", ".join(if_else_fullids)
 
-
 def make_cond_var_name(con_scopestr):
     """
     Make a condition variable name from the scope string `con_scopestr`
     """
     # FUTURE: potentially add scoping info
     return "COND"
-
 
 def make_loop_exit_name(con_scopestr):
     """
@@ -404,21 +334,16 @@ def make_loop_exit_name(con_scopestr):
     # FUTURE: potentially add scoping info
     return "EXIT"
 
-
 def is_literal_assignment(node):
     """
     Check if the node is a Number, Boolean, or String
     This may need to updated later
     """
     # FUTURE: may need to augment this list e.g. AnnCastList/AnnCastDict etc
-    if isinstance(
-        node,
-        (AnnCastNumber, AnnCastBoolean, AnnCastString, AnnCastLiteralValue),
-    ):
+    if isinstance(node, (AnnCastNumber, AnnCastBoolean, AnnCastString, AnnCastLiteralValue)):
         return True
 
     return False
-
 
 def is_func_def_main(node) -> bool:
     """
@@ -429,14 +354,12 @@ def is_func_def_main(node) -> bool:
     MAIN_FUNC_DEF_NAME = "main"
     return node.name.name == MAIN_FUNC_DEF_NAME
 
-
 def func_def_container_name(node) -> str:
     """
     Parameter: AnnCastFunctionDef
     Returns function container name in the form "name_id"
     """
     return func_container_name_from_name_node(node.name)
-
 
 def func_container_name_from_name_node(node) -> str:
     """
@@ -448,14 +371,12 @@ def func_container_name_from_name_node(node) -> str:
     else:
         return f"{node.name}_id{node.id}"
 
-
 def func_def_argument_name(node, arg_index: int) -> str:
     """
     Returns the FunctionDef argument name for argument with index `arg_index`
     Used for the AnnCastCall's top interface in
     """
     return f"{func_def_container_name(node)}_arg{arg_index}"
-
 
 def func_def_ret_val_name(node) -> str:
     """
@@ -464,13 +385,12 @@ def func_def_ret_val_name(node) -> str:
     """
     return f"{func_def_container_name(node)}_ret_val"
 
-
 def specialized_global_name(node, var_name) -> str:
     """
-    Parameters:
-        - node: a AnnCastFunctionDef
+    Parameters: 
+        - node: a AnnCastFunctionDef 
         - var_name: the variable name for the global
-    Returns the specialized global name for FunctionDef `func_def_node`
+    Returns the specialized global name for FunctionDef `func_def_node` 
     """
     return f"{func_def_container_name(node)}_{var_name}"
 
@@ -483,7 +403,6 @@ def call_argument_name(node, arg_index: int) -> str:
     func_con_name = func_container_name_from_name_node(node.func)
     return f"{func_con_name}_call{node.invocation_index}_arg{arg_index}"
 
-
 def call_param_name(node, arg_index: int) -> str:
     """
     Returns the call site parameter name for argument with index `arg_index`
@@ -492,7 +411,6 @@ def call_param_name(node, arg_index: int) -> str:
     func_con_name = func_container_name_from_name_node(node.func)
     return f"{func_con_name}_call{node.invocation_index}_param{arg_index}"
 
-
 def call_container_name(node) -> str:
     """
     Returns the call site container name
@@ -500,7 +418,6 @@ def call_container_name(node) -> str:
     """
     func_con_name = func_container_name_from_name_node(node.func)
     return f"{func_con_name}_call{node.invocation_index}"
-
 
 def call_ret_val_name(node) -> str:
     """
@@ -516,13 +433,10 @@ def ann_cast_name_to_fullid(node):
     Returns a string representing the fullid of the name node.
     The fullid has format
       'name.id.version.con_scopestr'
-    This should only be called after both VariableVersionPass and
+    This should only be called after both VariableVersionPass and 
     ContainerScopePass have completed
     """
-    return build_fullid(
-        node.name, node.id, node.version, con_scope_to_str(node.con_scope)
-    )
-
+    return build_fullid(node.name, node.id, node.version, con_scope_to_str(node.con_scope))
 
 def build_fullid(var_name: str, id: int, version: int, con_scopestr: str):
     """
@@ -531,10 +445,9 @@ def build_fullid(var_name: str, id: int, version: int, con_scopestr: str):
       'var_name.id.version.con_scopestr'
     """
     pieces = [var_name, str(id), str(version), con_scopestr]
-    if pieces[0] == None:
+    if(pieces[0] == None):
         pieces[0] = ""
     return FULLID_SEP.join(pieces)
-
 
 def parse_fullid(fullid: str) -> typing.Dict:
     """
@@ -548,10 +461,9 @@ def parse_fullid(fullid: str) -> typing.Dict:
     keys = ["var_name", "id", "version", "con_scopestr"]
     values = fullid.split(FULLID_SEP)
 
-    assert len(keys) == len(values)
+    assert(len(keys) == len(values))
 
     return dict(zip(keys, values))
-
 
 def lambda_var_from_fullid(fullid: str) -> str:
     """
@@ -560,13 +472,11 @@ def lambda_var_from_fullid(fullid: str) -> str:
     parsed = parse_fullid(fullid)
     return f"{parsed['var_name']}_{parsed['id']}"
 
-
 def var_name_from_fullid(fullid: str) -> str:
     """
     Return the variable name for variable with fullid `fullid`
     """
     return parse_fullid(fullid)["var_name"]
-
 
 def create_grfn_literal_node(metadata: typing.List):
     """
@@ -578,10 +488,8 @@ def create_grfn_literal_node(metadata: typing.List):
     lambda_str = ""
     lambda_func = lambda: None
     lambda_type = LambdaType.LITERAL
-    return LambdaNode(
-        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata
-    )
-
+    return LambdaNode(lambda_uuid, lambda_type,
+                      lambda_str, lambda_func, metadata)
 
 def create_grfn_assign_node(metadata: typing.List):
     """
@@ -593,11 +501,9 @@ def create_grfn_assign_node(metadata: typing.List):
     lambda_str = ""
     lambda_func = lambda: None
     lambda_type = LambdaType.ASSIGN
-    return LambdaNode(
-        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata
-    )
-
-
+    return LambdaNode(lambda_uuid, lambda_type,
+                      lambda_str, lambda_func, metadata)
+    
 def create_grfn_pack_node(metadata: typing.List):
     """
     Creates a GrFN `LambdaNode` with type `PACK` and metadata `metadata`.
@@ -606,9 +512,8 @@ def create_grfn_pack_node(metadata: typing.List):
     lambda_str = ""
     lambda_func = lambda: None
     lambda_type = LambdaType.PACK
-    return PackNode(
-        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata, "", ""
-    )
+    return PackNode(lambda_uuid, lambda_type,
+                      lambda_str, lambda_func, metadata, "", "")
 
 
 def create_grfn_unpack_node(metadata: typing.List):
@@ -619,10 +524,8 @@ def create_grfn_unpack_node(metadata: typing.List):
     lambda_str = ""
     lambda_func = lambda: None
     lambda_type = LambdaType.UNPACK
-    return UnpackNode(
-        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata, "", ""
-    )
-
+    return UnpackNode(lambda_uuid, lambda_type,
+                      lambda_str, lambda_func, metadata, "", "")
 
 def create_grfn_var_from_name_node(node):
     """
@@ -631,17 +534,14 @@ def create_grfn_var_from_name_node(node):
     con_scopestr = con_scope_to_str(node.con_scope)
     return create_grfn_var(node.name, node.id, node.version, con_scopestr)
 
-
-def create_grfn_var(var_name: str, id: int, version: int, con_scopestr: str):
+def create_grfn_var(var_name:str, id: int, version: int, con_scopestr: str):
     """
     Creates a GrFN `VariableNode` using the parameters
     """
-    identifier = VariableIdentifier(
-        "default_ns", con_scopestr, var_name, version
-    )
+    identifier = VariableIdentifier("default_ns", con_scopestr, var_name, version)
 
     uid = GenericNode.create_node_id()
-
+    
     # we initialize the GrFN VariableNode with an empty metadata list.
     # we fill in the metadata later with a call to add_metadata_to_grfn_var()
     metadata = []

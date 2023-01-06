@@ -1,12 +1,12 @@
 import networkx as nx
 
 from functools import singledispatchmethod
-from automates.utils.misc import uuid
+from skema.utils.misc import uuid
 
 from .cast_visitor import CASTVisitor
-from automates.program_analysis.CAST2GrFN.cast import CAST
+from skema.program_analysis.CAST2GrFN.cast import CAST
 
-from automates.program_analysis.CAST2GrFN.model.cast import (
+from skema.program_analysis.CAST2GrFN.model.cast import (
     AstNode,
     Assignment,
     Attribute,

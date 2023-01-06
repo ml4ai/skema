@@ -1,10 +1,10 @@
 import typing
 from functools import singledispatchmethod
 
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.model.cast import (
     AstNode,
 )
-from ..model.cast_to_air_model import (
+from skema.program_analysis.CAST2GrFN.model.cast_to_air_model import (
     C2ATypeError,
 )
 

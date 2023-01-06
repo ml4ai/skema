@@ -6,7 +6,7 @@ from skema.model_assembly.metadata import (
     LambdaType
 )
 from skema.model_assembly.networks import load_lambda_function
-from .ann_cast_helpers import (
+from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
     ELSEBODY,
     IFBODY,
     IFEXPR,
@@ -34,8 +34,8 @@ from .ann_cast_helpers import (
     is_func_def_main,
     specialized_global_name,
 )
-from .annotated_cast import *
-from ..model.cast import (
+from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2GrFN.model.cast import ( 
     ScalarType,
     ValueConstructor,
 )
@@ -65,7 +65,7 @@ class VariableVersionPass:
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
             print(f"initialized highest_vars_vers_dict {self.con_scope_to_highest_var_vers[con_scopestr]}")
-
+                       
 
     def get_highest_ver_in_con_scope(self, con_scopestr, id):
         """
@@ -104,7 +104,7 @@ class VariableVersionPass:
 
     def add_default_bot_interface_metadata(self, interface_vars):
         """
-        Adds a bot interface metadata to interface_vars
+        Adds a bot interface metadata to interface_vars 
         """
         for fullid in interface_vars.values():
             grfn_var = self.pipeline_state.get_grfn_var(fullid)
@@ -118,14 +118,14 @@ class VariableVersionPass:
         """
         This function adds a dummy GrfnAssignment to `None` for variable with id `id`
         in the container for con_scopestr
-
+    
         The motivation for this is the difference between how the gcc and Python handle
-        variable declaration.
+        variable declaration.  
 
         For gcc, all variable declaration are placed at the top
         of the enclosing FunctionDef.  Currently, we rely on this for If and Loop container
-        top interfaces.
-
+        top interfaces.  
+        
         The Python AST follows Python semantics, and variables are introduced inline dynamically.
         This leads to many challenges creating interfaces e.g.
 
@@ -169,13 +169,13 @@ class VariableVersionPass:
     def populate_interface(self, con_scopestr, vars, interface):
         """
         Parameters:
-          - `con_scopestr`: a cached container scope
+          - `con_scopestr`: a cached container scope 
           - `vars`: a dict mapping numerical ids to variable names
-          - `interface`: a dict mapping numerical variable ids to fullids
+          - `interface`: a dict mapping numerical variable ids to fullids 
                          (e.g. the top or bottom interface of a container node)
 
         For each variable from `vars`, put the highest version of that variable
-        from container `con_scopestr` into `interface`
+        from container `con_scopestr` into `interface` 
         """
         # add vars to interface
         for id, var_name in vars.items():
@@ -200,7 +200,7 @@ class VariableVersionPass:
         # these are all used variables
         node.top_interface_vars = node.used_vars
         self.populate_interface(prev_scopestr, node.top_interface_vars, node.top_interface_initial)
-        # increment versions of modified vars
+        # increment versions of modified vars 
         self.incr_vars_in_con_scope(prev_scopestr, node.modified_vars)
         # populate bot interface out
         node.bot_interface_vars = node.modified_vars
@@ -217,16 +217,16 @@ class VariableVersionPass:
             fullid = build_fullid(var_name, id, version, con_scopestr)
             node.top_interface_updated[id] = fullid
         # populate top interface out
-        # the top interface chooses between initial and updated versions;
+        # the top interface chooses between initial and updated versions; 
         # by convention the produced version is `VAR_INIT_VERSION`
-        # which is consistent with other containers
+        # which is consistent with other containers 
         for id, var_name in node.top_interface_vars.items():
             version = VAR_INIT_VERSION
             fullid = build_fullid(var_name, id, version, con_scopestr)
             node.top_interface_out[id] = fullid
         # populate bot interface in
         # the bot interface takes `VAR_EXIT_VERSION` modified variables
-        # During GrFN Variable Creation, these versions will be aliased to
+        # During GrFN Variable Creation, these versions will be aliased to 
         # the highest version occuring in the loop expr
         for id, var_name in node.bot_interface_vars.items():
             version = VAR_EXIT_VERSION
@@ -239,7 +239,7 @@ class VariableVersionPass:
         # populate top interface in
         node.top_interface_vars = node.used_vars
         self.populate_interface(prev_scopestr, node.top_interface_vars, node.top_interface_in)
-        # increment versions
+        # increment versions 
         self.incr_vars_in_con_scope(prev_scopestr, node.modified_vars)
         # populate bot interface out
         node.bot_interface_vars = node.modified_vars
@@ -248,16 +248,16 @@ class VariableVersionPass:
 
         # populate "inside" of interfaces
         con_scopestr = con_scope_to_str(node.con_scope)
-        # populate top interface out
+        # populate top interface out 
         # by convention the top interface produces version VAR_INIT_VERSION variables
-        # and these are propagated to if expr, if body, and else body
+        # and these are propagated to if expr, if body, and else body 
         for id, var_name in node.top_interface_vars.items():
             version = VAR_INIT_VERSION
             fullid = build_fullid(var_name, id, version, con_scopestr)
             node.top_interface_out[id] = fullid
         # populate bot interface in
         # by convention, the bot interface in takes version VAR_EXIT_VERSION variables
-        # these versions are produced by the Decision node
+        # these versions are produced by the Decision node 
         # and they are created during GrfnVariableCreationPass
         for id, var_name in node.bot_interface_vars.items():
             version = VAR_EXIT_VERSION
@@ -404,11 +404,11 @@ class VariableVersionPass:
             init_global = create_grfn_var(var_name, id, version, func_scopestr)
             self.pipeline_state.store_grfn_var(init_fullid, init_global)
             node.top_interface_out[id] = init_fullid
-            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py
+            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py 
             from_source = True if self.pipeline_state.FROM_SOURCE_FOR_GE else False
             from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.TOP_IFACE_INTRO)
             add_metadata_to_grfn_var(init_global, from_source_mdata)
-
+    
         # we do not create the GrFN VariableNode for the highest version global
         # here, since it is done while visitng Assignment node during GrfnVarCreation pass
         for id, var_name in node.bot_interface_vars.items():
@@ -447,7 +447,7 @@ class VariableVersionPass:
         node.bot_interface_vars = node.modified_globals
 
         # we create specialized globals for this function def, in the enclosing scope.
-        # this is to accomodate interfaces, since they expect the same id
+        # this is to accomodate interfaces, since they expect the same id 
         # on either side
         # this is similar to how we handle arguments from enclosing scope linking to
         # parameters in the interior of a container
@@ -463,7 +463,7 @@ class VariableVersionPass:
             self.pipeline_state.store_grfn_var(in_fullid, in_global)
             node.top_interface_in[id] = in_fullid
             # create From Source metadata for the GrFN var
-            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py
+            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py 
             from_source = True if self.pipeline_state.FROM_SOURCE_FOR_GE else False
             from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.DUP_GLOBAL)
             add_metadata_to_grfn_var(in_global, from_source_mdata)
@@ -473,11 +473,11 @@ class VariableVersionPass:
             self.pipeline_state.store_grfn_var(out_fullid, out_global)
             node.top_interface_out[id] = out_fullid
             # create From Source metadata for the GrFN var
-            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py
+            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py 
             from_source = True if self.pipeline_state.FROM_SOURCE_FOR_GE else False
             from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.TOP_IFACE_INTRO)
             add_metadata_to_grfn_var(in_global, from_source_mdata)
-
+    
         # create specialized globals for bot interface
         # by convention, the bot interface in takes version VAR_EXIT_VERSION variables
         for id, var_name in node.bot_interface_vars.items():
@@ -495,7 +495,7 @@ class VariableVersionPass:
             self.pipeline_state.store_grfn_var(out_fullid, out_global)
             node.bot_interface_out[id] = out_fullid
             # create From Source metadata for the GrFN var
-            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py
+            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py 
             from_source = True if self.pipeline_state.FROM_SOURCE_FOR_GE else False
             from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.DUP_GLOBAL)
             add_metadata_to_grfn_var(out_global, from_source_mdata)
@@ -515,8 +515,8 @@ class VariableVersionPass:
         """
         Creates initial version for each argument and each formal parameter
         Links these argument and parameters through the `top_interface_in` and `top_interface_out`
-
-        During GrfnAssignmentPass,
+       
+        During GrfnAssignmentPass, 
         for each argument, creates a `GrfnAssignment` which stores the assignment `LambdaNode`
         """
         # call container is used to scope parameters
@@ -574,8 +574,8 @@ class VariableVersionPass:
         """
         Creates initial version for each argument and each formal parameter
         Links these argument and parameters through the `top_interface_in` and `top_interface_out`
-
-        During GrfnAssignmentPass,
+       
+        During GrfnAssignmentPass, 
         for each argument, creates a `GrfnAssignment` which stores the assignment `LambdaNode`
         """
         # call container is used to scope parameters
@@ -592,7 +592,7 @@ class VariableVersionPass:
             # parameter name and scopestr
             param_name = call_param_name(node, i)
             param_con_scopestr = con_scope_to_str(node.func.con_scope + [call_con_name])
-
+            
             # argument and parameter share id, and start with initial version
             id = self.pipeline_state.next_collapsed_id()
             version = VAR_INIT_VERSION
@@ -668,8 +668,8 @@ class VariableVersionPass:
         """
         Creates initial version for each argument and each formal parameter
         Links these argument and parameters through the `top_interface_in` and `top_interface_out`
-
-        During GrfnAssignmentPass,
+       
+        During GrfnAssignmentPass, 
         for each argument, creates a `GrfnAssignment` which stores the assignment `LambdaNode`
         """
         # call container is used to scope parameters
@@ -678,7 +678,7 @@ class VariableVersionPass:
         # create argument and parameter variables
         # argument variables are inputs to the top interface
         # paramter variables are outputs of the top interface
-        # if we are generating GrFN 2.2, we would like the parameter to lie in the
+        # if we are generating GrFN 2.2, we would like the parameter to lie in the 
         # copied function def container, we do this by aliasing versions during GrfnVarCreation pass
         for i, n in enumerate(node.arguments):
             # argument name and scope str
@@ -690,7 +690,7 @@ class VariableVersionPass:
             assert(isinstance(param, AnnCastVar))
             param_name = param.val.name
             param_con_scopestr = con_scope_to_str(node.func.con_scope + [call_con_name])
-
+            
             # argument and parameter share id, and start with initial version
             id = self.pipeline_state.next_collapsed_id()
             version = VAR_INIT_VERSION
@@ -773,9 +773,9 @@ class VariableVersionPass:
           - Adds incoming global variable version to top_interface_in
           - Increments modified globals versions in enclosing scope
           - Adds incremented version to bot_interface_out
-          - Creates VAR_INIT_VERSION global variables in Call contianer scope and
+          - Creates VAR_INIT_VERSION global variables in Call contianer scope and 
             adds them to top_interface_out
-          - Creates VAR_INIT_VERSION global variables in copied FunctionDef scope and
+          - Creates VAR_INIT_VERSION global variables in copied FunctionDef scope and 
             aliases them to their corresponding Call container scope globals
           - Creates VAR_EXIT_VERSION global variables and adds to bot_interface_in
         """
@@ -809,7 +809,7 @@ class VariableVersionPass:
             call_init_global = create_grfn_var(var_name, id, version, call_con_scopestr)
             self.pipeline_state.store_grfn_var(call_init_fullid, call_init_global)
             node.top_interface_out[id] = call_init_fullid
-            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py
+            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py 
             from_source = True if self.pipeline_state.FROM_SOURCE_FOR_GE else False
             from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.TOP_IFACE_INTRO)
             add_metadata_to_grfn_var(call_init_global, from_source_mdata)
@@ -817,7 +817,7 @@ class VariableVersionPass:
             # alias the func copies init version
             func_copy_init_fullid = build_fullid(var_name, id, version, copied_func_scopestr)
             self.pipeline_state.alias_grfn_vars(func_copy_init_fullid, call_init_fullid)
-
+    
         for id, var_name in node.bot_interface_vars.items():
             version = VAR_EXIT_VERSION
             exit_fullid = build_fullid(var_name, id, version, call_con_scopestr)
@@ -826,7 +826,7 @@ class VariableVersionPass:
             node.bot_interface_in[id] = exit_fullid
             # we intentionally do not add metadata to the GrFN variable here, since
             # the highest version from the copied FunctionDef will be aliased to this
-            # variable, and the metadata for this GrFN variable will be populated from
+            # variable, and the metadata for this GrFN variable will be populated from 
             # that highest version
 
         # DEBUG printing
@@ -875,18 +875,18 @@ class VariableVersionPass:
             init_global = create_grfn_var(var_name, id, version, call_con_scopestr)
             self.pipeline_state.store_grfn_var(init_fullid, init_global)
             node.top_interface_out[id] = init_fullid
-            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py
+            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py 
             from_source = True if self.pipeline_state.FROM_SOURCE_FOR_GE else False
             from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.TOP_IFACE_INTRO)
             add_metadata_to_grfn_var(init_global, from_source_mdata)
-
+    
         for id, var_name in node.bot_interface_vars.items():
             version = VAR_EXIT_VERSION
             exit_fullid = build_fullid(var_name, id, version, call_con_scopestr)
             exit_global = create_grfn_var(var_name, id, version, call_con_scopestr)
             self.pipeline_state.store_grfn_var(exit_fullid, exit_global)
             node.bot_interface_in[id] = exit_fullid
-            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py
+            # See comment above declaration for `FROM_SOURCE_FOR_GE` in annotated_cast.py 
             from_source = True if self.pipeline_state.FROM_SOURCE_FOR_GE else False
             from_source_mdata = generate_from_source_metadata(from_source, VariableCreationReason.BOT_IFACE_INTRO)
             add_metadata_to_grfn_var(exit_global, from_source_mdata)
@@ -898,8 +898,8 @@ class VariableVersionPass:
             print(f"\tbot_interface_out = {node.bot_interface_out}")
 
     def visit(self, node: AnnCastNode, assign_lhs: bool):
-        # print current node being visited.
-        # this can be useful for debugging
+        # print current node being visited.  
+        # this can be useful for debugging 
         # class_name = node.__class__.__name__
         # print(f"\nProcessing node type {class_name}")
         return self._visit(node, assign_lhs)
@@ -945,11 +945,11 @@ class VariableVersionPass:
     @_visit.register
     def visit_call(self, node: AnnCastCall, assign_lhs: bool):
         assert isinstance(node.func, AnnCastName) or isinstance(node.func, AnnCastAttribute)
-
+        
         if node.is_grfn_2_2:
             self.visit_call_grfn_2_2(node, assign_lhs)
             return
-
+        
         self.visit_node_list(node.arguments, assign_lhs)
         # populate call nodes's top interface with arguments
         # The pattern for the top interface is as follows:
@@ -990,21 +990,22 @@ class VariableVersionPass:
         # add return value to bot interface out if function_copy has a ret_val
         if node.func_def_copy.has_ret_val:
             self.grfn_2_2_call_ret_val_creation(node)
-
+        
         # we visit the function def copy to version globals appearing in its body
         call_assign_lhs = False
         self.visit_function_def_copy(node.func_def_copy, call_assign_lhs)
 
         # add globals to call interface
         self.add_globals_to_grfn_2_2_call_interfaces(node)
-
+    
 
     @_visit.register
     def visit_record_def(self, node: AnnCastRecordDef, assign_lhs: bool):
         # Visit the function defs within this class to make sure
         # Everything is versioned correctly
         self.visit_node_list(node.funcs, assign_lhs)
-
+        
+        pass
 
     @_visit.register
     def visit_dict(self, node: AnnCastDict, assign_lhs: bool):
@@ -1022,7 +1023,7 @@ class VariableVersionPass:
         con_scopestr = con_scope_to_str(node.con_scope)
         # create VAR_INIT_VERSION of any modified or accessed variables
         self.init_highest_var_vers_dict(con_scopestr, node.used_vars.keys())
-
+        
         # visit children
         self.visit_node_list(node.func_args, assign_lhs)
         self.visit_node_list(node.body, assign_lhs)
@@ -1041,7 +1042,7 @@ class VariableVersionPass:
         con_scopestr = con_scope_to_str(node.con_scope)
         # create versions 0 of any modified or accessed variables
         self.init_highest_var_vers_dict(con_scopestr, node.used_vars.keys())
-
+        
         # visit children
         self.visit_node_list(node.func_args, assign_lhs)
         self.visit_node_list(node.body, assign_lhs)
@@ -1064,7 +1065,7 @@ class VariableVersionPass:
         # add globals to functiondef integfaces
         if is_func_def_main(node):
             self.add_globals_to_main_func_def_interfaces(node)
-        else:
+        else: 
             self.add_globals_to_non_main_func_def_interfaces(node)
 
         # DEBUG printing
@@ -1081,9 +1082,9 @@ class VariableVersionPass:
             # size - Var node or a LiteralValue node (for number)
             # initial_value - LiteralValue node
             val = node.value
-
+            
             # visit size's anncast name node
-            self.visit(val.size, assign_side)
+            self.visit(val.size, assign_side) 
 
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
@@ -1119,7 +1120,7 @@ class VariableVersionPass:
         if len(node.init) > 0:
             self.visit_node_list(node.init, assign_lhs)
         self.visit(node.expr, assign_lhs)
-
+        
         # print(node.used_vars)
         self.visit_node_list(node.body, assign_lhs)
 

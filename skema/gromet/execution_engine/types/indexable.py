@@ -1,7 +1,7 @@
 import numpy
 from typing import Union, Dict, Any, Tuple, List
 
-from .defined_types import Field, Sequence, Indexable, Record, RecordField
+from skema.gromet.execution_engine.types.defined_types import Field, Sequence, Indexable, Record, RecordField
 
 
 
