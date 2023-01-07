@@ -144,8 +144,7 @@ def python_to_cast(
                 out_handle.write(out_cast.to_json_str())
 
 
-def main():
-    """main"""
+if __name__ == "__main__":
     args = get_args()
     python_to_cast(
         args.pyfile_path,
@@ -155,7 +154,3 @@ def main():
         args.rawjson,
         args.legacy,
     )
-
-
-if __name__ == "__main__":
-    main()

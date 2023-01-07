@@ -44,12 +44,6 @@ def process_file_system(system_name, path, files, write_to_file=False) -> Gromet
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
 
-        # Open the file
-        # TODO: Do we want to open the CAST or the Python source?
-        #  If we open the Python source then we need to generate its CAST and then generate its GroMEt after
-        #  I'm thinking for now we open the CAST, and generate GroMEt
-        #  As a next-step we can incorporate the Python -> CAST step
-
         try:
             cast = python_to_cast(full_file, cast_obj=True)
             generated_gromet = ann_cast_pipeline(
