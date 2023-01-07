@@ -11,7 +11,6 @@ from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
 from .python2cast import python_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
-# python ../multi_file_ingester.py --sysname "chime_penn" --path "/Users/ferra/Desktop/Work_Repos/skema/scripts/program_analysis/CHIME_penn_full_model/penn_chime/" --files "system_filepaths.txt"
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -50,7 +49,6 @@ def process_file_system(system_name, path, files, write_to_file=False) -> Gromet
         #  If we open the Python source then we need to generate its CAST and then generate its GroMEt after
         #  I'm thinking for now we open the CAST, and generate GroMEt
         #  As a next-step we can incorporate the Python -> CAST step
-        print(full_file)
 
         try:
             cast = python_to_cast(full_file, cast_obj=True)
