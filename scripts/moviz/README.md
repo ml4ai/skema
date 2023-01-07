@@ -1,1 +1,0 @@
-# Scripts for the MOVIZ module
