@@ -27,7 +27,8 @@ setup(name='skema',
         "dill",
         "networkx",
         "requests",
-        "pygraphviz"
+        "pygraphviz",
+        "pytest"
         #"automates @ https://github.com/danbryce/automates/archive/e5fb635757aa57007615a75371f55dd4a24851e0.zip#sha1=f9b3c8a7d7fa28864952ccdd3293d02894614e3f"
       ],
       tests_require=["unittest"],
