@@ -1,5 +1,5 @@
 from pathlib import Path
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 import os
 
 
@@ -18,7 +18,7 @@ setup(name='skema',
       author='Enrique Noriega, Adarsh Pyarelal, Clayton Morrison, Tito Ferra, Vincent Raymond',
       author_email='enoriega@arizona.edu',
       license='MIT',
-      packages=find_packages('src'),
+      packages=find_namespace_packages(include=["skema.*"]),
       # package_dir={'mention_linking':os.path.join('skema', 'text_reading', 'mention_linking')},
       install_requires=[
         "gensim",
