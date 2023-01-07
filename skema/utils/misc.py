@@ -13,7 +13,7 @@ uuid.uuid4 = lambda: uuid.UUID(int=rd.getrandbits(128))
 
 
 def choose_font():
-    """Choose font for networkx graph labels, etc."
+    """Choose font for networkx graph labels, etc."""
     operating_system = platform.system()
 
     if operating_system == "Darwin":
