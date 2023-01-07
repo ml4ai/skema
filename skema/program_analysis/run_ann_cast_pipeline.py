@@ -12,37 +12,36 @@ import sys
 import dill
 import argparse
 
-import CAST2GrFN
 
-from CAST2GrFN.ann_cast.cast_to_annotated_cast import (
+from .CAST2GrFN.ann_cast.cast_to_annotated_cast import (
     CastToAnnotatedCastVisitor,
 )
-from CAST2GrFN.cast import CAST
-from CAST2GrFN.visitors.cast_to_agraph_visitor import (
+from .CAST2GrFN.cast import CAST
+from .CAST2GrFN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
-from CAST2GrFN.ann_cast.id_collapse_pass import (
+from .CAST2GrFN.ann_cast.id_collapse_pass import (
     IdCollapsePass,
 )
-from CAST2GrFN.ann_cast.container_scope_pass import (
+from .CAST2GrFN.ann_cast.container_scope_pass import (
     ContainerScopePass,
 )
-from CAST2GrFN.ann_cast.variable_version_pass import (
+from .CAST2GrFN.ann_cast.variable_version_pass import (
     VariableVersionPass,
 )
-from CAST2GrFN.ann_cast.grfn_var_creation_pass import (
+from .CAST2GrFN.ann_cast.grfn_var_creation_pass import (
     GrfnVarCreationPass,
 )
-from CAST2GrFN.ann_cast.grfn_assignment_pass import (
+from .CAST2GrFN.ann_cast.grfn_assignment_pass import (
     GrfnAssignmentPass,
 )
-from CAST2GrFN.ann_cast.lambda_expression_pass import (
+from .CAST2GrFN.ann_cast.lambda_expression_pass import (
     LambdaExpressionPass,
 )
-from CAST2GrFN.ann_cast.to_grfn_pass import (
+from .CAST2GrFN.ann_cast.to_grfn_pass import (
     ToGrfnPass,
 )
-from CAST2GrFN.ann_cast.to_gromet_pass import (
+from .CAST2GrFN.ann_cast.to_gromet_pass import (
     ToGrometPass,
 )
 
