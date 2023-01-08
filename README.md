@@ -43,3 +43,11 @@ The `text_reading` directory contains three subdirectories:
 - `mention_linking`: Python subpackage for linking mentions in code and text
 - `text_reading`: Scala project for rule-based extraction of mentions of scientific concepts.
 - `notebooks`: Jupyter notebooks for demoing text reading/mention linking functionality.
+
+Running the following command in this directory will install the `skema` Python
+package into your Python virtual environment (we assume you have one active),
+so that it is available for scripts running in that virtual environment.
+
+```
+pip install -e .
+```
