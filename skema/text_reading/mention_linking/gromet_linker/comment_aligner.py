@@ -11,7 +11,7 @@ from .uid_stamper import UidStamper
 from .utils import Utils
 from .variable_name_matcher import VariableNameMatcher
 
-from skema.gromet.fn import GrometBoxFunction, GrometFN, GrometFNModule, GrometPort, TypedValue
+from automates.gromet.fn import GrometBoxFunction, GrometFN, GrometFNModule, GrometPort, TypedValue
 
 class CommentAlignerHelper():
 
@@ -19,7 +19,7 @@ class CommentAlignerHelper():
 		self.debugger = debugger
 		self.uid_stamper = uid_stamper
 		self.gromet_fn_module = gromet_fn_module
-		self.variable_name_matcher = variable_name_matcher
+		self.variable_name_matcher = variable_name_matcher 
 		self.source_comments = source_comments
 		self.linker = linker
 		self.provenance_helper = ProvenanceHelper(time_stamper)
