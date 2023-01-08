@@ -1,8 +1,12 @@
 //! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
-/* Currently 2 cases I don't think there is support for:
-1st being functions of functions, most important case to expand support for
+/* TODO (1/7/23):
+-- Refactor repeated function call implementation to be more robust and in line with other methods
+-- Check and debug the wiring for complicated edge cases, some of which are in CHIME_SIR
+*/
+
+/* Currently 1 case I don't think there is support for:
 2nd being for a second function call of the same function which contains an expression,
     I believe the wiring will be messed up going into the expression from the second function
  */
@@ -1237,7 +1241,7 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
             cond_counter += 1;
         }
     }
-    // make conditionals if they exist
+    // make loops if they exist
     if !gromet.r#fn.bl.as_ref().is_none() {
         let mut while_counter = 0;
         let temp_mod_node = Node {
@@ -1493,6 +1497,49 @@ pub fn create_function(
         att_idx.clone(),
         bf_counter.clone(),
     );
+
+    // make conditionals if they exist
+    // might need to make wiring more robust
+    if !gromet.r#fn.bc.as_ref().is_none() {
+        let mut cond_counter = 0;
+        for _cond in gromet.r#fn.bc.as_ref().unwrap().iter() {
+            // now lets check for and setup any conditionals at this level
+            (nodes, edges, start, meta_nodes) = create_conditional(
+                &gromet.clone(),
+                eboxf.value.clone(), // This is gromet but is more generalizable based on scope
+                nodes.clone(),
+                edges.clone(),
+                n1.clone(),
+                (att_idx.clone() - 1), // because top level
+                cond_counter, // This indexes the conditional in the list of conditionals (bc)
+                bf_counter,   // because top level
+                start.clone(),
+                meta_nodes.clone(),
+            );
+            cond_counter += 1;
+        }
+    }
+    // make loops if they exist
+    // might need to make wiring more robust
+    if !gromet.r#fn.bl.as_ref().is_none() {
+        let mut while_counter = 0;
+        for _while_l in gromet.r#fn.bl.as_ref().unwrap().iter() {
+            // now lets check for and setup any conditionals at this level
+            (nodes, edges, start, meta_nodes) = create_while_loop(
+                &gromet.clone(),
+                eboxf.value.clone(), // This is gromet but is more generalizable based on scope
+                nodes.clone(),
+                edges.clone(),
+                n1.clone(),
+                (att_idx.clone() - 1), // because top level
+                while_counter, // This indexes the conditional in the list of conditionals (bc)
+                bf_counter,    // because top level
+                start.clone(),
+                meta_nodes.clone(),
+            );
+            while_counter += 1;
+        }
+    }
 
     return (nodes, edges, start, meta_nodes);
 }
@@ -3507,7 +3554,7 @@ pub fn wfopi_wiring(
             // make sure in correct box
             if bf_counter == node.nbox {
                 // make sure only looking in current attribute nodes for srcs and tgts
-                if (idx + 1) == node.contents {
+                if (idx) == node.contents {
                     // only include nodes with pifs
                     if !node.in_indx.is_none() {
                         // exclude opi's
@@ -3529,7 +3576,7 @@ pub fn wfopi_wiring(
             // make sure in correct box
             if bf_counter == node.nbox {
                 // make sure only looking in current attribute nodes for srcs and tgts
-                if (idx + 1) == node.contents {
+                if (idx) == node.contents {
                     // only opi's
                     if node.n_type == "Opi" {
                         // iterate through port to check for tgt
@@ -3544,7 +3591,6 @@ pub fn wfopi_wiring(
             }
         }
         if wfopi_src_tgt.len() == 2 {
-            println!("internal wfopi");
             let e6 = Edge {
                 src: wfopi_src_tgt[0].clone(),
                 tgt: wfopi_src_tgt[1].clone(),
@@ -3572,7 +3618,7 @@ pub fn wfopo_wiring(
             // make sure in correct box
             if bf_counter == node.nbox {
                 // make sure only looking in current attribute nodes for srcs and tgts
-                if (idx + 1) == node.contents {
+                if (idx) == node.contents {
                     // only opo's
                     if node.n_type == "Opo" {
                         // iterate through port to check for tgt
@@ -3591,7 +3637,7 @@ pub fn wfopo_wiring(
             // make sure in correct box
             if bf_counter == node.nbox {
                 // make sure only looking in current attribute nodes for srcs and tgts
-                if (idx + 1) == node.contents {
+                if (idx) == node.contents {
                     // only include nodes with pofs
                     if !node.out_idx.is_none() {
                         // exclude opo's
@@ -3609,7 +3655,6 @@ pub fn wfopo_wiring(
             }
         }
         if wfopo_src_tgt.len() == 2 {
-            println!("internal wfopo");
             let e7 = Edge {
                 src: wfopo_src_tgt[0].clone(),
                 tgt: wfopo_src_tgt[1].clone(),
@@ -3636,7 +3681,7 @@ pub fn wff_wiring(
             // make sure in correct box
             if bf_counter == node.nbox {
                 // make sure only looking in current attribute nodes for srcs and tgts
-                if (idx + 1) == node.contents {
+                if (idx) == node.contents {
                     // only include nodes with pifs
                     if !node.in_indx.is_none() {
                         // exclude opo's
@@ -3658,7 +3703,7 @@ pub fn wff_wiring(
             // make sure in correct box
             if bf_counter == node.nbox {
                 // make sure only looking in current attribute nodes for srcs and tgts
-                if (idx + 1) == node.contents {
+                if (idx) == node.contents {
                     // only include nodes with pofs
                     if !node.out_idx.is_none() {
                         // exclude opo's
@@ -3676,7 +3721,6 @@ pub fn wff_wiring(
             }
         }
         if wff_src_tgt.len() == 2 {
-            println!("internal wff");
             let e8 = Edge {
                 src: wff_src_tgt[0].clone(),
                 tgt: wff_src_tgt[1].clone(),
@@ -3752,8 +3796,6 @@ pub fn wopio_wiring(
     }
     return edges;
 }
-
-// 01/04/23: second call of this is failing completely, first call works...
 
 pub fn internal_wiring(
     eboxf: Attribute,
@@ -3939,7 +3981,6 @@ pub fn wfopi_cross_att_wiring(
                 }
             }
             if wfopi_src_tgt.len() == 2 {
-                println!("cross_att wfopi");
                 let e8 = Edge {
                     src: wfopi_src_tgt[0].clone(),
                     tgt: wfopi_src_tgt[1].clone(),
@@ -4026,7 +4067,6 @@ pub fn wfopo_cross_att_wiring(
                 }
             }
             if wfopo_src_tgt.len() == 2 {
-                println!("cross_att wfopo");
                 let e8 = Edge {
                     src: wfopo_src_tgt[0].clone(),
                     tgt: wfopo_src_tgt[1].clone(),
@@ -4125,7 +4165,6 @@ pub fn wff_cross_att_wiring(
                     }
                 }
                 if wff_src_tgt.len() == 2 {
-                    println!("cross_att wff");
                     let e8 = Edge {
                         src: wff_src_tgt[0].clone(),
                         tgt: wff_src_tgt[1].clone(),
@@ -4235,7 +4274,6 @@ pub fn external_wiring(gromet: &Gromet, nodes: Vec<Node>, mut edges: Vec<Edge>) 
                 }
             }
             if wff_src_tgt.len() == 2 {
-                println!("external wff");
                 let e9 = Edge {
                     src: wff_src_tgt[0].clone(),
                     tgt: wff_src_tgt[1].clone(),
