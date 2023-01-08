@@ -1,1 +1,1 @@
-from .align_comments import align_and_link
+from .comment_aligner import CommentAligner
