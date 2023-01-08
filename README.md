@@ -51,3 +51,7 @@ so that it is available for scripts running in that virtual environment.
 ```
 pip install -e .
 ```
+
+The `README.md` files in the `skema/skema-rs` and
+`skema/text_reading/text_reading` directories provide instructions on how to
+run the software components that are written in Rust and Scala respectively.
