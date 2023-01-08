@@ -1,6 +1,6 @@
 import datetime
 from typing import Optional, Tuple
-from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
+from skema.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
 
 from .mention_linking import TextReadingLinker
 
@@ -30,7 +30,7 @@ def get_element_line_numbers(elem, fn):
 		for m in metadata:
 			if m.metadata_type == "source_code_reference":
 				return m.line_begin, m.line_end
-		
+
 	return None
 
 def get_code_file_ref(comments_file_name: str, gromet) -> Optional[str]:
@@ -47,7 +47,7 @@ def get_code_file_ref(comments_file_name: str, gromet) -> Optional[str]:
 
 	if code_collection:
 		prefix = ".".join(comments_file_name.split(".")[:-1])
-		
+
 		for file in code_collection.files:
 			if file.name.startswith(prefix):
 				uid = file.uid
@@ -110,7 +110,7 @@ def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , el
 
 	# TODO: Differientiate between line comments and docstrings
 
-	if type(comment) == tuple:		
+	if type(comment) == tuple:
 		line, text = comment
 	else:
 		line, text = None, comment
@@ -144,7 +144,7 @@ def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet
 		char_end= mention['characterEndOffset']
 	)
 
-	
+
 
 	# if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
 	if mention['labels'][0] == "ParameterSetting":

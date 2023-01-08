@@ -6,14 +6,14 @@ import json
 from pathlib import Path
 from typing import Any, List, Mapping, NamedTuple, Optional, Tuple, Union
 
-from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
+from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 
 from .mention_linking import TextReadingLinker
 from .utils import get_code_file_ref, get_element_line_numbers, build_comment_metadata, build_tr_mention_metadata, get_doc_file_ref
 
 import re
 
-	
+
 @dataclass
 class SourceComments:
 	path:Path
@@ -50,7 +50,7 @@ class SourceComments:
 			return _helper(data)
 		else:
 			return {k:_helper(v) for k, v in data.items()}
-			
+
 
 
 def get_function_comments(box, fn,  line_comments):
@@ -85,7 +85,7 @@ def match_variable_name(name, comments):
 				ret.append(l)
 
 	return ret
-				
+
 
 class DebugInfo(NamedTuple):
 	line_range: Optional[Tuple[int]]
@@ -172,9 +172,9 @@ def enhance_attribute_with_comments(attr, attr_type, box, fn, src_comments: Sour
 	else:
 		return None
 
-	
 
-	
+
+
 
 
 def align_and_link(gromet_path:str, comments_path:str, extractions_path:str, embeddings_path:str, debug: bool = False):
@@ -226,8 +226,8 @@ def align_and_link(gromet_path:str, comments_path:str, extractions_path:str, emb
 			# for poc in v.poc:
 			# 	if poc.name:
 			# 		align_comments(b, fn, line_comments, doc_strings)
-			
-	
+
+
 	if debug:
 		# Aggregate the debug info per name
 		grouped_info = defaultdict(list)
@@ -240,6 +240,6 @@ def align_and_link(gromet_path:str, comments_path:str, extractions_path:str, emb
 		for key in sorted(grouped_info):
 			for info in grouped_info[key]:
 				print_debug_info(info)
-	
+
 
 	return fn

@@ -2,7 +2,7 @@
 
 from skema.text_reading.mention_linking.gromet_linker import align_and_link
 
-from automates.utils.fold import dictionary_to_gromet_json, del_nulls
+from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 if __name__ == "__main__":
 	gromet_path = "data/gromet/CHIME_SIR--Gromet-FN-auto.json"
