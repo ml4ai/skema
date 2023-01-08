@@ -1,4 +1,4 @@
-from automates.gromet.metadata import Provenance
+from skema.gromet.metadata import Provenance
 
 class ProvenanceHelper():
 

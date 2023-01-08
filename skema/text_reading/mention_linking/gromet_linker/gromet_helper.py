@@ -1,7 +1,7 @@
 # This is for basic gromet functions that require two or more Gromet objects.
 
-from automates.gromet.fn import GrometFNModule
-from automates.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
+from skema.gromet.fn import GrometFNModule
+from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 
 class GrometHelper():
 	empty_range = range(0, 0)
