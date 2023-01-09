@@ -241,11 +241,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
     def groundMention(m:Mention): Mention = m match  {
       case tbm: TextBoundMention => {
-        val isGrounded = tbm.attachments.exists {
-          case _: GroundingAttachment => true
+        if(tbm.attachments.exists{
+          case _:GroundingAttachment => true
           case _ => false
-        }
-        if(!isGrounded) {
+        }) {
           val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
             case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
           }
