@@ -38,10 +38,7 @@ steps:
   image: python:3.8-bullseye
   commands:
   - apt-get update
-  - apt-get -y -no-install-recommends install \
-    build-essential \
-    graphviz \
-    libgraphviz-dev
+  - apt-get -y -no-install-recommends install build-essential graphviz libgraphviz-dev
   - pip install -e .[dev]
   - pytest
   when:
