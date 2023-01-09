@@ -65,7 +65,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, 10, 0.25f) // TODO: Fix this @Enrique
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 0.25f) // TODO: Fix this @Enrique
   logger.info("Completed Initialization ...")
   // -------------------------------------------------
 
@@ -241,10 +241,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
     def groundMention(m:Mention): Mention = m match  {
       case tbm: TextBoundMention => {
-        if(tbm.attachments.exists{
-          case _:GroundingAttachment => true
+        val isGrounded = tbm.attachments.exists {
+          case _: GroundingAttachment => true
           case _ => false
-        }) {
+        }
+        if(!isGrounded) {
           val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
             case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
           }
