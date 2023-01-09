@@ -1,8 +1,8 @@
 from .gromet_helper import GrometHelper
 from .provenance_helper import ProvenanceHelper
 from .text_reading_linker import TextReadingLinker
-from automates.gromet.fn import GrometFNModule
-from automates.gromet.metadata import SourceCodeComment, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits
+from skema.gromet.fn import GrometFNModule
+from skema.gromet.metadata import SourceCodeComment, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits
 from typing import Optional, Tuple
 
 import itertools as it
@@ -24,7 +24,7 @@ class Utils():
 
 		if code_collection:
 			prefix = ".".join(comments_file_name.split(".")[:-1])
-			
+
 			for file in code_collection.files:
 				if file.name.startswith(prefix):
 					uid = file.uid
