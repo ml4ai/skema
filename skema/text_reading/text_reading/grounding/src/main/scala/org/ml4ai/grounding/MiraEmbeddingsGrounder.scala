@@ -15,7 +15,7 @@ import ujson.Arr
 
 import java.io.{BufferedInputStream, File}
 
-class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, lambda : Float, alpha: Float) extends Grounder {
+class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, alpha: Float) extends Grounder {
 
   /**
    * Returns an ordered sequence with the top k grounding candidates for the input
@@ -44,7 +44,6 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
         val alphas = DenseVector.fill(groundingConcepts.length)(alpha)
         val oneMinusAlphas = DenseVector.fill(groundingConcepts.length)(1 - alpha)
         val oneMinusEditDistances = DenseVector.ones[Float](normalizedEditDistances.length) -:- normalizedEditDistances
-        // TODO: Sushma, please add the lambda factor into the formula and run again the grind  search to find the best values for grounding
         (cosineSimilarities *:* alphas) + (oneMinusEditDistances *:* oneMinusAlphas)
 
       }
@@ -159,7 +158,7 @@ object MiraEmbeddingsGrounder{
       }
 
 
-    new MiraEmbeddingsGrounder(ontology, embeddingsModel, lambda, alpha)
+    new MiraEmbeddingsGrounder(ontology, embeddingsModel, alpha)
   }
 
   def averageEmbeddings(wordEmbeddings: Array[Array[Float]]): Array[Float] = {
