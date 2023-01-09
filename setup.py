@@ -30,6 +30,7 @@ setup(name='skema',
         "pygraphviz",
         "pytest"
       ],
+      python_requires=">=3.9",
       tests_require=["unittest"],
       zip_safe=False
 )
