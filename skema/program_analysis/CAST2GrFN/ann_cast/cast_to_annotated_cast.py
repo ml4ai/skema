@@ -114,10 +114,11 @@ class CastToAnnotatedCastVisitor:
 
     @_visit.register
     def visit_record_def(self, node: RecordDef):
+        bases = self.visit_node_list(node.bases)
         funcs = self.visit_node_list(node.funcs)
         fields = self.visit_node_list(node.fields)
         return AnnCastRecordDef(
-            node.name, node.bases, funcs, fields, node.source_refs
+            node.name, bases, funcs, fields, node.source_refs
         )
 
     @_visit.register
@@ -240,4 +241,8 @@ class CastToAnnotatedCastVisitor:
     @_visit.register
     def visit_var(self, node: Var):
         val = self.visit(node.val)
-        return AnnCastVar(val, node.type, node.source_refs)
+        if node.default_value != None:
+            default_value = self.visit(node.default_value)
+        else:
+            default_value = None
+        return AnnCastVar(val, node.type, default_value, node.source_refs)

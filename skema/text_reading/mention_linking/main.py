@@ -1,6 +1,6 @@
 """ Temporary test script for development This will change to unit tests and example usage script """
 
-from automates.utils.fold import dictionary_to_gromet_json, del_nulls
+from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.text_reading.mention_linking.gromet_linker.comment_aligner import (
     CommentAlignerHelper,
     GrometFNModuleCommentAligner,

@@ -25,6 +25,7 @@ class ScalarType(object):
     """
     allowed enum values
     """
+    ELLIPSIS = "Ellipsis"
     INTEGER = "Integer"
     ABSTRACTFLOAT = "AbstractFloat"
     BOOLEAN = "Boolean"

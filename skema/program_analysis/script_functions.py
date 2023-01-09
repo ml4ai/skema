@@ -2,30 +2,49 @@ import ast
 import dill
 import os.path
 import json
+
+# import astpp
+
 from skema.gromet.fn import (
     GrometFNModuleCollection,
 )
 
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.program_analysis.PyAST2CAST import py_ast_to_cast
-from skema.program_analysis.CAST2GrFN import (
-    cast,
-    SourceRef,
-    CAST,
+from skema.program_analysis.CAST2GrFN import cast
+from skema.program_analysis.CAST2GrFN.model.cast import SourceRef
+from skema.program_analysis.CAST2GrFN.cast import CAST
+from skema.program_analysis.CAST2GrFN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.cast_to_annotated_cast import (
     CastToAnnotatedCastVisitor,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.id_collapse_pass import (
     IdCollapsePass,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.container_scope_pass import (
     ContainerScopePass,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.variable_version_pass import (
     VariableVersionPass,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.grfn_var_creation_pass import (
     GrfnVarCreationPass,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.grfn_assignment_pass import (
     GrfnAssignmentPass,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.lambda_expression_pass import (
     LambdaExpressionPass,
-    ToGrfnPass,
+)
+from skema.program_analysis.CAST2GrFN.ann_cast.to_grfn_pass import ToGrfnPass
+from skema.program_analysis.CAST2GrFN.ann_cast.to_gromet_pass import (
     ToGrometPass,
 )
 
 
-def process_file_system(system_name, path, files):
+def process_file_system(system_name, path, files, write_to_file=False):
     root_dir = path.strip()
     file_list = open(files, "r").readlines()
 
@@ -88,9 +107,14 @@ def process_file_system(system_name, path, files):
             print("FAILURE")
 
     # After we go through the whole system, we can then write out the module_collection
-    with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
-        gromet_collection_dict = module_collection.to_dict()
-        f.write(dictionary_to_gromet_json(del_nulls(gromet_collection_dict)))
+    if write_to_file:
+        with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
+            gromet_collection_dict = module_collection.to_dict()
+            f.write(
+                dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
+            )
+
+    return module_collection
 
 
 def python_to_cast(
@@ -127,6 +151,7 @@ def python_to_cast(
     if astprint:
         # astpp.parseprint(file_contents)
         print("AST Printing Currently Disabled")
+        pass
 
     # 'Root' the current working directory so that it's where the
     # Source file we're generating CAST for is (for Import statements)
@@ -138,6 +163,8 @@ def python_to_cast(
         os.chdir(curr_path)
     else:
         curr_path = "./" + pyfile_path
+
+    # os.chdir(curr_path)
 
     # Parse the python program's AST and create the CAST
     contents = ast.parse(file_contents)
@@ -185,16 +212,19 @@ def ann_cast_pipeline(
     from_obj=False,
     indent_level=0,
 ):
-    """
+    """cast_to_annotated.py
+
     This function reads a JSON file that contains the CAST representation
     of a program, and transforms it to annotated CAST. It then calls a
     series of passes that each augment the information in the annotatd CAST nodes
     in preparation for the GrFN generation.
+
     One command-line argument is expected, namely the name of the JSON file that
     contains the CAST data.
     TODO: Update this docstring as the program has been tweaked so that this is a function instead of
     the program
     """
+
     if from_obj:
         f_name = ""
         cast = cast_instance
@@ -202,18 +232,25 @@ def ann_cast_pipeline(
         f_name = cast_instance
         f_name = f_name.split("/")[-1]
         file_contents = open(f_name, "r").read()
+
         cast_json = CAST([], "python")
         cast = cast_json.from_json_str(file_contents)
+
     visitor = CastToAnnotatedCastVisitor(cast)
     # The Annotated Cast is an attribute of the PipelineState object
     pipeline_state = visitor.generate_annotated_cast(grfn_2_2)
+
     # TODO: make filename creation more resilient
+
     print("Calling IdCollapsePass------------------------")
     IdCollapsePass(pipeline_state)
+
     print("\nCalling ContainerScopePass-------------------")
     ContainerScopePass(pipeline_state)
+
     print("\nCalling VariableVersionPass-------------------")
     VariableVersionPass(pipeline_state)
+
     # NOTE: CASTToAGraphVisitor uses misc.uuid, so placing it here means
     # that the generated GrFN uuids will not be consistent with GrFN uuids
     # created during test runtime. So, do not use these GrFN jsons as expected
@@ -223,15 +260,20 @@ def ann_cast_pipeline(
         agraph = CASTToAGraphVisitor(pipeline_state)
         pdf_file_name = f"{f_name}-AnnCast.pdf"
         agraph.to_pdf(pdf_file_name)
+
     print("\nCalling GrfnVarCreationPass-------------------")
     GrfnVarCreationPass(pipeline_state)
+
     print("\nCalling GrfnAssignmentPass-------------------")
     GrfnAssignmentPass(pipeline_state)
+
     print("\nCalling LambdaExpressionPass-------------------")
     LambdaExpressionPass(pipeline_state)
+
     if gromet:
         print("\nCalling ToGrometPass-----------------------")
         ToGrometPass(pipeline_state)
+
         if to_file:
             with open(f"{f_name}--Gromet-FN-auto.json", "w") as f:
                 gromet_collection_dict = (
@@ -249,8 +291,10 @@ def ann_cast_pipeline(
         ToGrfnPass(pipeline_state)
         grfn = pipeline_state.get_grfn()
         grfn.to_json_file(f"{f_name}--AC-GrFN.json")
+
         grfn_agraph = grfn.to_AGraph()
         grfn_agraph.draw(f"{f_name}--AC-GrFN.pdf", prog="dot")
+
         print("\nGenerating pickled AnnCast nodes-----------------")
         pickled_file_name = f"{f_name}--AnnCast.pickled"
         with open(pickled_file_name, "wb") as pkfile:

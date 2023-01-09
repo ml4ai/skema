@@ -1,0 +1,14 @@
+---
+postprocessing:
+
+  # aggregate output at which levels?
+  output_levels: ["adm0", "adm1"]
+
+  # default quantiles to calculate
+  output_quantiles: [0.01, 0.025, 0.050, 0.100, 0.150, 0.200, 0.250, 0.300, 0.350, 0.400, 0.450, 0.500, 0.550, 0.600, 0.650, 0.7, 0.750, 0.800, 0.85, 0.9, 0.950, 0.975, 0.990]
+
+  # Calculate a 'per 100k' version of these columns
+  per_capita_cols: ["cumulative_reported_cases", "cumulative_deaths", "current_hospitalizations", "daily_reported_cases", "daily_deaths", "vacc_dose1", "vacc_dose2", "immune"]
+
+  # Weight the following columns by population fraction when aggregating multiple values (i.e. take the average, weighted by local populations)
+  pop_weighted_cols: ["case_reporting_rate", "R_eff", "frac_vacc_dose1", "frac_vacc_dose2", "frac_vacc_dose1_65", "frac_vacc_dose2_65", "frac_immune", "frac_immune_65", "state_phase"]

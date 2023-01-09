@@ -1,15 +1,15 @@
 from copy import deepcopy
 import sys
 
-from skema.utils.misc import uuid
+from automates.utils.misc import uuid
 
 from functools import singledispatchmethod
 from datetime import datetime
 from time import time
 
-from skema.program_analysis.CAST2GrFN.model.cast import StructureType
+from automates.program_analysis.CAST2GrFN.model.cast import StructureType
 
-from skema.gromet.fn import (
+from automates.gromet.fn import (
     AttributeType,
     FunctionType,
     GrometBoxConditional,
@@ -25,7 +25,7 @@ from skema.gromet.fn import (
     TypedValue,
 )
 
-from skema.gromet.metadata import (
+from automates.gromet.metadata import (
     Provenance,
     SourceCodeDataType,
     SourceCodeReference,
@@ -35,14 +35,14 @@ from skema.gromet.metadata import (
     GrometCreation,
 )
 
-from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
-from skema.program_analysis.PyAST2CAST.modules_list import (
+from automates.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
+from automates.program_analysis.PyAST2CAST.modules_list import (
     BUILTINS,
     find_func_in_module,
     find_std_lib_module,
 )
 
-from skema.gromet.execution_engine.primitive_map import (
+from automates.gromet.execution_engine.primitive_map import (
     get_shorthand,
     get_inputs,
     get_outputs,

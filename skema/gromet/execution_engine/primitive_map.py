@@ -113,4 +113,3 @@ primitive_map = {
     "GCC": gcc_primitive_dict,
     "CAST": cast_primitive_dict,
 }
-print(primitive_map["CAST"])
