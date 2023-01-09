@@ -1,5 +1,6 @@
 import os
 import tempfile
+from typing import List
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -9,8 +10,8 @@ from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
 class System(BaseModel):
-    files: list[str]
-    blobs: list[str]
+    files: List[str]
+    blobs: List[str]
     system_name: str
     root_name: str
 
