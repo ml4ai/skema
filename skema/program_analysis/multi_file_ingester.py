@@ -8,7 +8,7 @@ from skema.gromet.fn import (
 )
 
 from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
-from .python2cast import python_to_cast
+from skema.program_analysis.python2cast import python_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 def get_args():
@@ -94,7 +94,7 @@ def process_file_system(system_name, path, files, write_to_file=False) -> Gromet
     return module_collection
 
 
-def main():
+if __name__ == "__main__":
     args = get_args()
 
     system_name = args.sysname
