@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Set, Dict
 from abc import ABC, abstractmethod
 
-from automates.program_analysis.for2py import f2grfn
+from skema.program_analysis.for2py import f2grfn
 from .networks import GroundedFunctionNetwork
 from .structures import (
     GenericContainer,
