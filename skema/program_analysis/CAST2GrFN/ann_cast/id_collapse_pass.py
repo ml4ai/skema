@@ -7,10 +7,11 @@ from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
     call_container_name,
 )
 from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2GrFN.model.cast import ( 
+from skema.program_analysis.CAST2GrFN.model.cast import (
     ScalarType,
     ValueConstructor,
 )
+
 
 class IdCollapsePass:
     def __init__(self, pipeline_state: PipelineState):
@@ -63,20 +64,22 @@ class IdCollapsePass:
             else:
                 func_id = call.func.id
             call.has_func_def = self.pipeline_state.func_def_exists(func_id)
-            
+
             # DEBUG printing
             if self.pipeline_state.PRINT_DEBUGGING_INFO:
                 print(f"{call_name} has FunctionDef: {call.has_func_def}")
 
     def visit(self, node: AnnCastNode, at_module_scope):
-        # print current node being visited.  
-        # this can be useful for debugging 
-        #class_name = node.__class__.__name__
-        #print(f"\nProcessing node type {class_name}")
-        
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f"\nProcessing node type {class_name}")
+
         return self._visit(node, at_module_scope)
 
-    def visit_node_list(self, node_list: typing.List[AnnCastNode], at_module_scope):
+    def visit_node_list(
+        self, node_list: typing.List[AnnCastNode], at_module_scope
+    ):
         return [self.visit(node, at_module_scope) for node in node_list]
 
     @singledispatchmethod
@@ -92,7 +95,11 @@ class IdCollapsePass:
         self.visit(node.right, at_module_scope)
         # The AnnCastTuple is added to handle scenarios where an assignment
         # is made by assigning to a tuple of values, as opposed to one singular value
-        assert isinstance(node.left, AnnCastVar) or isinstance(node.left, AnnCastTuple) or isinstance(node.left, AnnCastAttribute), f"id_collapse: visit_assigment: node.left is {type(node.left)}"
+        assert (
+            isinstance(node.left, AnnCastVar)
+            or isinstance(node.left, AnnCastTuple)
+            or isinstance(node.left, AnnCastAttribute)
+        ), f"id_collapse: visit_assigment: node.left is {type(node.left)}"
         self.visit(node.left, at_module_scope)
 
     @_visit.register
@@ -113,7 +120,9 @@ class IdCollapsePass:
         if isinstance(node.func, AnnCastLiteralValue):
             return
 
-        assert isinstance(node.func, AnnCastName) or isinstance(node.func, AnnCastAttribute), f"node.func is type f{type(node.func)}"
+        assert isinstance(node.func, AnnCastName) or isinstance(
+            node.func, AnnCastAttribute
+        ), f"node.func is type f{type(node.func)}"
         if isinstance(node.func, AnnCastName):
             node.func.id = self.collapse_id(node.func.id)
             node.invocation_index = self.next_function_invocation(node.func.id)
@@ -131,8 +140,10 @@ class IdCollapsePass:
             else:
                 node.func.value.id = self.collapse_id(node.func.value.id)
             node.func.attr.id = self.collapse_id(node.func.attr.id)
-            node.invocation_index = self.next_function_invocation(node.func.attr.id)
-            
+            node.invocation_index = self.next_function_invocation(
+                node.func.attr.id
+            )
+
         # cache Call node to later determine if this Call has a FunctionDef
         call_name = call_container_name(node)
         self.cached_call_nodes[call_name] = node
@@ -168,12 +179,12 @@ class IdCollapsePass:
 
     @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue, at_module_scope):
-        if node.value_type == 'List[Any]':
+        if node.value_type == "List[Any]":
             # operator - string
             # size - Var node or a LiteralValue node (for number)
             # initial_value - LiteralValue node
             val = node.value
-            self.visit(val.size, at_module_scope) 
+            self.visit(val.size, at_module_scope)
 
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
@@ -195,7 +206,9 @@ class IdCollapsePass:
         pass
 
     @_visit.register
-    def visit_model_continue(self, node: AnnCastModelContinue, at_module_scope):
+    def visit_model_continue(
+        self, node: AnnCastModelContinue, at_module_scope
+    ):
         pass
 
     @_visit.register
@@ -250,7 +263,7 @@ class IdCollapsePass:
     @_visit.register
     def visit_dict(self, node: AnnCastDict, at_module_scope):
         pass
-    
+
     @_visit.register
     def visit_list(self, node: AnnCastList, at_module_scope):
         self.visit_node_list(node.values, at_module_scope)
@@ -271,4 +284,3 @@ class IdCollapsePass:
     def visit_tuple(self, node: AnnCastTuple, at_module_scope):
         # Tuple of vars: Visit them all to collapse IDs, nothing else to be done I think
         self.visit_node_list(node.values, at_module_scope)
-

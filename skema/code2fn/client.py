@@ -4,6 +4,7 @@ import json
 import requests
 import argparse
 
+
 def system_to_json(
     root_path: str, system_filepaths: str, system_name: str
 ) -> str:
@@ -33,7 +34,7 @@ def system_to_json(
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--host", default="localhost")
-parser.add_argument("--port", type=int, default = 8000)
+parser.add_argument("--port", type=int, default=8000)
 
 parser.add_argument("root_path", type=str)
 parser.add_argument("system_filepaths", type=str)

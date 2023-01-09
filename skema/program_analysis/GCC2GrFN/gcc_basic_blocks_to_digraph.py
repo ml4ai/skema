@@ -6,6 +6,7 @@ from enum import IntFlag
 
 import networkx as nx
 from networkx import DiGraph
+
 # from networkx.algorithms.lowest_common_ancestors import lowest_common_ancestor
 from networkx.algorithms.dag import is_directed_acyclic_graph
 
@@ -18,28 +19,30 @@ EdgeData = namedtuple("EdgeData", ["flags", "type"])
 # https://gcc.gnu.org/onlinedocs/gccint/Edges.html#Edges
 # https://github.com/gcc-mirror/gcc/blob/master/gcc/cfg-flags.def
 class GccEdgeFlag(IntFlag):
-    """enum to store gcc edge flags.  
+    """enum to store gcc edge flags.
     It is a subclass of `IntFlag` to allow bitwise operations
     e.g. one can have an int variable `flag` and do
-    flag & GccEdgeFlag.FALLTHROUGH 
+    flag & GccEdgeFlag.FALLTHROUGH
     """
+
     FALLTHROUGH = 2**0
     ABNORMAL = 2**1
     EH = 2**3
     TRUE_VALUE = 2**8
     FALSE_VALUE = 2**9
 
+
 def edge_flags_to_str(flags: int):
     to_return = ""
     for flag in GccEdgeFlag:
         if flag & flags:
             to_return += flag.name + " "
-    
+
     return to_return[:-1]
 
 
 def basic_blocks_to_digraph(basic_blocks: List, latches: Set):
-    """ 
+    """
     Parameters:
         `basic_blocks` should be a list of basic_blocks obtained from
         the gcc AST plugin.  For example, it could be the list of basic blocks
@@ -80,7 +83,7 @@ def make_bbnode(bb: Dict, is_latch: bool):
     """
     Parameters:
         bb: the dict storing the basic block data from the json output of gcc plugin
-    
+
     Returns:
         returns a BBNode encompassing the data stored in `bb`
     """
@@ -101,16 +104,16 @@ def digraph_to_pdf(digraph: DiGraph, filename: str):
 
     agraph.draw(f"{filename}--basic_blocks.pdf", prog="dot")
 
+
 def find_lca_of_parents(digraph: DiGraph, node):
     """
-    Finds the lowest common ancestor (in `digraph`) of the set of all parents of `node` 
+    Finds the lowest common ancestor (in `digraph`) of the set of all parents of `node`
     Precondition: the indegree of node is greater than 1
     """
     parents = set(digraph.predecessors(node))
 
     # the LCA of parents does not make sense if the node only has one parent
-    assert(len(parents) > 1)    
-
+    assert len(parents) > 1
 
     current_lca = parents.pop()
 
@@ -124,14 +127,13 @@ def find_lca_of_parents(digraph: DiGraph, node):
 
     return current_lca
 
-def lowest_common_ancestor(digraph: Digraph, bb1 : BBNode, bb2 : BBNode):
+
+def lowest_common_ancestor(digraph: Digraph, bb1: BBNode, bb2: BBNode):
     """
     Find the lowest common ancestor of `bb1` and `bb2` without exploring any
     ancestors which are latches
     """
     pass
-
-
 
 
 def json_ast_to_bb_graphs(gcc_ast: Dict):
@@ -168,15 +170,20 @@ def json_ast_to_bb_graphs(gcc_ast: Dict):
 
         filename = f"{input_file_stripped}.{f['name']}"
         digraph_to_pdf(digraph, filename)
-        
+
 
 def main():
-    parser = argparse.ArgumentParser(description=("Creates networkx digraphs for the "
+    parser = argparse.ArgumentParser(
+        description=(
+            "Creates networkx digraphs for the "
             "basic blocks in each function from the provided gcc ast json file.  "
             "The edge data for each digraph is printed to the console, and a "
-            "pdf of the graph is generated in the cwd."))
-    parser.add_argument("json_file", nargs=1, 
-            help="the gcc ast json file to be read")
+            "pdf of the graph is generated in the cwd."
+        )
+    )
+    parser.add_argument(
+        "json_file", nargs=1, help="the gcc ast json file to be read"
+    )
 
     json_file = parser.parse_args().json_file[0]
 
@@ -184,6 +191,7 @@ def main():
     ast_json = json.load(open(json_file))
 
     json_ast_to_bb_graphs(ast_json)
+
 
 if __name__ == "__main__":
     main()

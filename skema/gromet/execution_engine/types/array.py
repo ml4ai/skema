@@ -3,10 +3,11 @@ from typing import Any
 
 from skema.gromet.execution_engine.types.defined_types import Field
 
+
 class new_Array(object):
-    source_language_name = {"Python":"new_Array"} 
+    source_language_name = {"Python": "new_Array"}
     inputs = [Field("elements", "Any", True)]
-    outputs =  [Field("array_output", "Array")]
+    outputs = [Field("array_output", "Array")]
     shorthand = "new_Array"
     documentation = ""
 

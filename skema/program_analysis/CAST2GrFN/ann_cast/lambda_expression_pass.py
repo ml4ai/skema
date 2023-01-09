@@ -10,19 +10,22 @@ from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
     lambda_var_from_fullid,
 )
 from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2GrFN.model.cast import ( 
+from skema.program_analysis.CAST2GrFN.model.cast import (
     ScalarType,
     ValueConstructor,
 )
 
 
-def lambda_for_grfn_assignment(grfn_assignment: GrfnAssignment, lambda_body: str) -> str:
+def lambda_for_grfn_assignment(
+    grfn_assignment: GrfnAssignment, lambda_body: str
+) -> str:
     var_names = map(lambda_var_from_fullid, grfn_assignment.inputs.keys())
 
     param_str = ", ".join(var_names)
-    lambda_expr = f"lambda {param_str}: {lambda_body}"  
+    lambda_expr = f"lambda {param_str}: {lambda_body}"
 
     return lambda_expr
+
 
 def lambda_for_condition(condition_in: typing.Dict, lambda_body: str) -> str:
     var_names = map(lambda_var_from_fullid, condition_in.values())
@@ -32,7 +35,10 @@ def lambda_for_condition(condition_in: typing.Dict, lambda_body: str) -> str:
 
     return lambda_expr
 
-def lambda_for_decision(condition_fullid: str, decision_in: typing.Dict) -> str:
+
+def lambda_for_decision(
+    condition_fullid: str, decision_in: typing.Dict
+) -> str:
     """
     Lambdas for decision nodes chooses betweeen IFBODY and ELSEBODY variables from
     interface_in based on condition_in
@@ -56,10 +62,12 @@ def lambda_for_decision(condition_fullid: str, decision_in: typing.Dict) -> str:
 
     if_names_str = ", ".join(if_names)
     else_names_str = ", ".join(else_names)
-   
+
     lambda_body = f"({if_names_str}) if {cond_name} else ({else_names_str})"
 
-    lambda_expr = f"lambda {cond_name}, {if_names_str}, {else_names_str}: {lambda_body}"  
+    lambda_expr = (
+        f"lambda {cond_name}, {if_names_str}, {else_names_str}: {lambda_body}"
+    )
 
     return lambda_expr
 
@@ -74,17 +82,20 @@ def lambda_for_interface(interface_in: typing.Dict) -> str:
     var_names = map(lambda_var_from_fullid, interface_in.values())
     param_str = ", ".join(var_names)
 
-    lambda_expr = f"lambda {param_str}: ({param_str})"  
+    lambda_expr = f"lambda {param_str}: ({param_str})"
 
     return lambda_expr
 
-def lambda_for_loop_top_interface(top_interface_initial: typing.Dict, top_interface_updated: typing.Dict) -> str:
+
+def lambda_for_loop_top_interface(
+    top_interface_initial: typing.Dict, top_interface_updated: typing.Dict
+) -> str:
     """
     Lambda for loop top interface chooses between initial and updated version
-    of variables 
+    of variables
 
-    LoopTopInterfaces are special LambdaNode's which store state on whether we have executed the 
-    body of the loop at least once.  
+    LoopTopInterfaces are special LambdaNode's which store state on whether we have executed the
+    body of the loop at least once.
     The returned lambda str has the form
     lambda use_initial, x_init, y_init, x_update, y_update: (x_init, y_init) if use_initial else (x_update, y_update)
     The `use_initial` value comes from the internal state of the LoopTopInterface during execution.
@@ -97,10 +108,12 @@ def lambda_for_loop_top_interface(top_interface_initial: typing.Dict, top_interf
 
     # NOTE: the lengths of top_interface_initial and top_interface_updated may not be the same
     # in some loops, you always use the initial value of a variable because it is never modified
-    # to model this, for those variables which have no updated version, 
+    # to model this, for those variables which have no updated version,
     # we add the "init" variable to the "update" variable group of the lambda expression
-    non_updated_keys = set(top_interface_initial.keys()).difference(top_interface_updated.keys())
-    non_updated_vars = {k : top_interface_initial[k] for k in non_updated_keys}
+    non_updated_keys = set(top_interface_initial.keys()).difference(
+        top_interface_updated.keys()
+    )
+    non_updated_vars = {k: top_interface_initial[k] for k in non_updated_keys}
 
     # use "init" var names for non updates variables
     non_updt_names = map(init_name, non_updated_vars.values())
@@ -109,7 +122,7 @@ def lambda_for_loop_top_interface(top_interface_initial: typing.Dict, top_interf
     return_updt_names = updt_names + list(non_updt_names)
 
     # now, the lengths of init group and update group should match
-    assert(len(return_updt_names) == len(top_interface_initial))
+    assert len(return_updt_names) == len(top_interface_initial)
 
     use_initial_str = "use_initial"
     init_names_str = ", ".join(init_names)
@@ -118,17 +131,19 @@ def lambda_for_loop_top_interface(top_interface_initial: typing.Dict, top_interf
 
     lambda_body = f"({init_names_str}) if {use_initial_str} else ({return_updt_names_str})"
 
-    lambda_expr = f"lambda {use_initial_str}, {init_names_str}, {updt_names_str}: {lambda_body}"  
+    lambda_expr = f"lambda {use_initial_str}, {init_names_str}, {updt_names_str}: {lambda_body}"
 
     return lambda_expr
+
 
 def lambda_for_loop_condition(condition_in, lambda_body):
     var_names = map(lambda_var_from_fullid, condition_in.values())
 
     param_str = ", ".join(var_names)
     lambda_expr = f"lambda {param_str}: {lambda_body}"
-   
+
     return lambda_expr
+
 
 class LambdaExpressionPass:
     def __init__(self, pipeline_state: PipelineState):
@@ -145,15 +160,17 @@ class LambdaExpressionPass:
         Useful for debugging/development.  For example,
         printing the nodes that are visited
         """
-        # print current node being visited.  
-        # this can be useful for debugging 
+        # print current node being visited.
+        # this can be useful for debugging
         # class_name = node.__class__.__name__
         # print(f"\nProcessing node type {class_name}")
 
         # call internal visit
         return self._visit(node)
 
-    def visit_node_list(self, node_list: typing.List[AnnCastNode]) -> typing.List[str]:
+    def visit_node_list(
+        self, node_list: typing.List[AnnCastNode]
+    ) -> typing.List[str]:
         return [self.visit(node) for node in node_list]
 
     @singledispatchmethod
@@ -210,7 +227,9 @@ class LambdaExpressionPass:
         # for the lambda body, we need to visit the Call nodes arguments
         for i, grfn_assignment in node.arg_assignments.items():
             lambda_body = self.visit(node.arguments[i])
-            grfn_assignment.lambda_expr = lambda_for_grfn_assignment(grfn_assignment, lambda_body)
+            grfn_assignment.lambda_expr = lambda_for_grfn_assignment(
+                grfn_assignment, lambda_body
+            )
 
         # top interface lambda
         node.top_interface_lambda = lambda_for_interface(node.top_interface_in)
@@ -220,7 +239,6 @@ class LambdaExpressionPass:
 
         # bot interface lambda
         node.bot_interface_lambda = lambda_for_interface(node.bot_interface_in)
-
 
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
@@ -246,7 +264,9 @@ class LambdaExpressionPass:
         # for the lambda body, we need to visit the Call nodes arguments
         for i, grfn_assignment in node.arg_assignments.items():
             lambda_body = self.visit(node.arguments[i])
-            grfn_assignment.lambda_expr = lambda_for_grfn_assignment(grfn_assignment, lambda_body)
+            grfn_assignment.lambda_expr = lambda_for_grfn_assignment(
+                grfn_assignment, lambda_body
+            )
 
         # top interface lambda
         node.top_interface_lambda = lambda_for_interface(node.top_interface_in)
@@ -269,16 +289,16 @@ class LambdaExpressionPass:
     def visit_call(self, node: AnnCastCall) -> str:
         if node.is_grfn_2_2:
             self.visit_call_grfn_2_2(node)
-        # in the case of GrFN 2.3 style Call or 
-        # if this Call does not have FunctionDef 
+        # in the case of GrFN 2.3 style Call or
+        # if this Call does not have FunctionDef
         # the Call node lambda expression has the same form
         else:
             self.visit_call_without_func_copy(node)
         if node.has_ret_val:
-            assert(len(node.out_ret_val) == 1)
+            assert len(node.out_ret_val) == 1
             ret_val_fullid = list(node.out_ret_val.values())[0]
             node.expr_str = lambda_var_from_fullid(ret_val_fullid)
-        
+
         return node.expr_str
 
     @_visit.register
@@ -301,11 +321,11 @@ class LambdaExpressionPass:
     @_visit.register
     def visit_function_def(self, node: AnnCastFunctionDef) -> str:
         node.top_interface_lambda = lambda_for_interface(node.top_interface_in)
-        # NOTE: we do not visit node.func_args because those parameters are 
+        # NOTE: we do not visit node.func_args because those parameters are
         # included in the outputs of the top interface lambda
         body_expr = self.visit_node_list(node.body)
         node.bot_interface_lambda = lambda_for_interface(node.bot_interface_in)
-        
+
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
             print(f"FunctionDef {node.name.name}")
@@ -321,20 +341,20 @@ class LambdaExpressionPass:
 
     @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue) -> str:
-        if node.value_type == 'List[Any]':
+        if node.value_type == "List[Any]":
             # val has
             # operator - string
             # size - Var node or a LiteralValue node (for number)
             # initial_value - dictionary holding a literal_value (or perhaps a Var)
             val = node.value
-            
+
             # visit size's anncast name node
-            size_str = self.visit(val.size) 
+            size_str = self.visit(val.size)
             init_val = self.visit(val.initial_value)
             op = val.operator
 
             to_ret = f"[{init_val}] {op} {size_str}"
-            #print(to_ret) # NOTE: remove when not needed
+            # print(to_ret) # NOTE: remove when not needed
             node.expr_str = to_ret
             return node.expr_str
 
@@ -357,20 +377,23 @@ class LambdaExpressionPass:
     @_visit.register
     def visit_loop(self, node: AnnCastLoop) -> str:
         # top interface lambda
-        node.top_interface_lambda = lambda_for_loop_top_interface(node.top_interface_initial, 
-                                                                 node.top_interface_updated)
+        node.top_interface_lambda = lambda_for_loop_top_interface(
+            node.top_interface_initial, node.top_interface_updated
+        )
         # init lambda
         if len(node.init) > 0:
             loop_init = self.visit_node_list(node.init)
 
         # condition lambda
         loop_expr = self.visit(node.expr)
-        node.condition_lambda = lambda_for_loop_condition(node.condition_in, loop_expr)
+        node.condition_lambda = lambda_for_loop_condition(
+            node.condition_in, loop_expr
+        )
 
         body_expr = self.visit_node_list(node.body)
 
         node.bot_interface_lambda = lambda_for_interface(node.bot_interface_in)
-        
+
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
             print(f"Loop ")
@@ -405,14 +428,18 @@ class LambdaExpressionPass:
 
         # make condition lambda
         expr_str = self.visit(node.expr)
-        node.condition_lambda = lambda_for_condition(node.condition_in, expr_str)
+        node.condition_lambda = lambda_for_condition(
+            node.condition_in, expr_str
+        )
 
         body_expr = self.visit_node_list(node.body)
         or_else_expr = self.visit_node_list(node.orelse)
 
         # make decision lambda
         cond_fullid = list(node.condition_out.values())[0]
-        node.decision_lambda = lambda_for_decision(cond_fullid, node.decision_in)
+        node.decision_lambda = lambda_for_decision(
+            cond_fullid, node.decision_in
+        )
 
         # bot interface lambda
         node.bot_interface_lambda = lambda_for_interface(node.bot_interface_in)
@@ -478,7 +505,7 @@ class LambdaExpressionPass:
 
     @_visit.register
     def visit_string(self, node: AnnCastString) -> str:
-        # return a multiline string, since the string may 
+        # return a multiline string, since the string may
         # contain \n
         node.expr_str = f'"""{str(node.string)}"""'
         return node.expr_str

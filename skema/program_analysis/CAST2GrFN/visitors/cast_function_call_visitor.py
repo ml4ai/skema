@@ -34,7 +34,9 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
 
 def flatten(l):
     for el in l:
-        if isinstance(el, typing.Iterable) and not isinstance(el, (str, bytes)):
+        if isinstance(el, typing.Iterable) and not isinstance(
+            el, (str, bytes)
+        ):
             yield from flatten(el)
         else:
             yield el
@@ -145,7 +147,11 @@ class CASTFunctionCallVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: ModelIf):
-        return self.visit(node.expr) + self.visit(node.body) + self.visit(node.orelse)
+        return (
+            self.visit(node.expr)
+            + self.visit(node.body)
+            + self.visit(node.orelse)
+        )
 
     @visit.register
     def _(self, node: ModelReturn):
@@ -153,7 +159,11 @@ class CASTFunctionCallVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: Module):
-        return {item[0]: item[1] for item in self.visit(node.body) if len(item) == 2}
+        return {
+            item[0]: item[1]
+            for item in self.visit(node.body)
+            if len(item) == 2
+        }
 
     @visit.register
     def _(self, node: Name):

@@ -11,6 +11,7 @@ from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
 from skema.program_analysis.python2cast import python_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
+
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -29,7 +30,9 @@ def get_args():
     return options
 
 
-def process_file_system(system_name, path, files, write_to_file=False) -> GrometFNModuleCollection:
+def process_file_system(
+    system_name, path, files, write_to_file=False
+) -> GrometFNModuleCollection:
     root_dir = path.strip()
     file_list = open(files, "r").readlines()
 

@@ -40,7 +40,9 @@ class TextReadingInterface:
             print(f"HTTP {res} for /json_doc_to_mentions on {doc_path}")
 
         else:
-            raise ValueError(f"Unknown input document extension in file {doc_path} (pdf or json expected)")
+            raise ValueError(
+                f"Unknown input document extension in file {doc_path} (pdf or json expected)"
+            )
 
         return json.load(open(out_path, "r"))
 
@@ -50,7 +52,7 @@ class TextReadingInterface:
         eqns_path: str,
         grfn_path: str,
         comments_path: str,
-        wikidata_path: str
+        wikidata_path: str,
     ) -> dict:
         if not os.path.isfile(mentions_path):
             raise RuntimeError(f"Mentions not found: {mentions_path}")
@@ -99,9 +101,14 @@ class TextReadingInterface:
                 "variables": variables,
                 "comments": json.load(open(comments_path, "r")),
             },
-            "toggles": {"groundToSVO": False, "groundToWiki": False, "saveWikiGroundings": False, "appendToGrFN": False},
+            "toggles": {
+                "groundToSVO": False,
+                "groundToWiki": False,
+                "saveWikiGroundings": False,
+                "appendToGrFN": False,
+            },
             "arguments": {"maxSVOgroundingsPerVar": 5},
-            "wikidata": wikidata_path
+            "wikidata": wikidata_path,
         }
         payload_path = f"{os.getcwd()}/align_payload.json"
         json.dump(payload, open(payload_path, "w"))

@@ -22,13 +22,16 @@ from skema.gromet.fn.gromet_box_function import GrometBoxFunction
 from skema.gromet.fn.gromet_box_loop import GrometBoxLoop
 from skema.gromet.fn.gromet_fn import GrometFN
 from skema.gromet.fn.gromet_fn_module import GrometFNModule
-from skema.gromet.fn.gromet_fn_module_collection import GrometFNModuleCollection
+from skema.gromet.fn.gromet_fn_module_collection import (
+    GrometFNModuleCollection,
+)
 from skema.gromet.fn.gromet_object import GrometObject
 from skema.gromet.fn.gromet_port import GrometPort
 from skema.gromet.fn.gromet_wire import GrometWire
 from skema.gromet.fn.import_reference import ImportReference
 from skema.gromet.fn.import_type import ImportType
 from skema.gromet.fn.literal_value import LiteralValue
+
 # from skema.gromet.fn.metadata import Metadata
 from skema.gromet.fn.source_type import SourceType
 from skema.gromet.fn.typed_value import TypedValue

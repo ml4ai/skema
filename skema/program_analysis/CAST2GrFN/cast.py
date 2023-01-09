@@ -38,7 +38,7 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
     UnaryOperator,
     VarType,
     Var,
-    ValueConstructor
+    ValueConstructor,
 )
 from skema.program_analysis.CAST2GrFN.visitors import (
     CASTToAIRVisitor,
@@ -88,7 +88,7 @@ CAST_NODES_TYPES_LIST = [
     UnaryOperator,
     VarType,
     Var,
-    ValueConstructor
+    ValueConstructor,
 ]
 
 
@@ -147,8 +147,10 @@ class CAST(object):
                 print(f"CAST __eq__ failed:")
                 self_lines = str(node).splitlines()
                 other_lines = str(other_node).splitlines()
-                for i, diff in enumerate(difflib.ndiff(self_lines, other_lines)):
-                    if diff[0]==' ': 
+                for i, diff in enumerate(
+                    difflib.ndiff(self_lines, other_lines)
+                ):
+                    if diff[0] == " ":
                         continue
                     print(f"Line {i}: {diff}")
                 return False
@@ -175,7 +177,9 @@ class CAST(object):
         air = c2a_visitor.to_air()
 
         main_container = [
-            c["name"] for c in air["containers"] if c["name"].endswith("::main")
+            c["name"]
+            for c in air["containers"]
+            if c["name"].endswith("::main")
         ]
 
         called_containers = [
@@ -185,7 +189,9 @@ class CAST(object):
             if s["function"]["type"] == "container"
         ]
         root_containers = [
-            c["name"] for c in air["containers"] if c["name"] not in called_containers
+            c["name"]
+            for c in air["containers"]
+            if c["name"] not in called_containers
         ]
 
         container_id_to_start_from = None
@@ -195,7 +201,9 @@ class CAST(object):
             container_id_to_start_from = root_containers[0]
         else:
             # TODO
-            raise Exception("Error: Unable to find root container to build GrFN.")
+            raise Exception(
+                "Error: Unable to find root container to build GrFN."
+            )
 
         air["entrypoint"] = container_id_to_start_from
 
@@ -275,7 +283,9 @@ class CAST(object):
         elif isinstance(data, (float, int, str, bool)):
             # If we see a primitave type, simply return its value
             return data
-        elif all(k in data for k in ("row_start", "row_end", "col_start", "col_end")):
+        elif all(
+            k in data for k in ("row_start", "row_end", "col_start", "col_end")
+        ):
             return SourceRef(
                 row_start=data["row_start"],
                 row_end=data["row_end"],

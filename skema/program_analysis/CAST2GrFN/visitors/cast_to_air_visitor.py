@@ -86,7 +86,9 @@ class CASTToAIRVisitor(CASTVisitor):
     state: C2AState
     cast_source_language: str
 
-    def __init__(self, cast_nodes: typing.List[AstNode], cast_source_language: str):
+    def __init__(
+        self, cast_nodes: typing.List[AstNode], cast_source_language: str
+    ):
         self.cast_nodes = cast_nodes
         self.state = C2AState()
         self.cast_source_language = cast_source_language
@@ -114,7 +116,9 @@ class CASTToAIRVisitor(CASTVisitor):
         """
         TODO
         """
-        raise C2ATypeError(f"Unrecognized type in CASTToAIRVisitor.visit: {type(node)}")
+        raise C2ATypeError(
+            f"Unrecognized type in CASTToAIRVisitor.visit: {type(node)}"
+        )
 
     @visit.register
     def _(self, node: Assignment):
@@ -313,8 +317,10 @@ class CASTToAIRVisitor(CASTVisitor):
             value_var = value_result[-1].input_variables[0]
 
             attr_var_name = f"{node.value.name}_{node.attr.name}"
-            cur_attr_var = self.state.find_highest_version_var_in_current_scope(
-                attr_var_name
+            cur_attr_var = (
+                self.state.find_highest_version_var_in_current_scope(
+                    attr_var_name
+                )
             )
 
             new_attr_var = cur_attr_var
@@ -434,7 +440,11 @@ class CASTToAIRVisitor(CASTVisitor):
         right_result = self.visit(node.right)
         op_result = self.get_op(node.op)
         source_ref = C2ASourceRef(
-            file=None, line_begin=None, line_end=None, col_start=None, col_end=None
+            file=None,
+            line_begin=None,
+            line_end=None,
+            col_start=None,
+            col_end=None,
         )
         if node.source_refs is not None:
             source_ref = self.retrieve_source_ref(node.source_refs[0])
@@ -450,7 +460,8 @@ class CASTToAIRVisitor(CASTVisitor):
                         self.state.current_module,
                         C2AIdentifierType.LAMBDA,
                     ),
-                    left_result[-1].input_variables + right_result[-1].input_variables,
+                    left_result[-1].input_variables
+                    + right_result[-1].input_variables,
                     [],
                     [],
                     C2ALambdaType.UNKNOWN,
@@ -489,7 +500,9 @@ class CASTToAIRVisitor(CASTVisitor):
                 v_ref,
             )
             self.state.add_variable(var_obj)
-            container = self.state.find_container(var_obj.identifier_information.scope)
+            container = self.state.find_container(
+                var_obj.identifier_information.scope
+            )
             container.add_arguments([var_obj])
             container.add_var_used_from_previous_scope(var_obj)
 
@@ -593,7 +606,9 @@ class CASTToAIRVisitor(CASTVisitor):
                 )
                 assign_res = self.visit(arg_assign)
                 assign_res[-1].output_variables[-1].add_metadata(
-                    generate_from_source_metadata(False, "LITERAL_FUNCTION_ARG")
+                    generate_from_source_metadata(
+                        False, "LITERAL_FUNCTION_ARG"
+                    )
                 )
                 arg_assign_lambdas.extend(assign_res)
                 input_vars.extend(assign_res[-1].output_variables)
@@ -603,7 +618,9 @@ class CASTToAIRVisitor(CASTVisitor):
         # These would have been added as additional arguments to the container
         # during previous processing.
         container_args_list = (
-            called_func.vars_from_previous_scope if called_func is not None else []
+            called_func.vars_from_previous_scope
+            if called_func is not None
+            else []
         )
         for v in container_args_list:
             input_var = self.check_and_add_container_var(
@@ -614,7 +631,8 @@ class CASTToAIRVisitor(CASTVisitor):
             matching_called_func_output_var = [
                 var
                 for var in called_func.output_variables
-                if var.identifier_information.name == v.identifier_information.name
+                if var.identifier_information.name
+                == v.identifier_information.name
             ]
             output_var = C2AVariable(
                 C2AIdentifierInformation(
@@ -651,7 +669,8 @@ class CASTToAIRVisitor(CASTVisitor):
             result_var_res = self.visit(result_var)[-1]
             self.state.add_variable(result_var_res.input_variables[0])
             container_call_lambda.output_variables = (
-                result_var_res.input_variables + container_call_lambda.output_variables
+                result_var_res.input_variables
+                + container_call_lambda.output_variables
             )
             results.append(result_var_res)
 
@@ -665,7 +684,12 @@ class CASTToAIRVisitor(CASTVisitor):
         name = node.name
 
         source_ref = (
-            {"line_begin": None, "col_start": None, "line_end": None, "col_end": None},
+            {
+                "line_begin": None,
+                "col_start": None,
+                "line_end": None,
+                "col_end": None,
+            },
         )
         if len(node.source_refs) > 0:
             class_source_ref = node.source_refs[0]
@@ -726,7 +750,9 @@ class CASTToAIRVisitor(CASTVisitor):
                     "Error: Currently unable to handle complex expression in dictionary definition for {k}: {v}"
                 )
 
-        lambda_expr = "{" + ",".join([f'"{k}": {v}' for (k, v) in lambda_kvs]) + "}"
+        lambda_expr = (
+            "{" + ",".join([f'"{k}": {v}' for (k, v) in lambda_kvs]) + "}"
+        )
 
         return [
             C2AExpressionLambda(
@@ -769,7 +795,9 @@ class CASTToAIRVisitor(CASTVisitor):
         if aas.has_outstanding_pack_nodes():
             all_packs = aas.get_outstanding_pack_nodes()
             con.add_body_lambdas(all_packs)
-            vars_output_from_packs = {v for n in all_packs for v in n.output_variables}
+            vars_output_from_packs = {
+                v for n in all_packs for v in n.output_variables
+            }
             for v in vars_output_from_packs:
                 self.state.add_variable(v)
             con.add_outputs(vars_output_from_packs)
@@ -785,7 +813,9 @@ class CASTToAIRVisitor(CASTVisitor):
                 previous scope
         """
         to_check = con.vars_from_previous_scope
-        output_names = [v.identifier_information.name for v in con.output_variables]
+        output_names = [
+            v.identifier_information.name for v in con.output_variables
+        ]
         for v in to_check:
             if v.identifier_information.name not in output_names:
                 newest_var = self.state.find_highest_version_var_in_scope(
@@ -804,7 +834,9 @@ class CASTToAIRVisitor(CASTVisitor):
             [type]: [description]
         """
         all_output_names_in_body = [
-            v.identifier_information.name for l in con.body for v in l.output_variables
+            v.identifier_information.name
+            for l in con.body
+            for v in l.output_variables
         ]
 
         def is_updated_collection(v):
@@ -880,7 +912,9 @@ class CASTToAIRVisitor(CASTVisitor):
         self.state.current_function.add_body_lambdas(body_result)
 
         self.handle_packs_exiting_container(self.state.current_function)
-        self.handle_previous_scope_variable_outputs(self.state.current_function)
+        self.handle_previous_scope_variable_outputs(
+            self.state.current_function
+        )
         self.handle_updated_collections(self.state.current_function)
 
         self.state.pop_scope()
@@ -970,7 +1004,13 @@ class CASTToAIRVisitor(CASTVisitor):
         )
 
     def handle_control_node_type(
-        self, expr, body, orelse, condition_type, condition_num, current_cond_block
+        self,
+        expr,
+        body,
+        orelse,
+        condition_type,
+        condition_num,
+        current_cond_block,
     ):
         node_name = f"{condition_type}_{condition_num}"
 
@@ -983,7 +1023,9 @@ class CASTToAIRVisitor(CASTVisitor):
             self.state.current_module,
             C2AIdentifierType.CONTAINER,
         )
-        cond_con = self.state.find_container(self.state.get_scope_stack() + [node_name])
+        cond_con = self.state.find_container(
+            self.state.get_scope_stack() + [node_name]
+        )
         if cond_con is None:
             # Create and add If/Loop container
             cond_con = None
@@ -1143,7 +1185,8 @@ class CASTToAIRVisitor(CASTVisitor):
                 (iv, ov)
                 for iv in cond_con.arguments
                 for ov in callee_output_vars
-                if ov.identifier_information.name == iv.identifier_information.name
+                if ov.identifier_information.name
+                == iv.identifier_information.name
             ]
             if matching_vars:
                 decision_var_names = [
@@ -1198,9 +1241,9 @@ class CASTToAIRVisitor(CASTVisitor):
                     )
                     callee_output_vars.append(new_ov)
 
-                input_decision_node_inputs = [vars[0] for vars in matching_vars] + [
-                    vars[1] for vars in matching_vars
-                ]
+                input_decision_node_inputs = [
+                    vars[0] for vars in matching_vars
+                ] + [vars[1] for vars in matching_vars]
 
                 to_output_from_input_decision = [
                     C2AVariable(
@@ -1240,7 +1283,9 @@ class CASTToAIRVisitor(CASTVisitor):
                     to_output_from_input_decision,
                     [],
                     C2ALambdaType.DECISION,
-                    C2ASourceRef(source_file_name, line_high, None, None, None),
+                    C2ASourceRef(
+                        source_file_name, line_high, None, None, None
+                    ),
                     input_decision_lambda_str,
                     # Theres no AST that corresponds to a decision node
                     None,
@@ -1276,7 +1321,9 @@ class CASTToAIRVisitor(CASTVisitor):
                     callee_output_vars,
                     [],
                     C2ALambdaType.DECISION,
-                    C2ASourceRef(source_file_name, line_high, None, None, None),
+                    C2ASourceRef(
+                        source_file_name, line_high, None, None, None
+                    ),
                     output_decision_lambda_str,
                     # Theres no AST that corresponds to a decision node
                     None,
@@ -1285,7 +1332,9 @@ class CASTToAIRVisitor(CASTVisitor):
                 body_result.insert(0, input_decision_node)
                 body_result.append(output_decision_node)
         elif condition_type == "IF":
-            cond_con.add_condition_outputs(current_cond_block, callee_output_vars)
+            cond_con.add_condition_outputs(
+                current_cond_block, callee_output_vars
+            )
             # If we are in the first block in an if/elif/else block, we
             # need to create the exit decision node
             if current_cond_block == 0:
@@ -1358,7 +1407,9 @@ class CASTToAIRVisitor(CASTVisitor):
                             # If there is a matching arg to this container,
                             # use that
                             if len(matching_con_arg) > 0:
-                                all_vars_for_cond_block.append(matching_con_arg[0])
+                                all_vars_for_cond_block.append(
+                                    matching_con_arg[0]
+                                )
                             # Else, this needs to be added as an arg to this
                             # container from the previous scope
                             else:
@@ -1377,15 +1428,22 @@ class CASTToAIRVisitor(CASTVisitor):
                                 cond_con.add_arguments([arg_var_obj])
                                 all_vars_for_cond_block.append(arg_var_obj)
 
-                    vars_to_output_per_conditions[block] = all_vars_for_cond_block
+                    vars_to_output_per_conditions[
+                        block
+                    ] = all_vars_for_cond_block
 
                 decision_inputs = all_cond_vars + [
-                    v for l in vars_to_output_per_conditions.values() for v in l
+                    v
+                    for l in vars_to_output_per_conditions.values()
+                    for v in l
                 ]
 
                 # TODO probably fix the + 2 thing
                 cond_blocks_to_output_strs = {
-                    k: [f"{v.identifier_information.name}_{v.version + 2}" for v in l]
+                    k: [
+                        f"{v.identifier_information.name}_{v.version + 2}"
+                        for v in l
+                    ]
                     for k, l in vars_to_output_per_conditions.items()
                 }
                 lambda_input_strs = build_unique_list_with_order(
@@ -1404,12 +1462,14 @@ class CASTToAIRVisitor(CASTVisitor):
                         continue
                     if body_str != "":
                         body_str += " else "
-                    body_str += (
-                        f"({','.join(var_strs)}) if COND_{condition_num}_{block}"
-                    )
+                    body_str += f"({','.join(var_strs)}) if COND_{condition_num}_{block}"
                 # Append else condition
-                body_str += f" else ({','.join(cond_blocks_to_output_strs[-1])})"
-                lambda_expr = f"lambda {','.join(lambda_input_strs)}: {body_str}"
+                body_str += (
+                    f" else ({','.join(cond_blocks_to_output_strs[-1])})"
+                )
+                lambda_expr = (
+                    f"lambda {','.join(lambda_input_strs)}: {body_str}"
+                )
 
                 decision = C2AExpressionLambda(
                     C2AIdentifierInformation(
@@ -1530,7 +1590,9 @@ class CASTToAIRVisitor(CASTVisitor):
         # return that variable
         if isinstance(node.value, Name):
             val_result = self.visit(node.value)
-            self.state.current_function.add_outputs(val_result[-1].input_variables)
+            self.state.current_function.add_outputs(
+                val_result[-1].input_variables
+            )
             return []
 
         result_name = "RETURN_VAL"
@@ -1560,7 +1622,9 @@ class CASTToAIRVisitor(CASTVisitor):
         self.state.current_module = node.name
         self.state.push_scope(node.name)
 
-        global_var_nodes = [n for n in node.body if isinstance(n, (Assignment, Var))]
+        global_var_nodes = [
+            n for n in node.body if isinstance(n, (Assignment, Var))
+        ]
         non_var_global_nodes = [
             n for n in node.body if not isinstance(n, (Assignment, Var))
         ]
@@ -1568,7 +1632,9 @@ class CASTToAIRVisitor(CASTVisitor):
         global_var_results = self.visit_node_list_and_flatten(global_var_nodes)
 
         visit_order = call_order.get_function_visit_order(node)
-        visit_order_name_to_pos = {name: pos for pos, name in enumerate(visit_order)}
+        visit_order_name_to_pos = {
+            name: pos for pos, name in enumerate(visit_order)
+        }
         pairs = [
             (visit_order_name_to_pos[n.name], n)
             for n in non_var_global_nodes
@@ -1576,7 +1642,9 @@ class CASTToAIRVisitor(CASTVisitor):
         ]
         pairs.sort(key=lambda p: p[0])
         visit_order = [p[1] for p in pairs] + [
-            n for n in non_var_global_nodes if n.name not in visit_order_name_to_pos
+            n
+            for n in non_var_global_nodes
+            if n.name not in visit_order_name_to_pos
         ]
         self.visit_node_list_and_flatten(visit_order)
 
@@ -1587,7 +1655,9 @@ class CASTToAIRVisitor(CASTVisitor):
 
             global_body = []
             for r in roots:
-                root_container_call = Call(func=r, arguments=[], source_refs=[])
+                root_container_call = Call(
+                    func=r, arguments=[], source_refs=[]
+                )
                 root_result = self.visit(root_container_call)
                 global_body.extend(root_result)
 
@@ -1628,8 +1698,10 @@ class CASTToAIRVisitor(CASTVisitor):
                 "object$"
             )  # TODO AND has outstanding packs
         ):
-            pack_lambda = self.state.attribute_access_state.get_outstanding_pack_node(
-                var_obj
+            pack_lambda = (
+                self.state.attribute_access_state.get_outstanding_pack_node(
+                    var_obj
+                )
             )
             additional_lambas.append(pack_lambda)
             var_obj = pack_lambda.output_variables[-1]
@@ -1637,9 +1709,13 @@ class CASTToAIRVisitor(CASTVisitor):
             C2AVariableContext.LOAD,
             C2AVariableContext.ATTR_VALUE,
         }:
-            var_obj = self.state.find_highest_version_var_in_previous_scopes(name)
+            var_obj = self.state.find_highest_version_var_in_previous_scopes(
+                name
+            )
             if var_obj is None:
-                raise C2AValueError(f"Error: Unable to find variable with name: {name}")
+                raise C2AValueError(
+                    f"Error: Unable to find variable with name: {name}"
+                )
 
             var_obj = self.check_and_add_container_var(
                 var_obj.identifier_information.name,
@@ -1752,7 +1828,9 @@ class CASTToAIRVisitor(CASTVisitor):
         slice_result = self.visit(node.slice)
         self.state.set_variable_context(prev_context)
 
-        lambda_expr = f"{val_result[-1].lambda_expr}[{slice_result[-1].lambda_expr}]"
+        lambda_expr = (
+            f"{val_result[-1].lambda_expr}[{slice_result[-1].lambda_expr}]"
+        )
         if self.state.current_context == C2AVariableContext.STORE:
             return (
                 val_result[:-1]
@@ -1825,7 +1903,11 @@ class CASTToAIRVisitor(CASTVisitor):
         op_result = self.get_op(node.op)
 
         source_ref = C2ASourceRef(
-            file=None, line_begin=None, line_end=None, col_start=None, col_end=None
+            file=None,
+            line_begin=None,
+            line_end=None,
+            col_start=None,
+            col_end=None,
         )
         if node.source_refs is not None:
             source_ref = self.retrieve_source_ref(node.source_refs[0])
