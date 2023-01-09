@@ -230,18 +230,26 @@ fn create_function_net_lib(gromet: &Gromet, mut start: u32) -> Vec<String> {
         edges.push(e1);
         if !eboxf.value.b[0].metadata.as_ref().is_none() {
             metadata_idx = eboxf.value.b[0].metadata.unwrap().clone();
-            meta_nodes.append(&mut create_metadata_node(
-                &gromet.clone(),
-                metadata_idx.clone(),
-            ));
-            // adding the metadata edge
-            let me1 = Edge {
-                src: n1.node_id.clone(),
-                tgt: format!("m{}", metadata_idx),
-                e_type: String::from("Metadata"),
-                prop: None,
-            };
-            edges.push(me1);
+            let mut repeat_meta = false;
+            for node in meta_nodes.iter() {
+                if node.metadata_idx == metadata_idx {
+                    repeat_meta = true;
+                }
+            }
+            if !repeat_meta {
+                meta_nodes.append(&mut create_metadata_node(
+                    &gromet.clone(),
+                    metadata_idx.clone(),
+                ));
+                // adding the metadata edge
+                let me1 = Edge {
+                    src: n1.node_id.clone(),
+                    tgt: format!("m{}", metadata_idx),
+                    e_type: String::from("Metadata"),
+                    prop: None,
+                };
+                edges.push(me1);
+            }
         }
         // we still construct unique ports for this function, however the contents will not be repeated
         start += 1;
@@ -424,18 +432,26 @@ fn create_function_net_lib(gromet: &Gromet, mut start: u32) -> Vec<String> {
 
         if !eboxf.value.b[0].metadata.as_ref().is_none() {
             metadata_idx = eboxf.value.b[0].metadata.unwrap().clone();
-            meta_nodes.append(&mut create_metadata_node(
-                &gromet.clone(),
-                metadata_idx.clone(),
-            ));
-            // adding the metadata edge
-            let me1 = Edge {
-                src: n1.node_id.clone(),
-                tgt: format!("m{}", metadata_idx),
-                e_type: String::from("Metadata"),
-                prop: None,
-            };
-            edges.push(me1);
+            let mut repeat_meta = false;
+            for node in meta_nodes.iter() {
+                if node.metadata_idx == metadata_idx {
+                    repeat_meta = true;
+                }
+            }
+            if !repeat_meta {
+                meta_nodes.append(&mut create_metadata_node(
+                    &gromet.clone(),
+                    metadata_idx.clone(),
+                ));
+                // adding the metadata edge
+                let me1 = Edge {
+                    src: n1.node_id.clone(),
+                    tgt: format!("m{}", metadata_idx),
+                    e_type: String::from("Metadata"),
+                    prop: None,
+                };
+                edges.push(me1);
+            }
         }
         // now travel to contents index of the attribute list (note it is 1 index,
         // so contents=1 => attribute[0])
@@ -710,17 +726,25 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 edges.push(e1);
                 if !boxf.metadata.as_ref().is_none() {
                     metadata_idx = boxf.metadata.unwrap();
-                    meta_nodes.append(&mut create_metadata_node(
-                        &gromet.clone(),
-                        metadata_idx.clone(),
-                    ));
-                    let me1 = Edge {
-                        src: n1.node_id.clone(),
-                        tgt: format!("m{}", metadata_idx),
-                        e_type: String::from("Metadata"),
-                        prop: None,
-                    };
-                    edges.push(me1);
+                    let mut repeat_meta = false;
+                    for node in meta_nodes.iter() {
+                        if node.metadata_idx == metadata_idx {
+                            repeat_meta = true;
+                        }
+                    }
+                    if !repeat_meta {
+                        meta_nodes.append(&mut create_metadata_node(
+                            &gromet.clone(),
+                            metadata_idx.clone(),
+                        ));
+                        let me1 = Edge {
+                            src: n1.node_id.clone(),
+                            tgt: format!("m{}", metadata_idx),
+                            e_type: String::from("Metadata"),
+                            prop: None,
+                        };
+                        edges.push(me1);
+                    }
                 }
             }
             FunctionType::Predicate => {
@@ -746,17 +770,25 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
 
                 if !boxf.metadata.as_ref().is_none() {
                     metadata_idx = boxf.metadata.unwrap();
-                    meta_nodes.append(&mut create_metadata_node(
-                        &gromet.clone(),
-                        metadata_idx.clone(),
-                    ));
-                    let me1 = Edge {
-                        src: n1.node_id.clone(),
-                        tgt: format!("m{}", metadata_idx),
-                        e_type: String::from("Metadata"),
-                        prop: None,
-                    };
-                    edges.push(me1);
+                    let mut repeat_meta = false;
+                    for node in meta_nodes.iter() {
+                        if node.metadata_idx == metadata_idx {
+                            repeat_meta = true;
+                        }
+                    }
+                    if !repeat_meta {
+                        meta_nodes.append(&mut create_metadata_node(
+                            &gromet.clone(),
+                            metadata_idx.clone(),
+                        ));
+                        let me1 = Edge {
+                            src: n1.node_id.clone(),
+                            tgt: format!("m{}", metadata_idx),
+                            e_type: String::from("Metadata"),
+                            prop: None,
+                        };
+                        edges.push(me1);
+                    }
                 }
 
                 // now travel to contents index of the attribute list (note it is 1 index,
@@ -854,17 +886,25 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                 edges.push(e1);
                 if !boxf.metadata.as_ref().is_none() {
                     metadata_idx = boxf.metadata.unwrap();
-                    meta_nodes.append(&mut create_metadata_node(
-                        &gromet.clone(),
-                        metadata_idx.clone(),
-                    ));
-                    let me1 = Edge {
-                        src: n1.node_id.clone(),
-                        tgt: format!("m{}", metadata_idx),
-                        e_type: String::from("Metadata"),
-                        prop: None,
-                    };
-                    edges.push(me1);
+                    let mut repeat_meta = false;
+                    for node in meta_nodes.iter() {
+                        if node.metadata_idx == metadata_idx {
+                            repeat_meta = true;
+                        }
+                    }
+                    if !repeat_meta {
+                        meta_nodes.append(&mut create_metadata_node(
+                            &gromet.clone(),
+                            metadata_idx.clone(),
+                        ));
+                        let me1 = Edge {
+                            src: n1.node_id.clone(),
+                            tgt: format!("m{}", metadata_idx),
+                            e_type: String::from("Metadata"),
+                            prop: None,
+                        };
+                        edges.push(me1);
+                    }
                 }
 
                 // now travel to contents index of the attribute list (note it is 1 index,
@@ -988,32 +1028,48 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
                     // bf level metadata reference
                     if !boxf.metadata.as_ref().is_none() {
                         metadata_idx = boxf.metadata.unwrap();
-                        meta_nodes.append(&mut create_metadata_node(
-                            &gromet.clone(),
-                            metadata_idx.clone(),
-                        ));
-                        let me1 = Edge {
-                            src: n1.node_id.clone(),
-                            tgt: format!("m{}", metadata_idx),
-                            e_type: String::from("Metadata"),
-                            prop: None,
-                        };
-                        edges.push(me1);
+                        let mut repeat_meta = false;
+                        for node in meta_nodes.iter() {
+                            if node.metadata_idx == metadata_idx {
+                                repeat_meta = true;
+                            }
+                        }
+                        if !repeat_meta {
+                            meta_nodes.append(&mut create_metadata_node(
+                                &gromet.clone(),
+                                metadata_idx.clone(),
+                            ));
+                            let me1 = Edge {
+                                src: n1.node_id.clone(),
+                                tgt: format!("m{}", metadata_idx),
+                                e_type: String::from("Metadata"),
+                                prop: None,
+                            };
+                            edges.push(me1);
+                        }
                     }
                     // attribute b level metadata reference
                     if !eboxf.value.b[0].metadata.as_ref().is_none() {
                         metadata_idx = eboxf.value.b[0].metadata.unwrap().clone();
-                        meta_nodes.append(&mut create_metadata_node(
-                            &gromet.clone(),
-                            metadata_idx.clone(),
-                        ));
-                        let me1 = Edge {
-                            src: n1.node_id.clone(),
-                            tgt: format!("m{}", metadata_idx),
-                            e_type: String::from("Metadata"),
-                            prop: None,
-                        };
-                        edges.push(me1);
+                        let mut repeat_meta = false;
+                        for node in meta_nodes.iter() {
+                            if node.metadata_idx == metadata_idx {
+                                repeat_meta = true;
+                            }
+                        }
+                        if !repeat_meta {
+                            meta_nodes.append(&mut create_metadata_node(
+                                &gromet.clone(),
+                                metadata_idx.clone(),
+                            ));
+                            let me1 = Edge {
+                                src: n1.node_id.clone(),
+                                tgt: format!("m{}", metadata_idx),
+                                e_type: String::from("Metadata"),
+                                prop: None,
+                            };
+                            edges.push(me1);
+                        }
                     }
                     // we still construct unique ports for this function, however the contents will not be repeated
                     start += 1;
@@ -1356,17 +1412,25 @@ pub fn create_function(
     // attribute b level metadata reference
     if !eboxf.value.b[0].metadata.as_ref().is_none() {
         metadata_idx = eboxf.value.b[0].metadata.unwrap().clone();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n1.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
     // initial function node has been constructed, based on given inputs
 
@@ -1586,17 +1650,25 @@ pub fn create_conditional(
         metadata_idx = function_net.bc.as_ref().unwrap()[cond_counter as usize]
             .metadata
             .unwrap();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n1.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
 
     start += 1;
@@ -1633,17 +1705,25 @@ pub fn create_conditional(
             edges.push(e3);
             if !pic.metadata.as_ref().is_none() {
                 metadata_idx = pic.metadata.unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
 
             port_count += 1;
@@ -1680,17 +1760,25 @@ pub fn create_conditional(
             edges.push(e5);
             if !poc.metadata.as_ref().is_none() {
                 metadata_idx = poc.metadata.unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n3.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n3.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             port_count += 1;
             start += 1;
@@ -2221,17 +2309,25 @@ pub fn create_while_loop(
         metadata_idx = function_net.bl.as_ref().unwrap()[cond_counter as usize]
             .metadata
             .unwrap();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n1.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
 
     start += 1;
@@ -2268,17 +2364,25 @@ pub fn create_while_loop(
             edges.push(e3);
             if !pic.metadata.as_ref().is_none() {
                 metadata_idx = pic.metadata.unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             port_count += 1;
             start += 1;
@@ -2314,17 +2418,25 @@ pub fn create_while_loop(
             edges.push(e5);
             if !poc.metadata.as_ref().is_none() {
                 metadata_idx = poc.metadata.unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n3.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n3.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             port_count += 1;
             start += 1;
@@ -2736,17 +2848,25 @@ pub fn create_att_expression(
     edges.push(e1);
     if !ssboxf.metadata.as_ref().is_none() {
         metadata_idx = ssboxf.metadata.unwrap();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n1.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
     // now travel to contents index of the attribute list (note it is 1 index,
     // so contents=1 => attribute[0])
@@ -2805,17 +2925,25 @@ pub fn create_att_expression(
                     .metadata
                     .clone()
                     .unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             // construct any metadata edges
             start += 1;
@@ -2865,17 +2993,25 @@ pub fn create_att_expression(
                     .metadata
                     .clone()
                     .unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             start += 1;
             iport += 1;
@@ -2970,17 +3106,25 @@ pub fn create_att_predicate(
     edges.push(e1);
     if !ssboxf.metadata.as_ref().is_none() {
         metadata_idx = ssboxf.metadata.unwrap();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n1.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n1.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
     // now travel to contents index of the attribute list (note it is 1 index,
     // so contents=1 => attribute[0])
@@ -3039,17 +3183,25 @@ pub fn create_att_predicate(
                     .metadata
                     .clone()
                     .unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             // construct any metadata edges
             start += 1;
@@ -3099,17 +3251,25 @@ pub fn create_att_predicate(
                     .metadata
                     .clone()
                     .unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             start += 1;
             iport += 1;
@@ -3214,17 +3374,25 @@ pub fn create_att_literal(
     edges.push(e4);
     if !sboxf.metadata.is_none() {
         metadata_idx = sboxf.metadata.clone().unwrap();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n3.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n3.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
     return (nodes, edges, meta_nodes);
 }
@@ -3285,17 +3453,25 @@ pub fn new_create_att_primitive(
     edges.push(e4);
     if !sboxf.metadata.is_none() {
         metadata_idx = sboxf.metadata.clone().unwrap();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n3.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n3.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
     start += 1;
     return (nodes, edges, meta_nodes, start);
@@ -3361,17 +3537,25 @@ pub fn create_att_primitive(
     edges.push(e4);
     if !sboxf.metadata.is_none() {
         metadata_idx = sboxf.metadata.clone().unwrap();
-        meta_nodes.append(&mut create_metadata_node(
-            &gromet.clone(),
-            metadata_idx.clone(),
-        ));
-        let me1 = Edge {
-            src: n3.node_id.clone(),
-            tgt: format!("m{}", metadata_idx),
-            e_type: String::from("Metadata"),
-            prop: None,
-        };
-        edges.push(me1);
+        let mut repeat_meta = false;
+        for node in meta_nodes.iter() {
+            if node.metadata_idx == metadata_idx {
+                repeat_meta = true;
+            }
+        }
+        if !repeat_meta {
+            meta_nodes.append(&mut create_metadata_node(
+                &gromet.clone(),
+                metadata_idx.clone(),
+            ));
+            let me1 = Edge {
+                src: n3.node_id.clone(),
+                tgt: format!("m{}", metadata_idx),
+                e_type: String::from("Metadata"),
+                prop: None,
+            };
+            edges.push(me1);
+        }
     }
     return (nodes, edges, meta_nodes);
 }
@@ -3437,17 +3621,25 @@ pub fn create_opo(
                     .metadata
                     .clone()
                     .unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             // construct any metadata edges
             start += 1;
@@ -3519,17 +3711,25 @@ pub fn create_opi(
                     .metadata
                     .clone()
                     .unwrap();
-                meta_nodes.append(&mut create_metadata_node(
-                    &gromet.clone(),
-                    metadata_idx.clone(),
-                ));
-                let me1 = Edge {
-                    src: n2.node_id.clone(),
-                    tgt: format!("m{}", metadata_idx),
-                    e_type: String::from("Metadata"),
-                    prop: None,
-                };
-                edges.push(me1);
+                let mut repeat_meta = false;
+                for node in meta_nodes.iter() {
+                    if node.metadata_idx == metadata_idx {
+                        repeat_meta = true;
+                    }
+                }
+                if !repeat_meta {
+                    meta_nodes.append(&mut create_metadata_node(
+                        &gromet.clone(),
+                        metadata_idx.clone(),
+                    ));
+                    let me1 = Edge {
+                        src: n2.node_id.clone(),
+                        tgt: format!("m{}", metadata_idx),
+                        e_type: String::from("Metadata"),
+                        prop: None,
+                    };
+                    edges.push(me1);
+                }
             }
             // construct any metadata edges
             start += 1;
