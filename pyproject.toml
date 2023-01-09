@@ -1,0 +1,32 @@
+[project]
+name="skema"
+authors=[
+    {name="Enrique Noriega", email="enoriega@arizona.edu"},
+    {name = "Adarsh Pyarelal", email="adarsh@arizona.edu"},
+    {name="Clayton Morrison", email="claytonm@lum.ai"},
+    {name="Tito Ferra", email="titofe16@gmail.com"},
+    {name="Vincent Raymond", email="vincentraymond1995@gmail.com"}
+]
+description="Scientific Knowledge Extraction and Model Analysis"
+version="0.1.0"
+dependencies=[
+    "gensim",
+    "dill",
+    "networkx",
+    "pygraphviz",
+]
+# The Python program analysis pipeline does not currently work with Python 3.9
+# or 3.10. This may change in the future.
+requires-python="==3.8.*"
+license={text="MIT"}
+
+[optional-dependencies]
+dev = ["fastapi", "requests", "uvicorn", "pytest"]
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
+
+# Minimum requirements for the build system to execute.
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
