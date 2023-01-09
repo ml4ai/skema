@@ -38,28 +38,44 @@ def remove_node_and_hyper_edges(grfn: GroundedFunctionNetwork, node):
         elif node == hyper_edge.lambda_fn:
             edges_to_remove.add(hyper_edge)
 
-    grfn.hyper_edges = [h for h in grfn.hyper_edges if h not in edges_to_remove]
+    grfn.hyper_edges = [
+        h for h in grfn.hyper_edges if h not in edges_to_remove
+    ]
     for edge in edges_to_remove:
         grfn.lambdas = [l for l in grfn.lambdas if edge.lambda_fn.uid != l.uid]
 
 
-def get_input_interface_node(grfn: GroundedFunctionNetwork, subgraph: GrFNSubgraph):
+def get_input_interface_node(
+    grfn: GroundedFunctionNetwork, subgraph: GrFNSubgraph
+):
     return [
         node
         for node in subgraph.nodes
         if isinstance(node, LambdaNode)
         and node.func_type == LambdaType.INTERFACE
-        and all([node_succ in subgraph.nodes for node_succ in grfn.successors(node)])
+        and all(
+            [
+                node_succ in subgraph.nodes
+                for node_succ in grfn.successors(node)
+            ]
+        )
     ][0]
 
 
-def get_output_interface_node(grfn: GroundedFunctionNetwork, subgraph: GrFNSubgraph):
+def get_output_interface_node(
+    grfn: GroundedFunctionNetwork, subgraph: GrFNSubgraph
+):
     return [
         node
         for node in subgraph.nodes
         if isinstance(node, LambdaNode)
         and node.func_type == LambdaType.INTERFACE
-        and all([node_succ in subgraph.nodes for node_succ in grfn.predecessors(node)])
+        and all(
+            [
+                node_succ in subgraph.nodes
+                for node_succ in grfn.predecessors(node)
+            ]
+        )
     ][0]
 
 
@@ -67,11 +83,14 @@ def get_decision_nodes(subgraph: GrFNSubgraph):
     return [
         node
         for node in subgraph.nodes
-        if isinstance(node, LambdaNode) and node.func_type == LambdaType.DECISION
+        if isinstance(node, LambdaNode)
+        and node.func_type == LambdaType.DECISION
     ]
 
 
-def extract_dynamics_from_loop(grfn: GroundedFunctionNetwork, loop: GrFNLoopSubgraph):
+def extract_dynamics_from_loop(
+    grfn: GroundedFunctionNetwork, loop: GrFNLoopSubgraph
+):
     # Create a copy of the current grfn to trim nodes out of to create the
     # model dynamics grfn
     dynamics_grfn = deepcopy(grfn)
@@ -117,7 +136,9 @@ def extract_dynamics_from_loop(grfn: GroundedFunctionNetwork, loop: GrFNLoopSubg
                     for v in dynamics_grfn.successors(output_var_succ)
                     if v.identifier.var_name == output_var.identifier.var_name
                 ][0]
-                for new_output_var_succ in dynamics_grfn.successors(var_after_decision):
+                for new_output_var_succ in dynamics_grfn.successors(
+                    var_after_decision
+                ):
                     dynamics_grfn.add_edge(output_var, new_output_var_succ)
                 remove_node_and_hyper_edges(dynamics_grfn, var_after_decision)
 
@@ -165,9 +186,15 @@ def extract_dynamics_from_loop(grfn: GroundedFunctionNetwork, loop: GrFNLoopSubg
     loop_nodes_to_preserve = set()
     for loop_succ in loop_successors:
         loop_succ.parent = dynamics_grfn.root_subgraph.uid
-        dynamics_grfn_subgraphs_graph.add_edge(dynamics_grfn.root_subgraph, loop_succ)
-        loop_succ_interface = get_input_interface_node(dynamics_grfn, loop_succ)
-        loop_succ_interface_pred = set(dynamics_grfn.predecessors(loop_succ_interface))
+        dynamics_grfn_subgraphs_graph.add_edge(
+            dynamics_grfn.root_subgraph, loop_succ
+        )
+        loop_succ_interface = get_input_interface_node(
+            dynamics_grfn, loop_succ
+        )
+        loop_succ_interface_pred = set(
+            dynamics_grfn.predecessors(loop_succ_interface)
+        )
         # Find potential paths to this loop successors interface
         paths_to_interface = all_simple_paths(
             dynamics_grfn, loop_interface, loop_succ_interface
@@ -195,7 +222,9 @@ def extract_dynamics_from_loop(grfn: GroundedFunctionNetwork, loop: GrFNLoopSubg
         ]
         if len(existing_hyper_edges) > 0:
             dynamics_grfn.hyper_edges = [
-                h for h in dynamics_grfn.hyper_edges if h != existing_hyper_edges[0]
+                h
+                for h in dynamics_grfn.hyper_edges
+                if h != existing_hyper_edges[0]
             ]
             dynamics_grfn.hyper_edges.append(
                 HyperEdge(
@@ -231,7 +260,9 @@ def extract_dynamics_from_loop(grfn: GroundedFunctionNetwork, loop: GrFNLoopSubg
         remove_node_and_hyper_edges(dynamics_grfn, output_var)
 
     # Remove variables going out of the loop sugraph as the results in main
-    loop_edges = [e for e in dynamics_grfn.hyper_edges if e.lambda_fn in loop.nodes]
+    loop_edges = [
+        e for e in dynamics_grfn.hyper_edges if e.lambda_fn in loop.nodes
+    ]
     loop_output_interface_edge = loop.get_output_interface_node(loop_edges)
     for loop_output_var in loop_output_interface_edge.outputs:
         if loop_output_var not in loop_nodes_to_preserve:
@@ -264,7 +295,9 @@ def extract_dynamics_from_loop(grfn: GroundedFunctionNetwork, loop: GrFNLoopSubg
         if n not in loop_nodes_to_preserve:
             remove_empty_path(n)
 
-    for l_node in [n for n in dynamics_grfn.nodes if isinstance(n, LambdaNode)]:
+    for l_node in [
+        n for n in dynamics_grfn.nodes if isinstance(n, LambdaNode)
+    ]:
         # There is only one output with a literal node
         output_var = list(dynamics_grfn.successors(l_node))[0]
         if (

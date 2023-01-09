@@ -60,7 +60,8 @@ class MetadataType(AutoMATESBaseEnum):
             return VariableFromSource
         else:
             raise MissingEnumError(
-                "Unhandled MetadataType to TypedMetadata conversion " + f"for: {mtype}"
+                "Unhandled MetadataType to TypedMetadata conversion "
+                + f"for: {mtype}"
             )
 
 
@@ -122,12 +123,20 @@ class MeasurementType(AutoMATESBaseEnum):
     @classmethod
     def isa_categorical(cls, item: MeasurementType) -> bool:
         return any(
-            [item == x for x in range(cls.CATEGORICAL.value, cls.NUMERICAL.value)]
+            [
+                item == x
+                for x in range(cls.CATEGORICAL.value, cls.NUMERICAL.value)
+            ]
         )
 
     @classmethod
     def isa_numerical(cls, item: MeasurementType) -> bool:
-        return any([item == x for x in range(cls.NUMERICAL.value, cls.RATIO.value + 1)])
+        return any(
+            [
+                item == x
+                for x in range(cls.NUMERICAL.value, cls.RATIO.value + 1)
+            ]
+        )
 
 
 @unique
@@ -147,7 +156,7 @@ class LambdaType(AutoMATESBaseEnum):
         return str(self.name)
 
     def shortname(self):
-        if (self == LambdaType.LOOP_TOP_INTERFACE):
+        if self == LambdaType.LOOP_TOP_INTERFACE:
             return "LTI"
         return self.__str__()[0]
 
@@ -576,7 +585,9 @@ class Domain(TypedMetadata):
         if MeasurementType.isa_categorical(mtype):
             els = [DomainSet.from_data(dom_el) for dom_el in data["elements"]]
         elif MeasurementType.isa_numerical(mtype):
-            els = [DomainInterval.from_data(dom_el) for dom_el in data["elements"]]
+            els = [
+                DomainInterval.from_data(dom_el) for dom_el in data["elements"]
+            ]
         else:
             els = []
         return cls(

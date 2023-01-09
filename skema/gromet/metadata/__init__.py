@@ -22,21 +22,33 @@ from skema.gromet.metadata.equation_literal_value import EquationLiteralValue
 from skema.gromet.metadata.gromet_creation import GrometCreation
 from skema.gromet.metadata.literal_value import LiteralValue
 from skema.gromet.metadata.metadata import Metadata
-from skema.gromet.metadata.program_analysis_record_bookkeeping import ProgramAnalysisRecordBookkeeping
+from skema.gromet.metadata.program_analysis_record_bookkeeping import (
+    ProgramAnalysisRecordBookkeeping,
+)
 from skema.gromet.metadata.provenance import Provenance
 from skema.gromet.metadata.source_code_collection import SourceCodeCollection
 from skema.gromet.metadata.source_code_comment import SourceCodeComment
 from skema.gromet.metadata.source_code_data_type import SourceCodeDataType
 from skema.gromet.metadata.source_code_loop_init import SourceCodeLoopInit
 from skema.gromet.metadata.source_code_loop_update import SourceCodeLoopUpdate
-from skema.gromet.metadata.source_code_port_default_val import SourceCodePortDefaultVal
-from skema.gromet.metadata.source_code_port_keyword_arg import SourceCodePortKeywordArg
+from skema.gromet.metadata.source_code_port_default_val import (
+    SourceCodePortDefaultVal,
+)
+from skema.gromet.metadata.source_code_port_keyword_arg import (
+    SourceCodePortKeywordArg,
+)
 from skema.gromet.metadata.source_code_reference import SourceCodeReference
 from skema.gromet.metadata.text_description import TextDescription
 from skema.gromet.metadata.text_extraction import TextExtraction
-from skema.gromet.metadata.text_extraction_metadata import TextExtractionMetadata
+from skema.gromet.metadata.text_extraction_metadata import (
+    TextExtractionMetadata,
+)
 from skema.gromet.metadata.text_grounding import TextGrounding
 from skema.gromet.metadata.text_literal_value import TextLiteralValue
 from skema.gromet.metadata.text_units import TextUnits
-from skema.gromet.metadata.textual_document_collection import TextualDocumentCollection
-from skema.gromet.metadata.textual_document_reference import TextualDocumentReference
+from skema.gromet.metadata.textual_document_collection import (
+    TextualDocumentCollection,
+)
+from skema.gromet.metadata.textual_document_reference import (
+    TextualDocumentReference,
+)

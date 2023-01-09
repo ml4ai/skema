@@ -21,19 +21,22 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
     Module,
     Name,
     Number,
-#    ScalarType,
+    #    ScalarType,
     RecordDef,
     Set,
     String,
     Subscript,
     Tuple,
     UnaryOp,
-#    ValueConstructor,
+    #    ValueConstructor,
     Var,
-)    
+)
 
 from skema.model_assembly.networks import GroundedFunctionNetwork, VariableNode
-from skema.program_analysis.CAST2GrFN.model.cast.model_import import ModelImport
+from skema.program_analysis.CAST2GrFN.model.cast.model_import import (
+    ModelImport,
+)
+
 
 class PipelineState:
     def __init__(self, ann_nodes: typing.List, grfn2_2: bool):
@@ -46,10 +49,10 @@ class PipelineState:
         self.func_con_scopestr_to_id = {}
         # dict mapping container scope strings to their nodes
         self.con_scopestr_to_node = {}
-        # dict mapping function IDs to their FunctionDef nodes.  
+        # dict mapping function IDs to their FunctionDef nodes.
         self.func_id_to_def = {}
         self.grfn_id_to_grfn_var = {}
-        # the fullid of a AnnCastName node is a string which includes its 
+        # the fullid of a AnnCastName node is a string which includes its
         # variable name, numerical id, version, and scope
         self.fullid_to_grfn_id = {}
         # `module_node` is simply a reference to the AnnCastModule node
@@ -59,11 +62,11 @@ class PipelineState:
         # GrFN stored after ToGrfnPass
         self.grfn: typing.Optional[GroundedFunctionNetwork] = None
 
-        # flag deciding whether or not to use GE's interpretation of From Source 
+        # flag deciding whether or not to use GE's interpretation of From Source
         # when populating metadata information
-        # 
-        # For GE, all instances of a variable which exists in the source code should 
-        # be considered from source.  
+        #
+        # For GE, all instances of a variable which exists in the source code should
+        # be considered from source.
         # We think this loses information about the GrFN variables we create to facilitate
         # transition between interfaces. That is, we create many GrFN variables which
         # do not literally exist in source, and so don't consider those to be from source
@@ -76,7 +79,7 @@ class PipelineState:
 
     def is_var_local_to_func(self, scopestr: str, id: int):
         """
-        Precondition: scopestr is the scopestr of a FunctionDef 
+        Precondition: scopestr is the scopestr of a FunctionDef
         Check if the variable with id `id` is neither a global nor a formal parameter
         """
         if self.is_global_var(id):
@@ -89,8 +92,8 @@ class PipelineState:
 
         return True
 
-    def is_container(self, scopestr: str): 
-        """ 
+    def is_container(self, scopestr: str):
+        """
         Check if scopestr is a container scopestr
         """
         return scopestr in self.con_scopestr_to_node
@@ -112,11 +115,11 @@ class PipelineState:
         return id in self.func_id_to_def
 
     def is_con_scopestr_func_def(self, con_scopestr: str):
-        return con_scopestr in  self.func_con_scopestr_to_id
+        return con_scopestr in self.func_con_scopestr_to_id
 
     def func_def_node_from_scopestr(self, con_scopestr: str):
         """
-        Return the AnnCastFuncitonDef node for the container scope 
+        Return the AnnCastFuncitonDef node for the container scope
         defined by `con_scopestr`
         """
         function_id = self.func_con_scopestr_to_id[con_scopestr]
@@ -126,9 +129,9 @@ class PipelineState:
         """
         Return the FunctionDef for `id`
         """
-        assert(self.func_def_exists(id))
+        assert self.func_def_exists(id)
         return self.func_id_to_def[id]
-        
+
     def is_global_var(self, id: int):
         """
         Check if id is in the used_variables attribute of the module node
@@ -172,11 +175,11 @@ class PipelineState:
     def alias_grfn_vars(self, src_fullid: str, tgt_fullid: str):
         """
         Put the GrFN id associated with `tgt_fullid` into dict `fullid_to_grfn_id` for key
-        `src_fullid` 
+        `src_fullid`
         """
         self.fullid_to_grfn_id[src_fullid] = self.fullid_to_grfn_id[tgt_fullid]
 
-    def equiv(self, other): 
+    def equiv(self, other):
         """
         Check if the PipelineState nodes are equivalent to other's
         Used in the test suite
@@ -187,22 +190,25 @@ class PipelineState:
         for i, node in enumerate(self.nodes):
             if not node.equiv(other.nodes[i]):
                 # printing diff to help locating difference
-                # because we do not overwrite the __str__() methods, 
+                # because we do not overwrite the __str__() methods,
                 # this has limited usefullness, but its better than nothing
                 print(f"AnnCast equiv failed:")
                 self_lines = str(node).splitlines()
                 other_lines = str(other.nodes[i]).splitlines()
-                for i, diff in enumerate(difflib.ndiff(self_lines, other_lines)):
-                    if diff[0]==' ': 
+                for i, diff in enumerate(
+                    difflib.ndiff(self_lines, other_lines)
+                ):
+                    if diff[0] == " ":
                         continue
                     print(f"Line {i}: {diff}")
 
                 return False
-        
+
         return True
 
+
 class AnnCastNode(AstNode):
-    def __init__(self,*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(self)
         self.expr_str: str = ""
 
@@ -216,8 +222,9 @@ class AnnCastNode(AstNode):
             return False
         return self.to_dict() == other.to_dict()
 
+
 class AnnCastAssignment(AnnCastNode):
-    def __init__(self, left, right, source_refs ):
+    def __init__(self, left, right, source_refs):
         super().__init__(self)
         self.left = left
         self.right = right
@@ -235,9 +242,10 @@ class AnnCastAssignment(AnnCastNode):
         if not isinstance(other, AnnCastAssignment):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Assignment.__str__(self)
+
 
 class AnnCastAttribute(AnnCastNode):
     def __init__(self, value, attr, source_refs):
@@ -255,9 +263,10 @@ class AnnCastAttribute(AnnCastNode):
         if not isinstance(other, AnnCastAttribute):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Attribute.__str__(self)
+
 
 class AnnCastBinaryOp(AnnCastNode):
     def __init__(self, op, left, right, source_refs):
@@ -282,6 +291,7 @@ class AnnCastBinaryOp(AnnCastNode):
     def __str__(self):
         return BinaryOp.__str__(self)
 
+
 class AnnCastBoolean(AnnCastNode):
     def __init__(self, boolean, source_refs):
         super().__init__(self)
@@ -297,9 +307,10 @@ class AnnCastBoolean(AnnCastNode):
         if not isinstance(other, AnnCastBoolean):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Boolean.__str__(self)
+
 
 class AnnCastCall(AnnCastNode):
     def __init__(self, func, arguments, source_refs):
@@ -309,8 +320,8 @@ class AnnCastCall(AnnCastNode):
         self.source_refs = source_refs
 
         # the index of this Call node over all invocations of this function
-        self.invocation_index: int 
-        
+        self.invocation_index: int
+
         # dicts mapping a Name id to its fullid
         self.top_interface_in = {}
         self.top_interface_out = {}
@@ -349,7 +360,7 @@ class AnnCastCall(AnnCastNode):
         self.arg_index_to_fullid = {}
         self.param_index_to_fullid = {}
         # this dict maps argument positional index to GrfnAssignment's
-        # Each GrfnAssignment stores the ASSIGN/LITERAL node, 
+        # Each GrfnAssignment stores the ASSIGN/LITERAL node,
         # the inputs to the ASSIGN/LITERAL node, and the outputs to the ASSIGN/LITERAL node
         # In this case, the output will map the arguments fullid to its grfn_id
         self.arg_assignments: typing.Dict[int, GrfnAssignment] = {}
@@ -367,9 +378,10 @@ class AnnCastCall(AnnCastNode):
         if not isinstance(other, AnnCastCall):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Call.__str__(self)
+
 
 class AnnCastDict(AnnCastNode):
     def __init__(self, keys, values, source_refs):
@@ -391,6 +403,7 @@ class AnnCastDict(AnnCastNode):
     def __str__(self):
         return Dict.__str__(self)
 
+
 class AnnCastExpr(AnnCastNode):
     def __init__(self, expr, source_refs):
         super().__init__(self)
@@ -406,9 +419,10 @@ class AnnCastExpr(AnnCastNode):
         if not isinstance(other, AnnCastExpr):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Expr.__str__(self)
+
 
 class AnnCastFunctionDef(AnnCastNode):
     def __init__(self, name, func_args, body, source_refs):
@@ -420,11 +434,11 @@ class AnnCastFunctionDef(AnnCastNode):
 
         self.con_scope: typing.List
 
-        # For CAST coming from C, we determine if the function 
+        # For CAST coming from C, we determine if the function
         # has a return value by looking for a CAST Return node.
         # We do this during the ContainerScopePass.
-        # FUTURE: What should be done with CAST coming from Python? 
-        # In Python, every function returns something, 
+        # FUTURE: What should be done with CAST coming from Python?
+        # In Python, every function returns something,
         # either None or the explicit return value
         self.has_ret_val: bool = False
         # for bot_interface
@@ -448,12 +462,12 @@ class AnnCastFunctionDef(AnnCastNode):
         self.globals_accessed_before_mod = {}
         self.used_globals = {}
         # for bot interface in
-        self.modified_globals = {} 
+        self.modified_globals = {}
 
         # dict mapping argument index to created argument fullid
         self.arg_index_to_fullid = {}
         self.param_index_to_fullid = {}
-    
+
         # dicts mapping a Name id to its fullid
         self.top_interface_in = {}
         self.top_interface_out = {}
@@ -486,9 +500,10 @@ class AnnCastFunctionDef(AnnCastNode):
         if not isinstance(other, AnnCastFunctionDef):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return FunctionDef.__str__(self)
+
 
 class AnnCastList(AnnCastNode):
     def __init__(self, values, source_refs):
@@ -506,9 +521,10 @@ class AnnCastList(AnnCastNode):
         if not isinstance(other, AnnCastList):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return List.__str__(self)
+
 
 class AnnCastRecordDef(AnnCastNode):
     def __init__(self, name, bases, funcs, fields, source_refs):
@@ -528,15 +544,16 @@ class AnnCastRecordDef(AnnCastNode):
         if not isinstance(other, AnnCastRecordDef):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return RecordDef.__str__(self)
+
 
 class AnnCastLiteralValue(AnnCastNode):
     def __init__(self, value_type, value, source_code_data_type, source_refs):
         super().__init__(self)
         self.value_type = value_type
-        self.value = value 
+        self.value = value
         self.source_code_data_type = source_code_data_type
         self.source_refs = source_refs
 
@@ -563,7 +580,7 @@ class AnnCastLoop(AnnCastNode):
 
         # Loop container scope
         self.con_scope: typing.List
-        # Function scopestr this Loop node is "living" in 
+        # Function scopestr this Loop node is "living" in
         self.base_func_scopestr: str = ""
 
         # dicts mapping a Name id to its string name
@@ -588,7 +605,7 @@ class AnnCastLoop(AnnCastNode):
 
         # dicts mapping a Name id to its fullid
         # initial versions for the top interface come from enclosing scope
-        # updated versions for the top interface are versions 
+        # updated versions for the top interface are versions
         # at the bottom of the loop after one or more executions of the loop
         self.top_interface_initial = {}
         self.top_interface_updated = {}
@@ -639,12 +656,13 @@ class AnnCastModelBreak(AnnCastNode):
         if not isinstance(other, AnnCastModelBreak):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return ModelBreak.__str__(self)
 
+
 class AnnCastModelContinue(AnnCastNode):
-    def __init__(self, node:ModelContinue):
+    def __init__(self, node: ModelContinue):
         super().__init__(self)
         self.source_refs = node.source_refs
 
@@ -656,9 +674,10 @@ class AnnCastModelContinue(AnnCastNode):
         if not isinstance(other, AnnCastModelContinue):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return ModelContinue.__str__(self)
+
 
 class AnnCastModelImport(AnnCastNode):
     def __init__(self, node: ModelImport):
@@ -681,6 +700,7 @@ class AnnCastModelImport(AnnCastNode):
     def __str__(self):
         return ModelImport.__str__(self)
 
+
 class AnnCastModelIf(AnnCastNode):
     def __init__(self, expr, body, orelse, source_refs):
         super().__init__(self)
@@ -691,7 +711,7 @@ class AnnCastModelIf(AnnCastNode):
 
         # ModelIf container scope
         self.con_scope: typing.List
-        # Function scopestr this ModelIf node is "living" in 
+        # Function scopestr this ModelIf node is "living" in
         self.base_func_scopestr: str = ""
 
         # dicts mapping a Name id to string name
@@ -731,7 +751,7 @@ class AnnCastModelIf(AnnCastNode):
 
         # metadata attributes
         self.grfn_con_src_ref: GrfnContainerSrcRef
-        
+
     def to_dict(self):
         result = super().to_dict()
         result["expr"] = self.expr.to_dict()
@@ -749,6 +769,7 @@ class AnnCastModelIf(AnnCastNode):
 
     def __str__(self):
         return ModelIf.__str__(self)
+
 
 class AnnCastModelReturn(AnnCastNode):
     def __init__(self, value, source_refs):
@@ -769,9 +790,10 @@ class AnnCastModelReturn(AnnCastNode):
         if not isinstance(other, AnnCastModelReturn):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return ModelReturn.__str__(self)
+
 
 class AnnCastModule(AnnCastNode):
     def __init__(self, name, body, source_refs):
@@ -802,7 +824,7 @@ class AnnCastModule(AnnCastNode):
         if not isinstance(other, AnnCastModule):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Module.__str__(self)
 
@@ -815,7 +837,7 @@ class AnnCastName(AnnCastNode):
         self.source_refs = source_refs
         # container_scope is used to aid GrFN generation
         self.con_scope: typing.List = []
-        # Function scopestr this Name node is "living" in 
+        # Function scopestr this Name node is "living" in
         self.base_func_scopestr: str = ""
         # versions are bound to the cope of the variable
         self.version = None
@@ -833,7 +855,7 @@ class AnnCastName(AnnCastNode):
         if not isinstance(other, AnnCastName):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Name.__str__(self)
 
@@ -853,9 +875,10 @@ class AnnCastNumber(AnnCastNode):
         if not isinstance(other, AnnCastNumber):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Number.__str__(self)
+
 
 class AnnCastSet(AnnCastNode):
     def __init__(self, values, source_refs):
@@ -872,9 +895,10 @@ class AnnCastSet(AnnCastNode):
         if not isinstance(other, AnnCastSet):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Set.__str__(self)
+
 
 class AnnCastString(AnnCastNode):
     def __init__(self, string, source_refs):
@@ -892,9 +916,9 @@ class AnnCastString(AnnCastNode):
             return False
         return self.to_dict() == other.to_dict()
 
-        
     def __str__(self):
         return String.__str__(self)
+
 
 class AnnCastSubscript(AnnCastNode):
     def __init__(self, value, slice, source_refs):
@@ -916,6 +940,7 @@ class AnnCastSubscript(AnnCastNode):
     def __str__(self):
         return Subscript.__str__(self)
 
+
 class AnnCastTuple(AnnCastNode):
     def __init__(self, values, source_refs):
         super().__init__(self)
@@ -931,9 +956,10 @@ class AnnCastTuple(AnnCastNode):
         if not isinstance(other, AnnCastTuple):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Tuple.__str__(self)
+
 
 class AnnCastUnaryOp(AnnCastNode):
     def __init__(self, op, value, source_refs):
@@ -951,9 +977,10 @@ class AnnCastUnaryOp(AnnCastNode):
         if not isinstance(other, AnnCastUnaryOp):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return UnaryOp.__str__(self)
+
 
 class AnnCastVar(AnnCastNode):
     def __init__(self, val, type, source_refs):
@@ -972,6 +999,6 @@ class AnnCastVar(AnnCastNode):
         if not isinstance(other, AnnCastVar):
             return False
         return self.to_dict() == other.to_dict()
-        
+
     def __str__(self):
         return Var.__str__(self)

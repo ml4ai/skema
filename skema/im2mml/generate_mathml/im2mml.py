@@ -25,28 +25,27 @@ from fastapi import FastAPI, File
 
 
 class Image2Tensor(object):
-    '''
+    """
     This class takes in an image and generates a tensor object
-    '''
+    """
+
     def __init__(self):
         print("Converting image to torch tensor...")
 
     def crop_image(self, image, size):
         return transforms.functional.crop(image, 0, 0, size[0], size[1])
 
-
     def resize_image(self, image):
-        return image.resize((int(image.size[0]/2), int(image.size[1]/2)))
+        return image.resize((int(image.size[0] / 2), int(image.size[1] / 2)))
 
     def pad_image(self, IMAGE):
-        right,left,top,bottom = 8, 8, 8, 8
+        right, left, top, bottom = 8, 8, 8, 8
         width, height = IMAGE.size
         new_width = width + right + left
         new_height = height + top + bottom
         result = Image.new(IMAGE.mode, (new_width, new_height))
-        result.paste(IMAGE,(left, top))
+        result.paste(IMAGE, (left, top))
         return result
-
 
     def __call__(self, image_path):
         """
@@ -57,7 +56,7 @@ class Image2Tensor(object):
 
         # crop, resize, and pad the image
         mean_w, mean_h = 500, 50
-        IMAGE = Image.open(io.BytesIO(image_path)).convert('L')
+        IMAGE = Image.open(io.BytesIO(image_path)).convert("L")
         IMAGE = self.crop_image(IMAGE, [mean_h, mean_w])
         IMAGE = self.resize_image(IMAGE)
         IMAGE = self.pad_image(IMAGE)
@@ -68,21 +67,24 @@ class Image2Tensor(object):
         return IMAGE
 
 
-def set_random_seed(SEED: int)-> None:
+def set_random_seed(SEED: int) -> None:
     # set up seed
     random.seed(SEED)
     np.random.seed(SEED)
     torch.manual_seed(SEED)
     torch.cuda.manual_seed(SEED)
 
-def define_model(config: dict, VOCAB: List[str], DEVICE: torch.device) -> Image2MathML_LSTM:
-    '''
+
+def define_model(
+    config: dict, VOCAB: List[str], DEVICE: torch.device
+) -> Image2MathML_LSTM:
+    """
     defining the model
     initializing encoder, decoder, and model
 
-    '''
+    """
 
-    print('defining model...')
+    print("defining model...")
 
     MODEL_TYPE = config["model_type"]
     INPUT_CHANNELS = config["input_channels"]
@@ -94,55 +96,73 @@ def define_model(config: dict, VOCAB: List[str], DEVICE: torch.device) -> Image2
     DROPOUT = config["dropout"]
     MAX_LEN = 110
 
-    print(f'building {MODEL_TYPE} model...')
+    print(f"building {MODEL_TYPE} model...")
 
     N_LAYERS = config["lstm_layers"]
-    TFR=0
+    TFR = 0
     ENC = CNN_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE)
-    DEC = LSTM_Decoder(EMB_DIM, ENC_DIM,  DEC_HID_DIM, OUTPUT_DIM, N_LAYERS, DEVICE, DROPOUT, TFR)
+    DEC = LSTM_Decoder(
+        EMB_DIM,
+        ENC_DIM,
+        DEC_HID_DIM,
+        OUTPUT_DIM,
+        N_LAYERS,
+        DEVICE,
+        DROPOUT,
+        TFR,
+    )
     model = Image2MathML_LSTM(ENC, DEC, DEVICE, ENCODING_TYPE, MAX_LEN, VOCAB)
 
     return model
 
 
-def evaluate(model: Image2MathML_LSTM, vocab: List[str], img: Image2Tensor, device:torch.device) -> str:
-    '''
+def evaluate(
+    model: Image2MathML_LSTM,
+    vocab: List[str],
+    img: Image2Tensor,
+    device: torch.device,
+) -> str:
+    """
     It predicts the sequence for the image to translate it into MathML contents
-    '''
+    """
     model.eval()
     with torch.no_grad():
         img = img.to(device)
-        output = model(img, is_train=False, is_test=False)  # O: (B, max_len, output_dim), preds: (B, max_len)
+        output = model(
+            img, is_train=False, is_test=False
+        )  # O: (B, max_len, output_dim), preds: (B, max_len)
 
         # translating mathml
         topK = torch.zeros(output.shape[0], output.shape[1])
         pred_arr = list()
         for j in range(output.shape[1]):
-            top = output[:,j,:].argmax(1)
-            topK[:,j] = top
+            top = output[:, j, :].argmax(1)
+            topK[:, j] = top
             if vocab[top].split()[0] != "<eos>":
                 pred_arr.append(vocab[top].split()[0])
             else:
                 break
-        pred_seq =  " ".join(pred_arr[1:])
+        pred_seq = " ".join(pred_arr[1:])
         return pred_seq
 
+
 def count_parameters(model):
-    '''
+    """
     counting total number of parameters
-    '''
+    """
 
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+
 def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
-    '''
+    """
     It allows us to obtain mathML for an image
-    '''
+    """
     # parameters
     optimizer_type = config["optimizer_type"]
     learning_rate = config["learning_rate"]
     weight_decay = config["weight_decay"]
-    (beta_1, beta_2) = config["beta_1"],config["beta_2"]
+    (beta_1, beta_2) = config["beta_1"], config["beta_2"]
     CLIP = config["clip"]
     SEED = config["seed"]
     model_type = config["model_type"]
@@ -152,28 +172,31 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     # set_random_seed
     set_random_seed(SEED)
 
-
     # defining model using DataParallel
-    device = torch.device(f'cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
     model: Image2MathML_LSTM = define_model(config, vocab, device).to(device)
 
     # optimizer
     if optimizer_type == "Adam":
-        optimizer = torch.optim.Adam(params = model.parameters(),
-                                lr=learning_rate,
-                                weight_decay=weight_decay,
-                                betas=(beta_1, beta_2))
+        optimizer = torch.optim.Adam(
+            params=model.parameters(),
+            lr=learning_rate,
+            weight_decay=weight_decay,
+            betas=(beta_1, beta_2),
+        )
 
-    best_valid_loss = float('inf')
+    best_valid_loss = float("inf")
     TRG_PAD_IDX = 0
 
     # generating equation
     print("loading trained model...")
 
-    if not torch.cuda.is_available():   # for CPU only
-        model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+    if not torch.cuda.is_available():  # for CPU only
+        model.load_state_dict(
+            torch.load(model_path, map_location=torch.device("cpu"))
+        )
     else:
-        model.load_state_dict(torch.load(model_path))   # for GPUs
+        model.load_state_dict(torch.load(model_path))  # for GPUs
 
     return evaluate(model, vocab, imagetensor, device)
 
@@ -182,19 +205,16 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
 
 app = FastAPI()
 
-@app.put(
-    "/get-mml",
-    summary="Get MathML representation of an equation image"
-)
+
+@app.put("/get-mml", summary="Get MathML representation of an equation image")
 async def get_mathml(file: bytes = File()):
-    '''
+    """
     Creates a web app using FastAPI for rendering MathML for an image
     by specifying the  parameters for the render_mml function.
-    '''
+    """
     # convert png image to tensor
     i2t = Image2Tensor()
     imagetensor = i2t(file)
-
 
     # change the shape of tensor from (C_in, H, W)
     # to (1, C_in, H, w) [batch =1]

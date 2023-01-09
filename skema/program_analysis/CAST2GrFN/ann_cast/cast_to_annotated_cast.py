@@ -35,6 +35,7 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
 
 from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
 
+
 class CASTTypeError(TypeError):
     """Used to create errors in the visitor, in particular
     when the visitor encounters some value that it wasn't expecting.
@@ -43,14 +44,15 @@ class CASTTypeError(TypeError):
         Exception: An exception that occurred during execution.
     """
 
-class CastToAnnotatedCastVisitor():
-    '''
+
+class CastToAnnotatedCastVisitor:
+    """
     class CastToAnnotatedCastVisitor - A visitor that traverses CAST nodes
     and generates an annotated cast version of the CAST.
 
     The AnnCastNodes have additional attributes (fields) that are used
     in a later pass to maintain scoping information for GrFN containers.
-    '''
+    """
 
     def __init__(self, cast: CAST):
         self.cast = cast
@@ -58,7 +60,7 @@ class CastToAnnotatedCastVisitor():
     def visit_node_list(self, node_list: typing.List[AstNode]):
         return [self.visit(node) for node in node_list]
 
-    def generate_annotated_cast(self, grfn_2_2: bool=False):
+    def generate_annotated_cast(self, grfn_2_2: bool = False):
         nodes = self.cast.nodes
 
         annotated_cast = []
@@ -68,10 +70,10 @@ class CastToAnnotatedCastVisitor():
         return PipelineState(annotated_cast, grfn_2_2)
 
     def visit(self, node: AstNode) -> AnnCastNode:
-        # print current node being visited.  
-        # this can be useful for debugging 
-        #class_name = node.__class__.__name__
-        #print(f"\nProcessing node type {class_name}")
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f"\nProcessing node type {class_name}")
         return self._visit(node)
 
     @singledispatchmethod
@@ -87,7 +89,7 @@ class CastToAnnotatedCastVisitor():
     @_visit.register
     def visit_attribute(self, node: Attribute):
         value = self.visit(node.value)
-        attr  = self.visit(node.attr)
+        attr = self.visit(node.attr)
         return AnnCastAttribute(value, attr, node.source_refs)
 
     @_visit.register
@@ -110,12 +112,13 @@ class CastToAnnotatedCastVisitor():
 
         return AnnCastCall(func, arguments, node.source_refs)
 
-
     @_visit.register
     def visit_record_def(self, node: RecordDef):
         funcs = self.visit_node_list(node.funcs)
         fields = self.visit_node_list(node.fields)
-        return AnnCastRecordDef(node.name, node.bases, funcs, fields, node.source_refs)
+        return AnnCastRecordDef(
+            node.name, node.bases, funcs, fields, node.source_refs
+        )
 
     @_visit.register
     def visit_dict(self, node: Dict):
@@ -134,7 +137,7 @@ class CastToAnnotatedCastVisitor():
         args = self.visit_node_list(node.func_args)
         body = self.visit_node_list(node.body)
         return AnnCastFunctionDef(name, args, body, node.source_refs)
-        
+
     @_visit.register
     def visit_list(self, node: List):
         values = self.visit_node_list(node.values)
@@ -142,11 +145,25 @@ class CastToAnnotatedCastVisitor():
 
     @_visit.register
     def visit_literal_value(self, node: LiteralValue):
-        if node.value_type == 'List[Any]':
-            node.value.size = self.visit(node.value.size) # Turns the cast var into annCast
-            node.value.initial_value = self.visit(node.value.initial_value) # Turns the literalValue into annCast
-            return AnnCastLiteralValue(node.value_type, node.value, node.source_code_data_type, node.source_refs)
-        return AnnCastLiteralValue(node.value_type, node.value, node.source_code_data_type, node.source_refs)
+        if node.value_type == "List[Any]":
+            node.value.size = self.visit(
+                node.value.size
+            )  # Turns the cast var into annCast
+            node.value.initial_value = self.visit(
+                node.value.initial_value
+            )  # Turns the literalValue into annCast
+            return AnnCastLiteralValue(
+                node.value_type,
+                node.value,
+                node.source_code_data_type,
+                node.source_refs,
+            )
+        return AnnCastLiteralValue(
+            node.value_type,
+            node.value,
+            node.source_code_data_type,
+            node.source_refs,
+        )
 
     @_visit.register
     def visit_loop(self, node: Loop):
@@ -156,7 +173,7 @@ class CastToAnnotatedCastVisitor():
             init = []
         expr = self.visit(node.expr)
         body = self.visit_node_list(node.body)
-        return AnnCastLoop(init,expr,body, node.source_refs)
+        return AnnCastLoop(init, expr, body, node.source_refs)
 
     @_visit.register
     def visit_model_break(self, node: ModelBreak):
@@ -181,7 +198,7 @@ class CastToAnnotatedCastVisitor():
     def visit_model_return(self, node: ModelReturn):
         value = self.visit(node.value)
         return AnnCastModelReturn(value, node.source_refs)
-        
+
     @_visit.register
     def visit_module(self, node: Module):
         body = self.visit_node_list(node.body)

@@ -46,6 +46,7 @@ class CASTTypeError(TypeError):
     Args:
         Exception: An exception that occurred during execution.
     """
+
     pass
 
 
@@ -62,8 +63,8 @@ class CASTToTokenCASTVisitor(CASTVisitor):
         - Visiting the node's children to generate their tokenized CAST
         - Adding the current node's tokenized CAST information along with their children
           to create the token CAST for this node (as a string) and return it.
-    
-    A couple of maps are generated while visiting the CAST and are 
+
+    A couple of maps are generated while visiting the CAST and are
     used to store information about the values and variables in the CAST.
     This is to make the tokenized CAST simpler, so the model training is less complicated,
     and in a later step the maps will be used to map the information back into the token CAST
@@ -74,11 +75,12 @@ class CASTToTokenCASTVisitor(CASTVisitor):
     Attributes:
         cast (CAST): The CAST object representation of the program
                      we're generating a DiGraph for.
-        var_map (list): A list that serves as a mapping between variable names and their mapped 
+        var_map (list): A list that serves as a mapping between variable names and their mapped
                      identifier
         val_map (list): A list that serves as a mapping between literal values and their mapped
                      identifier
     """
+
     cast: CAST
     var_map: list
     val_map: list
@@ -108,7 +110,6 @@ class CASTToTokenCASTVisitor(CASTVisitor):
         for val in value_map:
             out_file.write(f"{val}\n")
 
-
     def dump_var_map(self):
         """Dumps out the map of the variables."""
         vars = []
@@ -135,7 +136,7 @@ class CASTToTokenCASTVisitor(CASTVisitor):
     @visit.register
     def _(self, node: Assignment):
         """Visits Assignment nodes, the left and right nodes are visited
-        and their generated token CASTs are used to generate this Assignment 
+        and their generated token CASTs are used to generate this Assignment
         node's token CAST."""
 
         # This check allows us to ignore the initialization nodes
@@ -153,8 +154,7 @@ class CASTToTokenCASTVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: Attribute):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
@@ -168,8 +168,7 @@ class CASTToTokenCASTVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: Boolean):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
@@ -177,7 +176,7 @@ class CASTToTokenCASTVisitor(CASTVisitor):
         """Visits Call (function call) nodes. We check to see
         if we have arguments to the node and generate their tokenized CAST strings.
         Appending all the arguments of the function to this node,
-        if we have any. Then we create a string of the arguments and 
+        if we have any. Then we create a string of the arguments and
         generate a token CAST string."""
 
         args = []
@@ -190,20 +189,17 @@ class CASTToTokenCASTVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: ClassDef):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: Dict):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: Expr):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
@@ -223,37 +219,32 @@ class CASTToTokenCASTVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: List):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: Loop):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: ModelBreak):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: ModelContinue):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: ModelIf):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: ModelReturn):
-        """Visits a ModelReturn (return statment) node. The 
+        """Visits a ModelReturn (return statment) node. The
         value of the return is visited, and we use its token CAST
         to generate the return's token CAST string."""
         val = self.visit(node.value)
@@ -261,14 +252,13 @@ class CASTToTokenCASTVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: Module):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: Name):
         """Visits a Name node. As of now, the name nodes belong
-        to variables, so we check to see if the variable is in the 
+        to variables, so we check to see if the variable is in the
         variable map and return a variable identifier accordingly."""
         if node.name not in self.var_map:
             self.var_map.append(node.name)
@@ -290,8 +280,7 @@ class CASTToTokenCASTVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: Set):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
@@ -299,7 +288,7 @@ class CASTToTokenCASTVisitor(CASTVisitor):
         """Visits a String node. The string is edited to remove the null terminator
         and is then stored in the value map. A value identifier for the map is returned
         for the token CAST string."""
-        stripped_str = repr(node.string.replace('\0',''))
+        stripped_str = repr(node.string.replace("\0", ""))
         if stripped_str not in self.val_map:
             self.val_map.append(stripped_str)
 
@@ -308,26 +297,23 @@ class CASTToTokenCASTVisitor(CASTVisitor):
 
     @visit.register
     def _(self, node: Subscript):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: Tuple):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: UnaryOp):
-        """TODO
-        """
+        """TODO"""
         return ""
 
     @visit.register
     def _(self, node: Var):
         """Visits a Var node by visiting its value
-        The variable name gets stored in the map, and a 
+        The variable name gets stored in the map, and a
         variable identifier is returned for the token CAST string."""
         if node.val.name not in self.var_map:
             self.var_map.append(node.val.name)

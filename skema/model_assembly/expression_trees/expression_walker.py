@@ -10,6 +10,7 @@ from automates.model_assembly.expression_trees.expression_visitor import (
     ExprDefinitionNode,
 )
 
+
 def nodes2AGraph(graph_name: str, nodes: list):
     func_network = nodes2DiGraph(nodes)
     A = nx.nx_agraph.to_agraph(func_network)
@@ -46,6 +47,7 @@ def add_grfn_uids(nodes, F2H, func_uid):
     for node in variable_nodes:
         if node.identifier in arg_name2input_uid:
             node.grfn_uid = arg_name2input_uid[node.identifier]
+
 
 def expr_trees_from_grfn(G: GroundedFunctionNetwork, generate_agraph=False):
     func2hyperedge = {edge.lambda_fn.uid: edge for edge in G.hyper_edges}

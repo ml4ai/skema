@@ -317,7 +317,9 @@ class GenericContainer(ABC):
     @abstractmethod
     def __str__(self):
         args_str = "\n".join([f"\t{arg}" for arg in self.arguments])
-        outputs_str = "\n".join([f"\t{var}" for var in self.returns + self.updated])
+        outputs_str = "\n".join(
+            [f"\t{var}" for var in self.returns + self.updated]
+        )
         return f"Inputs:\n{args_str}\nVariables:\n{outputs_str}"
 
     @staticmethod
@@ -391,12 +393,18 @@ class GenericStmt(ABC):
 
     @abstractmethod
     def __str__(self):
-        inputs_str = ", ".join([f"{id.var_name} ({id.index})" for id in self.inputs])
-        outputs_str = ", ".join([f"{id.var_name} ({id.index})" for id in self.outputs])
+        inputs_str = ", ".join(
+            [f"{id.var_name} ({id.index})" for id in self.inputs]
+        )
+        outputs_str = ", ".join(
+            [f"{id.var_name} ({id.index})" for id in self.outputs]
+        )
         return f"Inputs: {inputs_str}\nOutputs: {outputs_str}"
 
     @staticmethod
-    def create_statement(stmt_data: dict, container: GenericContainer, file_ref: str):
+    def create_statement(
+        stmt_data: dict, container: GenericContainer, file_ref: str
+    ):
         func_type = stmt_data["function"]["type"]
         if func_type == "lambda":
             return LambdaStmt(stmt_data, container, file_ref)
