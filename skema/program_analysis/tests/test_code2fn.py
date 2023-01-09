@@ -3,6 +3,7 @@ from pathlib import Path
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.gromet.fn import GrometFNModuleCollection
 
+
 def test_code2fn():
     """This is simply a smokescreen test to see if the PA pipeline runs to
     completion without crashing. It does not test the actual outputs.

@@ -39,15 +39,14 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
     UnaryOperator,
     VarType,
     Var,
-    ValueConstructor
+    ValueConstructor,
 )
 from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
 from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
-        var_dict_to_str,
-        interface_to_str,
-        decision_in_to_str,
+    var_dict_to_str,
+    interface_to_str,
+    decision_in_to_str,
 )
-
 
 
 class CASTTypeError(TypeError):
@@ -263,12 +262,24 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         node_uid = uuid.uuid4()
         label = "CallGrfn2_2"
-        top_iface_in_vars_str = var_dict_to_str("Top In: ", node.top_interface_in)
-        top_iface_out_vars_str = var_dict_to_str("Top Out: ", node.top_interface_out)
-        bot_iface_in_vars_str = var_dict_to_str("Bot In: ", node.bot_interface_in)
-        bot_iface_out_vars_str = var_dict_to_str("Bot Out: ", node.bot_interface_out)
-        globals_in_str = var_dict_to_str("Globals In: ", node.func_def_copy.used_globals)
-        globals_out_str = var_dict_to_str("Globals Out: ", node.func_def_copy.modified_globals)
+        top_iface_in_vars_str = var_dict_to_str(
+            "Top In: ", node.top_interface_in
+        )
+        top_iface_out_vars_str = var_dict_to_str(
+            "Top Out: ", node.top_interface_out
+        )
+        bot_iface_in_vars_str = var_dict_to_str(
+            "Bot In: ", node.bot_interface_in
+        )
+        bot_iface_out_vars_str = var_dict_to_str(
+            "Bot Out: ", node.bot_interface_out
+        )
+        globals_in_str = var_dict_to_str(
+            "Globals In: ", node.func_def_copy.used_globals
+        )
+        globals_out_str = var_dict_to_str(
+            "Globals Out: ", node.func_def_copy.modified_globals
+        )
         label = f"{label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}"
         label = f"{label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}"
         label = f"{label}\n{globals_in_str}\n{globals_out_str}"
@@ -301,10 +312,18 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         node_uid = uuid.uuid4()
         label = "Call"
-        top_iface_in_vars_str = var_dict_to_str("Top In: ", node.top_interface_in)
-        top_iface_out_vars_str = var_dict_to_str("Top Out: ", node.top_interface_out)
-        bot_iface_in_vars_str = var_dict_to_str("Bot In: ", node.bot_interface_in)
-        bot_iface_out_vars_str = var_dict_to_str("Bot Out: ", node.bot_interface_out)
+        top_iface_in_vars_str = var_dict_to_str(
+            "Top In: ", node.top_interface_in
+        )
+        top_iface_out_vars_str = var_dict_to_str(
+            "Top Out: ", node.top_interface_out
+        )
+        bot_iface_in_vars_str = var_dict_to_str(
+            "Bot In: ", node.bot_interface_in
+        )
+        bot_iface_out_vars_str = var_dict_to_str(
+            "Bot Out: ", node.bot_interface_out
+        )
         label = f"{label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}"
         label = f"{label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}"
         self.G.add_node(node_uid, label=label)
@@ -432,7 +451,7 @@ class CASTToAGraphVisitor(CASTVisitor):
         self.G.add_edge(node_uid, expr)
 
         return node_uid
-        
+
     @visit.register
     def _(self, node: AnnCastFunctionDef):
         """Visits FunctionDef nodes. We visit all the arguments, and then
@@ -451,10 +470,14 @@ class CASTToAGraphVisitor(CASTVisitor):
         body_node = uuid.uuid4()
 
         modified_vars_str = var_dict_to_str("Modified: ", node.modified_vars)
-        vars_accessed_before_mod_str = var_dict_to_str("Accessed: ", node.vars_accessed_before_mod)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            "Accessed: ", node.vars_accessed_before_mod
+        )
         highest_ver = var_dict_to_str("HiVer: ", node.body_highest_var_vers)
         globals_in_str = var_dict_to_str("Globals In: ", node.used_globals)
-        globals_out_str = var_dict_to_str("Globals Out: ", node.modified_globals)
+        globals_out_str = var_dict_to_str(
+            "Globals Out: ", node.modified_globals
+        )
         func_label = f"Function: {node.name}\n{modified_vars_str}\n{vars_accessed_before_mod_str}\n{highest_ver}"
         func_label = f"{func_label}\n{globals_in_str}\n{globals_out_str}"
         self.G.add_node(node_uid, label=func_label)
@@ -470,7 +493,6 @@ class CASTToAGraphVisitor(CASTVisitor):
             self.G.add_edge(body_node, n)
 
         return node_uid
-
 
     @visit.register
     def _(self, node: FunctionDef):
@@ -491,7 +513,13 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         # include the Name node's id if we have it
         if isinstance(node.name, Name):
-            label = "Function: " + str(node.name.name) + " (id: " + str(node.name.id) +")"
+            label = (
+                "Function: "
+                + str(node.name.name)
+                + " (id: "
+                + str(node.name.id)
+                + ")"
+            )
         # otherwise name is just str
         else:
             label = f"Function: {node.name}"
@@ -560,7 +588,6 @@ class CASTToAGraphVisitor(CASTVisitor):
         self.G.add_node(test_uid, label="Test")
         self.G.add_node(body_uid, label="Body")
 
-
         self.G.add_edge(node_uid, init_uid)
         for n in init:
             self.G.add_edge(init_uid, n)
@@ -598,23 +625,28 @@ class CASTToAGraphVisitor(CASTVisitor):
             node_uid = uuid.uuid4()
             if isinstance(node.value, ValueConstructor):
                 op = node.value.operator
-                init_val = node.value.initial_value.value 
+                init_val = node.value.initial_value.value
                 if isinstance(node.value.size, LiteralValue):
                     size = node.value.size.value
                     id = -1
-                else: 
+                else:
                     size = node.value.size.name
                     id = node.value.size.id
 
-                #self.G.add_node(node_uid, label=f"List: Init_Val: [{init_val}], Size: {size} ")
-                self.G.add_node(node_uid, label=f"List: [{init_val}] {op} {size} (id: {id})")
+                # self.G.add_node(node_uid, label=f"List: Init_Val: [{init_val}], Size: {size} ")
+                self.G.add_node(
+                    node_uid,
+                    label=f"List: [{init_val}] {op} {size} (id: {id})",
+                )
             return node_uid
         elif node.value_type == StructureType.MAP:
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f"Dict: {node.value}")
             return node_uid
         else:
-            assert False, f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
+            assert (
+                False
+            ), f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
 
     @visit.register
     def _(self, node: LiteralValue):
@@ -638,22 +670,27 @@ class CASTToAGraphVisitor(CASTVisitor):
             node_uid = uuid.uuid4()
             if isinstance(node.value, ValueConstructor):
                 op = node.value.operator
-                init_val = node.value.initial_value.value 
+                init_val = node.value.initial_value.value
                 if isinstance(node.value.size, LiteralValue):
                     size = node.value.size.value
                     id = -1
-                else: 
+                else:
                     size = node.value.size.name
                     id = node.value.size.id
 
-                #self.G.add_node(node_uid, label=f"List: Init_Val: [{init_val}], Size: {size} ")
-                self.G.add_node(node_uid, label=f"List: [{init_val}] {op} {size} (id: {id})")
+                # self.G.add_node(node_uid, label=f"List: Init_Val: [{init_val}], Size: {size} ")
+                self.G.add_node(
+                    node_uid,
+                    label=f"List: [{init_val}] {op} {size} (id: {id})",
+                )
         elif node.value_type == StructureType.MAP:
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f"Dict: {node.value}")
             return node_uid
         else:
-            assert False, f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
+            assert (
+                False
+            ), f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
 
     @visit.register
     def _(self, node: AnnCastLoop):
@@ -673,12 +710,22 @@ class CASTToAGraphVisitor(CASTVisitor):
         body_uid = uuid.uuid4()
 
         modified_vars = var_dict_to_str("Modified: ", node.modified_vars)
-        vars_accessed_before_mod = var_dict_to_str("Accessed: ", node.vars_accessed_before_mod)
-        top_iface_init_vars = interface_to_str("Top Init: ", node.top_interface_initial)
-        top_iface_updt_vars = interface_to_str("Top Updt: ", node.top_interface_updated)
-        top_iface_out_vars = interface_to_str("Top Out: ", node.top_interface_out)
+        vars_accessed_before_mod = var_dict_to_str(
+            "Accessed: ", node.vars_accessed_before_mod
+        )
+        top_iface_init_vars = interface_to_str(
+            "Top Init: ", node.top_interface_initial
+        )
+        top_iface_updt_vars = interface_to_str(
+            "Top Updt: ", node.top_interface_updated
+        )
+        top_iface_out_vars = interface_to_str(
+            "Top Out: ", node.top_interface_out
+        )
         bot_iface_in_vars = interface_to_str("Bot In: ", node.bot_interface_in)
-        bot_iface_out_vars = interface_to_str("Bot Out: ", node.bot_interface_out)
+        bot_iface_out_vars = interface_to_str(
+            "Bot Out: ", node.bot_interface_out
+        )
         loop_label = f"Loop\n{modified_vars}\n{vars_accessed_before_mod}"
         loop_label = f"{loop_label}\n{top_iface_init_vars}\n{top_iface_updt_vars}\n{top_iface_out_vars}"
         loop_label = f"{loop_label}\n{bot_iface_in_vars}\n{bot_iface_out_vars}"
@@ -753,7 +800,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             self.G.add_edge(orelse_uid, n)
 
         return node_uid
-    
+
     @visit.register
     def _(self, node: AnnCastModelImport):
         """Visits a ModelImport (Import statement) node.
@@ -764,10 +811,13 @@ class CASTToAGraphVisitor(CASTVisitor):
         node_uid = uuid.uuid4()
 
         # TODO: Handle strings of If/Elif/Elif/... constructs
-        self.G.add_node(node_uid, label=f"Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}")
+        self.G.add_node(
+            node_uid,
+            label=f"Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}",
+        )
 
         return node_uid
-    
+
     @visit.register
     def _(self, node: ModelImport):
         """Visits a ModelImport (Import statement) node.
@@ -778,7 +828,10 @@ class CASTToAGraphVisitor(CASTVisitor):
         node_uid = uuid.uuid4()
 
         # TODO: Handle strings of If/Elif/Elif/... constructs
-        self.G.add_node(node_uid, label=f"Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}")
+        self.G.add_node(
+            node_uid,
+            label=f"Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}",
+        )
 
         return node_uid
 
@@ -800,10 +853,16 @@ class CASTToAGraphVisitor(CASTVisitor):
         test_uid = uuid.uuid4()
 
         modified_vars_str = var_dict_to_str("Modified: ", node.modified_vars)
-        vars_accessed_before_mod_str = var_dict_to_str("Accessed: ", node.vars_accessed_before_mod)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            "Accessed: ", node.vars_accessed_before_mod
+        )
         # top inteface
-        top_iface_in_vars_str = interface_to_str("Top In: ", node.top_interface_in)
-        top_iface_out_vars_str = interface_to_str("Top Out: ", node.top_interface_out)
+        top_iface_in_vars_str = interface_to_str(
+            "Top In: ", node.top_interface_in
+        )
+        top_iface_out_vars_str = interface_to_str(
+            "Top Out: ", node.top_interface_out
+        )
         # condition node
         condition_in = interface_to_str("Cond In: ", node.condition_in)
         condition_out = interface_to_str("Cond Out: ", node.condition_out)
@@ -811,13 +870,21 @@ class CASTToAGraphVisitor(CASTVisitor):
         decision_in = decision_in_to_str("Dec In: ", node.decision_in)
         decision_out = interface_to_str("Dec Out: ", node.decision_out)
         # bot interface
-        bot_iface_in_vars_str = interface_to_str("Bot In: ", node.bot_interface_in)
-        bot_iface_out_vars_str = interface_to_str("Bot Out: ", node.bot_interface_out)
+        bot_iface_in_vars_str = interface_to_str(
+            "Bot In: ", node.bot_interface_in
+        )
+        bot_iface_out_vars_str = interface_to_str(
+            "Bot Out: ", node.bot_interface_out
+        )
         if_label = f"If\n{modified_vars_str}\n{vars_accessed_before_mod_str}"
-        if_label = f"{if_label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}"
+        if_label = (
+            f"{if_label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}"
+        )
         if_label = f"{if_label}\n{condition_in}\n{condition_out}"
         if_label = f"{if_label}\n{decision_in}\n{decision_out}"
-        if_label = f"{if_label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}"
+        if_label = (
+            f"{if_label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}"
+        )
         self.G.add_node(node_uid, label=if_label)
         self.G.add_node(test_uid, label="Test")
         self.G.add_edge(node_uid, test_uid)
@@ -874,7 +941,9 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         module_uuid = uuid.uuid4()
         modified_vars_str = var_dict_to_str("Modified: ", node.modified_vars)
-        vars_accessed_before_mod_str = var_dict_to_str("Accessed: ", node.vars_accessed_before_mod)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            "Accessed: ", node.vars_accessed_before_mod
+        )
         used_vars_str = var_dict_to_str("Used: ", node.used_vars)
         module_label = f"Module: {node.name}\n{modified_vars_str}\n{vars_accessed_before_mod_str}"
         module_label = f"{module_label}\n{used_vars_str}"
@@ -886,7 +955,6 @@ class CASTToAGraphVisitor(CASTVisitor):
             self.G.add_edge(module_uuid, b)
 
         return program_uuid
-
 
     @visit.register
     def _(self, node: Module):
@@ -915,16 +983,16 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         class_init = False
         for n in self.cast.nodes[0].body:
-            if isinstance(n,RecordDef) and n.name == node.name:
+            if isinstance(n, RecordDef) and n.name == node.name:
                 class_init = True
                 self.G.add_node(node_uid, label=node.name + " Init()")
                 break
 
         if not class_init:
-            if isinstance(node.con_scope,list):
-                label=node.name  +"\n" + ".".join(node.con_scope)
+            if isinstance(node.con_scope, list):
+                label = node.name + "\n" + ".".join(node.con_scope)
             else:
-                label=node.name 
+                label = node.name
             label += f"\nver: {str(node.version)}, id: {str(node.id)}"
 
             self.G.add_node(node_uid, label=label)
@@ -941,16 +1009,20 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         class_init = False
         for n in self.cast.nodes[0].body:
-            if isinstance(n,RecordDef) and n.name == node.name:
+            if isinstance(n, RecordDef) and n.name == node.name:
                 class_init = True
                 self.G.add_node(node_uid, label=node.name + " Init()")
                 break
 
         if not class_init:
             if node.name == None:
-                self.G.add_node(node_uid, label="NONAME (id: " + str(node.id)+")")
+                self.G.add_node(
+                    node_uid, label="NONAME (id: " + str(node.id) + ")"
+                )
             else:
-                self.G.add_node(node_uid, label=node.name + " (id: " + str(node.id)+")")
+                self.G.add_node(
+                    node_uid, label=node.name + " (id: " + str(node.id) + ")"
+                )
 
         return node_uid
 
@@ -1078,6 +1150,8 @@ class CASTToAGraphVisitor(CASTVisitor):
         else:
             val = self.visit(node.default_value)
             node_uid = uuid.uuid4()
-            self.G.add_node(node_uid, label=f"{node.val.name} (id: {str(node.val.id)})") # value: {node.default_value.value}")
+            self.G.add_node(
+                node_uid, label=f"{node.val.name} (id: {str(node.val.id)})"
+            )  # value: {node.default_value.value}")
             self.G.add_edge(node_uid, val)
             return node_uid

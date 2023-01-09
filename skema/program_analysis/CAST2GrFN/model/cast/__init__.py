@@ -18,34 +18,54 @@ from skema.program_analysis.CAST2GrFN.model.cast.assignment import Assignment
 from skema.program_analysis.CAST2GrFN.model.cast.ast_node import AstNode
 from skema.program_analysis.CAST2GrFN.model.cast.attribute import Attribute
 from skema.program_analysis.CAST2GrFN.model.cast.binary_op import BinaryOp
-from skema.program_analysis.CAST2GrFN.model.cast.binary_operator import BinaryOperator
+from skema.program_analysis.CAST2GrFN.model.cast.binary_operator import (
+    BinaryOperator,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.boolean import Boolean
 from skema.program_analysis.CAST2GrFN.model.cast.call import Call
 from skema.program_analysis.CAST2GrFN.model.cast.dict import Dict
 from skema.program_analysis.CAST2GrFN.model.cast.expr import Expr
-from skema.program_analysis.CAST2GrFN.model.cast.function_def import FunctionDef
+from skema.program_analysis.CAST2GrFN.model.cast.function_def import (
+    FunctionDef,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.list import List
-from skema.program_analysis.CAST2GrFN.model.cast.literal_value import LiteralValue
+from skema.program_analysis.CAST2GrFN.model.cast.literal_value import (
+    LiteralValue,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.loop import Loop
 from skema.program_analysis.CAST2GrFN.model.cast.model_break import ModelBreak
-from skema.program_analysis.CAST2GrFN.model.cast.model_continue import ModelContinue
+from skema.program_analysis.CAST2GrFN.model.cast.model_continue import (
+    ModelContinue,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.model_if import ModelIf
-from skema.program_analysis.CAST2GrFN.model.cast.model_import import ModelImport
-from skema.program_analysis.CAST2GrFN.model.cast.model_return import ModelReturn
+from skema.program_analysis.CAST2GrFN.model.cast.model_import import (
+    ModelImport,
+)
+from skema.program_analysis.CAST2GrFN.model.cast.model_return import (
+    ModelReturn,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.module import Module
 from skema.program_analysis.CAST2GrFN.model.cast.name import Name
 from skema.program_analysis.CAST2GrFN.model.cast.number import Number
 from skema.program_analysis.CAST2GrFN.model.cast.record_def import RecordDef
 from skema.program_analysis.CAST2GrFN.model.cast.scalar_type import ScalarType
 from skema.program_analysis.CAST2GrFN.model.cast.set import Set
-from skema.program_analysis.CAST2GrFN.model.cast.source_code_data_type import SourceCodeDataType
+from skema.program_analysis.CAST2GrFN.model.cast.source_code_data_type import (
+    SourceCodeDataType,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.source_ref import SourceRef
 from skema.program_analysis.CAST2GrFN.model.cast.string import String
-from skema.program_analysis.CAST2GrFN.model.cast.structure_type import StructureType
+from skema.program_analysis.CAST2GrFN.model.cast.structure_type import (
+    StructureType,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.subscript import Subscript
 from skema.program_analysis.CAST2GrFN.model.cast.tuple import Tuple
 from skema.program_analysis.CAST2GrFN.model.cast.unary_op import UnaryOp
-from skema.program_analysis.CAST2GrFN.model.cast.unary_operator import UnaryOperator
-from skema.program_analysis.CAST2GrFN.model.cast.value_constructor import ValueConstructor
+from skema.program_analysis.CAST2GrFN.model.cast.unary_operator import (
+    UnaryOperator,
+)
+from skema.program_analysis.CAST2GrFN.model.cast.value_constructor import (
+    ValueConstructor,
+)
 from skema.program_analysis.CAST2GrFN.model.cast.var import Var
 from skema.program_analysis.CAST2GrFN.model.cast.var_type import VarType

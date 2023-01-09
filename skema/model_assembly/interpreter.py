@@ -309,7 +309,10 @@ class ImperativeInterpreter(SourceInterpreter):
         """
         return {
             name: GroundedFunctionNetwork.from_AIR(
-                name, self.containers, self.variables, self.types,
+                name,
+                self.containers,
+                self.variables,
+                self.types,
             )
             for name in self.containers.keys()
             if self.container_code_types[name] is CodeType.MODEL

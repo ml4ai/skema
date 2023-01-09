@@ -45,7 +45,8 @@ def run_gcc(
 
 def gather_ast_files(input_files):
     ast_file_names = [
-        f"./{i.split('/')[-1].rsplit('.')[0]}_gcc_ast.json" for i in input_files
+        f"./{i.split('/')[-1].rsplit('.')[0]}_gcc_ast.json"
+        for i in input_files
     ]
 
     # Assert an ast was made for each input file

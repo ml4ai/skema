@@ -19,7 +19,7 @@ GCC_OPS_TO_CAST_OPS = {
     "le_expr": BinaryOperator.LTE,
     "lt_expr": BinaryOperator.LT,
     "rdiv_expr": BinaryOperator.DIV,
-    "trunc_div_expr": BinaryOperator.DIV, 
+    "trunc_div_expr": BinaryOperator.DIV,
     "eq_expr": BinaryOperator.EQ,
     "ne_expr": BinaryOperator.NOTEQ,
     "negate_expr": UnaryOperator.USUB,
@@ -31,7 +31,7 @@ GCC_OPS_TO_CAST_OPS = {
     "bit_not_expr": UnaryOperator.INVERT,
     "logical_or": BinaryOperator.OR,
     "logical_and": BinaryOperator.AND,
-    "trunc_mod_expr": BinaryOperator.MOD, 
+    "trunc_mod_expr": BinaryOperator.MOD,
 }
 
 GCC_CONST_OPS = ["integer_cst", "real_cst", "string_cst", "const_decl"]
@@ -166,11 +166,15 @@ def default_cast_val(type, type_ids_to_defined_types):
         object_name = type.split("object$")[-1]
 
         type_defs = [
-            t for t in type_ids_to_defined_types.values() if t.name == object_name
+            t
+            for t in type_ids_to_defined_types.values()
+            if t.name == object_name
         ]
         if len(type_defs) < 1:
             # TODO custom exception
-            raise Exception(f"Error: Unknown object type while parsing gcc ast {type}")
+            raise Exception(
+                f"Error: Unknown object type while parsing gcc ast {type}"
+            )
         type_def = type_defs[0]
 
         keys = []
@@ -203,7 +207,9 @@ def default_cast_val_for_gcc_types(type, type_ids_to_defined_types):
         return default_cast_val("List", type_ids_to_defined_types)
     elif type_name == "record_type":
         type_def = type_ids_to_defined_types[type["id"]]
-        return default_cast_val(f"object${type_def.name}", type_ids_to_defined_types)
+        return default_cast_val(
+            f"object${type_def.name}", type_ids_to_defined_types
+        )
     else:
         # TODO custom exception
         raise Exception(f"Error: Unknown gcc type {type_name}")

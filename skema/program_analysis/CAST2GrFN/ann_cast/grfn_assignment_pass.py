@@ -13,10 +13,11 @@ from skema.program_analysis.CAST2GrFN.ann_cast.ann_cast_helpers import (
     is_literal_assignment,
 )
 from skema.program_analysis.CAST2GrFN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2GrFN.model.cast import ( 
+from skema.program_analysis.CAST2GrFN.model.cast import (
     ScalarType,
     ValueConstructor,
 )
+
 
 class GrfnAssignmentPass:
     def __init__(self, pipeline_state: PipelineState):
@@ -34,15 +35,17 @@ class GrfnAssignmentPass:
         When visiting variable nodes, we add the variable to this `add_to` dict.
         When visiting call nodes, we add the function return value to this `add_to` dict.
         """
-        # print current node being visited.  
-        # this can be useful for debugging 
+        # print current node being visited.
+        # this can be useful for debugging
         # class_name = node.__class__.__name__
         # print(f"\nProcessing node type {class_name}")
 
         # call internal visit
         return self._visit(node, add_to)
 
-    def visit_node_list(self, node_list: typing.List[AnnCastNode], add_to: typing.Dict):
+    def visit_node_list(
+        self, node_list: typing.List[AnnCastNode], add_to: typing.Dict
+    ):
         return [self.visit(node, add_to) for node in node_list]
 
     @singledispatchmethod
@@ -59,23 +62,39 @@ class GrfnAssignmentPass:
         # create the LambdaNode
         metadata = create_lambda_node_metadata(node.source_refs)
         if is_literal_assignment(node.right):
-            node.grfn_assignment = GrfnAssignment(create_grfn_literal_node(metadata), LambdaType.LITERAL)
+            node.grfn_assignment = GrfnAssignment(
+                create_grfn_literal_node(metadata), LambdaType.LITERAL
+            )
         elif isinstance(node.left, AnnCastTuple):
-            node.grfn_assignment = GrfnAssignment(create_grfn_unpack_node(metadata), LambdaType.UNPACK)
+            node.grfn_assignment = GrfnAssignment(
+                create_grfn_unpack_node(metadata), LambdaType.UNPACK
+            )
         else:
-            node.grfn_assignment = GrfnAssignment(create_grfn_assign_node(metadata), LambdaType.ASSIGN)
-            
+            node.grfn_assignment = GrfnAssignment(
+                create_grfn_assign_node(metadata), LambdaType.ASSIGN
+            )
+
         self.visit(node.right, node.grfn_assignment.inputs)
         # The AnnCastTuple is added to handle scenarios where an assignment
         # is made by assigning to a tuple of values, as opposed to one singular value
-        assert isinstance(node.left, AnnCastVar) or isinstance(node.left, AnnCastTuple) or isinstance(node.left, AnnCastAttribute), f"container_scope: visit_assigment: node.left is not AnnCastVar or AnnCastTuple it is {type(node.left)}"
+        assert (
+            isinstance(node.left, AnnCastVar)
+            or isinstance(node.left, AnnCastTuple)
+            or isinstance(node.left, AnnCastAttribute)
+        ), f"container_scope: visit_assigment: node.left is not AnnCastVar or AnnCastTuple it is {type(node.left)}"
         self.visit(node.left, node.grfn_assignment.outputs)
 
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
-            print(f"GrFN {node.grfn_assignment.assignment_type} after visiting children:")
-            print(f"     grfn_assignment.inputs:  {node.grfn_assignment.inputs}")
-            print(f"     grfn_assignment.outputs: {node.grfn_assignment.outputs}")
+            print(
+                f"GrFN {node.grfn_assignment.assignment_type} after visiting children:"
+            )
+            print(
+                f"     grfn_assignment.inputs:  {node.grfn_assignment.inputs}"
+            )
+            print(
+                f"     grfn_assignment.outputs: {node.grfn_assignment.outputs}"
+            )
 
     @_visit.register
     def visit_attribute(self, node: AnnCastAttribute, add_to: typing.Dict):
@@ -97,25 +116,29 @@ class GrfnAssignmentPass:
     def visit_call(self, node: AnnCastCall, add_to: typing.Dict):
         if node.is_grfn_2_2:
             self.visit_call_grfn_2_2(node, add_to)
-            return 
+            return
 
         # add ret_val to add_to dict
         for id, fullid in node.out_ret_val.items():
             grfn_var = self.pipeline_state.get_grfn_var(fullid)
             add_to[fullid] = grfn_var.uid
-            
+
         # populate `arg_assignments` attribute of node
         for i, n in enumerate(node.arguments):
             # grab GrFN variable for argument
             arg_fullid = node.arg_index_to_fullid[i]
             arg_grfn_var = self.pipeline_state.get_grfn_var(arg_fullid)
-            
+
             # create GrfnAssignment based on assignment type
             metadata = create_lambda_node_metadata(node.source_refs)
             if is_literal_assignment(n):
-                arg_assignment = GrfnAssignment(create_grfn_literal_node(metadata), LambdaType.LITERAL)
+                arg_assignment = GrfnAssignment(
+                    create_grfn_literal_node(metadata), LambdaType.LITERAL
+                )
             else:
-                arg_assignment = GrfnAssignment(create_grfn_assign_node(metadata), LambdaType.ASSIGN)
+                arg_assignment = GrfnAssignment(
+                    create_grfn_assign_node(metadata), LambdaType.ASSIGN
+                )
 
             # store argument as output to GrfnAssignment
             arg_assignment.outputs[arg_fullid] = arg_grfn_var.uid
@@ -123,7 +146,6 @@ class GrfnAssignmentPass:
             self.visit(n, arg_assignment.inputs)
             # store GrfnAssignment for this argument
             node.arg_assignments[i] = arg_assignment
-
 
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
@@ -137,19 +159,23 @@ class GrfnAssignmentPass:
         for id, fullid in node.out_ret_val.items():
             grfn_var = self.pipeline_state.get_grfn_var(fullid)
             add_to[fullid] = grfn_var.uid
-            
+
         # populate `arg_assignments` attribute of node
         for i, n in enumerate(node.arguments):
             # grab GrFN variable for argument
             arg_fullid = node.arg_index_to_fullid[i]
             arg_grfn_var = self.pipeline_state.get_grfn_var(arg_fullid)
-            
+
             # create GrfnAssignment based on assignment type
             metadata = create_lambda_node_metadata(node.source_refs)
             if is_literal_assignment(n):
-                arg_assignment = GrfnAssignment(create_grfn_literal_node(metadata), LambdaType.LITERAL)
+                arg_assignment = GrfnAssignment(
+                    create_grfn_literal_node(metadata), LambdaType.LITERAL
+                )
             else:
-                arg_assignment = GrfnAssignment(create_grfn_assign_node(metadata), LambdaType.ASSIGN)
+                arg_assignment = GrfnAssignment(
+                    create_grfn_assign_node(metadata), LambdaType.ASSIGN
+                )
 
             # store argument as output to GrfnAssignment
             arg_assignment.outputs[arg_fullid] = arg_grfn_var.uid
@@ -179,23 +205,27 @@ class GrfnAssignmentPass:
         self.visit(node.expr, add_to)
 
     @_visit.register
-    def visit_function_def(self, node: AnnCastFunctionDef, add_to: typing.Dict):
-        # linking function arguments to formal parameters through the top 
+    def visit_function_def(
+        self, node: AnnCastFunctionDef, add_to: typing.Dict
+    ):
+        # linking function arguments to formal parameters through the top
         # interface is handled during VariableVersionPass, so we don't need to visit
         # func_args here
         self.visit_node_list(node.body, add_to)
 
     @_visit.register
-    def visit_literal_value(self, node: AnnCastLiteralValue, add_to: typing.Dict):
-        if node.value_type == 'List[Any]':
+    def visit_literal_value(
+        self, node: AnnCastLiteralValue, add_to: typing.Dict
+    ):
+        if node.value_type == "List[Any]":
             # val has
             # operator - string
             # size - Var node or a LiteralValue node (for number)
             # initial_value - LiteralValue node
             val = node.value
-            
+
             # visit size's anncast name node
-            self.visit(val.size, add_to) 
+            self.visit(val.size, add_to)
 
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
@@ -221,11 +251,15 @@ class GrfnAssignmentPass:
         pass
 
     @_visit.register
-    def visit_model_continue(self, node: AnnCastModelContinue, add_to: typing.Dict):
+    def visit_model_continue(
+        self, node: AnnCastModelContinue, add_to: typing.Dict
+    ):
         pass
 
     @_visit.register
-    def visit_model_import(self, node: AnnCastModelImport, add_to: typing.Dict):
+    def visit_model_import(
+        self, node: AnnCastModelImport, add_to: typing.Dict
+    ):
         pass
 
     @_visit.register
@@ -235,15 +269,23 @@ class GrfnAssignmentPass:
         self.visit_node_list(node.orelse, add_to)
 
     @_visit.register
-    def visit_model_return(self, node: AnnCastModelReturn, add_to: typing.Dict):
+    def visit_model_return(
+        self, node: AnnCastModelReturn, add_to: typing.Dict
+    ):
         # create the assignment LambdaNode for this return statement
         metadata = create_lambda_node_metadata(node.source_refs)
         if is_literal_assignment(node.value):
-            node.grfn_assignment = GrfnAssignment(create_grfn_literal_node(metadata), LambdaType.LITERAL)
+            node.grfn_assignment = GrfnAssignment(
+                create_grfn_literal_node(metadata), LambdaType.LITERAL
+            )
         elif isinstance(node.value, AnnCastTuple):
-            node.grfn_assignment = GrfnAssignment(create_grfn_pack_node(metadata), LambdaType.PACK)
+            node.grfn_assignment = GrfnAssignment(
+                create_grfn_pack_node(metadata), LambdaType.PACK
+            )
         else:
-            node.grfn_assignment = GrfnAssignment(create_grfn_assign_node(metadata), LambdaType.ASSIGN)
+            node.grfn_assignment = GrfnAssignment(
+                create_grfn_assign_node(metadata), LambdaType.ASSIGN
+            )
 
         self.visit(node.value, node.grfn_assignment.inputs)
 
@@ -253,9 +295,15 @@ class GrfnAssignmentPass:
 
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
-            print(f"GrFN RETURN with type {node.grfn_assignment.assignment_type} after visiting children:")
-            print(f"     grfn_assignment.inputs:  {node.grfn_assignment.inputs}")
-            print(f"     grfn_assignment.outputs: {node.grfn_assignment.outputs}")
+            print(
+                f"GrFN RETURN with type {node.grfn_assignment.assignment_type} after visiting children:"
+            )
+            print(
+                f"     grfn_assignment.inputs:  {node.grfn_assignment.inputs}"
+            )
+            print(
+                f"     grfn_assignment.outputs: {node.grfn_assignment.outputs}"
+            )
 
     @_visit.register
     def visit_module(self, node: AnnCastModule, add_to: typing.Dict):
