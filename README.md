@@ -6,6 +6,8 @@ This is the main code repository for the SKEMA project. It contains the source
 code and documentation for the text reading, structural alignment, and model
 role analysis components of SKEMA.
 
+## Directory structure
+
 This repository contains code written in Python, Rust, and Scala. The directory
 structure has been chosen to make the components written in all these languages
 coexist peacefully.
@@ -55,3 +57,11 @@ pip install -e .
 The `README.md` files in the `skema/skema-rs` and
 `skema/text_reading/text_reading` directories provide instructions on how to
 run the software components that are written in Rust and Scala respectively.
+
+## Code2FN Dockerized service
+
+To run the Code2FN Dockerized service, run
+
+```
+docker-compose -f docker-compose.code2fn.yml up --build
+```
