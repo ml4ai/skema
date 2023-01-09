@@ -25,6 +25,11 @@ def get_args():
         type=str,
         help="The path to a file containing a list of files to ingest",
     )
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="If true, the script write the output to a JSON file"
+    )
 
     options = parser.parse_args()
     return options
@@ -108,4 +113,4 @@ if __name__ == "__main__":
     print(f"With root directory as specified in: {path}")
     print(f"Ingesting the files as specified in: {files}")
 
-    process_file_system(system_name, path, files)
+    process_file_system(system_name, path, files, args.write)
