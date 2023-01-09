@@ -28,3 +28,24 @@ steps:
   when:
     paths:
       skema/text_reading/text_reading/**
+
+---
+kind: pipeline
+name: skema-py
+
+steps:
+- name: test_python
+  image: python:3.8-bullseye
+  commands:
+  - apt-get update
+  - apt-get -y -no-install-recommends install \
+    build-essential \
+    graphviz \
+    libgraphviz-dev
+  - pip install -e .[dev]
+  - pytest
+  when:
+    paths:
+      - skema/program_analysis/**
+      - skema/gromet/**
+      - skema/model_assembly/**
