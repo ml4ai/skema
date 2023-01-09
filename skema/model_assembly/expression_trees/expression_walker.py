@@ -2,8 +2,8 @@ import networkx as nx
 from tqdm import tqdm
 import ast
 
-from automates.model_assembly.networks import GroundedFunctionNetwork
-from automates.model_assembly.expression_trees.expression_visitor import (
+from skema.model_assembly.networks import GroundedFunctionNetwork
+from skema.model_assembly.expression_trees.expression_visitor import (
     ExpressionVisitor,
     nodes2DiGraph,
     ExprVariableNode,

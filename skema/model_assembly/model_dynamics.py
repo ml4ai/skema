@@ -1,14 +1,14 @@
 from copy import deepcopy
 
 from networkx.algorithms.simple_paths import all_simple_paths
-from automates.model_assembly.networks import (
+from skema.model_assembly.networks import (
     GrFNLoopSubgraph,
     GrFNSubgraph,
     GroundedFunctionNetwork,
     HyperEdge,
     LambdaNode,
 )
-from automates.model_assembly.structures import LambdaType
+from skema.model_assembly.structures import LambdaType
 
 
 def remove_node_and_hyper_edges(grfn: GroundedFunctionNetwork, node):
