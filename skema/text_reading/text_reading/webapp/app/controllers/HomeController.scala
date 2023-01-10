@@ -259,20 +259,15 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       }
       case e:EventMention => {
         val groundedArguments =
-          e.arguments map {
-            case (argName, ms) =>
-              argName -> ms.map(groundMention)
-          }
+          e.arguments.mapValues(_.map(groundMention))
+          
 
         e.copy(arguments = groundedArguments)
       }
       // This is duplicated while we fix the Mention trait to define the abstrtact method copy
       case e: RelationMention => {
         val groundedArguments =
-          e.arguments map {
-            case (argName, ms) =>
-              argName -> ms.map(groundMention)
-          }
+          e.arguments.mapValues(_.map(groundMention))
 
         e.copy(arguments = groundedArguments)
       }
