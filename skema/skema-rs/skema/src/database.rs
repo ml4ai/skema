@@ -1,15 +1,16 @@
 //! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
-/* TODO (1/7/23):
+/* TODO (1/8/23):
+-- Update to newest GroMEt spec
 -- Refactor repeated function call implementation to be more robust and in line with other methods
 -- Check and debug the wiring for complicated edge cases, some of which are in CHIME_SIR
 */
 
-/* Currently 1 case I don't think there is support for:
-2nd being for a second function call of the same function which contains an expression,
+/* Currently I don't think there is support for:
+There being a second function call of the same function which contains an expression,
     I believe the wiring will be messed up going into the expression from the second function
- */
+*/
 
 use rsmgclient::{ConnectParams, Connection, MgError};
 

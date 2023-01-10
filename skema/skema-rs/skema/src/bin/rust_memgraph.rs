@@ -9,6 +9,8 @@ use std::env;
 use std::fs;
 
 fn main() {
+    // debug outputs
+    let debug = true;
     // take in gromet location and deserialize
     let args: Vec<String> = env::args().collect();
     let path = &args[1];
@@ -17,10 +19,6 @@ fn main() {
 
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
-
-    /* for query in queries.iter() {
-        println!("{}", query);
-    } */
 
     // need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     let mut full_query = queries[0].clone();
@@ -33,5 +31,7 @@ fn main() {
     execute_query(&full_query, "localhost"); // The properties need to have quotes!!
 
     // writing output to file, since too long for std out now.
-    fs::write("debug.txt", full_query).expect("Unable to write file");
+    if debug {
+        fs::write("debug.txt", full_query).expect("Unable to write file");
+    }
 }
