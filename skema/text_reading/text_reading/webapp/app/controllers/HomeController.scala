@@ -245,6 +245,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val mentions = for (tf <- textsAndFilenames) yield {
       val Array(text, filename) = tf.split("<::>")
       // Extract mentions and apply grounding
+      // TODO: Sushma, this is the spot where pdf2txt should run over "text" to fix the pdf tokenization issues
       ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
         case tbm:TextBoundMention => {
           val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter{
