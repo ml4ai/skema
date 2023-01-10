@@ -15,8 +15,9 @@ where {
     FILTER(REGEX(?xname, '(?=.*(^|~|_|-)crop($|~|_|-))','i')) .
     BIND (STR(?xname) as ?name)}
 ORDER BY ?x ?name ?prefLabel ?wikip"""
-bashCommand = '''curl -X POST -H "Accept:application/sparql-results+json" --data-urlencode "query='query'" http://35.194.43.13:3030/ds/query'''
+bashCommand = """curl -X POST -H "Accept:application/sparql-results+json" --data-urlencode "query='query'" http://35.194.43.13:3030/ds/query"""
 import subprocess
+
 process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
 output, error = process.communicate()
 print(process)

@@ -18,6 +18,9 @@ libraryDependencies ++= {
     "org.clulab"                 %% "processors-main"            % procVer,
     "org.clulab"                 %% "model-streamed-trigram-ser" % "1.0.0",
     "com.lihaoyi"                %% "ujson"                      % uJsonVer,
-    "org.scalatest"              %% "scalatest"                  % "3.0.9" % Test
+    "org.scalatest"              %% "scalatest"                  % "3.0.9" % Test ,
+    "org.scalanlp"               %% "breeze"                     % "1.1",
+    "org.scalanlp"               %% "breeze-natives"             % "1.1",
+    "org.scalanlp"               %% "breeze-viz"                 % "1.1",
   )
 }

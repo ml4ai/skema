@@ -1,4 +1,3 @@
-
 name := "skema_text_reading"
 organization := "org.clulab"
 

@@ -1,0 +1,24 @@
+---
+# Model related parameters
+model:
+  # Monte Carlo related parameters
+  fitting:
+      mask_zero_reporting_days: True
+      mask_outliers: True
+      skip_low_reported_rates: True
+      power_transform_inc_series: True
+
+      extrap_args:
+        n_pts: 3
+        order: 1
+
+      gam_args:
+        alp: 1.5
+        tol: 1.0e-5
+        gam_inc: 8. #2.4
+        gam_cum: 8. #2.4
+        standardize: False
+        a_min: 0.0
+         
+        robust_weighting: False #True
+        robust_weighting_iters: 3

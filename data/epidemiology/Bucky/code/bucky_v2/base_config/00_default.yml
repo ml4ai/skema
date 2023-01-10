@@ -1,0 +1,211 @@
+# Default model parameters, epi params are largely drawn from CDC planning scenario 5:
+# https://www.cdc.gov/coronavirus/2019-ncov/hcp/planning-scenarios.html
+---
+# Model related parameters
+model:
+  # Monte Carlo related parameters
+  monte_carlo:
+
+    # TODO move these to a 'rejection' sub param (with reasons why?)?
+    # Min allowed mean latent period
+    Te_min: 1.
+
+    # Min allowed infectious period
+    Ti_min: 2.
+
+    # Global multiplicative rescaling factor on estimated CFR, TODO how is this different from F_fac?
+    F_scaling: 1.
+
+    # Global multiplicative rescaling factor on estimated R_h
+    Rh_scaling: 1.
+
+    # Default fractional variance for distributional parameters with no 'scale'
+    # Will be rescaled by the distribution's mean
+    default_gaussian_variance: 0.002282531931996345
+
+    # Magnitude of perturbations to apply to the Aij matrix
+    Aij_gaussian_perturbation_scale: 0.
+
+    # Multiplicative parameters applied to estimated values during initialization
+    Rt_fac:
+      distribution:
+        func: "approx_mPERT"
+        mu: 1.
+        a: .9
+        b: 1.3
+        gamma: 4.
+    R_fac:
+      distribution:
+        func: "approx_mPERT"
+        mu: .4
+        a: .2
+        b: .6
+        gamma: 1.
+    E_fac:
+      distribution:
+        func: "approx_mPERT"
+        mu: .7
+        a: .5
+        b: .9
+        gamma: 4.
+    H_fac:
+      distribution:
+        func: "approx_mPERT"
+        mu: .55
+        a: .35
+        b: .75
+        gamma: 1.5
+    F_fac:
+      distribution:
+        func: "approx_mPERT"
+        mu: 1.
+        a: .8
+        b: 1.2
+        gamma: 4.
+    
+
+  vaccine:
+    # Vaccine parameters
+    monte_carlo: True
+    dose1_t: 14
+    dose2_t: 35
+
+    vacc_hesitancy:
+      distribution:
+        func: "truncnorm"
+        loc: .7
+        a_min: 0.
+        a_max: 1.
+    vacc_eff_1:
+      distribution:
+        func: "truncnorm"
+        loc: .15 #.35
+        a_min: 0.
+        a_max: 1.
+    vacc_eff_2:
+      distribution:
+        func: "truncnorm"
+        loc: .55 #.75 #.95
+        a_min: 0.
+        a_max: 1.
+
+  # Parameters related to the epi 
+  epi:
+
+    # Generation interval prior
+    Tg:
+      distribution:
+        func: "truncnorm_from_CI"
+        CI: [3.5,6.5]
+        a_min: 1.
+   
+    # Serial interval prior
+    Ts:
+      distribution:
+        func: "truncnorm_from_CI"
+        CI: [3.,6.]
+        a_min: 1.
+
+    # Hazard ratio (for deaths) of current strain vs wildtype
+    HR_vs_wildtype:
+      distribution:
+        func: "truncnorm_from_CI"
+        CI: [.3, .55]
+        a_min: 0.
+        a_max: 1.
+
+    ASYM_FRAC:
+      # Fraction of infections that are asymptomatic
+      distribution:
+        func: "truncnorm"
+        loc: 0.40
+        a_min: 0.
+        a_max: 1.
+    
+    rel_inf_asym:
+      # Relative infectiousness of asymptomatic infections
+      distribution:
+        func: "truncnorm"
+        loc: .75
+        a_min: 0.
+        a_max: 1.
+
+    frac_trans_before_sym:
+      # Fraction of transmissions occuring before symptom onset
+      distribution:
+        func: "truncnorm"
+        loc: 0.50
+        #CI: [0.4, 0.6]
+        a_min: 0.
+        a_max: 1.
+ 
+    CHR:
+      # Case hospitalization rate
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [0.017, 0.045, 0.074]
+        a_min: 0.
+        a_max: 1.
+    
+    I_TO_H_TIME:
+      # Time from symptom onset to hospitalization
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [6., 6., 4.]
+        scale: [5.0, 5.3, 5.7]
+        a_min: 1.
+    
+    H_TIME:
+      # Time spent in hospital
+      # TODO this should to be calced as the weighted avg of the icu and non icu params in the newest planning doc
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [4.9, 7.6, 8.1]
+        a_min: 1.
+    
+    ICU_TIME:
+      # Time in ICU
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [9.5, 10.5, 10.0]
+        scale: [7.2, 7.0, 6.8]
+        a_min: 1.
+    
+    ICU_FRAC:
+      # Fraction of hospitalizations requiring ICU
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [.238, .361, .353]
+        a_min: 0.
+        a_max: 1.
+    
+    ICU_VENT_FRAC:
+      # Fraction of ICU patients requiring ventilation
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [.721, .776, .755]
+        a_min: 0.
+        a_max: 1.
+ 
+    D_REPORT_TIME:
+      # Time from death until reporting
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [7.1, 7.2, 6.6]
+        scale: [7.7, 7.7, 7.3]
+        a_min: 0.
+    
+    CASE_TO_DEATH_TIME:
+      # Time from symptom onset to death
+      age_bins: [[0,49], [50,64], [65,100]]
+      distribution:
+        func: "truncnorm"
+        loc: [15., 17., 14.]
+        a_min: 0.
