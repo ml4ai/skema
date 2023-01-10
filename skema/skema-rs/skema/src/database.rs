@@ -2977,8 +2977,8 @@ pub fn create_att_expression(
             nodes.push(n2.clone());
             // construct edge: expression -> Opo
             let e3 = Edge {
-                src: n2.node_id.clone(),
-                tgt: n1.node_id.clone(),
+                src: n1.node_id.clone(),
+                tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
                 prop: None,
             };
@@ -3235,8 +3235,8 @@ pub fn create_att_predicate(
             nodes.push(n2.clone());
             // construct edge: expression -> Opo
             let e3 = Edge {
-                src: n2.node_id.clone(),
-                tgt: n1.node_id.clone(),
+                src: n1.node_id.clone(),
+                tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
                 prop: None,
             };
@@ -3693,8 +3693,8 @@ pub fn create_opi(
             nodes.push(n2.clone());
             // construct edge: expression <- Opi
             let e3 = Edge {
-                src: n2.node_id.clone(),
-                tgt: parent_node.node_id.clone(),
+                src: parent_node.node_id.clone(),
+                tgt: n2.node_id.clone(),
                 e_type: String::from("Port_Of"),
                 prop: None,
             };
