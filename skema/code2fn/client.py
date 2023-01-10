@@ -46,4 +46,5 @@ url = f"http://{args.host}:{args.port}"
 data = system_to_json(args.root_path, args.system_filepaths, args.system_name)
 response = requests.post(url, data=data)
 
-print(data)
+with open(f"{args.system_name}--Gromet-FN-auto.json", "w") as f:
+    f.write(response.json())
