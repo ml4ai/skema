@@ -687,9 +687,6 @@ fn create_function_net(gromet: &Gromet, mut start: u32) -> Vec<String> {
     let mut metadata_idx = 0;
     let mut edges: Vec<Edge> = vec![];
 
-    /* Adding a conditional for limited support for if the code being analyzed is not executable,
-    such as library. This is the case for the demo, so this is for demo support. */
-
     let mut bf_counter: u8 = 1;
     for boxf in gromet.r#fn.bf.as_ref().unwrap().iter() {
         // construct the sub module level boxes along with their metadata and connection to module
