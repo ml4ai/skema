@@ -8,15 +8,16 @@ resolvers ++= Seq(
   ("Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release").withAllowInsecureProtocol(true)
 )
 
+dependencyOverrides += "xml-apis" % "xml-apis" % "1.4.01"
+
 libraryDependencies ++= {
   val procVer = "8.5.2"
   val uJsonVer = "2.0.0"
 
   Seq(
-    "org.clulab"                 %% "pdf2txt"            % "1.1.3" exclude("xml-apis", "xml-apis"),
-    "org.clulab"                 %% "processors-main"    % procVer exclude("xml-apis", "xml-apis"),
-    "org.clulab"                 %% "processors-corenlp" % procVer exclude("xml-apis", "xml-apis"),
-    "xml-apis"                    % "xml-apis"           % "1.4.01", // Use this instead of the above.
+    "org.clulab"                 %% "pdf2txt"            % "1.1.3",
+    "org.clulab"                 %% "processors-main"    % procVer,
+    "org.clulab"                 %% "processors-corenlp" % procVer,
     "ai.lum"                     %% "common"             % "0.0.10",
     "com.github.lum-ai"           % "regextools"         % "ee64b773a6", // github version, master commit
     "com.lihaoyi"                %% "ujson"              % uJsonVer,
