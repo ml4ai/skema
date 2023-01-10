@@ -15,7 +15,8 @@ libraryDependencies ++= {
     "com.typesafe.scala-logging" %% "scala-logging"              % "3.9.4",
     "ch.qos.logback"              % "logback-classic"            % "1.2.8",
     // scala
-    "org.clulab"                 %% "processors-main"            % procVer,
+    "org.clulab"                 %% "processors-main"            % procVer exclude("xml-apis", "xml-apis"),
+    "xml-apis"                    % "xml-apis"                   % "1.4.01",
     "org.clulab"                 %% "model-streamed-trigram-ser" % "1.0.0",
     "com.lihaoyi"                %% "ujson"                      % uJsonVer,
     "org.scalatest"              %% "scalatest"                  % "3.0.9" % Test ,

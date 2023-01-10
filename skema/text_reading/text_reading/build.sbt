@@ -13,9 +13,10 @@ libraryDependencies ++= {
   val uJsonVer = "2.0.0"
 
   Seq(
-    "org.clulab"                 %% "pdf2txt"            % "1.1.3",
-    "org.clulab"                 %% "processors-main"    % procVer,
-    "org.clulab"                 %% "processors-corenlp" % procVer,
+    "org.clulab"                 %% "pdf2txt"            % "1.1.3" exclude("xml-apis", "xml-apis"),
+    "org.clulab"                 %% "processors-main"    % procVer exclude("xml-apis", "xml-apis"),
+    "org.clulab"                 %% "processors-corenlp" % procVer exclude("xml-apis", "xml-apis"),
+    "xml-apis"                    % "xml-apis"           % "1.4.01", // Use this instead of the above.
     "ai.lum"                     %% "common"             % "0.0.10",
     "com.github.lum-ai"           % "regextools"         % "ee64b773a6", // github version, master commit
     "com.lihaoyi"                %% "ujson"              % uJsonVer,
