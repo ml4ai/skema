@@ -16,9 +16,6 @@ from utils.helper_functions import (
 
 from utils.init import init
 
-# def drawWOPIO(data, g):
-
-
 def draw_graph(gromet, program_name: str):
     data = gromet.to_dict()
     init(data)
@@ -118,5 +115,3 @@ def draw_graph(gromet, program_name: str):
                     if attr.get("value").get("b") != None:
                         for b in attr.get("value").get("b"):
                             g.edge(bf["node"], b.get("node"))
-
-    g.view()
