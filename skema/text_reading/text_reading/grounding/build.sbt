@@ -6,7 +6,7 @@ resolvers ++= Seq(
   ("Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release").withAllowInsecureProtocol(true)
 )
 
-// Coordinate this with the root project.
+// Coordinate this with the root project!
 dependencyOverrides += "xml-apis" % "xml-apis" % "1.4.01"
 
 libraryDependencies ++= {
