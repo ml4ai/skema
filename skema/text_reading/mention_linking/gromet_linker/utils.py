@@ -1,225 +1,256 @@
-import datetime
+from .gromet_helper import GrometHelper
+from .provenance_helper import ProvenanceHelper
+from .text_reading_linker import TextReadingLinker
+from skema.gromet.fn import GrometFNModule
+from skema.gromet.metadata import (
+    SourceCodeComment,
+    TextGrounding,
+    TextExtraction,
+    TextDescription,
+    TextLiteralValue,
+    TextualDocumentCollection,
+    TextualDocumentReference,
+    TextUnits,
+)
 from typing import Optional, Tuple
-from automates.gromet.metadata import SourceCodeComment, Provenance, TextGrounding, TextExtraction, TextDescription, TextLiteralValue, TextualDocumentCollection, TextualDocumentReference, TextUnits, TextExtractionMetadata
-
-from .mention_linking import TextReadingLinker
 
 import itertools as it
 
-def build_provenance(method:str) -> Provenance:
-	return Provenance(
-		method,
-		str(datetime.datetime.now())
-	)
 
-def get_element_metadata(elem, fn):
-	# Get the metadata, if exists
-	if elem.metadata:
-		metadata = fn.metadata_collection[elem.metadata - 1] # Minus 1 because it is 1-based indexing
-	else:
-		metadata = None
+class Utils:
+    @staticmethod
+    def get_code_file_ref(
+        comments_file_name: str, gromet_fn_module: GrometFNModule
+    ) -> Optional[str]:
+        """Fetches the UUID of the code_file_reference that matches the one from the comments file"""
 
-	return metadata
+        metadata_collection = GrometHelper.get_element_metadata(
+            gromet_fn_module, gromet_fn_module
+        )
+        code_collection = None
+        uid = None
 
-def get_element_line_numbers(elem, fn):
-	metadata = get_element_metadata(elem, fn)
+        for metadata in metadata_collection:
+            if metadata.metadata_type == "source_code_collection":
+                code_collection = metadata
+                break
 
-	# First, comments in the same line
-	# Get the line numbers, if available
-	if metadata:
-		for m in metadata:
-			if m.metadata_type == "source_code_reference":
-				return m.line_begin, m.line_end
-		
-	return None
+        if code_collection:
+            prefix = ".".join(comments_file_name.split(".")[:-1])
 
-def get_code_file_ref(comments_file_name: str, gromet) -> Optional[str]:
-	""" Fetches the UUID of the code_file_reference that matches the one from the comments file """
+            for file in code_collection.files:
+                if file.name.startswith(prefix):
+                    uid = file.uid
+                    break
 
-	mdc = get_element_metadata(gromet, gromet)
-	code_collection = None
-	uid = None
+        return uid
 
-	for md in mdc:
-		if md.metadata_type == "source_code_collection":
-			code_collection = md
-			break
+    @staticmethod
+    def get_doc_file_ref(
+        provenance_helper: ProvenanceHelper,
+        uid_stamper,
+        scored_mention,
+        linker: TextReadingLinker,
+        gromet_fn_module: GrometFNModule,
+    ) -> Optional[str]:
+        """Fetches the UUID of the text doc reference that matches the one from the mention's file"""
 
-	if code_collection:
-		prefix = ".".join(comments_file_name.split(".")[:-1])
-		
-		for file in code_collection.files:
-			if file.name.startswith(prefix):
-				uid = file.uid
-				break
+        mention, _ = scored_mention
+        metadata_collection = GrometHelper.get_element_metadata(
+            gromet_fn_module, gromet_fn_module
+        )
+        text_collection = None
+        uid = None
 
-	return uid
+        for metadata in metadata_collection:
+            if metadata.metadata_type == "textual_document_collection":
+                text_collection = metadata
+                break
 
-def get_doc_file_ref(scored_mention, linker:TextReadingLinker, gromet) -> Optional[str]:
-	""" Fetches the UUID of the text doc reference that matches the one from the mention's file """
+        # If the text doc collection doesn't exist, then add it
+        if not text_collection:
+            text_collection = TextualDocumentCollection(
+                provenance=provenance_helper.build_embedding(),
+                documents=list(),
+            )
 
-	mention, _ = scored_mention
-	mdc = get_element_metadata(gromet, gromet)
-	text_collection = None
-	uid = None
+            metadata_collection.append(text_collection)
 
-	for md in mdc:
-		if md.metadata_type == "textual_document_collection":
-			text_collection = md
-			break
+        if text_collection:
+            mention_doc = linker.documents[mention["document"]]
+            doc_id = mention_doc["id"]
+            existing_docs_refs = text_collection.documents
 
-	# If the text doc collection doesn't exist, then add it
-	if not text_collection:
-		text_collection = TextualDocumentCollection(
-			provenance = build_provenance("embedding_similarity_1.0"),
-			documents= list()
-		)
+            doc_ref = None
+            for dr in existing_docs_refs:
+                if doc_id == dr.cosmos_id:
+                    doc_ref = dr
+                    break
 
-		mdc.append(text_collection)
+            # Create a new TextDocumentReference if it doesn't exist yet
+            if not doc_ref:
+                # TODO Figure out all the correct values here
+                doc_ref = TextualDocumentReference(
+                    uid=uid_stamper.stamp(doc_id),
+                    global_reference_id="TBD",
+                    cosmos_id=doc_id,
+                    cosmos_version_number=0.1,
+                    skema_id=0.1,
+                )
 
-	if text_collection:
-		mention_doc = linker.documents[mention['document']]
-		doc_id = mention_doc['id']
-		existing_docs_refs = text_collection.documents
+                existing_docs_refs.append(doc_ref)
 
-		doc_ref = None
-		for dr in existing_docs_refs:
-			if doc_id == dr.cosmos_id:
-				doc_ref = dr
-				break
+            uid = doc_ref.uid
 
-		# Create a new TextDocumentReference if it doesn't exist yet
-		if not doc_ref:
-			# TODO Figure out all the correct values here
-			doc_ref = TextualDocumentReference(
-				uid = str(hash(doc_id)),
-				global_reference_id= "TBD",
-				cosmos_id= doc_id,
-				cosmos_version_number= 0.1,
-				skema_id= 0.1
-			)
+        return uid
 
-			existing_docs_refs.append(doc_ref)
+    @staticmethod
+    def build_comment_metadata(
+        provenance_helper: ProvenanceHelper,
+        comment: str,
+        code_file_ref: str,
+        element,
+        gromet: GrometFNModule,
+    ):
+        # TODO: Differentiate between line comments and docstrings
+        line, text = None, comment
+        md = SourceCodeComment(
+            provenance=provenance_helper.build_comment(),
+            code_file_reference_uid=code_file_ref,
+            comment=text,
+            line_begin=line,
+            line_end=line,  # TODO Should it be +1?
+        )
+        Utils.attach_metadata(md, element, gromet)
 
-		uid = doc_ref.uid
+    @staticmethod
+    def build_line_comment_metadata(
+        provenance_helper: ProvenanceHelper,
+        line_comment: Tuple[int, str],
+        code_file_ref: str,
+        element,
+        gromet: GrometFNModule,
+    ):
+        # TODO: Differentiate between line comments and docstrings
+        line, text = line_comment
+        md = SourceCodeComment(
+            provenance=provenance_helper.build_comment(),
+            code_file_reference_uid=code_file_ref,
+            comment=text,
+            line_begin=line,
+            line_end=line,  # TODO Should it be +1?
+        )
 
+        Utils.attach_metadata(md, element, gromet)
 
-	return uid
+    @staticmethod
+    def build_textreading_mention_metadata(
+        provenance_helper: ProvenanceHelper,
+        scored_mention,
+        doc_file_ref: str,
+        element,
+        gromet: GrometFNModule,
+    ):
 
-def build_comment_metadata(comment:Tuple[int, str] | str, code_file_ref:str , element, gromet):
+        mention, score = scored_mention
 
-	# TODO: Differientiate between line comments and docstrings
+        page_num, block = None, None
+        for attachment in mention["attachments"]:
+            if "pageNum" in attachment:
+                page_num = attachment["pageNum"][0]
+            if "blockIdx" in attachment:
+                block = attachment["blockIdx"][0]
 
-	if type(comment) == tuple:		
-		line, text = comment
-	else:
-		line, text = None, comment
+        text_extraction = TextExtraction(
+            document_reference_uid=doc_file_ref,
+            page=page_num,
+            block=block,
+            char_begin=mention["characterStartOffset"],
+            char_end=mention["characterEndOffset"],
+        )
 
-	md = SourceCodeComment(
-		provenance= build_provenance("heuristic_1.0"),
-		code_file_reference_uid= code_file_ref,
-		comment=text,
-		line_begin= line,
-		line_end=line, # TODO Should it be +1?
-	)
+        # if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
+        if mention["labels"][0] == "ParameterSetting":
+            # ParameterSetting
+            md = TextLiteralValue(
+                provenance=provenance_helper.build_embedding(),
+                text_extraction=text_extraction,
+                value=mention["arguments"]["value"][0]["text"],
+                variable_identifier=mention["arguments"]["variable"][0][
+                    "text"
+                ],
+            )
+        # elif 'variable' in mention['arguments']:
+        elif mention["labels"][0] == "ParamAndUnit":
+            # UnitRelation, ParamAndUnit
+            # Candidate definition argument names
 
-	attach_metadata(md, element, gromet)
+            md = TextDescription(
+                provenance=provenance_helper.build_embedding(),
+                text_extraction=text_extraction,
+                variable_identifier=mention["arguments"]["variable"][0][
+                    "text"
+                ],
+                variable_definition=mention["arguments"]["description"][0][
+                    "text"
+                ],
+            )
+        elif mention["labels"][0] == "UnitRelation":
+            # UnitRelation, ParamAndUnit
+            # Candidate definition argument names
 
-def build_tr_mention_metadata(scored_mention, doc_file_ref: str, element, gromet):
+            md = TextUnits(
+                provenance=provenance_helper.build_embedding(),
+                text_extraction=text_extraction,
+                variable_identifier=mention["arguments"]["variable"][0][
+                    "text"
+                ],
+                unit_type=mention["arguments"]["unit"][0]["text"],
+            )
+        else:
+            md = None
 
-	mention, score = scored_mention
+        if md:
+            md.score = score
+            # Metametadata, the metadata of the metadata
+            # Generate the groundings
+            groundings = list()
+            for arg_name, arg in mention["arguments"].items():
+                for attachment in arg[0]["attachments"]:
+                    if type(attachment) == list:
+                        for g in attachment[0]:
+                            grounding = TextGrounding(
+                                argument_name=arg_name,
+                                id=g["id"],
+                                description=g["name"],
+                                score=g["score"],
+                            )
+                            groundings.append(grounding)
 
-	page_num, block = None, None
-	for attachment in mention['attachments']:
-		if 'pageNum' in attachment:
-			page_num = attachment['pageNum'][0]
-		if 'blockIdx' in attachment:
-			block = attachment['blockIdx'][0]
+            md.grounding = groundings
 
-	text_extraction = TextExtraction(
-		document_reference_uid= doc_file_ref,
-		page= page_num,
-		block= block,
-		char_begin= mention['characterStartOffset'],
-		char_end= mention['characterEndOffset']
-	)
+            # Attach the tr linking metadata to the gromet element
+            Utils.attach_metadata(md, element, gromet)
 
-	
+    @staticmethod
+    def attach_metadata(new_metadata, element, gromet: GrometFNModule):
 
-	# if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
-	if mention['labels'][0] == "ParameterSetting":
-		# ParameterSetting
-		md = TextLiteralValue(
-			provenance = build_provenance("embedding_similarity_1.0"),
-			text_extraction= text_extraction,
-			value= mention['arguments']['value'][0]['text'],
-			variable_identifier= mention['arguments']['variable'][0]['text']
-		)
-	# elif 'variable' in mention['arguments']:
-	elif mention['labels'][0] == "ParamAndUnit":
-		# UnitRelation, ParamAndUnit
-		# Candidate definition argument names
+        existing_metadata = GrometHelper.get_element_metadata(element, gromet)
 
-		md = TextDescription(
-			provenance = build_provenance("embedding_similarity_1.0"),
-			text_extraction= text_extraction,
-			variable_identifier= mention['arguments']['variable'][0]['text'],
-			variable_definition= mention['arguments']['description'][0]['text']
-		)
-	elif mention['labels'][0] == "UnitRelation":
-		# UnitRelation, ParamAndUnit
-		# Candidate definition argument names
+        # First, comments in the same line
+        # Get the line numbers, if available
+        if existing_metadata:
+            metadata_array = existing_metadata
+        else:
+            # If it doesn't exist, add it
+            # First create an empty list
+            metadata_array = list()
+            # Then add it to the gromet fn
+            md_collection = gromet.metadata_collection
+            md_collection.append(metadata_array)
+            # Finally, cross reference it to the gromet element
+            md_index = len(md_collection)
+            element.metadata = md_index
 
-		md = TextUnits(
-			provenance = build_provenance("embedding_similarity_1.0"),
-			text_extraction= text_extraction,
-			variable_identifier= mention['arguments']['variable'][0]['text'],
-			unit_type= mention['arguments']["unit"][0]['text']
-		)
-	else:
-		md = None
-
-	if md:
-		md.score = score
-		# Metametadata, the metadata of the metadata
-		# Generate the groundings
-		groundings = list()
-		for arg_name, arg in mention['arguments'].items():
-			for attachment in arg[0]['attachments']:
-				if type(attachment) == list:
-					for g in attachment[0]:
-						grounding = TextGrounding(
-							argument_name= arg_name,
-							id = g['id'],
-							description= g['name'],
-							score= g['score']
-						)
-						groundings.append(grounding)
-
-		md.grounding = groundings
-
-		# Attach the tr linking metadata to the gromet element
-		attach_metadata(md, element, gromet)
-
-
-def attach_metadata(new_metadata, element, gromet):
-
-	existing_metadata = get_element_metadata(element, gromet)
-
-	# First, comments in the same line
-	# Get the line numbers, if available
-	if existing_metadata:
-		metadata_array = existing_metadata
-	else:
-		# If it doesn't exist, add it
-		# First create an empty list
-		metadata_array = list()
-		# Then add it to the gromet fn
-		md_collection = gromet.metadata_collection
-		md_collection.append(metadata_array)
-		# Finally, cross reference it to the gromet element
-		md_index = len(md_collection)
-		element.metadata = md_index
-
-	# Append the new metadata element to the appropriate array
-	metadata_array.append(new_metadata)
+        # Append the new metadata element to the appropriate array
+        metadata_array.append(new_metadata)
