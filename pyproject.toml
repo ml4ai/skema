@@ -21,7 +21,14 @@ requires-python="==3.8.*"
 license={text="MIT"}
 
 [project.optional-dependencies]
+# Dev dependencies.
+# - fastapi & uvicorn: For running the code2fn REST API server
+# - requests: For testing the code2fn example client
+# - pytest: for running tests
 dev = ["fastapi", "requests", "uvicorn", "pytest"]
+
+# MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
+# the skema/moviz directory).
 moviz = ["flask", "graphviz"]
 
 [tool.setuptools.packages]
