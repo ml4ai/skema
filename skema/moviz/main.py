@@ -3,39 +3,27 @@ from flask import Flask, render_template
 import os
 import shutil
 import glob
+from pathlib import Path
+import argparse
 
-from utils.create_json import run_pipeline_export_gromet
-from utils.create_viz import draw_graph
+from skema.moviz.utils.create_json import run_cast_to_gromet_pipeline
+from skema.moviz.utils.create_viz import draw_graph
+from skema.program_analysis.python2cast import python_to_cast
 
 
 app = Flask(__name__)
-
 
 @app.route("/")
 @app.route("/index")
 def execute():
 
-    PYTHON_SOURCE_FILE = "inputs/while3.py"
-    PROGRAM_NAME = PYTHON_SOURCE_FILE.rsplit(".")[0].rsplit("/")[-1]
+    filepath = Path(__file__).parents[0] / "../../data/gromet/examples/while3/while3.py"
+    program_name = filepath.stem
 
-    run_pipeline_export_gromet(PYTHON_SOURCE_FILE, PROGRAM_NAME)
+    cast = python_to_cast(str(filepath), cast_obj=True)
+    gromet = run_cast_to_gromet_pipeline(cast)
 
-    src = f"{PROGRAM_NAME}--Gromet-FN-auto.json"
-    dest = "data"
-
-    if os.path.exists(
-        os.path.join(dest, f"{PROGRAM_NAME}--Gromet-FN-auto.json")
-    ):
-        os.remove(os.path.join(dest, f"{PROGRAM_NAME}--Gromet-FN-auto.json"))
-        shutil.move(src, dest)
-    else:
-        shutil.move(src, dest)
-
-    draw_graph(PROGRAM_NAME)
-    full_filename = os.path.join("static", f"{PROGRAM_NAME}.png")
-
-    # print(full_filename)
-    # if os.path.exists(os.path.join(dest, f"{PROGRAM_NAME}--Gromet-FN-auto.json")):
-    #     os.remove(os.path.join(dest, f"{PROGRAM_NAME}--Gromet-FN-auto.json"))
+    draw_graph(gromet, program_name)
+    full_filename = os.path.join("static", f"{program_name}.png")
 
     return render_template("index.html", output_image=full_filename)
