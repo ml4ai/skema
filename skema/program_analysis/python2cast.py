@@ -1,7 +1,7 @@
 import os
 import sys
 import ast
-from . import astpp
+from skema.program_analysis import astpp
 import json
 import argparse
 from skema.program_analysis.PyAST2CAST import py_ast_to_cast
