@@ -55,7 +55,7 @@ class Image2Tensor(object):
         """
 
         # crop, resize, and pad the image
-        IMAGE = Image.open(image_path).convert("L")
+        IMAGE = Image.open(io.BytesIO(image_path)).convert("L")
         IMAGE = self.resize_image(IMAGE)
         IMAGE = self.pad_image(IMAGE)
         # convert to tensor
