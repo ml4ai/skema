@@ -14,15 +14,26 @@ dependencies=[
     "dill",
     "networkx",
     "pygraphviz",
-    "pytest"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
 requires-python="==3.8.*"
 license={text="MIT"}
 
-[optional-dependencies]
-dev = ["fastapi", "requests", "uvicorn"]
+[project.optional-dependencies]
+# Dev dependencies.
+# - fastapi & uvicorn: For running the code2fn REST API server
+# - requests: For testing the code2fn example client
+# - pytest: for running tests
+dev = ["fastapi", "requests", "uvicorn", "pytest"]
+
+# MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
+# the skema/moviz directory).
+moviz = ["flask", "graphviz"]
+
+# Im2MML dependencies. The im2mml service converts equation images to MathML.
+# See the skema/im2mml directory.
+im2mml = ["torch"]
 
 [tool.setuptools.packages]
 find = {}  # Scan the project directory with the default parameters
