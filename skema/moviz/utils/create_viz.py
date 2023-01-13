@@ -115,3 +115,4 @@ def draw_graph(gromet, program_name: str):
                     if attr.get("value").get("b") != None:
                         for b in attr.get("value").get("b"):
                             g.edge(bf["node"], b.get("node"))
+    return g

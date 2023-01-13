@@ -6,6 +6,7 @@ from pathlib import Path
 from skema.moviz.utils.create_json import run_cast_to_gromet_pipeline
 from skema.moviz.utils.create_viz import draw_graph
 from skema.program_analysis.python2cast import python_to_cast
+import base64
 
 
 app = Flask(__name__)
@@ -14,10 +15,14 @@ app = Flask(__name__)
 @app.route("/index")
 def execute():
 
-    filepath = Path(__file__).parents[0] / "../../data/gromet/examples/while3/while3.py"
+    cwd = Path(__file__).parents[0]
+    filepath = cwd / "../../data/gromet/examples/while3/while3.py"
     program_name = filepath.stem
     cast = python_to_cast(str(filepath), cast_obj=True)
     gromet = run_cast_to_gromet_pipeline(cast)
-    draw_graph(gromet, program_name)
-    full_filename = os.path.join("static", f"{program_name}.png")
-    return render_template("index.html", output_image=full_filename)
+    graph = draw_graph(gromet, program_name)
+
+    # Get the raw bytes, encode them via base64, then decode them via utf-8.
+    # We embed the image directly in the HTML template.
+    output = str(base64.b64encode(graph.pipe()), encoding="utf-8")
+    return render_template("index.html", output_image=output)
