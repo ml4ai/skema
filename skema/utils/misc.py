@@ -1,3 +1,4 @@
+import sys
 import platform
 import random
 import uuid
@@ -10,6 +11,16 @@ import uuid
 rd = random.Random()
 uuid.uuid4 = lambda: uuid.UUID(int=rd.getrandbits(128))
 # -------------------------------------------
+
+def test_pygraphviz(error_message):
+    """Tests whether the pygraphviz package is installed.
+    If not, raises an exception"""
+
+    if "pygraphviz" not in sys.modules:
+        raise ModuleNotFoundError(
+            "The pygraphviz package is not installed! "
+            f"{error_message}"
+        )
 
 
 def choose_font():
