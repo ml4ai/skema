@@ -87,7 +87,7 @@ def process_file_system(
                 if fn.b[0].function_type == "FUNCTION"
             ]
             if "main" in defined_functions:
-                module_collection.executables.append(python_module_path)
+                module_collection.executables.append(len(module_collection.module_index))
 
         except ImportError:
             print("FAILURE")
