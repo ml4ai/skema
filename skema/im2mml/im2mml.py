@@ -9,6 +9,7 @@ from skema.im2mml.api import get_mathml_from_bytes
 
 app = FastAPI()
 
+
 @app.put("/get-mml", summary="Get MathML representation of an equation image")
 async def get_mathml(file: bytes = File()):
     """

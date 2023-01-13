@@ -15,7 +15,9 @@ import torch.multiprocessing as mp
 from torchvision import transforms
 from PIL import Image
 from skema.im2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.im2mml.models.image2mml_xfmer_for_inference import Image2MathML_Xfmer
+from skema.im2mml.models.image2mml_xfmer_for_inference import (
+    Image2MathML_Xfmer,
+)
 from skema.im2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.im2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io

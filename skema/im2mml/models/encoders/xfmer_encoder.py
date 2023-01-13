@@ -1,7 +1,9 @@
 import torch, math
 import torch.nn as nn
 from skema.im2mml.utils import generate_square_subsequent_mask
-from skema.im2mml.models.encoding.positional_encoding_for_xfmer import PositionalEncoding
+from skema.im2mml.models.encoding.positional_encoding_for_xfmer import (
+    PositionalEncoding,
+)
 
 
 class Transformer_Encoder(nn.Module):

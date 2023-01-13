@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "input",
         help="The path to the PNG file to process",
-        default="tests/data/261.png"
+        default="tests/data/261.png",
     )
 
     mml = get_mml("tests/data/261.png")
