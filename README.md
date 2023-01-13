@@ -71,3 +71,7 @@ To run the Im2MML Dockerized service, run
 ```
 docker-compose -f docker-compose.im2mml.yml up --build
 ```
+
+(make sure the appropriate im2mml model is in the
+`skema/im2mml/trained_models` directory - see the `README.md` file in
+`skema/im2mml` for details)
