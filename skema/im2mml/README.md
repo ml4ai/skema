@@ -23,9 +23,8 @@ docker-compose up --build
 ```
 
 To test the service without Docker (e.g., for development purposes), ensure
-that you have installed the required
-packages (either run `pip install -r requirements.txt` in this directory, or
-`pip install -e .[im2mml]` in the root of the repository).
+that you have installed the required packages (run `pip install -e .[im2mml]`
+in the root of the repository).
 
 Then, run the following command to launch the im2mml server program:
 
