@@ -61,9 +61,8 @@ steps:
   - apt-get update
   - apt-get -y install build-essential graphviz libgraphviz-dev
   - pip install -e .[im2mml]
-  - pip install pytest-cov
   - curl -L https://kraken.sista.arizona.edu/skema/im2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/im2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
-  - pytest --cov=skema skema/im2mml/tests
+  - pytest skema/im2mml/tests
   when:
     paths:
     - pyproject.toml
