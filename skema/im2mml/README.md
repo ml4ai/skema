@@ -12,7 +12,7 @@ https://kraken.sista.arizona.edu/skema/im2mml/models/cnn_xfmer_OMML-90K_best_mod
 The curl command below should do the trick.
 
 ```
-curl -L https://kraken.sista.arizona.edu/skema/im2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > generate_mathml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+curl -L https://kraken.sista.arizona.edu/skema/im2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
 ```
 
 Place the model file in the `generate_mathml` directory, then run the

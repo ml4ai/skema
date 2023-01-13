@@ -14,13 +14,12 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 from torchvision import transforms
 from PIL import Image
-from models.encoders.cnn_encoder import CNN_Encoder
-from models.image2mml_xfmer_for_inference import Image2MathML_Xfmer
-from models.encoders.xfmer_encoder import Transformer_Encoder
-from models.decoders.xfmer_decoder import Transformer_Decoder
+from skema.im2mml.models.encoders.cnn_encoder import CNN_Encoder
+from skema.im2mml.models.image2mml_xfmer_for_inference import Image2MathML_Xfmer
+from skema.im2mml.models.encoders.xfmer_encoder import Transformer_Encoder
+from skema.im2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
 from typing import List
-from fastapi import FastAPI, File
 
 
 class Image2Tensor(object):
@@ -210,36 +209,3 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
         model.load_state_dict(torch.load(model_path))
 
     return evaluate(model, vocab, imagetensor, device)
-
-
-# Create a web app using FastAPI
-
-app = FastAPI()
-
-
-@app.put("/get-mml", summary="Get MathML representation of an equation image")
-async def get_mathml(file: bytes = File()):
-    """
-    Creates a web app using FastAPI for rendering MathML for an image
-    by specifying the  parameters for the render_mml function.
-    """
-    # convert png image to tensor
-    i2t = Image2Tensor()
-    imagetensor = i2t(file)
-    print("image done!")
-
-    # change the shape of tensor from (C_in, H, W)
-    # to (1, C_in, H, w) [batch =1]
-    imagetensor = imagetensor.unsqueeze(0)
-
-    # read config file
-    config_path = "configs/ourmml_xfmer_config.json"
-    with open(config_path, "r") as cfg:
-        config = json.load(cfg)
-
-    # read vocab.txt
-    vocab = open("vocab.txt").readlines()
-
-    model_path = "trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt"
-
-    return render_mml(config, model_path, vocab, imagetensor)
