@@ -9,14 +9,16 @@ service was developed by Deepsana Shahi and Adarsh Pyarelal.
 The model itself is not checked into the repository, but you can get it from
 here:
 https://kraken.sista.arizona.edu/skema/im2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt.
+
+Place the model file in the `trained_models` directory.
+
 The curl command below should do the trick.
 
 ```
 curl -L https://kraken.sista.arizona.edu/skema/im2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
 ```
 
-Place the model file in the `generate_mathml` directory, then run the
-invocation below to launch the Dockerized service:
+Then, run the invocation below to launch the Dockerized service:
 
 ```
 docker-compose up --build

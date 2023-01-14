@@ -58,10 +58,20 @@ The `README.md` files in the `skema/skema-rs` and
 `skema/text_reading/text_reading` directories provide instructions on how to
 run the software components that are written in Rust and Scala respectively.
 
-## Code2FN Dockerized service
+## Dockerized services
 
 To run the Code2FN Dockerized service, run
 
 ```
 docker-compose -f docker-compose.code2fn.yml up --build
 ```
+
+To run the Im2MML Dockerized service, run
+
+```
+docker-compose -f docker-compose.im2mml.yml up --build
+```
+
+(make sure the appropriate im2mml model is in the
+`skema/im2mml/trained_models` directory - see the `README.md` file in
+`skema/im2mml` for details)
