@@ -30,6 +30,10 @@ import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
 //import org.ml4ai.grounding.MiraEmbeddingsGrounder
 import play.api.mvc._
 import play.api.libs.json._
+import org.clulab.pdf2txt.Pdf2txt
+import org.clulab.pdf2txt.common.pdf.TextConverter
+import org.clulab.pdf2txt.languageModel.GigawordLanguageModel
+import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 
 
 
@@ -68,7 +72,24 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, 10, 0.25f) // TODO: Fix this @Enrique
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, 10, 0.0f) // TODO: Fix this @Enrique
+
+  val pdfConverter = new TextConverter()
+  val languageModel = GigawordLanguageModel()
+  val preprocessors = Array(
+    new LinePreprocessor(),
+    new ParagraphPreprocessor(),
+    new UnicodePreprocessor(),
+    new CasePreprocessor(CasePreprocessor.defaultCutoff),
+    new NumberPreprocessor(NumberPreprocessor.Hyperparameters()),
+    new LigaturePreprocessor(languageModel),
+    new LineBreakPreprocessor(languageModel),
+    new WordBreakByHyphenPreprocessor(),
+    new WordBreakBySpacePreprocessor(languageModel) // This is by default NeverLanguageModel.
+  )
+  val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
+
+
   logger.info("Completed Initialization ...")
   // -------------------------------------------------
 
@@ -172,7 +193,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def process_text: Action[JsValue] = Action(parse.json) { request =>
     val data = request.body.toString()
     val json = ujson.read(data)
-    val text = json("text").str
+    val rawText = json("text").str
+    val text = pdf2txt.process(rawText, maxLoops = 1)
+    println(rawText)
+    println(text)
     val gazetteer = json.obj.get("entities").map(_.arr.map(_.str))
 
     val mentionsJson = getOdinJsonMentions(ieSystem, text, gazetteer)
@@ -243,9 +267,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     println("started extracting")
     // extract mentions form each text block
     val mentions = for (tf <- textsAndFilenames) yield {
-      val Array(text, filename) = tf.split("<::>")
+      val Array(rawText, filename) = tf.split("<::>")
       // Extract mentions and apply grounding
-      // TODO: Sushma, this is the spot where pdf2txt should run over "text" to fix the pdf tokenization issues
+
+      val text = pdf2txt.process(rawText, maxLoops = 1)
+
       ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
         case tbm:TextBoundMention => {
           val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter{
