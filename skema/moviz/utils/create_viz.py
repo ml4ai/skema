@@ -16,18 +16,13 @@ from utils.helper_functions import (
 
 from utils.init import init
 
-# def drawWOPIO(data, g):
-
-
-def draw_graph(PROGRAM_NAME):
-    f = open(f"data/{PROGRAM_NAME}--Gromet-FN-auto.json", "r")
-    data = json.loads(f.read())
-
+def draw_graph(gromet, program_name: str):
+    data = gromet.to_dict()
     init(data)
 
     g = graphviz.Graph(
         "G",
-        filename=PROGRAM_NAME,
+        filename=program_name,
         engine="fdp",
         format="png",
         directory="static",
@@ -120,5 +115,4 @@ def draw_graph(PROGRAM_NAME):
                     if attr.get("value").get("b") != None:
                         for b in attr.get("value").get("b"):
                             g.edge(bf["node"], b.get("node"))
-
-    g.view()
+    return g

@@ -56,6 +56,18 @@ so that it is available for scripts running in that virtual environment.
 pip install -e .
 ```
 
+The command above installs the minimum set packages required for the Code2FN
+pipeline. There are a couple of extra features that you can install as well
+with an alternative invocation. For example, the invocation below installs
+packages required for the `moviz` extra.
+
+
+```
+pip install -e .[moviz]
+```
+
+For more details on the available extras, see the `pyproject.toml` file.
+
 The `README.md` files in the `skema/skema-rs` and
 `skema/text_reading/text_reading` directories provide instructions on how to
 run the software components that are written in Rust and Scala respectively.

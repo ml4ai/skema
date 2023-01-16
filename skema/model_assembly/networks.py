@@ -14,7 +14,6 @@ import os
 import networkx as nx
 import numpy as np
 from networkx.algorithms.simple_paths import all_simple_paths
-from pygraphviz import AGraph
 
 from .sandbox import load_lambda_function
 from .air import AutoMATES_IR
@@ -1725,6 +1724,8 @@ class GroundedFunctionNetwork(nx.DiGraph):
 
     def to_AGraph(self):
         """Export to a PyGraphviz AGraph object."""
+
+        from pygraphviz import AGraph
         var_nodes = [n for n in self.nodes if isinstance(n, VariableNode)]
         input_nodes = []
         for v in var_nodes:
