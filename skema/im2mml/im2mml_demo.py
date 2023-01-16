@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """Example Python client program to work with the im2mml web service."""
 
 import argparse
@@ -20,10 +22,11 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "input",
+        "--input",
         help="The path to the PNG file to process",
         default="tests/data/261.png",
     )
 
-    mml = get_mml("tests/data/261.png")
+    args = parser.parse_args()
+    mml = get_mml(args.input)
     print(mml)
