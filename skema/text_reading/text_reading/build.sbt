@@ -23,7 +23,10 @@ libraryDependencies ++= {
     "com.typesafe.play"          %% "play-json"          % "2.9.3",
     "org.scala-lang.modules"     %% "scala-xml"          % "1.0.6", // 2.1.0",
     "org.clulab"                 %  "glove-840b-300d"    % "0.1.0" % Test,
-    "org.scalatest"              %% "scalatest"          % "3.0.9" % Test
+    "org.scalatest"              %% "scalatest"          % "3.0.9" % Test,
+    "org.scalanlp" %% "breeze" % "1.1",
+    "org.scalanlp" %% "breeze-natives" % "1.1",
+    "org.scalanlp" %% "breeze-viz" % "1.1",
   )
 }
 

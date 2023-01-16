@@ -1,35 +1,32 @@
 package controllers
 
-import java.io.File
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.FileUtils._
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
-
-import javax.inject._
-import org.ml4ai.skema.text_reading.apps.ExtractAndAlign.config
+//import edu.stanford.nlp.ie.machinereading.structure.EventMention
 import org.clulab.odin.serialization.json.JSONSerializer
-import upickle.default._
-
-import scala.collection.mutable.ArrayBuffer
-import ujson.json4s.Json4sJson
-import ujson.play.PlayJson
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.processors.{Document, Sentence}
-import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
-import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder, sparqlWikiResult}
+import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder}
 import org.ml4ai.skema.text_reading.OdinEngine
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
-import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
+import org.slf4j.{Logger, LoggerFactory}
+import ujson.json4s.Json4sJson
+import upickle.default._
+
+import java.io.File
+import javax.inject._
+import scala.collection.mutable.ArrayBuffer
 //import org.ml4ai.grounding.MiraEmbeddingsGrounder
-import play.api.mvc._
 import play.api.libs.json._
+import play.api.mvc._
 
 
 
@@ -68,7 +65,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, 10, 0.25f) // TODO: Fix this @Enrique
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
   logger.info("Completed Initialization ...")
   // -------------------------------------------------
 
@@ -241,22 +238,49 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val locations = textsAndLocations.map(_.split("<::>").takeRight(2).mkString("<::>")) //location = pageNum::blockIdx
 
     println("started extracting")
+
+    def groundMention(m:Mention): Mention = m match  {
+      case tbm: TextBoundMention => {
+        if(tbm.attachments.exists{
+          case _:GroundingAttachment => true
+          case _ => false
+        }) {
+          val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
+            case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
+          }
+
+          if (topGroundingCandidates.nonEmpty)
+            tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
+          else
+            tbm
+        }
+        else
+          tbm
+      }
+      case e:EventMention => {
+        val groundedArguments =
+          e.arguments.mapValues(_.map(groundMention))
+          
+
+        e.copy(arguments = groundedArguments)
+      }
+      // This is duplicated while we fix the Mention trait to define the abstrtact method copy
+      case e: RelationMention => {
+        val groundedArguments =
+          e.arguments.mapValues(_.map(groundMention))
+
+        e.copy(arguments = groundedArguments)
+      }
+      case m => m
+    }
+
     // extract mentions form each text block
     val mentions = for (tf <- textsAndFilenames) yield {
       val Array(text, filename) = tf.split("<::>")
       // Extract mentions and apply grounding
       ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
-        case tbm:TextBoundMention => {
-          val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter{
-            case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
-          }
-
-
-          if(topGroundingCandidates.nonEmpty)
-            tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
-          else
-            tbm
-        }
+        // Only ground arguments of events and relations, to save time
+        case e @ (_:EventMention | _:RelationMention) => groundMention(e)
         case m => m
       }.seq
     }
