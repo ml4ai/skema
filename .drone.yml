@@ -28,3 +28,24 @@ steps:
   when:
     paths:
       skema/text_reading/text_reading/**
+
+---
+kind: pipeline
+name: skema-pa
+
+steps:
+- name: test_program_analysis
+  image: python:3.8-bullseye
+  commands:
+  - apt-get update
+  - apt-get -y install build-essential graphviz libgraphviz-dev
+  - pip install -e .[dev]
+  - pip install pytest-cov pytest-xdist
+  - pytest --cov=skema --ignore=skema/im2mml skema/program_analysis/tests
+  when:
+    paths:
+    - pyproject.toml
+    - .drone.yml
+    - skema/program_analysis/**
+    - skema/gromet/**
+    - skema/model_assembly/**

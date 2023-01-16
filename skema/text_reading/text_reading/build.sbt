@@ -4,8 +4,7 @@ organization := "org.clulab"
 scalaVersion := "2.12.17"
 
 resolvers ++= Seq(
-  "jitpack" at "https://jitpack.io", // This provides access to regextools straight from github.
-  ("Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release").withAllowInsecureProtocol(true)
+  "clulab" at "https://artifactory.clulab.org/artifactory/sbt-release"
 )
 
 // Coordinate this with the grounding subproject.
@@ -20,7 +19,6 @@ libraryDependencies ++= {
     "org.clulab"                 %% "processors-main"    % procVer,
     "org.clulab"                 %% "processors-corenlp" % procVer,
     "ai.lum"                     %% "common"             % "0.0.10",
-    "com.github.lum-ai"           % "regextools"         % "ee64b773a6", // github version, master commit
     "com.lihaoyi"                %% "ujson"              % uJsonVer,
     "com.lihaoyi"                %% "upickle"            % uJsonVer,
     "com.lihaoyi"                %% "ujson-json4s"       % uJsonVer,

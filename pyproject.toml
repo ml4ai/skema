@@ -1,0 +1,47 @@
+[project]
+name="skema"
+authors=[
+    {name="Enrique Noriega", email="enoriega@arizona.edu"},
+    {name = "Adarsh Pyarelal", email="adarsh@arizona.edu"},
+    {name="Clayton Morrison", email="claytonm@lum.ai"},
+    {name="Tito Ferra", email="titofe16@gmail.com"},
+    {name="Vincent Raymond", email="vincentraymond1995@gmail.com"}
+]
+description="Scientific Knowledge Extraction and Model Analysis"
+version="0.1.0"
+dependencies=[
+    "gensim",
+    "dill",
+    "networkx",
+]
+# The Python program analysis pipeline does not currently work with Python 3.9
+# or 3.10. This may change in the future.
+requires-python="==3.8.*"
+license={text="MIT"}
+
+[project.optional-dependencies]
+# Dev dependencies.
+# - fastapi & uvicorn: For running the code2fn REST API server
+# - requests: For testing the code2fn example client
+# - pytest: for running tests
+# - black: Autoformatting
+# - pygraphviz: for creating function network visualizations for debugging.
+#   Pygraphviz is often tricky to install, so we reserve it for the dev extras
+#   list.
+dev = ["fastapi", "requests", "uvicorn", "pytest", "black", "pygraphviz"]
+
+# MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
+# the skema/moviz directory).
+moviz = ["flask", "graphviz"]
+
+# Im2MML dependencies. The im2mml service converts equation images to MathML.
+# See the skema/im2mml directory.
+im2mml = ["fastapi", "requests", "uvicorn", "torch", "torchvision", "python-multipart"]
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
+
+# Minimum requirements for the build system to execute.
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
