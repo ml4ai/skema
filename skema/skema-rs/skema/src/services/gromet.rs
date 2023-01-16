@@ -1,14 +1,14 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 
 use crate::database::{execute_query, parse_gromet_queries};
-use crate::Gromet;
+use crate::{Gromet, ModuleCollection};
 use crate::config::Config;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 
 use actix_web::{HttpResponse, get, post, web, delete};
 use utoipa;
 
-pub fn push_model_to_db(gromet: Gromet, host: &str) -> Result<i64, MgError> {
+pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgError> {
 
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
@@ -140,7 +140,7 @@ pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
     )
 )]
 #[post("/models")]
-pub async fn post_model(payload: web::Json<Gromet>, config: web::Data<Config>) -> HttpResponse {
+pub async fn post_model(payload: web::Json<ModuleCollection>, config: web::Data<Config>) -> HttpResponse {
     let model_id = push_model_to_db(payload.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(model_id))
 }
