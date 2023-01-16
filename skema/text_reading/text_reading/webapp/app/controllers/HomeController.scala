@@ -27,7 +27,15 @@ import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDat
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
+import org.slf4j.{Logger, LoggerFactory}
+import ujson.json4s.Json4sJson
+import upickle.default._
+
+import java.io.File
+import javax.inject._
+import scala.collection.mutable.ArrayBuffer
 //import org.ml4ai.grounding.MiraEmbeddingsGrounder
+import play.api.libs.json._
 import play.api.mvc._
 import play.api.libs.json._
 import org.clulab.pdf2txt.Pdf2txt
@@ -72,7 +80,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, 10, 0.0f) // TODO: Fix this @Enrique
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
 
   val pdfConverter = new TextConverter()
   val languageModel = GigawordLanguageModel()
@@ -193,10 +201,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def process_text: Action[JsValue] = Action(parse.json) { request =>
     val data = request.body.toString()
     val json = ujson.read(data)
-    val rawText = json("text").str
-    val text = pdf2txt.process(rawText, maxLoops = 1)
-    println(rawText)
-    println(text)
+    val text = json("text").str
     val gazetteer = json.obj.get("entities").map(_.arr.map(_.str))
 
     val mentionsJson = getOdinJsonMentions(ieSystem, text, gazetteer)
@@ -275,6 +280,14 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
         case tbm:TextBoundMention => {
           val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter{
+
+    def groundMention(m:Mention): Mention = m match  {
+      case tbm: TextBoundMention => {
+        if(tbm.attachments.exists{
+          case _:GroundingAttachment => true
+          case _ => false
+        }) {
+          val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
             case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
           }
 
@@ -284,6 +297,33 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
           else
             tbm
         }
+        else
+          tbm
+      }
+      case e:EventMention => {
+        val groundedArguments =
+          e.arguments.mapValues(_.map(groundMention))
+
+
+        e.copy(arguments = groundedArguments)
+      }
+      // This is duplicated while we fix the Mention trait to define the abstrtact method copy
+      case e: RelationMention => {
+        val groundedArguments =
+          e.arguments.mapValues(_.map(groundMention))
+
+        e.copy(arguments = groundedArguments)
+      }
+      case m => m
+    }
+
+    // extract mentions form each text block
+    val mentions = for (tf <- textsAndFilenames) yield {
+      val Array(text, filename) = tf.split("<::>")
+      // Extract mentions and apply grounding
+      ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
+        // Only ground arguments of events and relations, to save time
+        case e @ (_:EventMention | _:RelationMention) => groundMention(e)
         case m => m
       }.seq
     }

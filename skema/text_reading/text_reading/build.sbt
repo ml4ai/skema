@@ -15,7 +15,6 @@ libraryDependencies ++= {
   val uJsonVer = "2.0.0"
 
   Seq(
-    "org.clulab"                 %% "pdf2txt"            % "1.1.3",
     "org.clulab"                 %% "processors-main"    % procVer,
     "org.clulab"                 %% "processors-corenlp" % procVer,
     "ai.lum"                     %% "common"             % "0.0.10",
@@ -28,6 +27,11 @@ libraryDependencies ++= {
     "org.scala-lang.modules"     %% "scala-xml"          % "1.0.6", // 2.1.0",
     "org.clulab"                  % "glove-840b-300d"    % "0.1.0" % Test,
     "org.scalatest"              %% "scalatest"          % "3.0.9" % Test
+    "org.clulab"                 %  "glove-840b-300d"    % "0.1.0" % Test,
+    "org.scalatest"              %% "scalatest"          % "3.0.9" % Test,
+    "org.scalanlp" %% "breeze" % "1.1",
+    "org.scalanlp" %% "breeze-natives" % "1.1",
+    "org.scalanlp" %% "breeze-viz" % "1.1",
   )
 }
 
