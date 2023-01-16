@@ -1,3 +1,4 @@
+import sys
 import ast
 import dill
 import os.path
@@ -175,6 +176,11 @@ def python_to_cast(
     out_cast = cast.CAST([C], "python")
 
     if agraph:
+        import skema.utils.misc.test_pygraphviz
+        test_pygraphviz(
+            "For the agraph generation in the python_to_cast "
+            "function to work, pygraphviz must be installed."
+        )
         V = CASTToAGraphVisitor(out_cast)
         last_slash_idx = file_name.rfind("/")
         file_ending_idx = file_name.rfind(".")
