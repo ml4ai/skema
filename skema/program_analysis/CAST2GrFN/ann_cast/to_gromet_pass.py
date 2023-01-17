@@ -1810,14 +1810,6 @@ class ToGrometPass:
                     elif arg.right.name in self.var_environment["global"]:
                         var_env = self.var_environment["global"]
 
-                    # var_env is empty if it can't find the symbol
-                    # needed in the other environments in this file, 
-                    # that is, it's in another file
-                    # so we search the import collection
-                    if var_env == {}:
-                        print(self.import_collection)
-                        print(self.var_environment)
-
                     entry = var_env[arg.right.name]
                     arg_fn_pofs.append(entry[2] + 1)
                 else:
