@@ -251,7 +251,41 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok("")
   }
 
+  def groundMention(m: Mention): Mention = m match {
+    case tbm: TextBoundMention => {
+      if (tbm.attachments.exists {
+        case _: GroundingAttachment => true
+        case _ => false
+      }) {
+        val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
+          case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
+        }
 
+
+        if (topGroundingCandidates.nonEmpty)
+          tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
+        else
+          tbm
+      }
+      else
+        tbm
+    }
+    case e: EventMention => {
+      val groundedArguments =
+        e.arguments.mapValues(_.map(groundMention))
+
+
+      e.copy(arguments = groundedArguments)
+    }
+    // This is duplicated while we fix the Mention trait to define the abstrtact method copy
+    case e: RelationMention => {
+      val groundedArguments =
+        e.arguments.mapValues(_.map(groundMention))
+
+      e.copy(arguments = groundedArguments)
+    }
+    case m => m
+  }
 
 
   def cosmos_json_to_mentions: Action[AnyContent] = Action { request =>
@@ -277,55 +311,13 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
       val text = pdf2txt.process(rawText, maxLoops = 1)
 
-      ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
-        case tbm:TextBoundMention => {
-          val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter{
-
-    def groundMention(m:Mention): Mention = m match  {
-      case tbm: TextBoundMention => {
-        if(tbm.attachments.exists{
-          case _:GroundingAttachment => true
-          case _ => false
-        }) {
-          val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
-            case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
-          }
-
-
-          if(topGroundingCandidates.nonEmpty)
-            tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
-          else
-            tbm
-        }
-        else
-          tbm
-      }
-      case e:EventMention => {
-        val groundedArguments =
-          e.arguments.mapValues(_.map(groundMention))
-
-
-        e.copy(arguments = groundedArguments)
-      }
-      // This is duplicated while we fix the Mention trait to define the abstrtact method copy
-      case e: RelationMention => {
-        val groundedArguments =
-          e.arguments.mapValues(_.map(groundMention))
-
-        e.copy(arguments = groundedArguments)
-      }
-      case m => m
-    }
-
-    // extract mentions form each text block
-    val mentions = for (tf <- textsAndFilenames) yield {
-      val Array(text, filename) = tf.split("<::>")
       // Extract mentions and apply grounding
-      ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
+      ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map {
         // Only ground arguments of events and relations, to save time
-        case e @ (_:EventMention | _:RelationMention) => groundMention(e)
+        case e@(_: EventMention | _: RelationMention) => groundMention(e)
         case m => m
       }.seq
+
     }
 
     // store location information from cosmos as an attachment for each mention
