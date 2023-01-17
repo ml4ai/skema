@@ -1271,6 +1271,10 @@ class PyASTToCAST:
                         assign_node = Name(
                             name=arg.value.value.attr, id=-1, source_refs=ref
                         )
+                    elif isinstance(arg.value, ast.Call):
+                        assign_node = Name(
+                            name=arg.value.func.id, id=-1, source_refs=ref
+                        )
                     else:
                         assign_node = Name(
                             name=arg.value.id, id=-1, source_refs=ref

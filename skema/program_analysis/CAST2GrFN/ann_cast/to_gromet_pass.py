@@ -1802,12 +1802,22 @@ class ToGrometPass:
                 # argument assignments to the right ports
                 # print(parent_gromet_fn.pof)
                 if isinstance(arg.right, AnnCastName):
+                    var_env = {}
                     if arg.right.name in self.var_environment["local"]:
                         var_env = self.var_environment["local"]
                     elif arg.right.name in self.var_environment["args"]:
                         var_env = self.var_environment["args"]
-                    else:
+                    elif arg.right.name in self.var_environment["global"]:
                         var_env = self.var_environment["global"]
+
+                    # var_env is empty if it can't find the symbol
+                    # needed in the other environments in this file, 
+                    # that is, it's in another file
+                    # so we search the import collection
+                    if var_env == {}:
+                        print(self.import_collection)
+                        print(self.var_environment)
+
                     entry = var_env[arg.right.name]
                     arg_fn_pofs.append(entry[2] + 1)
                 else:
@@ -3393,6 +3403,36 @@ class ToGrometPass:
 
         # print("-------------- IF DONE  ---")
 
+    def add_import_symbol_to_env(
+        self, symbol, parent_gromet_fn, parent_cast_node
+    ):
+        """
+            Adds symbol to the GroMEt FN as a 'variable'
+            When we import something from another file with a symbol, 
+            we don't know the symbol is a function call or variable 
+            so we add in a 'dummy' variable of sorts so that it can
+            be used in this file
+        """
+
+        parent_gromet_fn.bf = insert_gromet_object(
+            parent_gromet_fn.bf,
+            GrometBoxFunction(
+                function_type=FunctionType.EXPRESSION,
+                contents=-1
+            )
+        )
+
+        bf_idx = len(parent_gromet_fn.bf)
+
+        parent_gromet_fn.pof = insert_gromet_object(
+            parent_gromet_fn.pof,
+            GrometPort(name=symbol, box=bf_idx)
+        )
+
+        pof_idx = len(parent_gromet_fn.pof) - 1
+
+        self.add_var_to_env(symbol, None, parent_gromet_fn.pof[pof_idx], pof_idx, parent_cast_node)
+
     @_visit.register
     def visit_model_import(
         self, node: AnnCastModelImport, parent_gromet_fn, parent_cast_node
@@ -3416,6 +3456,9 @@ class ToGrometPass:
                         self.import_collection[name][2],
                     )
                 self.import_collection[name][1].append(symbol)
+                # We also maintain the symbol as a 'variable' of sorts in the global environment
+                self.add_import_symbol_to_env(symbol, parent_gromet_fn, parent_cast_node)
+
             self.import_collection[name] = (
                 self.import_collection[name][0],
                 self.import_collection[name][1],
@@ -3427,6 +3470,8 @@ class ToGrometPass:
                 self.import_collection[name] = (alias, [], all)
             else:
                 self.import_collection[name] = (alias, [symbol], all)
+                # We also maintain the symbol as a 'variable' of sorts in the global environment
+                self.add_import_symbol_to_env(symbol, parent_gromet_fn, parent_cast_node)
 
     @_visit.register
     def visit_model_return(
@@ -3534,28 +3579,6 @@ class ToGrometPass:
             )
 
     @_visit.register
-    def visit_number(
-        self, node: AnnCastNumber, parent_gromet_fn, parent_cast_node
-    ):
-        pass
-
-    @_visit.register
-    def visit_set(self, node: AnnCastSet, parent_gromet_fn, parent_cast_node):
-        pass
-
-    @_visit.register
-    def visit_string(
-        self, node: AnnCastString, parent_gromet_fn, parent_cast_node
-    ):
-        pass
-
-    @_visit.register
-    def visit_subscript(
-        self, node: AnnCastSubscript, parent_gromet_fn, parent_cast_node
-    ):
-        pass
-
-    @_visit.register
     def visit_tuple(
         self, node: AnnCastTuple, parent_gromet_fn, parent_cast_node
     ):
@@ -3625,3 +3648,26 @@ class ToGrometPass:
     @_visit.register
     def visit_var(self, node: AnnCastVar, parent_gromet_fn, parent_cast_node):
         self.visit(node.val, parent_gromet_fn, parent_cast_node)
+    
+    ## Unused, will get removed later
+    @_visit.register
+    def visit_number(
+        self, node: AnnCastNumber, parent_gromet_fn, parent_cast_node
+    ):
+        pass
+
+    @_visit.register
+    def visit_set(self, node: AnnCastSet, parent_gromet_fn, parent_cast_node):
+        pass
+
+    @_visit.register
+    def visit_string(
+        self, node: AnnCastString, parent_gromet_fn, parent_cast_node
+    ):
+        pass
+
+    @_visit.register
+    def visit_subscript(
+        self, node: AnnCastSubscript, parent_gromet_fn, parent_cast_node
+    ):
+        pass
