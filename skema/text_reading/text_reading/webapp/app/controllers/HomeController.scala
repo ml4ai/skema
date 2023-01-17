@@ -18,7 +18,7 @@ import org.clulab.processors.{Document, Sentence}
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
 import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder, sparqlWikiResult}
-import org.ml4ai.skema.text_reading.OdinEngine
+import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
@@ -78,24 +78,9 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   private val groundToWikiDefault: Boolean = generalConfig[Boolean]("apps.groundToWiki")
   private val saveWikiGroundingsDefault: Boolean = generalConfig[Boolean]("apps.saveWikiGroundingsDefault")
 
-  private val ontologyFilePath = groundingConfig.getString("ontologyPath")
-  private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
 
-  val pdfConverter = new TextConverter()
-  val languageModel = GigawordLanguageModel()
-  val preprocessors = Array(
-    new LinePreprocessor(),
-    new ParagraphPreprocessor(),
-    new UnicodePreprocessor(),
-    new CasePreprocessor(CasePreprocessor.defaultCutoff),
-    new NumberPreprocessor(NumberPreprocessor.Hyperparameters()),
-    new LigaturePreprocessor(languageModel),
-    new LineBreakPreprocessor(languageModel),
-    new WordBreakByHyphenPreprocessor(),
-    new WordBreakBySpacePreprocessor(languageModel) // This is by default NeverLanguageModel.
-  )
-  val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
+
+  private val cosmosPipeline = new CosmosTextReadingPipeline
 
 
   logger.info("Completed Initialization ...")
@@ -251,96 +236,15 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok("")
   }
 
-  def groundMention(m: Mention): Mention = m match {
-    case tbm: TextBoundMention => {
-      val isGrounded =
-        tbm.attachments.exists {
-          case _: GroundingAttachment => false
-          case _ => true
-      }
-      if(!isGrounded) {
-        val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
-          case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
-        }
-
-        if (topGroundingCandidates.nonEmpty)
-          tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
-        else
-          tbm
-      }
-      else
-        tbm
-    }
-    case e: EventMention => {
-      val groundedArguments =
-        e.arguments.mapValues(_.map(groundMention))
-
-
-      e.copy(arguments = groundedArguments)
-    }
-    // This is duplicated while we fix the Mention trait to define the abstrtact method copy
-    case e: RelationMention => {
-      val groundedArguments =
-        e.arguments.mapValues(_.map(groundMention))
-
-      e.copy(arguments = groundedArguments)
-    }
-    case m => m
-  }
-
 
   def cosmos_json_to_mentions: Action[AnyContent] = Action { request =>
     val data = request.body.asJson.get.toString()
-
 
     val pathJson = ujson.read(data)
     val jsonPath = pathJson("pathToCosmosJson").str
     logger.info(s"Extracting mentions from $jsonPath")
 
-    // cosmos stores information about each block on each pdf page
-    // for each block, we load the text (content) and the location of the text (page_num and block order/index on the page)
-    val loader = new CosmosJsonDataLoader
-    val textsAndLocations = loader.loadFile(jsonPath)
-    val textsAndFilenames = textsAndLocations.map(_.split("<::>").slice(0,2).mkString("<::>"))
-    val locations = textsAndLocations.map(_.split("<::>").takeRight(2).mkString("<::>")) //location = pageNum::blockIdx
-
-    println("started extracting")
-    // extract mentions form each text block
-    val mentions = for (tf <- textsAndFilenames) yield {
-      val Array(rawText, filename) = tf.split("<::>")
-      // Extract mentions and apply grounding
-
-      val text = pdf2txt.process(rawText, maxLoops = 1)
-
-      // Extract mentions and apply grounding
-      ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map {
-        // Only ground arguments of events and relations, to save time
-        case e@(_: EventMention | _: RelationMention) => groundMention(e)
-        case m => m
-      }.seq
-
-    }
-
-    // store location information from cosmos as an attachment for each mention
-    val menWInd = mentions.zipWithIndex
-    val mentionsWithLocations = new ArrayBuffer[Mention]()
-    for (tuple <- menWInd) {
-      // get page and block index for each block; cosmos location information will be the same for all the mentions within one block
-      val menInTextBlocks = tuple._1
-      val id = tuple._2
-      val location = locations(id).split("<::>").map(loc => loc.split(",").map(_.toInt)) //(_.toDouble.toInt)
-      val pageNum = location.head
-      val blockIdx = location.last
-
-      for (m <- menInTextBlocks) {
-        val filename = m.document.id.getOrElse("unknown_file")
-        val newMen = m.withAttachment(new MentionLocationAttachment(filename, pageNum, blockIdx, "MentionLocation"))
-        mentionsWithLocations.append(newMen)
-      }
-    }
-
-
-    val exportedData  = ujson.write(AutomatesJSONSerializer.serializeMentions(mentionsWithLocations))
+    val exportedData = cosmosPipeline.serializeToJson(jsonPath)
 
     Ok(exportedData)
 
