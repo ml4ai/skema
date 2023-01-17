@@ -6,6 +6,9 @@ resolvers ++= Seq(
   "clulab" at "https://artifactory.clulab.org/artifactory/sbt-release"
 )
 
+// Coordinate this with the root project!
+dependencyOverrides += "xml-apis" % "xml-apis" % "1.4.01"
+
 libraryDependencies ++= {
   val procVer = "8.5.2"
   val uJsonVer = "2.0.0"
