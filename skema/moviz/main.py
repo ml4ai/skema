@@ -28,7 +28,7 @@ def visualize_single_file(filepath) -> str:
 def execute():
 
     cwd = Path(__file__).parents[0]
-    filepath = cwd / "../../data/gromet/examples/CHIME_SIR_core/CHIME_SIR_core.py"
+    filepath = cwd / "inputs/CHIME_SIR_core.py"
     output = visualize_single_file(filepath)
     return render_template("index.html", output_image=output)
 
