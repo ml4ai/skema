@@ -16,7 +16,7 @@ import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
 import scala.collection.mutable.ArrayBuffer
 
 
-case class CosmosTextReadingPipeline() extends Logging {
+class CosmosTextReadingPipeline extends Logging {
 
   /**
     * Assigns grounding elements to a mention
@@ -26,10 +26,8 @@ case class CosmosTextReadingPipeline() extends Logging {
   def groundMention(m: Mention): Mention = m match {
     case tbm: TextBoundMention => {
       val isGrounded =
-        tbm.attachments.exists {
-          case _: GroundingAttachment => false
-          case _ => true
-        }
+        tbm.attachments.exists(!_.isInstanceOf[GroundingAttachment])
+
       if (!isGrounded) {
         val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
           case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
@@ -98,22 +96,24 @@ case class CosmosTextReadingPipeline() extends Logging {
   // for each block, we load the text (content) and the location of the text (page_num and block order/index on the page)
   val loader = new CosmosJsonDataLoader
 
+  private val jsonSeparator  = "<::>"
+
   /**
     * Runs the textReadingPipeline over a cosmos file
     * @param jsonPath Path to the json file to annotate
     * @return Mentions extracted by the TR textReadingPipeline
     */
-  def apply(jsonPath: String): Seq[Mention] = {
+  def extractMentions(jsonPath: String): Seq[Mention] = {
 
     // TODO: Make this interpretable
     val textsAndLocations = loader.loadFile(jsonPath)
-    val textsAndFilenames = textsAndLocations.map(_.split("<::>").slice(0, 2).mkString("<::>"))
-    val locations = textsAndLocations.map(_.split("<::>").takeRight(2).mkString("<::>")) //location = pageNum::blockIdx
+    val textsAndFilenames = textsAndLocations.map(_.split(jsonSeparator).slice(0, 2).mkString(jsonSeparator))
+    val locations = textsAndLocations.map(_.split(jsonSeparator).takeRight(2).mkString(jsonSeparator)) //location = pageNum::blockIdx
 
     logger.info("started extracting")
     // extract mentions form each text block
     val mentions = for (tf <- textsAndFilenames) yield {
-      val Array(rawText, filename) = tf.split("<::>")
+      val Array(rawText, filename) = tf.split(jsonSeparator)
       // Extract mentions and apply grounding
 
       val text = pdf2txt.process(rawText, maxLoops = 1)
@@ -130,11 +130,13 @@ case class CosmosTextReadingPipeline() extends Logging {
     // store location information from cosmos as an attachment for each mention
     val menWInd = mentions.zipWithIndex
     val mentionsWithLocations = new ArrayBuffer[Mention]()
+
+    val separator =
     for (tuple <- menWInd) {
       // get page and block index for each block; cosmos location information will be the same for all the mentions within one block
       val menInTextBlocks = tuple._1
       val id = tuple._2
-      val location = locations(id).split("<::>").map(loc => loc.split(",").map(_.toInt)) //(_.toDouble.toInt)
+      val location = locations(id).split(jsonSeparator).map(loc => loc.split(",").map(_.toInt)) //(_.toDouble.toInt)
       val pageNum = location.head
       val blockIdx = location.last
 
@@ -153,5 +155,5 @@ case class CosmosTextReadingPipeline() extends Logging {
     * @param jsonPath Path to the json file to annotate
     * @return string with the json representation of the extractions and the document annotations
     */
-  def serializeToJson(jsonPath: String): String = ujson.write(AutomatesJSONSerializer.serializeMentions(this(jsonPath)))
+  def serializeToJson(jsonPath: String): String = ujson.write(AutomatesJSONSerializer.serializeMentions(this.extractMentions(jsonPath)))
 }
