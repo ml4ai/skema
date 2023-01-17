@@ -4,6 +4,7 @@ organization := "org.clulab"
 scalaVersion := "2.12.17"
 
 resolvers ++= Seq(
+  ("Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release").withAllowInsecureProtocol(true),
   "clulab" at "https://artifactory.clulab.org/artifactory/sbt-release"
 )
 
@@ -11,7 +12,7 @@ resolvers ++= Seq(
 dependencyOverrides += "xml-apis" % "xml-apis" % "1.4.01"
 
 libraryDependencies ++= {
-  val procVer = "8.5.2"
+  val procVer = "8.5.3-RC10"
   val uJsonVer = "2.0.0"
 
   Seq(
