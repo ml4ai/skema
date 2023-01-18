@@ -358,22 +358,13 @@ impl Expr {
 
                 let mut shift = 0;
                 if all_multi_div(op) {
-                    if op.len() == 3 {
-                        println!();
-                    }
                     for i in 0..args.len() {
                         match &mut args[i] {
                             Expr::Atom(_) => {}
                             Expr::Expression { op, args, name } => {
-                                if op.contains(&Operator::Divide) {
-                                    println!();
-                                }
                                 if op[0] == Operator::Other("".to_string()) && all_multi_div(op) {
                                     args_copy[i] = args[0].clone();
                                     for j in 1..op.len() {
-                                        if op[j] == Operator::Divide {
-                                            println!();
-                                        }
                                         op_copy.insert(i + shift + j, op[j].clone());
                                         args_copy.insert(i + shift + j, args[j].clone());
                                     }
@@ -384,7 +375,6 @@ impl Expr {
                     }
                     *op = op_copy.clone();
                     *args = args_copy.clone();
-                    println!();
                 }
 
                 for mut arg in args {
@@ -883,6 +873,32 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
     graph.add_node(name.to_string())
 }
 
+pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
+    let mut content = mml.clone();
+    let mut key_words_left = "<mrow>".to_string() + &*key_word.clone();
+    let mut key_word_right = key_word.clone();
+    key_word_right.insert(1, '/');
+    let mut key_words_right =  key_word_right.clone() + "</mrow>";
+    let mut locs: Vec<_> = content.match_indices(&key_words_left).map(|(i, _)| i).collect();
+    for loc in locs.iter().rev() {
+        if content[loc + 1..].contains(&key_words_right) {
+            let l = content[*loc..].find(&key_word_right).map(|i| i + *loc);
+            match l {
+                None => {}
+                Some(x) => {
+                    if content.len() > (x + key_words_right.len()) {
+                        if content[x..x + key_words_right.len()] == key_words_right {
+                            content.replace_range(x..x + key_words_right.len(), key_word_right.as_str());
+                            content.replace_range(*loc..*loc + key_words_left.len(), key_word.as_str());
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return content;
+}
+
 ///remove redundant mrow in mathml
 pub fn remove_rmrow(mathml_content: String) -> String {
     let mut content = mathml_content.clone();
@@ -910,6 +926,10 @@ pub fn remove_rmrow(mathml_content: String) -> String {
     content = std::str::from_utf8(&g(content.bytes().collect())).unwrap().to_string();
     content = content.replace("(", "<mrow>");
     content = content.replace(")", "</mrow>");
+    content = remove_redundant_mrow(content, "<mi>".to_string());
+    content = remove_redundant_mrow(content, "<mo>".to_string());
+    content = remove_redundant_mrow(content, "<mfrac>".to_string());
+    content = remove_redundant_mrow(content, "<mover>".to_string());
     return content;
 }
 
@@ -1795,4 +1815,29 @@ fn test_to_expr31() {
     let mut new_math = Mrow(math_vec);
     let _g = new_math.clone().to_graph();
     println!("{}", Dot::new(&_g));
+}
+
+#[test]
+fn test_to_expr32() {
+    let f = |b: &[u8]| -> Vec<u8>{
+        let v = (0..).zip(b).scan(vec![], |a, (b, c)| Some(match c {
+            40 => {
+                a.push(b);
+                None
+            }
+            41 => { Some((a.pop()?, b)) }
+            _ => None
+        })).flatten().collect::<Vec<_>>();
+        for k in &v {
+            if k.0 == 0 && k.1 == b.len() - 1 { return b[1..b.len() - 1].to_vec(); }
+            for l in &v { if l.0 == k.0 + 1 && l.1 == k.1 - 1 { return [&b[..k.0], &b[l.0..k.1], &b[k.1 + 1..]].concat(); } }
+        }
+        return b.to_vec();
+    };
+    let g = |mut b: Vec<u8>| {
+        while f(&b) != b { b = f(&b) }
+        b
+    };
+    let content = std::str::from_utf8(&g("((a+(bcd)))".bytes().collect())).unwrap().to_string();
+    println!("{}", content);
 }
