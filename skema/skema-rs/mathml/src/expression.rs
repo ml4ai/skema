@@ -493,8 +493,9 @@ impl Expr {
                     *name = name.replace("place_holder", "");
                 }
                 let parent_node_index: NodeIndex = get_node_idx(graph, name);
+                let mut eq_loc = 0;
                 if op.contains(&Operator::Equals) {
-                    let eq_loc = op.iter().position(|r| r == &(Operator::Equals)).unwrap();
+                    eq_loc = op.iter().position(|r| r == &(Operator::Equals)).unwrap();
                     let mut left_eq_name: String = "".to_string();
                     for i in 0..eq_loc {
                         match &mut args[i] {
@@ -508,28 +509,31 @@ impl Expr {
                             Expr::Expression { op, args, name } => {
                                 let tmp = op[0].clone();
                                 let tmp2 = args[0].clone();
-                                match tmp2 {
+                                match args[i].clone() {
                                     Expr::Atom(x) => {}
                                     Expr::Expression { op, mut args, name } => {
-                                        let tmp3 = op[0].to_string();
-                                        let tmp4 = args[0].get_names();
-                                        println!();
+                                        if op[0] != Operator::Other("".to_string()) {
+                                            let mut unitary_name = op[0].to_string();
+                                            let mut name_copy = name.to_string();
+                                            remove_paren(&mut name_copy);
+                                            unitary_name.push_str("(".clone());
+                                            unitary_name.push_str(&name_copy.clone());
+                                            unitary_name.push_str(")".clone());
+                                            left_eq_name.push_str(unitary_name.as_str());
+                                        } else {
+                                            left_eq_name.push_str(name.as_str());
+                                        }
                                     }
-                                }
-                                if op[0] != Operator::Other("".to_string()) {
-                                    let mut unitary_name = op[0].to_string();
-                                    let mut name_copy = name.to_string();
-                                    remove_paren(&mut name_copy);
-                                    unitary_name.push_str("(".clone());
-                                    unitary_name.push_str(&name_copy.clone());
-                                    unitary_name.push_str(")".clone());
-                                    left_eq_name.push_str(unitary_name.as_str());
-                                } else {
-                                    left_eq_name.push_str(name);
                                 }
                             }
                         }
                     }
+                    let node_idx = get_node_idx(graph, &mut left_eq_name);
+                    graph.update_edge(
+                        node_idx,
+                        parent_node_index,
+                        "=".to_string(),
+                    );
                 }
                 if op[0] != Operator::Other("".to_string()) {
                     let mut unitary_name = op[0].to_string();
@@ -542,7 +546,7 @@ impl Expr {
                     graph.update_edge(parent_node_index, node_idx, op[0].to_string());
                 }
                 let op_copy = op.clone();
-                for i in 0..=op_copy.len() - 1 {
+                for i in eq_loc..=op_copy.len() - 1 {
                     match &mut args[i] {
                         Expr::Atom(x) => match x {
                             Atom::Number(x) => {
@@ -904,6 +908,7 @@ pub fn preprocess_content(content_str: String) -> String {
         }
     }
     pre_string = html_escape::decode_html_entities(&pre_string).to_string();
+    pre_string = pre_string.replace(&html_escape::decode_html_entities("&#x2212;").to_string(), "-");
     pre_string = remove_rmrow(pre_string);
     return pre_string;
 }
