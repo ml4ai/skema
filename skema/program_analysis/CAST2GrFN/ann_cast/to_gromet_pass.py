@@ -151,6 +151,8 @@ def get_left_side_name(node):
         return node.attr.name
     if isinstance(node, AnnCastName):
         return node.val.name
+    if isinstance(node, AnnCastVar):
+        return node.val.name
     return "NO LEFT SIDE NAME"
 
 
@@ -2616,19 +2618,6 @@ class ToGrometPass:
         self.handle_function_def(node, new_gromet, node.body)
 
         self.var_environment["args"] = {}
-        # main is a special function, in that program executions start
-        # I think here we must add a bf to properly reflect this execution
-        # main's input/output ports are its arguments/return value if it has any
-        # not quite sure how to go about this yet (TODO)
-        if func_name == "main":
-            parent_gromet_fn.bf = insert_gromet_object(
-                parent_gromet_fn.bf,
-                GrometBoxFunction(
-                    name=identified_func_name,
-                    function_type=FunctionType.FUNCTION,
-                    contents=idx,
-                ),
-            )
 
     @_visit.register
     def visit_literal_value(
