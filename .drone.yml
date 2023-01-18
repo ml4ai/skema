@@ -31,17 +31,17 @@ steps:
 
 ---
 kind: pipeline
-name: skema-py
+name: skema-pa
 
 steps:
-- name: test_python
+- name: test_program_analysis
   image: python:3.8-bullseye
   commands:
   - apt-get update
   - apt-get -y install build-essential graphviz libgraphviz-dev
   - pip install -e .[dev]
-    pip install pytest-cov pytest-xdist
-  - pytest --cov=skema skema/program_analysis/tests
+  - pip install pytest-cov pytest-xdist
+  - pytest --cov=skema --ignore=skema/im2mml skema/program_analysis/tests
   when:
     paths:
     - pyproject.toml

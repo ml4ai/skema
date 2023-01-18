@@ -3,7 +3,6 @@ package org.ml4ai.skema.text_reading.entities
 import java.io.File
 import ai.lum.common.ConfigUtils._
 import ai.lum.common.FileUtils._
-import ai.lum.regextools.RegexBuilder
 import com.typesafe.config.Config
 import org.clulab.odin.{ExtractorEngine, Mention}
 import org.clulab.processors.Document
@@ -12,9 +11,7 @@ import org.ml4ai.skema.text_reading.utils.AlignmentJsonUtils
 
 class StringMatchEntityFinder(strings: Set[String], label: String, taxonomyPath: String) extends EntityFinder {
   println(s"from StringMatchEntityFinder: $strings")
-  val regexBuilder = new RegexBuilder()
-  regexBuilder.add(strings.toSeq:_*)
-  val regex = regexBuilder.mkPattern
+  val regex = RegexBuilder.build(strings)
   //           |     (?<! [word = equation]) /\\Q${stringToMatch}\\E/
   def extract(doc: Document): Seq[Mention] = {
     val ruleTemplate =

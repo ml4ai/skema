@@ -4,19 +4,21 @@ organization := "org.clulab"
 scalaVersion := "2.12.17"
 
 resolvers ++= Seq(
-  "jitpack" at "https://jitpack.io", // This provides access to regextools straight from github.
-  ("Artifactory" at "http://artifactory.cs.arizona.edu:8081/artifactory/sbt-release").withAllowInsecureProtocol(true)
+  "clulab" at "https://artifactory.clulab.org/artifactory/sbt-release"
 )
+
+// Coordinate this with the grounding subproject.
+dependencyOverrides += "xml-apis" % "xml-apis" % "1.4.01"
 
 libraryDependencies ++= {
   val procVer = "8.5.2"
   val uJsonVer = "2.0.0"
 
   Seq(
+    "org.clulab"                 %% "pdf2txt"            % "1.1.3",
     "org.clulab"                 %% "processors-main"    % procVer,
     "org.clulab"                 %% "processors-corenlp" % procVer,
     "ai.lum"                     %% "common"             % "0.0.10",
-    "com.github.lum-ai"           % "regextools"         % "ee64b773a6", // github version, master commit
     "com.lihaoyi"                %% "ujson"              % uJsonVer,
     "com.lihaoyi"                %% "upickle"            % uJsonVer,
     "com.lihaoyi"                %% "ujson-json4s"       % uJsonVer,
@@ -24,8 +26,13 @@ libraryDependencies ++= {
     "com.lihaoyi"                %% "requests"           % "0.7.1",
     "com.typesafe.play"          %% "play-json"          % "2.9.3",
     "org.scala-lang.modules"     %% "scala-xml"          % "1.0.6", // 2.1.0",
+    "org.clulab"                  % "glove-840b-300d"    % "0.1.0" % Test,
+    "org.scalatest"              %% "scalatest"          % "3.0.9" % Test,
     "org.clulab"                 %  "glove-840b-300d"    % "0.1.0" % Test,
-    "org.scalatest"              %% "scalatest"          % "3.0.9" % Test
+    "org.scalatest"              %% "scalatest"          % "3.0.9" % Test,
+    "org.scalanlp" %% "breeze" % "1.1",
+    "org.scalanlp" %% "breeze-natives" % "1.1",
+    "org.scalanlp" %% "breeze-viz" % "1.1",
   )
 }
 

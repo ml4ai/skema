@@ -19,6 +19,8 @@ struct Cli {
 }
 
 fn main() {
+    // debug outputs
+    let debug = true;
     // take in gromet location and deserialize
 
     let args = Cli::parse();
@@ -36,5 +38,9 @@ fn main() {
         full_query.push_str(&temp_str);
     }
 
-    execute_query(&full_query, &args.db_host).unwrap() // The properties need to have quotes!!
+    execute_query(&full_query, &args.db_host).unwrap(); // The properties need to have quotes!!
+                                                        // writing output to file, since too long for std out now.
+    if debug {
+        fs::write("debug.txt", full_query).expect("Unable to write file");
+    }
 }

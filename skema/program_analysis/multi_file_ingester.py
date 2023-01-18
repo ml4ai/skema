@@ -25,6 +25,11 @@ def get_args():
         type=str,
         help="The path to a file containing a list of files to ingest",
     )
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help="If true, the script write the output to a JSON file"
+    )
 
     options = parser.parse_args()
     return options
@@ -82,7 +87,7 @@ def process_file_system(
                 if fn.b[0].function_type == "FUNCTION"
             ]
             if "main" in defined_functions:
-                module_collection.executables.append(python_module_path)
+                module_collection.executables.append(len(module_collection.module_index))
 
         except ImportError:
             print("FAILURE")
@@ -108,4 +113,4 @@ if __name__ == "__main__":
     print(f"With root directory as specified in: {path}")
     print(f"Ingesting the files as specified in: {files}")
 
-    process_file_system(system_name, path, files)
+    process_file_system(system_name, path, files, args.write)

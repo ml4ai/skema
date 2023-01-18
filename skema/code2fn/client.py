@@ -1,4 +1,7 @@
 #!/usr/bin/env python
+
+"""Example Python client program to communicate with the Code2FN service."""
+
 import os
 import json
 import requests
@@ -32,18 +35,42 @@ def system_to_json(
     )
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--host", default="localhost")
-parser.add_argument("--port", type=int, default=8000)
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--host",
+        default="localhost",
+        help="Host machine where the Code2FN service is running",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="Port on which the Code2FN service is running",
+    )
+    parser.add_argument(
+        "--write",
+        action="store_true",
+        help=(
+            "If this flag is provided, the program writes the response "
+            "to a file. Otherwise it prints the response to standard output."
+        ),
+    )
 
-parser.add_argument("root_path", type=str)
-parser.add_argument("system_filepaths", type=str)
-parser.add_argument("system_name", type=str)
+    parser.add_argument("root_path", type=str)
+    parser.add_argument("system_filepaths", type=str)
+    parser.add_argument("system_name", type=str)
 
-args = parser.parse_args()
+    args = parser.parse_args()
 
-url = f"http://{args.host}:{args.port}"
-data = system_to_json(args.root_path, args.system_filepaths, args.system_name)
-response = requests.post(url, data=data)
+    url = f"http://{args.host}:{args.port}"
+    data = system_to_json(
+        args.root_path, args.system_filepaths, args.system_name
+    )
+    response = requests.post(url, data=data)
 
-print(data)
+    if args.write:
+        with open(f"{args.system_name}--Gromet-FN-auto.json", "w") as f:
+            f.write(response.json())
+    else:
+        print(response.json())
