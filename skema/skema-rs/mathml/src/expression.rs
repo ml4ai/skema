@@ -472,23 +472,16 @@ impl Expr {
                                 }
                             }
                             Expr::Expression { op, args, name } => {
-                                let tmp = op[0].clone();
-                                let tmp2 = args[0].clone();
-                                match args[i].clone() {
-                                    Expr::Atom(x) => {}
-                                    Expr::Expression { op, mut args, name } => {
-                                        if op[0] != Operator::Other("".to_string()) {
-                                            let mut unitary_name = op[0].to_string();
-                                            let mut name_copy = name.to_string();
-                                            remove_paren(&mut name_copy);
-                                            unitary_name.push_str("(".clone());
-                                            unitary_name.push_str(&name_copy.clone());
-                                            unitary_name.push_str(")".clone());
-                                            left_eq_name.push_str(unitary_name.as_str());
-                                        } else {
-                                            left_eq_name.push_str(name.as_str());
-                                        }
-                                    }
+                                if op[0] != Operator::Other("".to_string()) {
+                                    let mut unitary_name = op[0].to_string();
+                                    let mut name_copy = name.to_string();
+                                    remove_paren(&mut name_copy);
+                                    unitary_name.push_str("(".clone());
+                                    unitary_name.push_str(&name_copy.clone());
+                                    unitary_name.push_str(")".clone());
+                                    left_eq_name.push_str(unitary_name.as_str());
+                                } else {
+                                    left_eq_name.push_str(name.as_str());
                                 }
                             }
                         }
@@ -878,7 +871,7 @@ pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
     let mut key_words_left = "<mrow>".to_string() + &*key_word.clone();
     let mut key_word_right = key_word.clone();
     key_word_right.insert(1, '/');
-    let mut key_words_right =  key_word_right.clone() + "</mrow>";
+    let mut key_words_right = key_word_right.clone() + "</mrow>";
     let mut locs: Vec<_> = content.match_indices(&key_words_left).map(|(i, _)| i).collect();
     for loc in locs.iter().rev() {
         if content[loc + 1..].contains(&key_words_right) {
