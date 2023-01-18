@@ -349,37 +349,6 @@ impl Expr {
         }
     }
 
-    // fn remove_redundant_expr(&mut self) {
-    //     match self {
-    //         Expr::Atom(_) => {}
-    //         Expr::Expression { op, args, .. } => {
-    //             let mut op_copy = op.clone();
-    //             let mut args_copy = args.clone();
-    //
-    //             for i in 0..args.len() {
-    //                 match &mut args[i] {
-    //                     Expr::Atom(_) => {}
-    //                     Expr::Expression {op, args, name} => {
-    //                         for arg in args {
-    //                             arg.remove_redundant_expr();
-    //                         }
-    //                         if op[0] == Operator::Other("".to_string()) && op.len() == 1 {
-    //                             match &args[0] {
-    //                                 Expr::Atom(_) => {}
-    //                                 Expr::Expression { .. } => {
-    //                                     args_copy[i] = args[0].clone();
-    //                                 }
-    //                             }
-    //                         }
-    //                     }
-    //                 }
-    //                 *args = args_copy.clone();
-    //             }
-    //
-    //         }
-    //     }
-    // }
-
     fn collapse_expr(&mut self) {
         match self {
             Expr::Atom(_) => {}
@@ -389,10 +358,16 @@ impl Expr {
 
                 let mut shift = 0;
                 if all_multi_div(op) {
-                    for i in 0..args.len() - 1 {
+                    if op.len() == 3 {
+                        println!();
+                    }
+                    for i in 0..args.len() {
                         match &mut args[i] {
                             Expr::Atom(_) => {}
                             Expr::Expression { op, args, name } => {
+                                if op.contains(&Operator::Divide) {
+                                    println!();
+                                }
                                 if op[0] == Operator::Other("".to_string()) && all_multi_div(op) {
                                     args_copy[i] = args[0].clone();
                                     for j in 1..op.len() {
@@ -564,6 +539,12 @@ impl Expr {
                                                 parent_node_index,
                                                 "+".to_string(),
                                             );
+                                        } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
+                                            );
                                         } else {
                                             graph.update_edge(
                                                 node_idx,
@@ -579,6 +560,12 @@ impl Expr {
                                                 node_idx,
                                                 parent_node_index,
                                                 "+".to_string(),
+                                            );
+                                        } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
                                             );
                                         } else {
                                             graph.update_edge(
@@ -611,6 +598,12 @@ impl Expr {
                                                 parent_node_index,
                                                 "+".to_string(),
                                             );
+                                        } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
+                                            );
                                         } else {
                                             graph.update_edge(
                                                 node_idx,
@@ -626,6 +619,12 @@ impl Expr {
                                                 node_idx,
                                                 parent_node_index,
                                                 "+".to_string(),
+                                            );
+                                        } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
                                             );
                                         } else {
                                             graph.update_edge(
@@ -661,6 +660,12 @@ impl Expr {
                                                 parent_node_index,
                                                 "+".to_string(),
                                             );
+                                        } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
+                                            );
                                         } else {
                                             graph.update_edge(
                                                 node_idx,
@@ -677,6 +682,12 @@ impl Expr {
                                                     node_idx,
                                                     parent_node_index,
                                                     "+".to_string(),
+                                                );
+                                            } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                                graph.update_edge(
+                                                    node_idx,
+                                                    parent_node_index,
+                                                    "*".to_string(),
                                                 );
                                             } else {
                                                 graph.update_edge(
@@ -710,6 +721,12 @@ impl Expr {
                                                 parent_node_index,
                                                 "+".to_string(),
                                             );
+                                        } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
+                                            );
                                         } else {
                                             graph.update_edge(
                                                 node_idx,
@@ -725,6 +742,12 @@ impl Expr {
                                                 node_idx,
                                                 parent_node_index,
                                                 "+".to_string(),
+                                            );
+                                        } else if op_copy[i + 1].to_string() == "*" || op_copy[i + 1].to_string() == "/" {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
                                             );
                                         } else {
                                             graph.update_edge(
