@@ -55,7 +55,7 @@ def python_to_cast(
     legacy=False,
     cast_obj=False,
 ) -> Optional[CAST]:
-    """Example function with PEP 484 type annotations.
+    """Create a CAST object from a Python file and serialize it to JSON.
 
     Args:
         pyfile_path: Path to the Python source file

@@ -1,6 +1,9 @@
 import torch
 import torch.nn as nn
-from models.encoding.row_encoding import RowEncoding
+from skema.im2mml.models.encoding.positional_features_for_cnn_encoder import (
+    add_positional_features,
+)
+from skema.im2mml.models.encoding.row_encoding import RowEncoding
 
 
 class CNN_Encoder(nn.Module):

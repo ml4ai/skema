@@ -1,8 +1,22 @@
 # MOVIZ: Model Visualization
 
-1. Clone the [automates](https://github.com/ml4ai/automates) directory
-2. Clone the [skema](https://github.com/ml4ai/skema) directory
-3. Create a new virtual environment `venv` using [Python venv](https://docs.python.org/3/library/venv.html)
-4. Package installation: Run `pip install -r requirements.txt`
-5. Add the path to automates in PYTHONPATH: `export PYTHONPATH="/path/to/automates"`
-6. Run `flask --app main run` ; the project will run on localhost:5000/
+This directory contains the code for the MOVIZ web app for visualizing GroMEt
+function networks.
+
+## Installation
+
+Create a [virtual environment](https://docs.python.org/3/library/venv.html) and
+install the `skema` package with the `moviz` extra following the instructions
+in `../../README.md`.
+
+## Usage
+
+In this directory, run the command `flask --app main run`. The webapp can be
+accessed by going to `http://localhost:5000` in your web browser.
+
+**Note:**  The webapp can be started in debug mode with the alternative
+invocation below (this is useful for developers).
+
+```
+flask --app main --debug run
+```
