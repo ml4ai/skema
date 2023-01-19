@@ -106,7 +106,9 @@ pub struct GrometBoxConditional {
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct FunctionNet {
-    pub b: [GrometBox; 1],
+    // this I guess is optional as of import support now...
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub b: Option<[GrometBox; 1]>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opi: Option<Vec<GrometPort>>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -171,6 +173,15 @@ pub struct FunctionNet {
     pub wc_cargs: Option<Vec<GrometWire>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
+    // these additions are I guess how imports are being handled...
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub src_language: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "type")]
+    pub r#type: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
