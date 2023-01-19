@@ -42,6 +42,56 @@ pub struct PreExp {
     name: String,
 }
 
+pub fn is_derivative(xs1: &mut Box<MathExpression>, xs2: &mut Box<MathExpression>) -> bool {
+    let mut cond1 = false;
+    let mut cond2 = false;
+    match &**xs1 {
+        Mrow(x) => {
+            match &x[0] {
+                Mi(x) => {
+                    if x == "d" {
+                        cond1 = true;
+                    }
+                }
+                _ => ()
+            }
+        }
+        _ => ()
+    };
+
+    match &**xs2 {
+        Mrow(x) => {
+            match &x[0] {
+                Mi(x) => {
+                    if x == "d" {
+                        cond2 = true;
+                    }
+                }
+                _ => ()
+            }
+        }
+        _ => ()
+    };
+    if cond1 && cond2 {
+        match &mut **xs1 {
+            Mrow(x) => {
+                x.remove(0);
+            }
+            _ => ()
+        };
+
+        match &mut **xs2 {
+            Mrow(x) => {
+                x.remove(0);
+            }
+            _ => ()
+        };
+
+        return true;
+    }
+    return false;
+}
+
 impl MathExpression {
     pub fn to_expr(self, pre: &mut PreExp) {
         match self {
@@ -164,7 +214,7 @@ impl MathExpression {
                     ,
                 );
             }
-            Mfrac(xs1, xs2) => {
+            Mfrac(mut xs1, mut xs2) => {
                 if pre.args.len() >= pre.op.len() {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
@@ -174,7 +224,11 @@ impl MathExpression {
                     args: Vec::<Expr>::new(),
                     name: "".to_string(),
                 };
-                pre_exp.op.push(Operator::Other("".to_string()));
+                if is_derivative(&mut xs1, &mut xs2) {
+                    pre_exp.op.push(Operator::Other("derivative".to_string()));
+                } else {
+                    pre_exp.op.push(Operator::Other("".to_string()));
+                }
                 xs1.to_expr(&mut pre_exp);
                 pre_exp.op.push(Operator::Divide);
                 xs2.to_expr(&mut pre_exp);
@@ -357,24 +411,30 @@ impl Expr {
                 let mut args_copy = args.clone();
 
                 let mut shift = 0;
-                if all_multi_div(op) {
-                    for i in 0..args.len() {
-                        match &mut args[i] {
-                            Expr::Atom(_) => {}
-                            Expr::Expression { op, args, name } => {
-                                if op[0] == Operator::Other("".to_string()) && all_multi_div(op) {
-                                    args_copy[i] = args[0].clone();
-                                    for j in 1..op.len() {
-                                        op_copy.insert(i + shift + j, op[j].clone());
-                                        args_copy.insert(i + shift + j, args[j].clone());
+                if all_multi_div(op) && op.len() > 1 {
+                    let mut changed = true;
+                    while changed {
+                        for i in 0..args.len() {
+                            match &mut args[i] {
+                                Expr::Atom(_) => {}
+                                Expr::Expression { op, args, name } => {
+                                    if op[0] == Operator::Other("".to_string()) && all_multi_div(op) {
+                                        args_copy[i] = args[0].clone();
+                                        for j in 1..op.len() {
+                                            op_copy.insert(i + shift + j, op[j].clone());
+                                            args_copy.insert(i + shift + j, args[j].clone());
+                                        }
+                                        shift = shift + op.len() - 1;
                                     }
-                                    shift = shift + op.len() - 1;
                                 }
                             }
                         }
+                        if op.clone() == op_copy.clone() {
+                            changed = false;
+                        }
+                        *op = op_copy.clone();
+                        *args = args_copy.clone();
                     }
-                    *op = op_copy.clone();
-                    *args = args_copy.clone();
                 }
 
                 for mut arg in args {
@@ -398,19 +458,32 @@ impl Expr {
                 for i in 0..=op.len() - 1 {
                     if i > 0 {
                         if op[i] == Operator::Equals {
-                            let mut remove_idx = Vec::new();
-                            let mut x: i32 = (name.chars().count() - 1) as i32;
-                            if x > 0 {
-                                while x >= 0 {
-                                    if name.chars().nth(x as usize) != Some('(') && name.chars().nth(x as usize) != Some(')') {
-                                        remove_idx.push(x as usize);
-                                    }
-                                    x -= 1;
+                            let mut new_name: String = "".to_string();
+                            for n in name.as_bytes().clone(){
+                                if *n == 40 as u8{
+                                    new_name.push_str("(");
+                                }
+                                if *n == 41 as u8{
+                                    new_name.push_str(")");
                                 }
                             }
-                            for i in remove_idx.iter() {
-                                name.remove(*i);
-                            }
+                            *name = remove_paren(&mut new_name).clone();
+                            //
+                            // let mut remove_idx = Vec::new();
+                            // let mut x: i32 = (name.len() - 1) as i32;
+                            // if x > 0 {
+                            //     while x >= 0 {
+                            //         if name.chars().nth(x as usize) != Some('(') && name.chars().nth(x as usize) != Some(')') {
+                            //             remove_idx.push(x as usize);
+                            //         }
+                            //         x -= 1;
+                            //     }
+                            // }
+                            // for i in remove_idx.iter() {
+                            //     name.remove(*i);
+                            // }
+                            let tmp2 = name.clone();
+                            println!();
                         } else {
                             name.push_str(&op[i].to_string().clone());
                         }
@@ -427,14 +500,26 @@ impl Expr {
                         },
                         Expr::Expression { op, .. } => {
                             let mut string;
-                            // if op[0] != Operator::Other("".to_string()) {
-                            //     string = op[0].to_string();
-                            //     string.push_str(args[i].get_names().as_str().clone());
-                            // } else {
-                            //     string = args[i].get_names().as_str().to_string().clone();
+                            if op[0] != Operator::Other("".to_string()) {
+                                string = op[0].to_string();
+                                string.push_str("(");
+                                string.push_str(args[i].get_names().as_str().clone());
+                                string.push_str(")");
+                            } else {
+                                string = args[i].get_names().as_str().to_string().clone();
+                            }
+                            // let mut deri_flag = false;
+                            // if op[0].clone().to_string() == "derivative"{
+                            //     name.push_str("derivative(");
+                            //     deri_flag = true;
                             // }
-                            string = args[i].get_names().as_str().to_string().clone();
+                            // string = args[i].get_names().as_str().to_string().clone();
                             name.push_str(&string.clone());
+                            // if deri_flag {
+                            //     name.push_str(")");
+                            //     deri_flag = false;
+                            // }
+                            // name.push_str(")");
                         }
                     }
                 }
@@ -457,7 +542,12 @@ impl Expr {
                 } else if name.contains("place_holder") {
                     *name = name.replace("place_holder", "");
                 }
-                let parent_node_index: NodeIndex = get_node_idx(graph, name);
+
+                let mut parent_node_index: NodeIndex = Default::default();
+                if op[0].to_string() != "derivative" {
+                    parent_node_index = get_node_idx(graph, name)
+                }
+                // let parent_node_index: NodeIndex = get_node_idx(graph, name);
                 let mut eq_loc = 0;
                 if op.contains(&Operator::Equals) {
                     eq_loc = op.iter().position(|r| r == &(Operator::Equals)).unwrap();
@@ -486,6 +576,7 @@ impl Expr {
                             }
                         }
                     }
+
                     let node_idx = get_node_idx(graph, &mut left_eq_name);
                     graph.update_edge(
                         node_idx,
@@ -501,7 +592,11 @@ impl Expr {
                     unitary_name.push_str(&name_copy.clone());
                     unitary_name.push_str(")".clone());
                     let node_idx = get_node_idx(graph, &mut unitary_name);
-                    graph.update_edge(parent_node_index, node_idx, op[0].to_string());
+                    if op[0].to_string() == "derivative" {
+                        return;
+                    } else {
+                        graph.update_edge(parent_node_index, node_idx, op[0].to_string());
+                    }
                 }
                 let op_copy = op.clone();
                 for i in eq_loc..=op_copy.len() - 1 {
@@ -839,12 +934,16 @@ pub fn remove_paren(string: &mut String) -> &mut String {
         string.remove(string.len() - 1);
         string.remove(0);
     }
+    *string = string.replace("()", "");
     string
 }
 
 /// if exists, return the node index; if no, add a new node and return the node index
 pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeIndex {
     remove_paren(name);
+    if name.contains("derivative") {
+        *name = name.replace("/", ", ");
+    }
     if graph.node_count() > 0 {
         for n in 0..=graph.node_count() - 1 {
             match graph.raw_nodes().get(n) {
@@ -1778,7 +1877,7 @@ fn test_to_expr29() {
 
 #[test]
 fn test_to_expr30() {
-    let input = "tests/SEID_eq1.xml";
+    let input = "tests/SEIR_eq1.xml";
     let mut contents =
         std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
     contents = preprocess_content(contents);
@@ -1812,25 +1911,17 @@ fn test_to_expr31() {
 
 #[test]
 fn test_to_expr32() {
-    let f = |b: &[u8]| -> Vec<u8>{
-        let v = (0..).zip(b).scan(vec![], |a, (b, c)| Some(match c {
-            40 => {
-                a.push(b);
-                None
-            }
-            41 => { Some((a.pop()?, b)) }
-            _ => None
-        })).flatten().collect::<Vec<_>>();
-        for k in &v {
-            if k.0 == 0 && k.1 == b.len() - 1 { return b[1..b.len() - 1].to_vec(); }
-            for l in &v { if l.0 == k.0 + 1 && l.1 == k.1 - 1 { return [&b[..k.0], &b[l.0..k.1], &b[k.1 + 1..]].concat(); } }
-        }
-        return b.to_vec();
-    };
-    let g = |mut b: Vec<u8>| {
-        while f(&b) != b { b = f(&b) }
-        b
-    };
-    let content = std::str::from_utf8(&g("((a+(bcd)))".bytes().collect())).unwrap().to_string();
-    println!("{}", content);
+    let input = "tests/seirdv_eq7.xml";
+    let mut contents =
+        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
+    contents = preprocess_content(contents);
+    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    math.normalize();
+    let mut math_vec = vec![];
+    for con in math.content {
+        math_vec.push(con);
+    }
+    let mut new_math = Mrow(math_vec);
+    let _g = new_math.clone().to_graph();
+    println!("{}", Dot::new(&_g));
 }
