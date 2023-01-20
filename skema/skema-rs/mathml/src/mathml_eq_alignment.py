@@ -10,9 +10,12 @@ rng = np.random.default_rng(1)
 op_dict = {"+": 1, "-": 2, "*": 3, "/": 4, "=": 5, "√": 6}
 
 
-def generate_graph(filename="seir_eq1.xml"):
-    with open("../tests/" + filename) as f:
-        content = f.read()
+def generate_graph(file="seir_eq1.xml"):
+    if '<math>' in file and '</math>' in file:
+        content = file
+    else:
+        with open("../tests/" + file) as f:
+            content = f.read()
 
     digraph = requests.put('http://localhost:8080/mathml/math-exp-graph', data=content.encode('utf-8'))
     graph = pydot.graph_from_dot_data(str(digraph.text))[0]
@@ -34,9 +37,9 @@ def generate_amatrix(graph):
     return amatrix, node_labels
 
 
-if __name__ == "__main__":
-    graph1 = generate_graph("seir_eq1.xml")
-    graph2 = generate_graph("seirdv_eq2.xml")
+def align_mathml_eqs(file1, file2):
+    graph1 = generate_graph(file1)
+    graph2 = generate_graph(file2)
 
     amatrix1, node_labels1 = generate_amatrix(graph1)
     amatrix2, node_labels2 = generate_amatrix(graph2)
@@ -75,18 +78,31 @@ if __name__ == "__main__":
     diff_edges = abs(big_graph - small_graph_aligned_full)
     diff_edges[diff_edges > 0] = 1
     num_diff_edges = np.sum(diff_edges)
-    matching_ratio = 1 - (num_diff_edges / num_edges)
-    print('matching ratio: ' + str(round(matching_ratio * 100, 2)) + '%')
-
+    matching_ratio = round(1 - (num_diff_edges / num_edges), 2)
 
     long_len = len(node_labels1) if len(node_labels1) >= len(node_labels2) else len(node_labels2)
-
+    aligned_indices1 = np.zeros((long_len)) - 1
+    aligned_indices2 = np.zeros((long_len)) - 1
     for i in range(long_len):
         if i < len(node_labels1):
-            if i not in matched_indices1:
-                print(str(node_labels1[i]) + '<=====>missing')
-            else:
-                print(str(node_labels1[i]) + '<=====>' + str(
-                    node_labels2[matched_indices2[np.where(matched_indices1 == i)[0][0]]]))
+            if i in matched_indices1:
+                aligned_indices1[i] = matched_indices2[np.where(matched_indices1 == i)[0][0]]
+                aligned_indices2[matched_indices2[np.where(matched_indices1 == i)[0][0]]] = i
+
+    return matching_ratio, node_labels1, node_labels2, aligned_indices1, aligned_indices2
+
+
+if __name__ == "__main__":
+    matching_ratio, node_labels1, node_labels2, aligned_indices1, aligned_indices2 = align_mathml_eqs("seir_eq1.xml", "seirdv_eq2.xml")
+
+    print('matching ratio: ' + str(round(matching_ratio * 100, 2)) + '%')
+    for i in range(len(node_labels1)):
+        if aligned_indices1[i] != -1:
+            print(str(node_labels1[i]) + '<=====>' + str(node_labels2[int(aligned_indices1[i])]))
         else:
+            print(str(node_labels1[i]) + '<=====>missing')
+
+    for i in range(len(node_labels2)):
+        if i not in aligned_indices1:
             print('missing<=====>' + str(node_labels2[i]))
+
