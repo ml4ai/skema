@@ -15,10 +15,12 @@ coexist peacefully.
 At the top level, we have the following files and directories:
 
 - `Dockerfile.code2fn`: Dockerfile for the Code2FN service.
+- `Dockerfile.im2mml`: Dockerfile for the Im2MML service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
 - `docker-compose.code2fn.yml`: Docker Compose file for the Code2FN service.
+- `docker-compose.im2mml.yml`: Docker Compose file for the Im2MML service.
 - `docs`: Source code for the project website.
 - `notebooks`: Jupyter notebooks for demoing SKEMA functionality.
 - `scripts`: Miscellaneous scripts
@@ -53,6 +55,18 @@ so that it is available for scripts running in that virtual environment.
 ```
 pip install -e .
 ```
+
+The command above installs the minimum set packages required for the Code2FN
+pipeline. There are a couple of extra features that you can install as well
+with an alternative invocation. For example, the invocation below installs
+packages required for the `moviz` extra.
+
+
+```
+pip install -e .[moviz]
+```
+
+For more details on the available extras, see the `pyproject.toml` file.
 
 The `README.md` files in the `skema/skema-rs` and
 `skema/text_reading/text_reading` directories provide instructions on how to

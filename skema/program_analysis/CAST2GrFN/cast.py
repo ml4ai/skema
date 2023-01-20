@@ -165,6 +165,13 @@ class CAST(object):
             for ast_node in ast.walk(node.body):
                 for child_node in ast_node.children:
                     G.add_edge(ast_node, child_node)
+
+        import skema.utils.misc.test_pygraphviz
+
+        test_pygraphviz(
+            "The to_AGraph method requires the pygraphviz package to be installed!"
+        )
+
         A = nx.nx_agraph.to_agraph(G)
         A.graph_attr.update(
             {"dpi": 227, "fontsize": 20, "fontname": "Menlo", "rankdir": "TB"}
