@@ -2,7 +2,7 @@
 
 from typing import List
 from fastapi import FastAPI, File
-from skema.im2mml.api import get_mathml_from_bytes
+from skema.img2mml.api import get_mathml_from_bytes
 
 
 # Create a web app using FastAPI
