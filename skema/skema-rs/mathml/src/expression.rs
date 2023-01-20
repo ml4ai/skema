@@ -1,9 +1,5 @@
 use std::clone::Clone;
-use crate::ast::{
-    MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msup, Msubsup, Mover},
-    Operator,
-};
+use crate::ast::{Math, MathExpression, MathExpression::{Mfrac, Mi, Mn, Mo, Mrow, Msqrt, Msup, Msubsup, Mover}, Operator};
 
 
 use petgraph::visit::NodeRef;
@@ -1048,6 +1044,15 @@ pub fn preprocess_content(content_str: String) -> String {
     return pre_string;
 }
 
+pub fn wrap_math (math: Math) -> MathExpression{
+    let mut math_vec = vec![];
+    for con in math.content {
+        math_vec.push(con);
+    }
+    let mut new_math = Mrow(math_vec);
+    return new_math;
+}
+
 #[test]
 fn test_to_expr() {
     let math_expression = Mrow(vec![
@@ -1917,11 +1922,7 @@ fn test_to_expr32() {
     contents = preprocess_content(contents);
     let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
     math.normalize();
-    let mut math_vec = vec![];
-    for con in math.content {
-        math_vec.push(con);
-    }
-    let mut new_math = Mrow(math_vec);
+    let mut new_math = wrap_math(math);
     let _g = new_math.clone().to_graph();
     println!("{}", Dot::new(&_g));
 }

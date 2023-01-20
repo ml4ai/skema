@@ -3,16 +3,17 @@ use std::string::String;
 use mathml::parsing::parse;
 use utoipa;
 use petgraph::dot::{Config, Dot};
+use mathml::expression::{preprocess_content, wrap_math};
 
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 #[utoipa::path(
-    request_body = String,
-    responses(
-        (
-            status = 200,
-            body = String
-        )
-    )
+request_body = String,
+responses(
+(
+status = 200,
+body = String
+)
+)
 )]
 #[put("/mathml/ast-graph")]
 pub async fn get_ast_graph(payload: String) -> String {
@@ -28,20 +29,22 @@ pub async fn get_ast_graph(payload: String) -> String {
 /// expression graph (MEG), which can be used to perform structural alignment with the scientific
 /// model code that corresponds to the equation.
 #[utoipa::path(
-    request_body = String,
-    responses(
-        (
-            status = 200,
-            body = String
-        )
-    )
+request_body = String,
+responses(
+(
+status = 200,
+body = String
+)
+)
 )]
 #[put("/mathml/math-exp-graph")]
 pub async fn get_math_exp_graph(payload: String) -> String {
-    let contents = &payload;
+    let mut contents = payload.clone();
+    contents = preprocess_content(contents);
     let (_, mut math) = parse(&contents).expect(format!("Unable to parse payload!").as_str());
     math.normalize();
-    let g = &mut math.content[0].clone().to_graph();
-    let dot_representation = Dot::new(&*g);
+    let mut new_math = wrap_math(math);
+    let g = new_math.clone().to_graph();
+    let dot_representation = Dot::new(&g);
     dot_representation.to_string()
 }
