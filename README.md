@@ -15,12 +15,12 @@ coexist peacefully.
 At the top level, we have the following files and directories:
 
 - `Dockerfile.code2fn`: Dockerfile for the Code2FN service.
-- `Dockerfile.im2mml`: Dockerfile for the Im2MML service.
+- `Dockerfile.img2mml`: Dockerfile for the Im2MML service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
 - `docker-compose.code2fn.yml`: Docker Compose file for the Code2FN service.
-- `docker-compose.im2mml.yml`: Docker Compose file for the Im2MML service.
+- `docker-compose.img2mml.yml`: Docker Compose file for the Im2MML service.
 - `docs`: Source code for the project website.
 - `notebooks`: Jupyter notebooks for demoing SKEMA functionality.
 - `scripts`: Miscellaneous scripts
@@ -35,10 +35,10 @@ The `skema` directory contains two different types of directories:
     - `model_assembly`
     - `text_reading`
     - `code2fn`: Web service for converting code to GroMEt function networks.
-    - `im2mml`: Web service for extracting equations from images.
+    - `img2mml`: Web service for extracting equations from images.
     - `moviz`: Visualization interface for GroMEt function networks.
 
-Of the Python subpackages, the last three (`code2fn`, `im2mml`, `moviz`) are
+Of the Python subpackages, the last three (`code2fn`, `img2mml`, `moviz`) are
 currently the most 'outward/user-facing' components. The `program_analysis`,
 `gromet`, and `model_assembly` directories are comprised primarily of library
 code that is used by the `code2fn` service.
@@ -83,9 +83,9 @@ docker-compose -f docker-compose.code2fn.yml up --build
 To run the Im2MML Dockerized service, run
 
 ```
-docker-compose -f docker-compose.im2mml.yml up --build
+docker-compose -f docker-compose.img2mml.yml up --build
 ```
 
-(make sure the appropriate im2mml model is in the
-`skema/im2mml/trained_models` directory - see the `README.md` file in
-`skema/im2mml` for details)
+(make sure the appropriate img2mml model is in the
+`skema/img2mml/trained_models` directory - see the `README.md` file in
+`skema/img2mml` for details)

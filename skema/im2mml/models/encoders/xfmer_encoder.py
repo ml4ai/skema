@@ -1,7 +1,7 @@
 import torch, math
 import torch.nn as nn
-from skema.im2mml.utils import generate_square_subsequent_mask
-from skema.im2mml.models.encoding.positional_encoding_for_xfmer import (
+from skema.img2mml.utils import generate_square_subsequent_mask
+from skema.img2mml.models.encoding.positional_encoding_for_xfmer import (
     PositionalEncoding,
 )
 

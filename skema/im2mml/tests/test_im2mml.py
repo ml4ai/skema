@@ -1,5 +1,5 @@
 from pathlib import Path
-from skema.im2mml.api import get_mathml_from_file
+from skema.img2mml.api import get_mathml_from_file
 
 def test_get_mathml():
     cwd = Path(__file__).parents[0]
