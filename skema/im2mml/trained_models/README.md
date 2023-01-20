@@ -1,1 +1,1 @@
-This directory contains trained models for the im2mml pipeline.
+This directory contains trained models for the img2mml pipeline.

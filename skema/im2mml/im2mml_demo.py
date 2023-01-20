@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Example Python client program to work with the im2mml web service."""
+"""Example Python client program to work with the img2mml web service."""
 
 import argparse
 import requests
