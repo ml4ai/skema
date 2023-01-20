@@ -464,22 +464,6 @@ impl Expr {
                                 }
                             }
                             *name = remove_paren(&mut new_name).clone();
-                            //
-                            // let mut remove_idx = Vec::new();
-                            // let mut x: i32 = (name.len() - 1) as i32;
-                            // if x > 0 {
-                            //     while x >= 0 {
-                            //         if name.chars().nth(x as usize) != Some('(') && name.chars().nth(x as usize) != Some(')') {
-                            //             remove_idx.push(x as usize);
-                            //         }
-                            //         x -= 1;
-                            //     }
-                            // }
-                            // for i in remove_idx.iter() {
-                            //     name.remove(*i);
-                            // }
-                            let tmp2 = name.clone();
-                            println!();
                         } else {
                             name.push_str(&op[i].to_string().clone());
                         }
@@ -504,18 +488,7 @@ impl Expr {
                             } else {
                                 string = args[i].get_names().as_str().to_string().clone();
                             }
-                            // let mut deri_flag = false;
-                            // if op[0].clone().to_string() == "derivative"{
-                            //     name.push_str("derivative(");
-                            //     deri_flag = true;
-                            // }
-                            // string = args[i].get_names().as_str().to_string().clone();
                             name.push_str(&string.clone());
-                            // if deri_flag {
-                            //     name.push_str(")");
-                            //     deri_flag = false;
-                            // }
-                            // name.push_str(")");
                         }
                     }
                 }
@@ -543,7 +516,6 @@ impl Expr {
                 if op[0].to_string() != "derivative" {
                     parent_node_index = get_node_idx(graph, name)
                 }
-                // let parent_node_index: NodeIndex = get_node_idx(graph, name);
                 let mut eq_loc = 0;
                 if op.contains(&Operator::Equals) {
                     eq_loc = op.iter().position(|r| r == &(Operator::Equals)).unwrap();
@@ -1802,7 +1774,6 @@ fn test_to_expr24() {
         Mi("c".to_string()),
     ]);
     let _g = math_expression.to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1816,7 +1787,6 @@ fn test_to_expr25() {
         Mi("c".to_string()),
     ]);
     let _g = math_expression.to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1832,7 +1802,6 @@ fn test_to_expr26() {
         Mi("d".to_string()),
     ]);
     let _g = math_expression.to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1844,7 +1813,6 @@ fn test_to_expr27() {
         Mi("b".to_string()),
     ]);
     let _g = math_expression.to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1856,7 +1824,6 @@ fn test_to_expr28() {
         Mi("b".to_string()),
     ]);
     let _g = math_expression.to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1877,7 +1844,6 @@ fn test_to_expr29() {
                                          ])),
                                     )]);
     let _g = math_expression.to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1894,7 +1860,6 @@ fn test_to_expr30() {
     }
     let mut new_math = Mrow(math_vec);
     let _g = new_math.clone().to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1911,7 +1876,6 @@ fn test_to_expr31() {
     }
     let mut new_math = Mrow(math_vec);
     let _g = new_math.clone().to_graph();
-    println!("{}", Dot::new(&_g));
 }
 
 #[test]
@@ -1924,5 +1888,4 @@ fn test_to_expr32() {
     math.normalize();
     let mut new_math = wrap_math(math);
     let _g = new_math.clone().to_graph();
-    println!("{}", Dot::new(&_g));
 }
