@@ -1970,7 +1970,7 @@ class ToGrometPass:
         # Repeat with the getters I think?
         f = None
         for f in node.funcs:
-            if isinstance(f, FunctionDef) and f.name.name == "__init__":
+            if isinstance(f, AnnCastFunctionDef) and f.name.name == "__init__":
                 break
 
         new_gromet = GrometFN()
@@ -2116,6 +2116,7 @@ class ToGrometPass:
                     and isinstance(s.left, AnnCastAttribute)
                     and s.left.value.name == "self"
                 ):
+                    print("New field!")
                     inline_new_record = GrometBoxFunction(
                         name="new_Field", function_type=FunctionType.PRIMITIVE
                     )
@@ -2132,14 +2133,16 @@ class ToGrometPass:
                         ),
                     )
 
+                    new_gromet.bf = insert_gromet_object(
+                        new_gromet.bf,
+                        GrometBoxFunction(
+                            function_type=FunctionType.LITERAL,
+                            value=LiteralValue("string", s.left.attr.name),
+                        ),
+                    )
+                    # TODO: Have to figure out how to incorporate assignments that involve more than just a name
+                    # should be as simple as just rechecking what the right side is and visiting accordingly
                     if isinstance(s.right, AnnCastName):
-                        new_gromet.bf = insert_gromet_object(
-                            new_gromet.bf,
-                            GrometBoxFunction(
-                                function_type=FunctionType.LITERAL,
-                                value=LiteralValue("string", s.right.name),
-                            ),
-                        )
                         new_gromet.pof = insert_gromet_object(
                             new_gromet.pof, GrometPort(box=len(new_gromet.bf))
                         )
@@ -2167,7 +2170,7 @@ class ToGrometPass:
                     )
                     # Wires first arg for "set"
                     new_gromet.bf = insert_gromet_object(
-                        new_gromet.bf, inline_new_record
+                        new_gromet.bf, record_set
                     )
                     new_gromet.pif = insert_gromet_object(
                         new_gromet.pif, GrometPort(box=len(new_gromet.bf))
@@ -2231,7 +2234,8 @@ class ToGrometPass:
 
         # Generate and store the rest of the functions associated with this record
         for f in node.funcs:
-            if isinstance(f, FunctionDef) and f.name.name != "__init__":
+            if isinstance(f, AnnCastFunctionDef) and f.name.name != "__init__":
+                print(f.name.name)
                 arg_env_copy = deepcopy(self.var_environment["args"])
                 local_env_copy = deepcopy(self.var_environment["local"])
                 self.var_environment["args"] = {}
