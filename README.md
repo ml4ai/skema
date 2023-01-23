@@ -15,12 +15,12 @@ coexist peacefully.
 At the top level, we have the following files and directories:
 
 - `Dockerfile.code2fn`: Dockerfile for the Code2FN service.
-- `Dockerfile.img2mml`: Dockerfile for the Im2MML service.
+- `Dockerfile.img2mml`: Dockerfile for the img2mml service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
 - `docker-compose.code2fn.yml`: Docker Compose file for the Code2FN service.
-- `docker-compose.img2mml.yml`: Docker Compose file for the Im2MML service.
+- `docker-compose.img2mml.yml`: Docker Compose file for the img2mml service.
 - `docs`: Source code for the project website.
 - `notebooks`: Jupyter notebooks for demoing SKEMA functionality.
 - `scripts`: Miscellaneous scripts
@@ -80,7 +80,7 @@ To run the Code2FN Dockerized service, run
 docker-compose -f docker-compose.code2fn.yml up --build
 ```
 
-To run the Im2MML Dockerized service, run
+To run the img2mml Dockerized service, run
 
 ```
 docker-compose -f docker-compose.img2mml.yml up --build
