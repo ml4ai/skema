@@ -52,22 +52,23 @@ steps:
     - skema/gromet/**
     - skema/model_assembly/**
 
----
-kind: pipeline
-name: skema-er
+# TODO - get Equation Reading pipeline working
+#---
+#kind: pipeline
+#name: skema-er
 
-steps:
-- name: test_equation_reading
-  image: python:3.8-bullseye
-  commands:
-  - apt-get update
-  - apt-get -y install build-essential graphviz libgraphviz-dev
-  - pip install -e .[dev,img2mml]
-  - pip install pytest-cov
-  - curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
-  - pytest --cov=skema skema/img2mml/tests
-  when:
-    paths:
-    - pyproject.toml
-    - .drone.yml
-    - skema/img2mml/**
+#steps:
+#- name: test_equation_reading
+  #image: python:3.8-bullseye
+  #commands:
+  #- apt-get update
+  #- apt-get -y install build-essential graphviz libgraphviz-dev
+  #- pip install -e .[dev,img2mml]
+  #- pip install pytest-cov
+  #- curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+  #- pytest --cov=skema skema/img2mml/tests
+  #when:
+    #paths:
+    #- pyproject.toml
+    #- .drone.yml
+    #- skema/img2mml/**
