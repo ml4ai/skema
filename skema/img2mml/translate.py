@@ -13,6 +13,11 @@ from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
 from typing import List
+import logging
+from logging import info
+
+# Set logging level to INFO
+logging.basicConfig(level=logging.INFO)
 
 
 def pad_image(image: Image.Image) -> Image.Image:
@@ -146,6 +151,7 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     print("loading trained model...")
 
     if not torch.cuda.is_available():
+        info("CUDA is not available, falling back to using the CPU.")
         model.load_state_dict(
             torch.load(model_path, map_location=torch.device("cpu"))
         )
