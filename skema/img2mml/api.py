@@ -28,7 +28,7 @@ def get_mathml_from_bytes(data: bytes):
     return render_mml(config, model_path, vocab, imagetensor)
 
 
-def get_mathml_from_file(filepath):
+def get_mathml_from_file(filepath) -> str:
     """Read an equation image file and convert it to MathML"""
 
     with open(filepath, "rb") as f:
