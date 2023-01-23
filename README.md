@@ -24,7 +24,7 @@ At the top level, we have the following files and directories:
 - `docs`: Source code for the project website.
 - `notebooks`: Jupyter notebooks for demoing SKEMA functionality.
 - `scripts`: Miscellaneous scripts
-- `setup.py`: This `setup.py` file declares and defines the `skema` Python package.
+- `pyproject.toml`: This file declares and defines the `skema` Python package.
 - `skema`
 
 The `skema` directory contains two different types of directories:
