@@ -6,12 +6,12 @@ import argparse
 import requests
 
 
-def get_mml(image_path: str) -> str:
+def get_mml(image_path: str, url: str) -> str:
     """
     It sends the http requests to put in an image to translate it into MathML.
     """
     with open(image_path, "rb") as f:
-        r = requests.put("http://127.0.0.1:8000/get-mml", files={"file": f})
+        r = requests.put(url, files={"file": f})
     return r.text
 
 
@@ -27,6 +27,12 @@ if __name__ == "__main__":
         default="tests/data/261.png",
     )
 
+    parser.add_argument(
+        "--url",
+        help="The URL to the img2mml service endpoint.",
+        default="http://localhost:8000/get-mml",
+    )
+
     args = parser.parse_args()
-    mml = get_mml(args.input)
+    mml = get_mml(args.input, args.url)
     print(mml)
