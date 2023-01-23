@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*
+import warnings
+warnings.filterwarnings('ignore')
 import requests
 import pydot
 import numpy as np
