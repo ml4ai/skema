@@ -1,17 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import os, subprocess
 import random
 import numpy as np
-import time
-import json
-import math
-import itertools
 import torch
-import torchvision
-import torch.nn as nn
-import torch.distributed as dist
-import torch.multiprocessing as mp
 from torchvision import transforms
 from PIL import Image
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
@@ -24,75 +15,51 @@ import io
 from typing import List
 
 
-class Image2Tensor(object):
+def pad_image(image: Image.Image) -> Image.Image:
+    right, left, top, bottom = 8, 8, 8, 8
+    width, height = image.size
+    new_width = width + right + left
+    new_height = height + top + bottom
+    result = Image.new(image.mode, (new_width, new_height))
+    result.paste(image, (left, top))
+    return result
+
+def convert_to_torch_tensor(image: bytes) -> torch.Tensor:
+    print("Converting image to torch tensor...")
+    image = Image.open(io.BytesIO(image)).convert("L")
+    image = image.resize((500, 50))
+    image = pad_image(image)
+
+    # convert to tensor
+    image = transforms.ToTensor()(image)
+
+    return image
+
+def set_random_seed(seed: int) -> None:
     """
-    This class takes in an image and generates a tensor object
-    """
-
-    def __init__(self):
-        print("Converting image to torch tensor...")
-
-    def crop_image(self, image, size):
-        return transforms.functional.crop(image, 0, 0, size[0], size[1])
-
-    def resize_image(self, image):
-        return image.resize((500, 50))
-
-    def pad_image(self, IMAGE):
-        right, left, top, bottom = 8, 8, 8, 8
-        width, height = IMAGE.size
-        new_width = width + right + left
-        new_height = height + top + bottom
-        result = Image.new(IMAGE.mode, (new_width, new_height))
-        result.paste(IMAGE, (left, top))
-        return result
-
-    def __call__(self, image_path):
-        """
-        convert png image to tensor
-
-        :params: png image path
-        :return: processed image tensor
-        """
-
-        # crop, resize, and pad the image
-        IMAGE = Image.open(io.BytesIO(image_path)).convert("L")
-        IMAGE = self.resize_image(IMAGE)
-        IMAGE = self.pad_image(IMAGE)
-        # convert to tensor
-        convert = transforms.ToTensor()
-        IMAGE = convert(IMAGE)
-
-        return IMAGE
-
-
-def set_random_seed(SEED: int) -> None:
-    """
-    setting up seed
+    Setting up seed
     """
     # set up seed
-    random.seed(SEED)
-    np.random.seed(SEED)
-    torch.manual_seed(SEED)
-    torch.cuda.manual_seed(SEED)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
 
 
 def define_model(
     config: dict, VOCAB: List[str], DEVICE: torch.device, model_type="xfmer"
 ) -> Image2MathML_Xfmer:
     """
-    defining the model
+    Defining the model
     initializing encoder, decoder, and model
     """
 
-    print("defining model...")
+    print("Defining model...")
 
     MODEL_TYPE = config["model_type"]
     INPUT_CHANNELS = config["input_channels"]
     OUTPUT_DIM = len(VOCAB)
     EMB_DIM = config["embedding_dim"]
-    ENC_DIM = config["encoder_dim"]
-    ENCODING_TYPE = config["encoding_type"]
     DEC_HID_DIM = config["decoder_hid_dim"]
     DROPOUT = config["dropout"]
     MAX_LEN = config["max_len"]
@@ -136,7 +103,7 @@ def define_model(
 def evaluate(
     model: Image2MathML_Xfmer,
     vocab: List[str],
-    img: Image2Tensor,
+    img: torch.Tensor,
     device: torch.device,
 ) -> str:
 
@@ -169,36 +136,12 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     """
     It allows us to obtain mathML for an image
     """
-    # parameters
-    optimizer_type = config["optimizer_type"]
-    learning_rate = config["learning_rate"]
-    weight_decay = config["weight_decay"]
-    (beta_1, beta_2) = config["beta_1"], config["beta_2"]
-    CLIP = config["clip"]
-    SEED = config["seed"]
-    model_type = config["model_type"]
-    load_trained_model = config["load_trained_model_for_testing"]
-    use_single_gpu = config["use_single_gpu"]
-    max_len = config["max_len"]
-
     # set_random_seed
-    set_random_seed(SEED)
+    set_random_seed(config["seed"])
 
     # defining model using DataParallel
-    device = torch.device(f"cuda:0" if torch.cuda.is_available() else "cpu")
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
-
-    # optimizer
-    if optimizer_type == "Adam":
-        optimizer = torch.optim.Adam(
-            params=model.parameters(),
-            lr=learning_rate,
-            weight_decay=weight_decay,
-            betas=(beta_1, beta_2),
-        )
-
-    best_valid_loss = float("inf")
-    TRG_PAD_IDX = 0
 
     # generating equation
     print("loading trained model...")
