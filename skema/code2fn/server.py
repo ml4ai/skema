@@ -19,7 +19,18 @@ class System(BaseModel):
 app = FastAPI()
 
 
-@app.post("/")
+@app.ping("/ping", summary="Ping endpoint to test health of service")
+def ping():
+    return "The Code2FN service is running."
+
+
+@app.post(
+    "/fn-given-filepaths",
+    summary=(
+        "Send a system of code and filepaths of interest,"
+        " get a GroMEt FN Module collection back."
+    ),
+)
 async def root(system: System):
     # Create a tempory directory to store module
     with tempfile.TemporaryDirectory() as tmp:
