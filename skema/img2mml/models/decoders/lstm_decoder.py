@@ -61,7 +61,8 @@ class LSTM_Decoder(nn.Module):
 
     def init_weights(self):
         """
-        Initializes some parameters with values from the uniform distribution, for easier convergence.
+        Initializes some parameters with values from the uniform distribution,
+        for easier convergence.
         """
         self.embedding.weight.data.uniform_(-0.1, 0.1)
         self.fc.bias.data.fill_(0)
@@ -115,8 +116,10 @@ class LSTM_Decoder(nn.Module):
             enc_output, hidden, cell = enc_output
             if self.n_layers > 1:
                 """
-                since the number of lstm in row_encoding=1, the hidden shape will always going to be (1,B,dec_hid_dim).
-                hence we have to broadcast the hidden and cell layers to match n_layers of lstm in the decoder.
+                Since the number of LSTMs in row_encoding=1, the hidden shape
+                will always going to be (1,B,dec_hid_dim).  Hence we have to
+                broadcast the hidden and cell layers to match n_layers of lstm
+                in the decoder.
                 """
                 hidden = hidden.repeat(self.n_layers, 1, 1)
                 cell = cell.repeat(self.n_layers, 1, 1)

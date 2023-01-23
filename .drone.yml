@@ -65,7 +65,7 @@ steps:
   - pip install -e .[dev,img2mml]
   - pip install pytest-cov
   - curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
-  - pytest --cov=skema skema/img2mml/tests
+  - pytest -s --cov=skema skema/img2mml/tests
   when:
     paths:
     - pyproject.toml
