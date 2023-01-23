@@ -19,7 +19,7 @@ class System(BaseModel):
 app = FastAPI()
 
 
-@app.ping("/ping", summary="Ping endpoint to test health of service")
+@app.get("/ping", summary="Ping endpoint to test health of service")
 def ping():
     return "The Code2FN service is running."
 
