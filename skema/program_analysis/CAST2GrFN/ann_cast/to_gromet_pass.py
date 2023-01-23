@@ -887,6 +887,7 @@ class ToGrometPass:
         elif isinstance(node.right, AnnCastName):
             # Assignment for
             # x = y
+            # or some,set,of,values,... = y
 
             # Create a passthrough GroMEt
             new_gromet = GrometFN()
@@ -941,6 +942,10 @@ class ToGrometPass:
             if isinstance(
                 node.left, AnnCastTuple
             ):  # TODO: double check that this addition is correct
+                self.create_unpack(
+                    node.left.values, parent_gromet_fn, parent_cast_node
+                )
+                """
                 for (i, elem) in enumerate(node.left.values, 1):
                     if (
                         parent_gromet_fn.pof != None
@@ -948,10 +953,13 @@ class ToGrometPass:
                         pof_idx = len(parent_gromet_fn.pof) - i
                     else:
                         # print(node.source_refs[0])
+                        print(i, elem.val.name)
                         pof_idx = -1
+                    print(parent_gromet_fn.pof)
                     if (
                         parent_gromet_fn.pof != None
                     ):  # TODO: come back and fix this guard later
+                        print(i, elem.val.name)
                         self.add_var_to_env(
                             elem.val.name,
                             elem,
@@ -960,6 +968,7 @@ class ToGrometPass:
                             parent_cast_node,
                         )
                         parent_gromet_fn.pof[pof_idx].name = elem.val.name
+                """
             else:
                 parent_gromet_fn.pof = insert_gromet_object(
                     parent_gromet_fn.pof,
