@@ -77,7 +77,7 @@ class Tester:
             paths.extractions_path, paths.embeddings_path
         )
         self.paths = paths
-        self.gromet_fn_module = GrometHelper.json_to_gromet(paths.gromet_path)
+        self.gromet_fn_module = GrometHelper.json_to_gromet(paths.gromet_path).modules[0] # TODO, make this iterable over all the modules in the gromet
         self.comment_aligner_helper = CommentAlignerHelper(
             debugger,
             time_stamper,
