@@ -25,11 +25,11 @@ RUN mkdir -p /skema/skema
 
 # Copy the necessary files and folders, omitting unnecessary ones.
 COPY pyproject.toml /skema/
-COPY skema/im2mml /skema/skema/im2mml
+COPY skema/img2mml /skema/skema/img2mml
 WORKDIR /skema
 
 # Install the skema package
 RUN pip install wheel
-RUN pip install -e .[im2mml]
+RUN pip install -e .[img2mml]
 
-WORKDIR /skema/skema/im2mml/
+WORKDIR /skema/skema/img2mml/
