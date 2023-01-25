@@ -1,4 +1,4 @@
-""" Utility to see the mentions with alignments and gromets """
+"""Utility to see the mentions with alignments and gromets."""
 
 import json
 from pprint import pprint
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "-p",
         "--print_aligned",
-        help="rints the ports that have a linked text reading mention",
+        help="Prints the ports that have a linked text reading mention.",
         action="store_true",
     )
     # TODO
