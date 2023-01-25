@@ -1513,8 +1513,9 @@ class ToGrometPass:
                             parent_gromet_fn.bf,
                             GrometBoxFunction(
                                 name=node.value.name,
-                                function_type=FunctionType.FUNCTION,
-                                contents=-1,
+                                function_type=FunctionType.IMPORTED_METHOD,
+                                # function_type=FunctionType.FUNCTION,
+                                contents=None,
                             ),
                         )
                         parent_gromet_fn.pof = insert_gromet_object(
