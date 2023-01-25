@@ -1,6 +1,6 @@
 import itertools
 import json
-from typing import Any, Union
+from typing import Any
 from collections import defaultdict
 from gensim.models import KeyedVectors
 import numpy as np
@@ -104,9 +104,13 @@ class TextReadingLinker:
         #     m for m in data["mentions"] if m["type"] == "TextBoundMention"
         # ]
 
-        text_bound_mentions = list(it.chain.from_iterable(it.chain.from_iterable(
-            m['arguments'].values() for m in relevant_mentions
-        )))
+        text_bound_mentions = list(
+            it.chain.from_iterable(
+                it.chain.from_iterable(
+                    m["arguments"].values() for m in relevant_mentions
+                )
+            )
+        )
 
         # Add context to the mentions
         docs = data["documents"]

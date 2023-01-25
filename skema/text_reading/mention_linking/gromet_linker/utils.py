@@ -14,8 +14,6 @@ from skema.gromet.metadata import (
 )
 from typing import Optional, Tuple
 
-import itertools as it
-
 
 class Utils:
     @staticmethod
@@ -213,7 +211,7 @@ class Utils:
             except KeyError:
                 # TODO: Log this error
                 md = None
-                
+
         elif mention["labels"][0] == "UnitRelation":
             # UnitRelation, ParamAndUnit
             # Candidate definition argument names
