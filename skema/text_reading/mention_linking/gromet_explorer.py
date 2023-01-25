@@ -2,6 +2,7 @@
 
 import json
 from pprint import pprint
+import argparse
 
 def walk_nested_structure(obj, md_keys):
 	ret = list()
@@ -25,9 +26,15 @@ def walk_nested_structure(obj, md_keys):
 
 if __name__ == "__main__":
 
-	path = "/home/enoriega/hackaton/11b--GROMET-aligned.json"
+	parser = argparse.ArgumentParser()
+	parser.add_argument("input_path")
+	parser.add_argument("-p", "--print_aligned", help="rints the ports that have a linked text reading mention", action="store_true")
+	# TODO
+	# group by tr linked mention
+	# group by DKG grounded entity
+	args = parser.parse_args()
 
-	with open(path) as f:
+	with open(args.input_path) as f:
 		gromet_fn_module = json.load(f)
 
 
@@ -41,14 +48,16 @@ if __name__ == "__main__":
 	# Now, get the ports with TR metadata associated
 	ports = list(walk_nested_structure(gromet_fn_module, text_reading_mds.keys()))
 
-	# Print the "table"
-	for port in ports:
-		pprint(port, indent=4)
-		print()
-		for md in text_reading_mds[port['metadata']]:
-			pprint(md, indent=4)
-			print()
 
-		pprint("=================================================")
-		print()
+	if args.print_aligned:
+		# Print the "table"
+		for port in ports:
+			pprint(port, indent=4)
+			print()
+			for md in text_reading_mds[port['metadata']]:
+				pprint(md, indent=4)
+				print()
+
+			pprint("=================================================")
+			print()
 		
