@@ -3165,42 +3165,44 @@ pub fn create_att_expression(
     }
     // now to construct the nodes inside the expression, Literal and Primitives
     let mut box_counter: u8 = 1;
-    for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
-        match sboxf.function_type {
-            FunctionType::Literal => {
-                (nodes, edges, meta_nodes) = create_att_literal(
-                    &gromet.clone(),
-                    eboxf.clone(),
-                    sboxf.clone(),
-                    nodes.clone(),
-                    edges.clone(),
-                    n1.clone(),
-                    idx.clone(),
-                    box_counter.clone(),
-                    bf_counter.clone(),
-                    start.clone(),
-                    meta_nodes.clone(),
-                );
+    if !eboxf.value.bf.is_none() {
+        for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+            match sboxf.function_type {
+                FunctionType::Literal => {
+                    (nodes, edges, meta_nodes) = create_att_literal(
+                        &gromet.clone(),
+                        eboxf.clone(),
+                        sboxf.clone(),
+                        nodes.clone(),
+                        edges.clone(),
+                        n1.clone(),
+                        idx.clone(),
+                        box_counter.clone(),
+                        bf_counter.clone(),
+                        start.clone(),
+                        meta_nodes.clone(),
+                    );
+                }
+                FunctionType::Primitive => {
+                    (nodes, edges, meta_nodes) = create_att_primitive(
+                        &gromet.clone(),
+                        eboxf.clone(),
+                        sboxf.clone(),
+                        nodes.clone(),
+                        edges.clone(),
+                        n1.clone(),
+                        idx.clone(),
+                        box_counter.clone(),
+                        bf_counter.clone(),
+                        start.clone(),
+                        meta_nodes.clone(),
+                    );
+                }
+                _ => {}
             }
-            FunctionType::Primitive => {
-                (nodes, edges, meta_nodes) = create_att_primitive(
-                    &gromet.clone(),
-                    eboxf.clone(),
-                    sboxf.clone(),
-                    nodes.clone(),
-                    edges.clone(),
-                    n1.clone(),
-                    idx.clone(),
-                    box_counter.clone(),
-                    bf_counter.clone(),
-                    start.clone(),
-                    meta_nodes.clone(),
-                );
-            }
-            _ => {}
+            box_counter += 1;
+            start += 1;
         }
-        box_counter += 1;
-        start += 1;
     }
     // Now we perform the internal wiring of this branch
     edges = internal_wiring(
