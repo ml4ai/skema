@@ -95,6 +95,7 @@ class CommentAligner:
         aligned_comments: list[tuple[int, str]],
     ) -> None:
         # Build new metadata object and append it to the metadata list of each port.
+        # TODO Enrique: Here will be a good place to introduce the fallback/default comments
         comments = (
             [name]
             if name
