@@ -544,6 +544,9 @@ class ToGrometPass:
         return func_idx + 1, found_func
 
     def retrieve_var_port(self, var_name):
+        """ Given a variable named var_name in the variable environment
+            This function attempts to look up the port in which it's located
+            """
         if var_name in self.var_environment["local"]:
             local_env = self.var_environment["local"]
             entry = local_env[var_name]
@@ -637,6 +640,55 @@ class ToGrometPass:
                     pof_idx,
                     parent_cast_node,
                 )
+
+    def create_pack(self, var, tuple_values, parent_gromet_fn, parent_cast_node):
+        """Creates a 'pack' primitive whenever the left hand side
+        of a tuple assignment is a single variable, such as:
+        x = a,b,c...
+        """
+        # Make the "pack" literal and insert it in the GroMEt FN
+        # TODO: a better way to get the name of this 'pack'
+        pack_bf = GrometBoxFunction(
+            name="pack", function_type=FunctionType.PRIMITIVE
+        )  
+
+        parent_gromet_fn.bf = insert_gromet_object(
+            parent_gromet_fn.bf, pack_bf
+        )
+
+        pack_index = len(parent_gromet_fn.bf)
+
+        # Construct the pifs for the pack and wire them
+        for port in tuple_values:
+            parent_gromet_fn.pif = insert_gromet_object(
+                parent_gromet_fn.pif, GrometPort(box=pack_index) 
+            )
+
+            parent_gromet_fn.wff = insert_gromet_object(
+                parent_gromet_fn.wff, 
+                GrometWire(
+                    src=len(parent_gromet_fn.pif), 
+                    tgt=port
+                )
+            )
+
+        # Insert the return value of the pack
+        # Which is one variable
+        parent_gromet_fn.pof = insert_gromet_object(
+            parent_gromet_fn.pof, 
+            GrometPort(
+                name=get_left_side_name(var),
+                box=pack_index
+            )
+        )
+
+        self.add_var_to_env(
+            get_left_side_name(var),
+            var,
+            parent_gromet_fn.pof[-1],
+            len(parent_gromet_fn.pof) - 1,
+            parent_cast_node
+        )
 
     def create_unpack(self, tuple_values, parent_gromet_fn, parent_cast_node):
         """Creates an 'unpack' primitive whenever the left hand side
@@ -945,30 +997,6 @@ class ToGrometPass:
                 self.create_unpack(
                     node.left.values, parent_gromet_fn, parent_cast_node
                 )
-                """
-                for (i, elem) in enumerate(node.left.values, 1):
-                    if (
-                        parent_gromet_fn.pof != None
-                    ):  # TODO: come back and fix this guard later
-                        pof_idx = len(parent_gromet_fn.pof) - i
-                    else:
-                        # print(node.source_refs[0])
-                        print(i, elem.val.name)
-                        pof_idx = -1
-                    print(parent_gromet_fn.pof)
-                    if (
-                        parent_gromet_fn.pof != None
-                    ):  # TODO: come back and fix this guard later
-                        print(i, elem.val.name)
-                        self.add_var_to_env(
-                            elem.val.name,
-                            elem,
-                            parent_gromet_fn.pof[pof_idx],
-                            pof_idx,
-                            parent_cast_node,
-                        )
-                        parent_gromet_fn.pof[pof_idx].name = elem.val.name
-                """
             else:
                 parent_gromet_fn.pof = insert_gromet_object(
                     parent_gromet_fn.pof,
@@ -1066,6 +1094,110 @@ class ToGrometPass:
                 len(parent_gromet_fn.pof) - 1,
                 parent_cast_node,
             )
+        elif isinstance(node.right, AnnCastTuple):
+            # Case for when right hand side is a tuple
+            # For instances like
+            # x = a,b,c,...
+            # x,y,z,... = w,a,b,...
+            ref = node.source_refs[0]
+            metadata = self.create_source_code_reference(ref)
+            
+            # Make Expression GrometFN
+            #new_gromet = GrometFN()
+            #new_gromet.b = insert_gromet_object(
+            #    new_gromet.b,
+            #    GrometBoxFunction(function_type=FunctionType.EXPRESSION),
+            #)
+            
+            # Visit each individual value in the tuple 
+            # and collect the resulting
+            # pofs from each value 
+            tuple_indices = [] 
+            for val in node.right.values:
+
+                if isinstance(val, AnnCastLiteralValue):
+                    new_gromet = GrometFN()
+                    new_gromet.b = insert_gromet_object(
+                        new_gromet.b,
+                        GrometBoxFunction(function_type=FunctionType.EXPRESSION),
+                    )
+
+                    self.visit(val, new_gromet, parent_cast_node)
+                
+                    # Create the opo for the Gromet Expression holding the literal and then wire its opo to the literal's pof
+                    new_gromet.opo = insert_gromet_object(
+                        new_gromet.opo, GrometPort(box=len(new_gromet.b))
+                    )
+
+                    new_gromet.wfopo = insert_gromet_object(
+                        new_gromet.wfopo,
+                        GrometWire(src=len(new_gromet.opo), tgt=len(new_gromet.pof)),
+                    )
+
+                    # Append this Gromet Expression holding the value to the overall gromet FN collection
+                    self.gromet_module.attributes = insert_gromet_object(
+                        self.gromet_module.attributes,
+                        TypedValue(type=AttributeType.FN, value=new_gromet),
+                    )
+                    self.set_index()
+
+                    # Make the 'call' box function that connects the expression to the parent and creates its output port
+                    # print(node.source_refs)
+                    parent_gromet_fn.bf = insert_gromet_object(
+                        parent_gromet_fn.bf,
+                        GrometBoxFunction(
+                            function_type=FunctionType.EXPRESSION,
+                            contents=len(self.gromet_module.attributes),
+                            metadata=self.insert_metadata(metadata),
+                        ),
+                    )
+
+                    # Make the output port for this value in the tuple
+                    # If the left hand side is also a tuple this port will get named
+                    # further down
+                    parent_gromet_fn.pof = insert_gromet_object(
+                        parent_gromet_fn.pof,
+                        GrometPort(
+                            name=None,
+                            box=len(parent_gromet_fn.bf),
+                        ),
+                    )
+
+                    var_pof = len(parent_gromet_fn.pof)-1
+
+                elif isinstance(val, AnnCastName):
+                    var_pof = self.retrieve_var_port(val.name)
+                else:
+                    var_pof = -1
+                    print(type(val))
+                    print(val)
+
+                tuple_indices.append(var_pof)
+
+
+            # Determine if the left hand side is 
+            # - A tuple of variables
+            #   - In this case we can directly wire each value from the 
+            #     right hand side to values on the left hand side
+            # - One variable
+            #   - We need to add a pack primitive if that's the case
+            # NOTE: This is subject to change
+            if isinstance(node.left, AnnCastTuple):
+                for i,val in enumerate(node.left.values,0):
+                    parent_gromet_fn.pof[tuple_indices[i]].name = get_left_side_name(
+                        node.left.values[i]
+                    )
+
+                    self.add_var_to_env(
+                        get_left_side_name(node.left.values[i]),
+                        node.left.values[i],
+                        parent_gromet_fn.pof[tuple_indices[i]],
+                        tuple_indices[i],
+                        parent_cast_node,
+                    )
+            elif isinstance(node.left, AnnCastVar):
+                self.create_pack(node.left, tuple_indices, parent_gromet_fn, parent_cast_node)                
+
         else:
             # General Case
             # Assignment for
@@ -1102,7 +1234,6 @@ class ToGrometPass:
                     new_gromet.wfopo, GrometWire(src=-1, tgt=-1)
                 )
             elif new_gromet.pof == None:
-                # print(node.source_refs[0])
                 new_gromet.wfopo = insert_gromet_object(
                     new_gromet.wfopo,
                     GrometWire(src=len(new_gromet.opo), tgt=-1),
