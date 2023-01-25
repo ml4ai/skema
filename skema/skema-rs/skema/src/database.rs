@@ -3566,7 +3566,6 @@ pub fn create_att_primitive(
             }
             po_idx += 1;
         }
-    } else {
     }
     // then find pif's for box
     let mut pif: Vec<u32> = vec![];
@@ -3593,6 +3592,7 @@ pub fn create_att_primitive(
         att_bf_idx: box_counter as u32,
     };
     nodes.push(n3.clone());
+    println!("{:?}", n3.clone());
     // make edge connecting to expression
     let e4 = Edge {
         src: parent_node.node_id.clone(),
