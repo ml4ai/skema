@@ -3039,61 +3039,63 @@ pub fn create_att_expression(
                 }
             }
         }
-        let mut oport: u32 = 0;
-        for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
-            let n2 = Node {
-                n_type: String::from("Opo"),
-                value: None,
-                name: Some(opo_name[oport as usize].clone()),
-                node_id: format!("n{}", start),
-                out_idx: Some([oport + 1].to_vec()),
-                in_indx: None,
-                contents: idx,                  // current att idx
-                nbox: bf_counter,               // top parent top level idx
-                att_bf_idx: box_counter as u32, // current box idx of parent
-            };
-            nodes.push(n2.clone());
-            // construct edge: expression -> Opo
-            let e3 = Edge {
-                src: n1.node_id.clone(),
-                tgt: n2.node_id.clone(),
-                e_type: String::from("Port_Of"),
-                prop: None,
-            };
-            edges.push(e3);
-            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
-                .metadata
-                .clone()
-                .as_ref()
-                .is_none()
-            {
-                metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+        if opo_name.clone().len() != 0 {
+            let mut oport: u32 = 0;
+            for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+                let n2 = Node {
+                    n_type: String::from("Opo"),
+                    value: None,
+                    name: Some(opo_name[oport as usize].clone()),
+                    node_id: format!("n{}", start),
+                    out_idx: Some([oport + 1].to_vec()),
+                    in_indx: None,
+                    contents: idx,                  // current att idx
+                    nbox: bf_counter,               // top parent top level idx
+                    att_bf_idx: box_counter as u32, // current box idx of parent
+                };
+                nodes.push(n2.clone());
+                // construct edge: expression -> Opo
+                let e3 = Edge {
+                    src: n1.node_id.clone(),
+                    tgt: n2.node_id.clone(),
+                    e_type: String::from("Port_Of"),
+                    prop: None,
+                };
+                edges.push(e3);
+                if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
                     .metadata
                     .clone()
-                    .unwrap();
-                let mut repeat_meta = false;
-                for node in meta_nodes.iter() {
-                    if node.metadata_idx == metadata_idx {
-                        repeat_meta = true;
+                    .as_ref()
+                    .is_none()
+                {
+                    metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                        .metadata
+                        .clone()
+                        .unwrap();
+                    let mut repeat_meta = false;
+                    for node in meta_nodes.iter() {
+                        if node.metadata_idx == metadata_idx {
+                            repeat_meta = true;
+                        }
+                    }
+                    if !repeat_meta {
+                        meta_nodes.append(&mut create_metadata_node(
+                            &gromet.clone(),
+                            metadata_idx.clone(),
+                        ));
+                        let me1 = Edge {
+                            src: n2.node_id.clone(),
+                            tgt: format!("m{}", metadata_idx),
+                            e_type: String::from("Metadata"),
+                            prop: None,
+                        };
+                        edges.push(me1);
                     }
                 }
-                if !repeat_meta {
-                    meta_nodes.append(&mut create_metadata_node(
-                        &gromet.clone(),
-                        metadata_idx.clone(),
-                    ));
-                    let me1 = Edge {
-                        src: n2.node_id.clone(),
-                        tgt: format!("m{}", metadata_idx),
-                        e_type: String::from("Metadata"),
-                        prop: None,
-                    };
-                    edges.push(me1);
-                }
+                // construct any metadata edges
+                start += 1;
+                oport += 1;
             }
-            // construct any metadata edges
-            start += 1;
-            oport += 1;
         }
     }
     // construct opi nodes, in not none
