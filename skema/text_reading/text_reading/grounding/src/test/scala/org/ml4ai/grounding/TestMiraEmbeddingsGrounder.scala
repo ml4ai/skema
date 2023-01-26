@@ -22,7 +22,8 @@ class TestMiraEmbeddingsGrounder extends Test {
     val ontologyPath = config.getString("ontologyPath")
     // val embeddingsPath = config.getString("embeddingsPath")
 
-    MiraEmbeddingsGrounder(ontologyPath, None, 10, 0.25f)
+    // Set alpha to 1.0 to bypass the edit distance algo for now
+    MiraEmbeddingsGrounder(ontologyPath, None, 10, 1.0f)
   }
 
   def correctGrounding(shouldable: Shouldable, text: String, groundingID: String): Unit = {

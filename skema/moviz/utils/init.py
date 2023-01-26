@@ -1,15 +1,17 @@
 def init(data):
     i = 1
     if data.get("fn").get("bf") != None:
-        for item in data["fn"]["bf"]:
-            item["box"] = f"fn-bf-{i}"
-            i += 1
+        if data.get("fn").get("bf") != None:
+            for item in data["fn"]["bf"]:
+                    item["box"] = f"fn-bf-{i}"
+                    i += 1
 
     i = 1
     if data.get("fn").get("pof") != None:
-        for pof in data["fn"]["pof"]:
-            pof["id"] = i
-            i += 1
+        if data.get("fn").get("pof") != None:
+            for pof in data["fn"]["pof"]:
+                    pof["id"] = i
+                    i += 1
 
     # print(data.get('fn').get('pof'))
     i = 1

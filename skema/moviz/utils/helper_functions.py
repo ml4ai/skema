@@ -93,7 +93,7 @@ def drawPIL(data, bl, c):
             if str(pil["box"]) == str(index[-1]):
                 if pil.get("name") != None:
                     pil["node"] = f"pil-{bl['box']}"
-                    c.node(name=f"pil-{bl['box']}", label=str(pil.get("name")), width='0.5')
+                    c.node(name=f"pil-{bl['box']}", label=str(pil.get("name")),  width='0.5')
                 else:
                     pil["node"] = f"pil-{bl['box']}"
                     c.node(name=f"pil-{bl['box']}", fontcolor="white", width='0.5')

@@ -28,6 +28,7 @@ def draw_graph(gromet, program_name: str):
         directory="static",
     )
     g.attr(compound='true')
+    g.attr(compound='true')
 
     # LHS
     i=0
@@ -54,6 +55,7 @@ def draw_graph(gromet, program_name: str):
 
     # print("bf: ",data.get('fn').get('bf'))
     # RHS
+    i=0
     i=0
     for attribute in data.get("attributes"):
         if attribute.get("type") == "FN":
