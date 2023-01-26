@@ -95,6 +95,7 @@ class CommentAligner:
         aligned_comments: list[tuple[int, str]],
     ) -> None:
         # Build new metadata object and append it to the metadata list of each port.
+        # TODO Enrique: Here will be a good place to introduce the fallback/default comments
         comments = (
             [name]
             if name
@@ -135,6 +136,7 @@ class CommentAligner:
             )
 
         aligned_mentions = self.linker.align_to_comments(comments)
+
         for mention in aligned_mentions:
             doc_file_ref = Utils.get_doc_file_ref(
                 self.provenance_helper,
@@ -399,6 +401,7 @@ class GrometFNModuleCommentAligner(CommentAligner):
         # TODO: Add the codefile references.
 
     def align(self) -> None:
+        # TODO Make this work for several modules!
         for gromet_attribute in self.gromet_fn_module.attributes:
             GrometAttributeCommentAligner(
                 gromet_attribute, self.comment_aligner_helper

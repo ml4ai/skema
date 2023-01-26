@@ -1,8 +1,0 @@
-# Docker Compose file for the im2mml service
-version: "3"
-services:
-  im2mml:
-    build: .
-    entrypoint: uvicorn im2mml:app --host=0.0.0.0 --reload
-    ports:
-      - "8000:8000"

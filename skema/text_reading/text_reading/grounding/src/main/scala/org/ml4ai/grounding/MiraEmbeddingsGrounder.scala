@@ -1,6 +1,8 @@
 package org.ml4ai.grounding
 
 import breeze.linalg.DenseVector
+
+import scala.collection.mutable
 // to import all packages in linalg
 import breeze.linalg._
 import org.clulab.embeddings.{ExplicitWordEmbeddingMap, WordEmbeddingMap}
@@ -13,7 +15,7 @@ import ujson.Arr
 
 import java.io.{BufferedInputStream, File}
 
-class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, lambda : Float, alpha: Float) extends Grounder {
+class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, alpha: Float) extends Grounder {
 
   /**
    * Returns an ordered sequence with the top k grounding candidates for the input
@@ -32,18 +34,22 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     val tempVal = for (groundingConcept <- groundingConcepts) yield {
       WordEmbeddingMap.dotProduct(groundingConcept.embedding.get, queryEmbedding)
     }
+
     val cosineSimilarities: DenseVector[Float] = DenseVector( tempVal.toArray)
 
-    // Using breeze
-    val _temp = for (groundingConcept <- groundingConcepts.par) yield {
-      getNormalizedDistance(text, groundingConcept.name).floatValue()
-    }
-    val normalizedEditDistances: DenseVector[Float] = DenseVector(_temp.toArray )
+    val similarities =
+      if (alpha < 1.0){ // If alpha is 1, then don't even bother computing edit distances
+        // Using breeze
+        val normalizedEditDistances = DenseVector[Float](groundingConcepts.par.map(concept => getNormalizedDistance(text, concept.name).floatValue()).seq.toArray)
+        val alphas = DenseVector.fill(groundingConcepts.length)(alpha)
+        val oneMinusAlphas = DenseVector.fill(groundingConcepts.length)(1 - alpha)
+        val oneMinusEditDistances = DenseVector.ones[Float](normalizedEditDistances.length) -:- normalizedEditDistances
+        (cosineSimilarities *:* alphas) + (oneMinusEditDistances *:* oneMinusAlphas)
 
-    // Using breeze
-    val modDistances =  DenseVector.ones[Float]{normalizedEditDistances.length}.-:-(normalizedEditDistances)
-    val cosine_sim_alpha = cosineSimilarities.*:*(DenseVector.fill(cosineSimilarities.length){alpha})
-    val similarities = cosine_sim_alpha.+(modDistances.*:*(DenseVector.fill(modDistances.length){1-alpha}) )
+      }
+      else
+        cosineSimilarities
+
 
     // Choose the top k and return GroundingCandidates
     // The sorted values are reversed to have it on decreasing size
@@ -52,14 +58,19 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
     val topKIndices = sortedIndices.take(k)
     val topSimilarities = sortedCosineSimilarities.take(k)
     val topConcepts = topKIndices.map(groundingConcepts)
+
     (topConcepts zip topSimilarities) map {
       case (concept, similarity) => GroundingCandidate(concept, similarity)
     }
   }
 
-  def getNormalizedDistance(text:String, name:String): Float = {
+  private val editDistancesCache = mutable.HashMap[(String, String), Float]()
+  private def getNormalizedDistance(text:String, name:String): Float = {
+
     def getDistance(source: String, target: String) = MED(source, target, allowSubstitute = false, allowTranspose = false, allowCapitalize = false).getDistance
-    return getDistance(text.toLowerCase(), name.toLowerCase())/text.length().max(name.length())
+
+    editDistancesCache.getOrElseUpdate((text, name), getDistance(text.toLowerCase(), name.toLowerCase())/text.length().max(name.length()))
+
   }
 }
 
@@ -147,7 +158,7 @@ object MiraEmbeddingsGrounder{
       }
 
 
-    new MiraEmbeddingsGrounder(ontology, embeddingsModel, lambda, alpha)
+    new MiraEmbeddingsGrounder(ontology, embeddingsModel, alpha)
   }
 
   def averageEmbeddings(wordEmbeddings: Array[Array[Float]]): Array[Float] = {

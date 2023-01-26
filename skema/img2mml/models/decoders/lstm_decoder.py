@@ -61,7 +61,8 @@ class LSTM_Decoder(nn.Module):
 
     def init_weights(self):
         """
-        Initializes some parameters with values from the uniform distribution, for easier convergence.
+        Initializes some parameters with values from the uniform distribution,
+        for easier convergence.
         """
         self.embedding.weight.data.uniform_(-0.1, 0.1)
         self.fc.bias.data.fill_(0)
@@ -94,12 +95,12 @@ class LSTM_Decoder(nn.Module):
         encoding_type,
         max_len,
         sos_idx,
-        batch_size,
     ):
         """
         param enc_output: [B, L, dec_hid_dim]
         param trg: [B, max_len]
         """
+        batch_size = trg.shape[0]
         outputs = torch.zeros(max_len, batch_size, self.output_dim).to(
             self.device
         )  # (max_len, B, output_dim)
@@ -115,17 +116,17 @@ class LSTM_Decoder(nn.Module):
             enc_output, hidden, cell = enc_output
             if self.n_layers > 1:
                 """
-                since the number of lstm in row_encoding=1, the hidden shape will always going to be (1,B,dec_hid_dim).
-                hence we have to broadcast the hidden and cell layers to match n_layers of lstm in the decoder.
+                Since the number of LSTMs in row_encoding=1, the hidden shape
+                will always going to be (1,B,dec_hid_dim).  Hence we have to
+                broadcast the hidden and cell layers to match n_layers of lstm
+                in the decoder.
                 """
                 hidden = hidden.repeat(self.n_layers, 1, 1)
                 cell = cell.repeat(self.n_layers, 1, 1)
 
-        # token = trg[:, 0]       # (B) , <sos>
-        token = torch.full((batch_size,), sos_idx).to(self.device)
-
-        # _pred = torch.zeros(trg.shape).to(self.device)
-        # _pred[:,0] = torch.full(token.shape, sos_idx)
+        token = trg[:, 0]  # (B) , <sos>
+        _pred = torch.zeros(trg.shape).to(self.device)
+        _pred[:, 0] = torch.full(token.shape, sos_idx)
 
         for i in range(1, max_len):
             # Embedding
@@ -152,8 +153,8 @@ class LSTM_Decoder(nn.Module):
 
             top1 = predictions.argmax(1)  # (B)
 
-            # if is_test:
-            #     _pred[:,i] = top1
+            if is_test:
+                _pred[:, i] = top1
 
             if is_train:
                 teacher_force = random.random() < self.tfr
@@ -163,8 +164,4 @@ class LSTM_Decoder(nn.Module):
 
         outputs = outputs.permute(1, 0, 2)  # (B, max_len, output_dim)
 
-        return outputs  # , _pred
-        """
-        not translating here: commented line 87-89, 108-109
-        and removed "trg" from forward
-        """
+        return outputs, _pred

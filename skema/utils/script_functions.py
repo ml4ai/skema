@@ -44,7 +44,7 @@ from skema.program_analysis.CAST2GrFN.ann_cast.to_gromet_pass import (
 )
 
 
-def process_file_system(system_name, path, files):
+def process_file_system(system_name, path, files, write_to_file=False):
     root_dir = path.strip()
     file_list = open(files, "r").readlines()
 
@@ -107,9 +107,14 @@ def process_file_system(system_name, path, files):
             print("FAILURE")
 
     # After we go through the whole system, we can then write out the module_collection
-    with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
-        gromet_collection_dict = module_collection.to_dict()
-        f.write(dictionary_to_gromet_json(del_nulls(gromet_collection_dict)))
+    if write_to_file:
+        with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:
+            gromet_collection_dict = module_collection.to_dict()
+            f.write(
+                dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
+            )
+
+    return module_collection
 
 
 def python_to_cast(
@@ -145,6 +150,7 @@ def python_to_cast(
     # using the astpp module
     if astprint:
         # astpp.parseprint(file_contents)
+        print("AST Printing Currently Disabled")
         pass
 
     # 'Root' the current working directory so that it's where the
@@ -204,6 +210,7 @@ def ann_cast_pipeline(
     grfn_2_2=False,
     a_graph=False,
     from_obj=False,
+    indent_level=0,
 ):
     """cast_to_annotated.py
 
@@ -224,7 +231,6 @@ def ann_cast_pipeline(
     else:
         f_name = cast_instance
         f_name = f_name.split("/")[-1]
-        f_name = f_name.replace("--CAST.json", "")
         file_contents = open(f_name, "r").read()
 
         cast_json = CAST([], "python")
@@ -249,6 +255,7 @@ def ann_cast_pipeline(
     # that the generated GrFN uuids will not be consistent with GrFN uuids
     # created during test runtime. So, do not use these GrFN jsons as expected
     # json for testing
+    f_name = f_name.replace("--CAST.json", "")
     if a_graph:
         agraph = CASTToAGraphVisitor(pipeline_state)
         pdf_file_name = f"{f_name}-AnnCast.pdf"
@@ -274,7 +281,7 @@ def ann_cast_pipeline(
                 )
                 f.write(
                     dictionary_to_gromet_json(
-                        del_nulls(gromet_collection_dict)
+                        del_nulls(gromet_collection_dict), level=indent_level
                     )
                 )
         else:

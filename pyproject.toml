@@ -34,9 +34,9 @@ dev = ["fastapi", "requests", "uvicorn", "pytest", "black", "pygraphviz"]
 # the skema/moviz directory).
 moviz = ["flask", "graphviz"]
 
-# Im2MML dependencies. The im2mml service converts equation images to MathML.
-# See the skema/im2mml directory.
-im2mml = ["fastapi", "requests", "torch", "torchvision", "python-multipart"]
+# Im2MML dependencies. The img2mml service converts equation images to MathML.
+# See the skema/img2mml directory.
+img2mml = ["fastapi", "requests", "uvicorn", "torch", "torchvision", "python-multipart"]
 
 [tool.setuptools.packages]
 find = {}  # Scan the project directory with the default parameters
