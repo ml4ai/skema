@@ -12,13 +12,14 @@ hom_os = Hom("os", Output, Species)
 
 Name = AttrType("Name", str)
 
-attr_name = Attr("name", Transition, AttrType)
+attr_tname = Attr("tname", Transition, Name)
+attr_sname = Attr("sname", Species, Name)
 
 SchPetri = Schema(
     [Species, Transition, Input, Output],
     [hom_it, hom_is, hom_ot, hom_os],
     [Name],
-    [attr_name]
+    [attr_tname, attr_sname]
 )
 
 class Petri(ACSet):
