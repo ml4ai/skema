@@ -168,7 +168,7 @@ def parse_metadata(obj):
         "textual_document_collection": TextualDocumentCollection,
         "equation_definition": EquationDefinition,
         "equation_parameter": EquationLiteralValue,
-        "text_definition": TextDescription,
+        "text_description": TextDescription,
         "text_literal_value": TextLiteralValue,
         "text_units": TextUnits,
     }
@@ -266,6 +266,8 @@ def parse_metadata(obj):
         if "value" in obj:
             metadata_object.value = LiteralValue()
             import_basic_datatypes(obj["value"], metadata_object.value)
+           
+              
 
     elif metadata_type == "text_units":
         if "text_extraction" in obj:
@@ -307,3 +309,4 @@ def import_basic_datatypes(obj, gromet_obj):
         # TODO: Make this only print when there is an unhandled case
         # else:
         #    print(f"Could not automatically import field: {field}. Make sure it is being manually imported")
+
