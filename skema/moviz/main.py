@@ -28,11 +28,7 @@ def visualize_single_file(filepath) -> str:
 def execute():
 
     cwd = Path(__file__).parents[0]
-<<<<<<< HEAD
-    filepath = cwd / "../../data/gromet/examples/while3/while3.py"
-=======
     filepath = cwd / "inputs/CHIME_SIR_core.py"
->>>>>>> 1313a301f73becf435cb8620dc6aad1b4d153445
     output = visualize_single_file(filepath)
     return render_template("index.html", output_image=output)
 

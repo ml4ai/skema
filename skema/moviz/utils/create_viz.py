@@ -23,11 +23,7 @@ def draw_graph(gromet, program_name: str):
     g = graphviz.Graph(
         "G",
         filename=program_name,
-<<<<<<< HEAD
-        engine="fdp",
-=======
         engine="dot",
->>>>>>> 1313a301f73becf435cb8620dc6aad1b4d153445
         format="png",
         directory="static",
     )
