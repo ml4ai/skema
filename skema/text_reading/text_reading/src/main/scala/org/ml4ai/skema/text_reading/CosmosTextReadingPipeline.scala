@@ -12,6 +12,7 @@ import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
 import org.ml4ai.skema.text_reading.data.CosmosJsonDataLoader
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import scala.util.matching.Regex
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -24,37 +25,40 @@ class CosmosTextReadingPipeline extends Logging {
     * @return instance of the mention with grounding attachment if applicable
     */
   def groundMention(m: Mention): Mention = m match {
-    case tbm: TextBoundMention => {
+    case tbm: TextBoundMention =>
       val isGrounded =
         tbm.attachments.exists(!_.isInstanceOf[GroundingAttachment])
 
       if (!isGrounded) {
-        val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
-          case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
+        // Don't ground unless it is not a number
+        numberPattern.findFirstIn(tbm.text.trim) match {
+          case None =>
+            val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
+              case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
+            }
+
+            if (topGroundingCandidates.nonEmpty)
+              tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
+            else
+              tbm
+          case Some(_) => tbm // If it is a number, then don't ground
         }
 
-        if (topGroundingCandidates.nonEmpty)
-          tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
-        else
-          tbm
       }
       else
         tbm
-    }
-    case e: EventMention => {
+    case e: EventMention =>
       val groundedArguments =
         e.arguments.mapValues(_.map(groundMention))
 
 
       e.copy(arguments = groundedArguments)
-    }
     // This is duplicated while we fix the Mention trait to define the abstract method copy
-    case e: RelationMention => {
+    case e: RelationMention =>
       val groundedArguments =
         e.arguments.mapValues(_.map(groundMention))
 
       e.copy(arguments = groundedArguments)
-    }
     case m => m
   }
 
@@ -65,7 +69,7 @@ class CosmosTextReadingPipeline extends Logging {
   val readerType: String = generalConfig[String]("ReaderType")
   val defaultConfig: Config = generalConfig[Config](readerType)
   val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
-  val groundingConfig = generalConfig.getConfig("Grounding")
+  val groundingConfig: Config = generalConfig.getConfig("Grounding")
 
   // Grounding parameters
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
@@ -76,9 +80,9 @@ class CosmosTextReadingPipeline extends Logging {
   private val odinEngine = OdinEngine.fromConfig(config)
 
   // PDF converted to fix pdf tokenization artifacts
-  val pdfConverter = new TextConverter()
-  val languageModel = GigawordLanguageModel()
-  val preprocessors = Array(
+  private val pdfConverter = new TextConverter()
+  private val languageModel = GigawordLanguageModel()
+  private val preprocessors = Array(
     new LinePreprocessor(),
     new ParagraphPreprocessor(),
     new UnicodePreprocessor(),
@@ -91,6 +95,8 @@ class CosmosTextReadingPipeline extends Logging {
   )
   val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
   ////
+
+  val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
 
   // cosmos stores information about each block on each pdf page
   // for each block, we load the text (content) and the location of the text (page_num and block order/index on the page)
@@ -131,7 +137,6 @@ class CosmosTextReadingPipeline extends Logging {
     val menWInd = mentions.zipWithIndex
     val mentionsWithLocations = new ArrayBuffer[Mention]()
 
-    val separator =
     for (tuple <- menWInd) {
       // get page and block index for each block; cosmos location information will be the same for all the mentions within one block
       val menInTextBlocks = tuple._1
