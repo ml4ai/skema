@@ -11,7 +11,7 @@ def init(data):
             pof["id"] = i
             i += 1
 
-    print(data.get('fn').get('pof'))
+    # print(data.get('fn').get('pof'))
     i = 1
     if data.get("fn").get("pif") != None:
         for pif in data["fn"]["pif"]:
