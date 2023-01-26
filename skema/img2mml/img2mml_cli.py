@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 
-"""Example Python client program to work with the im2mml web service."""
+"""Command-line program to exercise the img2mml pipeline."""
 
 import argparse
-import requests
+from skema.img2mml.api import get_mathml_from_file
 
 
-def get_mml(image_path: str) -> str:
+def get_mml(image_path) -> None:
     """
-    It sends the http requests to put in an image to translate it into MathML.
+    Print rendered MML corresponding to a file
     """
-    with open(image_path, "rb") as f:
-        r = requests.put("http://127.0.0.1:8000/get-mml", files={"file": f})
-    return r.text
 
 
 if __name__ == "__main__":
@@ -28,5 +25,5 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    mml = get_mml(args.input)
+    mml = get_mathml_from_file(args.input)
     print(mml)

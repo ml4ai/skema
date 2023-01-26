@@ -1,7 +1,7 @@
-import torch, math
+import math
 import torch.nn as nn
-from skema.im2mml.utils import generate_square_subsequent_mask
-from skema.im2mml.models.encoding.positional_encoding_for_xfmer import (
+from skema.img2mml.utils import generate_square_subsequent_mask
+from skema.img2mml.models.encoding.positional_encoding_for_xfmer import (
     PositionalEncoding,
 )
 
@@ -66,7 +66,7 @@ class Transformer_Encoder(nn.Module):
         pos_src = self.pos(src_from_cnn)  # (max_len, B, dec_hid_dim)
 
         # xfmer encoder
-        mask = generate_square_subsequent_mask(pos_src.shape[0]).to(
+        generate_square_subsequent_mask(pos_src.shape[0]).to(
             self.device
         )
         xfmer_enc_output = self.xfmer_encoder(
