@@ -87,7 +87,7 @@ class CosmosTextReadingPipeline extends Logging {
     new LigaturePreprocessor(languageModel),
     new LineBreakPreprocessor(languageModel),
     new WordBreakByHyphenPreprocessor(),
-    new WordBreakBySpacePreprocessor(languageModel) // This is by default NeverLanguageModel.
+    // new WordBreakBySpacePreprocessor(languageModel) // This is by default NeverLanguageModel.
   )
   val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
   ////
