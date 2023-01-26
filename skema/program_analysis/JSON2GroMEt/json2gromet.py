@@ -267,8 +267,6 @@ def parse_metadata(obj):
             metadata_object.value = LiteralValue()
             import_basic_datatypes(obj["value"], metadata_object.value)
            
-              
-
     elif metadata_type == "text_units":
         if "text_extraction" in obj:
             metadata_object.text_extraction = TextExtraction()
@@ -309,4 +307,3 @@ def import_basic_datatypes(obj, gromet_obj):
         # TODO: Make this only print when there is an unhandled case
         # else:
         #    print(f"Could not automatically import field: {field}. Make sure it is being manually imported")
-
