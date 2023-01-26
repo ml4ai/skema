@@ -11,6 +11,7 @@ from skema.gromet.metadata import (
     TextualDocumentCollection,
     TextualDocumentReference,
     TextUnits,
+    LiteralValue
 )
 from typing import Optional, Tuple
 
@@ -173,7 +174,7 @@ class Utils:
             md = TextLiteralValue(
                 provenance=provenance_helper.build_embedding(),
                 text_extraction=text_extraction,
-                value=mention["arguments"]["value"][0]["text"],
+                value=LiteralValue(value=mention["arguments"]["value"][0]["text"]),
                 variable_identifier=mention["arguments"]["variable"][0][
                     "text"
                 ],

@@ -29,6 +29,10 @@ from skema.text_reading.mention_linking.gromet_linker.variable_name_matcher impo
     VariableNameMatcher,
 )
 
+from skema.utils.module_to_fn_collection import (
+    module_to_fn_collection
+)
+
 import os
 import argparse
 
@@ -108,7 +112,7 @@ class Tester:
         #     )
         print(
             dictionary_to_gromet_json(
-                del_nulls(self.gromet_fn_module.to_dict())
+                del_nulls(module_to_fn_collection(self.gromet_fn_module).to_dict())
             )
         )
 
