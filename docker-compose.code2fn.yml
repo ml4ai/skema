@@ -9,5 +9,5 @@ services:
       dockerfile: Dockerfile.code2fn
     container_name: Code2FN
     ports:
-    - "8000:8000"
+    - "8000:8000" # Change port mapping appropriately before deploying.
     command: ["uvicorn", "server:app", "--host", "0.0.0.0"]

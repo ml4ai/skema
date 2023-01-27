@@ -1,13 +1,11 @@
 import json
 from pathlib import Path
-from skema.img2mml.translate import Image2Tensor, render_mml
+from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
 
 def get_mathml_from_bytes(data: bytes):
     # convert png image to tensor
-    i2t = Image2Tensor()
-    imagetensor = i2t(data)
-    print("image done!")
+    imagetensor = convert_to_torch_tensor(data)
 
     # change the shape of tensor from (C_in, H, W)
     # to (1, C_in, H, w) [batch =1]
@@ -30,7 +28,7 @@ def get_mathml_from_bytes(data: bytes):
     return render_mml(config, model_path, vocab, imagetensor)
 
 
-def get_mathml_from_file(filepath):
+def get_mathml_from_file(filepath) -> str:
     """Read an equation image file and convert it to MathML"""
 
     with open(filepath, "rb") as f:

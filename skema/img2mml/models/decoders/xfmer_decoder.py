@@ -1,4 +1,5 @@
-import torch, math
+import math
+import torch
 import torch.nn as nn
 from skema.img2mml.utils import generate_square_subsequent_mask
 from skema.img2mml.models.encoding.positional_encoding_for_xfmer import (

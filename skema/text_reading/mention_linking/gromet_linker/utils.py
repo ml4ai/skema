@@ -14,8 +14,6 @@ from skema.gromet.metadata import (
 )
 from typing import Optional, Tuple
 
-import itertools as it
-
 
 class Utils:
     @staticmethod
@@ -181,20 +179,39 @@ class Utils:
                 ],
             )
         # elif 'variable' in mention['arguments']:
+        # elif mention["labels"][0] == "ParamAndUnit":
+        #     # UnitRelation, ParamAndUnit
+        #     # Candidate definition argument names
+
+        #     md = TextDescription(
+        #         provenance=provenance_helper.build_embedding(),
+        #         text_extraction=text_extraction,
+        #         variable_identifier=mention["arguments"]["variable"][0][
+        #             "text"
+        #         ],
+        #         variable_definition=mention["arguments"]["description"][0][
+        #             "text"
+        #         ],
+        #     )
         elif mention["labels"][0] == "ParamAndUnit":
             # UnitRelation, ParamAndUnit
             # Candidate definition argument names
 
-            md = TextDescription(
-                provenance=provenance_helper.build_embedding(),
-                text_extraction=text_extraction,
-                variable_identifier=mention["arguments"]["variable"][0][
-                    "text"
-                ],
-                variable_definition=mention["arguments"]["description"][0][
-                    "text"
-                ],
-            )
+            try:
+                md = TextDescription(
+                    provenance=provenance_helper.build_embedding(),
+                    text_extraction=text_extraction,
+                    variable_identifier=mention["arguments"]["variable"][0][
+                        "text"
+                    ],
+                    variable_definition=mention["arguments"]["description"][0][
+                        "text"
+                    ],
+                )
+            except KeyError:
+                # TODO: Log this error
+                md = None
+
         elif mention["labels"][0] == "UnitRelation":
             # UnitRelation, ParamAndUnit
             # Candidate definition argument names
