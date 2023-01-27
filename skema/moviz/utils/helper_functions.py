@@ -154,7 +154,7 @@ def drawWFOPO(data, g):
                             and wfopo["tgt"] == pof["id"]
                         ):
                             # print(opo.get('node'), pof.get('node'))
-                            g.edge(opo.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+                            g.edge(pof.get("node"), opo.get("node"), dir='forward', arrowhead='normal', color="brown")
 
 
 def drawWFOPI(data, g):
@@ -199,32 +199,32 @@ def drawWOPIO(data, g):
 
 def drawBF(data, a, bf):
     i=0
-    print(bf)
+    # print(bf)
     if bf.get('node') == None:
         if bf.get("function_type") == "EXPRESSION":
             with a.subgraph(name=f"cluster_expr_{bf['box']}") as b:
-                b.attr(color='purple', style='rounded', penwidth='3', labelloc="b", label=f"bf-{bf.get('box')[-1]}")
+                b.attr(color='purple', style='rounded', penwidth='3', label=f"id: {bf.get('box')}")
                 b.attr("node", shape = 'point')
                 b.node(name=f"cluster_expr_{bf['box']}_{i}", style = 'invis')
                 
                 bf['invisNode'] = f"cluster_expr_{bf['box']}_{i}"
                 i+=1
                 bf["node"] = f"cluster_expr_{bf['box']}"
-                b.attr("node", shape="box")
+                # b.attr("node", shape="box")
                 drawPIF(bf, b, data)
                 drawPOF(bf, b, data, None)
         if bf.get("function_type") == "LITERAL":
             if bf.get("value").get("value_type") == "Integer":
                 literal = str(bf.get("value").get("value"))
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
-                    c.attr(color='red', shape='box', penwidth='3')
-                    c.attr("node",shape = 'point')
+                    print(bf.get('box'))
+                    label = f"< <B>{literal} </B> >"+"\n id: "+bf.get('box')
+                    c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
+                    c.attr("node", shape = 'point')
                     c.node(name=f"cluster_lit_{literal}_{bf['box']}_{i}", style = 'invis')
                     bf['invisNode'] = f"cluster_lit_{literal}_{bf['box']}_{i}"
                     i+=1
                     bf["node"] = f"cluster_lit_{literal}_{bf['box']}"
-                    c.attr(label=literal)
-                    c.attr("node", shape="box")
                     drawPIF(bf, c, data)
                     drawPOF(bf, c, data, None)
             # if bf.get('value').get('value_type') == 'List':
@@ -237,14 +237,15 @@ def drawBF(data, a, bf):
                 i+=1
                 if primitive != None:
                     bf["node"] = f"cluster_prim_{primitive}_{bf['box']}"
-                d.attr(label=primitive)
+                label = primitive+"\n id: "+bf.get('box')
+                d.attr(label=label)
                 d.attr(color='black', shape='box', penwidth='3')
                 d.attr("node", shape="box")
                 drawPIF(bf, d, data)
                 drawPOF(bf, d, data, None)
         if bf.get("function_type") == "FUNCTION":
             with a.subgraph(name=f"cluster_func_{bf['box']}") as e:  # function
-                e.attr(color='green', style='rounded', penwidth='3', labelloc="b", label=f"bf-{bf.get('box')[-1]}")
+                e.attr(color='green', style='rounded', penwidth='3', label=f"bf-{bf.get('box')[-1]}")
                 e.attr("node",shape = 'point')
                 e.node(name=f"cluster_func_{bf['box']}_{i}", style = 'invis')
                 bf['invisNode'] = f"cluster_func_{bf['box']}_{i}"
@@ -254,7 +255,7 @@ def drawBF(data, a, bf):
                 drawPIF(bf, e, data)
         if bf.get("function_type") == "PREDICATE":
             with a.subgraph(name=f"cluster_pred_{bf['box']}") as f:
-                f.attr(color='pink', style='rounded', penwidth='3', labelloc="b", label=f"bf-{bf.get('box')[-1]}")
+                f.attr(color='pink', style='rounded', penwidth='3', label=f"bf-{bf.get('box')[-1]}")
                 f.attr("node", shape = 'point')
                 f.node(name=f"cluster_pred_{bf['box']}_{i}", style = 'invis')
                 bf['invisNode'] = f"cluster_pred_{bf['box']}_{i}"

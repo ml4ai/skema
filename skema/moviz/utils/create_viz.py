@@ -28,14 +28,14 @@ def draw_graph(gromet, program_name: str):
         directory="static",
     )
     g.attr(compound='true')
-    g.attr(compound='true')
-
+    g.attr(rankdir="BT")
     # LHS
     i=0
     for b in data.get("fn").get("b"):
+        print(b)
         if b["function_type"] == "MODULE":
             with g.subgraph(name="clusterA") as a:
-                a.attr(color='gray', style='rounded', penwidth='3')
+                a.attr(color='gray', style='rounded', penwidth='3', label=f"id: {b.get('box')}")
                 a.attr("node",shape = 'point')
                 a.node(name=f"clusterA_{i}", style = 'invis')
                 i+=1
@@ -63,8 +63,8 @@ def draw_graph(gromet, program_name: str):
                 for b in attribute.get("value").get("b"):
                     if b.get("function_type") == "EXPRESSION":
                         with g.subgraph(name=f"cluster_expr_{b.get('box')}") as a:
-                            print("rhs b: ",b.get('box'))
-                            a.attr(color='purple', style='rounded', penwidth='3', labelloc="b", label=f"{b.get('box')[-5:]}")
+                            # print("rhs b: ",b.get('box'))
+                            a.attr(color='purple', style='rounded', penwidth='3', label=f"id: {b.get('box')[-5:]}")
                             a.attr("node",shape = 'point')
                             a.node(name=f"cluster_expr_{b['box']}_{i}", style = 'invis')
                             
@@ -79,7 +79,7 @@ def draw_graph(gromet, program_name: str):
                                     drawBF(attribute.get("value"), a, bf)
                     if b.get("function_type") == "FUNCTION":
                         with g.subgraph(name=f"cluster_func_{b.get('box')}") as a:
-                            a.attr(color='green', style='rounded', penwidth='3')
+                            a.attr(color='green', style='rounded', penwidth='3', label=f"id: {b.get('box')[-5:]}")
                             a.attr("node",shape = 'point')
                             a.node(name=f"cluster_func_{b.get('box')}_{i}", style = 'invis')
                             
@@ -96,7 +96,7 @@ def draw_graph(gromet, program_name: str):
                                     drawBF(attribute.get("value"), a, bf)
                     if b.get("function_type") == "PREDICATE":
                         with g.subgraph(name=f"cluster_pred_{b.get('box')}") as a:
-                            a.attr(color='pink', style='rounded', penwidth='3')
+                            a.attr(color='pink', style='rounded', penwidth='3', label=f"id: {b.get('box')[-5:]}")
                             a.attr("node",shape = 'point')
                             a.node(name=f"cluster_pred_{b.get('box')}_{i}", style = 'invis')
                             
@@ -121,6 +121,7 @@ def draw_graph(gromet, program_name: str):
     # 
     # print(data.get("fn").get("pof"))
     # connecting LHS and RHS
+    # g.attr(rankdir="LR")
     if data.get("fn").get("bf") != None:
         for bf in data.get("fn").get("bf"):
             # for attribute in data.get('attributes'):
@@ -133,6 +134,7 @@ def draw_graph(gromet, program_name: str):
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3")
 
     # edges between the different attributes in RHS
+    
     for attribute in data.get("attributes"):
         if attribute.get("value").get("bf") != None:
             for bf in attribute.get("value").get("bf"):
@@ -140,7 +142,6 @@ def draw_graph(gromet, program_name: str):
                     attr = data.get("attributes")[bf.get("contents") - 1]
                     if attr.get("value").get("b") != None:
                         for b in attr.get("value").get("b"):
-
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="5")
 
     return g
