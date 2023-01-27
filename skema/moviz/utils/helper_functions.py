@@ -154,7 +154,7 @@ def drawWFOPO(data, g):
                             and wfopo["tgt"] == pof["id"]
                         ):
                             # print(opo.get('node'), pof.get('node'))
-                            g.edge(pof.get("node"), opo.get("node"), dir='forward', arrowhead='normal', color="brown")
+                            g.edge(opo.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
 
 
 def drawWFOPI(data, g):
@@ -167,7 +167,7 @@ def drawWFOPI(data, g):
                             wfopi["src"] == opi["id"]
                             and wfopi["tgt"] == pif["id"]
                         ):
-                            g.edge(opi["node"], pif["node"], dir='forward', arrowhead='normal', color="brown")
+                            g.edge( pif["node"], opi["node"], dir='forward', arrowhead='normal', color="brown")
 
 
 def drawWOPIO(data, g):
@@ -218,7 +218,7 @@ def drawBF(data, a, bf):
                 literal = str(bf.get("value").get("value"))
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
                     print(bf.get('box'))
-                    label = f"< <B>{literal} </B> >"+"\n id: "+bf.get('box')
+                    label = f"< <B>{literal}</B> >"+"\n id: "+bf.get('box')
                     c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
                     c.attr("node", shape = 'point')
                     c.node(name=f"cluster_lit_{literal}_{bf['box']}_{i}", style = 'invis')
