@@ -44,17 +44,13 @@ pub struct PreExp {
 pub fn is_derivative(xs1: &mut Box<MathExpression>, xs2: &mut Box<MathExpression>) -> bool {
     let mut cond1 = false;
     let mut cond2 = false;
-    match &**xs1 {
-        Mrow(x) => match &x[0] {
-            Mi(x) => {
-                if x == "d" {
-                    cond1 = true;
-                }
+    if let Mrow(x) = &**xs1 {
+        if let Mi(x) = &x[0] {
+            if x == "d" {
+                cond1 = true;
             }
-            _ => (),
-        },
-        _ => (),
-    };
+        }
+    }
 
     match &**xs2 {
         Mrow(x) => match &x[0] {
