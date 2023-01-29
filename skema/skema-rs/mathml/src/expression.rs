@@ -13,8 +13,8 @@ use std::collections::VecDeque;
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
 use clap::builder::Str;
-use std::collections::HashMap;
 use std::string::ToString;
+use crate::parsing::parse;
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -1696,8 +1696,6 @@ fn test_to_expr18() {
     let _g = math_expression.to_graph();
 }
 
-use crate::parsing::parse;
-
 #[test]
 fn test_to_expr19() {
     let input = "tests/sir.xml";
@@ -1815,8 +1813,6 @@ fn test_to_expr23() {
     ])]);
     let _g = math_expression.to_graph();
 }
-
-use petgraph::dot::{Config, Dot};
 
 #[test]
 fn test_to_expr24() {

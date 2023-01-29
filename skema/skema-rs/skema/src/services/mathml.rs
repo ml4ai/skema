@@ -1,9 +1,9 @@
 use actix_web::put;
-use std::string::String;
-use mathml::parsing::parse;
-use utoipa;
-use petgraph::dot::{Config, Dot};
 use mathml::expression::{preprocess_content, wrap_math};
+use mathml::parsing::parse;
+use petgraph::dot::{Config, Dot};
+use std::string::String;
+use utoipa;
 
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 #[utoipa::path(
