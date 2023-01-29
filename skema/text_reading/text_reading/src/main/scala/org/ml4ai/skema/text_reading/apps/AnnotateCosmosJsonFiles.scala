@@ -8,20 +8,32 @@ import java.io.{File, FileOutputStream, PrintWriter}
 object AnnotateCosmosJsonFiles extends App with Logging{
 
     private val textReadingPipeline = new CosmosTextReadingPipeline
-    textReadingPipeline.
 
     logger.info(s"Starting process with ${args.length} arguments")
 
+    // If an argument is a directory, look at all the inner files, otherwise consider it a file to annotate
+    val pathsToAnnotate = args flatMap {
+      path => {
+        val p = new File(path)
+        
+        if(p.isDirectory)
+          p.listFiles()
+        else
+          Seq(p)
+      }
+
+    }
+
     for{
-      path <- args.par
-      if path.endsWith(".json")
+      inputFile <- pathsToAnnotate.par
+      if inputFile.getName.endsWith(".json")
     } {
-      val inputFile = new File(path)
+      
       try {
         if(inputFile.exists()){
           val outputFile = new File("extractions_" + inputFile.getName)
           logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
-          val jsonContents = textReadingPipeline.serializeToJson(path)
+          val jsonContents = textReadingPipeline.serializeToJson(inputFile.getAbsolutePath)
           val writer = new PrintWriter(new FileOutputStream(outputFile))
           writer.write(jsonContents)
           writer.close()
