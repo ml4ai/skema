@@ -43,7 +43,7 @@ object AnnotateCosmosJsonFiles extends App with Logging{
           logger.error(s"Didn't find ${inputFile.getAbsolutePath}")
       } catch {
         case e:Exception =>
-          logger.error(s"Failes annotating: ${inputFile.getAbsolutePath} with $e")
+          logger.error(s"Failed annotating: ${inputFile.getAbsolutePath} with $e")
       }
 
     }
