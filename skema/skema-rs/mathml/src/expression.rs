@@ -1047,7 +1047,7 @@ pub fn preprocess_content(content_str: String) -> String {
     /// Unicode to Symbol
     let mut unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
     for ul in unicode_locs.iter().rev() {
-        let loc = pre_string[*ul..].find("<").map(|i| i + ul);
+        let loc = pre_string[*ul..].find('<').map(|i| i + ul);
         match loc {
             None => {}
             Some(x) => pre_string.insert(x, ';'),
@@ -1067,8 +1067,7 @@ pub fn wrap_math(math: Math) -> MathExpression {
     for con in math.content {
         math_vec.push(con);
     }
-    let mut new_math = Mrow(math_vec);
-    return new_math;
+    Mrow(math_vec)
 }
 
 #[test]
