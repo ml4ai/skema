@@ -1,17 +1,20 @@
-use actix_web::{App, HttpServer, HttpResponse, get, web::Data};
+use actix_web::{get, web::Data, App, HttpResponse, HttpServer};
+use skema::config::Config;
 use skema::services::comment_extraction::{
     get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
     SingleLineComment,
 };
 use skema::services::{
-    gromet::{get_model_ids, post_model, delete_model, get_named_opos, get_named_opis},
-    mathml::{get_ast_graph, get_math_exp_graph}
+    gromet::{
+        delete_model, get_model_ids, get_named_opis, get_named_opos, get_named_ports, get_subgraph,
+        post_model,
+    },
+    mathml::{get_ast_graph, get_math_exp_graph},
 };
-use skema::config::Config;
 
+use clap::Parser;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
-use clap::Parser;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -25,7 +28,7 @@ struct Cli {
 
     /// Database host
     #[arg(long, default_value_t = String::from("localhost"))]
-    db_host: String
+    db_host: String,
 }
 
 /// This endpoint can be used to check the health of the service.
@@ -52,6 +55,8 @@ async fn main() -> std::io::Result<()> {
             skema::services::gromet::delete_model,
             skema::services::gromet::get_named_opos,
             skema::services::gromet::get_named_opis,
+            skema::services::gromet::get_named_ports,
+            skema::services::gromet::get_subgraph,
             ping
         ),
         components(
@@ -76,7 +81,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(Config {
-                db_host: args.db_host.clone()
+                db_host: args.db_host.clone(),
             }))
             .service(get_comments)
             .service(ping)
@@ -85,14 +90,12 @@ async fn main() -> std::io::Result<()> {
             .service(delete_model)
             .service(get_named_opos)
             .service(get_named_opis)
+            .service(get_named_ports)
             .service(get_comments)
             .service(get_ast_graph)
             .service(get_math_exp_graph)
-            .service(
-            SwaggerUi::new("/docs/{_:.*}")
-                .url("/api-doc/openapi.json", openapi.clone()),
-            )
-            .service(ping)
+            .service(get_subgraph)
+            .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })
     .bind((args.host, args.port))?
     .run()
