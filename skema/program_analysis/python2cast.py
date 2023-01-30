@@ -100,20 +100,22 @@ def python_to_cast(
     # 'Root' the current working directory so that it's where the
     # Source file we're generating CAST for is (for Import statements)
     old_path = os.getcwd()
-    idx = pyfile_path.rfind("/")
+    try:
+        idx = pyfile_path.rfind("/")
 
-    if idx > -1:
-        curr_path = pyfile_path[0:idx]
-        os.chdir(curr_path)
-    else:
-        curr_path = "./" + pyfile_path
+        if idx > -1:
+            curr_path = pyfile_path[0:idx]
+            os.chdir(curr_path)
+        else:
+            curr_path = "./" + pyfile_path
 
-    # Parse the Python program's AST and create the CAST
-    contents = ast.parse(file_contents)
-    C = convert.visit(contents, {}, {})
-    C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
+        # Parse the Python program's AST and create the CAST
+        contents = ast.parse(file_contents)
+        C = convert.visit(contents, {}, {})
+        C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
+    finally:
+        os.chdir(old_path)
 
-    os.chdir(old_path)
     out_cast = cast.CAST([C], "python")
 
     if agraph:
