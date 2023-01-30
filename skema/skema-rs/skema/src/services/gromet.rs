@@ -4,6 +4,7 @@ use crate::database::{execute_query, parse_gromet_queries};
 use crate::{Gromet, ModuleCollection};
 use crate::config::Config;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
+use std::collections::HashMap;
 
 use actix_web::{HttpResponse, get, post, web, delete};
 use utoipa;
@@ -94,6 +95,15 @@ pub fn named_opo_query(module_id: i64, host: &str) -> Result<Vec<String>,MgError
     connection.commit()?;
     
     Ok(port_names)
+}
+
+pub fn named_port_query(module_id: i64, host: &str) -> Result<HashMap<&str, Vec<String>>,MgError> {
+    let mut result = HashMap::<&str, Vec<String>>::new();
+    let opis = named_opi_query(module_id, host);
+    let opos = named_opo_query(module_id, host);
+    result.insert("opis", opis.unwrap());
+    result.insert("opos", opos.unwrap());
+    Ok(result)
 }
 
 pub fn get_subgraph_query(module_id: i64, host: &str) -> Result<Vec<String>,MgError> {
@@ -203,10 +213,23 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
     HttpResponse::Ok().json(web::Json(response))
 }
 
+
+/// This retrieves named ports based on model id.
+#[utoipa::path(
+    responses(
+        (status = 200, description = "Successfully retrieved named ports")
+    )
+)]
+#[get("/models/{id}/named_ports")]
+pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let response = named_opo_query(path.into_inner(), &config.db_host).unwrap();
+    HttpResponse::Ok().json(web::Json(response))
+}
+
 /// This retrieves named Opis based on model id.
 #[utoipa::path(
     responses(
-        (status = 200, description = "Successfully retrieved named outports")
+        (status = 200, description = "Successfully retrieved named input ports")
     )
 )]
 #[get("/models/{id}/named_opis")]
@@ -214,6 +237,7 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
     let response = named_opi_query(path.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
+
 
 /// This retrieves a subgraph based on model id.
 #[utoipa::path(

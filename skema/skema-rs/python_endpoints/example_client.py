@@ -13,16 +13,15 @@ if __name__ == "__main__":
         r = requests.post(f"http://localhost:8080/models", json=json.load(f))
         MODEL_ID = r.json()
 
-    
+
     # Get opis and opos
-    request_url = f"http://localhost:8000/endpoint1"
-    response = requests.post(request_url, json=MODEL_ID)
+    request_url = f"http://localhost:8080/models/{MODEL_ID}/named_ports"
+    response = requests.post(request_url)
     print(response.json())
 
     # Get other thing
     obj = response.json()
-    data = {"opis": obj["opis"], "opos": obj["opos"]}
-    request_url = f"http://localhost:8000/endpoint2"
-    response = requests.post(request_url, json=data)
+    request_url = f"http://localhost:8000/get-pyacset"
+    response = requests.post(request_url, json=obj)
     print(response.json())
-    
+

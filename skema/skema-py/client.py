@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Example Python client program to communicate with the Code2FN service."""
+"""Example Python client program to communicate with the skema-py service."""
 
 import os
 import json

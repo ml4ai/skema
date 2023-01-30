@@ -5,6 +5,9 @@ from typing import List
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+import skema.skema_py.acsets
+import skema.skema_py.petris
+
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
@@ -31,7 +34,7 @@ def ping():
         " get a GroMEt FN Module collection back."
     ),
 )
-async def root(system: System):
+async def fn_given_filepaths(system: System):
     # Create a tempory directory to store module
     with tempfile.TemporaryDirectory() as tmp:
         # Recreate module structure
@@ -57,3 +60,22 @@ async def root(system: System):
     # Convert output to json
     gromet_collection_dict = gromet_collection.to_dict()
     return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
+
+@app.post(
+    "/get-pyacset",
+    summary=("Get PyACSet for a given model"),
+)
+async def get_pyacset(ports: str = Body()):
+    opis, opos = ports["opis"], ports["opos"]
+    petri = petris.Petri()
+    petri.add_species(len(opos))
+    trans = petris.Transition
+    petri.add_parts(trans, len(opis))
+
+    for i, tran in enumerate(opis):
+        petri.set_subpart(i, petris.attr_tname, opis[i])
+
+    for j, spec in enumerate(opos):
+        petri.set_subpart(j, petris.attr_sname, opos[j])
+
+    return petri.write_json()
