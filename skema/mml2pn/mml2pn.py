@@ -5,10 +5,9 @@ from xml.etree import cElementTree
 from typing import Tuple, List, Set, Dict
 
 # If you install https://pylatexenc.readthedocs.io/en/latest/latexencode/
-#    then you can uncomment lines 9 and 10 and comment-out lines 11 and 12.
+#    then you can uncomment lines 9 and 10 and comment-out line.
 # UNICODE_TO_LATEX = True
 # from pylatexenc.latexencode import unicode_to_latex
-UNICODE_TO_LATEX = False
 def unicode_to_latex(s): return s
 
 # Latex to MathML
@@ -173,10 +172,7 @@ class Var:
             latex_str = f'{self.var}_{{{"".join(self.sub)}}}'
         else:
             latex_str = self.var
-        if UNICODE_TO_LATEX:
-            return unicode_to_latex(latex_str)
-        else:
-            return latex_str
+        return unicode_to_latex(latex_str)
 
     def name_mml(self):
         if self.sub is not None:
