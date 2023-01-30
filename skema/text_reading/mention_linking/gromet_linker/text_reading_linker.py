@@ -1,5 +1,6 @@
 import itertools
 import json
+from pathlib import Path
 from typing import Any
 from collections import defaultdict
 from gensim.models import KeyedVectors
@@ -73,9 +74,7 @@ class TextReadingLinker:
             if word in self._model
         ]
 
-    def _read_text_mentions(self, path: str) -> dict[str, Any]:
-        with open(path) as f:
-            data = json.load(f)
+    def _read_text_mentions(self, input_path: str) -> dict[str, Any]:
 
         # TODO Filter out irrelevant extractions
         relevant_labels = {
@@ -93,33 +92,55 @@ class TextReadingLinker:
             "UnitRelation",
         }
 
-        relevant_mentions = [
-            m
-            for m in data["mentions"]
-            if m["type"] != "TextBoundMention"
-            and len(set(m["labels"]) & relevant_labels) > 0
-        ]
+        input_path = Path(input_path)
 
-        # text_bound_mentions = [
-        #     m for m in data["mentions"] if m["type"] == "TextBoundMention"
-        # ]
+        if not input_path.is_dir():
+            files =  [input_path]
+        else:
+            files = input_path.glob("*.json")
 
-        text_bound_mentions = list(
-            it.chain.from_iterable(
+        relevant_mentions, text_bound_mentions, docs = list(), list(), dict()
+
+        for file in files:
+
+            doc_name = file.name
+
+            with file.open() as f:
+                data = json.load(f)
+
+            local_relevant_mentions = [
+                m
+                for m in data["mentions"]
+                if m["type"] != "TextBoundMention"
+                and len(set(m["labels"]) & relevant_labels) > 0
+            ]
+
+            # Fix the mention document
+            for m in local_relevant_mentions:
+                m['document'] = (doc_name, m['document'])
+
+            local_text_bound_mentions = list(
                 it.chain.from_iterable(
-                    m["arguments"].values() for m in relevant_mentions
+                    it.chain.from_iterable(
+                        m["arguments"].values() for m in local_relevant_mentions
+                    )
                 )
             )
-        )
 
-        # Add context to the mentions
-        docs = data["documents"]
-        for m in relevant_mentions:
-            doc = docs[m["document"]]
-            sent = doc["sentences"][m["sentence"]]
-            # TODO perhaps extend this to a window of text
-            context = " ".join(sent["raw"])
-            m["context"] = context
+            # Add context to the mentions
+            local_docs = data["documents"]
+            for m in local_relevant_mentions:
+                doc = local_docs[m["document"][1]]
+                sent = doc["sentences"][m["sentence"]]
+                # TODO perhaps extend this to a window of text
+                context = " ".join(sent["raw"])
+                m["context"] = context
+
+            relevant_mentions.extend(local_relevant_mentions)
+            text_bound_mentions.extend(local_text_bound_mentions)
+            docs.update({(doc_name, key):value for key, value in local_docs.items()})
+
+        print(len(relevant_mentions))
 
         return relevant_mentions, text_bound_mentions, docs
 
