@@ -20,7 +20,7 @@ pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgE
         let temp_str = &queries[i].clone();
         full_query.push_str(&temp_str);
     }
-    execute_query(&full_query, host);
+    execute_query(&full_query, host)?;
     let model_ids = module_query(host)?;
     let last_model_id = model_ids[model_ids.len() - 1];
     Ok(last_model_id)
@@ -33,7 +33,7 @@ pub fn delete_module(module_id: i64, host: &str) -> Result<(), MgError> {
         "MATCH (n)-[r:Contains|Port_Of|Wire*1..5]->(m) WHERE id(n) = {}\nDETACH DELETE n,m",
         module_id
     );
-    execute_query(&query, host);
+    execute_query(&query, host)?;
     Ok(())
 }
 
@@ -219,7 +219,7 @@ pub async fn post_model(
 #[delete("/models/{id}")]
 pub async fn delete_model(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let id = path.into_inner();
-    delete_module(id, &config.db_host);
+    delete_module(id, &config.db_host).unwrap();
     HttpResponse::Ok().body("Model deleted")
 }
 

@@ -175,7 +175,7 @@ fn create_module(gromet: &ModuleCollection) -> Vec<String> {
     return queries;
 }
 
-fn create_graph_queries(gromet: &ModuleCollection, mut start: u32) -> Vec<String> {
+fn create_graph_queries(gromet: &ModuleCollection, start: u32) -> Vec<String> {
     let mut queries: Vec<String> = vec![];
     // if a library module need to walk through gromet differently
     if gromet.modules[0].r#fn.bf.is_none() {
@@ -1400,7 +1400,7 @@ pub fn create_import(
     att_idx: u32,      // This will index the attribute the function is in
     bf_counter: u8, // This indexes which box the function is under, inherited from parent if not explicit
     att_bf_idx: u32, // This indexes if the function is a subscope of a larger function, 0 if not
-    mut start: u32, // for node and edge indexing
+    start: u32,     // for node and edge indexing
     mut meta_nodes: Vec<MetadataNode>,
 ) -> (Vec<Node>, Vec<Edge>, u32, Vec<MetadataNode>) {
     let eboxf = gromet.modules[0].clone();
@@ -4159,7 +4159,7 @@ pub fn internal_wiring(
 // needs to handle top level and function level wiring that uses the function net at the call of the import.
 pub fn import_wiring(
     gromet: &ModuleCollection,
-    mut eboxf: Attribute,
+    eboxf: Attribute,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
@@ -4781,7 +4781,7 @@ pub fn external_wiring(
 pub fn parse_gromet_queries(gromet: ModuleCollection) -> Vec<String> {
     let mut queries: Vec<String> = vec![];
 
-    let mut start: u32 = 0;
+    let start: u32 = 0;
 
     queries.append(&mut create_module(&gromet));
     queries.append(&mut create_graph_queries(&gromet, start));
