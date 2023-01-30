@@ -49,32 +49,22 @@ pub fn is_derivative(xs1: &mut Box<MathExpression>, xs2: &mut Box<MathExpression
         }
     }
 
-    match &**xs2 {
-        Mrow(x) => match &x[0] {
-            Mi(x) => {
-                if x == "d" {
-                    cond2 = true;
-                }
+    if let Mrow(x) = &**xs2 {
+        if let Mi(x) = &x[0] {
+            if x == "d" {
+                cond2 = true;
             }
-            _ => (),
-        },
-        _ => (),
-    };
+        }
+    }
+
     if cond1 && cond2 {
-        match &mut **xs1 {
-            Mrow(x) => {
-                x.remove(0);
-            }
-            _ => (),
-        };
+        if let Mrow(x) = &mut **xs1 {
+            x.remove(0);
+        }
 
-        match &mut **xs2 {
-            Mrow(x) => {
-                x.remove(0);
-            }
-            _ => (),
-        };
-
+        if let Mrow(x) = &mut **xs2 {
+            x.remove(0);
+        }
         return true;
     }
     false
@@ -833,7 +823,7 @@ impl Expr {
     }
 }
 
-pub fn redundant_paren(string: &String) -> bool {
+pub fn redundant_paren(string: &str) -> bool {
     let str_len = string.chars().count();
     if !string.starts_with('(') || string.chars().nth(str_len - 1) != Some(')') {
         return false;
@@ -898,12 +888,9 @@ impl PreExp {
 
     fn to_graph(&mut self) -> MathExpressionGraph {
         let mut g = MathExpressionGraph::new();
-        for mut arg in &mut self.args {
-            match &mut arg {
-                Expr::Atom(_) => {}
-                Expr::Expression { .. } => {
-                    arg.to_graph(&mut g);
-                }
+        for arg in &mut self.args {
+            if let Expr::Expression { .. } = arg {
+                arg.to_graph(&mut g);
             }
         }
         g
@@ -1034,7 +1021,8 @@ pub fn preprocess_content(content_str: String) -> String {
     pre_string = pre_string.replace("<mo>(</mo>", "<mrow>");
     pre_string = pre_string.replace("<mo>)</mo>", "</mrow>");
     pre_string = pre_string.replace('\n', "");
-    /// Unicode to Symbol
+
+    // Unicode to Symbol
     let unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
     for ul in unicode_locs.iter().rev() {
         let loc = pre_string[*ul..].find('<').map(|i| i + ul);
@@ -1873,7 +1861,6 @@ fn test_to_expr28() {
 
 #[test]
 fn test_to_expr29() {
-    
     let math_expression = Mrow(vec![
         Mo(Operator::Subtract),
         Mi("a".to_string()),
