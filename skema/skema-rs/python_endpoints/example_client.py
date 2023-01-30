@@ -9,8 +9,9 @@ import argparse
 
 
 if __name__ == "__main__":
-    with open('../../../data/demo/CHIME_SVIIvR_core--Gromet-FN-auto.json') as f:
+    with open("~/Downloads/11c--Gromet-FN-manual-dynamics.json") as f:
         r = requests.post(f"http://localhost:8080/models", json=json.load(f))
+        print(r.text)
         MODEL_ID = r.json()
 
 
@@ -24,4 +25,3 @@ if __name__ == "__main__":
     request_url = f"http://localhost:8000/get-pyacset"
     response = requests.post(request_url, json=obj)
     print(response.json())
-
