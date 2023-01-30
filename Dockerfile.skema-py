@@ -28,7 +28,7 @@ COPY pyproject.toml /skema/
 COPY skema/program_analysis /skema/skema/program_analysis
 COPY skema/gromet /skema/skema/gromet
 COPY skema/model_assembly /skema/skema/model_assembly
-COPY skema/skema-py /skema/skema/skema-py
+COPY skema/skema_py /skema/skema/skema_py
 COPY skema/utils /skema/skema/utils
 WORKDIR /skema
 
@@ -37,5 +37,5 @@ RUN pip install wheel
 RUN pip install fastapi uvicorn
 RUN pip install -e .
 
-# Switch to the skema-py directory
-WORKDIR /skema/skema/skema-py/
+# Switch to the skema_py directory
+WORKDIR /skema/skema/skema_py/
