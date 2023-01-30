@@ -17,16 +17,6 @@ Currently, it has the following members:
 This is a web service to expose the functionality of the SKEMA Rust components
 via REST APIs.
 
-### Running the service
-
-#### End-user
-
-To run the service via Docker, invoke the following command:
-
-```
-docker-compose up --build
-```
-
 #### Developer
 
 If you are a developer working on this project, you will likely want to launch
@@ -35,17 +25,6 @@ the `skema_service` outside of Docker:
 ```
 cargo run --bin skema_service
 ```
-
-And if you want to test API endpoints that rely on the Memgraph database, you
-will want to launch Memgraph separately. You can do so using the following
-command:
-
-```
-docker-compose -f docker-compose.memgraph.yml up -d
-```
-
-You can skip the `-d` flag in the above invocation if you want to leave the
-Dockerized Memgraph service in the foreground.
 
 ### Documentation
 

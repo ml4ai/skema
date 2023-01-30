@@ -15,11 +15,14 @@ coexist peacefully.
 At the top level, we have the following files and directories:
 
 - `Dockerfile.skema-py`: Dockerfile for the skema-py service.
+- `Dockerfile.skema-rs`: Dockerfile for the skema-rs service.
 - `Dockerfile.img2mml`: Dockerfile for the img2mml service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
 - `docker-compose.skema-py.yml`: Docker Compose file for the skema-py service.
+- `docker-compose.skema-rs.yml`: Docker Compose file for the skema-rs service.
+- `docker-compose.memgraph.yml`: Docker Compose file for the memgraph database.
 - `docker-compose.img2mml.yml`: Docker Compose file for the img2mml service.
 - `docs`: Source code for the project website.
 - `notebooks`: Jupyter notebooks for demoing SKEMA functionality.

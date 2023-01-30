@@ -2,7 +2,7 @@ import os
 import tempfile
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from pydantic import BaseModel
 
 import skema.skema_py.acsets
