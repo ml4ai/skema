@@ -29,4 +29,4 @@ cargo run --bin skema_service
 ### Documentation
 
 OpenAPI documentation for the service can be found at
-`http://localhost:8080/api-docs/`.
+`http://localhost:8080/docs/`.
