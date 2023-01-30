@@ -5,16 +5,13 @@ use crate::ast::{
 };
 use std::clone::Clone;
 
-use petgraph::visit::NodeRef;
 use petgraph::{graph::NodeIndex, Graph};
 
 use std::collections::VecDeque;
 
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
-use clap::builder::Str;
 use std::string::ToString;
-use crate::parsing::parse;
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -34,7 +31,7 @@ enum Expr {
 }
 
 /// Intermediate data structure to support the generation of graphs of mathematical expressions
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, Default, PartialEq, Clone)]
 pub struct PreExp {
     op: Vec<Operator>,
     args: Vec<Expr>,
@@ -52,58 +49,43 @@ pub fn is_derivative(xs1: &mut Box<MathExpression>, xs2: &mut Box<MathExpression
         }
     }
 
-    match &**xs2 {
-        Mrow(x) => match &x[0] {
-            Mi(x) => {
-                if x == "d" {
-                    cond2 = true;
-                }
+    if let Mrow(x) = &**xs2 {
+        if let Mi(x) = &x[0] {
+            if x == "d" {
+                cond2 = true;
             }
-            _ => (),
-        },
-        _ => (),
-    };
+        }
+    }
+
     if cond1 && cond2 {
-        match &mut **xs1 {
-            Mrow(x) => {
-                x.remove(0);
-            }
-            _ => (),
-        };
+        if let Mrow(x) = &mut **xs1 {
+            x.remove(0);
+        }
 
-        match &mut **xs2 {
-            Mrow(x) => {
-                x.remove(0);
-            }
-            _ => (),
-        };
-
+        if let Mrow(x) = &mut **xs2 {
+            x.remove(0);
+        }
         return true;
     }
-    return false;
+    false
 }
 
 impl MathExpression {
     pub fn to_expr(self, pre: &mut PreExp) {
         match self {
             Mi(x) => {
-                if pre.args.len() > 0 {
+                if !pre.args.is_empty() {
                     let args_last_idx = pre.args.len() - 1;
-                    match &mut pre.args[args_last_idx] {
-                        Expr::Atom(y) => match y {
-                            Atom::Number(_) => {}
-                            Atom::Identifier(_) => {}
-                            Atom::Operator(z) => {
-                                if *z == Operator::Subtract {
-                                    let mut neg_identifier = String::from("-");
-                                    neg_identifier.push_str(&x.clone());
-                                    pre.args[args_last_idx] =
-                                        Expr::Atom(Atom::Identifier(neg_identifier));
-                                    return;
-                                }
+                    if let Expr::Atom(y) = &pre.args[args_last_idx] {
+                        if let Atom::Operator(z) = y {
+                            if let Operator::Subtract = z {
+                                let mut neg_identifier = String::from("-");
+                                neg_identifier.push_str(&x);
+                                pre.args[args_last_idx] =
+                                    Expr::Atom(Atom::Identifier(neg_identifier));
+                                return;
                             }
-                        },
-                        Expr::Expression { .. } => {}
+                        }
                     }
                 }
                 if pre.args.len() >= pre.op.len() {
@@ -111,14 +93,14 @@ impl MathExpression {
                     pre.op.push(Operator::Multiply);
                 }
                 pre.args
-                    .push(Expr::Atom(Atom::Identifier(x.replace(" ", ""))));
+                    .push(Expr::Atom(Atom::Identifier(x.replace(' ', ""))));
             }
             Mn(x) => {
                 if pre.args.len() >= pre.op.len() {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                pre.args.push(Expr::Atom(Atom::Number(x.replace(" ", ""))));
+                pre.args.push(Expr::Atom(Atom::Number(x.replace(' ', ""))));
             }
             Mo(x) => {
                 if x == Operator::Subtract && pre.op.len() > pre.args.len() {
@@ -134,11 +116,7 @@ impl MathExpression {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                let mut pre_exp = PreExp {
-                    op: Vec::<Operator>::new(),
-                    args: Vec::<Expr>::new(),
-                    name: "".to_string(),
-                };
+                let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
                 for x in xs {
                     x.to_expr(&mut pre_exp);
@@ -157,11 +135,7 @@ impl MathExpression {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                let mut pre_exp = PreExp {
-                    op: Vec::<Operator>::new(),
-                    args: Vec::<Expr>::new(),
-                    name: "".to_string(),
-                };
+                let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
                 let mut idx = 0;
                 for x in xs {
@@ -170,7 +144,7 @@ impl MathExpression {
                     } else if idx == 1 {
                         pre_exp.op.push(Operator::Other("^".to_string()));
                     }
-                    idx = idx + 1;
+                    idx += 1;
                     x.to_expr(&mut pre_exp);
                 }
                 pre.args.push(Expr::Expression {
@@ -184,11 +158,7 @@ impl MathExpression {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                let mut pre_exp = PreExp {
-                    op: Vec::<Operator>::new(),
-                    args: Vec::<Expr>::new(),
-                    name: "".to_string(),
-                };
+                let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Sqrt);
                 xs.to_expr(&mut pre_exp);
                 pre.args.push(Expr::Expression {
@@ -202,11 +172,7 @@ impl MathExpression {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                let mut pre_exp = PreExp {
-                    op: Vec::<Operator>::new(),
-                    args: Vec::<Expr>::new(),
-                    name: "".to_string(),
-                };
+                let mut pre_exp = PreExp::default();
                 if is_derivative(&mut xs1, &mut xs2) {
                     pre_exp.op.push(Operator::Other("derivative".to_string()));
                 } else {
@@ -226,11 +192,7 @@ impl MathExpression {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                let mut pre_exp = PreExp {
-                    op: Vec::<Operator>::new(),
-                    args: Vec::<Expr>::new(),
-                    name: "".to_string(),
-                };
+                let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
                 xs1.to_expr(&mut pre_exp);
                 pre_exp.op.push(Operator::Other("^".to_string()));
@@ -249,11 +211,7 @@ impl MathExpression {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                let mut pre_exp = PreExp {
-                    op: Vec::<Operator>::new(),
-                    args: Vec::<Expr>::new(),
-                    name: "".to_string(),
-                };
+                let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
                 for x in xs {
                     x.to_expr(&mut pre_exp);
@@ -289,132 +247,107 @@ impl MathExpression {
 
 impl Expr {
     fn group_expr(&mut self) {
-        match self {
-            Expr::Atom(_) => {}
-            Expr::Expression { op, args, .. } => {
-                let mut removed_idx = Vec::new();
-                let op_copy = op.clone();
-                let args_copy = args.clone();
-                if op.len() > 2 {
-                    let mut start_idx: i32 = -1;
-                    let mut end_idx: i32 = -1;
-                    let mut new_exp = Expr::Expression {
-                        op: vec![Operator::Other("".to_string())],
-                        args: Vec::<Expr>::new(),
-                        name: "".to_string(),
-                    };
-                    for o in 0..=op.len() - 1 {
-                        if op[o] == Operator::Multiply || op[o] == Operator::Divide {
-                            removed_idx.push(o);
-                            if start_idx == -1 {
-                                start_idx = o as i32;
-                                end_idx = o as i32;
-                                match &mut new_exp {
-                                    Expr::Atom(_) => {}
-                                    Expr::Expression { op, args, .. } => {
-                                        op.push(op_copy[o].clone());
-                                        args.push(args_copy[o - 1].clone());
-                                        args.push(args_copy[o].clone());
-                                    }
-                                }
-                            } else if o as i32 - end_idx == 1 {
-                                end_idx = o as i32;
-                                match &mut new_exp {
-                                    Expr::Atom(_) => {}
-                                    Expr::Expression { op, args, .. } => {
-                                        op.push(op_copy[o].clone());
-                                        args.push(args_copy[o].clone())
-                                    }
-                                }
-                            } else {
-                                args[start_idx as usize - 1] = new_exp.clone();
-                                new_exp = Expr::Expression {
-                                    op: vec![Operator::Other("".to_string())],
-                                    args: Vec::<Expr>::new(),
-                                    name: "".to_string(),
-                                };
-                                match &mut new_exp {
-                                    Expr::Atom(_) => {}
-                                    Expr::Expression { op, args, .. } => {
-                                        op.push(op_copy[o].clone());
-                                        args.push(args_copy[o - 1].clone());
-                                        args.push(args_copy[o].clone());
-                                    }
-                                }
-                                start_idx = o as i32;
-                                end_idx = o as i32;
+        if let Expr::Expression { op, args, .. } = self {
+            let mut removed_idx = Vec::new();
+            let op_copy = op.clone();
+            let args_copy = args.clone();
+            if op.len() > 2 {
+                let mut start_idx: i32 = -1;
+                let mut end_idx: i32 = -1;
+                let mut new_exp = Expr::Expression {
+                    op: vec![Operator::Other("".to_string())],
+                    args: Vec::<Expr>::new(),
+                    name: "".to_string(),
+                };
+                for o in 0..=op.len() - 1 {
+                    if op[o] == Operator::Multiply || op[o] == Operator::Divide {
+                        removed_idx.push(o);
+                        if start_idx == -1 {
+                            start_idx = o as i32;
+                            end_idx = o as i32;
+                            if let Expr::Expression { op, args, .. } = &mut new_exp {
+                                op.push(op_copy[o].clone());
+                                args.push(args_copy[o - 1].clone());
+                                args.push(args_copy[o].clone());
                             }
-                        }
-                    }
-
-                    if removed_idx.len() == op.len() - 1 {
-                        return;
-                    }
-
-                    match &mut new_exp {
-                        Expr::Atom(_) => {}
-                        Expr::Expression { op, .. } => {
-                            if !op.is_empty() && start_idx > 0 {
-                                args[start_idx as usize - 1] = new_exp.clone();
+                        } else if o as i32 - end_idx == 1 {
+                            end_idx = o as i32;
+                            if let Expr::Expression { op, args, .. } = &mut new_exp {
+                                op.push(op_copy[o].clone());
+                                args.push(args_copy[o].clone())
                             }
+                        } else {
+                            args[start_idx as usize - 1] = new_exp.clone();
+                            new_exp = Expr::Expression {
+                                op: vec![Operator::Other("".to_string())],
+                                args: Vec::<Expr>::new(),
+                                name: "".to_string(),
+                            };
+                            if let Expr::Expression { op, args, .. } = &mut new_exp {
+                                op.push(op_copy[o].clone());
+                                args.push(args_copy[o - 1].clone());
+                                args.push(args_copy[o].clone());
+                            }
+                            start_idx = o as i32;
+                            end_idx = o as i32;
                         }
-                    }
-                    for ri in removed_idx.iter().rev() {
-                        op.remove(*ri);
-                        args.remove(*ri);
                     }
                 }
 
-                for arg in args {
-                    match arg {
-                        Expr::Atom(_) => {}
-                        Expr::Expression { .. } => {
-                            arg.group_expr();
-                        }
+                if removed_idx.len() == op.len() - 1 {
+                    return;
+                }
+
+                if let Expr::Expression { op, .. } = &mut new_exp {
+                    if !op.is_empty() && start_idx > 0 {
+                        args[start_idx as usize - 1] = new_exp.clone();
                     }
+                }
+                for ri in removed_idx.iter().rev() {
+                    op.remove(*ri);
+                    args.remove(*ri);
+                }
+            }
+
+            for arg in args {
+                if let Expr::Expression { .. } = arg {
+                    arg.group_expr();
                 }
             }
         }
     }
 
     fn collapse_expr(&mut self) {
-        match self {
-            Expr::Atom(_) => {}
-            Expr::Expression { op, args, .. } => {
-                let mut op_copy = op.clone();
-                let mut args_copy = args.clone();
+        if let Expr::Expression { op, args, .. } = self {
+            let mut op_copy = op.clone();
+            let mut args_copy = args.clone();
 
-                let mut shift = 0;
-                if all_multi_div(op) && op.len() > 1 {
-                    let mut changed = true;
-                    while changed {
-                        for i in 0..args.len() {
-                            match &mut args[i] {
-                                Expr::Atom(_) => {}
-                                Expr::Expression { op, args, name } => {
-                                    if op[0] == Operator::Other("".to_string()) && all_multi_div(op)
-                                    {
-                                        args_copy[i] = args[0].clone();
-                                        for j in 1..op.len() {
-                                            op_copy.insert(i + shift + j, op[j].clone());
-                                            args_copy.insert(i + shift + j, args[j].clone());
-                                        }
-                                        shift = shift + op.len() - 1;
-                                    }
+            let mut shift = 0;
+            if all_multi_div(op) && op.len() > 1 {
+                let mut changed = true;
+                while changed {
+                    for i in 0..args.len() {
+                        if let Expr::Expression { op, args, name: _ } = &mut args[i] {
+                            if op[0] == Operator::Other("".to_string()) && all_multi_div(op) {
+                                args_copy[i] = args[0].clone();
+                                for j in 1..op.len() {
+                                    op_copy.insert(i + shift + j, op[j].clone());
+                                    args_copy.insert(i + shift + j, args[j].clone());
                                 }
+                                shift = shift + op.len() - 1;
                             }
                         }
-                        if op.clone() == op_copy.clone() {
-                            changed = false;
-                        }
-                        *op = op_copy.clone();
-                        *args = args_copy.clone();
                     }
+                    if op.clone() == op_copy.clone() {
+                        changed = false;
+                    }
+                    *op = op_copy.clone();
+                    *args = args_copy.clone();
                 }
+            }
 
-                for mut arg in args {
-                    arg.collapse_expr();
-                }
+            for arg in args {
+                arg.collapse_expr();
             }
         }
     }
@@ -436,11 +369,11 @@ impl Expr {
                         if op[i] == Operator::Equals {
                             let mut new_name: String = "".to_string();
                             for n in name.as_bytes().clone() {
-                                if *n == 40 as u8 {
-                                    new_name.push_str("(");
+                                if *n == 40_u8 {
+                                    new_name.push('(');
                                 }
-                                if *n == 41 as u8 {
-                                    new_name.push_str(")");
+                                if *n == 41_u8 {
+                                    new_name.push(')');
                                 }
                             }
                             *name = remove_paren(&mut new_name).clone();
@@ -462,9 +395,9 @@ impl Expr {
                             let mut string;
                             if op[0] != Operator::Other("".to_string()) {
                                 string = op[0].to_string();
-                                string.push_str("(");
+                                string.push('(');
                                 string.push_str(args[i].get_names().as_str().clone());
-                                string.push_str(")");
+                                string.push(')');
                             } else {
                                 string = args[i].get_names().as_str().to_string().clone();
                             }
@@ -483,354 +416,349 @@ impl Expr {
     }
 
     fn to_graph(&mut self, graph: &mut MathExpressionGraph) {
-        match self {
-            Expr::Atom(_x) => {}
-            Expr::Expression { op, args, name } => {
-                if name == "place_holder" {
-                    return;
-                } else if name.contains("place_holder") {
-                    *name = name.replace("place_holder", "");
-                }
+        if let Expr::Expression { op, args, name } = self {
+            if name == "place_holder" {
+                return;
+            } else if name.contains("place_holder") {
+                *name = name.replace("place_holder", "");
+            }
 
-                let mut parent_node_index: NodeIndex = Default::default();
-                if op[0].to_string() != "derivative" {
-                    parent_node_index = get_node_idx(graph, name)
-                }
-                let mut eq_loc = 0;
-                if op.contains(&Operator::Equals) {
-                    eq_loc = op.iter().position(|r| r == &(Operator::Equals)).unwrap();
-                    let mut left_eq_name: String = "".to_string();
-                    for i in 0..eq_loc {
-                        match &mut args[i] {
-                            Expr::Atom(x) => match x {
-                                Atom::Number(y) => {
-                                    left_eq_name.push_str(y);
-                                }
-                                Atom::Identifier(y) => {
-                                    left_eq_name.push_str(y);
-                                }
-                                Atom::Operator(y) => {}
-                            },
-                            Expr::Expression { op, args, name } => {
-                                if op[0] != Operator::Other("".to_string()) {
-                                    let mut unitary_name = op[0].to_string();
-                                    let mut name_copy = name.to_string();
-                                    remove_paren(&mut name_copy);
-                                    unitary_name.push_str("(".clone());
-                                    unitary_name.push_str(&name_copy.clone());
-                                    unitary_name.push_str(")".clone());
-                                    left_eq_name.push_str(unitary_name.as_str());
-                                } else {
-                                    left_eq_name.push_str(name.as_str());
-                                }
-                            }
-                        }
-                    }
-
-                    let node_idx = get_node_idx(graph, &mut left_eq_name);
-                    graph.update_edge(node_idx, parent_node_index, "=".to_string());
-                }
-                if op[0] != Operator::Other("".to_string()) {
-                    let mut unitary_name = op[0].to_string();
-                    let mut name_copy = name.to_string();
-                    remove_paren(&mut name_copy);
-                    unitary_name.push_str("(".clone());
-                    unitary_name.push_str(&name_copy.clone());
-                    unitary_name.push_str(")".clone());
-                    let node_idx = get_node_idx(graph, &mut unitary_name);
-                    if op[0].to_string() == "derivative" {
-                        return;
-                    } else {
-                        graph.update_edge(parent_node_index, node_idx, op[0].to_string());
-                    }
-                }
-                let op_copy = op.clone();
-                for i in eq_loc..=op_copy.len() - 1 {
+            let mut parent_node_index: NodeIndex = Default::default();
+            if op[0].to_string() != "derivative" {
+                parent_node_index = get_node_idx(graph, name)
+            }
+            let mut eq_loc = 0;
+            if op.contains(&Operator::Equals) {
+                eq_loc = op.iter().position(|r| r == &(Operator::Equals)).unwrap();
+                let mut left_eq_name: String = "".to_string();
+                for i in 0..eq_loc {
                     match &mut args[i] {
                         Expr::Atom(x) => match x {
-                            Atom::Number(x) => {
-                                if x == "place_holder" {
-                                    continue;
-                                } else if x.contains("place_holder") {
-                                    *x = x.replace("place_holder", "");
-                                }
-                                let node_idx = get_node_idx(graph, x);
-                                if i == 0 {
-                                    if op_copy.len() > 1 {
-                                        if (op_copy[i + 1].to_string() == "+"
-                                            || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "+".to_string(),
-                                            );
-                                        } else if op_copy[i + 1].to_string() == "*"
-                                            || op_copy[i + 1].to_string() == "/"
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "*".to_string(),
-                                            );
-                                        } else {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                op_copy[i + 1].to_string(),
-                                            );
-                                        }
-                                    }
-                                } else if op_copy[i] == Operator::Equals {
-                                    if i <= op_copy.len() - 2 {
-                                        if (op_copy[i + 1].to_string() == "+"
-                                            || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "+".to_string(),
-                                            );
-                                        } else if op_copy[i + 1].to_string() == "*"
-                                            || op_copy[i + 1].to_string() == "/"
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "*".to_string(),
-                                            );
-                                        } else {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                op_copy[i + 1].to_string(),
-                                            );
-                                        }
-                                    }
-                                } else {
-                                    graph.update_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i].to_string(),
-                                    );
-                                }
+                            Atom::Number(y) => {
+                                left_eq_name.push_str(y);
                             }
-                            Atom::Identifier(x) => {
-                                if x == "place_holder" {
-                                    continue;
-                                } else if x.contains("place_holder") {
-                                    *x = x.replace("place_holder", "");
-                                }
-                                let node_idx = get_node_idx(graph, x);
-                                if i == 0 {
-                                    if op_copy.len() > 1 {
-                                        if (op_copy[i + 1].to_string() == "+"
-                                            || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "+".to_string(),
-                                            );
-                                        } else if op_copy[i + 1].to_string() == "*"
-                                            || op_copy[i + 1].to_string() == "/"
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "*".to_string(),
-                                            );
-                                        } else {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                op_copy[i + 1].to_string(),
-                                            );
-                                        }
-                                    }
-                                } else if op_copy[i] == Operator::Equals {
-                                    if i <= op_copy.len() - 2 {
-                                        if (op_copy[i + 1].to_string() == "+"
-                                            || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "+".to_string(),
-                                            );
-                                        } else if op_copy[i + 1].to_string() == "*"
-                                            || op_copy[i + 1].to_string() == "/"
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "*".to_string(),
-                                            );
-                                        } else {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                op_copy[i + 1].to_string(),
-                                            );
-                                        }
-                                    }
-                                } else {
-                                    graph.update_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i].to_string(),
-                                    );
-                                }
+                            Atom::Identifier(y) => {
+                                left_eq_name.push_str(y);
                             }
-                            Atom::Operator(_x) => {}
+                            Atom::Operator(_y) => {}
                         },
-                        Expr::Expression { op, name, .. } => {
-                            if name == "place_holder" {
-                                continue;
-                            } else if name.contains("place_holder") {
-                                *name = name.replace("place_holder", "");
-                            }
-                            if op[0] == Operator::Other("".to_string()) {
-                                let node_idx = get_node_idx(graph, name);
-                                if i == 0 {
-                                    if op_copy.len() > 1 {
-                                        if (op_copy[i + 1].to_string() == "+"
-                                            || op_copy[i + 1].to_string() == "-")
-                                            && name.chars().nth(0).unwrap() != '-'
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "+".to_string(),
-                                            );
-                                        } else if op_copy[i + 1].to_string() == "*"
-                                            || op_copy[i + 1].to_string() == "/"
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "*".to_string(),
-                                            );
-                                        } else {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                op_copy[i + 1].to_string(),
-                                            );
-                                        }
-                                    }
-                                } else if op_copy[i] == Operator::Equals {
-                                    if i <= op_copy.len() - 2 {
-                                        if op_copy.len() > 1 {
-                                            if (op_copy[i + 1].to_string() == "+"
-                                                || op_copy[i + 1].to_string() == "-")
-                                                && name.chars().nth(0).unwrap() != '-'
-                                            {
-                                                graph.update_edge(
-                                                    node_idx,
-                                                    parent_node_index,
-                                                    "+".to_string(),
-                                                );
-                                            } else if op_copy[i + 1].to_string() == "*"
-                                                || op_copy[i + 1].to_string() == "/"
-                                            {
-                                                graph.update_edge(
-                                                    node_idx,
-                                                    parent_node_index,
-                                                    "*".to_string(),
-                                                );
-                                            } else {
-                                                graph.update_edge(
-                                                    node_idx,
-                                                    parent_node_index,
-                                                    op_copy[i + 1].to_string(),
-                                                );
-                                            }
-                                        }
-                                    }
-                                } else {
-                                    graph.update_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i].to_string(),
-                                    );
-                                }
-                            } else {
+                        Expr::Expression { op, args: _, name } => {
+                            if op[0] != Operator::Other("".to_string()) {
                                 let mut unitary_name = op[0].to_string();
-                                let mut name_copy = name.to_string().clone();
+                                let mut name_copy = name.to_string();
                                 remove_paren(&mut name_copy);
                                 unitary_name.push_str("(".clone());
                                 unitary_name.push_str(&name_copy.clone());
                                 unitary_name.push_str(")".clone());
-                                let node_idx = get_node_idx(graph, &mut unitary_name);
-                                if i == 0 {
-                                    if op_copy.len() > 1 {
-                                        if (op_copy[i + 1].to_string() == "+"
-                                            || op_copy[i + 1].to_string() == "-")
-                                            && unitary_name.chars().nth(0).unwrap() != '-'
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "+".to_string(),
-                                            );
-                                        } else if op_copy[i + 1].to_string() == "*"
-                                            || op_copy[i + 1].to_string() == "/"
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "*".to_string(),
-                                            );
-                                        } else {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                op_copy[i + 1].to_string(),
-                                            );
-                                        }
-                                    }
-                                } else if op_copy[i] == Operator::Equals {
-                                    if i <= op_copy.len() - 2 {
-                                        if (op_copy[i + 1].to_string() == "+"
-                                            || op_copy[i + 1].to_string() == "-")
-                                            && unitary_name.chars().nth(0).unwrap() != '-'
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "+".to_string(),
-                                            );
-                                        } else if op_copy[i + 1].to_string() == "*"
-                                            || op_copy[i + 1].to_string() == "/"
-                                        {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                "*".to_string(),
-                                            );
-                                        } else {
-                                            graph.update_edge(
-                                                node_idx,
-                                                parent_node_index,
-                                                op_copy[i + 1].to_string(),
-                                            );
-                                        }
-                                    }
-                                } else {
-                                    graph.update_edge(
-                                        node_idx,
-                                        parent_node_index,
-                                        op_copy[i].to_string(),
-                                    );
-                                }
+                                left_eq_name.push_str(unitary_name.as_str());
+                            } else {
+                                left_eq_name.push_str(name.as_str());
                             }
-                            args[i].to_graph(graph);
                         }
+                    }
+                }
+
+                let node_idx = get_node_idx(graph, &mut left_eq_name);
+                graph.update_edge(node_idx, parent_node_index, "=".to_string());
+            }
+            if op[0] != Operator::Other("".to_string()) {
+                let mut unitary_name = op[0].to_string();
+                let mut name_copy = name.to_string();
+                remove_paren(&mut name_copy);
+                unitary_name.push_str("(".clone());
+                unitary_name.push_str(&name_copy.clone());
+                unitary_name.push_str(")".clone());
+                let node_idx = get_node_idx(graph, &mut unitary_name);
+                if op[0].to_string() == "derivative" {
+                    return;
+                } else {
+                    graph.update_edge(parent_node_index, node_idx, op[0].to_string());
+                }
+            }
+            let op_copy = op.clone();
+            for i in eq_loc..=op_copy.len() - 1 {
+                match &mut args[i] {
+                    Expr::Atom(x) => match x {
+                        Atom::Number(x) => {
+                            if x == "place_holder" {
+                                continue;
+                            } else if x.contains("place_holder") {
+                                *x = x.replace("place_holder", "");
+                            }
+                            let node_idx = get_node_idx(graph, x);
+                            if i == 0 {
+                                if op_copy.len() > 1 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !x.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else if op_copy[i] == Operator::Equals {
+                                if i <= op_copy.len() - 2 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !x.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else {
+                                graph.update_edge(
+                                    node_idx,
+                                    parent_node_index,
+                                    op_copy[i].to_string(),
+                                );
+                            }
+                        }
+                        Atom::Identifier(x) => {
+                            if x == "place_holder" {
+                                continue;
+                            } else if x.contains("place_holder") {
+                                *x = x.replace("place_holder", "");
+                            }
+                            let node_idx = get_node_idx(graph, x);
+                            if i == 0 {
+                                if op_copy.len() > 1 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !x.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else if op_copy[i] == Operator::Equals {
+                                if i <= op_copy.len() - 2 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !x.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else {
+                                graph.update_edge(
+                                    node_idx,
+                                    parent_node_index,
+                                    op_copy[i].to_string(),
+                                );
+                            }
+                        }
+                        Atom::Operator(_x) => {}
+                    },
+                    Expr::Expression { op, name, .. } => {
+                        if name == "place_holder" {
+                            continue;
+                        } else if name.contains("place_holder") {
+                            *name = name.replace("place_holder", "");
+                        }
+                        if op[0] == Operator::Other("".to_string()) {
+                            let node_idx = get_node_idx(graph, name);
+                            if i == 0 {
+                                if op_copy.len() > 1 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !name.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else if op_copy[i] == Operator::Equals {
+                                if i <= op_copy.len() - 2 && op_copy.len() > 1 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !name.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else {
+                                graph.update_edge(
+                                    node_idx,
+                                    parent_node_index,
+                                    op_copy[i].to_string(),
+                                );
+                            }
+                        } else {
+                            let mut unitary_name = op[0].to_string();
+                            let mut name_copy = name.to_string().clone();
+                            remove_paren(&mut name_copy);
+                            unitary_name.push_str("(".clone());
+                            unitary_name.push_str(&name_copy.clone());
+                            unitary_name.push_str(")".clone());
+                            let node_idx = get_node_idx(graph, &mut unitary_name);
+                            if i == 0 {
+                                if op_copy.len() > 1 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !unitary_name.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else if op_copy[i] == Operator::Equals {
+                                if i <= op_copy.len() - 2 {
+                                    if (op_copy[i + 1].to_string() == "+"
+                                        || op_copy[i + 1].to_string() == "-")
+                                        && !unitary_name.starts_with('-')
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "+".to_string(),
+                                        );
+                                    } else if op_copy[i + 1].to_string() == "*"
+                                        || op_copy[i + 1].to_string() == "/"
+                                    {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            "*".to_string(),
+                                        );
+                                    } else {
+                                        graph.update_edge(
+                                            node_idx,
+                                            parent_node_index,
+                                            op_copy[i + 1].to_string(),
+                                        );
+                                    }
+                                }
+                            } else {
+                                graph.update_edge(
+                                    node_idx,
+                                    parent_node_index,
+                                    op_copy[i].to_string(),
+                                );
+                            }
+                        }
+                        args[i].to_graph(graph);
                     }
                 }
             }
@@ -838,7 +766,7 @@ impl Expr {
     }
 }
 
-pub fn redundant_paren(string: &String) -> bool {
+pub fn redundant_paren(string: &str) -> bool {
     let str_len = string.chars().count();
     if !string.starts_with('(') || string.chars().nth(str_len - 1) != Some(')') {
         return false;
@@ -870,45 +798,33 @@ pub fn all_multi_div(op: &mut Vec<Operator>) -> bool {
 impl PreExp {
     fn group_expr(&mut self) {
         for arg in &mut self.args {
-            match arg {
-                Expr::Atom(_) => {}
-                Expr::Expression { .. } => {
-                    arg.group_expr();
-                }
+            if let Expr::Expression { .. } = arg {
+                arg.group_expr();
             }
         }
     }
 
     fn collapse_expr(&mut self) {
         for arg in &mut self.args {
-            match arg {
-                Expr::Atom(_) => {}
-                Expr::Expression { .. } => {
-                    arg.collapse_expr();
-                }
+            if let Expr::Expression { .. } = arg {
+                arg.collapse_expr();
             }
         }
     }
 
     fn get_names(&mut self) {
         for mut arg in &mut self.args {
-            match &mut arg {
-                Expr::Atom(_) => {}
-                Expr::Expression { .. } => {
-                    arg.get_names();
-                }
+            if let Expr::Expression { .. } = arg {
+                arg.get_names();
             }
         }
     }
 
     fn to_graph(&mut self) -> MathExpressionGraph {
         let mut g = MathExpressionGraph::new();
-        for mut arg in &mut self.args {
-            match &mut arg {
-                Expr::Atom(_) => {}
-                Expr::Expression { .. } => {
-                    arg.to_graph(&mut g);
-                }
+        for arg in &mut self.args {
+            if let Expr::Expression { .. } = arg {
+                arg.to_graph(&mut g);
             }
         }
         g
@@ -928,20 +844,14 @@ pub fn remove_paren(string: &mut String) -> &mut String {
 pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeIndex {
     remove_paren(name);
     if name.contains("derivative") {
-        *name = name.replace("/", ", ");
+        *name = name.replace('/', ", ");
     }
     if graph.node_count() > 0 {
         for n in 0..=graph.node_count() - 1 {
-            match graph.raw_nodes().get(n) {
-                None => {}
-                Some(x) => {
-                    if *name == x.weight {
-                        match graph.node_indices().nth(n) {
-                            None => {}
-                            Some(x) => {
-                                return x;
-                            }
-                        }
+            if let Some(x) = graph.raw_nodes().get(n) {
+                if *name == x.weight {
+                    if let Some(x) = graph.node_indices().nth(n) {
+                        return x;
                     }
                 }
             }
@@ -952,43 +862,34 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
 }
 
 pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
-    let mut content = mml.clone();
-    let mut key_words_left = "<mrow>".to_string() + &*key_word.clone();
+    let mut content = mml;
+    let key_words_left = "<mrow>".to_string() + &*key_word.clone();
     let mut key_word_right = key_word.clone();
     key_word_right.insert(1, '/');
-    let mut key_words_right = key_word_right.clone() + "</mrow>";
-    let mut locs: Vec<_> = content
+    let key_words_right = key_word_right.clone() + "</mrow>";
+    let locs: Vec<_> = content
         .match_indices(&key_words_left)
         .map(|(i, _)| i)
         .collect();
     for loc in locs.iter().rev() {
         if content[loc + 1..].contains(&key_words_right) {
             let l = content[*loc..].find(&key_word_right).map(|i| i + *loc);
-            match l {
-                None => {}
-                Some(x) => {
-                    if content.len() > (x + key_words_right.len()) {
-                        if content[x..x + key_words_right.len()] == key_words_right {
-                            content.replace_range(
-                                x..x + key_words_right.len(),
-                                key_word_right.as_str(),
-                            );
-                            content.replace_range(
-                                *loc..*loc + key_words_left.len(),
-                                key_word.as_str(),
-                            );
-                        }
-                    }
+            if let Some(x) = l {
+                if content.len() > (x + key_words_right.len())
+                    && content[x..x + key_words_right.len()] == key_words_right
+                {
+                    content.replace_range(x..x + key_words_right.len(), key_word_right.as_str());
+                    content.replace_range(*loc..*loc + key_words_left.len(), key_word.as_str());
                 }
             }
         }
     }
-    return content;
+    content
 }
 
 ///remove redundant mrow in mathml
 pub fn remove_rmrow(mathml_content: String) -> String {
-    let mut content = mathml_content.clone();
+    let mut content = mathml_content;
     content = content.replace("<mrow>", "(");
     content = content.replace("</mrow>", ")");
     let f = |b: &[u8]| -> Vec<u8> {
@@ -1016,7 +917,7 @@ pub fn remove_rmrow(mathml_content: String) -> String {
                 }
             }
         }
-        return b.to_vec();
+        b.to_vec()
     };
     let g = |mut b: Vec<u8>| {
         while f(&b) != b {
@@ -1027,25 +928,26 @@ pub fn remove_rmrow(mathml_content: String) -> String {
     content = std::str::from_utf8(&g(content.bytes().collect()))
         .unwrap()
         .to_string();
-    content = content.replace("(", "<mrow>");
-    content = content.replace(")", "</mrow>");
+    content = content.replace('(', "<mrow>");
+    content = content.replace(')', "</mrow>");
     content = remove_redundant_mrow(content, "<mi>".to_string());
     content = remove_redundant_mrow(content, "<mo>".to_string());
     content = remove_redundant_mrow(content, "<mfrac>".to_string());
     content = remove_redundant_mrow(content, "<mover>".to_string());
-    return content;
+    content
 }
 
-/// preprocess the parsed content
+/// Preprocess the parsed content
 pub fn preprocess_content(content_str: String) -> String {
-    let mut pre_string = content_str.clone();
-    pre_string = pre_string.replace(" ", "");
+    let mut pre_string = content_str;
+    pre_string = pre_string.replace(' ', "");
     pre_string = pre_string.replace("<mo>,</mo>", "");
     pre_string = pre_string.replace("<mo>(</mo>", "<mrow>");
     pre_string = pre_string.replace("<mo>)</mo>", "</mrow>");
-    pre_string = pre_string.replace("\n", "");
-    /// Unicode to Symbol
-    let mut unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
+    pre_string = pre_string.replace('\n', "");
+
+    // Unicode to Symbol
+    let unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
     for ul in unicode_locs.iter().rev() {
         let loc = pre_string[*ul..].find('<').map(|i| i + ul);
         match loc {
@@ -1059,7 +961,7 @@ pub fn preprocess_content(content_str: String) -> String {
         "-",
     );
     pre_string = remove_rmrow(pre_string);
-    return pre_string;
+    pre_string
 }
 
 pub fn wrap_math(math: Math) -> MathExpression {
@@ -1067,6 +969,7 @@ pub fn wrap_math(math: Math) -> MathExpression {
     for con in math.content {
         math_vec.push(con);
     }
+
     Mrow(math_vec)
 }
 
@@ -1085,14 +988,11 @@ fn test_to_expr() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
 
-    match &pre_exp.args[0] {
-        Expr::Atom(_) => {}
-        Expr::Expression { op, args, .. } => {
-            assert_eq!(op[0], Operator::Other("".to_string()));
-            assert_eq!(op[1], Operator::Add);
-            assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
-            assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
-        }
+    if let Expr::Expression { op, args, .. } = &pre_exp.args[0] {
+        assert_eq!(op[0], Operator::Other("".to_string()));
+        assert_eq!(op[1], Operator::Add);
+        assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
+        assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
     }
 }
 
@@ -1697,10 +1597,12 @@ fn test_to_expr18() {
 
 #[test]
 fn test_to_expr19() {
+    use crate::parsing::parse;
     let input = "tests/sir.xml";
-    let contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    let contents = std::fs::read_to_string(input)
+        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
     let _g = &mut math.content[0].clone().to_graph();
 }
@@ -1903,28 +1805,32 @@ fn test_to_expr29() {
 
 #[test]
 fn test_to_expr30() {
+    use crate::parsing::parse;
     let input = "tests/SEIR_eq1.xml";
-    let mut contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
+    let mut contents = std::fs::read_to_string(input)
+        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     contents = preprocess_content(contents);
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
     let mut math_vec = vec![];
     for con in math.content {
         math_vec.push(con);
     }
-    let mut new_math = Mrow(math_vec);
-    let _g = new_math.clone().to_graph();
+    let new_math = Mrow(math_vec);
+    let _g = new_math.to_graph();
 }
 
 #[test]
 fn test_to_expr32() {
+    use crate::parsing::parse;
     let input = "tests/seirdv_eq7.xml";
-    let mut contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
+    let mut contents = std::fs::read_to_string(input)
+        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     contents = preprocess_content(contents);
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
-    let mut new_math = wrap_math(math);
-    let _g = new_math.clone().to_graph();
+    let new_math = wrap_math(math);
+    let _g = new_math.to_graph();
 }
