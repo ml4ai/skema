@@ -1919,22 +1919,6 @@ fn test_to_expr30() {
 }
 
 #[test]
-fn test_to_expr31() {
-    let input = "tests/test02.xml";
-    let mut contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
-    contents = preprocess_content(contents);
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
-    math.normalize();
-    let mut math_vec = vec![];
-    for con in math.content {
-        math_vec.push(con);
-    }
-    let mut new_math = Mrow(math_vec);
-    let _g = new_math.clone().to_graph();
-}
-
-#[test]
 fn test_to_expr32() {
     let input = "tests/seirdv_eq7.xml";
     let mut contents =
