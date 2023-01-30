@@ -23,7 +23,7 @@ if __name__ == "__main__":
     print(named_ports)
 
     # Get other thing
-    request_url = f"http://localhost:8000/get-pyacset"
+    request_url = f"http://localhost:8001/get-pyacset"
     r = post(request_url, json=named_ports)
     print(r.json())
 
