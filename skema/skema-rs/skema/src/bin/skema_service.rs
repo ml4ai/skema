@@ -4,7 +4,7 @@ use skema::services::comment_extraction::{
     SingleLineComment,
 };
 use skema::services::{
-    gromet::{get_model_ids, post_model, delete_model, get_named_opos, get_named_opis, get_subgraph},
+    gromet::{get_model_ids, post_model, delete_model, get_named_opos, get_named_opis, get_named_ports, get_subgraph},
     mathml::{get_ast_graph, get_math_exp_graph}
 };
 use skema::config::Config;
@@ -52,6 +52,7 @@ async fn main() -> std::io::Result<()> {
             skema::services::gromet::delete_model,
             skema::services::gromet::get_named_opos,
             skema::services::gromet::get_named_opis,
+            skema::services::gromet::get_named_ports,
             skema::services::gromet::get_subgraph,
             ping
         ),
@@ -86,6 +87,7 @@ async fn main() -> std::io::Result<()> {
             .service(delete_model)
             .service(get_named_opos)
             .service(get_named_opis)
+            .service(get_named_ports)
             .service(get_comments)
             .service(get_ast_graph)
             .service(get_math_exp_graph)

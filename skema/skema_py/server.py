@@ -12,6 +12,10 @@ from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
+class Ports(BaseModel):
+    opis: List[str]
+    opos: List[str]
+
 class System(BaseModel):
     files: List[str]
     blobs: List[str]
@@ -65,17 +69,17 @@ async def fn_given_filepaths(system: System):
     "/get-pyacset",
     summary=("Get PyACSet for a given model"),
 )
-async def get_pyacset(ports: str = Body()):
-    opis, opos = ports["opis"], ports["opos"]
-    petri = petris.Petri()
+async def get_pyacset(ports: Ports):
+    opis, opos = ports.opis, ports.opos
+    petri = skema.skema_py.petris.Petri()
     petri.add_species(len(opos))
-    trans = petris.Transition
+    trans = skema.skema_py.petris.Transition
     petri.add_parts(trans, len(opis))
 
     for i, tran in enumerate(opis):
-        petri.set_subpart(i, petris.attr_tname, opis[i])
+        petri.set_subpart(i, skema.skema_py.petris.attr_tname, opis[i])
 
     for j, spec in enumerate(opos):
-        petri.set_subpart(j, petris.attr_sname, opos[j])
+        petri.set_subpart(j, skema.skema_py.petris.attr_sname, opos[j])
 
     return petri.write_json()

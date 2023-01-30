@@ -222,7 +222,7 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
 )]
 #[get("/models/{id}/named_ports")]
 pub async fn get_named_ports(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let response = named_opo_query(path.into_inner(), &config.db_host).unwrap();
+    let response = named_port_query(path.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
 

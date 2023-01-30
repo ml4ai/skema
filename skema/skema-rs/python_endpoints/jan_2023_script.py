@@ -1,27 +1,27 @@
 #!/usr/bin/env python
 
-"""Example Python client program to communicate with the Code2FN service."""
+"""Example Python client program to communicate with the skema-py service."""
 
 import os
 import json
-import requests
+from requests import get, post, delete
 import argparse
 
 
 if __name__ == "__main__":
-    with open("~/Downloads/11c--Gromet-FN-manual-dynamics.json") as f:
-        r = requests.post(f"http://localhost:8080/models", json=json.load(f))
-        print(r.text)
-        MODEL_ID = r.json()
-
+    with open("11c--Gromet-FN-manual-dynamics.json") as f:
+        r = post(f"http://localhost:8080/models", json=json.load(f))
+        MODEL_ID = r.text
 
     # Get opis and opos
     request_url = f"http://localhost:8080/models/{MODEL_ID}/named_ports"
-    response = requests.post(request_url)
-    print(response.json())
+    named_ports = get(request_url).json()
+    print(named_ports)
 
     # Get other thing
-    obj = response.json()
     request_url = f"http://localhost:8000/get-pyacset"
-    response = requests.post(request_url, json=obj)
-    print(response.json())
+    r = post(request_url, json=named_ports)
+    print(r.json())
+
+    # Delete the model so we don't waste space
+    delete(f"http://localhost:8080/models/{MODEL_ID}")
