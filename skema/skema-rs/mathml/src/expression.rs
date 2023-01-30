@@ -76,21 +76,16 @@ impl MathExpression {
             Mi(x) => {
                 if !pre.args.is_empty() {
                     let args_last_idx = pre.args.len() - 1;
-                    match &mut pre.args[args_last_idx] {
-                        Expr::Atom(y) => match y {
-                            Atom::Number(_) => {}
-                            Atom::Identifier(_) => {}
-                            Atom::Operator(z) => {
-                                if *z == Operator::Subtract {
-                                    let mut neg_identifier = String::from("-");
-                                    neg_identifier.push_str(&x);
-                                    pre.args[args_last_idx] =
-                                        Expr::Atom(Atom::Identifier(neg_identifier));
-                                    return;
-                                }
+                    if let Expr::Atom(y) = &pre.args[args_last_idx] {
+                        if let Atom::Operator(z) = y {
+                            if let Operator::Subtract = z {
+                                let mut neg_identifier = String::from("-");
+                                neg_identifier.push_str(&x);
+                                pre.args[args_last_idx] =
+                                    Expr::Atom(Atom::Identifier(neg_identifier));
+                                return;
                             }
-                        },
-                        Expr::Expression { .. } => {}
+                        }
                     }
                 }
                 if pre.args.len() >= pre.op.len() {
