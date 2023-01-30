@@ -4,7 +4,6 @@ use crate::ast::{
     Operator,
 };
 
-use petgraph::visit::NodeRef;
 use petgraph::{graph::NodeIndex, Graph};
 
 use std::collections::VecDeque;

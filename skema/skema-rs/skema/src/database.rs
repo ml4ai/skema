@@ -18,7 +18,7 @@ use rsmgclient::{ConnectParams, Connection, MgError};
 
 use crate::FunctionType;
 use crate::{Attribute, FnType::Import, FunctionNet, GrometBox};
-use crate::{Files, Gromet, Metadata, ModuleCollection, Provenance};
+use crate::{Files, ModuleCollection, Provenance};
 
 #[derive(Debug, Clone)]
 pub struct MetadataNode {
