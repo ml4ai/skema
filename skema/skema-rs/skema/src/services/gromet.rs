@@ -1,14 +1,14 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 
 use crate::database::{execute_query, parse_gromet_queries};
-use crate::Gromet;
+use crate::{Gromet, ModuleCollection};
 use crate::config::Config;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 
 use actix_web::{HttpResponse, get, post, web, delete};
 use utoipa;
 
-pub fn push_model_to_db(gromet: Gromet, host: &str) -> Result<i64, MgError> {
+pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgError> {
 
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
@@ -96,6 +96,38 @@ pub fn named_opo_query(module_id: i64, host: &str) -> Result<Vec<String>,MgError
     Ok(port_names)
 }
 
+pub fn get_subgraph_query(module_id: i64, host: &str) -> Result<Vec<String>,MgError> {
+
+    // Connect to Memgraph.
+    let connect_params = ConnectParams {
+        host: Some(host.to_string()),
+        ..Default::default()
+    };
+    let mut connection = Connection::connect(&connect_params)?;
+
+    // create query1
+    let query1 = format!("MATCH p = (n)-[r*]->(m) WHERE id(n) = {}
+    \nWITH reduce(output = [], n IN nodes(p) | output + n ) AS nodes1
+    \nUNWIND nodes1 AS nodes2
+    \nWITH DISTINCT nodes2
+    \nRETURN collect(nodes2);", module_id);
+
+    // Run Query1.
+    connection.execute(&query1, None)?;
+
+    // Check that the first value of the first record is a list
+    let mut node_list = Vec::<String>::new();
+    if let Value::List(xs) = &connection.fetchall()?[0].values[0] {
+        node_list = xs.iter().filter_map(|x| match x {
+            Value::String(x) => Some(x.clone()),
+            _ => None
+        }).collect();
+    }
+    connection.commit()?;
+
+    Ok(node_list)
+}
+
 pub fn module_query(host: &str) -> Result<Vec<i64>, MgError> {
     // Connect to Memgraph.
     let connect_params = ConnectParams {
@@ -140,7 +172,7 @@ pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
     )
 )]
 #[post("/models")]
-pub async fn post_model(payload: web::Json<Gromet>, config: web::Data<Config>) -> HttpResponse {
+pub async fn post_model(payload: web::Json<ModuleCollection>, config: web::Data<Config>) -> HttpResponse {
     let model_id = push_model_to_db(payload.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(model_id))
 }
@@ -180,5 +212,17 @@ pub async fn get_named_opos(path: web::Path<i64>, config: web::Data<Config>) -> 
 #[get("/models/{id}/named_opis")]
 pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let response = named_opi_query(path.into_inner(), &config.db_host).unwrap();
+    HttpResponse::Ok().json(web::Json(response))
+}
+
+/// This retrieves a subgraph based on model id.
+#[utoipa::path(
+    responses(
+        (status = 200, description = "Successfully retrieved subgraph")
+    )
+)]
+#[get("/models/{id}/subgraph")]
+pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let response = get_subgraph_query(path.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
 }
