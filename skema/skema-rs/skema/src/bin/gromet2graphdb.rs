@@ -4,7 +4,7 @@ use clap::Parser;
 use serde_json;
 use skema::{
     database::{execute_query, parse_gromet_queries},
-    Gromet, ModuleCollection,
+    ModuleCollection,
 };
 use std::fs;
 

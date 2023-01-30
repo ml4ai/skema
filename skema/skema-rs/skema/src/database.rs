@@ -1718,7 +1718,7 @@ pub fn create_function(
                         nodes.clone(),
                         edges.clone(),
                         n1.clone(),
-                        (att_idx.clone() - 1), // because top level
+                        att_idx.clone() - 1, // because top level
                         cond_counter, // This indexes the conditional in the list of conditionals (bc)
                         bf_counter,   // because top level
                         start.clone(),
@@ -1739,7 +1739,7 @@ pub fn create_function(
                         nodes.clone(),
                         edges.clone(),
                         n1.clone(),
-                        (att_idx.clone() - 1), // because top level
+                        att_idx.clone() - 1, // because top level
                         while_counter, // This indexes the conditional in the list of conditionals (bc)
                         bf_counter,    // because top level
                         start.clone(),
