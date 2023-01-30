@@ -460,7 +460,7 @@ fn test_math() {
 
 #[test]
 fn test_mathml_parser() {
-    let eqn = fs::read_to_string("tests/test01.xml").unwrap();
+    let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
     test_parser(
         &eqn,
         math,
