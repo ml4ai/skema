@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 
-"""Example Python client program to communicate with the skema-py service."""
+"""Example Python client program to communicate with the SKEMA services and get
+pyacsets.
+
+Originally developed for the Jan 2023 ASKEM Hackathon/PI meeting/evaluation.
+"""
 
 import os
 import json

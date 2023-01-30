@@ -1,13 +1,13 @@
-# Docker Compose file for the Code2FN service
+# Docker Compose file for the skema-py service
 version: "3.9"
 
 services:
-  Code2FN:
-    image: code2fn:latest
+  skema-py:
+    image: skema-py:latest
     build:
       context: .
-      dockerfile: Dockerfile.code2fn
-    container_name: Code2FN
+      dockerfile: Dockerfile.skema-py
+    container_name: skema-py
     ports:
     - "8000:8000" # Change port mapping appropriately before deploying.
     command: ["uvicorn", "server:app", "--host", "0.0.0.0"]

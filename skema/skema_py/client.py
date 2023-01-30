@@ -40,7 +40,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--url",
         default="http://localhost:8000/fn-given-filepaths",
-        help="Host machine where the Code2FN service is running",
+        help="URL for the fn-given-filepaths endpoint",
     )
 
     parser.add_argument(
