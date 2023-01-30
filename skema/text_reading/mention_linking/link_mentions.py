@@ -134,7 +134,7 @@ if __name__ == "__main__":
         "-c", "--comments_name", help="Code comments file name"
     )
     parser.add_argument(
-        "-x", "--extractions_name", help="TR extractions file name"
+        "-x", "--extractions_name", help="TR extractions file name", default=''
     )
 
     args = parser.parse_args()
