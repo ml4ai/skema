@@ -110,6 +110,5 @@ pub fn get_comments(src_file_name: &str) -> Result<Comments, Box<dyn Error + 'st
 
 #[test]
 fn test_get_comments() {
-    get_comments("../../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.for")
-        .unwrap();
+    get_comments("../../../data/epidemiology/CHIME/CHIME_SIR_model/code/CHIME_SIR.for").unwrap();
 }
