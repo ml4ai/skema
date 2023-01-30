@@ -1,8 +1,10 @@
-Code2FN
+skema-py
 =======
 
-The Code2FN web service ingests source code and returns a GroMEt function
-network module collection.
+The skema-py web service ingests source code and can return one of the
+following:
+- a GroMEt function network module collection
+- a pyacset.
 
 There are two ways to run the service. The first is to use the Dockerized
 version (see `../../README.md`). To run the service 'unDockerized', you can

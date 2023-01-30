@@ -21,7 +21,7 @@ app = FastAPI()
 
 @app.get("/ping", summary="Ping endpoint to test health of service")
 def ping():
-    return "The Code2FN service is running."
+    return "The skema-py service is running."
 
 
 @app.post(

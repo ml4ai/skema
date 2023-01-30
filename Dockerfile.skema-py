@@ -1,4 +1,4 @@
-# Dockerfile for the Code2FN service
+# Dockerfile for the skema-py service
 
 FROM  python:3.8-bullseye
 
@@ -28,7 +28,7 @@ COPY pyproject.toml /skema/
 COPY skema/program_analysis /skema/skema/program_analysis
 COPY skema/gromet /skema/skema/gromet
 COPY skema/model_assembly /skema/skema/model_assembly
-COPY skema/code2fn /skema/skema/code2fn
+COPY skema/skema-py /skema/skema/skema-py
 COPY skema/utils /skema/skema/utils
 WORKDIR /skema
 
@@ -37,5 +37,5 @@ RUN pip install wheel
 RUN pip install fastapi uvicorn
 RUN pip install -e .
 
-# Switch to the code2fn directory
-WORKDIR /skema/skema/code2fn/
+# Switch to the skema-py directory
+WORKDIR /skema/skema/skema-py/
