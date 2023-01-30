@@ -1142,14 +1142,14 @@ fn test_to_expr18() {
     let _g = math_expression.to_graph();
 }
 
-use crate::parsing::parse;
+
 
 #[test]
 fn test_to_expr19() {
     let input = "tests/sir.xml";
     let contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+        std::fs::read_to_string(input).unwrap_or_else(|_| panic!("Unable to read file {input}!"));
+    let (_, mut math) = parse(&contents).unwrap_or_else(|_| panic!("Unable to parse file {input}!"));
     math.normalize();
     let _g = &mut math.content[0].clone().to_graph();
 }

@@ -3,7 +3,7 @@
 //! AutoMATES project (https://ml4ai.github.io/automates), and ported over to this Rust version by
 //! Adarsh Pyarelal for the SKEMA project.
 
-use pretty_env_logger;
+
 
 use clap::Parser;
 use std::fs::write;
@@ -39,7 +39,7 @@ fn main() {
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
         } else {
-            println!("{}", comments);
+            println!("{comments}");
         }
     } else if extension == "py" {
         let comments = get_python_comments(input);
@@ -47,7 +47,7 @@ fn main() {
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
         } else {
-            println!("{}", comments);
+            println!("{comments}");
         }
     } else {
         panic!(

@@ -20,7 +20,7 @@ pub fn line_is_comment(line: &String) -> bool {
             HashSet::from(['c', 'C', 'd', 'D', '*', '!']);
     }
 
-    match &line.chars().nth(0) {
+    match &line.chars().next() {
         Some(c) => FORTRAN_COMMENT_CHAR_SET.contains(c),
         None => true,
     }
@@ -84,7 +84,7 @@ pub fn line_ends_subpgm(line: &String) -> bool {
 /// Returns true iff line is a continuation line, else False.  Currently this
 /// is used only for fixed-form input files, i.e., extension is in ('.f', '.for')
 pub fn line_is_continuation(line: &String, extension: &str) -> bool {
-    if line_is_comment(&line) {
+    if line_is_comment(line) {
         return false;
     }
 
@@ -103,8 +103,8 @@ pub fn line_is_continuation(line: &String, extension: &str) -> bool {
     // case, the Python version of this code does not include any checks of this kind. If the
     // expectation was for the script to crash in such cases, the type signature in the original
     // Python version did not reflect it.
-    if fixed_form_ext.contains(&extension as &str) {
-        if line.chars().nth(0).unwrap() == '\t' {
+    if fixed_form_ext.contains(extension as &str) {
+        if line.starts_with('\t') {
             return FIXED_FORM_SET.contains(&line.chars().nth(1).unwrap());
         } else {
             let c_5 = &line.chars().nth(5).unwrap();
@@ -112,7 +112,7 @@ pub fn line_is_continuation(line: &String, extension: &str) -> bool {
         }
     }
 
-    if line.chars().nth(0).unwrap() == '&' {
+    if line.starts_with('&') {
         return true;
     }
 

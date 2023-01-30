@@ -39,7 +39,7 @@ pub fn get_comments(src_file_name: &str) -> Result<Comments, Box<dyn Error + 'st
         .expect("Unable to get extension for {src_file_name}!")
         .to_str()
         .expect("Unable to convert extension to a valid string!");
-    let f = File::open(&src_file_name)?;
+    let f = File::open(src_file_name)?;
     let lines = io::BufReader::new(f).lines();
 
     for line in lines {
@@ -73,19 +73,16 @@ pub fn get_comments(src_file_name: &str) -> Result<Comments, Box<dyn Error + 'st
                     in_neck = true;
                 } else if line_ends_subpgm(&l) {
                     curr_comment.clear();
-                } else if line_is_continuation(&l, &extension) {
+                } else if line_is_continuation(&l, extension) {
                     continue;
-                } else {
-                    if in_neck {
-                        comments
-                            .subprograms
-                            .get_mut(&curr_fn.clone().unwrap())
-                            .unwrap()
-                            .neck = curr_comment.clone();
-                        in_neck = false;
-                        curr_comment.clear();
-                    }
-                    // TODO: Implement logic for collecting the internal comments.
+                } else if in_neck {
+                    comments
+                        .subprograms
+                        .get_mut(&curr_fn.clone().unwrap())
+                        .unwrap()
+                        .neck = curr_comment.clone();
+                    in_neck = false;
+                    curr_comment.clear();
                 }
             }
         }
