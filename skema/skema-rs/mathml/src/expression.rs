@@ -5,16 +5,13 @@ use crate::ast::{
 };
 use std::clone::Clone;
 
-use petgraph::visit::NodeRef;
 use petgraph::{graph::NodeIndex, Graph};
 
 use std::collections::VecDeque;
 
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
-use clap::builder::Str;
 use std::string::ToString;
-use crate::parsing::parse;
 
 #[derive(Debug, PartialEq, Clone)]
 enum Atom {
@@ -80,14 +77,14 @@ pub fn is_derivative(xs1: &mut Box<MathExpression>, xs2: &mut Box<MathExpression
 
         return true;
     }
-    return false;
+    false
 }
 
 impl MathExpression {
     pub fn to_expr(self, pre: &mut PreExp) {
         match self {
             Mi(x) => {
-                if pre.args.len() > 0 {
+                if !pre.args.is_empty() {
                     let args_last_idx = pre.args.len() - 1;
                     match &mut pre.args[args_last_idx] {
                         Expr::Atom(y) => match y {
@@ -96,7 +93,7 @@ impl MathExpression {
                             Atom::Operator(z) => {
                                 if *z == Operator::Subtract {
                                     let mut neg_identifier = String::from("-");
-                                    neg_identifier.push_str(&x.clone());
+                                    neg_identifier.push_str(&x);
                                     pre.args[args_last_idx] =
                                         Expr::Atom(Atom::Identifier(neg_identifier));
                                     return;
@@ -111,14 +108,14 @@ impl MathExpression {
                     pre.op.push(Operator::Multiply);
                 }
                 pre.args
-                    .push(Expr::Atom(Atom::Identifier(x.replace(" ", ""))));
+                    .push(Expr::Atom(Atom::Identifier(x.replace(' ', ""))));
             }
             Mn(x) => {
                 if pre.args.len() >= pre.op.len() {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
-                pre.args.push(Expr::Atom(Atom::Number(x.replace(" ", ""))));
+                pre.args.push(Expr::Atom(Atom::Number(x.replace(' ', ""))));
             }
             Mo(x) => {
                 if x == Operator::Subtract && pre.op.len() > pre.args.len() {
@@ -170,7 +167,7 @@ impl MathExpression {
                     } else if idx == 1 {
                         pre_exp.op.push(Operator::Other("^".to_string()));
                     }
-                    idx = idx + 1;
+                    idx += 1;
                     x.to_expr(&mut pre_exp);
                 }
                 pre.args.push(Expr::Expression {
@@ -391,7 +388,7 @@ impl Expr {
                         for i in 0..args.len() {
                             match &mut args[i] {
                                 Expr::Atom(_) => {}
-                                Expr::Expression { op, args, name } => {
+                                Expr::Expression { op, args, name: _ } => {
                                     if op[0] == Operator::Other("".to_string()) && all_multi_div(op)
                                     {
                                         args_copy[i] = args[0].clone();
@@ -412,7 +409,7 @@ impl Expr {
                     }
                 }
 
-                for mut arg in args {
+                for arg in args {
                     arg.collapse_expr();
                 }
             }
@@ -436,11 +433,11 @@ impl Expr {
                         if op[i] == Operator::Equals {
                             let mut new_name: String = "".to_string();
                             for n in name.as_bytes().clone() {
-                                if *n == 40 as u8 {
-                                    new_name.push_str("(");
+                                if *n == 40_u8 {
+                                    new_name.push('(');
                                 }
-                                if *n == 41 as u8 {
-                                    new_name.push_str(")");
+                                if *n == 41_u8 {
+                                    new_name.push(')');
                                 }
                             }
                             *name = remove_paren(&mut new_name).clone();
@@ -462,9 +459,9 @@ impl Expr {
                             let mut string;
                             if op[0] != Operator::Other("".to_string()) {
                                 string = op[0].to_string();
-                                string.push_str("(");
+                                string.push('(');
                                 string.push_str(args[i].get_names().as_str().clone());
-                                string.push_str(")");
+                                string.push(')');
                             } else {
                                 string = args[i].get_names().as_str().to_string().clone();
                             }
@@ -509,9 +506,9 @@ impl Expr {
                                 Atom::Identifier(y) => {
                                     left_eq_name.push_str(y);
                                 }
-                                Atom::Operator(y) => {}
+                                Atom::Operator(_y) => {}
                             },
-                            Expr::Expression { op, args, name } => {
+                            Expr::Expression { op, args: _, name } => {
                                 if op[0] != Operator::Other("".to_string()) {
                                     let mut unitary_name = op[0].to_string();
                                     let mut name_copy = name.to_string();
@@ -559,7 +556,7 @@ impl Expr {
                                     if op_copy.len() > 1 {
                                         if (op_copy[i + 1].to_string() == "+"
                                             || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
+                                            && !x.starts_with('-')
                                         {
                                             graph.update_edge(
                                                 node_idx,
@@ -586,7 +583,7 @@ impl Expr {
                                     if i <= op_copy.len() - 2 {
                                         if (op_copy[i + 1].to_string() == "+"
                                             || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
+                                            && !x.starts_with('-')
                                         {
                                             graph.update_edge(
                                                 node_idx,
@@ -628,7 +625,7 @@ impl Expr {
                                     if op_copy.len() > 1 {
                                         if (op_copy[i + 1].to_string() == "+"
                                             || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
+                                            && !x.starts_with('-')
                                         {
                                             graph.update_edge(
                                                 node_idx,
@@ -655,7 +652,7 @@ impl Expr {
                                     if i <= op_copy.len() - 2 {
                                         if (op_copy[i + 1].to_string() == "+"
                                             || op_copy[i + 1].to_string() == "-")
-                                            && x.chars().nth(0).unwrap() != '-'
+                                            && !x.starts_with('-')
                                         {
                                             graph.update_edge(
                                                 node_idx,
@@ -700,7 +697,7 @@ impl Expr {
                                     if op_copy.len() > 1 {
                                         if (op_copy[i + 1].to_string() == "+"
                                             || op_copy[i + 1].to_string() == "-")
-                                            && name.chars().nth(0).unwrap() != '-'
+                                            && !name.starts_with('-')
                                         {
                                             graph.update_edge(
                                                 node_idx,
@@ -724,32 +721,30 @@ impl Expr {
                                         }
                                     }
                                 } else if op_copy[i] == Operator::Equals {
-                                    if i <= op_copy.len() - 2 {
-                                        if op_copy.len() > 1 {
-                                            if (op_copy[i + 1].to_string() == "+"
-                                                || op_copy[i + 1].to_string() == "-")
-                                                && name.chars().nth(0).unwrap() != '-'
-                                            {
-                                                graph.update_edge(
-                                                    node_idx,
-                                                    parent_node_index,
-                                                    "+".to_string(),
-                                                );
-                                            } else if op_copy[i + 1].to_string() == "*"
-                                                || op_copy[i + 1].to_string() == "/"
-                                            {
-                                                graph.update_edge(
-                                                    node_idx,
-                                                    parent_node_index,
-                                                    "*".to_string(),
-                                                );
-                                            } else {
-                                                graph.update_edge(
-                                                    node_idx,
-                                                    parent_node_index,
-                                                    op_copy[i + 1].to_string(),
-                                                );
-                                            }
+                                    if i <= op_copy.len() - 2 && op_copy.len() > 1 {
+                                        if (op_copy[i + 1].to_string() == "+"
+                                            || op_copy[i + 1].to_string() == "-")
+                                            && !name.starts_with('-')
+                                        {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "+".to_string(),
+                                            );
+                                        } else if op_copy[i + 1].to_string() == "*"
+                                            || op_copy[i + 1].to_string() == "/"
+                                        {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                "*".to_string(),
+                                            );
+                                        } else {
+                                            graph.update_edge(
+                                                node_idx,
+                                                parent_node_index,
+                                                op_copy[i + 1].to_string(),
+                                            );
                                         }
                                     }
                                 } else {
@@ -771,7 +766,7 @@ impl Expr {
                                     if op_copy.len() > 1 {
                                         if (op_copy[i + 1].to_string() == "+"
                                             || op_copy[i + 1].to_string() == "-")
-                                            && unitary_name.chars().nth(0).unwrap() != '-'
+                                            && !unitary_name.starts_with('-')
                                         {
                                             graph.update_edge(
                                                 node_idx,
@@ -798,7 +793,7 @@ impl Expr {
                                     if i <= op_copy.len() - 2 {
                                         if (op_copy[i + 1].to_string() == "+"
                                             || op_copy[i + 1].to_string() == "-")
-                                            && unitary_name.chars().nth(0).unwrap() != '-'
+                                            && !unitary_name.starts_with('-')
                                         {
                                             graph.update_edge(
                                                 node_idx,
@@ -928,7 +923,7 @@ pub fn remove_paren(string: &mut String) -> &mut String {
 pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeIndex {
     remove_paren(name);
     if name.contains("derivative") {
-        *name = name.replace("/", ", ");
+        *name = name.replace('/', ", ");
     }
     if graph.node_count() > 0 {
         for n in 0..=graph.node_count() - 1 {
@@ -952,12 +947,12 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
 }
 
 pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
-    let mut content = mml.clone();
-    let mut key_words_left = "<mrow>".to_string() + &*key_word.clone();
+    let mut content = mml;
+    let key_words_left = "<mrow>".to_string() + &*key_word.clone();
     let mut key_word_right = key_word.clone();
     key_word_right.insert(1, '/');
-    let mut key_words_right = key_word_right.clone() + "</mrow>";
-    let mut locs: Vec<_> = content
+    let key_words_right = key_word_right.clone() + "</mrow>";
+    let locs: Vec<_> = content
         .match_indices(&key_words_left)
         .map(|(i, _)| i)
         .collect();
@@ -967,28 +962,23 @@ pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
             match l {
                 None => {}
                 Some(x) => {
-                    if content.len() > (x + key_words_right.len()) {
-                        if content[x..x + key_words_right.len()] == key_words_right {
-                            content.replace_range(
-                                x..x + key_words_right.len(),
-                                key_word_right.as_str(),
-                            );
-                            content.replace_range(
-                                *loc..*loc + key_words_left.len(),
-                                key_word.as_str(),
-                            );
-                        }
+                    if content.len() > (x + key_words_right.len())
+                        && content[x..x + key_words_right.len()] == key_words_right
+                    {
+                        content
+                            .replace_range(x..x + key_words_right.len(), key_word_right.as_str());
+                        content.replace_range(*loc..*loc + key_words_left.len(), key_word.as_str());
                     }
                 }
             }
         }
     }
-    return content;
+    content
 }
 
 ///remove redundant mrow in mathml
 pub fn remove_rmrow(mathml_content: String) -> String {
-    let mut content = mathml_content.clone();
+    let mut content = mathml_content;
     content = content.replace("<mrow>", "(");
     content = content.replace("</mrow>", ")");
     let f = |b: &[u8]| -> Vec<u8> {
@@ -1016,7 +1006,7 @@ pub fn remove_rmrow(mathml_content: String) -> String {
                 }
             }
         }
-        return b.to_vec();
+        b.to_vec()
     };
     let g = |mut b: Vec<u8>| {
         while f(&b) != b {
@@ -1027,27 +1017,27 @@ pub fn remove_rmrow(mathml_content: String) -> String {
     content = std::str::from_utf8(&g(content.bytes().collect()))
         .unwrap()
         .to_string();
-    content = content.replace("(", "<mrow>");
-    content = content.replace(")", "</mrow>");
+    content = content.replace('(', "<mrow>");
+    content = content.replace(')', "</mrow>");
     content = remove_redundant_mrow(content, "<mi>".to_string());
     content = remove_redundant_mrow(content, "<mo>".to_string());
     content = remove_redundant_mrow(content, "<mfrac>".to_string());
     content = remove_redundant_mrow(content, "<mover>".to_string());
-    return content;
+    content
 }
 
 /// preprocess the parsed content
 pub fn preprocess_content(content_str: String) -> String {
-    let mut pre_string = content_str.clone();
-    pre_string = pre_string.replace(" ", "");
+    let mut pre_string = content_str;
+    pre_string = pre_string.replace(' ', "");
     pre_string = pre_string.replace("<mo>,</mo>", "");
     pre_string = pre_string.replace("<mo>(</mo>", "<mrow>");
     pre_string = pre_string.replace("<mo>)</mo>", "</mrow>");
-    pre_string = pre_string.replace("\n", "");
+    pre_string = pre_string.replace('\n', "");
     /// Unicode to Symbol
-    let mut unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
+    let unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
     for ul in unicode_locs.iter().rev() {
-        let loc = pre_string[*ul..].find("<").map(|i| i + ul);
+        let loc = pre_string[*ul..].find('<').map(|i| i + ul);
         match loc {
             None => {}
             Some(x) => pre_string.insert(x, ';'),
@@ -1059,7 +1049,7 @@ pub fn preprocess_content(content_str: String) -> String {
         "-",
     );
     pre_string = remove_rmrow(pre_string);
-    return pre_string;
+    pre_string
 }
 
 pub fn wrap_math(math: Math) -> MathExpression {
@@ -1067,8 +1057,8 @@ pub fn wrap_math(math: Math) -> MathExpression {
     for con in math.content {
         math_vec.push(con);
     }
-    let mut new_math = Mrow(math_vec);
-    return new_math;
+
+    Mrow(math_vec)
 }
 
 #[test]
@@ -1698,10 +1688,12 @@ fn test_to_expr18() {
 
 #[test]
 fn test_to_expr19() {
+    use crate::parsing::parse;
     let input = "tests/sir.xml";
-    let contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    let contents = std::fs::read_to_string(input)
+        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
     let _g = &mut math.content[0].clone().to_graph();
 }
@@ -1881,6 +1873,7 @@ fn test_to_expr28() {
 
 #[test]
 fn test_to_expr29() {
+    use crate::parsing::parse;
     let math_expression = Mrow(vec![
         Mo(Operator::Subtract),
         Mi("a".to_string()),
@@ -1904,28 +1897,32 @@ fn test_to_expr29() {
 
 #[test]
 fn test_to_expr30() {
+    use crate::parsing::parse;
     let input = "tests/SEIR_eq1.xml";
-    let mut contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
+    let mut contents = std::fs::read_to_string(input)
+        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     contents = preprocess_content(contents);
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
     let mut math_vec = vec![];
     for con in math.content {
         math_vec.push(con);
     }
-    let mut new_math = Mrow(math_vec);
-    let _g = new_math.clone().to_graph();
+    let new_math = Mrow(math_vec);
+    let _g = new_math.to_graph();
 }
 
 #[test]
 fn test_to_expr32() {
+    use crate::parsing::parse;
     let input = "tests/seirdv_eq7.xml";
-    let mut contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
+    let mut contents = std::fs::read_to_string(input)
+        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     contents = preprocess_content(contents);
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
-    let mut new_math = wrap_math(math);
-    let _g = new_math.clone().to_graph();
+    let new_math = wrap_math(math);
+    let _g = new_math.to_graph();
 }
