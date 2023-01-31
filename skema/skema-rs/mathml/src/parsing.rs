@@ -9,7 +9,7 @@ use crate::ast::{
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, multispace0, not_line_ending},
+    character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
     combinator::{map, map_parser, opt, recognize, value},
     multi::many0,
     sequence::{delimited, pair, preceded, separated_pair, tuple},
@@ -171,7 +171,7 @@ fn add(input: Span) -> IResult<Operator> {
 }
 
 fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, tag("-"))(input)?;
+    let (s, op) = value(Operator::Subtract, one_of("-−"))(input)?;
     Ok((s, op))
 }
 

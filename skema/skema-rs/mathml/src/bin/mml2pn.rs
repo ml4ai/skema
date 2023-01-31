@@ -4,9 +4,11 @@ use mathml::{
     ast::{Math, MathExpression, Operator},
     parsing::parse,
 };
-use std::collections::{HashMap, HashSet};
-use std::fs::File;
-use std::io::{self, BufRead};
+use std::{
+    collections::{HashMap, HashSet},
+    fs::File,
+    io::{self, BufRead},
+};
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -21,7 +23,7 @@ struct Cli {
 /// Representation of a "named" variable
 /// Here, 'variable' is intended to mean a symbolic name for a value.
 /// Variables could be names of species (states) or rate (parameters).
-#[derive(Debug, Eq, PartialEq, Default, Hash)]
+#[derive(Debug, Eq, PartialEq, Default, Hash, Clone)]
 struct Var {
     name: String,
     sub: (String, Option<Vec<String>>),
@@ -34,16 +36,14 @@ impl Var {
             ..Default::default()
         };
     }
-
-    //fn from_var_candidate
 }
 
 /// Represents the Tangent var of an ODE.
 /// This is perhaps not really needed, although it at least introduces a type.
-#[derive(Debug, Eq, PartialEq, Default)]
+#[derive(Debug, Eq, PartialEq, Default, Clone)]
 struct Tangent(Var);
 
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 enum Polarity {
     add,
     sub,
@@ -53,24 +53,24 @@ enum Polarity {
 /// THere should just be one rate, but since we're parsing and there could
 /// be noise, this accommodates possibly reading several names of things
 /// that should be combined into a single rate.
-#[derive(Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Term {
-    rate: Vec<Var>,
-    species: Vec<Var>,
+    rate: Vec<Vec<MathExpressionOrVarOrTerm>>,
+    species: Vec<Vec<MathExpressionOrVarOrTerm>>,
     polarity: Polarity,
 }
 
 /// A single ODE equation.
-#[derive(Debug, Eq, PartialEq, Default)]
+#[derive(Debug, Eq, PartialEq, Default, Clone)]
 struct Eqn {
     /// The left-hand-side is the tangent.
     lhs: Tangent,
 
     /// The right-hand-side of the equation, a sequence of Terms.
-    rhs: Vec<Term>,
+    rhs: Vec<Vec<MathExpressionOrVarOrTerm>>,
 
     /// Collects all of the Vars that appear in the rhs.
-    rhs_vars: HashSet<Var>,
+    rhs_vars: HashSet<MathExpressionOrVarOrTerm>,
 }
 
 /// A collection of Eqns, indexed by the Var of the lhs Tangent.
@@ -79,10 +79,10 @@ struct EqnDict {
     eqns: HashMap<Var, Eqn>,
 
     /// The set of all Vars across the eqns that are interpreted as species.
-    species: HashSet<Var>,
+    species: HashSet<MathExpressionOrVarOrTerm>,
 
     /// The set of all Vars across the eqns that are interpreted as rates.
-    rates: HashSet<Var>,
+    rates: HashSet<MathExpressionOrVarOrTerm>,
 }
 
 /// Check if fraction is Leibniz notation
@@ -177,11 +177,6 @@ fn mfrac_leibniz_to_var(numerator: &Box<MathExpression>, denominator: &Box<MathE
     }
 }
 
-/// Translate MathML :mover as Newton dot notation
-//fn mover_to_var(base: &Box<MathExpression>, overscript) -> Var {
-// Check if the mover
-//}
-
 /// Get tangent
 fn get_tangent(expressions: &[MathExpression]) -> Tangent {
     // Check if first expression is an mfrac
@@ -195,6 +190,7 @@ fn get_tangent(expressions: &[MathExpression]) -> Tangent {
                 panic!("Expression is an mfrac but not a Leibniz diff operator!");
             }
         }
+        // Translate MathML :mover as Newton dot notation
         MathExpression::Mover(base, overscript) => {
             // Check if overscript is ˙
             if let MathExpression::Mo(id) = &**overscript {
@@ -211,12 +207,85 @@ fn get_tangent(expressions: &[MathExpression]) -> Tangent {
     }
 }
 
-/// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
-fn group_rhs(rhs: &[MathExpression]) -> Vec<Term> {
-    let terms = Vec::new();
-    let current_term = Vec::new();
+/// Predicate testing whether a MathML operator (:mo) is a subtraction or addition.
+fn is_sum_or_sub(element: &MathExpression) -> bool {
+    if let MathExpression::Mo(operator) = element {
+        if Operator::Add == *operator || Operator::Subtract == *operator {
+            return true;
+        }
+    }
+    return false;
+}
 
-    //for element in rhs {}
+/// Predicate testing whether a MathML elm could be interpreted as a Var.
+/// TODO: This currently permits :mn -> MathML numerical literals.
+///     Perhaps useful to represent constant coefficients?
+///     But should those be Vars?
+fn is_var_candidate(element: &MathExpression) -> bool {
+    match element {
+        MathExpression::Mi(x) => true,
+        MathExpression::Mn(x) => true,
+        MathExpression::Msub(x1, x2) => true,
+        _ => false,
+    }
+}
+/// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
+fn group_rhs(rhs: &[MathExpression]) -> Vec<Vec<&MathExpression>> {
+    let mut terms_math_expressions = Vec::<Vec<&MathExpression>>::new();
+    let mut current_term = Vec::<&MathExpression>::new();
+
+    for element in rhs.iter() {
+        if is_sum_or_sub(element) {
+            if current_term.is_empty() {
+                current_term.push(element);
+            } else {
+                terms_math_expressions.push(current_term);
+                current_term = vec![element];
+            }
+        } else if is_var_candidate(element) {
+            current_term.push(element);
+        } else {
+            panic!("Unhandled rhs element {:?}, rhs {:?}", element, rhs);
+        }
+    }
+    if !current_term.is_empty() {
+        terms_math_expressions.push(current_term);
+    }
+    terms_math_expressions
+}
+
+/// MathExpression or Var
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+enum MathExpressionOrVarOrTerm {
+    MathExpression(MathExpression),
+    Var(Var),
+    Term(Term),
+}
+
+/// Identify elements in grouped rhs elements that are Var candidates and translate them to Vars.
+fn rhs_groups_to_vars(
+    rhs_groups: Vec<Vec<&MathExpression>>,
+) -> (
+    Vec<Vec<MathExpressionOrVarOrTerm>>,
+    HashSet<MathExpressionOrVarOrTerm>,
+) {
+    let mut var_set = HashSet::<MathExpressionOrVarOrTerm>::new();
+    let mut new_groups = Vec::<Vec<MathExpressionOrVarOrTerm>>::new();
+
+    for group in rhs_groups {
+        let mut new_group = Vec::new();
+        for element in group {
+            if is_var_candidate(element) {
+                let var = var_candidate_to_var(element);
+                new_group.push(MathExpressionOrVarOrTerm::Var(var.clone()));
+                var_set.insert(MathExpressionOrVarOrTerm::Var(var.clone()));
+            } else {
+                new_group.push(MathExpressionOrVarOrTerm::MathExpression(element.clone()));
+            }
+            new_groups.push(new_group.clone());
+        }
+    }
+    (new_groups, var_set)
 }
 
 /// Converts a MathML AST to an Eqn
@@ -244,22 +313,95 @@ fn mml_to_eqn(ast: Math) -> Eqn {
 
         let tangent = get_tangent(lhs);
         let rhs_groups = group_rhs(rhs);
-    }
 
-    Eqn::default()
+        let (new_groups, var_set) = rhs_groups_to_vars(rhs_groups);
+
+        // NOTE: Here the rhs represents an intermediate step of having
+        //       grouped the rhs into components of terms and translated
+        //       var candidates into Vars, but not yet fully translated
+        //       into a Tuple of Terms. This intermediate step must be
+        //       finished before all equations have been collection, after
+        //       which we can identify the tangent Vars that in turn
+        //       are the basis for inferring which Vars are species vs rates
+        //       Once species and rates are distinguished, then Terms can
+        //       be formed.
+
+        let eqn = Eqn {
+            lhs: tangent,
+            rhs: new_groups,
+            rhs_vars: var_set,
+        };
+        eqn
+    } else {
+        panic!("Does not look like Eqn: {:?}", ast)
+    }
 }
 
 /// Translate list of MathML ASTs to EqnDict containing a collection of MAK ODE equations.
 fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
-    let eqns = Vec::<Eqn>::new();
-    let vars = HashSet::<Var>::new();
-    let species = HashSet::<Var>::new();
+    let mut eqns = Vec::<Eqn>::new();
+    let mut vars = HashSet::<MathExpressionOrVarOrTerm>::new();
+    let mut species = HashSet::<MathExpressionOrVarOrTerm>::new();
 
     for ast in mathml_asts {
         let eqn = mml_to_eqn(ast);
+        vars.extend(eqn.rhs_vars.clone());
+        species.insert(MathExpressionOrVarOrTerm::Var(Var::new(&eqn.lhs.0.name)));
+        eqns.push(eqn);
     }
 
-    EqnDict::default()
+    let rates = vars.difference(&species).cloned().collect();
+    let mut eqn_dict = HashMap::<Var, Eqn>::new();
+
+    for mut eqn in eqns {
+        let mut terms = Vec::new();
+        for rhs_group in eqn.rhs.clone() {
+            let mut term_rate = Vec::new();
+            let mut term_species = Vec::new();
+            let mut term_polarity = Polarity::add;
+
+            for element in rhs_group {
+                match element {
+                    MathExpressionOrVarOrTerm::Var(var) => {
+                        let var = MathExpressionOrVarOrTerm::Var(var.clone());
+                        if species.contains(&var) {
+                            term_species.push(var);
+                        } else {
+                            term_rate.push(var);
+                        }
+                    }
+                    MathExpressionOrVarOrTerm::MathExpression(expression) => {
+                        if let MathExpression::Mo(op) = expression {
+                            if op == Operator::Subtract {
+                                term_polarity = Polarity::sub;
+                            } else if op == Operator::Add {
+                                term_polarity = Polarity::add;
+                            }
+                        }
+                    }
+                    _ => panic!("Unexpected rhs element: {:?}", element),
+                }
+                let term = Term {
+                    rate: vec![term_rate.clone()],
+                    species: vec![term_species.clone()],
+                    polarity: term_polarity.clone(),
+                };
+                terms.push(MathExpressionOrVarOrTerm::Term(term));
+                eqn.rhs = vec![terms.clone()];
+            }
+        }
+        eqn_dict.insert(Var::new(&eqn.lhs.0.name), eqn);
+    }
+
+    EqnDict {
+        eqns: eqn_dict,
+        species: species,
+        rates: rates,
+    }
+}
+
+fn export_eqn_dict_json(eqn_dict: EqnDict) {
+    dbg!(eqn_dict);
 }
 
 fn main() {
@@ -282,4 +424,5 @@ fn main() {
     }
 
     let eqn_dict = mathml_asts_to_eqn_dict(mathml_asts);
+    export_eqn_dict_json(eqn_dict)
 }
