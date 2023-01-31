@@ -211,6 +211,14 @@ fn get_tangent(expressions: &[MathExpression]) -> Tangent {
     }
 }
 
+/// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
+fn group_rhs(rhs: &[MathExpression]) -> Vec<Term> {
+    let terms = Vec::new();
+    let current_term = Vec::new();
+
+    //for element in rhs {}
+}
+
 /// Converts a MathML AST to an Eqn
 fn mml_to_eqn(ast: Math) -> Eqn {
     let mut equals_index = 0;
@@ -235,6 +243,7 @@ fn mml_to_eqn(ast: Math) -> Eqn {
         let rhs = &expr[equals_index + 1..];
 
         let tangent = get_tangent(lhs);
+        let rhs_groups = group_rhs(rhs);
     }
 
     Eqn::default()
