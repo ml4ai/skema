@@ -38,9 +38,13 @@ pub enum MathExpression {
     Mfrac(Box<MathExpression>, Box<MathExpression>),
     Msup(Box<MathExpression>, Box<MathExpression>),
     Msub(Box<MathExpression>, Box<MathExpression>),
-    Munder(Vec<MathExpression>),
-    Mover(Vec<MathExpression>),
-    Msubsup(Vec<MathExpression>),
+    Munder(Box<MathExpression>, Box<MathExpression>),
+    Mover(Box<MathExpression>, Box<MathExpression>),
+    Msubsup(
+        Box<MathExpression>,
+        Box<MathExpression>,
+        Box<MathExpression>,
+    ),
     Mtext(String),
     Mstyle(Vec<MathExpression>),
     Mspace(String),
@@ -53,4 +57,3 @@ pub enum MathExpression {
 pub struct Math {
     pub content: Vec<MathExpression>,
 }
-

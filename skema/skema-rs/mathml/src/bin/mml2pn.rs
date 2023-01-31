@@ -81,7 +81,7 @@ struct EqnDict {
     /// The set of all Vars across the eqns that are interpreted as species.
     species: HashSet<Var>,
 
-    /// The set of all Vars across the eqns that are interpreted as species.
+    /// The set of all Vars across the eqns that are interpreted as rates.
     rates: HashSet<Var>,
 }
 
@@ -125,21 +125,9 @@ fn is_leibniz_diff_op(numerator: &Box<MathExpression>, denominator: &Box<MathExp
         || (numerator_contains_partial && denominator_contains_partial)
 }
 
-/// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
-/// In this case, the values after the 'd' or '∂' in the numerator are interpreted as
-/// the Var tangent.
-/// TODO: possibly generalize to accommodate superscripts for higher order derivatives;
-///       although likely that would be an msup, so still the "first" elm of the numerator,
-///       with the second (and beyond) elm(s) being the Var.
-fn mfrac_leibniz_to_var(numerator: &Box<MathExpression>, denominator: &Box<MathExpression>) -> Var {
-    // Check if numerator is an mrow
-    if let MathExpression::Mrow(num_expressions) = &**numerator {
-        // We assume here that the numerator is of the form dX where X is the variable of interest.
-        if num_expressions.len() == 2 {
-            let expression = &num_expressions[1];
-
-            match expression {
-                MathExpression::Mi(identifier) => return Var::new(identifier),
+fn var_candidate_to_var(expression: &MathExpression) -> Var {
+    match expression {
+                MathExpression::Mi(identifier) => return Var::new(&identifier),
                 MathExpression::Msub(base, subscript) => {
                     // Get identifier from base
                     let base_identifier: String;
@@ -166,6 +154,20 @@ fn mfrac_leibniz_to_var(numerator: &Box<MathExpression>, denominator: &Box<MathE
                 }
                 _ => panic!("For now, we only handle the case where there is a single 'Var' after the 'd' in the numerator of the Leibniz differential operator."),
             }
+}
+/// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
+/// In this case, the values after the 'd' or '∂' in the numerator are interpreted as
+/// the Var tangent.
+/// TODO: possibly generalize to accommodate superscripts for higher order derivatives;
+///       although likely that would be an msup, so still the "first" elm of the numerator,
+///       with the second (and beyond) elm(s) being the Var.
+fn mfrac_leibniz_to_var(numerator: &Box<MathExpression>, denominator: &Box<MathExpression>) -> Var {
+    // Check if numerator is an mrow
+    if let MathExpression::Mrow(num_expressions) = &**numerator {
+        // We assume here that the numerator is of the form dX where X is the variable of interest.
+        if num_expressions.len() == 2 {
+            let expression = &num_expressions[1];
+            return var_candidate_to_var(expression);
         } else {
             panic!(
                 "More than two elements in the numerator, cannot convert this Leibniz differential operator to a Var!");
@@ -175,14 +177,33 @@ fn mfrac_leibniz_to_var(numerator: &Box<MathExpression>, denominator: &Box<MathE
     }
 }
 
+/// Translate MathML :mover as Newton dot notation
+//fn mover_to_var(base: &Box<MathExpression>, overscript) -> Var {
+// Check if the mover
+//}
+
 /// Get tangent
 fn get_tangent(expressions: &[MathExpression]) -> Tangent {
     // Check if first expression is an mfrac
 
-    if let MathExpression::Mfrac(numerator, denominator) = &expressions[0] {
-        if is_leibniz_diff_op(numerator, denominator) {
-            let var = mfrac_leibniz_to_var(numerator, denominator);
+    match &expressions[0] {
+        MathExpression::Mfrac(numerator, denominator) => {
+            if is_leibniz_diff_op(numerator, denominator) {
+                let var = mfrac_leibniz_to_var(numerator, denominator);
+            }
         }
+        MathExpression::Mover(base, overscript) => {
+            // Check if overscript is ˙
+            if let MathExpression::Mo(id) = &**overscript {
+                if *id == Operator::Other("˙".to_string()) {
+                    //var
+                } else {
+                    panic!("Overscript is not ˙, unhandled case!")
+                }
+            }
+            //let var = mover_to_var(base, overscript);
+        }
+        _ => panic!("Unhandled case!"),
     }
 
     Tangent::default()

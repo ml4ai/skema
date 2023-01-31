@@ -133,6 +133,19 @@ macro_rules! elem2 {
     }};
 }
 
+/// A macro to help build parsers for MathML elements with 3 arguments.
+macro_rules! elem3 {
+    ($tag:expr, $t:ident) => {{
+        map(
+            tag_parser!(
+                $tag,
+                tuple((math_expression, math_expression, math_expression))
+            ),
+            |(x, y, z)| $t(Box::new(x), Box::new(y), Box::new(z)),
+        )
+    }};
+}
+
 /// A macro to help build parsers for MathML elements with zero or more arguments.
 macro_rules! elem_many0 {
     ($tag:expr) => {{
@@ -230,28 +243,20 @@ fn msqrt(input: Span) -> IResult<MathExpression> {
 
 // Underscripts
 fn munder(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = ws(delimited(
-        tag("<munder>"),
-        many0(math_expression),
-        tag("</munder>"),
-    ))(input)?;
-    Ok((s, Munder(elements)))
+    let (s, underscript) = elem2!("munder", Munder)(input)?;
+    Ok((s, underscript))
 }
 
-// Overscipts
+// Overscripts
 fn mover(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = ws(delimited(
-        tag("<mover>"),
-        many0(math_expression),
-        tag("</mover>"),
-    ))(input)?;
-    Ok((s, Mover(elements)))
+    let (s, overscript) = elem2!("mover", Mover)(input)?;
+    Ok((s, overscript))
 }
 
 // Subscript-superscript Pair
 fn msubsup(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = elem_many0!("msubsup")(input)?;
-    Ok((s, Msubsup(elements)))
+    let (s, subsup) = elem3!("msubsup", Msubsup)(input)?;
+    Ok((s, subsup))
 }
 
 //Text
