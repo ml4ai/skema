@@ -127,32 +127,32 @@ fn is_leibniz_diff_op(numerator: &Box<MathExpression>, denominator: &Box<MathExp
 
 fn var_candidate_to_var(expression: &MathExpression) -> Var {
     match expression {
-                MathExpression::Mi(identifier) => return Var::new(&identifier),
-                MathExpression::Msub(base, subscript) => {
-                    // Get identifier from base
-                    let base_identifier: String;
+        MathExpression::Mi(identifier) => return Var::new(&identifier),
+        MathExpression::Msub(base, subscript) => {
+            // Get identifier from base
+            let base_identifier: String;
 
-                    // Check that the base is an <mi> element
-                    if let MathExpression::Mi(identifier) = &**base {
-                        base_identifier = identifier.to_string();
-                    } else {
-                        panic!("Unhandled case!");
-                    }
+            // Check that the base is an <mi> element
+            if let MathExpression::Mi(identifier) = &**base {
+                base_identifier = identifier.to_string();
+            } else {
+                panic!("Unhandled case!");
+            }
 
-                    // Handle cases where the subscript is an Mi or an Mrow.
-                    match &**subscript {
-                        MathExpression::Mi(sub_identifier) => {
-                            return Var {
-                                name: base_identifier.to_string(),
-                                sub: (sub_identifier.to_string(), None),
-                            }
-                        }
-                        _ => {
-                            panic!("For now, we only handle the case where the subscript is an Mi");
-                        }
+            // Handle cases where the subscript is an Mi or an Mrow.
+            match &**subscript {
+                MathExpression::Mi(sub_identifier) => {
+                    return Var {
+                        name: base_identifier.to_string(),
+                        sub: (sub_identifier.to_string(), None),
                     }
                 }
-                _ => panic!("For now, we only handle the case where there is a single 'Var' after the 'd' in the numerator of the Leibniz differential operator."),
+                _ => {
+                    panic!("For now, we only handle the case where the subscript is an Mi");
+                }
+            }
+        }
+        _ => panic!("For now, we only handle the case where there is a single 'Var' after the 'd' in the numerator of the Leibniz differential operator."),
             }
 }
 /// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
@@ -190,23 +190,25 @@ fn get_tangent(expressions: &[MathExpression]) -> Tangent {
         MathExpression::Mfrac(numerator, denominator) => {
             if is_leibniz_diff_op(numerator, denominator) {
                 let var = mfrac_leibniz_to_var(numerator, denominator);
+                return Tangent(var);
+            } else {
+                panic!("Expression is an mfrac but not a Leibniz diff operator!");
             }
         }
         MathExpression::Mover(base, overscript) => {
             // Check if overscript is ˙
             if let MathExpression::Mo(id) = &**overscript {
                 if *id == Operator::Other("˙".to_string()) {
-                    //var
+                    return Tangent(var_candidate_to_var(base));
                 } else {
                     panic!("Overscript is not ˙, unhandled case!")
                 }
+            } else {
+                panic!("Found an overscript that is not an Mo, aborting!");
             }
-            //let var = mover_to_var(base, overscript);
         }
         _ => panic!("Unhandled case!"),
     }
-
-    Tangent::default()
 }
 
 /// Converts a MathML AST to an Eqn
