@@ -178,10 +178,9 @@ fn mfrac_leibniz_to_var(numerator: &Box<MathExpression>, denominator: &Box<MathE
 }
 
 /// Get tangent
-fn get_tangent(expressions: &[MathExpression]) -> Tangent {
-    // Check if first expression is an mfrac
-
-    match &expressions[0] {
+fn get_tangent(expression: &MathExpression) -> Tangent {
+    // Check if expression is an mfrac
+    match expression {
         MathExpression::Mfrac(numerator, denominator) => {
             if is_leibniz_diff_op(numerator, denominator) {
                 let var = mfrac_leibniz_to_var(numerator, denominator);
@@ -208,13 +207,11 @@ fn get_tangent(expressions: &[MathExpression]) -> Tangent {
 }
 
 /// Predicate testing whether a MathML operator (:mo) is a subtraction or addition.
-fn is_sum_or_sub(element: &MathExpression) -> bool {
+fn is_add_or_subtract_operator(element: &MathExpression) -> bool {
     if let MathExpression::Mo(operator) = element {
-        if Operator::Add == *operator || Operator::Subtract == *operator {
-            return true;
-        }
+        return Operator::Add == *operator || Operator::Subtract == *operator;
     }
-    return false;
+    false
 }
 
 /// Predicate testing whether a MathML elm could be interpreted as a Var.
@@ -229,17 +226,18 @@ fn is_var_candidate(element: &MathExpression) -> bool {
         _ => false,
     }
 }
+
 /// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
 fn group_rhs(rhs: &[MathExpression]) -> Vec<Vec<&MathExpression>> {
-    let mut terms_math_expressions = Vec::<Vec<&MathExpression>>::new();
+    let mut terms = Vec::<Vec<&MathExpression>>::new();
     let mut current_term = Vec::<&MathExpression>::new();
 
     for element in rhs.iter() {
-        if is_sum_or_sub(element) {
+        if is_add_or_subtract_operator(element) {
             if current_term.is_empty() {
                 current_term.push(element);
             } else {
-                terms_math_expressions.push(current_term);
+                terms.push(current_term);
                 current_term = vec![element];
             }
         } else if is_var_candidate(element) {
@@ -249,9 +247,9 @@ fn group_rhs(rhs: &[MathExpression]) -> Vec<Vec<&MathExpression>> {
         }
     }
     if !current_term.is_empty() {
-        terms_math_expressions.push(current_term);
+        terms.push(current_term);
     }
-    terms_math_expressions
+    terms
 }
 
 /// MathExpression or Var
@@ -308,7 +306,10 @@ fn mml_to_eqn(ast: Math) -> Eqn {
             }
         }
 
-        let lhs = &expr[0..equals_index];
+        if equals_index != 1 {
+            panic!("We do not handle the case where there is more than one term on the LHS of an equation!");
+        }
+        let lhs = &expr[0];
         let rhs = &expr[equals_index + 1..];
 
         let tangent = get_tangent(lhs);
@@ -401,12 +402,11 @@ fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
 }
 
 fn export_eqn_dict_json(eqn_dict: EqnDict) {
-    dbg!(eqn_dict);
+    //dbg!(eqn_dict);
 }
 
-fn main() {
-    let args = Cli::parse();
-    let f = File::open(&args.input).unwrap();
+fn process_file(filepath: &str) {
+    let f = File::open(filepath).unwrap();
     let lines = io::BufReader::new(f).lines();
 
     let mut mathml_asts = Vec::<Math>::new();
@@ -425,4 +425,29 @@ fn main() {
 
     let eqn_dict = mathml_asts_to_eqn_dict(mathml_asts);
     export_eqn_dict_json(eqn_dict)
+}
+
+#[test]
+fn test_simple_sir_v1() {
+    process_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
+}
+
+#[test]
+fn test_simple_sir_v2() {
+    process_file("../../mml2pn/mml/simple_sir_v2/mml_list.txt");
+}
+
+#[test]
+fn test_simple_sir_v3() {
+    process_file("../../mml2pn/mml/simple_sir_v3/mml_list.txt");
+}
+
+#[test]
+fn test_simple_sir_v4() {
+    process_file("../../mml2pn/mml/simple_sir_v4/mml_list.txt");
+}
+
+fn main() {
+    let args = Cli::parse();
+    process_file(&args.input);
 }
