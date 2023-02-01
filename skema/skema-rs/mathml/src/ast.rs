@@ -21,7 +21,7 @@ impl fmt::Display for Operator {
             Operator::Divide => write!(f, "/"),
             Operator::Subtract => write!(f, "-"),
             Operator::Sqrt => write!(f, "√"),
-            Operator::Other(op) => write!(f, "{}", op),
+            Operator::Other(op) => write!(f, "{op}"),
         }
     }
 }

@@ -14,12 +14,17 @@ coexist peacefully.
 
 At the top level, we have the following files and directories:
 
-- `Dockerfile.code2fn`: Dockerfile for the Code2FN service.
+- `Dockerfile.skema-py`: Dockerfile for the skema-py service.
+- `Dockerfile.skema-rs`: Dockerfile for the skema-rs service.
 - `Dockerfile.img2mml`: Dockerfile for the img2mml service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
-- `docker-compose.code2fn.yml`: Docker Compose file for the Code2FN service.
+- `docker-compose.skema-py.yml`: Docker Compose file for the skema-py service.
+- `docker-compose.skema-rs.yml`: Docker Compose file for the skema-rs service.
+- `docker-compose.yml`: Docker Compose file for multiple SKEMA services
+  (currently skema-py and skema-rs).
+- `docker-compose.memgraph.yml`: Docker Compose file for the memgraph database.
 - `docker-compose.img2mml.yml`: Docker Compose file for the img2mml service.
 - `docs`: Source code for the project website.
 - `notebooks`: Jupyter notebooks for demoing SKEMA functionality.
@@ -34,14 +39,14 @@ The `skema` directory contains two different types of directories:
     - `gromet`
     - `model_assembly`
     - `text_reading`
-    - `code2fn`: Web service for converting code to GroMEt function networks.
+    - `skema_py`: Web service for converting code to GroMEt function networks and pyacsets.
     - `img2mml`: Web service for extracting equations from images.
     - `moviz`: Visualization interface for GroMEt function networks.
 
-Of the Python subpackages, the last three (`code2fn`, `img2mml`, `moviz`) are
+Of the Python subpackages, the last three (`skema_py`, `img2mml`, `moviz`) are
 currently the most 'outward/user-facing' components. The `program_analysis`,
 `gromet`, and `model_assembly` directories are comprised primarily of library
-code that is used by the `code2fn` service.
+code that is used by the `skema-py` service.
 
 The `text_reading` directory contains three subdirectories:
 - `mention_linking`: Python subpackage for linking mentions in code and text
@@ -74,11 +79,14 @@ run the software components that are written in Rust and Scala respectively.
 
 ## Dockerized services
 
-To run the Code2FN Dockerized service, run
+To run the `skema-py` and `skema-rs` services in conjunction, do:
 
 ```
-docker-compose -f docker-compose.code2fn.yml up --build
+docker-compose up --build
 ```
+
+You can also launch the skema-py and skema-rs services individually by using
+their individual `docker-compose.*.yml` files.
 
 To run the img2mml Dockerized service, run
 

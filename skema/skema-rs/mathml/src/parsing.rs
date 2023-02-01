@@ -15,7 +15,7 @@ use nom::{
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
-use std::fs;
+
 
 type Span<'a> = LocatedSpan<&'a str>;
 
@@ -47,7 +47,7 @@ impl<'a> ParseError<'a> {
 /// Further trait implementation for Span
 impl<'a> nom::error::ParseError<Span<'a>> for ParseError<'a> {
     fn from_error_kind(input: Span<'a>, kind: nom::error::ErrorKind) -> Self {
-        Self::new(format!("Parse error {:?}", kind), input)
+        Self::new(format!("Parse error {kind:?}"), input)
     }
 
     fn append(_input: Span<'a>, _kind: nom::error::ErrorKind, other: Self) -> Self {
@@ -55,7 +55,7 @@ impl<'a> nom::error::ParseError<Span<'a>> for ParseError<'a> {
     }
 
     fn from_char(input: Span<'a>, c: char) -> Self {
-        Self::new(format!("Unexpected character '{}'", c), input)
+        Self::new(format!("Unexpected character '{c}'"), input)
     }
 }
 
@@ -465,7 +465,7 @@ fn test_math() {
 
 #[test]
 fn test_mathml_parser() {
-    let eqn = fs::read_to_string("tests/test01.xml").unwrap();
+    let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
     test_parser(
         &eqn,
         math,
