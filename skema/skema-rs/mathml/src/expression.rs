@@ -4,8 +4,6 @@ use crate::ast::{
     Operator,
 };
 
-
-use petgraph::visit::NodeRef;
 use petgraph::{graph::NodeIndex, Graph};
 
 use std::collections::VecDeque;
@@ -55,9 +53,7 @@ impl MathExpression {
                 pre.args.push(Expr::Atom(Atom::Number(x)));
             }
             Mo(x) => {
-                {
-                    pre.op.push(x);
-                }
+                pre.op.push(x);
             }
             Mrow(xs) => {
                 let mut pre_exp = PreExp {
@@ -69,14 +65,11 @@ impl MathExpression {
                 for x in xs {
                     x.to_expr(&mut pre_exp);
                 }
-                pre.args.push(
-                    Expr::Expression {
-                        op: pre_exp.op,
-                        args: pre_exp.args,
-                        name: "".to_string(),
-                    }
-                    ,
-                );
+                pre.args.push(Expr::Expression {
+                    op: pre_exp.op,
+                    args: pre_exp.args,
+                    name: "".to_string(),
+                });
             }
             Msqrt(xs) => {
                 let mut pre_exp = PreExp {
@@ -86,14 +79,11 @@ impl MathExpression {
                 };
                 pre_exp.op.push(Operator::Sqrt);
                 xs.to_expr(&mut pre_exp);
-                pre.args.push(
-                    Expr::Expression {
-                        op: pre_exp.op,
-                        args: pre_exp.args,
-                        name: "".to_string(),
-                    }
-                    ,
-                );
+                pre.args.push(Expr::Expression {
+                    op: pre_exp.op,
+                    args: pre_exp.args,
+                    name: "".to_string(),
+                });
             }
             Mfrac(xs1, xs2) => {
                 let mut pre_exp = PreExp {
@@ -105,14 +95,11 @@ impl MathExpression {
                 xs1.to_expr(&mut pre_exp);
                 pre_exp.op.push(Operator::Divide);
                 xs2.to_expr(&mut pre_exp);
-                pre.args.push(
-                    Expr::Expression {
-                        op: pre_exp.op,
-                        args: pre_exp.args,
-                        name: "".to_string(),
-                    }
-                    ,
-                );
+                pre.args.push(Expr::Expression {
+                    op: pre_exp.op,
+                    args: pre_exp.args,
+                    name: "".to_string(),
+                });
             }
             _ => {
                 panic!("Unhandled type!");
@@ -228,11 +215,12 @@ impl Expr {
     fn get_names(&mut self) -> String {
         let mut add_paren = false;
         match self {
-            Expr::Atom(_) => {
-                "".to_string()
-            }
+            Expr::Atom(_) => "".to_string(),
             Expr::Expression { op, args, name } => {
-                if op[0] == Operator::Other("".to_string()) && !all_multi_div(op) && !redundant_paren(name) {
+                if op[0] == Operator::Other("".to_string())
+                    && !all_multi_div(op)
+                    && !redundant_paren(name)
+                {
                     name.push('(');
                     add_paren = true;
                 }
@@ -243,7 +231,9 @@ impl Expr {
                             let mut x: i32 = (name.chars().count() - 1) as i32;
                             if x > 0 {
                                 while x >= 0 {
-                                    if name.chars().nth(x as usize) != Some('(') && name.chars().nth(x as usize) != Some(')') {
+                                    if name.chars().nth(x as usize) != Some('(')
+                                        && name.chars().nth(x as usize) != Some(')')
+                                    {
                                         remove_idx.push(x as usize);
                                     }
                                     x -= 1;
@@ -1151,14 +1141,14 @@ fn test_to_expr18() {
     let _g = math_expression.to_graph();
 }
 
-use crate::parsing::parse;
+
 
 #[test]
 fn test_to_expr19() {
     let input = "tests/sir.xml";
     let contents =
-        std::fs::read_to_string(input).expect(format!("Unable to read file {input}!").as_str());
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse file {input}!").as_str());
+        std::fs::read_to_string(input).unwrap_or_else(|_| panic!("Unable to read file {input}!"));
+    let (_, mut math) = crate::parsing::parse(&contents).unwrap_or_else(|_| panic!("Unable to parse file {input}!"));
     math.normalize();
     let _g = &mut math.content[0].clone().to_graph();
 }
