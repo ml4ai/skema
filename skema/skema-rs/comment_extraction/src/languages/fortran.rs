@@ -14,13 +14,13 @@ use std::collections::HashSet;
 /// line is a comment.
 ///
 /// A totally blank line is a comment line as well.
-pub fn line_is_comment(line: &String) -> bool {
+pub fn line_is_comment(line: &str) -> bool {
     lazy_static! {
         static ref FORTRAN_COMMENT_CHAR_SET: HashSet<char> =
             HashSet::from(['c', 'C', 'd', 'D', '*', '!']);
     }
 
-    match &line.chars().nth(0) {
+    match &line.chars().next() {
         Some(c) => FORTRAN_COMMENT_CHAR_SET.contains(c),
         None => true,
     }
@@ -35,7 +35,7 @@ pub fn line_is_comment(line: &String) -> bool {
 ///Returns:
 ///    (true, f_name) if line begins a definition for subprogram f_name;
 ///    (false, None) if line does not begin a subprogram definition.
-pub fn line_starts_subpgm(line: &String) -> (bool, Option<String>) {
+pub fn line_starts_subpgm(line: &str) -> (bool, Option<String>) {
     lazy_static! {
         static ref RE_SUB_START: Regex = Regex::new(r"\s*subroutine\s+(\w+)\s*\(").unwrap();
         static ref RE_FN_START: Regex =
@@ -55,7 +55,7 @@ pub fn line_starts_subpgm(line: &String) -> (bool, Option<String>) {
     (false, None)
 }
 
-pub fn line_ends_subpgm(line: &String) -> bool {
+pub fn line_ends_subpgm(line: &str) -> bool {
     lazy_static! {
         static ref RE_SUBPGM_END: Regex = Regex::new(r"\s*end\s+").unwrap();
     }
@@ -83,8 +83,8 @@ pub fn line_ends_subpgm(line: &String) -> bool {
 ///
 /// Returns true iff line is a continuation line, else False.  Currently this
 /// is used only for fixed-form input files, i.e., extension is in ('.f', '.for')
-pub fn line_is_continuation(line: &String, extension: &str) -> bool {
-    if line_is_comment(&line) {
+pub fn line_is_continuation(line: &str, extension: &str) -> bool {
+    if line_is_comment(line) {
         return false;
     }
 
@@ -103,8 +103,8 @@ pub fn line_is_continuation(line: &String, extension: &str) -> bool {
     // case, the Python version of this code does not include any checks of this kind. If the
     // expectation was for the script to crash in such cases, the type signature in the original
     // Python version did not reflect it.
-    if fixed_form_ext.contains(&extension as &str) {
-        if line.chars().nth(0).unwrap() == '\t' {
+    if fixed_form_ext.contains(extension as &str) {
+        if line.starts_with('\t') {
             return FIXED_FORM_SET.contains(&line.chars().nth(1).unwrap());
         } else {
             let c_5 = &line.chars().nth(5).unwrap();
@@ -112,7 +112,7 @@ pub fn line_is_continuation(line: &String, extension: &str) -> bool {
         }
     }
 
-    if line.chars().nth(0).unwrap() == '&' {
+    if line.starts_with('&') {
         return true;
     }
 

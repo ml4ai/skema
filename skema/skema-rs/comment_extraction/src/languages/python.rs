@@ -145,7 +145,7 @@ pub fn get_comments(src_file_path: &str) -> Comments {
 }
 
 pub fn get_comments_from_string(source_code: &str) -> Comments {
-    let span = Span::new(&source_code);
+    let span = Span::new(source_code);
     let (_, result) = comments(span).unwrap();
     result
 }

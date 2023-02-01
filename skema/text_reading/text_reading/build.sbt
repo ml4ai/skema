@@ -7,17 +7,15 @@ resolvers ++= Seq(
   "clulab" at "https://artifactory.clulab.org/artifactory/sbt-release"
 )
 
-// Coordinate this with the grounding subproject.
-dependencyOverrides += "xml-apis" % "xml-apis" % "1.4.01"
-
 libraryDependencies ++= {
-  val procVer = "8.5.2"
+  val procVer = "8.5.3"
   val uJsonVer = "2.0.0"
 
   Seq(
     "org.clulab"                 %% "pdf2txt"            % "1.1.3",
     "org.clulab"                 %% "processors-main"    % procVer,
     "org.clulab"                 %% "processors-corenlp" % procVer,
+    "xml-apis"                    % "xml-apis"           % "1.4.01",
     "ai.lum"                     %% "common"             % "0.0.10",
     "com.lihaoyi"                %% "ujson"              % uJsonVer,
     "com.lihaoyi"                %% "upickle"            % uJsonVer,
