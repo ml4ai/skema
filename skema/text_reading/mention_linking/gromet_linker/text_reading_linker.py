@@ -45,37 +45,43 @@ class TextReadingLinker:
         self._linkable_descriptions = dict()
 
         for m in linkable_mentions:
-            var = m["arguments"]["variable"][0]["text"]
+            arg = m["arguments"]["variable"][0]
+            var = arg["text"]
+            context = (tuple(m['context'].split()), m['tokenInterval']['start'], m['tokenInterval']['end']-1)
+            
             if type(self._model) == KeyedVectors and len(self._preprocess(var)) > 0:
-                self._linkable_variables[var].append(m)
+                self._linkable_variables[(var, context)].append(m)
             else:
-                self._linkable_variables[var].append(m)
+                self._linkable_variables[(var, context)].append(m)
 
             # This is a level of indirection in which we also look at the variable descriptions for linking
             if "description" in m["arguments"]:
                 desc = m["arguments"]["description"][0]["text"]
+
                 if type(self._model) == KeyedVectors and len(self._preprocess(desc)) > 0:
                     self._linkable_descriptions[
-                        desc
+                        (desc, context)
                     ] = var  # We resolve to the variable name, which will use later to do the "graph" linking
                 else:
                     self._linkable_descriptions[
-                        desc
+                        (desc, context)
                     ] = var  # We resolve to the variable name, which will use later to do the "graph" linking
 
 
         # Preprocess the vectors for each mention text
         keys, vectors = list(), list()
         if type(self._model) == KeyedVectors:
-            agg_function = lambda s: self._average_vector(self._preprocess(s))
+            agg_function = lambda t, s, e: self._average_vector(self._preprocess(' '.join(t)))
         else:
             agg_function = self._contextualized_vector
 
-        for k in it.chain(
+        for (k, ctx) in it.chain(
             self._linkable_variables, self._linkable_descriptions
         ):
-            keys.append(k)
-            vectors.append(agg_function(k))
+            keys.append((k, ctx))
+            # TODO make the agg_function ctx aware
+            tokens, start, end = ctx
+            vectors.append(agg_function(tokens, start, end))
 
         vectors = np.stack(vectors, axis=0)
 
@@ -169,18 +175,25 @@ class TextReadingLinker:
 
         return relevant_mentions, text_bound_mentions, docs
 
-    def _contextualized_vector(self, input_text:list[str] | str):
+    def _contextualized_vector(self, input_text:list[str] | str, start:int = 0, end:int = - 1):
         """Computes the contextualized vector using a bert model for cosine similarity"""
 
-        if type(input_text) == list:
-            input_text = ' '.join(input_text)
-
         # Tokenize the input
-        input = self._tokenizer(input_text, return_tensors='pt').to(self._device)
+        if type(input_text) != str:
+            if len(input_text) == 1:
+                end = start 
+            input = self._tokenizer(input_text, is_split_into_words=True, return_tensors='pt').to(self._device)
+            # Map word indices to sub word tokens
+            start = input.word_to_tokens(start).start
+            end = (input.word_to_tokens(end).end)
+        else:
+            input = self._tokenizer(input_text, return_tensors='pt').to(self._device)
+            start, end = 1, -1
+
         # Forward pass
         output = self._model(**input).last_hidden_state[0, :, :]
         # Select the first and last token of the mention
-        first, last = output[0, :].detach().cpu().numpy(), output[1, :].detach().cpu().numpy()
+        first, last = output[start, :].detach().cpu().numpy(), output[end-1, :].detach().cpu().numpy()
         emb = np.concatenate([first, last])
 
         return emb
@@ -204,7 +217,10 @@ class TextReadingLinker:
                 return []
 
         else:
-            emb = self._contextualized_vector(comments)
+            if len(comments) > 0:
+                emb = self._contextualized_vector(comments)
+            else:
+                return []
             
 
         similarities = self._vectors @ emb
