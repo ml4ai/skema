@@ -19,11 +19,10 @@ def unicode_to_latex(s): return s
 """
 TODO
 
-() Extract list of
-    - as latex string, as MathML string
-    () tangents / species
-    () rates
+() Extend to allow for seeding the species and rate sets
+() Allow for taking existing equations and then recalculating with new species/rates
 
+# JSON PN export
 {
   "species": [str...],
   "rates": [str...]
@@ -189,6 +188,7 @@ class Var:
     def __hash__(self):
         return hash((self.var, self.sub))
 
+    # TODO: Still needed now that hashable?
     def __eq__(self, other):
         if not isinstance(other, Var):
             return NotImplementedError
@@ -240,7 +240,7 @@ def unit_test_var_eq():
 class Tangent:
     """
     Represents the Tangent var of an ODE.
-    This is perhaps not really needed, although it at least introduces a type.
+    TODO: This is perhaps not really needed, although it at least introduces a type.
     """
     var: Var
 
@@ -252,10 +252,49 @@ class Term:
     THere should just be one rate, but since we're parsing and there could
     be noise, this accommodates possibly reading several names of things
     that should be combined into a single rate.
+
+    Possible sources of multiple rates (both of which are errors):
+      (1) MathML interpreted multiple symbols as individual vars when they're really a single rate name
+      (2) Error in identification of rates vs. species
+      ...?
     """
-    rate: Tuple[Var]
-    species: Tuple[Var]
+    rate: Tuple[Var, ...]
+    species: Tuple[Var, ...]
     polarity: str  # one of 'add', 'sub'
+
+    def __eq__(self, other):
+        return self.rate == other.rate and self.species == other.species
+
+    def __hash__(self):
+        return hash((self.rate, self.species))
+
+
+def unit_test_term_eq():
+    """
+    quick-n-dirty test of Term.__eq__
+    :return:
+    """
+    t1_v1 = Var(var='beta', sub=('1',))
+    t1_v2 = Var(var='S')
+    t1_v3 = Var(var='I')
+    t1 = Term(rate=(t1_v1,), species=(t1_v2, t1_v3), polarity='sub')
+
+    t2_v1 = Var(var='beta', sub=('1',))
+    t2_v2 = Var(var='S')
+    t2_v3 = Var(var='I')
+    t2 = Term(rate=(t2_v1,), species=(t2_v2, t2_v3), polarity='add')
+
+    t3_v1 = Var(var='beta', sub=('1',))
+    t3_v2 = Var(var='S')
+    t3_v3 = Var(var='I')
+    t3 = Term(rate=(t3_v1,), species=(t3_v3, t3_v2), polarity='add')  # swapped order of species
+
+    assert t1 == t2
+    assert t1 != t3
+    assert t2 != t3
+
+    print('unit_test_term_eq() DONE')
+
 
 
 @dataclass
@@ -279,8 +318,10 @@ class EqnDict:
     rates: the set of all Vars across the eqns that are interpreted as species.
     """
     eqns: Dict[Var, Eqn]
+    term_to_eqns: Dict[Term, Dict[str, List[Eqn]]]
     species: Set[Var] = field(default_factory=set)
     rates: Set[Var] = field(default_factory=set)
+    term_to_edges: Dict[Term, Dict[str, List[Var]]] = field(default_factory=dict)  # dict: "in", "out"
 
 
 def var_candidate_to_var(vc) -> Var:
@@ -466,13 +507,13 @@ def mml_to_eqn(mml: cElementTree.XML) -> Eqn:
         # pprint.pprint(rhs)
         # print()
 
-        tangent = process_lhs(lhs)
-        rhs_groups = group_rhs(rhs)
+        tangent = process_lhs(lhs)  # creates Tangent
+        rhs_groups = group_rhs(rhs)  # groups the sequence of MathML elms into term-groups
 
         # print('before rhs_groups_to_vars')
         # pprint.pprint(rhs_groups)
 
-        new_groups, var_set = rhs_groups_to_vars(rhs_groups)
+        new_groups, var_set = rhs_groups_to_vars(rhs_groups)  # for each group, turns var-candidates into vars
 
         # print('after rhs_groups_to_vars')
         # pprint.pprint(new_groups)
@@ -539,12 +580,47 @@ def mml_str_list_to_eqn_dict(mml_str_list) -> EqnDict:
         eqn.rhs = tuple(terms)
 
     eqn_dict = dict()
+    term_to_eqn_dict = dict()
     for eqn in eqn_list:
         eqn_dict[eqn.lhs.var] = eqn
 
-    eqn_dict = EqnDict(eqns=eqn_dict, species=species, rates=rates)
+        # link Terms to eqns
+        #   term_to_eqns: Dict[Term, Dict[str, Eqn]]
+        for rhs_term in eqn.rhs:
+            if rhs_term in term_to_eqn_dict:
+                term_to_eqn_dict[rhs_term][rhs_term.polarity].append(eqn.lhs.var)
+                # if rhs_term.polarity == 'sub':
+                #     term_to_eqn_dict[rhs_term]['sub'].append(eqn.lhs.var)
+                # elif rhs_term.polarity == 'add':
+                #     term_to_eqn_dict[rhs_term]['add'].append(eqn.lhs.var)
+            else:
+                polarity_dict = {'sub': list(), 'add': list()}
+                polarity_dict[rhs_term.polarity].append(eqn.lhs.var)
+                term_to_eqn_dict[rhs_term] = polarity_dict
+
+    eqn_dict = EqnDict(eqns=eqn_dict, term_to_eqns=term_to_eqn_dict, species=species, rates=rates)
+
+    wire_pn(eqn_dict)
 
     return eqn_dict
+
+
+def wire_pn(eqn_dict: EqnDict):
+    """
+
+    :param eqn_dict:
+    :return:
+    """
+    for term, in_out_flow_dict in eqn_dict.term_to_eqns.items():
+        in_list = list()
+        out_list = list()
+        for state in term.species:
+            in_list.append(state)
+            if state not in in_out_flow_dict['sub']:
+                out_list.append(state)
+        for state in in_out_flow_dict['add']:
+            out_list.append(state)
+        eqn_dict.term_to_edges[term] = {'in': in_list, 'out': out_list}
 
 
 def read_mml_str_list(filepath) -> List[str]:
@@ -566,11 +642,35 @@ def read_mml_str_list(filepath) -> List[str]:
 
 
 def export_eqn_dict_json(eqn_dict: EqnDict, filepath: str = None, verbose=False):
+
+    species_sequence = list(eqn_dict.species)
+    # rates_sequence = list(eqn_dict.rates)
+    term_sequence = list(eqn_dict.term_to_edges.keys())
+
+    species_index = dict()
+    counter = 0
+    for species in species_sequence:
+        species_index[species] = counter
+        counter += 1
+
+    term_index = dict()
+    counter = 0
+    for term in term_sequence:
+        term_index[term] = counter
+        counter += 1
+
     json_dict = dict()
-    json_dict['rates_mml'] = [v.name_mml() for v in eqn_dict.rates]
-    json_dict['rates_latex'] = [v.name_latex() for v in eqn_dict.rates]
-    json_dict['species_mml'] = [v.name_mml() for v in eqn_dict.species]
-    json_dict['species_latex'] = [v.name_latex() for v in eqn_dict.species]
+    json_dict['rates_mml'] = [term.rate[0].name_mml() for term in term_sequence]
+    json_dict['rates_latex'] = [term.rate[0].name_latex() for term in term_sequence]
+    json_dict['species_mml'] = [species.name_mml() for species in species_sequence]
+    json_dict['species_latex'] = [species.name_latex() for species in species_sequence]
+
+    edges = list()
+    for term in term_sequence:
+        edges.append(tuple([[species_index[species] for species in eqn_dict.term_to_edges[term]['in']],
+                            [species_index[species] for species in eqn_dict.term_to_edges[term]['out']]]))
+
+    json_dict['edges'] = edges
 
     if verbose:
         print(json.dumps(json_dict))
@@ -607,6 +707,7 @@ def main(mml_str_list_filepath, json_export_filepath: str = None, verbose=False)
 
 if __name__ == "__main__":
     # Use the above V1..V4 paths to run existing mml_list.txt files
-    main(mml_str_list_filepath=V1, json_export_filepath='model_pn.json', verbose=True)
+    main(mml_str_list_filepath=V3, json_export_filepath='model_pn.json', verbose=True)
 
     # unit_test_var_eq()
+    unit_test_term_eq()
