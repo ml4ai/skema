@@ -85,7 +85,7 @@ struct EqnDict {
     rates: HashSet<MathExpressionOrVarOrTerm>,
 }
 
-/// Check if fraction is Leibniz notation
+/// Check if fraction is a derivative expressed in Leibniz notation
 fn is_leibniz_diff_op(numerator: &Box<MathExpression>, denominator: &Box<MathExpression>) -> bool {
     let mut numerator_contains_d = false;
     let mut denominator_contains_d = false;
@@ -155,6 +155,7 @@ fn var_candidate_to_var(expression: &MathExpression) -> Var {
         _ => panic!("For now, we only handle the case where there is a single 'Var' after the 'd' in the numerator of the Leibniz differential operator."),
             }
 }
+
 /// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
 /// In this case, the values after the 'd' or '∂' in the numerator are interpreted as
 /// the Var tangent.
@@ -227,6 +228,14 @@ fn is_var_candidate(element: &MathExpression) -> bool {
     }
 }
 
+/// MathExpression or Var
+#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+enum MathExpressionOrVarOrTerm {
+    MathExpression(MathExpression),
+    Var(Var),
+    Term(Term),
+}
+
 /// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
 fn group_rhs(rhs: &[MathExpression]) -> Vec<Vec<&MathExpression>> {
     let mut terms = Vec::<Vec<&MathExpression>>::new();
@@ -252,13 +261,30 @@ fn group_rhs(rhs: &[MathExpression]) -> Vec<Vec<&MathExpression>> {
     terms
 }
 
-/// MathExpression or Var
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
-enum MathExpressionOrVarOrTerm {
-    MathExpression(MathExpression),
-    Var(Var),
-    Term(Term),
-}
+/// Alternative implementation of group_rhs
+//fn group_rhs_2(rhs: &[MathExpression]) -> Vec<Term> {
+//let mut terms = Vec::<Vec<&MathExpression>>::new();
+////let mut current_term = Term::new();
+
+//for element in rhs.iter() {
+//if is_add_or_subtract_operator(element) {
+//if current_term.is_empty() {
+//current_term.push(element);
+//} else {
+//terms.push(current_term);
+//current_term = vec![element];
+//}
+//} else if is_var_candidate(element) {
+//current_term.push(element);
+//} else {
+//panic!("Unhandled rhs element {:?}, rhs {:?}", element, rhs);
+//}
+//}
+//if !current_term.is_empty() {
+//terms.push(current_term);
+//}
+//terms
+//}
 
 /// Identify elements in grouped rhs elements that are Var candidates and translate them to Vars.
 fn rhs_groups_to_vars(
