@@ -117,7 +117,7 @@ class TextReadingLinker:
 
             # Fix the mention document
             for m in local_relevant_mentions:
-                m['document'] = (doc_name, m['document'])
+                m['document'] = (doc_name, m.get('document', "N/A"))
 
             local_text_bound_mentions = list(
                 it.chain.from_iterable(
@@ -129,12 +129,13 @@ class TextReadingLinker:
 
             # Add context to the mentions
             local_docs = data["documents"]
-            for m in local_relevant_mentions:
-                doc = local_docs[m["document"][1]]
-                sent = doc["sentences"][m["sentence"]]
-                # TODO perhaps extend this to a window of text
-                context = " ".join(sent["raw"])
-                m["context"] = context
+            if len(local_docs) > 0:
+                for m in local_relevant_mentions:
+                    doc = local_docs[m["document"][1]]
+                    sent = doc["sentences"][m["sentence"]]
+                    # TODO perhaps extend this to a window of text
+                    context = " ".join(sent["raw"])
+                    m["context"] = context
 
             relevant_mentions.extend(local_relevant_mentions)
             text_bound_mentions.extend(local_text_bound_mentions)
