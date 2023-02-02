@@ -51,6 +51,22 @@ pub enum MathExpression {
     MoLine(String),
 }
 
+impl fmt::Display for MathExpression {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            MathExpression::Mi(identifier) => write!(f, "{}", identifier.to_string()),
+            MathExpression::Mn(number) => write!(f, "{}", number.to_string()),
+            MathExpression::Msup(base, superscript) => {
+                write!(f, "{}_{}", base.to_string(), superscript.to_string())
+            }
+            MathExpression::Msub(base, subscript) => {
+                write!(f, "{}_{}", base.to_string(), subscript.to_string())
+            }
+            _ => panic!("Unhandled case!"),
+        }
+    }
+}
+
 /// The Math struct represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_math)
 #[derive(Debug, PartialEq)]

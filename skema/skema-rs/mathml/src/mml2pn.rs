@@ -21,12 +21,11 @@ struct Var(MathExpression);
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default)]
 struct Term {
     polarity: Polarity,
-    rate: String,
     vars: Vec<Var>,
 }
 
 /// A single ODE equation.
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Hash, Eq, PartialEq, Clone)]
 struct Eqn {
     /// The left-hand-side is the tangent.
     lhs: Tangent,
@@ -49,14 +48,6 @@ pub struct EqnDict {
     /// The set of all Vars across the eqns that are interpreted as rates.
     rates: HashSet<Var>,
 }
-
-//fn expression_to_var(expression: &MathExpression) -> Var {
-//match expression {
-//MathExpression::Mi(_) => Var::Specie(*expression),
-//MathExpression::Msub(_, _) => Var::Specie(*expression),
-//_ => (),
-//}
-//}
 
 /// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
 /// In this case, the values after the 'd' or '∂' in the numerator are interpreted as
@@ -146,7 +137,7 @@ fn group_rhs(rhs: &[MathExpression]) -> (Vec<Term>, HashSet<Var>) {
             } else {
                 terms.push(current_term);
                 current_term = Term {
-                    vars: vec![Var(element.clone())],
+                    vars: vec![],
                     ..Default::default()
                 };
             }
@@ -218,7 +209,6 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
     let mut eqns = Vec::<Eqn>::new();
     let mut vars = HashSet::<Var>::new();
     let mut species = HashSet::<Var>::new();
-
     for ast in mathml_asts {
         let eqn = mml_to_eqn(ast);
         vars.extend(eqn.rhs_vars.clone());
@@ -227,24 +217,43 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
     }
 
     let rates = vars.difference(&species).cloned().collect();
-    let mut eqn_dict = HashMap::<Var, Eqn>::new();
 
     for mut eqn in eqns {
         let mut terms = Vec::<Term>::new();
         for term in eqn.rhs.clone() {
-            let mut term_rate = Vec::<Var>::new();
-            let mut term_species = Vec::<Var>::new();
+            let mut rate_vars = Vec::<Var>::new();
+            let mut species_vars = Vec::<Var>::new();
             let mut term_polarity = Polarity::add;
 
             for var in term.vars {
                 if species.contains(&var) {
-                    term_species.push(var);
+                    species_vars.push(var);
                 } else {
-                    term_rate.push(var);
+                    rate_vars.push(var);
                 }
             }
         }
+        eqn.rhs = terms;
+    }
+
+    let mut eqn_dict = HashMap::<Var, Eqn>::new();
+    let mut term_to_eqn_map = HashMap::<Term, HashMap<Polarity, Vec<Var>>>::new();
+
+    for mut eqn in eqns {
         eqn_dict.insert(Var(eqn.clone().lhs.0 .0), eqn.clone());
+
+        // Link terms to equations
+        for term in eqn.rhs {
+            term_to_eqn_map
+                .entry(term)
+                .and_modify(|e| {
+                    *e = HashMap::from([(term.polarity, vec![Var(eqn.clone().lhs.0 .0)])])
+                })
+                .or_insert(HashMap::from([(
+                    term.polarity,
+                    vec![Var(eqn.clone().lhs.0 .0)],
+                )]));
+        }
     }
 
     EqnDict {
@@ -254,6 +263,10 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
     }
 }
 
+pub fn eqn_dict_to_petri_net(eqn_dict: EqnDict) -> PetriNet {
+    //
+}
+
 pub fn export_eqn_dict_json(eqn_dict: EqnDict) {
-    dbg!(eqn_dict);
+    println!("{:#?}", eqn_dict);
 }
