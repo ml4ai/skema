@@ -34,6 +34,12 @@ struct Eqn {
     rhs: Vec<Term>,
 }
 
+#[derive(Debug, Eq, PartialEq, Default)]
+struct TermToEdgesMap {
+    inward: Vec<Var>,
+    outward: Vec<Var>,
+}
+
 /// A collection of Eqns, indexed by the Var of the lhs Tangent.
 #[derive(Debug, Eq, PartialEq, Default)]
 pub struct EqnDict {
@@ -45,8 +51,11 @@ pub struct EqnDict {
     /// The set of all Vars across the eqns that are interpreted as rates.
     rates: HashSet<Var>,
 
-    // Term to equation map
+    /// Term to equation map
     term_to_eqn_map: HashMap<Term, HashMap<Polarity, Vec<Var>>>,
+
+    /// Term to edges map
+    term_to_edges_map: TermToEdgesMap,
 }
 
 /// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
@@ -260,13 +269,36 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
         species: species,
         rates: rates,
         term_to_eqn_map: term_to_eqn_map,
+        ..Default::default()
     }
 }
 
-pub fn eqn_dict_to_petri_net(eqn_dict: EqnDict) {
-    //
+pub fn wire_pn(eqn_dict: &mut EqnDict) {
+    println!("Wiring PN");
+    for (term, in_out_flow_dict) in eqn_dict.term_to_eqn_map.iter() {
+        let mut in_list = Vec::<Var>::new();
+        let mut out_list = Vec::<Var>::new();
+        for var in &term.vars {
+            in_list.push(var.clone());
+            if !in_out_flow_dict[&Polarity::sub].contains(&var) {
+                out_list.push(var.clone());
+            }
+        }
+
+        for var in &in_out_flow_dict[&Polarity::add] {
+            out_list.push(var.clone());
+        }
+        dbg!(&in_list);
+        dbg!(&out_list);
+
+        eqn_dict.term_to_edges_map = TermToEdgesMap {
+            inward: in_list,
+            outward: out_list,
+        }
+    }
 }
 
-pub fn export_eqn_dict_json(eqn_dict: EqnDict) {
-    println!("{:#?}", eqn_dict);
+pub fn export_eqn_dict_json(eqn_dict: &mut EqnDict) {
+    wire_pn(eqn_dict);
+    //dbg!(&eqn_dict);
 }

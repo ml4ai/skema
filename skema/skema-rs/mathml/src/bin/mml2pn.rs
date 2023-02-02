@@ -38,8 +38,8 @@ fn process_file(filepath: &str) {
         }
     }
 
-    let eqn_dict = mathml_asts_to_eqn_dict(mathml_asts);
-    export_eqn_dict_json(eqn_dict)
+    let mut eqn_dict = mathml_asts_to_eqn_dict(mathml_asts);
+    export_eqn_dict_json(&mut eqn_dict)
 }
 
 #[test]
