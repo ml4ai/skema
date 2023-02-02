@@ -2154,7 +2154,6 @@ class ToGrometPass:
         # to represent the parent class that this current record 'might' 
         # inherit. Currently we support either no parent class or one parent class
         
-        # TODO: single class
         if func_name in self.record.keys():
             
             # Generate a "None" for no parent class
