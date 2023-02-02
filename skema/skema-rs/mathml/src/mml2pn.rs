@@ -32,9 +32,6 @@ struct Eqn {
 
     /// The right-hand-side of the equation, a sequence of Terms.
     rhs: Vec<Term>,
-
-    /// Collects all of the Vars that appear in the rhs.
-    rhs_vars: HashSet<Var>,
 }
 
 /// A collection of Eqns, indexed by the Var of the lhs Tangent.
@@ -47,6 +44,9 @@ pub struct EqnDict {
 
     /// The set of all Vars across the eqns that are interpreted as rates.
     rates: HashSet<Var>,
+
+    // Term to equation map
+    term_to_eqn_map: HashMap<Term, HashMap<Polarity, Vec<Var>>>,
 }
 
 /// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
@@ -155,7 +155,7 @@ fn group_rhs(rhs: &[MathExpression]) -> (Vec<Term>, HashSet<Var>) {
 }
 
 /// Converts a MathML AST to an Eqn
-fn mml_to_eqn(ast: Math) -> Eqn {
+fn mml_to_eqn(ast: Math) -> (Eqn, HashSet<Var>) {
     let mut equals_index = 0;
 
     // Check if the first element is an mrow
@@ -196,9 +196,8 @@ fn mml_to_eqn(ast: Math) -> Eqn {
         let eqn = Eqn {
             lhs: tangent,
             rhs: terms,
-            rhs_vars: vars,
         };
-        eqn
+        (eqn, vars)
     } else {
         panic!("Does not look like Eqn: {:?}", ast)
     }
@@ -210,8 +209,8 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
     let mut vars = HashSet::<Var>::new();
     let mut species = HashSet::<Var>::new();
     for ast in mathml_asts {
-        let eqn = mml_to_eqn(ast);
-        vars.extend(eqn.rhs_vars.clone());
+        let (eqn, rhs_vars) = mml_to_eqn(ast);
+        vars.extend(rhs_vars.clone());
         species.insert(Var(eqn.clone().lhs.0 .0));
         eqns.push(eqn.clone());
     }
@@ -239,7 +238,7 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
     let mut eqn_dict = HashMap::<Var, Eqn>::new();
     let mut term_to_eqn_map = HashMap::<Term, HashMap<Polarity, Vec<Var>>>::new();
 
-    for mut eqn in eqns {
+    for eqn in eqns {
         eqn_dict.insert(Var(eqn.clone().lhs.0 .0), eqn.clone());
 
         // Link terms to equations
@@ -260,10 +259,11 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
         eqns: eqn_dict,
         species: species,
         rates: rates,
+        term_to_eqn_map: term_to_eqn_map,
     }
 }
 
-pub fn eqn_dict_to_petri_net(eqn_dict: EqnDict) -> PetriNet {
+pub fn eqn_dict_to_petri_net(eqn_dict: EqnDict) {
     //
 }
 
