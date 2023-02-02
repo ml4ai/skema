@@ -217,7 +217,7 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
 
     let rates = vars.difference(&species).cloned().collect();
 
-    for mut eqn in eqns {
+    for mut eqn in &mut eqns {
         let mut terms = Vec::<Term>::new();
         for term in eqn.rhs.clone() {
             let mut rate_vars = Vec::<Var>::new();
@@ -242,14 +242,14 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
         eqn_dict.insert(Var(eqn.clone().lhs.0 .0), eqn.clone());
 
         // Link terms to equations
-        for term in eqn.rhs {
+        for term in &eqn.rhs {
             term_to_eqn_map
-                .entry(term)
+                .entry(term.clone())
                 .and_modify(|e| {
-                    *e = HashMap::from([(term.polarity, vec![Var(eqn.clone().lhs.0 .0)])])
+                    *e = HashMap::from([(term.polarity.clone(), vec![Var(eqn.clone().lhs.0 .0)])])
                 })
                 .or_insert(HashMap::from([(
-                    term.polarity,
+                    term.polarity.clone(),
                     vec![Var(eqn.clone().lhs.0 .0)],
                 )]));
         }
