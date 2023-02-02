@@ -22,6 +22,8 @@ struct Var(MathExpression);
 struct Term {
     polarity: Polarity,
     vars: Vec<Var>,
+    rates: Vec<Var>,
+    species: Vec<Var>,
 }
 
 /// A single ODE equation.
@@ -227,40 +229,54 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
     let rates = vars.difference(&species).cloned().collect();
 
     for mut eqn in &mut eqns {
-        let mut terms = Vec::<Term>::new();
-        for term in eqn.rhs.clone() {
+        for mut term in &mut eqn.rhs {
             let mut rate_vars = Vec::<Var>::new();
-            let mut species_vars = Vec::<Var>::new();
-            let mut term_polarity = Polarity::add;
+            let mut specie_vars = Vec::<Var>::new();
 
-            for var in term.vars {
+            for var in term.vars.clone() {
                 if species.contains(&var) {
-                    species_vars.push(var);
+                    &specie_vars.push(var);
                 } else {
-                    rate_vars.push(var);
+                    &rate_vars.push(var);
                 }
             }
+            term.species.append(&mut specie_vars);
+            term.rates.append(&mut rate_vars);
         }
-        eqn.rhs = terms;
     }
 
     let mut eqn_dict = HashMap::<Var, Eqn>::new();
     let mut term_to_eqn_map = HashMap::<Term, HashMap<Polarity, Vec<Var>>>::new();
 
-    for eqn in eqns {
+    for eqn in &mut eqns {
         eqn_dict.insert(Var(eqn.clone().lhs.0 .0), eqn.clone());
 
         // Link terms to equations
-        for term in &eqn.rhs {
-            term_to_eqn_map
-                .entry(term.clone())
-                .and_modify(|e| {
-                    *e = HashMap::from([(term.polarity.clone(), vec![Var(eqn.clone().lhs.0 .0)])])
-                })
-                .or_insert(HashMap::from([(
-                    term.polarity.clone(),
-                    vec![Var(eqn.clone().lhs.0 .0)],
-                )]));
+        for term in &mut eqn.rhs {
+            if term_to_eqn_map.contains_key(&term) {
+                term_to_eqn_map
+                    .entry(term.clone())
+                    .or_insert(HashMap::from([(
+                        term.polarity.clone(),
+                        vec![Var(eqn.lhs.0 .0.clone())],
+                    )]));
+                //.unwrap()
+                //.push(Var(eqn.lhs.0 .0.clone()));
+            } else {
+                let var = Var(eqn.lhs.0 .0.clone());
+                let polarity_dict = HashMap::from([(term.polarity.clone(), vec![var])]);
+                term_to_eqn_map.insert(term.clone(), polarity_dict);
+            }
+            //dbg!(&term_to_eqn_map);
+            //term_to_eqn_map
+            //.entry(term.clone())
+            //.and_modify(|e| {
+            //*e = HashMap::from([(term.polarity.clone(), vec![Var(eqn.lhs.0 .0.clone())])])
+            //})
+            //.or_insert(HashMap::from([(
+            //term.polarity.clone(),
+            //vec![Var(eqn.clone().lhs.0 .0)],
+            //)]));
         }
     }
 
@@ -288,8 +304,6 @@ pub fn wire_pn(eqn_dict: &mut EqnDict) {
         for var in &in_out_flow_dict[&Polarity::add] {
             out_list.push(var.clone());
         }
-        dbg!(&in_list);
-        dbg!(&out_list);
 
         eqn_dict.term_to_edges_map = TermToEdgesMap {
             inward: in_list,
