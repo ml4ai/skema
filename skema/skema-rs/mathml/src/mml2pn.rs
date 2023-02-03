@@ -261,36 +261,16 @@ pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
                     });
                 })
                 .or_insert_with_key(|k| {
-                    HashMap::from([(k.polarity.clone(), vec![Var(eqn.clone().lhs.0 .0)])])
+                    let other_polarity = if k.polarity == Polarity::sub {
+                        Polarity::add
+                    } else {
+                        Polarity::sub
+                    };
+                    HashMap::from([
+                        (k.polarity.clone(), vec![Var(eqn.clone().lhs.0 .0)]),
+                        (other_polarity, vec![]),
+                    ])
                 });
-            //if term_to_eqn_map.contains_key(&term) {
-            //term_to_eqn_map
-            //.entry(term.clone())
-            //.or_insert(HashMap::from([(
-            //term.polarity.clone(),
-            //vec![Var(eqn.lhs.0 .0.clone())],
-            //)]));
-            ////.unwrap()
-            ////.push(Var(eqn.lhs.0 .0.clone()));
-            //} else {
-            //let var = Var(eqn.lhs.0 .0.clone());
-            //let mut polarity_dict =
-            //HashMap::from([(Polarity::add, vec![]), (Polarity::sub, vec![])]);
-            //polarity_dict.get_mut(&term.polarity.clone()).push(var);
-            //term_to_eqn_map.insert(term.clone(), polarity_dict);
-            //term_to_eqn_map.entry
-            //}
-
-            //dbg!(&term_to_eqn_map);
-            //term_to_eqn_map
-            //.entry(term.clone())
-            //.and_modify(|e| {
-            //*e = HashMap::from([(term.polarity.clone(), vec![Var(eqn.lhs.0 .0.clone())])])
-            //})
-            //.or_insert(HashMap::from([(
-            //term.polarity.clone(),
-            //vec![Var(eqn.clone().lhs.0 .0)],
-            //)]));
         }
     }
 
@@ -308,19 +288,15 @@ pub fn wire_pn(eqn_dict: &mut EqnDict) {
     for (term, in_out_flow_dict) in eqn_dict.term_to_eqn_map.iter() {
         let mut in_list = Vec::<Var>::new();
         let mut out_list = Vec::<Var>::new();
-        for var in &term.vars {
-            in_list.push(var.clone());
-            if in_out_flow_dict.contains_key(&Polarity::sub) {
-                if !in_out_flow_dict[&Polarity::sub].contains(var) {
-                    out_list.push(var.clone());
-                }
+        for specie in &term.species {
+            in_list.push(specie.clone());
+            if !in_out_flow_dict[&Polarity::sub].contains(specie) {
+                out_list.push(specie.clone());
             }
         }
 
-        if in_out_flow_dict.contains_key(&Polarity::add) {
-            for var in &in_out_flow_dict[&Polarity::add] {
-                out_list.push(var.clone());
-            }
+        for specie in &in_out_flow_dict[&Polarity::add] {
+            out_list.push(specie.clone());
         }
 
         eqn_dict.term_to_edges_map = TermToEdgesMap {
