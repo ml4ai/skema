@@ -10,10 +10,13 @@ pub struct Flux {
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 pub struct Specie(pub MathExpression);
 
-#[derive(Debug, PartialEq, Clone, Default)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+pub struct Rate(pub MathExpression);
+
+#[derive(Debug, PartialEq, Clone)]
 pub struct Transition {
     name: String,
-    rate: f32,
+    rate: Rate,
 }
 
 #[derive(Debug, PartialEq, Clone)]

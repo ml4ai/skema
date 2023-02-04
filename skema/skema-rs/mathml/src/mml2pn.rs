@@ -1,6 +1,6 @@
 use crate::petri_net::{
     recognizers::{get_polarity, is_add_or_subtract_operator, is_leibniz_diff_operator},
-    PetriNet, Polarity, Specie, Tangent, Transition,
+    PetriNet, Polarity, Rate, Specie, Tangent, Transition,
 };
 use crate::{
     ast::{
@@ -31,6 +31,9 @@ use std::{
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Var(MathExpression);
 
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+struct Exponent(i32);
+
 impl fmt::Display for Var {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0.to_string())
@@ -50,9 +53,8 @@ struct Eqn {
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default)]
 struct Term {
     polarity: Polarity,
+    species: Vec<Specie>,
     vars: Vec<Var>,
-    rate: Option<Var>,
-    species: Vec<Var>,
 }
 
 //#[derive(Debug, Eq, PartialEq, Default)]
@@ -280,18 +282,50 @@ fn group_by_operators(
     eqns.insert(lhs_specie, terms);
 }
 
+// M(S) is the set of monomials
+// m: T -> M(S)
+// \dot{x_i} = \sum_{y} f(x_i, y)m(y)
+// e(i, y): T -> N --- exponent of species i in monomial corresponding to transition y.
+// For each transition y, draw e(i, y) arrows from specie x_i to transition y.
+// Finally, for each transition y, draw n_i(y) = f(x_i) + e(i, y) arrows from y to x_i
+// Algorithm:
+// - Identify monomials (i.e. products of species). Each monomial corresponds to a transition (TODO: Check if this is right)
+// - When a monomial is identified, get the exponents of the species in it and store it in a data
+//  structure.
 #[test]
 fn test_simple_sir_v1() {
     let mathml_asts = get_mathml_asts_from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
     let mut species = HashSet::<Var>::new();
     let mut vars = HashSet::<Var>::new();
     let mut eqns = HashMap::<Var, Vec<Term>>::new();
+    let f = HashMap::<(Var, String), Var>::new();
     for (i, ast) in mathml_asts.into_iter().enumerate() {
         let terms = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
     }
     let rates: HashSet<&Var> = vars.difference(&species).collect();
 
-    for (lhs_specie, terms) in eqns.iter() {}
+    let mut monomials = HashSet::<HashMap<Specie, Exponent>>::new();
+    let mut exponents = HashMap::<Specie, HashMap<Transition, i32>>::new();
+    let mut term_to_rate_map = HashMap::<Term, Rate>::new();
+
+    for (lhs_specie, terms) in eqns.iter() {
+        for mut term in terms {
+            let rate: Option<Rate> = None;
+            let mut monomial = Monomial::default();
+            for var in term.vars.clone() {
+                if rates.contains(&var) {
+                    let rate = Some(Rate(var.0));
+                } else {
+                    monomial.0.insert(Specie(var.0), Exponent(1));
+                }
+            }
+            term_to_rate_map.insert(
+                term.clone(),
+                rate.expect(&format!("Unable to find rate in term {:?}", term)),
+            );
+            monomials.insert(&monomial);
+        }
+    }
 }
 
 //pub fn export_eqn_dict_json(eqn_dict: &mut EqnDict) {
