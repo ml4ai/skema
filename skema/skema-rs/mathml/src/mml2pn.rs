@@ -1,6 +1,9 @@
 use crate::petri_net::{
-    recognizers::{get_polarity, is_add_or_subtract_operator, is_leibniz_diff_operator},
-    PetriNet, Polarity, Rate, Specie, Tangent, Transition,
+    recognizers::{
+        get_polarity, get_specie_var, is_add_or_subtract_operator, is_leibniz_diff_operator,
+        is_var_candidate,
+    },
+    PetriNet, Polarity, Rate, Specie, Tangent, Transition, Var,
 };
 use crate::{
     ast::{
@@ -24,12 +27,6 @@ use std::{
 //   - The variables on the LHSes are the tangent variables (i.e., the ones whose
 //     derivatives are being taken). The variables on the RHSes that correspond to variables on the
 //     LHS are species. The rest are rates.
-
-/// Representation of a "named" variable
-/// Here, 'variable' is intended to mean a symbolic name for a value.
-/// Variables could be names of species (states) or rate (parameters).
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-struct Var(MathExpression);
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Exponent(i32);
@@ -57,150 +54,6 @@ struct Term {
     vars: Vec<Var>,
 }
 
-//#[derive(Debug, Eq, PartialEq, Default)]
-//struct TermToEdgesMap {
-//inward: Vec<Var>,
-//outward: Vec<Var>,
-//}
-
-///// The set of all Vars across the eqns that are interpreted as species.
-//species: HashSet<Var>,
-
-///// The set of all Vars across the eqns that are interpreted as rates.
-//rates: HashSet<Var>,
-
-///// Term to equation map
-//term_to_eqn_map: HashMap<Term, HashMap<Polarity, Vec<Var>>>,
-
-///// Term to edges map
-//term_to_edges_map: TermToEdgesMap,
-//}
-
-/// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
-/// In this case, the values after the 'd' or '∂' in the numerator are interpreted as
-/// the Var tangent.
-/// TODO: possibly generalize to accommodate superscripts for higher order derivatives;
-///       although likely that would be an msup, so still the "first" elm of the numerator,
-///       with the second (and beyond) elm(s) being the Var.
-fn mfrac_leibniz_to_specie(
-    numerator: &Box<MathExpression>,
-    denominator: &Box<MathExpression>,
-) -> Var {
-    // Check if numerator is an mrow
-    if let Mrow(num_expressions) = &**numerator {
-        // We assume here that the numerator is of the form dX where X is the variable of interest.
-        if num_expressions.len() == 2 {
-            let expression = &num_expressions[1];
-            return Var(expression.clone());
-        } else {
-            panic!(
-                "More than two elements in the numerator, cannot extract specie from Leibniz differential operator!");
-        }
-    } else {
-        panic!("Unable to extract specie from Leibniz differential operator!");
-    }
-}
-
-/// Get tangent
-fn get_specie_var(expression: &MathExpression) -> Var {
-    // Check if expression is an mfrac
-    match expression {
-        Mfrac(numerator, denominator) => {
-            if is_leibniz_diff_operator(numerator, denominator) {
-                let specie = mfrac_leibniz_to_specie(numerator, denominator);
-                return specie;
-            } else {
-                panic!("Expression is an mfrac but not a Leibniz diff operator!");
-            }
-        }
-        // Translate MathML :mover as Newton dot notation
-        Mover(base, overscript) => {
-            // Check if overscript is ˙
-            if let Mo(id) = &**overscript {
-                if *id == Operator::Other("˙".to_string()) {
-                    return Var(*base.clone());
-                } else {
-                    panic!("Overscript is not ˙, unhandled case!")
-                }
-            } else {
-                panic!("Found an overscript that is not an Mo, aborting!");
-            }
-        }
-        _ => panic!("Unhandled case!"),
-    }
-}
-
-/// Predicate testing whether a MathML elm could be interpreted as a Var.
-/// TODO: This currently permits :mn -> MathML numerical literals.
-///     Perhaps useful to represent constant coefficients?
-///     But should those be Vars?
-fn is_var_candidate(element: &MathExpression) -> bool {
-    match element {
-        Mi(x) => true,
-        Mn(x) => true,
-        Msub(x1, x2) => true,
-        _ => false,
-    }
-}
-
-// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
-
-//// Link terms to equations
-//for term in &eqn.rhs {
-//term_to_eqn_map
-//.entry(term.clone())
-//.and_modify(|e1| {
-//e1.entry(term.polarity.clone()).and_modify(|e2| {
-//e2.push(Var(eqn.lhs.0 .0.clone()));
-//});
-//})
-//.or_insert_with_key(|k| {
-//let other_polarity = if k.polarity == Polarity::sub {
-//Polarity::add
-//} else {
-//Polarity::sub
-//};
-//HashMap::from([
-//(k.polarity.clone(), vec![Var(eqn.clone().lhs.0 .0)]),
-//(other_polarity, vec![]),
-//])
-//});
-//}
-//}
-
-//EqnDict {
-//eqns: eqn_dict,
-//species: species,
-//rates: rates,
-//term_to_eqn_map: term_to_eqn_map,
-//..Default::default()
-//}
-//}
-
-//pub fn wire_pn(eqn_dict: &mut EqnDict) {
-//println!("Wiring PN");
-//for (term, in_out_flow_dict) in eqn_dict.term_to_eqn_map.iter() {
-//let mut in_list = Vec::<Var>::new();
-//let mut out_list = Vec::<Var>::new();
-//for specie in &term.species {
-//in_list.push(specie.clone());
-//if !in_out_flow_dict[&Polarity::sub].contains(specie) {
-//out_list.push(specie.clone());
-//}
-//}
-
-//for specie in &in_out_flow_dict[&Polarity::add] {
-//out_list.push(specie.clone());
-//}
-
-//eqn_dict.term_to_edges_map = TermToEdgesMap {
-//inward: in_list,
-//outward: out_list,
-//};
-//}
-//dbg!(&eqn_dict.term_to_edges_map);
-//}
-
 pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
     let f = File::open(filepath).unwrap();
     let lines = io::BufReader::new(f).lines();
@@ -219,9 +72,6 @@ pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
         }
     }
     mathml_asts
-
-    //let mut eqn_dict = mathml_asts_to_eqn_dict(mathml_asts);
-    //export_eqn_dict_json(&mut eqn_dict)
 }
 
 /// Group the variables in the equations by the =, +, and - operators, and collect the variables.
@@ -304,28 +154,33 @@ fn test_simple_sir_v1() {
     }
     let rates: HashSet<&Var> = vars.difference(&species).collect();
 
-    let mut monomials = HashSet::<HashMap<Specie, Exponent>>::new();
+    let mut monomials = Vec::<HashMap<Specie, Exponent>>::new();
     let mut exponents = HashMap::<Specie, HashMap<Transition, i32>>::new();
     let mut term_to_rate_map = HashMap::<Term, Rate>::new();
 
     for (lhs_specie, terms) in eqns.iter() {
         for mut term in terms {
-            let rate: Option<Rate> = None;
-            let mut monomial = Monomial::default();
+            let mut rate: Option<Rate> = None;
+            let mut monomial = HashMap::<Specie, Exponent>::new();
             for var in term.vars.clone() {
                 if rates.contains(&var) {
-                    let rate = Some(Rate(var.0));
+                    rate = Some(Rate(var.0));
                 } else {
-                    monomial.0.insert(Specie(var.0), Exponent(1));
+                    monomial.insert(Specie(var.0), Exponent(1));
                 }
             }
             term_to_rate_map.insert(
                 term.clone(),
                 rate.expect(&format!("Unable to find rate in term {:?}", term)),
             );
-            monomials.insert(&monomial);
+
+            // This is inefficient, but probably fine for our purposes
+            if !monomials.contains(&monomial) {
+                monomials.push(monomial);
+            };
         }
     }
+    println!("{:?}", monomials);
 }
 
 //pub fn export_eqn_dict_json(eqn_dict: &mut EqnDict) {

@@ -1,6 +1,12 @@
 pub mod recognizers;
 use crate::ast::MathExpression;
 
+/// Representation of a "named" variable
+/// Here, 'variable' is intended to mean a symbolic name for a value.
+/// Variables could be names of species (states) or rate (parameters).
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+pub struct Var(pub MathExpression);
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Flux {
     rate: String,
