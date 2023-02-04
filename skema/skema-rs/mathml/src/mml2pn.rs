@@ -51,7 +51,7 @@ struct Eqn {
 struct Term {
     polarity: Polarity,
     vars: Vec<Var>,
-    //rate: Var,
+    rate: Option<Var>,
     species: Vec<Var>,
 }
 
@@ -60,11 +60,6 @@ struct Term {
 //inward: Vec<Var>,
 //outward: Vec<Var>,
 //}
-
-// A collection of Eqns, indexed by the Var of the lhs Tangent.
-//#[derive(Debug, Eq, PartialEq, Default)]
-//pub struct EqnDict {
-//eqns: HashMap<Var, Eqn>,
 
 ///// The set of all Vars across the eqns that are interpreted as species.
 //species: HashSet<Var>,
@@ -146,129 +141,7 @@ fn is_var_candidate(element: &MathExpression) -> bool {
     }
 }
 
-/// MathExpression or Var
-//#[derive(Debug, PartialEq, Eq, Clone, Hash)]
-//enum MathExpressionOrVarOrTerm {
-//MathExpression(MathExpression),
-//Var(Var),
-//Term(Term),
-//}
-
-/// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
-//fn group_rhs(rhs: &[MathExpression]) -> (Vec<Term>, HashSet<Var>) {
-//let mut terms = Vec::<Term>::new();
-//let mut current_term = Term::default();
-//let mut vars = HashSet::<Var>::new();
-
-//for element in rhs.iter() {
-//if is_add_or_subtract_operator(element) {
-//if current_term.vars.is_empty() {
-//current_term.polarity = get_polarity(element);
-//} else {
-//terms.push(current_term);
-//current_term = Term {
-//vars: vec![],
-//..Default::default()
-//};
-//}
-//} else if is_var_candidate(element) {
-//current_term.vars.push(Var(element.clone()));
-//vars.insert(Var(element.clone()));
-//} else {
-//panic!("Unhandled rhs element {:?}, rhs {:?}", element, rhs);
-//}
-//}
-//if !current_term.vars.is_empty() {
-//terms.push(current_term);
-//}
-//(terms, vars)
-//}
-
-// Converts a MathML AST to an Eqn
-//fn mml_to_eqn(ast: Math) -> (Eqn, HashSet<Var>) {
-//let mut equals_index = 0;
-
-//// Check if the first element is an mrow
-//if let Mrow(expr) = &ast.content[0] {
-//// Get the index of the equals term
-//for (i, term) in (*expr).iter().enumerate() {
-//if let Mo(Operator::Equals) = term {
-//if equals_index == 0 {
-//equals_index = i;
-//} else {
-//panic!(
-//"Found multiple equals signs, does not look like an equation: {:?}",
-//ast
-//)
-//}
-//}
-//}
-
-//if equals_index != 1 {
-//panic!("We do not handle the case where there is more than one term on the LHS of an equation!");
-//}
-//let lhs = &expr[0];
-//let rhs = &expr[equals_index + 1..];
-
-//let tangent = get_tangent(lhs);
-//let (terms, vars) = group_rhs(rhs);
-
-//// NOTE: Here the rhs represents an intermediate step of having
-////       grouped the rhs into components of terms and translated
-////       var candidates into Vars, but not yet fully translated
-////       into a Tuple of Terms. This intermediate step must be
-////       finished before all equations have been collection, after
-////       which we can identify the tangent Vars that in turn
-////       are the basis for inferring which Vars are species vs rates
-////       Once species and rates are distinguished, then Terms can
-////       be formed.
-
-//let eqn = Eqn {
-//lhs: tangent,
-//rhs: terms,
-//};
-//(eqn, vars)
-//} else {
-//panic!("Does not look like Eqn: {:?}", ast)
-//}
-//}
-
-// Translate list of MathML ASTs to EqnDict containing a collection of MAK ODE equations.
-//pub fn mathml_asts_to_eqn_dict(mathml_asts: Vec<Math>) -> EqnDict {
-//let mut eqns = Vec::<Eqn>::new();
-//let mut vars = HashSet::<Var>::new();
-//let mut species = HashSet::<Var>::new();
-//for ast in mathml_asts {
-//let (eqn, rhs_vars) = mml_to_eqn(ast);
-//vars.extend(rhs_vars.clone());
-//species.insert(Var(eqn.clone().lhs.0 .0));
-//eqns.push(eqn.clone());
-//}
-
-//let rates = vars.difference(&species).cloned().collect();
-
-//for mut eqn in &mut eqns {
-//for mut term in &mut eqn.rhs {
-//let mut rate_vars = Vec::<Var>::new();
-//let mut specie_vars = Vec::<Var>::new();
-
-//for var in term.vars.clone() {
-//if species.contains(&var) {
-//&specie_vars.push(var);
-//} else {
-//&rate_vars.push(var);
-//}
-//}
-//term.species.append(&mut specie_vars);
-//term.rates.append(&mut rate_vars);
-//}
-//}
-
-//let mut eqn_dict = HashMap::<Var, Eqn>::new();
-//let mut term_to_eqn_map = HashMap::<Term, HashMap<Polarity, Vec<Var>>>::new();
-
-//for eqn in &mut eqns {
-//eqn_dict.insert(Var(eqn.clone().lhs.0 .0), eqn.clone());
+// Walk rhs sequence of MathML, identifying subsequences of elms that represent Terms
 
 //// Link terms to equations
 //for term in &eqn.rhs {
@@ -349,8 +222,13 @@ pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
     //export_eqn_dict_json(&mut eqn_dict)
 }
 
-/// Group the variables in the equations by the =, +, and - operators
-fn group_by_operators(ast: Math) -> Eqn {
+/// Group the variables in the equations by the =, +, and - operators, and collect the variables.
+fn group_by_operators(
+    ast: Math,
+    species: &mut HashSet<Var>,
+    vars: &mut HashSet<Var>,
+    eqns: &mut HashMap<Var, Vec<Term>>,
+) {
     // Check if there is exactly one element in the AST
     if ast.content.len() != 1 {
         panic!("We cannot handle expressions with more than one top-level MathExpression yet!");
@@ -358,7 +236,6 @@ fn group_by_operators(ast: Math) -> Eqn {
 
     let mut terms = Vec::<Term>::new();
     let mut current_term = Term::default();
-    let mut vars = HashSet::<Var>::new();
     let mut lhs_specie: Option<Var> = None;
 
     let mut equals_index = 0;
@@ -399,19 +276,22 @@ fn group_by_operators(ast: Math) -> Eqn {
     }
 
     let lhs_specie = lhs_specie.expect("Unable to determine the specie on the LHS!");
-
-    Eqn { lhs_specie, terms }
+    species.insert(lhs_specie.clone());
+    eqns.insert(lhs_specie, terms);
 }
 
 #[test]
 fn test_simple_sir_v1() {
     let mathml_asts = get_mathml_asts_from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
-    let mut lhs_species = HashSet::<Var>::new();
+    let mut species = HashSet::<Var>::new();
+    let mut vars = HashSet::<Var>::new();
+    let mut eqns = HashMap::<Var, Vec<Term>>::new();
     for (i, ast) in mathml_asts.into_iter().enumerate() {
-        let eqn = group_by_operators(ast);
-        lhs_species.insert(eqn.lhs_specie.clone());
-        println!("{:?}", eqn);
+        let terms = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
     }
+    let rates: HashSet<&Var> = vars.difference(&species).collect();
+
+    for (lhs_specie, terms) in eqns.iter() {}
 }
 
 //pub fn export_eqn_dict_json(eqn_dict: &mut EqnDict) {
