@@ -31,6 +31,9 @@ use std::{
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Exponent(i32);
 
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+struct Transition(usize);
+
 impl fmt::Display for Var {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}", self.0.to_string())
@@ -155,7 +158,6 @@ fn test_simple_sir_v1() {
     let rates: HashSet<&Var> = vars.difference(&species).collect();
 
     let mut monomials = Vec::<HashMap<Specie, Exponent>>::new();
-    let mut exponents = HashMap::<Specie, HashMap<Transition, i32>>::new();
     let mut term_to_rate_map = HashMap::<Term, Rate>::new();
 
     for (lhs_specie, terms) in eqns.iter() {
@@ -180,7 +182,18 @@ fn test_simple_sir_v1() {
             };
         }
     }
-    println!("{:?}", monomials);
+
+    // Construct exponential table e(i, y)
+    let exponentials = HashMap::<Specie, HashMap<Transition, Exponent>>::new();
+
+    let mut counter: usize = 0;
+    for monomial in monomials {
+        for (specie, exponent) in monomial {
+            exponentials
+                .entry(specie)
+                .or_insert(HashMap::from([(transition(counter), )]));
+        }
+    }
 }
 
 //pub fn export_eqn_dict_json(eqn_dict: &mut EqnDict) {
