@@ -15,6 +15,6 @@ assembly / assemblyMergeStrategy := {
     val oldStrategy = (assembly / assemblyMergeStrategy).value
     oldStrategy(other)
 }
+assembly / mainClass := Some("org.ml4ai.skema.text_reading.apps.AnnotateCosmosJsonFiles")
 // This prevents testing in root, then non-aggregation prevents it in other subprojects.
-assembly / mainClass := None
 assembly / test := {}
