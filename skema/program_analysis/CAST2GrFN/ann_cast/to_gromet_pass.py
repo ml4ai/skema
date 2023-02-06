@@ -94,6 +94,9 @@ def generate_provenance():
 
 
 def comp_name_nodes(n1, n2):
+    """ Given two AnnCast nodes we compare their name
+        and ids to see if they reference the same name
+    """
     if not isinstance(n1, AnnCastName) and not isinstance(n1, AnnCastUnaryOp):
         return False
     if not isinstance(n2, AnnCastName) and not isinstance(n2, AnnCastUnaryOp):
@@ -162,9 +165,11 @@ def get_left_side_name(node):
     if isinstance(node, AnnCastAttribute):
         return node.attr.name
     if isinstance(node, AnnCastName):
-        return node.val.name
+        return node.name
     if isinstance(node, AnnCastVar):
-        return node.val.name
+        return get_left_side_name(node.val)
+    if isinstance(node, AnnCastCall):
+        return node.func.name
     return "NO LEFT SIDE NAME"
 
 
@@ -850,13 +855,15 @@ class ToGrometPass:
                         parent_gromet_fn.pof = insert_gromet_object(
                             parent_gromet_fn.pof,
                             GrometPort(
-                                name=node.left.val.name,
+                                # name=node.left.val.name,
+                                name=get_left_side_name(node.left),
                                 box=func_bf_idx,
                                 metadata=self.insert_metadata(metadata),
                             ),
                         )
                         self.add_var_to_env(
-                            node.left.val.name,
+                            # node.left.val.name,
+                            get_left_side_name(node.left),
                             node.left,
                             parent_gromet_fn.pof[-1],
                             len(parent_gromet_fn.pof) - 1,
@@ -1552,28 +1559,29 @@ class ToGrometPass:
             )
             left_pof = len(parent_gromet_fn.pof)
             for arg in node.left.arguments:
-                found_opi, opi_idx = find_existing_opi(parent_gromet_fn, arg.name)
-                
-                if found_opi:
-                    parent_gromet_fn.wfopi = insert_gromet_object(
-                        parent_gromet_fn.wfopi,
-                        GrometWire(
-                            src=len(parent_gromet_fn.pif),
-                            tgt=opi_idx,
-                        ),
-                    )
-                else:
-                    parent_gromet_fn.opi = insert_gromet_object(
-                        parent_gromet_fn.opi,
-                        GrometPort(name=arg.name, box=len(parent_gromet_fn.b)),
-                    )
-                    parent_gromet_fn.wfopi = insert_gromet_object(
-                        parent_gromet_fn.wfopi,
-                        GrometWire(
-                            src=len(parent_gromet_fn.pif),
-                            tgt=len(parent_gromet_fn.opi),
-                        ),
-                    )
+                if hasattr(arg, "name"):
+                    found_opi, opi_idx = find_existing_opi(parent_gromet_fn, arg.name)
+                    
+                    if found_opi:
+                        parent_gromet_fn.wfopi = insert_gromet_object(
+                            parent_gromet_fn.wfopi,
+                            GrometWire(
+                                src=len(parent_gromet_fn.pif),
+                                tgt=opi_idx,
+                            ),
+                        )
+                    else:
+                        parent_gromet_fn.opi = insert_gromet_object(
+                            parent_gromet_fn.opi,
+                            GrometPort(name=arg.name, box=len(parent_gromet_fn.b)),
+                        )
+                        parent_gromet_fn.wfopi = insert_gromet_object(
+                            parent_gromet_fn.wfopi,
+                            GrometWire(
+                                src=len(parent_gromet_fn.pif),
+                                tgt=len(parent_gromet_fn.opi),
+                            ),
+                        )
 
         # visit RHS second, storing the return value and used if necessary
         # cases where it's used
@@ -1599,28 +1607,29 @@ class ToGrometPass:
             )
             right_pof = len(parent_gromet_fn.pof)
             for arg in node.right.arguments:
-                found_opi, opi_idx = find_existing_opi(parent_gromet_fn, arg.name)
-                
-                if found_opi:
-                    parent_gromet_fn.wfopi = insert_gromet_object(
-                        parent_gromet_fn.wfopi,
-                        GrometWire(
-                            src=len(parent_gromet_fn.pif),
-                            tgt=opi_idx,
-                        ),
-                    )
-                else:
-                    parent_gromet_fn.opi = insert_gromet_object(
-                        parent_gromet_fn.opi,
-                        GrometPort(name=arg.name, box=len(parent_gromet_fn.b)),
-                    )
-                    parent_gromet_fn.wfopi = insert_gromet_object(
-                        parent_gromet_fn.wfopi,
-                        GrometWire(
-                            src=len(parent_gromet_fn.pif),
-                            tgt=len(parent_gromet_fn.opi),
-                        ),
-                    )
+                if hasattr(arg, "name"):
+                    found_opi, opi_idx = find_existing_opi(parent_gromet_fn, arg.name)
+                    
+                    if found_opi:
+                        parent_gromet_fn.wfopi = insert_gromet_object(
+                            parent_gromet_fn.wfopi,
+                            GrometWire(
+                                src=len(parent_gromet_fn.pif),
+                                tgt=opi_idx,
+                            ),
+                        )
+                    else:
+                        parent_gromet_fn.opi = insert_gromet_object(
+                            parent_gromet_fn.opi,
+                            GrometPort(name=arg.name, box=len(parent_gromet_fn.b)),
+                        )
+                        parent_gromet_fn.wfopi = insert_gromet_object(
+                            parent_gromet_fn.wfopi,
+                            GrometWire(
+                                src=len(parent_gromet_fn.pif),
+                                tgt=len(parent_gromet_fn.opi),
+                            ),
+                        )
 
 
 
