@@ -3,7 +3,7 @@ use crate::petri_net::{
         get_polarity, get_specie_var, is_add_or_subtract_operator, is_leibniz_diff_operator,
         is_var_candidate,
     },
-    PetriNet, Polarity, Rate, Specie, Tangent, Transition, Var,
+    Polarity, Rate, Specie, Tangent, Var,
 };
 use crate::{
     ast::{
@@ -184,14 +184,27 @@ fn test_simple_sir_v1() {
     }
 
     // Construct exponential table e(i, y)
-    let exponentials = HashMap::<Specie, HashMap<Transition, Exponent>>::new();
+    let mut exponentials = HashMap::<Transition, HashMap<&Specie, &Exponent>>::new();
+    //let mut exponentials = HashMap::<Specie, HashMap<Transition, Exponent>>::new();
+    //println!("{:?}", monomials);
 
     let mut counter: usize = 0;
-    for monomial in monomials {
+    for (i, monomial) in monomials.iter().enumerate() {
         for (specie, exponent) in monomial {
             exponentials
-                .entry(specie)
-                .or_insert(HashMap::from([(transition(counter), )]));
+                .entry(Transition(i))
+                .and_modify(|e| {
+                    let _ = *e.entry(specie).or_insert(exponent);
+                })
+                .or_insert(HashMap::from([(specie, exponent)]));
+        }
+    }
+
+    for (transition, exponential_map) in exponentials {
+        for (specie, exponent) in exponential_map {
+            for n in 0..exponent.0 {
+                println!("{:?}, {:?}", specie, transition);
+            }
         }
     }
 }
