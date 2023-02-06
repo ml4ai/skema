@@ -852,6 +852,7 @@ class ToGrometPass:
                             parent_cast_node,
                         )
                     else:
+                        print(type(node.left))
                         parent_gromet_fn.pof = insert_gromet_object(
                             parent_gromet_fn.pof,
                             GrometPort(
@@ -3215,6 +3216,7 @@ class ToGrometPass:
                 len(body_if_fn.opi) - 1,
             )
 
+        print(node.modified_vars.items())
         for (_, val) in node.modified_vars.items():
             body_if_fn.opo = insert_gromet_object(
                 body_if_fn.opo, GrometPort(name=val, box=len(body_if_fn.b))
