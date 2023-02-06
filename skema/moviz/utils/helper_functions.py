@@ -116,11 +116,14 @@ def drawPOL(data, bl, c):
 def drawWFF(data, g):
     if data.get("wff") != None:
         for wff in data["wff"]:
-            for pif in data["pif"]:
-                for pof in data["pof"]:
-                    if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
-                        # print(pif.get("node"), pof.get("node"))
-                        g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+            if data.get("pif") != None:
+                for pif in data["pif"]:
+                    if data.get("pof") != None:
+                        for pof in data["pof"]:
+                            # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
+                            if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
+                                # print(pif.get("node"), pof.get("node"))
+                                g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
 
 
 def drawWFC(data, g):
@@ -214,11 +217,11 @@ def drawBF(data, a, bf):
                 drawPIF(bf, b, data)
                 drawPOF(bf, b, data, None)
         if bf.get("function_type") == "LITERAL":
-            if bf.get("value").get("value_type") == "Integer":
+            if bf.get("value").get("value_type") == "Integer" or bf.get("value").get("value_type") == "Boolean":
                 literal = str(bf.get("value").get("value"))
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
                     print(bf.get('box'))
-                    label = f"< <B>{literal}</B> >"+"\n id: "+bf.get('box')
+                    label = f"{literal}"+"\n id: "+bf.get('box')
                     c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
                     c.attr("node", shape = 'point')
                     c.node(name=f"cluster_lit_{literal}_{bf['box']}_{i}", style = 'invis')
@@ -226,8 +229,24 @@ def drawBF(data, a, bf):
                     i+=1
                     bf["node"] = f"cluster_lit_{literal}_{bf['box']}"
                     drawPIF(bf, c, data)
-                    drawPOF(bf, c, data, None)
-            # if bf.get('value').get('value_type') == 'List':
+                    drawPOF(bf, c, data, None)                 
+            if bf.get('value').get('value_type') == 'List':
+                literal = ""
+                for value in bf.get('value').get('value'):
+                    print(value)
+                    literal = literal+", "+str(value.get('value'))
+                    print('vals: ',literal)
+                with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
+                    print(bf.get('box'))
+                    label = f"{literal}"+"\n id: "+bf.get('box')
+                    c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
+                    c.attr("node", shape = 'point')
+                    c.node(name=f"cluster_lit_{literal}_{bf['box']}_{i}", style = 'invis')
+                    bf['invisNode'] = f"cluster_lit_{literal}_{bf['box']}_{i}"
+                    i+=1
+                    bf["node"] = f"cluster_lit_{literal}_{bf['box']}"
+                    drawPIF(bf, c, data)
+                    drawPOF(bf, c, data, None) 
         if bf["function_type"] == "PRIMITIVE":
             primitive = str(bf["name"])
             with a.subgraph(name=f"cluster_prim_{primitive}_{bf['box']}") as d:

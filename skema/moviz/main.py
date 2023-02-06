@@ -17,7 +17,7 @@ def visualize_single_file(filepath) -> str:
     cast = python_to_cast(str(filepath), cast_obj=True)
     gromet = run_cast_to_gromet_pipeline(cast)
     graph = draw_graph(gromet, program_name)
-    print(graph)
+    # print(graph)
     # Get the raw bytes, encode them via base64, then decode them via utf-8.
     # We embed the image directly in the HTML template.
     output = str(base64.b64encode(graph.pipe()), encoding="utf-8")
