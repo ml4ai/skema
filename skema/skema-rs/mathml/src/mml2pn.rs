@@ -135,14 +135,18 @@ fn group_by_operators(
     eqns.insert(lhs_specie, terms);
 }
 
+// Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
 // M(S) is the set of monomials
 // m: T -> M(S)
 // \dot{x_i} = \sum_{y} f(x_i, y)m(y)
+// f(x_i, y) are integers such that f(x_i, y) + m_i(y) is a natural number.
+// m_i(y) is the exponent of the specie x_i inside the monomial m(y)
 // e(i, y): T -> N --- exponent of species i in monomial corresponding to transition y.
 // For each transition y, draw e(i, y) arrows from specie x_i to transition y.
 // Finally, for each transition y, draw n_i(y) = f(x_i) + e(i, y) arrows from y to x_i
 // Algorithm:
-// - Identify monomials (i.e. products of species). Each monomial corresponds to a transition (TODO: Check if this is right)
+// - Identify monomials (i.e. products of species). Each monomial corresponds to a transition
+//  (TODO: Check if this is right)
 // - When a monomial is identified, get the exponents of the species in it and store it in a data
 //  structure.
 #[test]
@@ -151,7 +155,7 @@ fn test_simple_sir_v1() {
     let mut species = HashSet::<Var>::new();
     let mut vars = HashSet::<Var>::new();
     let mut eqns = HashMap::<Var, Vec<Term>>::new();
-    let f = HashMap::<(Var, String), Var>::new();
+    let mut f = HashMap::<Transition, HashMap<&Specie, &Exponent>>::new();
     for (i, ast) in mathml_asts.into_iter().enumerate() {
         let terms = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
     }
@@ -176,7 +180,7 @@ fn test_simple_sir_v1() {
                 rate.expect(&format!("Unable to find rate in term {:?}", term)),
             );
 
-            // This is inefficient, but probably fine for our purposes
+            // This is inefficient (an O(N) lookup), but probably fine for our purposes.
             if !monomials.contains(&monomial) {
                 monomials.push(monomial);
             };
@@ -185,8 +189,6 @@ fn test_simple_sir_v1() {
 
     // Construct exponential table e(i, y)
     let mut exponentials = HashMap::<Transition, HashMap<&Specie, &Exponent>>::new();
-    //let mut exponentials = HashMap::<Specie, HashMap<Transition, Exponent>>::new();
-    //println!("{:?}", monomials);
 
     let mut counter: usize = 0;
     for (i, monomial) in monomials.iter().enumerate() {
