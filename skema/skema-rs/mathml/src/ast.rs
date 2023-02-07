@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash)]
 pub enum Operator {
     Add,
     Multiply,
@@ -28,7 +28,7 @@ impl fmt::Display for Operator {
 
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default)]
 pub enum MathExpression {
     Mi(String),
     Mo(Operator),
@@ -49,6 +49,8 @@ pub enum MathExpression {
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
+    #[default]
+    None,
 }
 
 impl fmt::Display for MathExpression {

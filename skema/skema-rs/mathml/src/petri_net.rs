@@ -4,7 +4,7 @@ use crate::ast::MathExpression;
 /// Representation of a "named" variable
 /// Here, 'variable' is intended to mean a symbolic name for a value.
 /// Variables could be names of species (states) or rate (parameters).
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
 pub struct Var(pub MathExpression);
 
 #[derive(Debug, PartialEq, Clone)]
@@ -13,10 +13,10 @@ pub struct Flux {
     vars: Vec<MathExpression>,
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
 pub struct Specie(pub MathExpression);
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Default)]
 pub struct Rate(pub MathExpression);
 
 /// Represents the Tangent var of an ODE.

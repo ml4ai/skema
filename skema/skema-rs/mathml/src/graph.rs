@@ -78,6 +78,7 @@ impl MathExpression {
             Mstyle(xs) => add_to_graph_many0(graph, parent_index, "mstyle", xs),
             Mspace(x) => add_to_graph_0(graph, parent_index, x),
             MoLine(x) => add_to_graph_0(graph, parent_index, x),
+            _ => {}
         }
     }
 }

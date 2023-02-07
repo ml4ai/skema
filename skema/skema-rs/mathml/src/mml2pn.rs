@@ -13,7 +13,7 @@ use crate::{
     },
     parsing::parse,
 };
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt;
 use std::{
     fs::File,
@@ -28,18 +28,25 @@ use std::{
 //     derivatives are being taken). The variables on the RHSes that correspond to variables on the
 //     LHS are species. The rest are rates.
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-struct Exponent(isize);
+pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
+    let f = File::open(filepath).unwrap();
+    let lines = io::BufReader::new(f).lines();
 
-/// A transition in a Petri net
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-struct Transition(usize);
+    let mut mathml_asts = Vec::<Math>::new();
 
-/// Coefficient of monomials in an ODE corresponding to a Petri net.
-/// For example, in the following equation: \dot{S} = -βSI,
-/// The coefficient of the βSI monomial on the RHS is (-1).
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-struct Coefficient(isize);
+    for line in lines {
+        if let Ok(l) = line {
+            if let Some('#') = &l.chars().nth(0) {
+                // Ignore lines starting with '#'
+            } else {
+                // Parse MathML into AST
+                let (_, math) = parse(&l).unwrap_or_else(|_| panic!("Unable to parse line {}!", l));
+                mathml_asts.push(math);
+            }
+        }
+    }
+    mathml_asts
+}
 
 impl fmt::Display for Var {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -62,26 +69,6 @@ struct Term {
     polarity: Polarity,
     species: Vec<Specie>,
     vars: Vec<Var>,
-}
-
-pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
-    let f = File::open(filepath).unwrap();
-    let lines = io::BufReader::new(f).lines();
-
-    let mut mathml_asts = Vec::<Math>::new();
-
-    for line in lines {
-        if let Ok(l) = line {
-            if let Some('#') = &l.chars().nth(0) {
-                // Ignore lines starting with '#'
-            } else {
-                // Parse MathML into AST
-                let (_, math) = parse(&l).unwrap_or_else(|_| panic!("Unable to parse line {}!", l));
-                mathml_asts.push(math);
-            }
-        }
-    }
-    mathml_asts
 }
 
 /// Group the variables in the equations by the =, +, and - operators, and collect the variables.
@@ -142,7 +129,30 @@ fn group_by_operators(
     eqns.insert(lhs_specie, terms);
 }
 
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
+struct Exponent(isize);
+
+/// A transition in a Petri net
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+struct Transition(usize);
+
+/// Coefficient of monomials in an ODE corresponding to a Petri net.
+/// For example, in the following equation: \dot{S} = -βSI,
+/// The coefficient of the βSI monomial on the RHS is (-1).
+#[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Default)]
+struct Coefficient(isize);
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
+struct Monomial((Rate, BTreeMap<Specie, Exponent>));
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
+struct Monomials(BTreeSet<Monomial>);
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
+struct Coefficients(BTreeMap<Monomial, BTreeMap<Specie, Coefficient>>);
+
 // Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
+//
 // M(S) is the set of monomials
 // m: T -> M(S)
 // \dot{x_i} = \sum_{y} f(i, y)m(y)
@@ -163,26 +173,25 @@ fn test_simple_sir_v1() {
     let mut eqns = HashMap::<Var, Vec<Term>>::new();
 
     // Construct exponents table e(i, y) and coefficient table f(i, y)
-    let mut exponents = Vec::<HashMap<Specie, Exponent>>::new();
-    let mut coefficients = Vec::<HashMap<Specie, Coefficient>>::new();
+    let mut coefficients = Coefficients::default();
     for ast in mathml_asts.into_iter() {
         let _ = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
     }
     let rate_vars: HashSet<&Var> = vars.difference(&species).collect();
 
-    let mut monomials = Vec::<(Rate, HashMap<Specie, Exponent>)>::new();
+    let mut monomials = Monomials::default();
     let mut term_to_rate_map = HashMap::<Term, Rate>::new();
 
     for (lhs_specie, terms) in eqns.iter() {
         for term in terms {
             let mut rate = Rate(Mn("1".to_string()));
-            let mut monomial = (rate, HashMap::<Specie, Exponent>::new());
+            let mut monomial = Monomial::default();
             for var in term.vars.clone() {
                 if rate_vars.contains(&var) {
-                    monomial.0 = Rate(var.0);
+                    monomial.0 .0 = Rate(var.0);
                 } else {
                     // TODO: Generalize this to when the coefficients aren't just 1 and -1.
-                    monomial.1.insert(Specie(var.0), Exponent(1));
+                    monomial.0 .1.insert(Specie(var.0), Exponent(1));
                 }
             }
             let mut coefficient = Coefficient(1);
@@ -195,19 +204,16 @@ fn test_simple_sir_v1() {
             //);
 
             // This is inefficient (an O(N) lookup), but probably fine for our purposes.
-            if !monomials.contains(&monomial) {
-                monomials.push(monomial.clone());
+            if !monomials.0.contains(&monomial) {
+                monomials.0.insert(monomial.clone());
             }
-            let transition_index = monomials
-                .iter()
-                .position(|x| x == &monomial)
-                .expect("Unable to find monomial in vector!");
 
-            if let Some(e) = coefficients.get_mut(transition_index) {
-                e.insert(Specie(lhs_specie.0.clone()), coefficient);
-            } else {
-                coefficients.push(HashMap::from([(Specie(lhs_specie.0.clone()), coefficient)]));
-            }
+            let specie = Specie(lhs_specie.0.clone());
+            coefficients
+                .0
+                .entry(monomial)
+                .or_insert(BTreeMap::from([(specie, coefficient)]));
+
             //coefficients .get_mut(transition_index) .entry(Specie(lhs_specie.0.clone()))
             //.or_insert(coefficient);
             //for (specie, exponent) in monomial.1 {
@@ -221,39 +227,34 @@ fn test_simple_sir_v1() {
     }
 
     let mut counter: usize = 0;
-    for (i, monomial) in monomials.into_iter().enumerate() {
-        println!("{:?}", monomial);
-        for (specie, exponent) in monomial.1.clone() {
-            if let Some(e) = exponents.get_mut(i) {
-                e.insert(specie, exponent);
-            } else {
-                exponents.push(HashMap::from([(specie, exponent)]));
-            }
-
-            //exponents[i].insert(specie, exponent);
+    for (i, monomial) in monomials.0.into_iter().enumerate() {
+        for (specie, exponent) in monomial.0 .1.clone() {
+            println!(
+                "Specie: {:?}, Transition: {i}, n_arrows: {}",
+                &specie, exponent.0
+            );
+            let coefficient = coefficients.0.get_mut(&monomial).unwrap();
+            let n_arrows = coefficient
+                .entry(specie.clone())
+                .or_insert(Coefficient(0))
+                .0
+                + exponent.0;
+            println!(
+                "Transition: {i}, Specie: {:?}, n_arrows: {}",
+                &specie, n_arrows
+            );
         }
     }
 
-    for (i, exponents_map) in exponents.iter().enumerate() {
-        for (specie, exponent) in exponents_map {
-            let n_edges = exponent.0;
-            for _ in 0..n_edges {
-                println!("{:?}, {:?}", specie, i);
-            }
-        }
-    }
-    dbg!(&exponents);
-    for (i, coefficients_map) in coefficients.iter().enumerate() {
-        for (specie, coefficient) in coefficients_map {
-            //println!("{:?}, {:?}, {:?}", transition, specie, coefficient);
-            //let f = coefficient.0;
-            //let e = exponents[i][specie].0;
+    ////println!("{:?}, {:?}, {:?}", transition, specie, coefficient);
+    ////let f = coefficient.0;
+    ////let e = exponents[i][specie].0;
 
-            //println!("{:?}, {:?}", f, e);
-            let n_edges = coefficient.0 + exponents[i][specie].0;
-            for _ in 0..n_edges {
-                println!("{:?}, {:?}", i, specie);
-            }
-        }
-    }
+    ////println!("{:?}, {:?}", f, e);
+    //let n_edges = coefficient.0 + exponents[i][specie].0;
+    //for _ in 0..n_edges {
+    //println!("{:?}, {:?}", i, specie);
+    //}
+    //}
+    //}
 }
