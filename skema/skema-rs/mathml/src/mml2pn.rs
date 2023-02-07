@@ -145,6 +145,17 @@ struct Coefficient(isize);
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
 struct Monomial((Rate, BTreeMap<Specie, Exponent>));
 
+impl Monomial {
+    fn new(vars: HashSet<Var>) -> Monomial {
+        let mut m = Monomial::default();
+        m.0 .0 = Rate(Mn("1".to_string()));
+        for var in vars {
+            m.0 .1.insert(Specie(var.0), Exponent(0));
+        }
+        m
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
 struct Monomials(BTreeSet<Monomial>);
 
@@ -180,12 +191,10 @@ fn test_simple_sir_v1() {
     let rate_vars: HashSet<&Var> = vars.difference(&species).collect();
 
     let mut monomials = Monomials::default();
-    let mut term_to_rate_map = HashMap::<Term, Rate>::new();
 
     for (lhs_specie, terms) in eqns.iter() {
         for term in terms {
-            let mut rate = Rate(Mn("1".to_string()));
-            let mut monomial = Monomial::default();
+            let mut monomial = Monomial::new(species.clone());
             for var in term.vars.clone() {
                 if rate_vars.contains(&var) {
                     monomial.0 .0 = Rate(var.0);
@@ -196,65 +205,62 @@ fn test_simple_sir_v1() {
             }
             let mut coefficient = Coefficient(1);
             if term.polarity == Polarity::sub {
-                coefficient.0 *= -1;
+                coefficient.0 = -1;
             }
-            //term_to_rate_map.insert(
-            //term.clone(),
-            //rate.expect(&format!("Unable to find rate in term {:?}", term)),
-            //);
 
-            // This is inefficient (an O(N) lookup), but probably fine for our purposes.
             if !monomials.0.contains(&monomial) {
                 monomials.0.insert(monomial.clone());
             }
 
             let specie = Specie(lhs_specie.0.clone());
+            //println!("{:?}", specie);
             coefficients
                 .0
-                .entry(monomial)
-                .or_insert(BTreeMap::from([(specie, coefficient)]));
+                .entry(monomial.clone())
+                .and_modify(|e| {
+                    e.entry(specie.clone()).or_insert(coefficient.clone());
+                })
+                .or_insert(BTreeMap::from([(specie.clone(), Coefficient(0))]));
+            //println!("{:?}", coefficients);
+        }
+    }
+    //dbg!(&coefficients);
 
-            //coefficients .get_mut(transition_index) .entry(Specie(lhs_specie.0.clone()))
-            //.or_insert(coefficient);
-            //for (specie, exponent) in monomial.1 {
-            //coefficients[transition_index][specie]kk
-            //.and_modify(|e| {
-            //let _ = *e.entry(specie.clone()).or_insert(coefficient.clone());
-            //})
-            //.or_insert(HashMap::from([(specie, coefficient.clone())]));
+    //let mut arrows = HashMap::<String, usize>::from(["In]);
+
+    for (i, monomial) in monomials.0.iter().enumerate() {
+        for (specie, exponent) in monomial.0 .1.clone() {
+            //println!("{:?}", specie);
+            let n_arrows = exponent.0;
+            if n_arrows != 0 {
+                println!("Inward: {:?}, {i}, {n_arrows}", &specie.0.to_string());
+            }
+            //if coefficients.0.contains_key(&monomial) {
+            //println!("coefficient contains monomial {:?}", monomial);
+            //if !coefficients.0[monomial].contains_key(&specie) {
+            //println!(
+            //"monomial {:?} does not contain specie {:?}",
+            //coefficients.0[monomial], specie
+            //);
+            ////println!("{:?}, {:?}", specie, monomial);
+            //}
+            //}
+            let coefficient = coefficients
+                .0
+                .get_mut(&monomial)
+                .unwrap()
+                .entry(specie.clone())
+                .or_insert(Coefficient(0))
+                .0;
+
+            let narrows = coefficient + exponent.0;
+            for _ in 0..narrows {
+                println!("{specie:?}, {i}");
+            }
+            //let n_arrows = coefficient.0 + exponent.0;
+            //if n_arrows != 0 {
+            //println!("Outward: {i}, {:?}, {n_arrows}", &specie.0.to_string());
             //}
         }
     }
-
-    let mut counter: usize = 0;
-    for (i, monomial) in monomials.0.into_iter().enumerate() {
-        for (specie, exponent) in monomial.0 .1.clone() {
-            println!(
-                "Specie: {:?}, Transition: {i}, n_arrows: {}",
-                &specie, exponent.0
-            );
-            let coefficient = coefficients.0.get_mut(&monomial).unwrap();
-            let n_arrows = coefficient
-                .entry(specie.clone())
-                .or_insert(Coefficient(0))
-                .0
-                + exponent.0;
-            println!(
-                "Transition: {i}, Specie: {:?}, n_arrows: {}",
-                &specie, n_arrows
-            );
-        }
-    }
-
-    ////println!("{:?}, {:?}, {:?}", transition, specie, coefficient);
-    ////let f = coefficient.0;
-    ////let e = exponents[i][specie].0;
-
-    ////println!("{:?}, {:?}", f, e);
-    //let n_edges = coefficient.0 + exponents[i][specie].0;
-    //for _ in 0..n_edges {
-    //println!("{:?}, {:?}", i, specie);
-    //}
-    //}
-    //}
 }
