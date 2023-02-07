@@ -29,10 +29,17 @@ use std::{
 //     LHS are species. The rest are rates.
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
-struct Exponent(i32);
+struct Exponent(isize);
 
+/// A transition in a Petri net
 #[derive(Debug, Eq, PartialEq, Hash, Clone)]
 struct Transition(usize);
+
+/// Coefficient of monomials in an ODE corresponding to a Petri net.
+/// For example, in the following equation: \dot{S} = -βSI,
+/// The coefficient of the βSI monomial on the RHS is (-1).
+#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+struct Coefficient(isize);
 
 impl fmt::Display for Var {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -139,46 +146,51 @@ fn group_by_operators(
 // M(S) is the set of monomials
 // m: T -> M(S)
 // \dot{x_i} = \sum_{y} f(x_i, y)m(y)
-// f(x_i, y) are integers such that f(x_i, y) + m_i(y) is a natural number.
-// m_i(y) is the exponent of the specie x_i inside the monomial m(y)
+// f(i, y) are integers such that f(i, y) + e(i, y) is a natural number.
 // e(i, y): T -> N --- exponent of species i in monomial corresponding to transition y.
 // For each transition y, draw e(i, y) arrows from specie x_i to transition y.
-// Finally, for each transition y, draw n_i(y) = f(x_i) + e(i, y) arrows from y to x_i
+// Finally, for each transition y, draw n_i(y) = f(i, y) + e(i, y) arrows from y to x_i
 // Algorithm:
-// - Identify monomials (i.e. products of species). Each monomial corresponds to a transition
-//  (TODO: Check if this is right)
+// - Identify monomials (i.e. products of species and rates). I assume each monomial corresponds to
+//   a transition.
 // - When a monomial is identified, get the exponents of the species in it and store it in a data
-//  structure.
+//   structure.
 #[test]
 fn test_simple_sir_v1() {
     let mathml_asts = get_mathml_asts_from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
     let mut species = HashSet::<Var>::new();
     let mut vars = HashSet::<Var>::new();
     let mut eqns = HashMap::<Var, Vec<Term>>::new();
-    let mut f = HashMap::<Transition, HashMap<&Specie, &Exponent>>::new();
-    for (i, ast) in mathml_asts.into_iter().enumerate() {
-        let terms = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
-    }
-    let rates: HashSet<&Var> = vars.difference(&species).collect();
 
-    let mut monomials = Vec::<HashMap<Specie, Exponent>>::new();
+    let mut coefficients = HashMap::<Transition, HashMap<&Specie, &Coefficient>>::new();
+    for ast in mathml_asts.into_iter() {
+        let _ = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
+    }
+    let rate_vars: HashSet<&Var> = vars.difference(&species).collect();
+
+    // Indexed by transition
+    let mut monomials = Vec::<(Rate, HashMap<Specie, Exponent>)>::new();
     let mut term_to_rate_map = HashMap::<Term, Rate>::new();
 
-    for (lhs_specie, terms) in eqns.iter() {
-        for mut term in terms {
-            let mut rate: Option<Rate> = None;
-            let mut monomial = HashMap::<Specie, Exponent>::new();
+    for (_, terms) in eqns.iter() {
+        for term in terms {
+            let mut rate = Rate(Mn("1".to_string()));
+            let mut monomial = (rate, HashMap::<Specie, Exponent>::new());
             for var in term.vars.clone() {
-                if rates.contains(&var) {
-                    rate = Some(Rate(var.0));
+                if rate_vars.contains(&var) {
+                    monomial.0 = Rate(var.0);
                 } else {
-                    monomial.insert(Specie(var.0), Exponent(1));
+                    // TODO: Generalize this to when the coefficients aren't just 1 and -1.
+                    monomial.1.insert(Specie(var.0), Exponent(1));
                 }
             }
-            term_to_rate_map.insert(
-                term.clone(),
-                rate.expect(&format!("Unable to find rate in term {:?}", term)),
-            );
+            //if term.polarity == Polarity::sub {
+            //monomial.0 .0 *= -1
+            //}
+            //term_to_rate_map.insert(
+            //term.clone(),
+            //rate.expect(&format!("Unable to find rate in term {:?}", term)),
+            //);
 
             // This is inefficient (an O(N) lookup), but probably fine for our purposes.
             if !monomials.contains(&monomial) {
@@ -186,32 +198,47 @@ fn test_simple_sir_v1() {
             };
         }
     }
+    dbg!(&monomials);
 
-    // Construct exponential table e(i, y)
-    let mut exponentials = HashMap::<Transition, HashMap<&Specie, &Exponent>>::new();
+    // Construct exponents table e(i, y) and coefficient table f(i, y)
+    let mut exponents = HashMap::<Transition, HashMap<&Specie, &Exponent>>::new();
 
     let mut counter: usize = 0;
     for (i, monomial) in monomials.iter().enumerate() {
-        for (specie, exponent) in monomial {
-            exponentials
+        for (specie, exponent) in &monomial.1 {
+            exponents
                 .entry(Transition(i))
                 .and_modify(|e| {
-                    let _ = *e.entry(specie).or_insert(exponent);
+                    let _ = *e.entry(&specie).or_insert(&exponent);
                 })
                 .or_insert(HashMap::from([(specie, exponent)]));
+
         }
+        for term in term.vars
+            coefficients
+                .entry(Transition(i))
+                .and_modify(|e| {
+                    let _ = *e.entry(specie).or_insert(coefficient);
+                })
+                .or_insert(HashMap::from([(specie, coefficient)]));
+
     }
 
-    for (transition, exponential_map) in exponentials {
-        for (specie, exponent) in exponential_map {
-            for n in 0..exponent.0 {
-                println!("{:?}, {:?}", specie, transition);
+    for (transition, exponents_map) in &exponents {
+        for (specie, exponent) in exponents_map {
+            let n_edges = exponent.0;
+            for _ in 0..n_edges {
+                //println!("{:?}, {:?}", specie, transition);
+            }
+        }
+
+        for (transition, coefficients_map) in &coefficients {
+            for (specie, coefficient) in coefficients_map {
+                let n_edges = coefficient.0 + exponents[&transition][specie].0;
+                for _ in 0..n_edges {
+                    //println!("{:?}, {:?}", transition, specie);
+                }
             }
         }
     }
 }
-
-//pub fn export_eqn_dict_json(eqn_dict: &mut EqnDict) {
-//wire_pn(eqn_dict);
-//dbg!(&eqn_dict);
-//}
