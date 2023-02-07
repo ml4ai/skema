@@ -1,0 +1,90 @@
+{
+    "schema": "FN",
+    "schema_version": "0.1.5",
+    "name": "dso_kmeans",
+    "modules": [
+        {
+            "schema": "FN",
+            "schema_version": "0.1.4",
+            "name": "sklearn_clustering_kmeans",
+            "fn": {
+                "b": [{"function_type":"MODULE","name":"module","metadata":2}],
+                "bf": [
+                    {"function_type":"FUNCTION","contents":1,"metadata":3},
+                    {"function_type":"LITERAL","value":{"value_type":"List","value":"datasets/iris.csv"},"metadata":4},
+                    {"function_type":"LITERAL","value":{"value_type":"List","value":"Species"},"metadata":5},
+                    {"function_type":"LITERAL","value":{"value_type":"Integer","value":1},"metadata":6},
+                    {"function_type":"EXPRESSION","contents":2,"metadata":7},
+                    {"function_type":"EXPRESSION","contents":3,"metadata":8}
+                ],
+                "pif": [{"id":1,"box":1},{"id":1,"box":2},{"id":2,"box":2},{"id":1,"box":4}],
+                "pof": [{"id":1,"box":2},{"id":1,"name":"iris","box":1},{"id":2,"name":"iris","box":2},{"id":1,"box":3},{"id":1,"box":4},{"id":1,"name":"iris","box":5},{"id":1,"name":"iris","box":6},{"id":1,"name":"kmeans","box":7},{"id":1,"name":"kmeans","box":8},{"id":2,"name":"centroids","box":5},{"id":2,"name":"clusters","box":6}],
+                "wff": [{"src":1,"tgt":1},{"src":2,"tgt":4},{"src":3,"tgt":5},{"src":4,"tgt":7}]
+            },
+            "attributes": [
+                {
+                    "type": "IMPORT",
+                    "value": {
+                        "name": "pandas.read_csv",
+                        "src_language": "Python",
+                        "type": "OTHER",
+                        "version": "3.8"
+                    }
+                },
+                {
+                    "type": "FN",
+                    "value": {
+                        "b": [{"function_type":"EXPRESSION"}],
+                        "opo": [{"id":1,"box":1}],
+                        "wfopo": [{"src":1,"tgt":-1}]
+                    }
+                },
+                {
+                    "type": "FN",
+                    "value": {
+                        "b": [{"function_type":"EXPRESSION"}],
+                        "opo": [{"id":1,"box":1}],
+                        "wfopo": [{"src":1,"tgt":-1}]
+                    }
+                }
+            ],
+            "metadata_collection": [
+                [
+                    {"metadata_type":"source_code_collection","name":"","global_reference_id":"","files":[{"uid":"18ec3e55-b31c-e319-7066-49e0870841da","name":"sklearn_clustering_kmeans.py","path":""}],"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343376"}},
+                    {"metadata_type":"gromet_creation","gromet_version":"0.1.2","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343395"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"18ec3e55-b31c-e319-7066-49e0870841da","line_begin":1,"line_end":9,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343411"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"18ec3e55-b31c-e319-7066-49e0870841da","line_begin":4,"line_end":4,"col_begin":7,"col_end":18,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343495"}}
+                ],
+                [
+                    {"metadata_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'str'>","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343530"}},
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"18ec3e55-b31c-e319-7066-49e0870841da","line_begin":4,"line_end":4,"col_begin":19,"col_end":38,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343522"}}
+                ],
+                [
+                    {"metadata_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'str'>","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343631"}},
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"18ec3e55-b31c-e319-7066-49e0870841da","line_begin":5,"line_end":5,"col_begin":17,"col_end":26,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343625"}}
+                ],
+                [
+                    {"metadata_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'int'>","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343665"}},
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"18ec3e55-b31c-e319-7066-49e0870841da","line_begin":5,"line_end":5,"col_begin":28,"col_end":29,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343655"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"18ec3e55-b31c-e319-7066-49e0870841da","line_begin":8,"line_end":8,"col_begin":0,"col_end":35,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343794"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"18ec3e55-b31c-e319-7066-49e0870841da","line_begin":9,"line_end":9,"col_begin":0,"col_end":25,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2022-12-12 10:10:25.343841"}}
+                ]
+            ],
+            "metadata": 1
+        }
+    ],
+    "module_index": [
+        "dso_kmeans.sklearn_clustering_kmeans"
+    ],
+    "executables": [
+
+    ]
+}
