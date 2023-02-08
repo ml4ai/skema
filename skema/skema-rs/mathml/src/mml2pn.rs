@@ -160,7 +160,10 @@ impl Monomial {
 struct Monomials(BTreeSet<Monomial>);
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
-struct Coefficients(BTreeMap<Monomial, BTreeMap<Specie, Coefficient>>);
+struct Coefficients(BTreeMap<Specie, BTreeMap<Monomial, Coefficient>>);
+
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
+struct Exponents(BTreeMap<Specie, BTreeMap<Monomial, Exponent>>);
 
 // Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
 //
@@ -184,6 +187,7 @@ fn test_simple_sir_v1() {
     let mut eqns = HashMap::<Var, Vec<Term>>::new();
 
     // Construct exponents table e(i, y) and coefficient table f(i, y)
+    let mut exponents = Exponents::default();
     let mut coefficients = Coefficients::default();
     for ast in mathml_asts.into_iter() {
         let _ = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
@@ -213,21 +217,15 @@ fn test_simple_sir_v1() {
             }
 
             let specie = Specie(lhs_specie.0.clone());
-            //println!("{:?}", specie);
             coefficients
                 .0
-                .entry(monomial.clone())
+                .entry(specie)
                 .and_modify(|e| {
-                    e.entry(specie.clone()).or_insert(coefficient.clone());
+                    e.entry(monomial.clone()).or_insert(coefficient.clone());
                 })
-                .or_insert(BTreeMap::from([(specie.clone(), Coefficient(0))]));
-            //println!("{:?}", coefficients);
+                .or_insert(BTreeMap::from([(monomial.clone(), Coefficient(0))]));
         }
     }
-    //dbg!(&coefficients);
-
-    //let mut arrows = HashMap::<String, usize>::from(["In]);
-
     for (i, monomial) in monomials.0.iter().enumerate() {
         for (specie, exponent) in monomial.0 .1.clone() {
             //println!("{:?}", specie);
@@ -235,32 +233,37 @@ fn test_simple_sir_v1() {
             if n_arrows != 0 {
                 println!("Inward: {:?}, {i}, {n_arrows}", &specie.0.to_string());
             }
-            //if coefficients.0.contains_key(&monomial) {
-            //println!("coefficient contains monomial {:?}", monomial);
-            //if !coefficients.0[monomial].contains_key(&specie) {
-            //println!(
-            //"monomial {:?} does not contain specie {:?}",
-            //coefficients.0[monomial], specie
-            //);
-            ////println!("{:?}, {:?}", specie, monomial);
-            //}
-            //}
+            exponents
+                .0
+                .entry(specie)
+                .or_insert(BTreeMap::from([(monomial.clone(), exponent.clone())]));
+        }
+    }
+    for specie_var in species {
+        println!("{specie_var:?}");
+        let specie = Specie(specie_var.0);
+        for (i, monomial) in monomials.0.iter().enumerate() {
             let coefficient = coefficients
                 .0
-                .get_mut(&monomial)
+                .get_mut(&specie)
                 .unwrap()
-                .entry(specie.clone())
+                .entry(monomial.clone())
                 .or_insert(Coefficient(0))
                 .0;
 
+            let exponent = exponents
+                .0
+                .entry(specie.clone())
+                .or_default()
+                .entry(monomial.clone())
+                .or_insert(Exponent(0));
+
+            dbg!(&specie, &exponent, &coefficient);
+            dbg!(&coefficient);
             let narrows = coefficient + exponent.0;
             for _ in 0..narrows {
-                println!("{specie:?}, {i}");
+                println!("Outward: {i}, {specie:?}");
             }
-            //let n_arrows = coefficient.0 + exponent.0;
-            //if n_arrows != 0 {
-            //println!("Outward: {i}, {:?}, {n_arrows}", &specie.0.to_string());
-            //}
         }
     }
 }
