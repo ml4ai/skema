@@ -64,7 +64,7 @@ impl fmt::Display for MathExpression {
             MathExpression::Msub(base, subscript) => {
                 write!(f, "{base}_{{{subscript}}}")
             }
-            _ => panic!("Unhandled case!"),
+            expression => write!(f, "{expression:?}"),
         }
     }
 }
