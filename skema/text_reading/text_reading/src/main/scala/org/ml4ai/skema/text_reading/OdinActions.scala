@@ -270,23 +270,26 @@ class OdinActions(val taxonomy: Taxonomy, expansionHandler: Option[ExpansionHand
             oldKey -> oldMentions
         }
       }
-
-      // required for expansion
-      val newPaths = mutable.Map[String, Map[Mention, SynPath]]()
-
-      // this will only need to be done for events, not relation mentions---relation mentions don't have paths
-      if (m.paths.nonEmpty) {
-        // synpaths for each mention in the picture
-        val synPaths = m.paths.flatMap(_._2)
-        // we have remapped the args to new names already; now will need to update the paths map to have correct new names and the correct synpaths for switched out min/max values
-        for (arg <- newArgs) {
-          // for each arg type, get the synpath for its new mention (for now, assume one arg of each type)
-          newPaths += (arg._1 -> Map(arg._2.head -> synPaths(newArgs(arg._1).head)))
+      // This will only need to be done for events, not relation mentions,
+      // because relation mentions don't have paths.
+      val newPaths = if (m.paths.nonEmpty) {
+        val synPaths: Map[Mention, SynPath] = m.paths.flatMap(_._2)
+        // We have remapped the args to new names already; now will need to update the paths map
+        // to have correct new names and the correct synPaths for switched out min/max values.
+        val newPaths = newArgs.mapValues { newMentions =>
+          // Get the synPath for the new mention if available.  (For now, assume one Mention of each type.)
+          // If the Mention has been newly created for a "variable" argument, track down the synPath for it.
+          val newMention = newMentions.head
+          val newSynPath = synPaths.get(newMention).getOrElse {
+            val oldMention = m.arguments("variable").head
+            synPaths(oldMention)
+          }
+          Map(newMention -> newSynPath)
         }
-      }
-
+        newPaths
+      } else Map.empty[String, Map[Mention, SynPath]]
       val att = new ParamSettingIntAttachment(inclLower, inclUpper, attachedTo, "ParamSettingIntervalAtt")
-      val newMen = copyWithArgsAndPaths(m, newArgs.toMap, newPaths.toMap)
+      val newMen = copyWithArgsAndPaths(m, newArgs, newPaths)
 
       newMen.withAttachment(att)
     }
