@@ -76,8 +76,8 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
     match expression {
         Mfrac(numerator, denominator) => {
             if is_leibniz_diff_operator(numerator, denominator) {
-                let specie = mfrac_leibniz_to_specie(numerator, denominator);
-                return specie;
+                
+                mfrac_leibniz_to_specie(numerator, denominator)
             } else {
                 panic!("Expression is an mfrac but not a Leibniz diff operator!");
             }
@@ -87,7 +87,7 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
             // Check if overscript is ˙
             if let Mo(id) = &**overscript {
                 if *id == Operator::Other("˙".to_string()) {
-                    return Var(*base.clone());
+                    Var(*base.clone())
                 } else {
                     panic!("Overscript is not ˙, unhandled case!")
                 }
@@ -105,9 +105,9 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
 ///     But should those be Vars?
 pub fn is_var_candidate(element: &MathExpression) -> bool {
     match element {
-        Mi(x) => true,
-        Mn(x) => true,
-        Msub(x1, x2) => true,
+        Mi(_x) => true,
+        Mn(_x) => true,
+        Msub(_x1, _x2) => true,
         _ => false,
     }
 }
@@ -120,14 +120,14 @@ pub fn is_var_candidate(element: &MathExpression) -> bool {
 ///       with the second (and beyond) elm(s) being the Var.
 fn mfrac_leibniz_to_specie(
     numerator: &Box<MathExpression>,
-    denominator: &Box<MathExpression>,
+    _denominator: &Box<MathExpression>,
 ) -> Var {
     // Check if numerator is an mrow
     if let Mrow(num_expressions) = &**numerator {
         // We assume here that the numerator is of the form dX where X is the variable of interest.
         if num_expressions.len() == 2 {
             let expression = &num_expressions[1];
-            return Var(expression.clone());
+            Var(expression.clone())
         } else {
             panic!(
                 "More than two elements in the numerator, cannot extract specie from Leibniz differential operator!");

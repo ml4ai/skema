@@ -56,8 +56,8 @@ pub enum MathExpression {
 impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MathExpression::Mi(identifier) => write!(f, "{}", identifier.to_string()),
-            MathExpression::Mn(number) => write!(f, "{}", number.to_string()),
+            MathExpression::Mi(identifier) => write!(f, "{}", identifier),
+            MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
                 write!(f, "{base}^{{{superscript}}}")
             }

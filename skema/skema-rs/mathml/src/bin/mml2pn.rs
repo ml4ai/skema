@@ -1,7 +1,7 @@
 ///! Program to parse MathML and convert it to a Petri Net
 use clap::{Parser, ValueEnum};
 use mathml::mml2pn::ACSet;
-use std::fmt;
+
 
 #[derive(Debug, Clone, ValueEnum, Default)]
 enum OutputFormat {

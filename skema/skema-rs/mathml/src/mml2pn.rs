@@ -28,7 +28,7 @@ pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
 
     for line in lines {
         if let Ok(l) = line {
-            if let Some('#') = &l.chars().nth(0) {
+            if let Some('#') = &l.chars().next() {
                 // Ignore lines starting with '#'
             } else {
                 // Parse MathML into AST
@@ -42,7 +42,7 @@ pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
 
 impl fmt::Display for Var {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.0.to_string())
+        write!(f, "{}", self.0)
     }
 }
 
@@ -93,7 +93,7 @@ fn group_by_operators(
         }
 
         // Iterate over MathExpressions in the RHS
-        for (i, expr_2) in expr_1[equals_index + 1..].iter().enumerate() {
+        for (_i, expr_2) in expr_1[equals_index + 1..].iter().enumerate() {
             if is_add_or_subtract_operator(expr_2) {
                 if current_term.vars.is_empty() {
                     current_term.polarity = get_polarity(expr_2);
@@ -205,7 +205,7 @@ impl acset::ACSet {
         let mut eqns = HashMap::<Var, Vec<Term>>::new();
 
         for ast in mathml_asts.into_iter() {
-            let _ = group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
+            group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
         }
         let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
 
@@ -373,7 +373,7 @@ impl acset::ACSet {
                 graph[edge]
             ));
         }
-        dot.push_str("}");
+        dot.push('}');
         dot
     }
 }
@@ -395,7 +395,7 @@ fn test_simple_sir_v1() {
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v1_acset.json").unwrap())
             .unwrap();
-    assert!(test_acset_equality(acset_1.clone(), acset_2.clone()));
+    assert!(test_acset_equality(acset_1, acset_2));
 }
 
 #[test]
@@ -404,7 +404,7 @@ fn test_simple_sir_v2() {
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v2_acset.json").unwrap())
             .unwrap();
-    assert!(test_acset_equality(acset_1.clone(), acset_2.clone()));
+    assert!(test_acset_equality(acset_1, acset_2));
 }
 
 #[test]
@@ -413,5 +413,5 @@ fn test_simple_sir_v3() {
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v3_acset.json").unwrap())
             .unwrap();
-    assert!(test_acset_equality(acset_1.clone(), acset_2.clone()));
+    assert!(test_acset_equality(acset_1, acset_2));
 }
