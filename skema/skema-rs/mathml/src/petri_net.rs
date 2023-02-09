@@ -1,3 +1,5 @@
+//! Structs for representing elements of Petri Nets.
+
 pub mod recognizers;
 use crate::ast::MathExpression;
 use std::fmt;
@@ -7,12 +9,6 @@ use std::fmt;
 /// Variables could be names of species (states) or rate (parameters).
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
 pub struct Var(pub MathExpression);
-
-#[derive(Debug, PartialEq, Clone)]
-pub struct Flux {
-    rate: String,
-    vars: Vec<MathExpression>,
-}
 
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
 pub struct Specie(pub MathExpression);
@@ -32,14 +28,9 @@ impl fmt::Display for Rate {
     }
 }
 
-/// Represents the Tangent var of an ODE.
-/// This is perhaps not really needed, although it at least introduces a type.
-#[derive(Debug, Eq, PartialEq, Clone, Hash)]
-pub struct Tangent(pub Specie);
-
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Default)]
 pub enum Polarity {
     #[default]
-    positive,
-    negative,
+    Positive,
+    Negative,
 }

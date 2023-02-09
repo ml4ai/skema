@@ -1,3 +1,6 @@
+//! This module contains functions for predicate testing of MathML elements, as well as extracting
+//! semantically-meaningful objects from MathML expressions.
+
 use crate::ast::{
     MathExpression,
     MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub},
@@ -48,7 +51,7 @@ pub fn is_leibniz_diff_operator(
         || (numerator_contains_partial && denominator_contains_partial)
 }
 
-/// Predicate testing whether a MathML operator (:mo) is a subtraction or addition.
+/// Predicate testing whether a MathML operator (Mo) is a subtraction or addition.
 pub fn is_add_or_subtract_operator(element: &MathExpression) -> bool {
     if let MathExpression::Mo(operator) = element {
         return Operator::Add == *operator || Operator::Subtract == *operator;
@@ -56,12 +59,13 @@ pub fn is_add_or_subtract_operator(element: &MathExpression) -> bool {
     false
 }
 
+/// Get polarity from a Mo element.
 pub fn get_polarity(element: &MathExpression) -> Polarity {
     if let MathExpression::Mo(op) = element {
         if *op == Operator::Subtract {
-            Polarity::negative
+            Polarity::Negative
         } else if *op == Operator::Add {
-            Polarity::positive
+            Polarity::Positive
         } else {
             panic!("Unhandled operator!");
         }
@@ -70,13 +74,12 @@ pub fn get_polarity(element: &MathExpression) -> Polarity {
     }
 }
 
-/// Get specie_var
+/// Get variable corresponding to specie.
 pub fn get_specie_var(expression: &MathExpression) -> Var {
     // Check if expression is an mfrac
     match expression {
         Mfrac(numerator, denominator) => {
             if is_leibniz_diff_operator(numerator, denominator) {
-                
                 mfrac_leibniz_to_specie(numerator, denominator)
             } else {
                 panic!("Expression is an mfrac but not a Leibniz diff operator!");
@@ -100,7 +103,7 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
 }
 
 /// Predicate testing whether a MathML elm could be interpreted as a Var.
-/// TODO: This currently permits :mn -> MathML numerical literals.
+/// TODO: This currently permits Mn -> MathML numerical literals.
 ///     Perhaps useful to represent constant coefficients?
 ///     But should those be Vars?
 pub fn is_var_candidate(element: &MathExpression) -> bool {

@@ -184,20 +184,20 @@ pub enum PetriNetElement {
 }
 
 impl acset::ACSet {
-    // Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
-    //
-    // M(S) is the set of monomials
-    // m: T -> M(S)
-    // \dot{x_i} = \sum_{y} f(i, y)m(y)
-    // f(i, y) are integers such that f(i, y) + e(i, y) is a natural number.
-    // e(i, y): T -> N --- exponent of species i in monomial corresponding to transition y.
-    // For each transition y, draw e(i, y) arrows from specie x_i to transition y.
-    // Finally, for each transition y, draw n(i, y) = f(i, y) + e(i, y) arrows from y to x_i
-    // Algorithm:
-    // - Identify monomials (i.e. products of species and rates). I assume each monomial corresponds to
-    //   a transition.
-    // - When a monomial is identified, get the exponents of the species in it and store it in a data
-    //   structure.
+    /// Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
+    ///
+    /// M(S) is the set of monomials
+    /// m: T -> M(S)
+    /// The ODEs corresponding to a Petri net can be written as follows:
+    ///     \dot{x_i} = \sum_{y} f(i, y)m(y)
+    /// where f(i, y) are integers such that f(i, y) + e(i, y) is a natural number.
+    ///
+    /// e(i, y): T -> N is a function representing the exponent of species i in monomial corresponding to transition y.
+    /// For each transition y, draw e(i, y) arrows from specie x_i to transition y.
+    /// Finally, for each transition y, draw n(i, y) = f(i, y) + e(i, y) arrows from y to x_i.
+    ///
+    /// This function returns a JSON serializable representation of an ACSet for TA2 teams to
+    /// consume.
     pub fn from_file(filepath: &str) -> acset::ACSet {
         let mathml_asts = get_mathml_asts_from_file(filepath);
         let mut specie_vars = HashSet::<Var>::new();
@@ -207,17 +207,19 @@ impl acset::ACSet {
         for ast in mathml_asts.into_iter() {
             group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
         }
+
+        // Get the rate variables
         let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
 
         let mut species = BTreeSet::<Specie>::new();
         let mut monomials = Monomials::default();
-        // Construct exponents table e(i, y) and coefficient table f(i, y)
-        let mut exponents = Exponents::default();
+        // Initialize coefficient table f(i, y)
         let mut coefficients = Coefficients::default();
 
         for (lhs_specie, terms) in eqns {
             for term in terms {
                 let mut monomial = Monomial::new(specie_vars.clone());
+
                 for var in term.vars.clone() {
                     if rate_vars.contains(&var) {
                         monomial.0 .0 = Rate(var.0);
@@ -226,8 +228,9 @@ impl acset::ACSet {
                         monomial.0 .1.insert(Specie(var.0), Exponent(1));
                     }
                 }
+
                 let mut coefficient = Coefficient(1);
-                if term.polarity == Polarity::negative {
+                if term.polarity == Polarity::Negative {
                     coefficient.0 = -1;
                 }
 
@@ -251,6 +254,8 @@ impl acset::ACSet {
         // Construct the ACSet for TA2
         // We increment indices by 1 wherever necessary in order to facilitate interoperability with Julia.
         let mut acset = acset::ACSet::default();
+
+        // Collect the species for the ACSet
         acset.S = species
             .clone()
             .into_iter()
@@ -260,6 +265,10 @@ impl acset::ACSet {
                 uid: i,
             })
             .collect();
+
+        // Initialize exponents table e(i, y)
+        let mut exponents = Exponents::default();
+
         for (i, monomial) in monomials.0.iter().enumerate() {
             acset.T.push(acset::Transition {
                 tname: monomial.0 .0.to_string(),
@@ -309,6 +318,7 @@ impl acset::ACSet {
         acset
     }
 
+    /// Construct a graph object from an ACSet
     pub fn to_graph(&self) -> Graph<PetriNetElement, usize> {
         let mut graph = Graph::<PetriNetElement, usize>::new();
         let mut specie_indices = Vec::new();
@@ -344,6 +354,8 @@ impl acset::ACSet {
         graph
     }
 
+    /// Construct a graph from an ACSet object and output it to DOT format for visualization and
+    /// debugging.
     pub fn to_dot(&self) -> String {
         let graph = self.to_graph();
         let mut dot: String = "".to_owned();

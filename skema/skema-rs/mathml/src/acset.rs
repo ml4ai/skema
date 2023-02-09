@@ -1,3 +1,5 @@
+//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
+//! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize)]
