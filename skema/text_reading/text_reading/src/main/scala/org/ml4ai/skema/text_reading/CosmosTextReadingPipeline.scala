@@ -7,20 +7,41 @@ import org.clulab.pdf2txt.Pdf2txt
 import org.clulab.pdf2txt.common.pdf.TextConverter
 import org.clulab.pdf2txt.languageModel.GigawordLanguageModel
 import org.clulab.pdf2txt.preprocessor._
+import org.clulab.processors.Document
 import org.clulab.utils.Logging
 import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
 import org.ml4ai.skema.text_reading.data.CosmosJsonDataLoader
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
-import scala.util.matching.Regex
 
+import scala.util.matching.Regex
 import scala.collection.mutable.ArrayBuffer
 
+class TextReadingPipeline extends Logging {
+  logger.info("Initializing the OdinEngine ...")
 
-class CosmosTextReadingPipeline extends Logging {
+  // Read the configuration from the files
+  val generalConfig: Config = ConfigFactory.load()
+  val readerType: String = generalConfig[String]("ReaderType")
+  val defaultConfig: Config = generalConfig[Config](readerType)
+  val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
+  val groundingConfig: Config = generalConfig.getConfig("Grounding")
+
+  // Grounding parameters
+  private val ontologyFilePath = groundingConfig.getString("ontologyPath")
+  private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
+
+  val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
+
+  // Odin Engine instantiation
+  private val odinEngine = OdinEngine.fromConfig(config)
+  // Initialize the odin engine
+  odinEngine.annotate("x = 10")
 
   /**
     * Assigns grounding elements to a mention
+    *
     * @param m mention to ground
     * @return instance of the mention with grounding attachment if applicable
     */
@@ -62,24 +83,27 @@ class CosmosTextReadingPipeline extends Logging {
     case m => m
   }
 
-  logger.info("Initializing the OdinEngine ...")
+  /**
+    * Runs the mention extraction engine on the  parameter
+    * @param text to annotate
+    * @param fileName to identify the provenance of the document being annotated
+    * @return Annotated doc object and the mentions extracted by odin
+    */
+  def extractMentions(text:String, fileName: Option[String]): (Document, Seq[Mention]) = {
+    // Extract mentions and apply grounding
+    val (doc, mentions) = odinEngine.extractFromText(text, keepText = true, fileName)
+    // Run grounding
+    val groundedMentions =  mentions.par.map {
+      // Only ground arguments of events and relations, to save time
+      case e@(_: EventMention | _: RelationMention) => groundMention(e)
+      case m => m
+    }.seq
 
-  // Read the configuration from the files
-  val generalConfig: Config = ConfigFactory.load()
-  val readerType: String = generalConfig[String]("ReaderType")
-  val defaultConfig: Config = generalConfig[Config](readerType)
-  val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
-  val groundingConfig: Config = generalConfig.getConfig("Grounding")
+    (doc, groundedMentions)
+  }
+}
 
-  // Grounding parameters
-  private val ontologyFilePath = groundingConfig.getString("ontologyPath")
-  private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
-
-  // Odin Engine instantiation
-  private val odinEngine = OdinEngine.fromConfig(config)
-  // Initialize the odin engine
-  odinEngine.annotate("x = 10")
+class CosmosTextReadingPipeline extends TextReadingPipeline {
 
   // PDF converted to fix pdf tokenization artifacts
   private val pdfConverter = new TextConverter()
@@ -98,7 +122,7 @@ class CosmosTextReadingPipeline extends Logging {
   val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
   ////
 
-  val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
+
 
   // cosmos stores information about each block on each pdf page
   // for each block, we load the text (content) and the location of the text (page_num and block order/index on the page)
@@ -111,7 +135,7 @@ class CosmosTextReadingPipeline extends Logging {
     * @param jsonPath Path to the json file to annotate
     * @return Mentions extracted by the TR textReadingPipeline
     */
-  def extractMentions(jsonPath: String): Seq[Mention] = {
+  def extractMentionsFromCosmosJson(jsonPath: String): Seq[Mention] = {
 
     // TODO: Make this interpretable
     val textsAndLocations = loader.loadFile(jsonPath)
@@ -125,13 +149,7 @@ class CosmosTextReadingPipeline extends Logging {
       // Extract mentions and apply grounding
 
       val text = pdf2txt.process(rawText, maxLoops = 1)
-
-      // Extract mentions and apply grounding
-      odinEngine.extractFromText(text, keepText = true, Some(filename)).par.map {
-        // Only ground arguments of events and relations, to save time
-        case e@(_: EventMention | _: RelationMention) => groundMention(e)
-        case m => m
-      }.seq
+      this.extractMentions(text, Some(filename))._2
 
     }
 
@@ -162,5 +180,5 @@ class CosmosTextReadingPipeline extends Logging {
     * @param jsonPath Path to the json file to annotate
     * @return string with the json representation of the extractions and the document annotations
     */
-  def serializeToJson(jsonPath: String): String = ujson.write(AutomatesJSONSerializer.serializeMentions(this.extractMentions(jsonPath)))
+  def extractMentionsFromJsonAndSerialize(jsonPath: String): String = ujson.write(AutomatesJSONSerializer.serializeMentions(this.extractMentionsFromCosmosJson(jsonPath)))
 }

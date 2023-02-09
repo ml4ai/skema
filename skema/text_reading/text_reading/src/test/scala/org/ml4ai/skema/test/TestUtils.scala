@@ -21,7 +21,7 @@ object TestUtils {
 
   // This is the standard way to extract mentions for testing
   def extractMentions(ieSystem: OdinEngine, text: String): Seq[Mention] = {
-    ieSystem.extractFromText(text, true, None)
+    ieSystem.extractFromText(text, true, None)._2
   }
 
   def newOdinSystem(config: Config): OdinEngine = this.synchronized {

@@ -111,10 +111,10 @@ class OdinEngine(
 
   }
 
-  def extractFromText(text: String, keepText: Boolean = false, filename: Option[String]): Seq[Mention] = {
+  def extractFromText(text: String, keepText: Boolean = false, filename: Option[String]): (Document, Seq[Mention]) = {
     val doc = cleanAndAnnotate(text, keepText, filename)
     val odinMentions = extractFrom(doc)  // CTM: runs the Odin grammar
-    odinMentions  // CTM: collection of mentions ; to be converted to some form (json)
+    (doc, odinMentions)  // CTM: collection of mentions ; to be converted to some form (json)
   }
 
   // Supports web service, when existing entities are already known but from outside the project

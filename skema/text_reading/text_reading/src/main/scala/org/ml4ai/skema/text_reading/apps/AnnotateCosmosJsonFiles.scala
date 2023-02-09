@@ -33,7 +33,7 @@ object AnnotateCosmosJsonFiles extends App with Logging{
         if(inputFile.exists()){
           val outputFile = new File("extractions_" + inputFile.getName)
           logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
-          val jsonContents = textReadingPipeline.serializeToJson(inputFile.getAbsolutePath)
+          val jsonContents = textReadingPipeline.extractMentionsFromJsonAndSerialize(inputFile.getAbsolutePath)
           val writer = new PrintWriter(new FileOutputStream(outputFile))
           writer.write(jsonContents)
           writer.close()
