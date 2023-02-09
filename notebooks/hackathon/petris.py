@@ -11,6 +11,10 @@ hom_ot = Hom("ot", Output, Transition)
 hom_os = Hom("os", Output, Species)
 
 Name = AttrType("Name", str)
+Uid = AttrType("uid", int)
+
+attr_tuid = Attr("uid", Transition, Uid)
+attr_suid = Attr("uid", Species, Uid)
 
 attr_tname = Attr("tname", Transition, Name)
 attr_sname = Attr("sname", Species, Name)
@@ -18,8 +22,8 @@ attr_sname = Attr("sname", Species, Name)
 SchPetri = Schema(
     [Species, Transition, Input, Output],
     [hom_it, hom_is, hom_ot, hom_os],
-    [Name],
-    [attr_tname, attr_sname]
+    [Name, Uid],
+    [attr_tname, attr_sname, attr_tuid, attr_suid]
 )
 
 class Petri(ACSet):
@@ -36,8 +40,8 @@ class Petri(ACSet):
                 arc = self.add_part(Input)
                 self.set_subpart(arc, hom_it, t)
                 self.set_subpart(arc, hom_is, s)
-            for t in ins:
+            for tt in outs:
                 arc = self.add_part(Output)
                 self.set_subpart(arc, hom_ot, t)
-                self.set_subpart(arc, hom_os, s)
+                self.set_subpart(arc, hom_os, tt)
         return ts

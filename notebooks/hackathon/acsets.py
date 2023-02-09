@@ -104,7 +104,7 @@ class ACSet:
         })
 
     def prop_dict(self, ob: Ob, i: int) -> dict[str, any]:
-        return { f.name: self.subpart(i, f, oneindex=True) for f in self.schema.props_outof(ob) }
+        return { f.name: self.subpart(i, f, oneindex=True) for f in self.schema.props_outof(ob) } # This sets the base indexing
 
     @classmethod
     def read_json(cls, schema: Schema, s: str):
