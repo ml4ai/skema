@@ -227,11 +227,12 @@ class OdinActions(val taxonomy: Taxonomy, expansionHandler: Option[ExpansionHand
       // so it makes sense to try to remap the least and most values in case they
       // are in the wrong order (example: "... varying from 27 000 to 22000...")
       val (leastMentionsOpt, mostMentionsOpt) = if (valueArgs.size == 2) {
-        val headDoubleOpt = asDoubleOption(mentions.head)
+        val valueMentions = valueArgs.toSeq.map { case (_, values) => values.head }
+        val headDoubleOpt = asDoubleOption(valueMentions.head)
         if (headDoubleOpt.isDefined) {
-          val lastDoubleOpt = asDoubleOption(mentions.last)
+          val lastDoubleOpt = asDoubleOption(valueMentions.last)
           if (lastDoubleOpt.isDefined) {
-            val unsorted = (Some(Seq(mentions.head)), Some(Seq(mentions.last)))
+            val unsorted = (Some(Seq(valueMentions.head)), Some(Seq(valueMentions.last)))
             if (headDoubleOpt.get <= lastDoubleOpt.get) unsorted
             else unsorted.swap
           } else (None, None)
