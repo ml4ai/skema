@@ -382,20 +382,40 @@ impl acset::ACSet {
     }
 }
 
+/// Helper function for testing equality of ACSets, since the order of the edges is not guaranteed
+/// to be preserved in roundtrip serialization.
+#[cfg(test)]
+fn test_acset_equality(mut acset_1: ACSet, mut acset_2: ACSet) -> bool {
+    acset_1.I.sort();
+    acset_1.O.sort();
+    acset_2.O.sort();
+    acset_2.I.sort();
+    acset_1 == acset_2
+}
+
 #[test]
 fn test_simple_sir_v1() {
-    let acset = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
-    println!("{}", serde_json::to_string(&acset).unwrap());
+    let acset_1 = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
+    let acset_2: acset::ACSet =
+        serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v1_acset.json").unwrap())
+            .unwrap();
+    assert!(test_acset_equality(acset_1.clone(), acset_2.clone()));
 }
 
 #[test]
 fn test_simple_sir_v2() {
-    let acset = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v2/mml_list.txt");
-    println!("{}", serde_json::to_string(&acset).unwrap());
+    let acset_1 = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v2/mml_list.txt");
+    let acset_2: acset::ACSet =
+        serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v2_acset.json").unwrap())
+            .unwrap();
+    assert!(test_acset_equality(acset_1.clone(), acset_2.clone()));
 }
 
 #[test]
 fn test_simple_sir_v3() {
-    let acset = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v3/mml_list.txt");
-    println!("{}", serde_json::to_string(&acset).unwrap());
+    let acset_1 = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v3/mml_list.txt");
+    let acset_2: acset::ACSet =
+        serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v3_acset.json").unwrap())
+            .unwrap();
+    assert!(test_acset_equality(acset_1.clone(), acset_2.clone()));
 }
