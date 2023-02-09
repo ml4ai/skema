@@ -76,30 +76,31 @@ class Utils:
             metadata_collection.append(text_collection)
 
         if text_collection:
-            mention_doc = linker.documents[mention["document"]]
-            doc_id = mention_doc["id"]
-            existing_docs_refs = text_collection.documents
+            if mention["document"][1] != 'N/A':
+                mention_doc = linker.documents[mention["document"]]
+                doc_id = mention_doc["id"]
+                existing_docs_refs = text_collection.documents
 
-            doc_ref = None
-            for dr in existing_docs_refs:
-                if doc_id == dr.cosmos_id:
-                    doc_ref = dr
-                    break
+                doc_ref = None
+                for dr in existing_docs_refs:
+                    if doc_id == dr.cosmos_id:
+                        doc_ref = dr
+                        break
 
-            # Create a new TextDocumentReference if it doesn't exist yet
-            if not doc_ref:
-                # TODO Figure out all the correct values here
-                doc_ref = TextualDocumentReference(
-                    uid=uid_stamper.stamp(doc_id),
-                    global_reference_id="TBD",
-                    cosmos_id=doc_id,
-                    cosmos_version_number=0.1,
-                    skema_id=0.1,
-                )
+                # Create a new TextDocumentReference if it doesn't exist yet
+                if not doc_ref:
+                    # TODO Figure out all the correct values here
+                    doc_ref = TextualDocumentReference(
+                        uid=uid_stamper.stamp(doc_id),
+                        global_reference_id="TBD",
+                        cosmos_id=doc_id,
+                        cosmos_version_number=0.1,
+                        skema_id=0.1,
+                    )
 
-                existing_docs_refs.append(doc_ref)
+                    existing_docs_refs.append(doc_ref)
 
-            uid = doc_ref.uid
+                uid = doc_ref.uid
 
         return uid
 
@@ -164,8 +165,8 @@ class Utils:
             document_reference_uid=doc_file_ref,
             page=page_num,
             block=block,
-            char_begin=mention["characterStartOffset"],
-            char_end=mention["characterEndOffset"],
+            char_begin=mention.get("characterStartOffset", 0),
+            char_end=mention.get("characterEndOffset", 0),
         )
 
         # if 'value' in mention['arguments'] and 'variable' in mention['arguments']:
