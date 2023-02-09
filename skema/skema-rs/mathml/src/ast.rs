@@ -59,10 +59,10 @@ impl fmt::Display for MathExpression {
             MathExpression::Mi(identifier) => write!(f, "{}", identifier.to_string()),
             MathExpression::Mn(number) => write!(f, "{}", number.to_string()),
             MathExpression::Msup(base, superscript) => {
-                write!(f, "{}_{}", base.to_string(), superscript.to_string())
+                write!(f, "{base}^{{{superscript}}}")
             }
             MathExpression::Msub(base, subscript) => {
-                write!(f, "{}_{}", base.to_string(), subscript.to_string())
+                write!(f, "{base}_{{{subscript}}}")
             }
             _ => panic!("Unhandled case!"),
         }

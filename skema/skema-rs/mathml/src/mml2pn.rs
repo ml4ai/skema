@@ -1,14 +1,12 @@
 use crate::petri_net::{
-    recognizers::{
-        get_polarity, get_specie_var, is_add_or_subtract_operator, is_leibniz_diff_operator,
-        is_var_candidate,
-    },
-    Polarity, Rate, Specie, Tangent, Var,
+    recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
+    Polarity, Rate, Specie, Var,
 };
 use crate::{
+    acset,
     ast::{
-        Math, MathExpression,
-        MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub, Munder},
+        Math,
+        MathExpression::{Mn, Mo, Mrow},
         Operator,
     },
     parsing::parse,
@@ -19,14 +17,6 @@ use std::{
     fs::File,
     io::{self, BufRead},
 };
-
-// MathML to Petri Net algorithm
-// - Identify which variables are rates and which ones are species.
-//   - Perform one pass over the equations in the ODE system to collect all the variables.
-//     - Group the variables on the RHS into terms by splitting the RHS by + and - operators.
-//   - The variables on the LHSes are the tangent variables (i.e., the ones whose
-//     derivatives are being taken). The variables on the RHSes that correspond to variables on the
-//     LHS are species. The rest are rates.
 
 pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
     let f = File::open(filepath).unwrap();
@@ -54,12 +44,6 @@ impl fmt::Display for Var {
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-struct Eqn {
-    lhs_specie: Var,
-    terms: Vec<Term>,
-}
-
 /// A product of rate and species that is added or subtracted.
 /// THere should just be one rate, but since we're parsing and there could
 /// be noise, this accommodates possibly reading several names of things
@@ -71,6 +55,13 @@ struct Term {
     vars: Vec<Var>,
 }
 
+// MathML to Petri Net algorithm
+// - Identify which variables are rates and which ones are species.
+//   - Perform one pass over the equations in the ODE system to collect all the variables.
+//     - Group the variables on the RHS into terms by splitting the RHS by + and - operators.
+//   - The variables on the LHSes are the tangent variables (i.e., the ones whose
+//     derivatives are being taken). The variables on the RHSes that correspond to variables on the
+//     LHS are species. The rest are rates.
 /// Group the variables in the equations by the =, +, and - operators, and collect the variables.
 fn group_by_operators(
     ast: Math,
@@ -142,6 +133,12 @@ struct Transition(usize);
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone, Default)]
 struct Coefficient(isize);
 
+impl fmt::Display for Coefficient {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
 struct Monomial((Rate, BTreeMap<Specie, Exponent>));
 
@@ -153,6 +150,23 @@ impl Monomial {
             m.0 .1.insert(Specie(var.0), Exponent(0));
         }
         m
+    }
+}
+
+impl fmt::Display for Exponent {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl fmt::Display for Monomial {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}(", self.0 .0);
+        for (specie, exponent) in &self.0 .1 {
+            write!(f, " {}^{} ", specie, exponent);
+        }
+        write!(f, ")");
+        Ok(())
     }
 }
 
@@ -182,23 +196,24 @@ struct Exponents(BTreeMap<Specie, BTreeMap<Monomial, Exponent>>);
 #[test]
 fn test_simple_sir_v1() {
     let mathml_asts = get_mathml_asts_from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
-    let mut species = HashSet::<Var>::new();
+    let mut specie_vars = HashSet::<Var>::new();
     let mut vars = HashSet::<Var>::new();
     let mut eqns = HashMap::<Var, Vec<Term>>::new();
 
+    for ast in mathml_asts.into_iter() {
+        let _ = group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
+    }
+    let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
+
+    let mut species = BTreeSet::<Specie>::new();
+    let mut monomials = Monomials::default();
     // Construct exponents table e(i, y) and coefficient table f(i, y)
     let mut exponents = Exponents::default();
     let mut coefficients = Coefficients::default();
-    for ast in mathml_asts.into_iter() {
-        let _ = group_by_operators(ast, &mut species, &mut vars, &mut eqns);
-    }
-    let rate_vars: HashSet<&Var> = vars.difference(&species).collect();
 
-    let mut monomials = Monomials::default();
-
-    for (lhs_specie, terms) in eqns.iter() {
+    for (lhs_specie, terms) in eqns {
         for term in terms {
-            let mut monomial = Monomial::new(species.clone());
+            let mut monomial = Monomial::new(specie_vars.clone());
             for var in term.vars.clone() {
                 if rate_vars.contains(&var) {
                     monomial.0 .0 = Rate(var.0);
@@ -217,21 +232,40 @@ fn test_simple_sir_v1() {
             }
 
             let specie = Specie(lhs_specie.0.clone());
+            species.insert(specie.clone());
+
             coefficients
                 .0
-                .entry(specie)
+                .entry(specie.clone())
                 .and_modify(|e| {
                     e.entry(monomial.clone()).or_insert(coefficient.clone());
                 })
-                .or_insert(BTreeMap::from([(monomial.clone(), Coefficient(0))]));
+                .or_insert(BTreeMap::from([(monomial.clone(), coefficient.clone())]));
         }
     }
+
+    // Construct the ACSet for TA2
+    let mut acset = acset::ACSet::default();
+    acset.S = species
+        .clone()
+        .into_iter()
+        .enumerate()
+        .map(|(i, x)| acset::Specie {
+            sname: x.to_string(),
+            uid: i,
+        })
+        .collect();
     for (i, monomial) in monomials.0.iter().enumerate() {
+        acset.T.push(acset::Transition {
+            tname: monomial.0 .0.to_string(),
+        });
         for (specie, exponent) in monomial.0 .1.clone() {
-            //println!("{:?}", specie);
             let n_arrows = exponent.0;
-            if n_arrows != 0 {
-                println!("Inward: {:?}, {i}, {n_arrows}", &specie.0.to_string());
+            for _ in 0..n_arrows {
+                acset.I.push(acset::InputArc {
+                    it: i + 1,
+                    is: species.iter().position(|x| x == &specie).unwrap() + 1,
+                });
             }
             exponents
                 .0
@@ -239,8 +273,8 @@ fn test_simple_sir_v1() {
                 .or_insert(BTreeMap::from([(monomial.clone(), exponent.clone())]));
         }
     }
-    for specie_var in species {
-        println!("{specie_var:?}");
+
+    for specie_var in specie_vars {
         let specie = Specie(specie_var.0);
         for (i, monomial) in monomials.0.iter().enumerate() {
             let coefficient = coefficients
@@ -258,12 +292,15 @@ fn test_simple_sir_v1() {
                 .entry(monomial.clone())
                 .or_insert(Exponent(0));
 
-            dbg!(&specie, &exponent, &coefficient);
-            dbg!(&coefficient);
             let narrows = coefficient + exponent.0;
             for _ in 0..narrows {
-                println!("Outward: {i}, {specie:?}");
+                acset.O.push(acset::OutputArc {
+                    ot: i + 1,
+                    os: species.iter().position(|x| x == &specie).unwrap() + 1,
+                });
             }
         }
     }
+
+    println!("{}", serde_json::to_string(&acset).unwrap());
 }
