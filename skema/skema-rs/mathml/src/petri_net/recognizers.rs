@@ -1,12 +1,9 @@
-use crate::petri_net::{Polarity, Var};
-use crate::{
-    ast::{
-        Math, MathExpression,
-        MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub, Munder},
-        Operator,
-    },
-    parsing::parse,
+use crate::ast::{
+    MathExpression,
+    MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub},
+    Operator,
 };
+use crate::petri_net::{Polarity, Var};
 
 /// Check if fraction is a derivative expressed in Leibniz notation
 pub fn is_leibniz_diff_operator(
@@ -62,9 +59,9 @@ pub fn is_add_or_subtract_operator(element: &MathExpression) -> bool {
 pub fn get_polarity(element: &MathExpression) -> Polarity {
     if let MathExpression::Mo(op) = element {
         if *op == Operator::Subtract {
-            Polarity::sub
+            Polarity::negative
         } else if *op == Operator::Add {
-            Polarity::add
+            Polarity::positive
         } else {
             panic!("Unhandled operator!");
         }

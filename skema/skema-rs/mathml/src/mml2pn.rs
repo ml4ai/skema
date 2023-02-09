@@ -1,3 +1,4 @@
+pub use crate::acset::ACSet;
 use crate::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
     Polarity, Rate, Specie, Var,
@@ -179,6 +180,118 @@ struct Coefficients(BTreeMap<Specie, BTreeMap<Monomial, Coefficient>>);
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
 struct Exponents(BTreeMap<Specie, BTreeMap<Monomial, Exponent>>);
 
+impl acset::ACSet {
+    pub fn from_file(filepath: &str) -> acset::ACSet {
+        let mathml_asts = get_mathml_asts_from_file(filepath);
+        let mut specie_vars = HashSet::<Var>::new();
+        let mut vars = HashSet::<Var>::new();
+        let mut eqns = HashMap::<Var, Vec<Term>>::new();
+
+        for ast in mathml_asts.into_iter() {
+            let _ = group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
+        }
+        let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
+
+        let mut species = BTreeSet::<Specie>::new();
+        let mut monomials = Monomials::default();
+        // Construct exponents table e(i, y) and coefficient table f(i, y)
+        let mut exponents = Exponents::default();
+        let mut coefficients = Coefficients::default();
+
+        for (lhs_specie, terms) in eqns {
+            for term in terms {
+                let mut monomial = Monomial::new(specie_vars.clone());
+                for var in term.vars.clone() {
+                    if rate_vars.contains(&var) {
+                        monomial.0 .0 = Rate(var.0);
+                    } else {
+                        // TODO: Generalize this to when the coefficients aren't just 1 and -1.
+                        monomial.0 .1.insert(Specie(var.0), Exponent(1));
+                    }
+                }
+                let mut coefficient = Coefficient(1);
+                if term.polarity == Polarity::negative {
+                    coefficient.0 = -1;
+                }
+
+                if !monomials.0.contains(&monomial) {
+                    monomials.0.insert(monomial.clone());
+                }
+
+                let specie = Specie(lhs_specie.0.clone());
+                species.insert(specie.clone());
+
+                coefficients
+                    .0
+                    .entry(specie.clone())
+                    .and_modify(|e| {
+                        e.entry(monomial.clone()).or_insert(coefficient.clone());
+                    })
+                    .or_insert(BTreeMap::from([(monomial.clone(), coefficient.clone())]));
+            }
+        }
+
+        // Construct the ACSet for TA2
+        let mut acset = acset::ACSet::default();
+        acset.S = species
+            .clone()
+            .into_iter()
+            .enumerate()
+            .map(|(i, x)| acset::Specie {
+                sname: x.to_string(),
+                uid: i,
+            })
+            .collect();
+        for (i, monomial) in monomials.0.iter().enumerate() {
+            acset.T.push(acset::Transition {
+                tname: monomial.0 .0.to_string(),
+            });
+            for (specie, exponent) in monomial.0 .1.clone() {
+                let n_arrows = exponent.0;
+                for _ in 0..n_arrows {
+                    acset.I.push(acset::InputArc {
+                        it: i + 1,
+                        is: species.iter().position(|x| x == &specie).unwrap() + 1,
+                    });
+                }
+                exponents
+                    .0
+                    .entry(specie)
+                    .or_insert(BTreeMap::from([(monomial.clone(), exponent.clone())]));
+            }
+        }
+
+        for specie_var in specie_vars {
+            let specie = Specie(specie_var.0);
+            for (i, monomial) in monomials.0.iter().enumerate() {
+                let coefficient = coefficients
+                    .0
+                    .get_mut(&specie)
+                    .unwrap()
+                    .entry(monomial.clone())
+                    .or_insert(Coefficient(0))
+                    .0;
+
+                let exponent = exponents
+                    .0
+                    .entry(specie.clone())
+                    .or_default()
+                    .entry(monomial.clone())
+                    .or_insert(Exponent(0));
+
+                let narrows = coefficient + exponent.0;
+                for _ in 0..narrows {
+                    acset.O.push(acset::OutputArc {
+                        ot: i + 1,
+                        os: species.iter().position(|x| x == &specie).unwrap() + 1,
+                    });
+                }
+            }
+        }
+        acset
+    }
+}
+
 // Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
 //
 // M(S) is the set of monomials
@@ -195,112 +308,6 @@ struct Exponents(BTreeMap<Specie, BTreeMap<Monomial, Exponent>>);
 //   structure.
 #[test]
 fn test_simple_sir_v1() {
-    let mathml_asts = get_mathml_asts_from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
-    let mut specie_vars = HashSet::<Var>::new();
-    let mut vars = HashSet::<Var>::new();
-    let mut eqns = HashMap::<Var, Vec<Term>>::new();
-
-    for ast in mathml_asts.into_iter() {
-        let _ = group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
-    }
-    let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
-
-    let mut species = BTreeSet::<Specie>::new();
-    let mut monomials = Monomials::default();
-    // Construct exponents table e(i, y) and coefficient table f(i, y)
-    let mut exponents = Exponents::default();
-    let mut coefficients = Coefficients::default();
-
-    for (lhs_specie, terms) in eqns {
-        for term in terms {
-            let mut monomial = Monomial::new(specie_vars.clone());
-            for var in term.vars.clone() {
-                if rate_vars.contains(&var) {
-                    monomial.0 .0 = Rate(var.0);
-                } else {
-                    // TODO: Generalize this to when the coefficients aren't just 1 and -1.
-                    monomial.0 .1.insert(Specie(var.0), Exponent(1));
-                }
-            }
-            let mut coefficient = Coefficient(1);
-            if term.polarity == Polarity::sub {
-                coefficient.0 = -1;
-            }
-
-            if !monomials.0.contains(&monomial) {
-                monomials.0.insert(monomial.clone());
-            }
-
-            let specie = Specie(lhs_specie.0.clone());
-            species.insert(specie.clone());
-
-            coefficients
-                .0
-                .entry(specie.clone())
-                .and_modify(|e| {
-                    e.entry(monomial.clone()).or_insert(coefficient.clone());
-                })
-                .or_insert(BTreeMap::from([(monomial.clone(), coefficient.clone())]));
-        }
-    }
-
-    // Construct the ACSet for TA2
-    let mut acset = acset::ACSet::default();
-    acset.S = species
-        .clone()
-        .into_iter()
-        .enumerate()
-        .map(|(i, x)| acset::Specie {
-            sname: x.to_string(),
-            uid: i,
-        })
-        .collect();
-    for (i, monomial) in monomials.0.iter().enumerate() {
-        acset.T.push(acset::Transition {
-            tname: monomial.0 .0.to_string(),
-        });
-        for (specie, exponent) in monomial.0 .1.clone() {
-            let n_arrows = exponent.0;
-            for _ in 0..n_arrows {
-                acset.I.push(acset::InputArc {
-                    it: i + 1,
-                    is: species.iter().position(|x| x == &specie).unwrap() + 1,
-                });
-            }
-            exponents
-                .0
-                .entry(specie)
-                .or_insert(BTreeMap::from([(monomial.clone(), exponent.clone())]));
-        }
-    }
-
-    for specie_var in specie_vars {
-        let specie = Specie(specie_var.0);
-        for (i, monomial) in monomials.0.iter().enumerate() {
-            let coefficient = coefficients
-                .0
-                .get_mut(&specie)
-                .unwrap()
-                .entry(monomial.clone())
-                .or_insert(Coefficient(0))
-                .0;
-
-            let exponent = exponents
-                .0
-                .entry(specie.clone())
-                .or_default()
-                .entry(monomial.clone())
-                .or_insert(Exponent(0));
-
-            let narrows = coefficient + exponent.0;
-            for _ in 0..narrows {
-                acset.O.push(acset::OutputArc {
-                    ot: i + 1,
-                    os: species.iter().position(|x| x == &specie).unwrap() + 1,
-                });
-            }
-        }
-    }
-
+    let acset = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
     println!("{}", serde_json::to_string(&acset).unwrap());
 }

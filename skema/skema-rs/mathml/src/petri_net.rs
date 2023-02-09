@@ -40,6 +40,6 @@ pub struct Tangent(pub Specie);
 #[derive(Debug, Eq, PartialEq, Clone, Hash, Default)]
 pub enum Polarity {
     #[default]
-    add,
-    sub,
+    positive,
+    negative,
 }

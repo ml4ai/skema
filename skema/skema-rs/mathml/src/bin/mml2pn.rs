@@ -1,5 +1,7 @@
 ///! Program to parse MathML and convert it to a Petri Net
 use clap::Parser;
+use mathml::mml2pn::ACSet;
+use serde_json;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -13,5 +15,6 @@ struct Cli {
 
 fn main() {
     let args = Cli::parse();
-    //process_file(&args.input);
+    let acset = ACSet::from_file(&args.input);
+    println!("{}", serde_json::to_string(&acset).unwrap());
 }

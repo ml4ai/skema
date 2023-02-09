@@ -1,5 +1,4 @@
 use serde::{Deserialize, Serialize};
-use serde_json;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Specie {
@@ -24,6 +23,7 @@ pub struct OutputArc {
     pub os: usize,
 }
 
+#[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ACSet {
     pub S: Vec<Specie>,
