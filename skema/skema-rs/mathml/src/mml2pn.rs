@@ -12,6 +12,7 @@ use crate::{
     },
     parsing::parse,
 };
+use petgraph::Graph;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt;
 use std::{
@@ -180,7 +181,27 @@ struct Coefficients(BTreeMap<Specie, BTreeMap<Monomial, Coefficient>>);
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default, Ord, PartialOrd)]
 struct Exponents(BTreeMap<Specie, BTreeMap<Monomial, Exponent>>);
 
+#[derive(Debug, Clone)]
+pub enum PetriNetElement {
+    Specie(acset::Specie),
+    Transition(acset::Transition),
+}
+
 impl acset::ACSet {
+    // Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
+    //
+    // M(S) is the set of monomials
+    // m: T -> M(S)
+    // \dot{x_i} = \sum_{y} f(i, y)m(y)
+    // f(i, y) are integers such that f(i, y) + e(i, y) is a natural number.
+    // e(i, y): T -> N --- exponent of species i in monomial corresponding to transition y.
+    // For each transition y, draw e(i, y) arrows from specie x_i to transition y.
+    // Finally, for each transition y, draw n(i, y) = f(i, y) + e(i, y) arrows from y to x_i
+    // Algorithm:
+    // - Identify monomials (i.e. products of species and rates). I assume each monomial corresponds to
+    //   a transition.
+    // - When a monomial is identified, get the exponents of the species in it and store it in a data
+    //   structure.
     pub fn from_file(filepath: &str) -> acset::ACSet {
         let mathml_asts = get_mathml_asts_from_file(filepath);
         let mut specie_vars = HashSet::<Var>::new();
@@ -232,6 +253,7 @@ impl acset::ACSet {
         }
 
         // Construct the ACSet for TA2
+        // We increment indices by 1 wherever necessary in order to facilitate interoperability with Julia.
         let mut acset = acset::ACSet::default();
         acset.S = species
             .clone()
@@ -290,24 +312,90 @@ impl acset::ACSet {
         }
         acset
     }
+
+    pub fn to_graph(&self) -> Graph<PetriNetElement, usize> {
+        let mut graph = Graph::<PetriNetElement, usize>::new();
+        let mut specie_indices = Vec::new();
+        let mut transition_indices = Vec::new();
+        for specie in &self.S {
+            let node_index = graph.add_node(PetriNetElement::Specie(specie.clone()));
+            specie_indices.push(node_index);
+        }
+        for transition in &self.T {
+            let node_index = graph.add_node(PetriNetElement::Transition(transition.clone()));
+            transition_indices.push(node_index);
+        }
+
+        for input_arc in &self.I {
+            let source = specie_indices[input_arc.is - 1];
+            let destination = transition_indices[input_arc.it - 1];
+            if let Some(e) = graph.find_edge(source, destination) {
+                graph[e] += 1;
+            } else {
+                graph.add_edge(source, destination, 1);
+            }
+        }
+        for output_arc in &self.O {
+            let source = transition_indices[output_arc.ot - 1];
+            let destination = specie_indices[output_arc.os - 1];
+
+            if let Some(e) = graph.find_edge(source, destination) {
+                graph[e] += 1;
+            } else {
+                graph.add_edge(source, destination, 1);
+            }
+        }
+        graph
+    }
+
+    pub fn to_dot(&self) -> String {
+        let graph = self.to_graph();
+        let mut dot: String = "".to_owned();
+        dot.push_str("digraph {\n");
+        for node in graph.node_indices() {
+            dot.push_str(&format!("\t {} ", node.index()));
+            let (label, shape, color) = {
+                match &graph[node] {
+                    PetriNetElement::Specie(specie) => (&specie.sname, "circle", "dodgerblue3"),
+                    PetriNetElement::Transition(transition) => {
+                        (&transition.tname, "square", "darkorange2")
+                    }
+                }
+            };
+            dot.push_str(&format!(
+                "[ label = \"{}\" , shape = {}, color = {}]\n",
+                label, shape, color
+            ));
+        }
+
+        for edge in graph.edge_indices() {
+            let (src, dest) = graph.edge_endpoints(edge).unwrap();
+            dot.push_str(&format!(
+                "\t {} -> {} [ label = \"{}\" ]\n ",
+                src.index(),
+                dest.index(),
+                graph[edge]
+            ));
+        }
+        dot.push_str("}");
+        dot
+    }
 }
 
-// Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
-//
-// M(S) is the set of monomials
-// m: T -> M(S)
-// \dot{x_i} = \sum_{y} f(i, y)m(y)
-// f(i, y) are integers such that f(i, y) + e(i, y) is a natural number.
-// e(i, y): T -> N --- exponent of species i in monomial corresponding to transition y.
-// For each transition y, draw e(i, y) arrows from specie x_i to transition y.
-// Finally, for each transition y, draw n(i, y) = f(i, y) + e(i, y) arrows from y to x_i
-// Algorithm:
-// - Identify monomials (i.e. products of species and rates). I assume each monomial corresponds to
-//   a transition.
-// - When a monomial is identified, get the exponents of the species in it and store it in a data
-//   structure.
 #[test]
 fn test_simple_sir_v1() {
     let acset = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v1/mml_list.txt");
+    println!("{}", serde_json::to_string(&acset).unwrap());
+}
+
+#[test]
+fn test_simple_sir_v2() {
+    let acset = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v2/mml_list.txt");
+    println!("{}", serde_json::to_string(&acset).unwrap());
+}
+
+#[test]
+fn test_simple_sir_v3() {
+    let acset = acset::ACSet::from_file("../../mml2pn/mml/simple_sir_v3/mml_list.txt");
     println!("{}", serde_json::to_string(&acset).unwrap());
 }
