@@ -125,10 +125,6 @@ fn group_by_operators(
 #[derive(Debug, Ord, PartialOrd, Eq, PartialEq, Hash, Clone)]
 struct Exponent(isize);
 
-/// A transition in a Petri net
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
-struct Transition(usize);
-
 /// Coefficient of monomials in an ODE corresponding to a Petri net.
 /// For example, in the following equation: \dot{S} = -βSI,
 /// The coefficient of the βSI monomial on the RHS is (-1).
