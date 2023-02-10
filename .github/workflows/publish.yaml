@@ -1,0 +1,54 @@
+---
+# Automatically build Docker images on changes to main and push them to a
+# Container Registry using HCL Bake file.
+
+name: Build and Publish
+on:
+  push:
+    branches: ['main']
+    tags: ['*']
+
+env:
+  REGISTRY: ghcr.io
+  OWNER: ${{ github.repository_owner }}
+  BAKE_FILE: docker-bake.hcl
+
+jobs:
+  tag-generator:
+    name: Determine image tag
+    runs-on: ubuntu-22.04
+    outputs:
+      image-tag: ${{ steps.generate.outputs.tag }}
+    steps:
+      - name: Generate apprropriate tag
+        id: generate
+        run: |
+          if [[ '${{ github.ref_type }}' == 'branch' && '${{ github.ref_name }}' == 'main' ]]; then
+            TAG=latest
+          else
+            SEMVER=$( echo ${{ github.ref_name }} | sed -nre 's/^v[^0-9]*(([0-9]+\.)*[0-9]+(-[a-z]+)?).*/\1/p')
+            if [[ -n $SEMVER ]]; then
+              TAG=${SEMVER}
+            else
+              TAG=${{ github.ref_name }}
+            fi
+          fi
+
+          echo "$TAG"
+          echo "tag=${TAG,,}" >> ${GITHUB_OUTPUT}
+
+      - name: Show Generated Tag
+        run: echo ${{ steps.generate.outputs.tag }}
+  bake:
+    needs:
+      - tag-generator
+    uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
+    with:
+      file: 'docker-bake.hcl'
+      group: 'prod'
+      registry: 'ghcr.io'
+      organization: ${{ github.repository_owner }}
+      tag: ${{ needs.tag-generator.outputs.image-tag }}
+    secrets:
+      username: ${{ github.repository_owner }}
+      password: ${{ secrets.GITHUB_TOKEN }}
