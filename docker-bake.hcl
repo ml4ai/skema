@@ -38,7 +38,9 @@ group "default" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 target "_platforms" {
-  platforms = ["linux/amd64", "linux/arm64"]
+  # Currently skema-rs fails to compile on arm64 so we build only for amd at the moment
+  # platforms = ["linux/amd64", "linux/arm64"]
+  platforms = ["linux/amd64"]
 }
 
 target "skema-py-base" {
