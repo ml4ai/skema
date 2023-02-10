@@ -941,10 +941,13 @@ pub fn remove_rmrow(mathml_content: String) -> String {
 pub fn preprocess_content(content_str: String) -> String {
     let mut pre_string = content_str;
     pre_string = pre_string.replace(' ', "");
+    pre_string = pre_string.replace('\n', "");
+    pre_string = pre_string.replace('\t', "");
+    pre_string = pre_string.replace("<mo>(</mo><mi>t</mi><mo>)</mo>", "");
     pre_string = pre_string.replace("<mo>,</mo>", "");
     pre_string = pre_string.replace("<mo>(</mo>", "<mrow>");
     pre_string = pre_string.replace("<mo>)</mo>", "</mrow>");
-    pre_string = pre_string.replace('\n', "");
+
 
     // Unicode to Symbol
     let unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
