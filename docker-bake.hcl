@@ -62,7 +62,3 @@ target "skema-py" {
 target "skema-rs" {
   inherits = ["_platforms", "skema-rs-base"]
 }
-
-target "data-service-storage" {
-  inherits = ["_platforms", "data-service-storage-base"]
-}
