@@ -1,0 +1,1330 @@
+---
+# TODOs:
+# - Add general operators
+# - Remove/update CASTGeneric operators
+
+# Array
+new_Array:
+  source_language_name:
+    CAST: new_Array
+  inputs:
+  - name: elements
+    type: Any
+    variatic: true
+  outputs:
+  - name: array_output
+    type: Array
+    variatic: false
+  shorthand: new_Array
+  documentation: ''
+
+# Arithmatic 
+Add:
+  source_language_name:
+    Python: Add
+    GCC: plus_expr
+    CAST: Add
+  inputs:
+  - name: augend
+    type: Number
+    variatic: false
+  - name: addend
+    type: Number
+    variatic: false
+  outputs:
+  - name: sum
+    type: Number
+    variatic: false
+  shorthand: "+"
+  documentation: Add is the numerical addition operator. For a general addition
+    operation (For example, the case of concatanation with +) see GenAdd.
+Div:
+  source_language_name:
+    Python: Div
+    GCC: rdiv_expr
+    CAST: Div
+  inputs:
+  - name: dividend
+    type: Number
+    variatic: false
+  - name: divisor
+    type: Number
+    variatic: false
+  outputs:
+  - name: quotient
+    type: Number
+    variatic: false
+  shorthand: "/"
+  documentation: ''
+FloorDiv:
+    source_language_name:
+      Python: FloorDiv
+      CAST: FloorDiv
+    inputs:
+    - name: dividend
+      type: Number
+      variatic: false
+    - name: divisor
+      type: Number
+      variatic: false
+    outputs:
+    - name: quotient
+      type: Number
+      variatic: false
+    shorthand: "//"
+    documentation: ''
+Mod:
+  source_language_name:
+    Python: Mod
+    GCC: trunc_mod_expr
+    CAST: Mod
+  inputs:
+  - name: dividend
+    type: Number
+    variatic: false
+  - name: divisor
+    type: Number
+    variatic: false
+  outputs:
+  - name: remainder
+    type: Number
+    variatic: false
+  shorthand: "%"
+  documentation: ''
+Mult:
+  source_language_name:
+    Python: Mult
+    GCC: mult_expr
+    CAST: Mult
+  inputs:
+  - name: multiplier
+    type: Number
+    variatic: false
+  - name: multiplicand
+    type: Number
+    variatic: false
+  outputs:
+  - name: product
+    type: Number
+    variatic: false
+  shorthand: "*"
+  documentation: ''
+Pow:
+  source_language_name:
+    Python: Pow
+    CAST: Pow
+  inputs:
+  - name: base
+    type: Number
+    variatic: false
+  - name: exponent
+    type: Number
+    variatic: false
+  outputs:
+  - name: power
+    type: Number
+    variatic: false
+  shorthand: "**"
+  documentation: ''
+Sub:
+  source_language_name:
+    Python: Sub
+    GCC: minus_expr
+    CAST: Sub
+  inputs:
+  - name: minuend
+    type: Number
+    variatic: false
+  - name: subtrahend
+    type: Number
+    variatic: false
+  outputs:
+  - name: difference
+    type: Number
+    variatic: false
+  shorthand: "-"
+  documentation: Sub is the numerical subtraction operator. For a general subtraction
+    operation () see GenSub.
+
+# Bitwise
+BitAnd:
+  source_language_name:
+    Python: BitAnd
+    GCC: bit_and_expr
+    CAST: BitAnd
+  inputs:
+  - name: binary1
+    type: Number
+    variatic: false
+  - name: binary2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: "&"
+  documentation: ''
+BitOr:
+  source_language_name:
+    Python: BitOr
+    GCC: bit_ior_expr
+    CAST: BitOr
+  inputs:
+  - name: binary1
+    type: Number
+    variatic: false
+  - name: binary2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: "|"
+  documentation: ''
+BitXor:
+  source_language_name:
+    Python: BitXor
+    GCC: bit_xor_expr
+    CAST: BitXor
+  inputs:
+  - name: binary1
+    type: Number
+    variatic: false
+  - name: binary2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: "^"
+  documentation: ''
+LShift:
+  source_language_name:
+    Python: LShift
+    GCC: lshift_expr
+    CAST: LShift
+  inputs:
+  - name: operand1
+    type: Number
+    variatic: false
+  - name: operand2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: '<<'
+  documentation: ''
+RShift:
+  source_language_name:
+    Python: RShift
+    GCC: rshift_expr
+    CAST: RShift
+  inputs:
+  - name: operand1
+    type: Number
+    variatic: false
+  - name: operand2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: ">>"
+  documentation: ''
+
+# CAST Generic - TODO: Which of these do we still need if any?
+CASTGenericIter:
+  source_language_name:
+    CAST: iter
+  inputs:
+  - name: iterable_input
+    type: Iterable
+    variatic: false
+  outputs:
+  - name: iterator_output
+    type: Iterator
+    variatic: false
+  shorthand: iter
+  documentation: The cast currently uses generic primitive operators (_get, _set,
+    iter, next) while the  Gromet uses specific operators (IteratorMap_next). These
+    primitive ops are a tempory fix for that mismatch
+CASTGenericNext:
+  source_language_name:
+    CAST: next
+  inputs:
+  - name: iterator_input
+    type: Iterator
+    variatic: false
+  outputs:
+  - name: element
+    type: Any
+    variatic: false
+  - name: iterator_output
+    type: Iterator
+    variatic: false
+  - name: stop_condition
+    type: Boolean
+    variatic: false
+  shorthand: next
+  documentation: The cast currently uses generic primitive operators (_get, _set,
+    iter, next) while the  Gromet uses specific operators (IteratorMap_next). These
+    primitive ops are a tempory fix for that mismatch
+CASTGenericPrint:
+  source_language_name:
+    CAST: print
+  inputs:
+  - name: input
+    type: Any
+    variatic: false
+  outputs: []
+  shorthand: print
+  documentation: The cast currently uses generic primitive operators (_get, _set,
+    iter, next) while the  Gromet uses specific operators (IteratorMap_next). These
+    primitive ops are a tempory fix for that mismatch
+CASTGenericRange:
+  source_language_name:
+    CAST: range
+  inputs:
+  - name: input
+    type: Integer
+    variatic: false
+  outputs:
+  - name: range_output
+    type: Range
+    variatic: false
+  shorthand: range
+  documentation: ''
+
+# Comparative
+Gt:
+  source_language_name:
+    Python: Gt
+    GCC: gt_expr
+    CAST: Gt
+  inputs:
+  - name: number1
+    type: Number
+    variatic: false
+  - name: number2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: ">"
+  documentation: ''
+Gte:
+  source_language_name:
+    Python: GtE
+    GCC: ge_expr
+    CAST: Gte
+  inputs:
+  - name: number1
+    type: Number
+    variatic: false
+  - name: number2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: ">="
+  documentation: ''
+Lt:
+  source_language_name:
+    Python: Lt
+    GCC: lt_expr
+    CAST: Lt
+  inputs:
+  - name: number1
+    type: Number
+    variatic: false
+  - name: number2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: "<"
+  documentation: ''
+Lte:
+  source_language_name:
+    Python: Lte
+    GCC: le_expr
+    CAST: Lte
+  inputs:
+  - name: number1
+    type: Number
+    variatic: false
+  - name: number2
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: "<="
+  documentation: ''
+
+# DataFrame
+new_DataFrame:
+  source_language_name:
+    CAST: new_DataFrame
+  inputs:
+  - name: elements
+    type: Iterable
+    variatic: True
+  - name: row_index
+    type: List
+    variatic: False
+    default: None
+  - name: column_index
+    type: List
+    variatic: False
+    default: None
+  outputs:
+  - name: dataframe_output
+    type: DataFrame
+    variatic: false
+  shorthand: "new_DataFrame"
+  documentation: ''
+
+# Edge 
+new_Edge:
+  source_language_name:
+    CAST: new_Edge
+  inputs:
+  - name: edge_type
+    type: String
+    variatic: false
+    default: "Edge"
+  - name: extends
+    type: Tuple[String]
+    variatic: false
+    default: None
+  - name: obj
+    type: Record
+    variatic: false
+    default: None
+  - name: directed
+    type: Boolean
+    variatic: false
+    default: false
+  outputs:
+  - name: edge_output
+    type: Edge
+    variatic: false
+  shorthand: "new_Edge"
+  documentation: ''
+Edge_get_src:
+  source_language_name:
+    CAST: get_src
+  inputs:
+  - name: edge_input
+    type: Edge
+    variatic: false
+  outputs:
+  - name: node_output
+    type: Node
+    variatic: false
+  shorthand: ""
+  documentation: 
+Edge_set_src:
+  source_language_name:
+    CAST: set_src
+  inputs:
+  - name: edge_input
+    type: Edge
+    variatic: false
+  - name: node
+    type: Node
+    variatic: false
+  outputs:
+  - name: edge_output
+    type: Edge
+    variatic: false
+  shorthand: ""
+  documentation: 
+Edge_get_dst:
+  source_language_name:
+    CAST: get_dst
+  inputs:
+  - name: edge_input
+    type: Edge
+    variatic: false
+  outputs:
+  - name: node_output
+    type: Node
+    variatic: false
+  shorthand: ""
+  documentation: 
+Edge_set_dst:
+  source_language_name:
+    CAST: set_dst
+  inputs:
+  - name: edge_input
+    type: Edge
+    variatic: false
+  - name: node
+    type: Node
+    variatic: false
+  outputs:
+  - name: edge_output
+    type: Edge
+    variatic: false
+  shorthand: ""
+  documentation: 
+
+# Graph:
+new_Graph:
+  source_language_name:
+    CAST: new_Graph
+  inputs:
+  outputs:
+  - name: graph_output
+    type: Graph
+    variatic: false
+  shorthand: "new_Graph"
+  documentation: 
+Graph_add_node:
+  source_language_name:
+    CAST: add_node
+  inputs:
+  - name: graph_input
+    type: Graph
+    variatic: false
+  - name: node
+    type: Node
+    variatic: false
+  outputs:
+  - name: graph_output
+    type: Graph
+    variatic: false
+  shorthand: ""
+  documentation: 
+Graph_get_node:
+  source_language_name:
+    CAST: get_node
+  inputs:
+  - name: graph_input
+    type: Graph
+    variatic: false
+  - name: index
+    type: Hashable
+    variatic: false
+  outputs:
+  - name: node_output
+    type: Node
+    variatic: false
+  shorthand: ""
+  documentation: 
+Graph_add_edge:
+  source_language_name:
+    CAST: add_edge
+  inputs:
+  - name: graph_input
+    type: Graph
+    variatic: false
+  - name: edge_input
+    type: Edge
+    variatic: false
+  outputs:
+  - name: graph_output
+    type: Graph
+    variatic: false
+  shorthand: ""
+  documentation: 
+Graph_get_edge:
+  source_language_name:
+    CAST: get_edge
+  inputs:
+  - name: graph_input
+    type: Graph
+    variatic: false
+  - name: index
+    type: Hashable
+    variatic: false
+  outputs:
+  - name: edge_output
+    type: Edge
+    variatic: false
+  shorthand: ""
+  documentation: 
+
+# Indexable
+Indexable_get:
+  source_language_name:
+    CAST: get
+  inputs:
+  - name: indexable_input
+    type: Indexable
+    variatic: false
+  - name: index
+    type: Any
+    variatic: false
+  outputs:
+  - name: element
+    type: Any
+    variatic: false
+  shorthand: get
+  documentation: 'The Indexable_get and Indexable_set primitives are overloaded by each child type (Sequence, Record, Map)'
+Indexable_set:
+  source_language_name:
+    CAST: set
+  inputs:
+  - name: indexable_input
+    type: Indexable
+    variatic: false
+  - name: index
+    type: Any
+    variatic: false
+  - name: value
+    type: Any
+    variatic: false
+  outputs:
+  - name: indexable_output
+    type: Indexable
+    variatic: false
+  shorthand: set
+  documentation: 'The Indexable_get and Indexable_set primitives are overloaded by each child type (Sequence, Record, Map)'
+
+# Itterable
+Iterable_in:
+  source_language_name:
+    CAST: in
+  inputs:
+  - name: iterable_input
+    type: Iterable
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: iterator_output
+    type: Iterator
+    variatic: false
+  shorthand: in
+  documentation: ''
+Iterable_new_Iterator:
+  source_language_name:
+    CAST: iter
+  inputs:
+  - name: iterable_input
+    type: Iterable
+    variatic: false
+  outputs:
+  - name: iterator_output
+    type: Iterator
+    variatic: false
+  shorthand: iter
+  documentation: ''
+
+# Itterator
+Iterator_next:
+  source_language_name:
+    CAST: next
+  inputs:
+  - name: iterator_input
+    type: Iterator
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: element
+    type: Any
+    variatic: false
+  - name: iterator_output
+    type: Iterator
+    variatic: false
+  - name: stop_condition
+    type: Boolean
+    variatic: false
+  shorthand: next
+  documentation: ''
+
+# List
+new_List:
+  source_language_name:
+    CAST: new_List
+  inputs:
+  - name: elements
+    type: Any
+    variatic: true
+  outputs:
+  - name: list_output
+    type: List
+    variatic: false
+  shorthand: new_List
+  documentation: ''
+
+# Logical
+And:
+  source_language_name:
+    Python: And
+    GCC: logical_and
+    CAST: And
+  inputs:
+  - name: logical1
+    type: Boolean
+    variatic: false
+  - name: logical2
+    type: Boolean
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: and
+  documentation: ''
+Or:
+  source_language_name:
+    Python: Or
+    GCC: logical_or
+    CAST: Or
+  inputs:
+  - name: logical1
+    type: Boolean
+    variatic: false
+  - name: logical2
+    type: Boolean
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: or
+  documentation: ''
+Eq:
+  source_language_name:
+    Python: Eq
+    GCC: eq_expr
+    CAST: Eq
+  inputs:
+  - name: operand1
+    type: Any
+    variatic: false
+  - name: operand2
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: "=="
+  documentation: ''
+NotEq:
+  source_language_name:
+    Python: NotEq
+    GCC: ne_expr
+    CAST: NotEq
+  inputs:
+  - name: operand1
+    type: Any
+    variatic: false
+  - name: operand2
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: "!="
+  documentation: ''
+In:
+  source_language_name:
+    CAST: In
+  inputs:
+  - name: container_input
+    type: Any
+    variatic: false
+  - name: value
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: in
+  documentation: ''
+NotIn:
+  source_language_name:
+    CAST: NotIn
+  inputs:
+  - name: container_input
+    type: Any
+    variatic: false
+  - name: value
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: not in
+  documentation: ''
+Is:
+  source_language_name:
+    CAST: Is
+  inputs:
+  - name: operand1
+    type: Any
+    variatic: false
+  - name: operand2
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: is
+  documentation: ''
+NotIs:
+  source_language_name:
+    CAST: NotIs
+  inputs:
+  - name: operand1
+    type: Any
+    variatic: false
+  - name: operand2
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: not is
+  documentation: ''
+
+# Map 
+new_Map:
+  source_language_name:
+    CAST: new_Map
+  inputs: []
+  outputs:
+  - name: map_output
+    type: Map
+    variatic: false
+  shorthand: new_Map
+  documentation: ''
+Map_get: # TODO: How will this be represented in the CAST
+  source_language_name:
+    CAST: map_get
+  inputs:
+  - name: map_input
+    type: Map
+    variatic: false
+  - name: index
+    type: Hashable
+    variatic: false
+  outputs:
+  - name: element
+    type: Any
+    variatic: false
+  shorthand: map_get
+  documentation: 'This is the overloaded version of Indexable_get for Map type.'
+Map_set:
+  source_language_name:
+    CAST: map_set
+  inputs:
+  - name: map_input
+    type: Map
+    variatic: false
+  - name: index
+    type: Hashable
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: map_output
+    type: Map
+    variatic: false
+  shorthand: map_set
+  documentation: 'This is the overloaded version of Indexable_set for Map type.'
+
+# Node 
+new_Node:
+  source_language_name:
+    CAST: new_Node
+  inputs:
+    - name: node_type
+      type: str
+      variatic: false
+      default: Node 
+    - name: extends
+      type: Tuple[String]
+      variatic: false
+      default: None 
+    - name: obj
+      type: Record
+      variatic: false
+      default: None 
+  outputs:
+  - name: node_output
+    type: Node
+    variatic: false
+  shorthand: "new_Node"
+  documentation: ''
+
+# Range
+new_Range:
+  source_language_name:
+    CAST: new_Range
+  inputs:
+  - name: stop
+    type: Integer
+    variatic: false
+  - name: start
+    type: Integer
+    variatic: false
+  - name: step
+    type: Integer
+    variatic: false
+  outputs:
+  - name: range_output
+    type: Range
+    variatic: false
+  shorthand: new_Range
+  documentation: ''
+
+# Record #TODO: fix new_Record
+new_Field:
+  source_language_name:
+    CAST: new_Field
+  inputs:
+  - name: record_input
+    type: Record
+    variatic: false
+  - name: field_name
+    type: String
+    variatic: false
+  - name: value_type
+    type: Type
+    variatic: false
+  outputs:
+  - name: record_output
+    type: Record
+    variatic: false
+  shorthand: new_Field
+  documentation: ''
+new_Record:
+  source_language_name:
+    CAST: new_Record
+  inputs:
+  - name: record_type
+    type: String
+    variatic: false
+  - name: extends
+    type: Tuple[String]
+    variatic: false
+    default: None
+  - name: obj
+    type: Record
+    variatic: false
+    default: None
+  outputs:
+  - name: record_output
+    type: Record
+    variatic: false
+  shorthand: new_Record
+  documentation: 'When obj is specified (e.g., in call to super constructor), then new_Record is a “pass-through” — see class2.py'
+Record_get: # TODO: How will this be represented in the CAST
+  source_language_name:
+    CAST: record_get
+  inputs:
+  - name: record_input
+    type: Record
+    variatic: false
+  - name: index
+    type: String
+    variatic: false
+  outputs:
+  - name: element
+    type: Any
+    variatic: false
+  shorthand: record_get
+  documentation: 'This is the overloaded version of Indexable_get for Record type.'
+Record_set:
+  source_language_name:
+    CAST: record_set
+  inputs:
+  - name: record_input
+    type: Record
+    variatic: false
+  - name: index
+    type: String
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: record_output
+    type: Record
+    variatic: false
+  shorthand: record_set
+  documentation: 'This is the overloaded version of Indexable_set for Record type.'
+
+# Sequence
+Sequence_concatenate:
+  source_language_name:
+    CAST: concatenate
+  inputs:
+  - name: sequence_inputs
+    type: Sequence
+    variatic: true
+  outputs:
+  - name: sequence_output
+    type: Sequence
+    variatic: false
+  shorthand: ''
+  documentation: ''
+Sequence_count:
+  source_language_name:
+    CAST: count
+  inputs:
+  - name: sequence_input
+    type: Sequence
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: count
+    type: Integer
+    variatic: false
+  shorthand: ''
+  documentation: ''
+Sequence_index:
+  source_language_name:
+    CAST: index
+  inputs:
+  - name: list_input
+    type: List
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: index
+    type: Integer
+    variatic: false
+  shorthand: ''
+  documentation: ''
+Sequence_length:
+  source_language_name:
+    CAST: length
+  inputs:
+  - name: sequence_input
+    type: Sequence
+    variatic: false
+  outputs:
+  - name: length
+    type: Integer
+    variatic: false
+  shorthand: ''
+  documentation: ''
+Sequence_max:
+  source_language_name:
+    CAST: max
+  inputs:
+  - name: sequence_input
+    type: Sequence
+    variatic: false
+  outputs:
+  - name: maximum
+    type: Any
+    variatic: false
+  shorthand: ''
+  documentation: ''
+Sequence_min:
+  source_language_name:
+    CAST: min
+  inputs:
+  - name: sequence_input
+    type: Sequence
+    variatic: false
+  outputs:
+  - name: minimum
+    type: Any
+    variatic: false
+  shorthand: ''
+  documentation: ''
+Sequence_replicate:
+  source_language_name:
+    CAST: replicate
+  inputs:
+  - name: sequence_input
+    type: Sequence
+    variatic: false
+  - name: count
+    type: Integer
+    variatic: false
+  outputs:
+  - name: sequence_output
+    type: Sequence
+    variatic: false
+  shorthand: ''
+  documentation: ''
+Sequence_get: # TODO: How will this be represented in the CAST
+  source_language_name:
+    CAST: sequence_get
+  inputs:
+  - name: sequence_input
+    type: Sequence
+    variatic: false
+  - name: index
+    type: DimensionalIndex
+    variatic: false
+  outputs:
+  - name: sequence_output
+    type: Any
+    variatic: false
+  shorthand: sequence_get
+  documentation: 'This is the overloaded version of Indexable_get for Sequence type. Because Sequence_get can return a single element or a slice, the output type is Sequence'
+Sequence_set:
+  source_language_name:
+    CAST: sequence_set
+  inputs:
+  - name: sequence_input
+    type: Sequence
+    variatic: false
+  - name: index
+    type: DimensionalIndex
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: sequence_output
+    type: Sequence
+    variatic: false
+  shorthand: sequence_set
+  documentation: 'This is the overloaded version of Indexable_set for Sequence type.'
+
+
+# Slice - # TODO: Should this be Slice or Slice_slice or new_Slice
+Slice:
+  source_language_name:
+    CAST: slice
+  inputs:
+  - name: lower
+    type: Integer
+    variatic: false
+  - name: upper
+    type: Integer
+    variatic: false
+  - name: step
+    type: Integer
+    variatic: false
+  outputs:
+  - name: output_slice
+    type: Slice
+    variatic: false
+  shorthand: slice
+  documentation: ''
+ExtSlice:
+  source_language_name:
+    CAST: ext_slice
+  inputs:
+  - name: dims
+    type: List[Slice, Integer, Ellipsis]
+    variatic: false
+  outputs:
+  - name: output_slice
+    type: ExtSlice
+    variatic: false
+  shorthand: ext_slice
+  documentation: 'Note on Ellipsis: Only 1 element of the dims list is allowed to contain an ellipsis'
+
+# Set
+add_elm:
+  source_language_name:
+    CAST: add_elm
+  inputs:
+  - name: input_set
+    type: Set
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: set_output
+    type: Set
+    variatic: false
+  shorthand: add_elm
+  documentation: ''
+del_elm:
+  source_language_name:
+    CAST: del_elm
+  inputs:
+  - name: input_set
+    type: Set
+    variatic: false
+  - name: element
+    type: Any
+    variatic: false
+  outputs:
+  - name: set_output
+    type: Set
+    variatic: false
+  shorthand: del_elm
+  documentation: ''
+member:
+  source_language_name:
+    CAST: member
+  inputs:
+  - name: set_input
+    type: Set
+    variatic: true
+  - name: value
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: member
+  documentation: ''
+new_Set:
+  source_language_name:
+    CAST: new_set
+  inputs:
+  - name: elements
+    type: Any
+    variatic: true
+  outputs:
+  - name: set_output
+    type: Set
+    variatic: false
+  shorthand: new_Set
+  documentation: ''
+
+# Tuple
+new_Tuple:
+  source_language_name:
+    CAST: new_Tuple
+  inputs:
+  - name: elements
+    type: Any
+    variatic: true
+  outputs:
+  - name: tuple_output
+    type: Tuple
+    variatic: false
+  shorthand: new_Tuple
+  documentation: ''
+
+# Type
+IsInstance:
+  source_language_name:
+    CAST: is_instance
+  inputs:
+  - name: operand
+    type: Any
+    variatic: false
+  - name: type
+    type: Type
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: type
+  documentation: ''
+Type:
+  source_language_name:
+    CAST: type
+  inputs:
+  - name: operand
+    type: Any
+    variatic: false
+  outputs:
+  - name: result
+    type: Type
+    variatic: false
+  shorthand: type
+  documentation: ''
+Cast:
+  source_language_name:
+    CAST: cast
+  inputs:
+  - name: operand
+    type: Any
+    variatic: false
+  - name: type_name
+    type: String
+    variatic: false
+  outputs:
+  - name: result
+    type: Any
+    variatic: false
+  shorthand: cast
+  documentation: ''
+
+# Unary
+Invert:
+  source_language_name:
+    Python: Invert
+    CAST: Invert
+  inputs:
+  - name: operand
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: "~"
+  documentation: ''
+Not:
+  source_language_name:
+    Python: Not
+    CAST: Not
+  inputs:
+  - name: operand
+    type: Boolean
+    variatic: false
+  outputs:
+  - name: result
+    type: Boolean
+    variatic: false
+  shorthand: not
+  documentation: ''
+UAdd:
+  source_language_name:
+    Python: UAdd
+    CAST: UAdd
+  inputs:
+  - name: operand
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: u+
+  documentation: ''
+USub:
+  source_language_name:
+    Python: USub
+    CAST: USub
+  inputs:
+  - name: operand
+    type: Number
+    variatic: false
+  outputs:
+  - name: result
+    type: Number
+    variatic: false
+  shorthand: u-
+  documentation: ''
