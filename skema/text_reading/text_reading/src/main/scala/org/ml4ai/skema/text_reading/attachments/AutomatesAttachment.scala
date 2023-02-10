@@ -42,25 +42,22 @@ class LocationContextAttachment(locations:Seq[Mention]) extends AutomatesAttachm
     )
   })
 
-  override def toUJson: Value = ujson.Arr(locations map {
-    l => ujson.Obj(
-      "scenarioLocation" -> l.text
-    )
-  })
+  override def toUJson: Value = ujson.Obj(
+    "scenarioLocation" -> (locations map (_.text)).distinct
+  )
 }
 
-class TimeContextAttachment(locations:Seq[Mention]) extends AutomatesAttachment {
-  override def toJson: JsValue = Json.arr(locations map {
+class TimeContextAttachment(times:Seq[Mention]) extends AutomatesAttachment {
+  override def toJson: JsValue = Json.arr(times map {
     l => Json.obj(
       "scenarioTime" -> l.text
     )
   })
 
-  override def toUJson: Value = ujson.Arr(locations map {
-    l => ujson.Obj(
-      "scenarioTime" -> l.text
-    )
-  })
+
+  override def toUJson: Value = ujson.Obj(
+    "scenarioTime" -> (times map (_.text)).distinct
+  )
 }
 
 class MentionLocationAttachment(val filename: String, val  pageNum: Seq[Int], val blockIdx: Seq[Int], attType: String) extends AutomatesAttachment {

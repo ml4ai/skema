@@ -33,9 +33,10 @@ class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer:
             val contextMentions = mentionsMap.getOrElse(sentenceIndex, Seq.empty)
             contextMentions
         }.groupBy(_.label).map {
-          case (label, mentions) if label == "Location" => new LocationContextAttachment(mentions)
+          case (label, mentions) if label == "Location" =>
+            new LocationContextAttachment(mentions)
           case (label, mentions) if label == "Date" => new TimeContextAttachment(mentions)
-        }.toSeq
+        }.toSeq.distinct
 
       m match {
         case evt: EventMention =>
