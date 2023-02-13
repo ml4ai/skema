@@ -128,26 +128,21 @@ impl MathExpression {
                     name: "".to_string(),
                 });
             }
-            Msubsup(xs) => {
-                if xs.len() != 3 {
-                    return;
-                }
+            Msubsup(xs1, xs2, xs3) => {
+                // if xs.len() != 3 {
+                //     return;
+                // }
                 if pre.args.len() >= pre.op.len() {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
                 let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
-                let mut idx = 0;
-                for x in xs {
-                    if idx == 0 {
-                        pre_exp.op.push(Operator::Other("_".to_string()));
-                    } else if idx == 1 {
-                        pre_exp.op.push(Operator::Other("^".to_string()));
-                    }
-                    idx += 1;
-                    x.to_expr(&mut pre_exp);
-                }
+                pre_exp.op.push(Operator::Other("_".to_string()));
+                xs1.to_expr(&mut pre_exp);
+                pre_exp.op.push(Operator::Other("^".to_string()));
+                xs2.to_expr(&mut pre_exp);
+                xs3.to_expr(&mut pre_exp);
                 pre.args.push(Expr::Expression {
                     op: pre_exp.op,
                     args: pre_exp.args,
@@ -204,19 +199,21 @@ impl MathExpression {
                     name: "".to_string(),
                 });
             }
-            Mover(xs) => {
-                if xs.len() != 2 {
-                    return;
-                }
+            Mover(xs1, xs2) => {
+                // if xs.len() != 2 {
+                //     return;
+                // }
                 if pre.args.len() >= pre.op.len() {
                     // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
                 let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
-                for x in xs {
-                    x.to_expr(&mut pre_exp);
-                }
+                // for x in xs {
+                //     x.to_expr(&mut pre_exp);
+                // }
+                xs1.to_expr(&mut pre_exp);
+                xs2.to_expr(&mut pre_exp);
                 pre_exp.op.remove(0);
                 pre.args.push(Expr::Expression {
                     op: pre_exp.op,
@@ -1702,19 +1699,19 @@ fn test_to_expr22() {
 
 #[test]
 fn test_to_expr23() {
-    let math_expression = Mrow(vec![Msubsup(vec![
-        Mrow(vec![
+    let math_expression = Mrow(vec![Msubsup(
+        Box::from(Mrow(vec![
             Mi("a".to_string()),
             Mo(Operator::Add),
             Mi("b".to_string()),
-        ]),
-        Mrow(vec![
+        ])),
+        Box::from(Mrow(vec![
             Mi("c".to_string()),
             Mo(Operator::Subtract),
             Mi("d".to_string()),
-        ]),
-        Mi("c".to_string()),
-    ])]);
+        ])),
+        Box::from(Mi("c".to_string())),
+    )]);
     let _g = math_expression.to_graph();
 }
 
