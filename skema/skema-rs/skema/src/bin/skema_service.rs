@@ -83,18 +83,12 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(Config {
                 db_host: args.db_host.clone(),
             }))
+            .configure(skema::services::gromet::configure())
             .service(get_comments)
             .service(ping)
-            .service(get_model_ids)
-            .service(post_model)
-            .service(delete_model)
-            .service(get_named_opos)
-            .service(get_named_opis)
-            .service(get_named_ports)
             .service(get_comments)
             .service(get_ast_graph)
             .service(get_math_exp_graph)
-            .service(get_subgraph)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })
     .bind((args.host, args.port))?
