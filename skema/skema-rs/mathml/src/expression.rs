@@ -8,7 +8,7 @@ use std::clone::Clone;
 use petgraph::{graph::NodeIndex, Graph};
 
 use std::collections::VecDeque;
-
+use crate::petri_net::recognizers::is_leibniz_diff_operator;
 /// Struct for representing mathematical expressions in order to align with source code.
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
@@ -41,33 +41,11 @@ pub struct PreExp {
 
 /// Check if the fraction is a derivative expressed in Leibniz notation. If yes, mutate it to
 /// remove the 'd' prefixes.
-/// TODO: It would be ideal if we could have a pure function rather than a function with side
-/// effects here. Also, there is a lot of overlap between this function and and the
-/// 'is_leibniz_diff_operator function'. It would be good to reduce the duplicated code.
 pub fn is_derivative(
     numerator: &mut Box<MathExpression>,
     denominator: &mut Box<MathExpression>,
 ) -> bool {
-    let mut numerator_contains_d = false;
-    let mut denominator_contains_d = false;
-    if let Mrow(x) = &**numerator {
-        if let Mi(x) = &x[0] {
-            if x == "d" {
-                numerator_contains_d = true;
-            }
-        }
-    }
-
-    if let Mrow(x) = &**denominator {
-        if let Mi(x) = &x[0] {
-            if x == "d" {
-                denominator_contains_d = true;
-            }
-        }
-    }
-
-    // If the fraction is a derivative, remove the 'd' prefixes in the numerator and denominator.
-    if numerator_contains_d && denominator_contains_d {
+    if is_leibniz_diff_operator(numerator, denominator){
         if let Mrow(x) = &mut **numerator {
             x.remove(0);
         }
@@ -308,22 +286,21 @@ impl Expr {
         }
     }
 
-    /// If the current term's operators are all multiplication or division, make a new expression
-    /// structure.
-    /// TODO Liang: Complete this description.
+    /// If the current term's operators are all multiplication or division, check if it contains
+    /// nested all multiplication or division terms inside. If so, collapse them into a single term.
     fn collapse_expr(&mut self) {
         if let Expr::Expression { op, args, .. } = self {
             let mut op_copy = op.clone();
             let mut args_copy = args.clone();
 
             let mut shift = 0;
-            if all_ops_are_mult_and_not_div(op.to_vec()) && op.len() > 1 {
+            if all_ops_are_mult_or_div(op.to_vec()) && op.len() > 1 {
                 let mut changed = true;
                 while changed {
                     for i in 0..args.len() {
                         if let Expr::Expression { op, args, name: _ } = &mut args[i] {
                             if op[0] == Operator::Other("".to_string())
-                                && all_ops_are_mult_and_not_div(op.to_vec())
+                                && all_ops_are_mult_or_div(op.to_vec())
                             {
                                 args_copy[i] = args[0].clone();
                                 for j in 1..op.len() {
@@ -355,7 +332,7 @@ impl Expr {
             Expr::Atom(_) => "".to_string(),
             Expr::Expression { op, args, name } => {
                 if op[0] == Operator::Other("".to_string())
-                    && !all_ops_are_mult_and_not_div(op.to_vec())
+                    && !all_ops_are_mult_or_div(op.to_vec())
                     && !contains_redundant_parens(name)
                 {
                     name.push('(');
@@ -785,8 +762,8 @@ pub fn contains_redundant_parens(string: &str) -> bool {
     false
 }
 
-/// Check if the current term's operators are all multiply and not divide.
-pub fn all_ops_are_mult_and_not_div(op: Vec<Operator>) -> bool {
+/// Check if the current term's operators are all multiply or divide.
+pub fn all_ops_are_mult_or_div(op: Vec<Operator>) -> bool {
     for o in 1..=op.len() - 1 {
         if op[o] != Operator::Multiply && op[o] != Operator::Divide {
             return false;
@@ -862,7 +839,8 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
     graph.add_node(name.to_string())
 }
 
-/// Remove redundant mrow. This function will likely be removed once the img2mml pipeline is fixed.
+/// Remove redundant mrow next to specific MathML elements. This function will likely be removed
+/// once the img2mml pipeline is fixed.
 pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
     let mut content = mml;
     let key_words_left = "<mrow>".to_string() + &*key_word.clone();
@@ -889,10 +867,10 @@ pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
     content
 }
 
-/// Remove redundant mrow in mathml
-/// TODO Liang: Come up with a better name for this function (or the remove_redundant_mrow
-/// function).
-pub fn remove_rmrow(mathml_content: String) -> String {
+/// Remove redundant mrows in mathml because some mathml elements don't need mrow to wrap. This
+/// function will likely be removed
+/// once the img2mml pipeline is fixed.
+pub fn remove_redundant_mrows(mathml_content: String) -> String {
     let mut content = mathml_content;
     content = content.replace("<mrow>", "(");
     content = content.replace("</mrow>", ")");
@@ -966,11 +944,11 @@ pub fn preprocess_content(content_str: String) -> String {
         &html_escape::decode_html_entities("&#x2212;").to_string(),
         "-",
     );
-    pre_string = remove_rmrow(pre_string);
+    pre_string = remove_redundant_mrows(pre_string);
     pre_string
 }
 
-/// TODO Liang: Add a docstring for this function.
+/// Wrap mathml vectors by mrow as a single expression to process
 pub fn wrap_math(math: Math) -> MathExpression {
     let mut math_vec = vec![];
     for con in math.content {

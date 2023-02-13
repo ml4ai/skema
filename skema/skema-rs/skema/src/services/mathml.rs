@@ -8,12 +8,12 @@ use utoipa;
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 #[utoipa::path(
 request_body = String,
-responses(
-(
-status = 200,
-body = String
-)
-)
+    responses(
+        (
+            status = 200,
+            body = String
+        )
+    )
 )]
 #[put("/mathml/ast-graph")]
 pub async fn get_ast_graph(payload: String) -> String {
@@ -30,12 +30,12 @@ pub async fn get_ast_graph(payload: String) -> String {
 /// model code that corresponds to the equation.
 #[utoipa::path(
 request_body = String,
-responses(
-(
-status = 200,
-body = String
-)
-)
+    responses(
+        (
+            status = 200,
+            body = String
+        )
+    )
 )]
 #[put("/mathml/math-exp-graph")]
 pub async fn get_math_exp_graph(payload: String) -> String {
