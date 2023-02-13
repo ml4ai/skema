@@ -227,8 +227,8 @@ pub struct TextExtraction {
     pub char_end: Option<u32>,
 }
 
-/*#[derive(Deserialize, Serialize, Clone, Debug)]
-pub struct TextExtraction {
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct Grounding {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub argument_name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -237,7 +237,13 @@ pub struct TextExtraction {
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub score: Option<f32>,
-}*/
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct ValueMeta {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+}
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 pub struct Metadata {
@@ -252,9 +258,9 @@ pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub variable_definition: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<String>,
-    //#[serde(skip_serializing_if = "Option::is_none")]
-    //pub grounding: Option<Vec<Grounding>>,
+    pub value: Option<ValueMeta>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grounding: Option<Vec<Grounding>>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

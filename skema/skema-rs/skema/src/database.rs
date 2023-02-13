@@ -18,27 +18,34 @@ use rsmgclient::{ConnectParams, Connection, MgError};
 
 use crate::FunctionType;
 use crate::{Attribute, FnType::Import, FunctionNet, GrometBox};
-use crate::{Files, Gromet, Metadata, ModuleCollection, Provenance};
+use crate::{
+    Files, Gromet, Grounding, Metadata, ModuleCollection, Provenance, TextExtraction, ValueMeta,
+};
 
 #[derive(Debug, Clone)]
 pub struct MetadataNode {
     pub n_type: String,
     pub node_id: String,
     pub metadata_idx: u32,
-    pub metadata_type: Option<String>,
-    pub gromet_version: Option<String>,
-    pub name: Option<String>,
-    pub global_reference_id: Option<String>,
-    pub files: Option<Vec<Files>>,
-    pub source_language: Option<String>,
-    pub source_language_version: Option<String>,
-    pub data_type: Option<String>,
-    pub code_file_reference_uid: Option<String>,
-    pub line_begin: Option<u32>,
-    pub line_end: Option<u32>,
-    pub col_begin: Option<u32>,
-    pub col_end: Option<u32>,
-    pub provenance: Option<Provenance>,
+    pub metadata_type: Vec<Option<String>>,
+    pub gromet_version: Vec<Option<String>>,
+    pub text_extraction: Vec<Option<TextExtraction>>,
+    pub variable_identifier: Vec<Option<String>>,
+    pub variable_definition: Vec<Option<String>>,
+    pub value: Vec<Option<ValueMeta>>,
+    pub grounding: Vec<Option<Vec<Grounding>>>,
+    pub name: Vec<Option<String>>,
+    pub global_reference_id: Vec<Option<String>>,
+    pub files: Vec<Option<Vec<Files>>>,
+    pub source_language: Vec<Option<String>>,
+    pub source_language_version: Vec<Option<String>>,
+    pub data_type: Vec<Option<String>>,
+    pub code_file_reference_uid: Vec<Option<String>>,
+    pub line_begin: Vec<Option<u32>>,
+    pub line_end: Vec<Option<u32>>,
+    pub col_begin: Vec<Option<u32>>,
+    pub col_end: Vec<Option<u32>>,
+    pub provenance: Vec<Option<Provenance>>,
 }
 
 #[derive(Debug, Clone)]
@@ -84,43 +91,154 @@ fn create_metadata_node(gromet: &ModuleCollection, metadata_idx: u32) -> Vec<Met
         [(metadata_idx.clone() - 1) as usize][0]
         .clone();
     let mut metas: Vec<MetadataNode> = vec![];
+
+    // since there can be an array of metadata after alignment
+    let mut metadata_type_vec: Vec<Option<String>> = vec![];
+    let mut gromet_version_vec: Vec<Option<String>> = vec![];
+    let mut text_extraction_vec: Vec<Option<TextExtraction>> = vec![];
+    let mut variable_identifier_vec: Vec<Option<String>> = vec![];
+    let mut variable_definition_vec: Vec<Option<String>> = vec![];
+    let mut value_vec: Vec<Option<ValueMeta>> = vec![];
+    let mut grounding_vec: Vec<Option<Vec<Grounding>>> = vec![];
+    let mut name_vec: Vec<Option<String>> = vec![];
+    let mut global_reference_id_vec: Vec<Option<String>> = vec![];
+    let mut files_vec: Vec<Option<Vec<Files>>> = vec![];
+    let mut source_language_vec: Vec<Option<String>> = vec![];
+    let mut source_language_version_vec: Vec<Option<String>> = vec![];
+    let mut data_type_vec: Vec<Option<String>> = vec![];
+    let mut code_file_reference_uid_vec: Vec<Option<String>> = vec![];
+    let mut line_begin_vec: Vec<Option<u32>> = vec![];
+    let mut line_end_vec: Vec<Option<u32>> = vec![];
+    let mut col_begin_vec: Vec<Option<u32>> = vec![];
+    let mut col_end_vec: Vec<Option<u32>> = vec![];
+    let mut provenance_vec: Vec<Option<Provenance>> = vec![];
+
+    // fill out metadata arrays
+    for data in gromet.modules[0].metadata_collection.as_ref().unwrap()[(metadata_idx.clone() - 1) as usize].clone() {
+        metadata_type_vec.push(data.metadata_type.clone());
+        gromet_version_vec.push(data.gromet_version.clone());
+        text_extraction_vec.push(data.text_extraction.clone());
+        variable_identifier_vec.push(data.variable_identifier.clone());
+        variable_definition_vec.push(data.variable_definition.clone());
+        value_vec.push(data.value.clone());
+        grounding_vec.push(data.grounding.clone());
+        name_vec.push(data.name.clone());
+        global_reference_id_vec.push(data.global_reference_id.clone());
+        files_vec.push(data.files.clone());
+        source_language_vec.push(data.source_language.clone());
+        source_language_version_vec.push(data.source_language_version.clone());
+        data_type_vec.push(data.data_type.clone());
+        code_file_reference_uid_vec.push(data.code_file_reference_uid.clone());
+        line_begin_vec.push(data.line_begin.clone());
+        line_end_vec.push(data.line_end.clone());
+        col_begin_vec.push(data.col_begin.clone());
+        col_end_vec.push(data.col_end.clone());
+        provenance_vec.push(data.provenance.clone());
+    }
+
     let m1 = MetadataNode {
         n_type: String::from("Metadata"),
         node_id: format!("m{}", metadata_idx),
         metadata_idx: metadata_idx.clone(),
-        metadata_type: metadata.metadata_type.clone(),
-        gromet_version: metadata.gromet_version.clone(),
-        name: metadata.name.clone(),
-        global_reference_id: metadata.global_reference_id.clone(),
-        files: metadata.files.clone(),
-        source_language: metadata.source_language.clone(),
-        source_language_version: metadata.source_language_version.clone(),
-        data_type: metadata.data_type.clone(),
-        code_file_reference_uid: metadata.code_file_reference_uid.clone(),
-        line_begin: metadata.line_begin.clone(),
-        line_end: metadata.line_end.clone(),
-        col_begin: metadata.col_begin.clone(),
-        col_end: metadata.col_end.clone(),
-        provenance: metadata.provenance.clone(),
+        metadata_type: metadata_type_vec.clone(),
+        gromet_version: gromet_version_vec.clone(),
+        text_extraction: text_extraction_vec.clone(),
+        variable_identifier: variable_identifier_vec.clone(),
+        variable_definition: variable_definition_vec.clone(),
+        value: value_vec.clone(),
+        grounding: grounding_vec.clone(),
+        name: name_vec.clone(),
+        global_reference_id: global_reference_id_vec.clone(),
+        files: files_vec.clone(),
+        source_language: source_language_vec.clone(),
+        source_language_version: source_language_version_vec.clone(),
+        data_type: data_type_vec.clone(),
+        code_file_reference_uid: code_file_reference_uid_vec.clone(),
+        line_begin: line_begin_vec.clone(),
+        line_end: line_end_vec.clone(),
+        col_begin: col_begin_vec.clone(),
+        col_end: col_end_vec.clone(),
+        provenance: provenance_vec.clone(),
     };
     metas.push(m1);
     return metas;
 }
 // creates the metadata node query
 fn create_metadata_node_query(meta_node: MetadataNode) -> Vec<String> {
+
+    // determine vec length
+    let metadata_len = meta_node.gromet_version.len();
+
+    // construct the metadata fields
+    let mut metadata_type_q: Vec<String> = vec![];
+    let mut gromet_version_q: Vec<String> = vec![];
+    let mut text_extraction_q: Vec<String> = vec![];
+    let mut variable_identifier_q: Vec<String> = vec![];
+    let mut variable_definition_q: Vec<String> = vec![];
+    let mut value_q: Vec<String> = vec![];
+    let mut grounding_q: Vec<String> = vec![];
+    let mut name_q: Vec<String> = vec![];
+    let mut global_reference_id_q: Vec<String> = vec![];
+    let mut files_q: Vec<String> = vec![];
+    let mut source_language_q: Vec<String> = vec![];
+    let mut source_language_version_q: Vec<String> = vec![];
+    let mut data_type_q: Vec<String> = vec![];
+    let mut code_file_reference_uid_q: Vec<String> = vec![];
+    let mut line_begin_q: Vec<u32> = vec![];
+    let mut line_end_q: Vec<u32> = vec![];
+    let mut col_begin_q: Vec<u32> = vec![];
+    let mut col_end_q: Vec<u32> = vec![];
+    let mut provenance_q: Vec<String> = vec![];
+
+    for i in 0..metadata_len {
+        metadata_type_q.push(meta_node.metadata_type[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        gromet_version_q.push(meta_node.gromet_version[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        text_extraction_q.push(meta_node.text_extraction[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
+        variable_identifier_q.push(meta_node.variable_identifier[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        variable_definition_q.push(meta_node.variable_definition[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        value_q.push(meta_node.value[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
+        grounding_q.push(meta_node.grounding[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
+        name_q.push(meta_node.name[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        global_reference_id_q.push(meta_node.global_reference_id[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        files_q.push(meta_node.files[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
+        source_language_q.push(meta_node.source_language[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        source_language_version_q.push(meta_node.source_language_version[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        data_type_q.push(meta_node.data_type[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        code_file_reference_uid_q.push(meta_node.code_file_reference_uid[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
+        line_begin_q.push(meta_node.line_begin[i].as_ref().map_or_else(|| 0,|x| *x));
+        line_end_q.push(meta_node.line_end[i].as_ref().map_or_else(|| 0,|x| *x));
+        col_begin_q.push(meta_node.col_begin[i].as_ref().map_or_else(|| 0,|x| *x));
+        col_end_q.push(meta_node.col_end[i].as_ref().map_or_else(|| 0,|x| *x));
+        provenance_q.push(meta_node.provenance[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
+    }
+
+    // construct the queries
     let mut queries: Vec<String> = vec![];
     let create = String::from("CREATE");
     let metanode_query = format!(
-        "{} ({}:{} {{metadata_idx:{:?},gromet_version:{:?},name:{:?},global_reference_id:{:?},files:{:?},source_language:{:?}
+        "{} ({}:{} {{metadata_idx:{:?},metadata_type:{:?},gromet_version:{:?},text_extraction:{:?},variable_identifier:{:?},variable_definition:{:?},value:{:?},grounding:{:?},name:{:?},global_reference_id:{:?},files:{:?},source_language:{:?}
             ,source_language_version:{:?},data_type:{:?},code_file_reference_uid:{:?},line_begin:{:?},line_end:{:?}
             ,col_begin:{:?},col_end:{:?},provenance:{:?}}})",
-        create, meta_node.node_id, meta_node.n_type, meta_node.metadata_idx, meta_node.gromet_version.map_or_else(|| String::from(""),|x| format!("{}", x)), 
-        meta_node.name.map_or_else(|| String::from(""),|x| format!("{}", x)), meta_node.global_reference_id.map_or_else(|| String::from(""),|x| format!("{}", x)),
-        meta_node.files.map_or_else(|| String::from(""),|x| format!("{:?}", x)), meta_node.source_language.map_or_else(|| String::from(""),|x| format!("{}", x)),
-        meta_node.source_language_version.map_or_else(|| String::from(""),|x| format!("{}", x)), meta_node.data_type.map_or_else(|| String::from(""),|x| format!("{}", x)),
-        meta_node.code_file_reference_uid.map_or_else(|| String::from(""),|x| format!("{}", x)), meta_node.line_begin.map_or_else(|| 0,|x| x),
-        meta_node.line_end.map_or_else(|| 0,|x| x), meta_node.col_begin.map_or_else(|| 0,|x| x), meta_node.col_end.map_or_else(|| 0,|x| x),
-        meta_node.provenance.map_or_else(|| String::from(""),|x| format!("{:?}", x))
+        create, meta_node.node_id, meta_node.n_type, meta_node.metadata_idx, 
+        metadata_type_q,
+        gromet_version_q,
+        text_extraction_q,
+        variable_identifier_q,
+        variable_definition_q,
+        value_q,
+        grounding_q,
+        name_q,
+        global_reference_id_q,
+        files_q,
+        source_language_q,
+        source_language_version_q,
+        data_type_q,
+        code_file_reference_uid_q,
+        line_begin_q,
+        line_end_q,
+        col_begin_q,
+        col_end_q,
+        provenance_q
     );
     queries.push(metanode_query);
     return queries;
@@ -3596,7 +3714,6 @@ pub fn create_att_primitive(
         att_bf_idx: box_counter as u32,
     };
     nodes.push(n3.clone());
-    println!("{:?}", n3.clone());
     // make edge connecting to expression
     let e4 = Edge {
         src: parent_node.node_id.clone(),
