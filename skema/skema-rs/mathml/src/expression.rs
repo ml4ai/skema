@@ -949,7 +949,6 @@ pub fn preprocess_content(content_str: String) -> String {
     pre_string = pre_string.replace("<mo>(</mo>", "<mrow>");
     pre_string = pre_string.replace("<mo>)</mo>", "</mrow>");
 
-
     // Unicode to Symbol
     let unicode_locs: Vec<_> = pre_string.match_indices("&#").map(|(i, _)| i).collect();
     for ul in unicode_locs.iter().rev() {
