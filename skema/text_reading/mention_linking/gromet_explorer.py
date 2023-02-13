@@ -41,7 +41,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with open(args.input_path) as f:
-        gromet_fn_module = json.load(f)
+        gromet_fn_module = json.load(f)['modules'][0]
 
     # First, retrieve the relevant metadata fields
     text_reading_mds = dict()
