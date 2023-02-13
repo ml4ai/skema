@@ -1,3 +1,4 @@
+import logging
 import os
 import tempfile
 from typing import List
@@ -12,9 +13,18 @@ from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
+class EndpointFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.getMessage().find("/ping") == -1
+
+
+logging.getLogger("uvicorn.access").addFilter(EndpointFilter())
+
+
 class Ports(BaseModel):
     opis: List[str]
     opos: List[str]
+
 
 class System(BaseModel):
     files: List[str]
@@ -34,8 +44,8 @@ def ping():
 @app.post(
     "/fn-given-filepaths",
     summary=(
-        "Send a system of code and filepaths of interest,"
-        " get a GroMEt FN Module collection back."
+            "Send a system of code and filepaths of interest,"
+            " get a GroMEt FN Module collection back."
     ),
 )
 async def fn_given_filepaths(system: System):
@@ -64,6 +74,7 @@ async def fn_given_filepaths(system: System):
     # Convert output to json
     gromet_collection_dict = gromet_collection.to_dict()
     return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
+
 
 @app.post(
     "/get-pyacset",
