@@ -9,6 +9,7 @@ use petgraph::{graph::NodeIndex, Graph};
 
 use std::collections::VecDeque;
 
+/// Struct for representing mathematical expressions in order to align with source code.
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
 use std::string::ToString;
