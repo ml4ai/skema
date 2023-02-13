@@ -5,6 +5,7 @@ pub mod services;
 
 // Stub for SKEMA library
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use utoipa::ToSchema;
 
 use serde_json::Value; // for json
 use std::string::ToString;
@@ -259,7 +260,7 @@ pub struct Gromet {
     pub metadata: Option<u32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct ModuleCollection {
     pub schema: String,
     pub schema_version: String,

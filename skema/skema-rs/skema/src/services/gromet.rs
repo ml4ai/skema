@@ -2,7 +2,7 @@
 
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
-use crate::{Gromet, ModuleCollection};
+use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use std::collections::HashMap;
@@ -210,7 +210,7 @@ pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
 
 /// Pushes a gromet JSON to the Memgraph database
 #[utoipa::path(
-    request_body = Gromet,
+    request_body = ModuleCollection,
     responses(
         (status = 200, description = "Model successfully pushed")
     )

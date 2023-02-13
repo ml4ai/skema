@@ -1,15 +1,14 @@
 use actix_web::{get, web::Data, App, HttpResponse, HttpServer};
 use skema::config::Config;
-use skema::services::comment_extraction::{
-    get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
-    SingleLineComment,
-};
-use skema::services::{
-    gromet::{
-        delete_model, get_model_ids, get_named_opis, get_named_opos, get_named_ports, get_subgraph,
-        post_model,
+use skema::{
+    services::{
+        comment_extraction::{
+            get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
+            SingleLineComment,
+        },
+        mathml::{get_ast_graph, get_math_exp_graph},
     },
-    mathml::{get_ast_graph, get_math_exp_graph},
+    ModuleCollection,
 };
 
 use clap::Parser;
@@ -66,10 +65,11 @@ async fn main() -> std::io::Result<()> {
                 SingleLineComment,
                 Docstring,
                 CommentExtractionResponse,
+                ModuleCollection,
             )
         ),
         tags(
-            (name = "SKEMA", description = "SKEMA web services.")
+            (name = "SKEMA", description = "SKEMA web services."),
         ),
     )]
     struct ApiDoc;
