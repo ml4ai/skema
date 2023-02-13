@@ -39,31 +39,40 @@ pub struct PreExp {
     name: String,
 }
 
-pub fn is_derivative(xs1: &mut Box<MathExpression>, xs2: &mut Box<MathExpression>) -> bool {
-    let mut cond1 = false;
-    let mut cond2 = false;
-    if let Mrow(x) = &**xs1 {
+/// Check if the fraction is a derivative expressed in Leibniz notation. If yes, mutate it to
+/// remove the 'd' prefixes.
+/// TODO: It would be ideal if we could have a pure function rather than a function with side
+/// effects here. Also, there is a lot of overlap between this function and and the
+/// 'is_leibniz_diff_operator function'. It would be good to reduce the duplicated code.
+pub fn is_derivative(
+    numerator: &mut Box<MathExpression>,
+    denominator: &mut Box<MathExpression>,
+) -> bool {
+    let mut numerator_contains_d = false;
+    let mut denominator_contains_d = false;
+    if let Mrow(x) = &**numerator {
         if let Mi(x) = &x[0] {
             if x == "d" {
-                cond1 = true;
+                numerator_contains_d = true;
             }
         }
     }
 
-    if let Mrow(x) = &**xs2 {
+    if let Mrow(x) = &**denominator {
         if let Mi(x) = &x[0] {
             if x == "d" {
-                cond2 = true;
+                denominator_contains_d = true;
             }
         }
     }
 
-    if cond1 && cond2 {
-        if let Mrow(x) = &mut **xs1 {
+    // If the fraction is a derivative, remove the 'd' prefixes in the numerator and denominator.
+    if numerator_contains_d && denominator_contains_d {
+        if let Mrow(x) = &mut **numerator {
             x.remove(0);
         }
 
-        if let Mrow(x) = &mut **xs2 {
+        if let Mrow(x) = &mut **denominator {
             x.remove(0);
         }
         return true;
@@ -71,10 +80,20 @@ pub fn is_derivative(xs1: &mut Box<MathExpression>, xs2: &mut Box<MathExpression
     false
 }
 
+/// Identify if there is an implicit multiplication operator, and if so, add an
+/// explicit multiplication operator.
+fn insert_explicit_multiplication_operator(pre: &mut PreExp) {
+    if pre.args.len() >= pre.op.len() {
+        pre.op.push(Operator::Multiply);
+    }
+}
+
 impl MathExpression {
+    /// Convert a MathExpression struct to a PreExp struct.
     pub fn to_expr(self, pre: &mut PreExp) {
         match self {
             Mi(x) => {
+                // Process unary minus operation.
                 if !pre.args.is_empty() {
                     let args_last_idx = pre.args.len() - 1;
                     if let Expr::Atom(y) = &pre.args[args_last_idx] {
@@ -89,21 +108,21 @@ impl MathExpression {
                         }
                     }
                 }
+                // deal with the invisible multiply operator
                 if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
                     pre.op.push(Operator::Multiply);
                 }
                 pre.args
                     .push(Expr::Atom(Atom::Identifier(x.replace(' ', ""))));
             }
             Mn(x) => {
-                if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
-                    pre.op.push(Operator::Multiply);
-                }
+                insert_explicit_multiplication_operator(pre);
+                // Remove redundant whitespace
                 pre.args.push(Expr::Atom(Atom::Number(x.replace(' ', ""))));
             }
             Mo(x) => {
+                // Insert a temporary placeholder identifier to deal with unary minus operation.
+                // The placeholder will be removed later.
                 if x == Operator::Subtract && pre.op.len() > pre.args.len() {
                     pre.op.push(x);
                     pre.args
@@ -113,10 +132,7 @@ impl MathExpression {
                 }
             }
             Mrow(xs) => {
-                if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
-                    pre.op.push(Operator::Multiply);
-                }
+                insert_explicit_multiplication_operator(pre);
                 let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
                 for x in xs {
@@ -129,13 +145,7 @@ impl MathExpression {
                 });
             }
             Msubsup(xs1, xs2, xs3) => {
-                // if xs.len() != 3 {
-                //     return;
-                // }
-                if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
-                    pre.op.push(Operator::Multiply);
-                }
+                insert_explicit_multiplication_operator(pre);
                 let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
                 pre_exp.op.push(Operator::Other("_".to_string()));
@@ -150,10 +160,7 @@ impl MathExpression {
                 });
             }
             Msqrt(xs) => {
-                if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
-                    pre.op.push(Operator::Multiply);
-                }
+                insert_explicit_multiplication_operator(pre);
                 let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Sqrt);
                 xs.to_expr(&mut pre_exp);
@@ -164,10 +171,7 @@ impl MathExpression {
                 });
             }
             Mfrac(mut xs1, mut xs2) => {
-                if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
-                    pre.op.push(Operator::Multiply);
-                }
+                insert_explicit_multiplication_operator(pre);
                 let mut pre_exp = PreExp::default();
                 if is_derivative(&mut xs1, &mut xs2) {
                     pre_exp.op.push(Operator::Other("derivative".to_string()));
@@ -184,10 +188,7 @@ impl MathExpression {
                 });
             }
             Msup(xs1, xs2) => {
-                if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
-                    pre.op.push(Operator::Multiply);
-                }
+                insert_explicit_multiplication_operator(pre);
                 let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
                 xs1.to_expr(&mut pre_exp);
@@ -200,18 +201,9 @@ impl MathExpression {
                 });
             }
             Mover(xs1, xs2) => {
-                // if xs.len() != 2 {
-                //     return;
-                // }
-                if pre.args.len() >= pre.op.len() {
-                    // deal with the invisible multiply operator
-                    pre.op.push(Operator::Multiply);
-                }
+                insert_explicit_multiplication_operator(pre);
                 let mut pre_exp = PreExp::default();
                 pre_exp.op.push(Operator::Other("".to_string()));
-                // for x in xs {
-                //     x.to_expr(&mut pre_exp);
-                // }
                 xs1.to_expr(&mut pre_exp);
                 xs2.to_expr(&mut pre_exp);
                 pre_exp.op.remove(0);
@@ -237,13 +229,14 @@ impl MathExpression {
         self.to_expr(&mut pre_exp);
         pre_exp.group_expr();
         pre_exp.collapse_expr();
-        pre_exp.get_names();
+        pre_exp.set_name();
 
         pre_exp.to_graph()
     }
 }
 
 impl Expr {
+    /// Group expression by multiplication and division operations.
     fn group_expr(&mut self) {
         if let Expr::Expression { op, args, .. } = self {
             let mut removed_idx = Vec::new();
@@ -315,18 +308,23 @@ impl Expr {
         }
     }
 
+    /// If the current term's operators are all multiplication or division, make a new expression
+    /// structure.
+    /// TODO Liang: Complete this description.
     fn collapse_expr(&mut self) {
         if let Expr::Expression { op, args, .. } = self {
             let mut op_copy = op.clone();
             let mut args_copy = args.clone();
 
             let mut shift = 0;
-            if all_multi_div(op) && op.len() > 1 {
+            if all_ops_are_mult_and_not_div(op.to_vec()) && op.len() > 1 {
                 let mut changed = true;
                 while changed {
                     for i in 0..args.len() {
                         if let Expr::Expression { op, args, name: _ } = &mut args[i] {
-                            if op[0] == Operator::Other("".to_string()) && all_multi_div(op) {
+                            if op[0] == Operator::Other("".to_string())
+                                && all_ops_are_mult_and_not_div(op.to_vec())
+                            {
                                 args_copy[i] = args[0].clone();
                                 for j in 1..op.len() {
                                     op_copy.insert(i + shift + j, op[j].clone());
@@ -350,14 +348,15 @@ impl Expr {
         }
     }
 
-    fn get_names(&mut self) -> String {
+    /// Construct a string representation of the Expression and store it under its 'name' property.
+    fn set_name(&mut self) -> String {
         let mut add_paren = false;
         match self {
             Expr::Atom(_) => "".to_string(),
             Expr::Expression { op, args, name } => {
                 if op[0] == Operator::Other("".to_string())
-                    && !all_multi_div(op)
-                    && !redundant_paren(name)
+                    && !all_ops_are_mult_and_not_div(op.to_vec())
+                    && !contains_redundant_parens(name)
                 {
                     name.push('(');
                     add_paren = true;
@@ -374,7 +373,7 @@ impl Expr {
                                     new_name.push(')');
                                 }
                             }
-                            *name = remove_paren(&mut new_name).clone();
+                            *name = remove_redundant_parens(&mut new_name).clone();
                         } else {
                             name.push_str(&op[i].to_string().clone());
                         }
@@ -394,10 +393,10 @@ impl Expr {
                             if op[0] != Operator::Other("".to_string()) {
                                 string = op[0].to_string();
                                 string.push('(');
-                                string.push_str(args[i].get_names().as_str().clone());
+                                string.push_str(args[i].set_name().as_str().clone());
                                 string.push(')');
                             } else {
-                                string = args[i].get_names().as_str().to_string().clone();
+                                string = args[i].set_name().as_str().to_string().clone();
                             }
                             name.push_str(&string.clone());
                         }
@@ -444,7 +443,7 @@ impl Expr {
                             if op[0] != Operator::Other("".to_string()) {
                                 let mut unitary_name = op[0].to_string();
                                 let mut name_copy = name.to_string();
-                                remove_paren(&mut name_copy);
+                                remove_redundant_parens(&mut name_copy);
                                 unitary_name.push_str("(".clone());
                                 unitary_name.push_str(&name_copy.clone());
                                 unitary_name.push_str(")".clone());
@@ -462,7 +461,7 @@ impl Expr {
             if op[0] != Operator::Other("".to_string()) {
                 let mut unitary_name = op[0].to_string();
                 let mut name_copy = name.to_string();
-                remove_paren(&mut name_copy);
+                remove_redundant_parens(&mut name_copy);
                 unitary_name.push_str("(".clone());
                 unitary_name.push_str(&name_copy.clone());
                 unitary_name.push_str(")".clone());
@@ -689,7 +688,7 @@ impl Expr {
                         } else {
                             let mut unitary_name = op[0].to_string();
                             let mut name_copy = name.to_string().clone();
-                            remove_paren(&mut name_copy);
+                            remove_redundant_parens(&mut name_copy);
                             unitary_name.push_str("(".clone());
                             unitary_name.push_str(&name_copy.clone());
                             unitary_name.push_str(")".clone());
@@ -764,7 +763,9 @@ impl Expr {
     }
 }
 
-pub fn redundant_paren(string: &str) -> bool {
+/// The graph generation process adds additional parentheses to preserve operation order. This
+/// function checks for the existence of those redundant parentheses.
+pub fn contains_redundant_parens(string: &str) -> bool {
     let str_len = string.chars().count();
     if !string.starts_with('(') || string.chars().nth(str_len - 1) != Some(')') {
         return false;
@@ -784,7 +785,8 @@ pub fn redundant_paren(string: &str) -> bool {
     false
 }
 
-pub fn all_multi_div(op: &mut Vec<Operator>) -> bool {
+/// Check if the current term's operators are all multiply and not divide.
+pub fn all_ops_are_mult_and_not_div(op: Vec<Operator>) -> bool {
     for o in 1..=op.len() - 1 {
         if op[o] != Operator::Multiply && op[o] != Operator::Divide {
             return false;
@@ -810,10 +812,10 @@ impl PreExp {
         }
     }
 
-    fn get_names(&mut self) {
-        for mut arg in &mut self.args {
+    fn set_name(&mut self) {
+        for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
-                arg.get_names();
+                arg.set_name();
             }
         }
     }
@@ -829,8 +831,9 @@ impl PreExp {
     }
 }
 
-pub fn remove_paren(string: &mut String) -> &mut String {
-    while redundant_paren(string) {
+/// Remove redundant parentheses.
+pub fn remove_redundant_parens(string: &mut String) -> &mut String {
+    while contains_redundant_parens(string) {
         string.remove(string.len() - 1);
         string.remove(0);
     }
@@ -838,9 +841,9 @@ pub fn remove_paren(string: &mut String) -> &mut String {
     string
 }
 
-/// if exists, return the node index; if no, add a new node and return the node index
+/// Return the node index if it exists; if not, add a new node and return the node index.
 pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeIndex {
-    remove_paren(name);
+    remove_redundant_parens(name);
     if name.contains("derivative") {
         *name = name.replace('/', ", ");
     }
@@ -859,6 +862,7 @@ pub fn get_node_idx(graph: &mut MathExpressionGraph, name: &mut String) -> NodeI
     graph.add_node(name.to_string())
 }
 
+/// Remove redundant mrow. This function will likely be removed once the img2mml pipeline is fixed.
 pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
     let mut content = mml;
     let key_words_left = "<mrow>".to_string() + &*key_word.clone();
@@ -885,7 +889,9 @@ pub fn remove_redundant_mrow(mml: String, key_word: String) -> String {
     content
 }
 
-///remove redundant mrow in mathml
+/// Remove redundant mrow in mathml
+/// TODO Liang: Come up with a better name for this function (or the remove_redundant_mrow
+/// function).
 pub fn remove_rmrow(mathml_content: String) -> String {
     let mut content = mathml_content;
     content = content.replace("<mrow>", "(");
@@ -935,7 +941,7 @@ pub fn remove_rmrow(mathml_content: String) -> String {
     content
 }
 
-/// Preprocess the parsed content
+/// Preprocess the content prior to parsing.
 pub fn preprocess_content(content_str: String) -> String {
     let mut pre_string = content_str;
     pre_string = pre_string.replace(' ', "");
@@ -964,6 +970,7 @@ pub fn preprocess_content(content_str: String) -> String {
     pre_string
 }
 
+/// TODO Liang: Add a docstring for this function.
 pub fn wrap_math(math: Math) -> MathExpression {
     let mut math_vec = vec![];
     for con in math.content {
@@ -1230,7 +1237,7 @@ fn test_to_expr7() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
 
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
@@ -1280,7 +1287,7 @@ fn test_to_expr8() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
 
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
@@ -1340,7 +1347,7 @@ fn test_to_expr9() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
 
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
@@ -1393,7 +1400,7 @@ fn test_to_expr10() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
     let _g = pre_exp.to_graph();
 }
 
@@ -1419,7 +1426,7 @@ fn test_to_expr11() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
     let _g = pre_exp.to_graph();
 }
 
@@ -1450,7 +1457,7 @@ fn test_to_expr12() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
     let _g = pre_exp.to_graph();
 }
 
@@ -1481,7 +1488,7 @@ fn test_to_expr13() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
     let _g = pre_exp.to_graph();
 }
 
@@ -1508,7 +1515,7 @@ fn test_to_expr14() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
     let _g = pre_exp.to_graph();
 }
 
@@ -1535,7 +1542,7 @@ fn test_to_expr15() {
     pre_exp.op.push(Operator::Other("root".to_string()));
     math_expression.to_expr(&mut pre_exp);
     pre_exp.group_expr();
-    pre_exp.get_names();
+    pre_exp.set_name();
     let _g = pre_exp.to_graph();
 }
 
