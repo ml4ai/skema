@@ -108,6 +108,26 @@ object MiraEmbeddingsGrounder{
     }
   }
 
+
+  def filterRelevantTerms(terms:IndexedSeq[GroundingConcept]): IndexedSeq[GroundingConcept] = {
+    
+    val relevantPrefixes = Set(
+      "vo",
+      "trans",
+      "apollosv",
+      "ncit",
+      "cemo",
+      "covoc"
+    )
+
+    terms filter {
+      term => {
+        val prefix = term.id.split(":").head
+        relevantPrefixes contains prefix
+      }
+    }
+  }
+
   /**
    * Loads a specific word embeddings model from disk
    * @param path to the file containing the embeddings
@@ -150,7 +170,8 @@ object MiraEmbeddingsGrounder{
       else {
         // If this was not ser, assume it is json
         val json = FileUtils.getTextFromResource(ontologyPath)
-        val ontology = parseMiraJson(json)
+        val ontology = filterRelevantTerms(parseMiraJson(json))
+
         val ontologyWithEmbeddings = createOntologyEmbeddings(ontology, embeddingsModel, lambda)
 //        val newFileName = ontologyPath.getAbsolutePath + ".ser"
 //        Serializer.save(ontologyWithEmbeddings, newFileName)

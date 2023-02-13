@@ -218,75 +218,81 @@ class OdinActions(val taxonomy: Taxonomy, expansionHandler: Option[ExpansionHand
   }.toOption
 
   def processParamSettingInt(mentions: Seq[Mention], state: State = new State()): Seq[Mention] = {
-    val newMentions = new ArrayBuffer[Mention]()
-    for (m <- mentions) {
-      val valueArgs = m.arguments.filter(_._1.contains("value"))
-      // if there are two value args, that means we have both least and most value, so it makes sense to try to remap the least and most values in case they are in the wrong order (example: "... varying from 27 000 to 22000...")
-      val valueMentionsSorted: Option[Seq[Mention]] = if (valueArgs.toSeq.length == 2) {
-        // check if the values are actual numbers
-        if (valueArgs.forall(arg => parseDouble(arg._2.head.text.replace(" ", "")).isDefined)) {
-          // if yes, sort them in increasing order (so that the least value is first and most is last)
-          Some(valueArgs.flatMap(_._2).toSeq.sortBy(_.text.replace(" ", "").toDouble))
-        } else None
-      } else None
 
-      val newArgs = mutable.Map[String, Seq[Mention]]()
-      val attachedTo = if (m.arguments.exists(arg => looksLikeAnIdentifier(arg._2, state).nonEmpty)) "variable" else "concept"
-      var inclLower: Option[Boolean] = None
-      var inclUpper: Option[Boolean] = None
-      for (arg <- m.arguments) {
-        arg._1 match {
-          case "valueLeastExcl" => {
-            newArgs("valueLeast") = if (valueMentionsSorted.isDefined) {
-              Seq(valueMentionsSorted.get.head)
-            } else arg._2
-            inclLower = Some(false)
-          }
-          case "valueLeastIncl" => {
-            newArgs("valueLeast") = if (valueMentionsSorted.isDefined) {
-              Seq(valueMentionsSorted.get.head)
-            } else arg._2
-            inclLower = Some(true)
-          }
-          case "valueMostExcl" => {
-            newArgs("valueMost") = if (valueMentionsSorted.isDefined) {
-              Seq(valueMentionsSorted.get.last)
-            } else arg._2
-            inclUpper = Some(false)
-          }
-          case "valueMostIncl" => {
-            newArgs("valueMost") = if (valueMentionsSorted.isDefined) {
-              Seq(valueMentionsSorted.get.last)
-            } else arg._2
-            inclUpper = Some(true)
-          }
+    def asDoubleOption(m: Mention): Option[Double] = parseDouble(m.text.replace(" ", ""))
 
-          // assumes only one variable argument
-          case "variable" => {
-            newArgs(arg._1) = if (looksLikeAnIdentifier(arg._2, state).nonEmpty) Seq(copyWithLabel(arg._2.head, "Identifier")) else arg._2
-          }
-          case _ => newArgs(arg._1) = arg._2
+    val newMentions = mentions.map { m =>
+      val valueArgs = m.arguments.filterKeys(_.contains("value"))
+      // If there are two value args, that means we have both least and most value,
+      // so it makes sense to try to remap the least and most values in case they
+      // are in the wrong order (example: "... varying from 27 000 to 22000...")
+      val (leastMentionsOpt, mostMentionsOpt) = if (valueArgs.size == 2) {
+        val valueMentions = valueArgs.toSeq.map { case (_, values) => values.head }
+        val headDoubleOpt = asDoubleOption(valueMentions.head)
+        if (headDoubleOpt.isDefined) {
+          val lastDoubleOpt = asDoubleOption(valueMentions.last)
+          if (lastDoubleOpt.isDefined) {
+            val unsorted = (Some(Seq(valueMentions.head)), Some(Seq(valueMentions.last)))
+            if (headDoubleOpt.get <= lastDoubleOpt.get) unsorted
+            else unsorted.swap
+          } else (None, None)
+        } else (None, None)
+      } else (None, None)
+      val attachedTo =
+          if (m.arguments.values.exists(looksLikeAnIdentifier(_, state).nonEmpty)) "variable"
+          else "concept"
+      // We're assuming that there is only one valueLeast* and one valueMost*!
+      val inclLower =
+          if (m.arguments.contains("valueLeastExcl")) Some(false)
+          else if (m.arguments.contains("valueLeastIncl")) Some(true)
+          else None
+      val inclUpper =
+          if (m.arguments.contains("valueMostExcl")) Some(false)
+          else if (m.arguments.contains("valueMostIncl")) Some(true)
+          else None
+      val newArgs = m.arguments.map { case (oldKey, oldMentions) =>
+        oldKey match {
+          case "valueLeastExcl" =>
+            "valueLeast" -> leastMentionsOpt.getOrElse(oldMentions)
+          case "valueLeastIncl" =>
+            "valueLeast" -> leastMentionsOpt.getOrElse(oldMentions)
+          case "valueMostExcl" =>
+            "valueMost" -> mostMentionsOpt.getOrElse(oldMentions)
+          case "valueMostIncl" =>
+            "valueMost" -> mostMentionsOpt.getOrElse(oldMentions)
+          case "variable" => // This assumes only one variable argument!
+            val newMentions =
+                if (looksLikeAnIdentifier(oldMentions, state).nonEmpty)
+                  Seq(copyWithLabel(oldMentions.head, "Identifier"))
+                else
+                  oldMentions
+            oldKey -> newMentions
+          case _ =>
+            oldKey -> oldMentions
         }
       }
-
-      // required for expansion
-      val newPaths = mutable.Map[String, Map[Mention, SynPath]]()
-
-      // this will only need to be done for events, not relation mentions---relation mentions don't have paths
-      if (m.paths.nonEmpty) {
-        // synpaths for each mention in the picture
-        val synPaths = m.paths.flatMap(_._2)
-        // we have remapped the args to new names already; now will need to update the paths map to have correct new names and the correct synpaths for switched out min/max values
-        for (arg <- newArgs) {
-          // for each arg type, get the synpath for its new mention (for now, assume one arg of each type)
-          newPaths += (arg._1 -> Map(arg._2.head -> synPaths(newArgs(arg._1).head)))
+      // This will only need to be done for events, not relation mentions,
+      // because relation mentions don't have paths.
+      val newPaths = if (m.paths.nonEmpty) {
+        val synPaths: Map[Mention, SynPath] = m.paths.flatMap(_._2)
+        // We have remapped the args to new names already; now will need to update the paths map
+        // to have correct new names and the correct synPaths for switched out min/max values.
+        val newPaths = newArgs.mapValues { newMentions =>
+          // Get the synPath for the new mention if available.  (For now, assume one Mention of each type.)
+          // If the Mention has been newly created for a "variable" argument, track down the synPath for it.
+          val newMention = newMentions.head
+          val newSynPath = synPaths.get(newMention).getOrElse {
+            val oldMention = m.arguments("variable").head
+            synPaths(oldMention)
+          }
+          Map(newMention -> newSynPath)
         }
-      }
-
+        newPaths
+      } else Map.empty[String, Map[Mention, SynPath]]
       val att = new ParamSettingIntAttachment(inclLower, inclUpper, attachedTo, "ParamSettingIntervalAtt")
-      val newMen = copyWithArgsAndPaths(m, newArgs.toMap, newPaths.toMap)
+      val newMen = copyWithArgsAndPaths(m, newArgs, newPaths)
 
-      newMentions.append(newMen.withAttachment(att))
+      newMen.withAttachment(att)
     }
     newMentions
   }
