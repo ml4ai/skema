@@ -3,6 +3,7 @@ import json
 from dataclasses import dataclass, field
 from xml.etree import cElementTree
 from typing import Tuple, List, Set, Dict
+from pathlib import Path
 
 # If you install https://pylatexenc.readthedocs.io/en/latest/latexencode/
 #    then you can uncomment lines 9 and 10 and comment-out line.
@@ -38,10 +39,11 @@ Revisit Bucky dynamics
 
 # -----------------------------------------------------------------------------
 
-V1 = 'mml/simple_sir_v1/mml_list.txt'
-V2 = 'mml/simple_sir_v2/mml_list.txt'
-V3 = 'mml/simple_sir_v3/mml_list.txt'
-V4 = 'mml/simple_sir_v4/mml_list.txt'
+data_dir = (Path(__file__).absolute() / "../../data/mml2pn_inputs").resolve()
+V1 = data_dir / "simple_sir_v1/mml_list.txt"
+V2 = data_dir / "simple_sir_v2/mml_list.txt"
+V3 = data_dir / "simple_sir_v3/mml_list.txt"
+V4 = data_dir / "simple_sir_v4/mml_list.txt"
 
 
 # -----------------------------------------------------------------------------
