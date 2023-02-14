@@ -1791,7 +1791,7 @@ fn test_to_expr29() {
 #[test]
 fn test_to_expr30() {
     use crate::parsing::parse;
-    let input = "tests/SEIR_eq1.xml";
+    let input = "tests/seir_eq1.xml";
     let mut contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     contents = preprocess_content(contents);
