@@ -29,7 +29,7 @@ pub async fn get_ast_graph(payload: String) -> String {
 /// expression graph (MEG), which can be used to perform structural alignment with the scientific
 /// model code that corresponds to the equation.
 #[utoipa::path(
-request_body = String,
+    request_body = String,
     responses(
         (
             status = 200,
