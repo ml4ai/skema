@@ -338,7 +338,10 @@ class ToGrometPass:
             ),
         )
 
-        func_name = node.func.name
+        if isinstance(node.func, AnnCastAttribute):
+            func_name = node.func.attr.name
+        else:
+            func_name = node.func.name
 
         # primitives that come from something other than an assignment or functions designated to be inlined at all times have
         # special semantics in that they're inlined as opposed to creating their own GroMEt FNs
@@ -408,7 +411,8 @@ class ToGrometPass:
 
             # Create the primitive expression bf
             primitive_func_bf = GrometBoxFunction(
-                name=node.func.name, function_type=FunctionType.PRIMITIVE
+                name=func_name, function_type=FunctionType.PRIMITIVE
+                # name=node.func.name, function_type=FunctionType.PRIMITIVE
             )
             primitive_fn.bf = insert_gromet_object(
                 primitive_fn.bf, primitive_func_bf
@@ -445,7 +449,7 @@ class ToGrometPass:
                         primitive_fn.wff,
                         GrometWire(
                             src=len(primitive_fn.pif),
-                            tgt=(len(primitive_fn.pof)),
+                            tgt=len(primitive_fn.pof),
                         ),
                     )
                 # elif isinstance(arg, AnnCastCall):
@@ -467,6 +471,8 @@ class ToGrometPass:
                             tgt=len(primitive_fn.opi),
                         ),
                     )
+
+            # print(f"input count for primitive {len(get_inputs(func_name, 'CAST'))} ")
 
             # Insert it into the overall Gromet FN collection
             self.gromet_module.attributes = insert_gromet_object(
@@ -577,7 +583,7 @@ class ToGrometPass:
         """
         # print current node being visited.
         # this can be useful for debugging
-        class_name = node.__class__.__name__
+        # class_name = node.__class__.__name__
         # print(f"\nProcessing node type {class_name}")
 
         # call internal visit
@@ -852,7 +858,6 @@ class ToGrometPass:
                             parent_cast_node,
                         )
                     else:
-                        print(type(node.left))
                         parent_gromet_fn.pof = insert_gromet_object(
                             parent_gromet_fn.pof,
                             GrometPort(
@@ -1471,6 +1476,8 @@ class ToGrometPass:
                 ):  # Case where a class is calling a method (i.e. mc is a class, and we do mc.get_c())
                     func_name = node.attr.name
 
+                    # print("---")
+                    # print(func_name)
                     if node.value.name in self.initialized_records:
                         obj_name = self.initialized_records[node.value.name]
                         if (
@@ -1810,6 +1817,7 @@ class ToGrometPass:
         if we found it or not and the string denotes the module if we did find it
 
         """
+        # print(self.import_collection)
         for mname in self.import_collection.keys():
             curr_module = self.import_collection[mname]
             if curr_module[2] and find_func_in_module(
@@ -1837,6 +1845,14 @@ class ToGrometPass:
         ref = node.source_refs[0]
         metadata = self.create_source_code_reference(ref)
         if isinstance(node.func, AnnCastAttribute):
+            # print(type(node.func.attr))
+            # if isinstance(node.func.attr, AnnCastName):
+            # print(node.func.attr.name)
+            if is_primitive(node.func.attr.name, "CAST"):
+                # print("Primitive")
+                self.handle_primitive_function(node, parent_gromet_fn, parent_cast_node, from_assignment)
+                return
+
             self.visit(node.func, parent_gromet_fn, node)
             if (
                 parent_gromet_fn.bf == None
@@ -3216,7 +3232,7 @@ class ToGrometPass:
                 len(body_if_fn.opi) - 1,
             )
 
-        print(node.modified_vars.items())
+        # print(node.modified_vars.items())
         for (_, val) in node.modified_vars.items():
             body_if_fn.opo = insert_gromet_object(
                 body_if_fn.opo, GrometPort(name=val, box=len(body_if_fn.b))
@@ -3352,6 +3368,7 @@ class ToGrometPass:
         symbol = node.symbol
         all = node.all
 
+        # print(name)
         # self.import collection maintains a dictionary of
         # name:(alias, [symbols], all boolean flag)
         # pairs that we can use to look up later

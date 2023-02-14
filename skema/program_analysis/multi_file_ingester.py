@@ -1,6 +1,7 @@
 import argparse
 import glob
 
+import sys
 import os.path
 
 from skema.gromet.fn import (
@@ -49,14 +50,22 @@ def process_file_system(
         executables=[],
     )
 
+    # print(os.getcwd())
+    print(path)
+    sys.path.append("./"+path)
+    print(os.getcwd())
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
 
         try:
             cast = python_to_cast(full_file, cast_obj=True)
+            
+            #cur_dir = os.getcwd()
+            #os.chdir(os.path.join(os.getcwd(),path))
             generated_gromet = ann_cast_pipeline(
                 cast, gromet=True, to_file=False, from_obj=True
             )
+            #os.chdir(cur_dir)
 
             # Then, after we generate the GroMEt we store it in the 'modules' field
             # and store its path in the 'module_index' field
@@ -89,8 +98,9 @@ def process_file_system(
             if "main" in defined_functions:
                 module_collection.executables.append(len(module_collection.module_index))
 
-        except ImportError:
+        except ImportError as e:
             print("FAILURE")
+            raise e
 
     if write_to_file:
         with open(f"{system_name}--Gromet-FN-auto.json", "w") as f:

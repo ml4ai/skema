@@ -143,7 +143,8 @@ class IdCollapsePass:
             elif isinstance(node.func.value, AnnCastAssignment):
                 self.visit(node.func.value, at_module_scope)
             else:
-                node.func.value.id = self.collapse_id(node.func.value.id)
+                if not isinstance(node.func.value, AnnCastLiteralValue):
+                    node.func.value.id = self.collapse_id(node.func.value.id)
             node.func.attr.id = self.collapse_id(node.func.attr.id)
             node.invocation_index = self.next_function_invocation(
                 node.func.attr.id

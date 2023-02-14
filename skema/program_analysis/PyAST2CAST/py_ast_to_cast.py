@@ -512,10 +512,10 @@ class PyASTToCAST:
         ref = [
             SourceRef(
                 source_file_name=self.filenames[-1],
-                col_start=-1,
-                col_end=-1,
-                row_start=-1,
-                row_end=-1,
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
             )
         ]
         return [
@@ -1290,6 +1290,7 @@ class PyASTToCAST:
         args = func_args + kw_args
 
         if isinstance(node.func, ast.Attribute):
+            # print(node.func.attr)
             res = self.visit(node.func, prev_scope_id_dict, curr_scope_id_dict)
             return [Call(res[0], args, source_refs=ref)]
         else:
@@ -1644,7 +1645,16 @@ class PyASTToCAST:
             )
         ]
         source_code_data_type = ["Python", "3.8", str(type(node.value))]
-        if isinstance(node.value, int):
+        # NOTE: We have to check the types such that no ancestor is checked before a descendant
+        # boolean values are also seen as integers with isinstance()
+        # TODO: Consider using type() with a map instead of isinstance to check types
+        if isinstance(node.value, bool):
+            return [
+                LiteralValue(
+                    ScalarType.BOOLEAN, str(node.value), source_code_data_type, ref
+                )
+            ]
+        elif isinstance(node.value, int):
             return [
                 LiteralValue(
                     ScalarType.INTEGER, node.value, source_code_data_type, ref
@@ -1657,12 +1667,6 @@ class PyASTToCAST:
                     node.value,
                     source_code_data_type,
                     ref,
-                )
-            ]
-        elif isinstance(node.value, bool):
-            return [
-                LiteralValue(
-                    ScalarType.BOOLEAN, node.value, source_code_data_type, ref
                 )
             ]
         elif isinstance(node.value, str):
