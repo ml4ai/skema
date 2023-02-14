@@ -4,7 +4,7 @@ use clap::Parser;
 use serde_json;
 use skema::{
     database::{execute_query, parse_gromet_queries},
-    Gromet,
+    Gromet, ModuleCollection,
 };
 use std::fs;
 
@@ -25,7 +25,7 @@ fn main() {
 
     let args = Cli::parse();
     let data = fs::read_to_string(&args.path).expect("Unable to read file");
-    let gromet: Gromet = serde_json::from_str(&data).expect("Unable to parse");
+    let gromet: ModuleCollection = serde_json::from_str(&data).expect("Unable to parse");
 
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
@@ -38,9 +38,10 @@ fn main() {
         full_query.push_str(&temp_str);
     }
 
+    if debug {
+        fs::write("debug.txt", full_query.clone()).expect("Unable to write file");
+    }
+
     execute_query(&full_query, &args.db_host).unwrap(); // The properties need to have quotes!!
                                                         // writing output to file, since too long for std out now.
-    if debug {
-        fs::write("debug.txt", full_query).expect("Unable to write file");
-    }
 }

@@ -17,7 +17,7 @@ def visualize_single_file(filepath) -> str:
     cast = python_to_cast(str(filepath), cast_obj=True)
     gromet = run_cast_to_gromet_pipeline(cast)
     graph = draw_graph(gromet, program_name)
-
+    # print(graph)
     # Get the raw bytes, encode them via base64, then decode them via utf-8.
     # We embed the image directly in the HTML template.
     output = str(base64.b64encode(graph.pipe()), encoding="utf-8")
@@ -28,7 +28,7 @@ def visualize_single_file(filepath) -> str:
 def execute():
 
     cwd = Path(__file__).parents[0]
-    filepath = cwd / "inputs/CHIME_SIR_core.py"
+    filepath = cwd / "../../data/gromet/examples/exp2/exp2.py"
     output = visualize_single_file(filepath)
     return render_template("index.html", output_image=output)
 

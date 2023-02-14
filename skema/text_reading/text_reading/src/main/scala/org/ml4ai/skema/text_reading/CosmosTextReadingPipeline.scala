@@ -78,6 +78,8 @@ class CosmosTextReadingPipeline extends Logging {
 
   // Odin Engine instantiation
   private val odinEngine = OdinEngine.fromConfig(config)
+  // Initialize the odin engine
+  odinEngine.annotate("x = 10")
 
   // PDF converted to fix pdf tokenization artifacts
   private val pdfConverter = new TextConverter()
