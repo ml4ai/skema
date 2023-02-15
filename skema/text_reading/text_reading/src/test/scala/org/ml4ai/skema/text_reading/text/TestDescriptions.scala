@@ -394,7 +394,7 @@ class TestDescriptions extends ExtractionTest {
 //    val desired = Seq(
 //
 //    )
-//    val mentions = extractMentions(t9c)
+//    val mentions = extractMentionsFromCosmosJson(t9c)
 //    testDescriptionEvent(mentions, desired)
 //  }
 
