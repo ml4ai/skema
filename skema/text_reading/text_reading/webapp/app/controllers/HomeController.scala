@@ -210,7 +210,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       scienceParseDoc.sections.get.map(_.headingAndText) ++ scienceParseDoc.abstractText
     } else scienceParseDoc.abstractText.toSeq
     logger.info("Finished converting to text")
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile))._2)
+    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile)).mentions)
     val outFile = json("outfile").str
     AutomatesExporter(outFile).export(mentions)
     //    mentions.saveJSON(outFile, pretty=true)
@@ -230,7 +230,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     logger.info(s"Extracting mentions from $jsonFile")
     val loader = new ScienceParsedDataLoader
     val texts = loader.loadFile(jsonFile)
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile))._2)
+    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile)).mentions)
     val outFile = json("outfile").str
     AutomatesExporter(outFile).export(mentions)
     Ok("")

@@ -85,7 +85,7 @@ class TextReadingPipeline extends Logging {
     */
   def extractMentions(text: String, fileName: Option[String]): (Document, Seq[Mention]) = {
     // Extract mentions and apply grounding
-    val (doc, mentions) = odinEngine.extractFromText(text, keepText = true, fileName)
+    val ExtractionResults(doc, mentions) = odinEngine.extractFromText(text, keepText = true, fileName)
     // Run grounding
     val groundedMentions = mentions.par.map {
       // Only ground arguments of events and relations, to save time

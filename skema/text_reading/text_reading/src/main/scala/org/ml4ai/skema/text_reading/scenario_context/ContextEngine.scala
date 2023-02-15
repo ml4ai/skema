@@ -11,7 +11,7 @@ class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer:
 
  // Select TB mentions of Location and Date type
   private val candidateMentions = documentMentions.filter{
-     case tb:TextBoundMention if contextLabels contains tb.label => true
+     case tb:TextBoundMention if contextLabels(tb.label) => true
      case _ => false
   }
 
@@ -32,10 +32,10 @@ class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer:
           sentenceIndex =>
             val contextMentions = mentionsMap.getOrElse(sentenceIndex, Seq.empty)
             contextMentions
-        }.groupBy(_.label).map {
-          case (label, mentions) if label == "Location" =>
+        }.groupBy(_.label).collect {
+          case ("Location", mentions) =>
             new LocationContextAttachment(mentions)
-          case (label, mentions) if label == "Date" => new TimeContextAttachment(mentions)
+          case ("Date", mentions) => new TimeContextAttachment(mentions)
         }.toSeq.distinct
 
       m match {
