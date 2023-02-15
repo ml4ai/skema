@@ -60,12 +60,12 @@ def process_file_system(
         try:
             cast = python_to_cast(full_file, cast_obj=True)
             
-            #cur_dir = os.getcwd()
-            #os.chdir(os.path.join(os.getcwd(),path))
+            cur_dir = os.getcwd()
+            os.chdir(os.path.join(os.getcwd(),path))
             generated_gromet = ann_cast_pipeline(
                 cast, gromet=True, to_file=False, from_obj=True
             )
-            #os.chdir(cur_dir)
+            os.chdir(cur_dir)
 
             # Then, after we generate the GroMEt we store it in the 'modules' field
             # and store its path in the 'module_index' field

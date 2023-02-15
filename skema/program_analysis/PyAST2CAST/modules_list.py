@@ -318,12 +318,9 @@ def find_func_in_module(module_name, func_name):
     # TODO: cache the module objects to look back so we dont do multiple imports in a map
     import os
     import sys
-    # sys.path.append("./COmplexVID-19")
-    os.path.append("./COmplexVID-19")
-    print(sys.path)
-    print(f"curr path: {os.getcwd()}")    
 
-    # module_import = importlib.import_module(os.path.join(os.getcwd(),module_name))
+    sys.path.append(os.getcwd())
     module_import = importlib.import_module(module_name)
+    
     funcs = list(dir(module_import))
     return func_name in funcs
