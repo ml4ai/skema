@@ -920,7 +920,8 @@ class ToGrometPass:
                                 parent_cast_node,
                             )
 
-                            self.wire_from_var_env(node.left.val.name, parent_gromet_fn)
+                            if parent_gromet_fn.pif != None:
+                                self.wire_from_var_env(node.left.val.name, parent_gromet_fn)
                 else:
                     self.add_var_to_env(
                         node.left.val.name,
@@ -3221,7 +3222,8 @@ class ToGrometPass:
         self.var_environment["args"] = {}
 
         # TODO: determine a better for loop that only grabs what appears in the body of the if_true
-        for (_, val) in node.expr_used_vars.items():
+        # for (_, val) in node.expr_used_vars.items():
+        for (_, val) in node.used_vars.items():
             body_if_fn.opi = insert_gromet_object(
                 body_if_fn.opi, GrometPort(box=len(body_if_fn.b))
             )
@@ -3281,7 +3283,8 @@ class ToGrometPass:
                 parent_gromet_fn.bf
             )  # NOTE: this is an index to the bf array of the Gromet FN this if statement is in
 
-            for (_, val) in node.expr_used_vars.items():
+            for (_, val) in node.used_vars.items():
+            # for (_, val) in node.expr_used_vars.items():
                 parent_gromet_fn.pif = insert_gromet_object(
                     parent_gromet_fn.pif,
                     GrometPort(box=len(parent_gromet_fn.bf)),

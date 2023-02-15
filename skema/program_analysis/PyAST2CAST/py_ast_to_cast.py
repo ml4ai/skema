@@ -512,10 +512,10 @@ class PyASTToCAST:
         ref = [
             SourceRef(
                 source_file_name=self.filenames[-1],
-                col_start=node.col_offset,
-                col_end=node.end_col_offset,
-                row_start=node.lineno,
-                row_end=node.end_lineno,
+                col_start=-1,
+                col_end=-1,
+                row_start=-1,
+                row_end=-1,
             )
         ]
         return [
@@ -3833,8 +3833,60 @@ class PyASTToCAST:
             Loop: A CAST loop node, which generically represents both For
                   loops and While loops.
         """
+        ref = [
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
 
-        test = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        bool_func = "bool"
+        source_code_data_type = ["Python", "3.8", str(type(True))]
+        true_val = LiteralValue(ScalarType.BOOLEAN, "True", source_code_data_type=source_code_data_type, source_refs=ref)
+        if isinstance(node.test, (ast.Name, ast.Constant)):
+            if bool_func not in prev_scope_id_dict.keys():
+                # If a built-in is called, then it gets added to the global dictionary if
+                # it hasn't been called before. This is to maintain one consistent ID per built-in
+                # function
+                if bool_func not in self.global_identifier_dict.keys():
+                    self.insert_next_id(
+                        self.global_identifier_dict, bool_func
+                    )
+
+                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
+                    bool_func
+                ]
+            bool_call = Call(Name("bool",
+                                id=prev_scope_id_dict[bool_func], 
+                                source_refs=ref),
+                            [test_cond],
+                            source_refs=ref)
+            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
+        elif isinstance(node.test, ast.UnaryOp) and isinstance(node.test.operand, (ast.Name, ast.Constant)): 
+            if bool_func not in prev_scope_id_dict.keys():
+                # If a built-in is called, then it gets added to the global dictionary if
+                # it hasn't been called before. This is to maintain one consistent ID per built-in
+                # function
+                if bool_func not in self.global_identifier_dict.keys():
+                    self.insert_next_id(
+                        self.global_identifier_dict, bool_func
+                    )
+
+                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
+                    bool_func
+                ]
+            bool_call = Call(Name("bool",
+                                id=prev_scope_id_dict[bool_func], 
+                                source_refs=ref),
+                            [test_cond],
+                            source_refs=ref)
+            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
+        else:
+            test = test_cond
 
         # Loops have their own enclosing scopes
         curr_scope_copy = copy.deepcopy(curr_scope_id_dict)
@@ -3847,15 +3899,6 @@ class PyASTToCAST:
 
         curr_scope_id_dict = copy.deepcopy(curr_scope_copy)
 
-        ref = [
-            SourceRef(
-                source_file_name=self.filenames[-1],
-                col_start=node.col_offset,
-                col_end=node.end_col_offset,
-                row_start=node.lineno,
-                row_end=node.end_lineno,
-            )
-        ]
         # loop_body_fn_def = FunctionDef(name="while_temp", func_args=None, body=body)
         # return [Loop(init=[], expr=test, body=loop_body_fn_def, source_refs=ref)]
         return [Loop(init=[], expr=test, body=body, source_refs=ref)]
