@@ -2001,6 +2001,7 @@ class PyASTToCAST:
         args = []
         curr_scope_id_dict = {}
         arg_count = len(node.args.args)
+        kwonlyargs_count = len(node.args.kwonlyargs)
         default_val_count = len(node.args.defaults)
         if arg_count > 0:
             # No argument has a default value
@@ -2158,6 +2159,41 @@ class PyASTToCAST:
                         pos_idx += 1
                         arg_count -= 1
                         default_index += 1
+
+        if kwonlyargs_count > 0:
+            for arg in node.args.kwonlyargs:
+                # unique_name = construct_unique_name(self.filenames[-1], arg.arg)
+                self.insert_next_id(curr_scope_id_dict, arg.arg)
+                # self.insert_next_id(curr_scope_id_dict, unique_name)
+                args.append(
+                    Var(
+                        Name(
+                            arg.arg,
+                            id=curr_scope_id_dict[arg.arg],
+                            source_refs=[
+                                SourceRef(
+                                    self.filenames[-1],
+                                    arg.col_offset,
+                                    arg.end_col_offset,
+                                    arg.lineno,
+                                    arg.end_lineno,
+                                )
+                            ],
+                        ),
+                        "float",  # TODO: Correct typing instead of just 'float'
+                        None,
+                        source_refs=[
+                            SourceRef(
+                                self.filenames[-1],
+                                arg.col_offset,
+                                arg.end_col_offset,
+                                arg.lineno,
+                                arg.end_lineno,
+                            )
+                        ],
+                    )
+                )
+
 
         # Store '*args' as a name
         arg = node.args.vararg
