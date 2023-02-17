@@ -50,13 +50,8 @@ def process_file_system(
         executables=[],
     )
 
-    # print(os.getcwd())
-    print(path)
-    sys.path.append("./"+path)
-    print(os.getcwd())
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
-
         try:
             cast = python_to_cast(full_file, cast_obj=True)
             
