@@ -597,8 +597,8 @@ class ToGrometPass:
         """
         # print current node being visited.
         # this can be useful for debugging
-        # class_name = node.__class__.__name__
-        # print(f"\nProcessing node type {class_name}")
+        class_name = node.__class__.__name__
+        print(f"\nProcessing node type {class_name}")
 
         # call internal visit
         try:
@@ -3254,12 +3254,14 @@ class ToGrometPass:
 
         # TODO: These need to be put in a for loop to handle more than one argument into the if body
         # TODO: determine a better for loop that only grabs what appears in the body of the if_true
-        for (_, val) in node.expr_used_vars.items():
+        # for (_, val) in node.expr_used_vars.items():
+        for (_, val) in node.used_vars.items():
             parent_gromet_fn.pif = insert_gromet_object(
                 parent_gromet_fn.pif, GrometPort(box=len(parent_gromet_fn.bf))
             )
 
-        for (_, val) in node.modified_vars.items():
+        # for (_, val) in node.modified_vars.items():
+        for (_, val) in node.used_vars.items():
             parent_gromet_fn.pof = insert_gromet_object(
                 parent_gromet_fn.pof,
                 GrometPort(name=val, box=len(parent_gromet_fn.bf)),
@@ -3285,7 +3287,8 @@ class ToGrometPass:
             )
 
         # print(node.modified_vars.items())
-        for (_, val) in node.modified_vars.items():
+        # for (_, val) in node.modified_vars.items():
+        for (_, val) in node.used_vars.items():
             body_if_fn.opo = insert_gromet_object(
                 body_if_fn.opo, GrometPort(name=val, box=len(body_if_fn.b))
             )
@@ -3333,14 +3336,15 @@ class ToGrometPass:
                 parent_gromet_fn.bf
             )  # NOTE: this is an index to the bf array of the Gromet FN this if statement is in
 
-            for (_, val) in node.used_vars.items():
             # for (_, val) in node.expr_used_vars.items():
+            for (_, val) in node.used_vars.items():
                 parent_gromet_fn.pif = insert_gromet_object(
                     parent_gromet_fn.pif,
                     GrometPort(box=len(parent_gromet_fn.bf)),
                 )
 
-            for (_, val) in node.modified_vars.items():
+            # for (_, val) in node.modified_vars.items():
+            for (_, val) in node.used_vars.items():
                 parent_gromet_fn.pof = insert_gromet_object(
                     parent_gromet_fn.pof,
                     GrometPort(name=val, box=len(parent_gromet_fn.bf)),
@@ -3353,7 +3357,8 @@ class ToGrometPass:
             self.var_environment["args"] = {}
 
             # TODO: determine a better for loop that only grabs what appears in the body of the if_true
-            for (_, val) in node.expr_used_vars.items():
+            # for (_, val) in node.expr_used_vars.items():
+            for (_, val) in node.used_vars.items():
                 body_else_fn.opi = insert_gromet_object(
                     body_else_fn.opi, GrometPort(box=len(body_else_fn.b))
                 )
@@ -3364,7 +3369,8 @@ class ToGrometPass:
                     len(body_else_fn.opi) - 1,
                 )
 
-            for (_, val) in node.modified_vars.items():
+            # for (_, val) in node.modified_vars.items():
+            for (_, val) in node.used_vars.items():
                 body_else_fn.opo = insert_gromet_object(
                     body_else_fn.opo,
                     GrometPort(name=val, box=len(body_else_fn.b)),

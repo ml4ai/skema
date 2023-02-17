@@ -191,6 +191,7 @@ class buckyModelCovid:
         # test = calc_initial_state(self.g_data, self.params, self.base_mc_instance)
 
         # Estimate the current age distribution of S, S_age_dist
+        nonvaccs = 1.0
         if self.base_mc_instance.vacc_data is not None:
             nonvaccs = xp.clip(
                 1 - self.base_mc_instance.vacc_data.V_tot(vac_params, 0) * mc_params["R_fac"],
