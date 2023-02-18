@@ -1,3 +1,4 @@
+use petgraph::dot::{Config, Dot};
 use petgraph::prelude::*;
 use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
@@ -7,9 +8,40 @@ use skema::{
 };
 
 fn main() {
-    let (x, y) = test().unwrap();
-    println!("nodes: {:?}, edges: {:?}", x.len(), y.len());
-    //println!("{:?}", x[0].clone());
+    let module_id = 0;
+    let graph = subgraph2petgraph(module_id);
+
+    // find all the expressions
+    let mut expression_nodes = Vec::<NodeIndex>::new();
+    for node in graph.node_indices() {
+        if graph[node].labels == ["Expression"] {
+            expression_nodes.push(node);
+        }
+    }
+
+    // initialize vector to collect all expressions
+    let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+    for i in 0..expression_nodes.len() {
+        // grab the subgraph of the given expression
+        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id.clone()));
+    }
+
+    // debugging outputs
+    /*for i in 0..expression_nodes.len() {
+        println!("{:?}", graph[expression_nodes[i]].id);
+        println!("Nodes in subgraph: {}", expressions[i].node_count());
+        println!("Edges in subgraph: {}", expressions[i].edge_count());
+    }
+    println!(
+        "{:?}",
+        Dot::with_config(&expressions[1], &[Config::EdgeNoLabel])
+    );*/
+}
+
+fn subgraph2petgraph(
+    module_id: i64,
+) -> petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> {
+    let (x, y) = get_subgraph(module_id).unwrap();
 
     // Create a petgraph graph
     let mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> = Graph::new();
@@ -17,12 +49,9 @@ fn main() {
     // Add nodes to the petgraph graph and collect their indexes
     let mut nodes = Vec::<NodeIndex>::new();
     for node in x {
-        // println!("{:?}", node.id.clone());
         let n1 = graph.add_node(node);
         nodes.push(n1.clone());
     }
-
-    //println!("{:?}", graph[nodes[2]].id);
 
     // add the edges to the petgraph
     for edge in y {
@@ -40,13 +69,10 @@ fn main() {
             graph.add_edge(src[0].clone(), tgt[0].clone(), edge);
         }
     }
-
-    // Use petgraph functions to analyze and visualize the graph
-    println!("Number of nodes: {}", graph.node_count());
-    println!("Number of edges: {}", graph.edge_count());
+    return graph;
 }
 
-pub fn test() -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
+pub fn get_subgraph(module_id: i64) -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
     // construct the query that will delete the module with a given unique identifier
 
     // Connect to Memgraph.
@@ -58,11 +84,12 @@ pub fn test() -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
 
     // create query for nodes
     let query1 = format!(
-        "MATCH p = (n)-[r*]->(m) WHERE id(n) = 0
+        "MATCH p = (n)-[r*]->(m) WHERE id(n) = {}
     WITH reduce(output = [], n IN nodes(p) | output + n ) AS nodes1
     UNWIND nodes1 AS nodes2
     WITH DISTINCT nodes2
-    return collect(nodes2)"
+    return collect(nodes2)",
+        module_id
     );
 
     // Run Query for nodes
@@ -83,11 +110,12 @@ pub fn test() -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
 
     // create query for edges
     let query2 = format!(
-        "MATCH p = (n)-[r*]->(m) WHERE id(n) = 0
+        "MATCH p = (n)-[r*]->(m) WHERE id(n) ={}
         WITH reduce(output = [], n IN relationships(p) | output + n ) AS edges1
         UNWIND edges1 AS edges2
         WITH DISTINCT edges2
-        return collect(edges2)"
+        return collect(edges2)",
+        module_id
     );
 
     // Run Query for edges
@@ -105,9 +133,6 @@ pub fn test() -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
             .collect();
     }
     connection.commit()?;
-
-    //println!("{:?}", node_list.clone().len());
-    //println!("{:?}", edge_list.clone().len());
 
     return Ok((node_list, edge_list));
 }
