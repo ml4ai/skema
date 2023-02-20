@@ -16,11 +16,12 @@ def test_pygraphviz(error_message):
     """Tests whether the pygraphviz package is installed.
     If not, raises an exception"""
 
-    if "pygraphviz" not in sys.modules:
-        raise ModuleNotFoundError(
-            "The pygraphviz package is not installed! "
-            f"{error_message}"
-        )
+    # NOTE: Commented out until resolved libraries in SKEMA repo
+    #if "pygraphviz" not in sys.modules:
+    #    raise ModuleNotFoundError(
+    #        "The pygraphviz package is not installed! "
+    #        f"{error_message}"
+    #    )
 
 
 def choose_font():

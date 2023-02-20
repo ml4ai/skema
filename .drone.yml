@@ -5,7 +5,7 @@ name: skema-rs
 
 steps:
 - name: test_rust_components
-  image: rust:1.65
+  image: rust:1.67
   commands:
   - apt update && apt install -y cmake openssl libclang-13-dev
   - cd skema/skema-rs

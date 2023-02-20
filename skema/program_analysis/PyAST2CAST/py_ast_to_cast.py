@@ -1276,15 +1276,21 @@ class PyASTToCAST:
                             name=arg.value.func.id, id=-1, source_refs=ref
                         )
                     else:
-                        assign_node = Name(
-                            name=arg.value.id, id=-1, source_refs=ref
-                        )
+                        if isinstance(arg.value, ast.Attribute):
+                            assign_node = Name(
+                                name=arg.value.value, id=-1, source_refs=ref
+                            )
+                        else:
+                            assign_node = Name(
+                                name=arg.value.id, id=-1, source_refs=ref
+                            )
                 kw_args.append(assign_node)
                 # kw_args.extend(self.visit(arg.value, prev_scope_id_dict, curr_scope_id_dict))
 
         args = func_args + kw_args
 
         if isinstance(node.func, ast.Attribute):
+            # print(node.func.attr)
             res = self.visit(node.func, prev_scope_id_dict, curr_scope_id_dict)
             return [Call(res[0], args, source_refs=ref)]
         else:
@@ -1639,7 +1645,16 @@ class PyASTToCAST:
             )
         ]
         source_code_data_type = ["Python", "3.8", str(type(node.value))]
-        if isinstance(node.value, int):
+        # NOTE: We have to check the types such that no ancestor is checked before a descendant
+        # boolean values are also seen as integers with isinstance()
+        # TODO: Consider using type() with a map instead of isinstance to check types
+        if isinstance(node.value, bool):
+            return [
+                LiteralValue(
+                    ScalarType.BOOLEAN, str(node.value), source_code_data_type, ref
+                )
+            ]
+        elif isinstance(node.value, int):
             return [
                 LiteralValue(
                     ScalarType.INTEGER, node.value, source_code_data_type, ref
@@ -1652,12 +1667,6 @@ class PyASTToCAST:
                     node.value,
                     source_code_data_type,
                     ref,
-                )
-            ]
-        elif isinstance(node.value, bool):
-            return [
-                LiteralValue(
-                    ScalarType.BOOLEAN, node.value, source_code_data_type, ref
                 )
             ]
         elif isinstance(node.value, str):
@@ -1992,6 +2001,7 @@ class PyASTToCAST:
         args = []
         curr_scope_id_dict = {}
         arg_count = len(node.args.args)
+        kwonlyargs_count = len(node.args.kwonlyargs)
         default_val_count = len(node.args.defaults)
         if arg_count > 0:
             # No argument has a default value
@@ -2149,6 +2159,41 @@ class PyASTToCAST:
                         pos_idx += 1
                         arg_count -= 1
                         default_index += 1
+
+        if kwonlyargs_count > 0:
+            for arg in node.args.kwonlyargs:
+                # unique_name = construct_unique_name(self.filenames[-1], arg.arg)
+                self.insert_next_id(curr_scope_id_dict, arg.arg)
+                # self.insert_next_id(curr_scope_id_dict, unique_name)
+                args.append(
+                    Var(
+                        Name(
+                            arg.arg,
+                            id=curr_scope_id_dict[arg.arg],
+                            source_refs=[
+                                SourceRef(
+                                    self.filenames[-1],
+                                    arg.col_offset,
+                                    arg.end_col_offset,
+                                    arg.lineno,
+                                    arg.end_lineno,
+                                )
+                            ],
+                        ),
+                        "float",  # TODO: Correct typing instead of just 'float'
+                        None,
+                        source_refs=[
+                            SourceRef(
+                                self.filenames[-1],
+                                arg.col_offset,
+                                arg.end_col_offset,
+                                arg.lineno,
+                                arg.end_lineno,
+                            )
+                        ],
+                    )
+                )
+
 
         # Store '*args' as a name
         arg = node.args.vararg
@@ -3728,213 +3773,6 @@ class PyASTToCAST:
                 )
             ]
 
-        """
-        if isinstance(slc,ast.Slice):
-            if slc.lower is not None:
-                lower = self.visit(slc.lower, prev_scope_id_dict, curr_scope_id_dict)[0]
-            else:
-                lower = LiteralValue(value_type=ScalarType.INTEGER, value=0, source_code_data_type=["Python","3.8","Float"], source_refs=ref)
-
-            if slc.upper is not None:
-                upper = self.visit(slc.upper, prev_scope_id_dict, curr_scope_id_dict)[0]
-            else:
-                if isinstance(node.value,ast.Call):
-                    if isinstance(node.value.func,ast.Attribute):
-                        upper = Call(Name("len", source_refs=ref), [Name(node.value.func.attr, source_refs=ref)], source_refs=ref)
-                    else:
-                        upper = Call(Name("len", source_refs=ref), [Name(node.value.func.id, source_refs=ref)], source_refs=ref)
-                elif isinstance(node.value,ast.Attribute):
-                    upper = Call(Name("len", source_refs=ref), [Name(node.value.attr, source_refs=ref)], source_refs=ref)
-                else:
-                    if isinstance(node.value, ast.Subscript):
-                        id = self.visit(node.value, prev_scope_id_dict, curr_scope_id_dict)
-                    else:
-                        id = node.value.id
-                    upper = Call(Name("len", source_refs=ref), [Name(id, source_refs=ref)], source_refs=ref)
-
-            if slc.step is not None:
-                step = self.visit(slc.step, prev_scope_id_dict, curr_scope_id_dict)[0]
-            else:
-                step = LiteralValue(value_type=ScalarType.INTEGER, value=1, source_code_data_type=["Python","3.8","Float"], source_refs=ref)
-
-            if isinstance(node.value,ast.Call):
-                if isinstance(node.value.func,ast.Attribute):
-                    temp_list = f"{node.value.func.attr}_generated_{self.var_count}"
-                else:
-                    temp_list = f"{node.value.func.id}_generated_{self.var_count}"
-            elif isinstance(node.value,ast.Attribute):
-                temp_list = f"{node.value.attr}_generated_{self.var_count}"
-            else:
-                if isinstance(node.value, ast.Subscript):
-                    temp_list = f"temp_generated_{self.var_count}"
-                else:
-                    temp_list = f"{value.name}_generated_{self.var_count}"
-            self.var_count += 1
-
-            new_list = Assignment(Var(Name(temp_list, source_refs=ref), "float", source_refs=ref), List([], source_refs=ref), source_refs=ref)
-            loop_var = Assignment(Var(Name(temp_var, source_refs=ref), "float", source_refs=ref), lower, source_refs=ref)
-
-            loop_cond = BinaryOp(
-                BinaryOperator.LT,
-                Name(temp_var, source_refs=ref),
-                upper,
-                source_refs=ref
-            )
-
-            if isinstance(node.value,ast.Call):
-                if isinstance(node.value.func,ast.Attribute):
-                    body = [Call(func=Attribute(Name(temp_list, source_refs=ref),Name("append", source_refs=ref),source_refs=ref),
-                                arguments=[Subscript(Name(node.value.func.attr, source_refs=ref),Name(temp_var, source_refs=ref), source_refs=ref)],
-                                source_refs=ref)]
-                else:
-                    body = [Call(func=Attribute(Name(temp_list, source_refs=ref),Name("append", source_refs=ref),source_refs=ref),
-                                arguments=[Subscript(Name(node.value.func.id, source_refs=ref),Name(temp_var, source_refs=ref), source_refs=ref)],
-                                source_refs=ref)]
-            elif isinstance(node.value,ast.Attribute):
-                body = [Call(func=Attribute(Name(temp_list, source_refs=ref),Name("append", source_refs=ref),source_refs=ref),
-                            arguments=[Subscript(Name(node.value.attr, source_refs=ref),Name(temp_var, source_refs=ref), source_refs=ref)],
-                            source_refs=ref)]
-            else:
-                if isinstance(node.value, ast.Subscript):
-                    body = [Call(func=Attribute(Name(temp_list, source_refs=ref),Name("append", source_refs=ref),source_refs=ref),
-                                arguments=[Subscript(Name("TEMP", source_refs=ref),Name(temp_var, source_refs=ref), source_refs=ref)],
-                                source_refs=ref)]
-                else:
-                    body = [Call(func=Attribute(Name(temp_list, source_refs=ref),Name("append", source_refs=ref),source_refs=ref),
-                                arguments=[Subscript(Name(node.value.id, source_refs=ref),Name(temp_var, source_refs=ref), source_refs=ref)],
-                                source_refs=ref)]
-
-            loop_increment = [Assignment(
-                Var(Name(temp_var, source_refs=ref), "float", source_refs=ref),
-                BinaryOp(BinaryOperator.ADD, Name(temp_var, source_refs=ref), step, source_refs=ref),
-                source_refs=ref
-            )]
-
-            slice_loop = Loop(
-                expr=loop_cond, body=body + loop_increment, source_refs=ref
-            )
-
-            slice_var = Var(Name(temp_list, source_refs=ref), "float", source_refs=ref)
-
-            return [new_list, loop_var, slice_loop, slice_var]
-        elif isinstance(slc,ast.ExtSlice):
-            dims = slc.dims
-            result = []
-            source_code_data_type = ["Python","3.8","List"]
-            ref = [SourceRef(source_file_name=self.filenames[-1], col_start=node.col_offset, col_end=node.end_col_offset, row_start=node.lineno, row_end=node.end_lineno)]
-            return [LiteralValue(StructureType.LIST, "NotImplemented", source_code_data_type, ref)]
-
-            if isinstance(node.value,ast.Call):
-                if isinstance(node.value.func,ast.Attribute):
-                    lists = [node.value.func.attr]
-                else:
-                    lists = [node.value.func.id]
-            elif isinstance(node.value,ast.Attribute):
-                lists = [node.value.attr]
-            else:
-                lists = [node.value.id]
-
-            temp_count = 1
-            for dim in dims:
-                temp_list_name = f"{lists[0]}_{str(temp_count)}"
-                temp_count += 1
-
-                list_var = Assignment(Var(Name(temp_list_name, source_refs=ref), "float", source_refs=ref), List([], source_refs=ref), source_refs=ref)
-                loop_var = Assignment(Var(Name(temp_var, source_refs=ref), "float", source_refs=ref), Number(0, source_refs=ref),source_refs=ref)
-
-                if isinstance(dim,ast.Slice):
-                    # For each dim in dimensions
-                    # Check if it's a slice or a constant
-                    # For a slice
-                    # Take the current temp list
-                    # Make a new temp list
-                    # Using the slice bounds, generate a loop that assigns the elements of
-                    # the slice bounds to the new temp list
-                    # Append the cast and temp list accordingly
-                    if dim.lower is not None:
-                        lower = self.visit(dim.lower, prev_scope_id_dict, curr_scope_id_dict)[0]
-                    else:
-                        lower = Number(0, source_refs=ref)
-
-                    if dim.upper is not None:
-                        upper = self.visit(dim.upper, prev_scope_id_dict, curr_scope_id_dict)[0]
-                    else:
-                        if isinstance(node.value,ast.Call):
-                            if isinstance(node.value.func,ast.Attribute):
-                                upper = Call(Name("len", source_refs=ref), [Name(node.value.func.attr, source_refs=ref)], source_refs=ref)
-                            else:
-                                upper = Call(Name("len", source_refs=ref), [Name(node.value.func.id, source_refs=ref)], source_refs=ref)
-                        elif isinstance(node.value,ast.Attribute):
-                            upper = Call(Name("len", source_refs=ref), [Name(node.value.attr, source_refs=ref)], source_refs=ref)
-                        else:
-                            upper = Call(Name("len", source_refs=ref), [Name(node.value.id, source_refs=ref)], source_refs=ref)
-
-                    if dim.step is not None:
-                        step = self.visit(dim.step, prev_scope_id_dict, curr_scope_id_dict)[0]
-                    else:
-                        step = Number(1, source_refs=ref)
-
-
-                    loop_cond = BinaryOp(
-                        BinaryOperator.LT,
-                        Name(temp_var, source_refs=ref),
-                        upper,
-                        source_refs=ref
-                    )
-
-                    body = [Call(Attribute(Name(temp_list_name,source_refs=ref),Name("append", source_refs=ref),source_refs=ref),
-                                [Subscript(Name(lists[-1], source_refs=ref),Name(temp_var, source_refs=ref),source_refs=ref)],source_refs=ref)]
-
-                    loop_increment = [Assignment(
-                        Var(Name(temp_var, source_refs=ref), "float", source_refs=ref),
-                        BinaryOp(BinaryOperator.ADD, Name(temp_var, source_refs=ref), step, source_refs=ref),
-                        source_refs=ref
-                    )]
-
-                    slice_loop = Loop(
-                        expr=loop_cond, body=body + loop_increment, source_refs=ref
-                    )
-
-                    lists.append(temp_list_name)
-
-                    result.extend([list_var,loop_var,slice_loop])
-                if isinstance(dim,ast.Index):
-                    # For an index
-                    # Take the current temp list
-                    # Make a new temp list
-                    # This new temp list indexes into the current temp list
-                    # and copies the elements according to the index number
-                    # Append that new temp list and its corresponding CAST
-                    # to our result
-                    curr_dim = self.visit(dim, prev_scope_id_dict, curr_scope_id_dict)[0]
-
-                    loop_cond = BinaryOp(
-                        BinaryOperator.LT,
-                        Name(temp_var, source_refs=ref),
-                        Call(Name("len", source_refs=ref), [Name(lists[-1], source_refs=ref)], source_refs=ref),
-                        source_refs=ref
-                    )
-
-                    body = [Call(Attribute(Name(temp_list_name, source_refs=ref),Name("append", source_refs=ref), source_refs=ref),
-                                [Subscript(Name(lists[-1], source_refs=ref), curr_dim, source_refs=ref)], source_refs=ref)]
-
-
-                    loop_increment = [Assignment(
-                        Var(Name(temp_var, source_refs=ref), "float", source_refs=ref),
-                        BinaryOp(BinaryOperator.ADD, Name(temp_var, source_refs=ref), Number(1, source_refs=ref), source_refs=ref),
-                        source_refs=ref
-                    )]
-
-                    slice_loop = Loop(
-                        expr=loop_cond, body=body + loop_increment, source_refs=ref
-                    )
-
-                    lists.append(temp_list_name)
-
-                    result.extend([list_var,loop_var,slice_loop])
-
-            return result
-            """
         # else:
         #   sl = self.visit(slc, prev_scope_id_dict, curr_scope_id_dict)
 
@@ -4031,8 +3869,60 @@ class PyASTToCAST:
             Loop: A CAST loop node, which generically represents both For
                   loops and While loops.
         """
+        ref = [
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
 
-        test = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        bool_func = "bool"
+        source_code_data_type = ["Python", "3.8", str(type(True))]
+        true_val = LiteralValue(ScalarType.BOOLEAN, "True", source_code_data_type=source_code_data_type, source_refs=ref)
+        if isinstance(node.test, (ast.Name, ast.Constant)):
+            if bool_func not in prev_scope_id_dict.keys():
+                # If a built-in is called, then it gets added to the global dictionary if
+                # it hasn't been called before. This is to maintain one consistent ID per built-in
+                # function
+                if bool_func not in self.global_identifier_dict.keys():
+                    self.insert_next_id(
+                        self.global_identifier_dict, bool_func
+                    )
+
+                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
+                    bool_func
+                ]
+            bool_call = Call(Name("bool",
+                                id=prev_scope_id_dict[bool_func], 
+                                source_refs=ref),
+                            [test_cond],
+                            source_refs=ref)
+            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
+        elif isinstance(node.test, ast.UnaryOp) and isinstance(node.test.operand, (ast.Name, ast.Constant)): 
+            if bool_func not in prev_scope_id_dict.keys():
+                # If a built-in is called, then it gets added to the global dictionary if
+                # it hasn't been called before. This is to maintain one consistent ID per built-in
+                # function
+                if bool_func not in self.global_identifier_dict.keys():
+                    self.insert_next_id(
+                        self.global_identifier_dict, bool_func
+                    )
+
+                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
+                    bool_func
+                ]
+            bool_call = Call(Name("bool",
+                                id=prev_scope_id_dict[bool_func], 
+                                source_refs=ref),
+                            [test_cond],
+                            source_refs=ref)
+            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
+        else:
+            test = test_cond
 
         # Loops have their own enclosing scopes
         curr_scope_copy = copy.deepcopy(curr_scope_id_dict)
@@ -4045,15 +3935,6 @@ class PyASTToCAST:
 
         curr_scope_id_dict = copy.deepcopy(curr_scope_copy)
 
-        ref = [
-            SourceRef(
-                source_file_name=self.filenames[-1],
-                col_start=node.col_offset,
-                col_end=node.end_col_offset,
-                row_start=node.lineno,
-                row_end=node.end_lineno,
-            )
-        ]
         # loop_body_fn_def = FunctionDef(name="while_temp", func_args=None, body=body)
         # return [Loop(init=[], expr=test, body=loop_body_fn_def, source_refs=ref)]
         return [Loop(init=[], expr=test, body=body, source_refs=ref)]

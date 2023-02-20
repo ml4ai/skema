@@ -44,7 +44,7 @@ object MentionUtils {
 
   def getMentionsWithoutLocations(texts: Seq[String], file: File, reader: OdinEngine): Seq[Mention] = {
     // this is for science parse
-    val mentions = texts.flatMap(t => reader.extractFromText(t, filename = Some(file.getName)))
+    val mentions = texts.flatMap(t => reader.extractFromText(t, filename = Some(file.getName)).mentions)
     // most fields here will be null, but there will be a filename field; doing this so that all mentions, regardless of whether they have dtailed location (in the document) can be processed the same way
     val mentionsWithLocations = new ArrayBuffer[Mention]()
     for (m <- mentions) {
@@ -64,7 +64,7 @@ object MentionUtils {
     val locations = texts.map(_.split("<::>").takeRight(2).mkString("<::>")) //location = pageNum::blockIdx
     val mentions = for (tf <- textsAndFilenames) yield {
       val Array(text, filename) = tf.split("<::>")
-      reader.extractFromText(text, keepText = true, Some(filename))
+      reader.extractFromText(text, keepText = true, Some(filename)).mentions
     }
     // store location information from cosmos as an attachment for each mention
     val menWInd = mentions.zipWithIndex

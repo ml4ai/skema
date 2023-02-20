@@ -7,7 +7,7 @@ import org.clulab.struct.{DirectedGraph, Edge, GraphMap, Interval}
 import org.clulab.odin.serialization.json._
 import org.clulab.serialization.json.{DirectedGraphOps, EdgeOps, Equivalency, GraphMapOps, JSONSerialization}
 import org.json4s.{JArray, JNothing, JNull, JObject, JValue}
-import org.ml4ai.skema.text_reading.attachments.{ContextAttachment, DiscontinuousCharOffsetAttachment, FunctionAttachment, GroundingAttachment, MentionLocationAttachment, ParamSetAttachment, ParamSettingIntAttachment, UnitAttachment}
+import org.ml4ai.skema.text_reading.attachments.{AutomatesAttachment, ContextAttachment, DiscontinuousCharOffsetAttachment, FunctionAttachment, GroundingAttachment, MentionLocationAttachment, ParamSetAttachment, ParamSettingIntAttachment, UnitAttachment}
 import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
 
 import scala.collection.mutable.ArrayBuffer
@@ -26,7 +26,7 @@ object AutomatesJSONSerializer {
     val docMap = mkDocumentMap(menUJson("documents"))
     val mentionsUJson = menUJson("mentions")
 
-    mentionsUJson.arr.map(item => toMention(item, docMap)).toSeq
+    mentionsUJson.arr.map(item => toMention(item, docMap))
   }
 
 
@@ -76,7 +76,7 @@ object AutomatesJSONSerializer {
           foundBy,
           attachments = attAsSet
         )
-      case "RelationMention" => {
+      case "RelationMention" =>
         new RelationMention(
           labels,
           tokenInterval,
@@ -88,9 +88,7 @@ object AutomatesJSONSerializer {
           foundBy,
           attachments = attAsSet
         )
-
-      }
-      case "EventMention" => {
+      case "EventMention" =>
         new EventMention(
           labels,
           tokenInterval,
@@ -103,8 +101,7 @@ object AutomatesJSONSerializer {
           foundBy,
           attachments = attAsSet
         )
-      }
-      case "CrossSentenceEventMention" => {
+      case "CrossSentenceEventMention" =>
         new CrossSentenceEventMention(
           labels,
           tokenInterval,
@@ -118,7 +115,6 @@ object AutomatesJSONSerializer {
           foundBy,
           attachments = attAsSet
         )
-      }
     }
   }
 
@@ -173,25 +169,22 @@ object AutomatesJSONSerializer {
       case "MentionLocation" => new MentionLocationAttachment(json("filename").str, json("pageNum").arr.map(_.num.toInt), json("blockIdx").arr.map(_.num.toInt), attType)
       case "DiscontinuousCharOffset" => new DiscontinuousCharOffsetAttachment(json("charOffsets").arr.map(v => (v.arr.head.num.toInt, v.arr.last.num.toInt)), attType)
       case "ParamSetAtt" => new ParamSetAttachment(json("attachedTo").str, attType)
-      case "ParamSettingIntervalAtt" => {
+      case "ParamSettingIntervalAtt" =>
         var inclLower: Option[Boolean] = None
         var inclUpper: Option[Boolean] = None
         if (!json("inclusiveLower").isNull) inclLower = Some(json("inclusiveLower").bool)
         if (!json("inclusiveUpper").isNull) inclUpper = Some(json("inclusiveUpper").bool)
 
         new ParamSettingIntAttachment(inclLower, inclUpper, json("attachedTo").str, attType)
-      }
 
       case "UnitAtt" => new UnitAttachment(json("attachedTo").str, attType)
-      case "ContextAtt" => {
+      case "ContextAtt" =>
         val foundBy = json("foundBy").str
         new ContextAttachment(attType, json("contexts").arr, foundBy)
-      }
-      case "FunctionAtt" => {
+      case "FunctionAtt" =>
         val foundBy = json("foundBy").str
         val trigger = json("trigger").str
         new FunctionAttachment(attType, trigger, foundBy)
-      }
       case _ => ???
     }
     toReturn
@@ -207,7 +200,7 @@ object AutomatesJSONSerializer {
   }
 
   def toDocument(docComponents: ujson.Value): Document = {
-    val sentences = docComponents("sentences").arr.map(toSentence(_)).toArray
+    val sentences = docComponents("sentences").arr.map(toSentence).toArray
     val doc = Document(sentences)
     doc.text = Some(docComponents("text").str)
     doc.id = Some(docComponents("id").str)
@@ -233,7 +226,7 @@ object AutomatesJSONSerializer {
   }
 
   def toDirectedGraph(edgesAndRoots: ujson.Value): DirectedGraph[String] = {
-    val edges = edgesAndRoots.obj("edges").arr.map(item => new Edge(item.obj("source").num.toInt, item.obj("destination").num.toInt, item.obj("relation").str))
+    val edges = edgesAndRoots.obj("edges").arr.map(item => Edge(item.obj("source").num.toInt, item.obj("destination").num.toInt, item.obj("relation").str))
     val roots = edgesAndRoots.obj("roots").arr.map(_.num.toInt).toSet
     assert(roots.size == 1)
     new DirectedGraph[String](edges.toList, None, Some(roots))
@@ -285,27 +278,21 @@ object AutomatesJSONSerializer {
       ujson.Obj(
       "source" -> edge.source,
       "destination" -> edge.destination,
-      "relation" -> edge.relation.toString
+      "relation" -> edge.relation
       )
     }
   }
 
 
   def toUJson(attachments: Set[Attachment]): ujson.Value = {
-    val attsAsUJson = attachments.map(toUJson(_)).toList
+    val attsAsUJson = attachments.map(toUJson).toList
     attsAsUJson
   }
 
   def toUJson(attachment: Attachment): ujson.Value = {
     attachment match {
-      case a: MentionLocationAttachment => a.toUJson
-      case a: DiscontinuousCharOffsetAttachment => a.toUJson
-      case a: ParamSetAttachment => a.toUJson
-      case a: ParamSettingIntAttachment => a.toUJson
-      case a: UnitAttachment => a.toUJson
-      case a: ContextAttachment => a.toUJson
-      case a: FunctionAttachment => a.toUJson
-      case a: GroundingAttachment => a.toUJson
+      case a: AutomatesAttachment => a.toUJson
+      case _ => ujson.Null
     }
   }
 
@@ -313,7 +300,7 @@ object AutomatesJSONSerializer {
   def argsToUJson(arguments: Map[String, Seq[Mention]]): ujson.Value = {
     val argsAsUJson = ujson.Obj()
     for (arg <- arguments) {
-      argsAsUJson(arg._1) = arg._2.map(toUJson(_)).toList
+      argsAsUJson(arg._1) = arg._2.map(toUJson).toList
     }
     argsAsUJson
   }

@@ -33,7 +33,7 @@ class TestParameterSetting  extends ExtractionTest {
 //      "Kcbmax" -> Seq("0.9", "1.4"), // todo: depends on how we decide to return intervals
 //      "Kcbmax" -> Seq("1.15") //todo is this going to break if there are two kcbmax values -- Yes, see comment in t8
 //    )
-//    val mentions = extractMentions(t2a)
+//    val mentions = extractMentionsFromCosmosJson(t2a)
 //    testParameterSettingEvent(mentions, desired)
 //  }
 
@@ -88,7 +88,7 @@ class TestParameterSetting  extends ExtractionTest {
 //    val desired = Seq(
 //      "height" -> Seq("2.0 m") //todo: attaching value and unit? spelt out term?
 //    )
-//    val mentions = extractMentions(t7)
+//    val mentions = extractMentionsFromCosmosJson(t7)
 //    testParameterSettingEvent(mentions, desired)
 //  }
 
@@ -174,7 +174,7 @@ class TestParameterSetting  extends ExtractionTest {
 //    val desired = Seq(
 //      "ETsz" -> Seq("2.45")
 //    )
-//    val mentions = extractMentions(t2b)
+//    val mentions = extractMentionsFromCosmosJson(t2b)
 //    testParameterSettingEvent(mentions, desired)
 //  }
 
@@ -361,7 +361,7 @@ class TestParameterSetting  extends ExtractionTest {
 //    val desired = Seq(
 //      "The inverse ratio of λ ρw times energy flux" -> Seq("1.0")
 //    )
-//    val mentions = extractMentions(t4b)
+//    val mentions = extractMentionsFromCosmosJson(t4b)
 //    testParameterSettingEvent(mentions, desired)
 //  }
 
