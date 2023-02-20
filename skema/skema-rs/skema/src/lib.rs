@@ -5,12 +5,13 @@ pub mod services;
 
 // Stub for SKEMA library
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use utoipa::ToSchema;
 
 use serde_json::Value; // for json
 use std::string::ToString;
 
 /******** AST for the Gromet Data Structure ********/
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 #[serde(rename_all = "UPPERCASE")] // Allows variants to match to uppercase json values
 #[derive(strum_macros::Display)] // Allows variants to be printed as strings if needed
 pub enum FnType {
@@ -18,7 +19,7 @@ pub enum FnType {
     Import,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, PartialEq)]
+#[derive(Deserialize, Serialize, Clone, Debug, PartialEq, ToSchema)]
 #[serde(rename_all = "UPPERCASE")]
 #[derive(strum_macros::Display)]
 pub enum FunctionType {
@@ -30,7 +31,7 @@ pub enum FunctionType {
     Literal,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct ValueL {
     pub value_type: String, // could be enum?
     #[serde(deserialize_with = "de_value")]
@@ -38,7 +39,7 @@ pub struct ValueL {
     pub value: String, // This is the generic problem. floats are exported as ints but rust exports as floats, making full generic isn't feasible since we don't know the number of instances before hand. So we import as a string to capture the data regardless of type.
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct GrometBox {
     pub function_type: FunctionType,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,7 +52,7 @@ pub struct GrometBox {
     pub metadata: Option<u32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct GrometPort {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<u8>,
@@ -63,7 +64,7 @@ pub struct GrometPort {
     pub metadata: Option<u32>, // pof: 473, 582, b: 685, 702, 719, 736, most b's
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct GrometWire {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -73,7 +74,7 @@ pub struct GrometWire {
     pub metadata: Option<u32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct GrometBoxLoop {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -88,7 +89,7 @@ pub struct GrometBoxLoop {
 }
 // condition, body_if, and body_else don't match online documentation
 // They are vecs of gromet boxes not integers...
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct GrometBoxConditional {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -104,7 +105,7 @@ pub struct GrometBoxConditional {
     pub metadata: Option<u32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct FunctionNet {
     // this I guess is optional as of import support now...
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -184,7 +185,7 @@ pub struct FunctionNet {
     pub version: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct Attribute {
     #[serde(rename = "type")]
     pub r#type: FnType,
@@ -195,7 +196,7 @@ pub struct Attribute {
     pub metadata: Option<Vec<Metadata>>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct Provenance {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<String>,
@@ -203,7 +204,7 @@ pub struct Provenance {
     pub timestamp: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct Files {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uid: Option<String>,
@@ -214,23 +215,65 @@ pub struct Files {
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct TextExtraction {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_reference_uid: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub block: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub char_begin: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub char_end: Option<u32>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct Grounding {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub argument_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub score: Option<f32>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct ValueMeta {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata_type: Option<String>, // Could be enum?
+    pub metadata_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gromet_version: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>, // only in highest meta
+    pub text_extraction: Option<TextExtraction>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub global_reference_id: Option<String>, // only in highest meta
+    pub variable_identifier: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub files: Option<Vec<Files>>, // only in highest meta
+    pub variable_definition: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub source_language: Option<String>, // Could be enum?
+    pub value: Option<ValueMeta>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grounding: Option<Vec<Grounding>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub global_reference_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub files: Option<Vec<Files>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_language: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_language_version: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub data_type: Option<String>, // Could be enum?
+    pub data_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code_file_reference_uid: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -245,7 +288,7 @@ pub struct Metadata {
     pub provenance: Option<Provenance>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct Gromet {
     pub schema: String,
     pub schema_version: String,
@@ -259,7 +302,7 @@ pub struct Gromet {
     pub metadata: Option<u32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct ModuleCollection {
     pub schema: String,
     pub schema_version: String,

@@ -74,8 +74,13 @@ class IdCollapsePass:
         # this can be useful for debugging
         # class_name = node.__class__.__name__
         # print(f"\nProcessing node type {class_name}")
-
-        return self._visit(node, at_module_scope)
+        try:
+            return self._visit(node, at_module_scope)
+        except Exception as e:
+            print(
+                f"id_collapse_pass.py: Error for {type(node)} which has source ref information {node.source_refs}"
+            )
+            raise e
 
     def visit_node_list(
         self, node_list: typing.List[AnnCastNode], at_module_scope
@@ -138,7 +143,8 @@ class IdCollapsePass:
             elif isinstance(node.func.value, AnnCastAssignment):
                 self.visit(node.func.value, at_module_scope)
             else:
-                node.func.value.id = self.collapse_id(node.func.value.id)
+                if not isinstance(node.func.value, AnnCastLiteralValue):
+                    node.func.value.id = self.collapse_id(node.func.value.id)
             node.func.attr.id = self.collapse_id(node.func.attr.id)
             node.invocation_index = self.next_function_invocation(
                 node.func.attr.id

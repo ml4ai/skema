@@ -44,7 +44,7 @@ class GrometCreation(Metadata):
     def __init__(
         self,
         metadata_type="gromet_creation",
-        gromet_version="0.1.2",
+        gromet_version="0.1.5",
         *args,
         **kwargs
     ):  # noqa: E501

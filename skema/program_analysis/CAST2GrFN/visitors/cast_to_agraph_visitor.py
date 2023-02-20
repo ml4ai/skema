@@ -126,11 +126,11 @@ class CASTToAGraphVisitor(CASTVisitor):
     def to_pdf(self, pdf_filepath: str):
         """Generates an agraph, and uses it
         to create a PDF using the 'dot' program"""
-        import skema.utils.misc.test_pygraphviz
-        test_pygraphviz(
-            "For the agraph generation in the python_to_cast "
-            "function to work, pygraphviz must be installed."
-        )
+        # import skema.utils.misc.test_pygraphviz
+        # test_pygraphviz(
+          #  "For the agraph generation in the python_to_cast "
+           # "function to work, pygraphviz must be installed."
+        # )
 
         A = self.to_agraph()
         A.draw(pdf_filepath, prog="dot")

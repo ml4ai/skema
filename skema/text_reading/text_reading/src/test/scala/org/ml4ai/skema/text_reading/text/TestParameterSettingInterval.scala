@@ -134,7 +134,7 @@ class TestParameterSettingEventInterval  extends ExtractionTest {
 //      "KEP" -> Seq("0", "0.8") //todo: need a rule for "range from"
 //    )
 //
-//    val mentions = extractMentions(t3a)
+//    val mentions = extractMentionsFromCosmosJson(t3a)
 //    testParameterSettingEventInterval(mentions, desired)
 //  }
 

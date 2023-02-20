@@ -133,3 +133,13 @@ class Sequence_index(object):
 
     def exec(list_input: List, element: Any) -> Any:
         return list(list_input).index(element)
+
+#class Sequence_pop(object):
+ #   source_language_name = {"CAST": "pop"}
+  #  inputs = [Field("list_input", "List"), Field("index", "Integer")]
+   # outputs = [Field("value", "Any"), Field("list_output", "List")]
+    #shorthand = ""
+    #documentation = ""
+
+#    def exec(list_input: List, element: Any) -> Any:
+ #       return list(list_input).pop(element)
