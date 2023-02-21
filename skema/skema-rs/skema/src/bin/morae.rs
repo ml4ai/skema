@@ -2,10 +2,6 @@ use petgraph::dot::{Config, Dot};
 use petgraph::prelude::*;
 use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
-use skema::{
-    database::{execute_query, parse_gromet_queries},
-    Gromet, ModuleCollection,
-};
 
 fn main() {
     let module_id = 460;
@@ -35,7 +31,7 @@ fn main() {
     }
 
     // debugging outputs
-    for i in 0..expression_nodes.len() {
+    /*for i in 0..expression_nodes.len() {
         println!("{:?}", graph[expression_nodes[i]].id);
         println!(
             "Nodes in wiring subgraph: {}",
@@ -63,9 +59,9 @@ fn main() {
         println!("{:?}", node);
     }
 
-    /*println!(
+    println!(
         "{:?}",
-        Dot::with_config(&expressions[1], &[Config::EdgeNoLabel])
+        Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
     );*/
 }
 
