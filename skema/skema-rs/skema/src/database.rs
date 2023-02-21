@@ -3869,7 +3869,7 @@ pub fn create_opi(
     box_counter: u8,
 ) -> (Vec<Node>, Vec<Edge>, Vec<MetadataNode>, u32) {
     let eboxf = gromet.modules[0].attributes[(parent_node.contents - 1) as usize].clone();
-    // construct opo nodes, if not none
+    // construct opi nodes, if not none
     if !eboxf.value.opi.clone().is_none() {
         // grab name which is one level up and based on indexing
         let mut opi_name = "un-named";
@@ -4837,7 +4837,7 @@ pub fn wff_cross_att_wiring(
                                     // iterate through port to check for tgt
                                     for p in node.out_idx.as_ref().unwrap().iter() {
                                         // push the src first, being pif
-                                        if (tgt_opo_idx as u32) == *p {
+                                        if (tgt_idx as u32) == *p {
                                             wff_src_tgt.push(node.node_id.clone());
                                         }
                                     }
@@ -4852,8 +4852,8 @@ pub fn wff_cross_att_wiring(
                     // and the tgt_opo_idx which is the pof idx for the name
                     for i in 0..nodes.clone().len() {
                         if nodes[i].node_id.clone() == wff_src_tgt[0].clone() {
-                            if !eboxf.value.pof.as_ref().unwrap()[(tgt_opo_idx - 1) as usize].name.is_none() {
-                                nodes[i].name = eboxf.value.pof.as_ref().unwrap()[(tgt_opo_idx - 1) as usize].name.clone();
+                            if !eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].name.is_none() {
+                                nodes[i].name = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].name.clone();
                             }
                         }
                     }

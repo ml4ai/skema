@@ -8,7 +8,7 @@ use skema::{
 };
 
 fn main() {
-    let module_id = 0;
+    let module_id = 460;
     let graph = subgraph2petgraph(module_id);
 
     // find all the expressions
@@ -35,7 +35,7 @@ fn main() {
     }
 
     // debugging outputs
-    /*for i in 0..expression_nodes.len() {
+    for i in 0..expression_nodes.len() {
         println!("{:?}", graph[expression_nodes[i]].id);
         println!(
             "Nodes in wiring subgraph: {}",
@@ -45,7 +45,7 @@ fn main() {
             "Edges in wiring subgraph: {}",
             expressions_wiring[i].edge_count()
         );
-    }*/
+    }
 
     let (nodes1, edges1) = expressions_wiring[1].clone().into_nodes_edges();
 
