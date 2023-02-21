@@ -16,15 +16,15 @@ This repository is for generating the dataset from raw arXiV latex source. It ha
 
 1) parse the mathematical equations from the raw arXiV latex source paper(s). All symbols, greek letters are provided in the _Latex_symbols.xlsx_ file.
 ```
-python parsing_latex_equations.py -src </path/to/arxiv/papers/>  -dst </path/to/destination>  -yr </path/to/year/folder/> -dir </path/to/specific/month/directory/>
+python parsing_latex_equations.py
 ```
 
 2) After getting the mathematical equations, we will create TeX files for each equation which will be used to render the PDF and PNG image of the equation.
 ```
-python tex_builder.py -src </path/to/arxiv/papers/>  -dst </path/to/destination/of/parsed_equations/>  -yr </path/to/year/folder/> -dir </path/to/specific/month/directory/>
+python tex_builder.py
 ```
 ```
-python tex2png.py -src </path/to/arxiv/papers/>  -dst </path/to/destination/of/parsed_equations/>  -yr </path/to/year/folder/> -dir </path/to/specific/month/directory/>
+python tex2png.py
 ```
 
 3) Render MathML from the latex equations. NOTE: We first need to run MathJax or TeMML server in a separate terminal and then will proceed with the MathML rendering script.
@@ -37,13 +37,13 @@ node temml_service.js
 ```
 
 ```
-python latex_mathml.py -src </path/to/arxiv/papers/>  -dst </path/to/destination/of/parsed_equations/>  -yr </path/to/year/folder/> -dir </path/to/specific/month/directory/>
+python latex_mathml.py
 ```
 
 4) Simplify the MathML equations by removing unnecessary details or tokens. Those simplified MathML equations will then be used to render XML ElementTrees using pretty print.
 ```
-python mathml_simplification.py -src </path/to/arxiv/papers/>  -dst </path/to/destination/of/parsed_equations/>  -yr </path/to/year/folder/> -dir </path/to/specific/month/directory/>
+python mathml_simplification.py
 ```
 ```
-python etreeParser.py -src </path/to/arxiv/papers/>  -dst </path/to/destination/of/parsed_equations/>  -yr </path/to/year/folder/> -dir </path/to/specific/month/directory/>
+python etreeParser.py 
 ```
