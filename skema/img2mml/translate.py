@@ -6,7 +6,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.img2mml.models.image2mml_xfmer_for_inference import (
+from skema.img2mml.models.image2mml_xfmer import (
     Image2MathML_Xfmer,
 )
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
@@ -20,26 +20,78 @@ from logging import info
 logging.basicConfig(level=logging.INFO)
 
 
-def pad_image(image: Image.Image) -> Image.Image:
-    """Pad image."""
-    right, left, top, bottom = 8, 8, 8, 8
-    width, height = image.size
-    new_width = width + right + left
-    new_height = height + top + bottom
-    result = Image.new(image.mode, (new_width, new_height))
-    result.paste(image, (left, top))
-    return result
+def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
+    """ preprocessing image - cropping, resizing, and padding """
 
-def convert_to_torch_tensor(image: bytes) -> torch.Tensor:
+    # checking if the image lies wihin permissible boundary
+    w, h = image.size
+    max_h = config["max_input_hgt"]
+    if h >= max_h:
+        resize_factor = max_h/h
+
+    # downsampling the image
+    image = image.resize((int(image.size[0] * resize_factor),
+                          int(image.size[1] * resize_factor,
+                          Image.LANCZOS)))
+
+    # converting to np array
+    image_arr = np.asarray(image, dtype=np.uint8)
+    # find where the data lies
+    indices = np.where(image_arr != 255)
+    # get the boundaries
+    x_min = np.min(indices[1])
+    x_max = np.max(indices[1])
+    y_min = np.min(indices[0])
+    y_max = np.max(indices[0])
+
+    # cropping tha image
+    image =  image.crop(( x_min, y_min, x_max,  y_max ))
+
+    # finding the bucket
+    # [width, hgt, resize_factor]
+    buckets = [
+        [820,86,0.6],
+        [615, 65,0.8],
+        [492, 52,1],
+        [410, 43,1.2],
+        [350, 37,1.4]
+        ]
+    # current width, hgt
+    crop_width, crop_hgt = image.size[0], image.size[1]
+
+    # find correct bucket
+    resize_factor = config["resizing_factor"]
+    for b in buckets:
+        w,h,r = b
+        if crop_width <= w and crop_hgt <= h:
+            resize_factor = r
+
+    # resizing the image
+    resize_factor = config["resizing_factor"]
+    image = image.resize((int(image.size[0] * resize_factor),
+                          int(image.size[1] * resize_factor)),
+                          Image.LANCZOS)
+
+    # padding
+    pad = config["padding"]
+    width = config["preprocessed_image_width"]
+    height = config["preprocessed_image_height"]
+    new_image = Image.new("RGB", (width, height), (255,255,255))
+    new_image.paste(image, (pad,pad))
+
+    return new_image
+
+
+def convert_to_torch_tensor(image: bytes, config: dict) -> torch.Tensor:
     """Convert image to torch tensor."""
     image = Image.open(io.BytesIO(image)).convert("L")
-    image = image.resize((500, 50))
-    image = pad_image(image)
+    image = preprocess_img(image, config)
 
     # convert to tensor
     image = transforms.ToTensor()(image)
 
     return image
+
 
 def set_random_seed(seed: int) -> None:
     """Set up seed."""
@@ -76,7 +128,13 @@ def define_model(
     n_xfmer_decoder_layers = config["n_xfmer_decoder_layers"]
 
     enc = {
-        "CNN": CNN_Encoder(input_channels, dec_hid_dim, dropout, device),
+        "CNN": CNN_Encoder(
+                        input_channels,
+                        dec_hid_dim,
+                        dropout,
+                        device
+                        ),
+
         "XFMER": Transformer_Encoder(
             emb_dim,
             dec_hid_dim,
@@ -119,8 +177,8 @@ def evaluate(
     with torch.no_grad():
         img = img.to(device)
         output = model(
-            img, device, is_train=False, is_test=False
-        )  # O: (B, max_len, output_dim), preds: (B, max_len)
+            img, device, is_inference=True,
+        )  # O: (1, max_len, output_dim), preds: (1, max_len)
 
         vocab_dict = {}
         for v in vocab:
