@@ -533,7 +533,7 @@ if __name__ == "__main__":
     with open(config_path, "r") as cfg:
         config = json.load(cfg)
 
-    for year in list(config["years"]):
+    for year in config["years"].split(","):
         print("year: ", year)
         main(config, str(year))
 
