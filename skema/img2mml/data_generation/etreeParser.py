@@ -22,10 +22,8 @@ def main(config, year):
 
     src_path = config["source_directory"]
     destination = config["destination_directory"]
-    directories = list(config["months"])
+    directories = config["months"].split(",")
     verbose = config["verbose"]
-
-    print(directories)
 
     # Setting up Logger - To get log files
     Log_Format = '%(message)s'
@@ -144,7 +142,7 @@ if __name__ == "__main__":
     with open(config_path, "r") as cfg:
         config = json.load(cfg)
 
-    for year in list(config["years"]):
+    for year in config["years"].split(","):
         main(config, str(year))
 
 

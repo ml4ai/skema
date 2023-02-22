@@ -48,11 +48,9 @@ def main(config, year):
     verbose = config["verbose"]
 
     #  create directories
-    dir_path = os.path.join(src_path, DIR)
     results_dir = os.path.join(destination, year)
-    for p in [dir_path, results_dir]:
-        if not os.path.exists(p):
-            os.mkdir(p)
+    if not os.path.exists(results_dir):
+        os.mkdir(results_dir)
 
     # Setting up Logger - To get log files
     logFile_dst = os.path.join(destination, year)
@@ -66,6 +64,7 @@ def main(config, year):
 
     for DIR in directories:
         DIR = str(DIR)
+        dir_path = os.path.join(src_path, DIR)
         results_folder = os.path.join(results_dir, DIR)
         latex_equations = os.path.join(results_folder, 'latex_equations')
 
