@@ -35,6 +35,7 @@ torchtext
 ## Training
 
 Before starting the training, we need to get the dataset and put it under _data_ folder.
+Please ensure that current working directory is `skema/img2mml`
 
 #### To preprocess images:   
 ```
