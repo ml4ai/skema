@@ -145,8 +145,10 @@ def main():
     if not os.path.exists(f'{data_path}/image_tensors'):
         os.mkdir(f'{data_path}/image_tensors')
 
-    with Pool(multiprocessing.cpu_count()) as pool:
-            result = pool.map(preprocess_images, images)
+    for i in images[:100]:
+        preprocess_images(i)
+    # with Pool(multiprocessing.cpu_count()) as pool:
+    #         result = pool.map(preprocess_images, images)
 
 
 if __name__ == "__main__":
