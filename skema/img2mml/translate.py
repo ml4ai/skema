@@ -5,12 +5,12 @@ import numpy as np
 import torch
 from torchvision import transforms
 from PIL import Image
-from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.img2mml.models.image2mml_xfmer import (
+from models.encoders.cnn_encoder import CNN_Encoder
+from models.image2mml_xfmer import (
     Image2MathML_Xfmer,
 )
-from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
-from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
+from models.encoders.xfmer_encoder import Transformer_Encoder
+from models.decoders.xfmer_decoder import Transformer_Decoder
 import io
 from typing import List
 import logging
@@ -29,10 +29,10 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     if h >= max_h:
         resize_factor = max_h/h
 
-    # downsampling the image
-    image = image.resize((int(image.size[0] * resize_factor),
-                          int(image.size[1] * resize_factor,
-                          Image.LANCZOS)))
+        # downsampling the image
+        image = image.resize((int(image.size[0] * resize_factor),
+                              int(image.size[1] * resize_factor,
+                              Image.LANCZOS)))
 
     # converting to np array
     image_arr = np.asarray(image, dtype=np.uint8)

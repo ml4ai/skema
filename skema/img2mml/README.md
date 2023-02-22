@@ -67,7 +67,7 @@ Place the model file in the `trained_models` directory.
 The curl command below should do the trick.
 
 ```
-curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best.pt > trained_models/cnn_xfmer_OMML-90K_best.pt
 ```
 
 Then, run the invocation below to launch the Dockerized service:
