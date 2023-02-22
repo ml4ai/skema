@@ -87,7 +87,7 @@ def define_model(config, VOCAB, DEVICE):
         DEC = Transformer_Decoder(EMB_DIM, N_HEADS, DEC_HID_DIM, OUTPUT_DIM, DROPOUT, MAX_LEN,
                                     N_XFMER_DECODER_LAYERS, DIM_FEEDFWD, DEVICE)
 
-        model = Image2MathML_Xfmer(ENC, DEC, VOCAB)
+        model = Image2MathML_Xfmer(ENC, DEC, VOCAB, DEVICE)
 
     return model
 

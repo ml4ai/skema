@@ -67,7 +67,12 @@ Place the model file in the `trained_models` directory.
 The curl command below should do the trick.
 
 ```
-curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best.pt > trained_models/cnn_xfmer_OMML-90K_best.pt
+curl -L https://kraken.sista.arizona.edu/skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best.pt > trained_models/cnn_xfmer_OMML-90K_best.pt
+```
+
+If model is trained on different server, then _vocab.txt_ file need to transferred here.
+```
+curl -L https://kraken.sista.arizona.edu/skema/img2mml/vocab.txt > vocab.txt
 ```
 
 Then, run the invocation below to launch the Dockerized service:

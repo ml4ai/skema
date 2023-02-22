@@ -157,14 +157,15 @@ def define_model(
         dim_feedfwd,
         device,
     )
-    model = Image2MathML_Xfmer(enc, dec, vocab)
+    model = Image2MathML_Xfmer(enc, dec, vocab, device)
 
     return model
 
 
 def evaluate(
     model: Image2MathML_Xfmer,
-    vocab: List[str],
+    vocab_itos: dict,
+    vocab_stoi:dict,
     img: torch.Tensor,
     device: torch.device,
 ) -> str:
@@ -176,18 +177,17 @@ def evaluate(
     model.eval()
     with torch.no_grad():
         img = img.to(device)
+
         output = model(
             img, device, is_inference=True,
+            SOS_token=int(vocab_stoi["<sos>"]),
+            EOS_token=int(vocab_stoi["<eos>"]),
+            PAD_token=int(vocab_stoi["<pad>"]),
         )  # O: (1, max_len, output_dim), preds: (1, max_len)
-
-        vocab_dict = {}
-        for v in vocab:
-            k, v = v.split()
-            vocab_dict[v.strip()] = k.strip()
 
         pred = list()
         for p in output:
-            pred.append(vocab_dict[str(p)])
+            pred.append(vocab_itos[str(p)])
 
         pred_seq = " ".join(pred[1:-1])
         return pred_seq
@@ -204,6 +204,14 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     # defining model using DataParallel
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
+
+    # creating a dictionary from vocab list
+    vocab_itos = dict()
+    vocab_stoi = dict()
+    for v in vocab:
+        k, v = v.split()
+        vocab_itos[v.strip()] = k.strip()
+        vocab_stoi[k.strip()] = v.strip()
 
     # generating equation
     print("loading trained model...")
@@ -225,4 +233,4 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
         else:
             model.load_state_dict(torch.load(model_path))
 
-    return evaluate(model, vocab, imagetensor, device)
+    return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)
