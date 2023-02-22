@@ -25,6 +25,7 @@ def main(config, year):
     directories = list(config["months"])
     verbose = config["verbose"]
 
+    print(directories)
 
     # Setting up Logger - To get log files
     Log_Format = '%(message)s'
