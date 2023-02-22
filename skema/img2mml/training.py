@@ -22,7 +22,6 @@ from models.encoders.cnn_encoder import CNN_Encoder
 from models.encoders.xfmer_encoder import Transformer_Encoder
 from models.decoders.lstm_decoder import LSTM_Decoder
 from models.decoders.xfmer_decoder import Transformer_Decoder
-from models.entire_xfmer import Transformer
 from models.image2mml_lstm import Image2MathML_LSTM
 from models.image2mml_xfmer import Image2MathML_Xfmer
 from src.train import train
