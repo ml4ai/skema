@@ -1,5 +1,7 @@
 # Data Generation Scripts
 
+Packages to install: xlrd==1.2.0, openpyxl
+
 ### Updates paths in the config files
 
 -src (source_path) = path to the directory where the data has been stored.  
@@ -45,5 +47,5 @@ python latex_mathml.py
 python mathml_simplification.py
 ```
 ```
-python etreeParser.py 
+python etreeParser.py
 ```

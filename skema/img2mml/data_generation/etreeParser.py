@@ -13,33 +13,29 @@ from multiprocessing import Pool, Lock, TimeoutError
 # Defining global lock
 lock = Lock()
 
-
-# Setting up Logger - To get log files
-Log_Format = '%(message)s'
-logFile_dst = os.path.join(args.source, f'{str(args.year)}/Logs')
-begin_month, end_month = str(args.directories[0]), str(args.directories[-1])
-logging.basicConfig(filename = os.path.join(logFile_dst, f'{begin_month}-{end_month}_etree.log'),
-                    level = logging.DEBUG,
-                    format = Log_Format,
-                    filemode = 'w')
-
-logger = logging.getLogger()
-
 # Printing starting time
 print(' ')
 start_time = datetime.now()
 print('Starting at:  ', start_time)
 
-
-# Defining lock
-lock = Lock()
-
 def main(config, year):
 
     src_path = config["source_directory"]
     destination = config["destination_directory"]
-    directories = list(config["month"])
+    directories = list(config["months"])
     verbose = config["verbose"]
+
+
+    # Setting up Logger - To get log files
+    Log_Format = '%(message)s'
+    logFile_dst = os.path.join(args.source, f'{year}/Logs')
+    begin_month, end_month = directories[0], directories[-1]
+    logging.basicConfig(filename = os.path.join(logFile_dst, f'{begin_month}-{end_month}_etree.log'),
+                        level = logging.DEBUG,
+                        format = Log_Format,
+                        filemode = 'w')
+
+    logger = logging.getLogger()
 
     # Creating 'etree' directory
     for DIR in directories:

@@ -18,7 +18,7 @@ def main(config, year):
 
     src_path = config["source_directory"]
     destination = config["destination_directory"]
-    directories = list(config["month"])
+    directories = list(config["months"])
     verbose = config["verbose"]
 
     for DIR in directories:

@@ -44,7 +44,7 @@ def main(config, year):
     # looping through the latex paper directories
     src_path = config["source_directory"]
     destination = config["destination_directory"]
-    directories = list(config["month"])
+    directories = list(config["months"])
     verbose = config["verbose"]
 
     # Setting up Logger - To get log files
