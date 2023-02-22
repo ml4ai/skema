@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
-from skema.img2mml.utils.utils import *
+from utils.utils import *
 
 def train(model, model_type, train_dataloader, vocab, optimizer, clip, ddp=False, rank=None):
 

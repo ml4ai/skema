@@ -2,7 +2,7 @@
 
 import torch
 import torch.nn as nn
-from skema.img2mml.utils.utils import *
+from utils.utils import *
 
 def evaluate(model, model_type, vocab, batch_size, test_dataloader,
                 beam_params=None, is_test=False, ddp=False, rank=None, g2p=False):

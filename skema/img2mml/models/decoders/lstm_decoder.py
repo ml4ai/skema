@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import random
-from skema.img2mml.models.attention.bahdanau_attention import BahdanauAttention
+from models.attention.bahdanau_attention import BahdanauAttention
 
 class LSTM_Decoder(nn.Module):
     """

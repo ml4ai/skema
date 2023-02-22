@@ -17,17 +17,17 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
-from skema.img2mml.preprocessing.preprocess import preprocess_mml
-from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
-from skema.img2mml.models.decoders.lstm_decoder import LSTM_Decoder
-from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
-from skema.img2mml.models.entire_xfmer import Transformer
-from skema.img2mml.models.image2mml_lstm import Image2MathML_LSTM
-from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
-from skema.img2mml.src.train import train
-from skema.img2mml.src.test import evaluate
-from skema.img2mml.utils.bleu_score import calculate_bleu_score
+from preprocessing.preprocess import preprocess_mml
+from models.encoders.cnn_encoder import CNN_Encoder
+from models.encoders.xfmer_encoder import Transformer_Encoder
+from models.decoders.lstm_decoder import LSTM_Decoder
+from models.decoders.xfmer_decoder import Transformer_Decoder
+from models.entire_xfmer import Transformer
+from models.image2mml_lstm import Image2MathML_LSTM
+from models.image2mml_xfmer import Image2MathML_Xfmer
+from src.train import train
+from src.test import evaluate
+from utils.bleu_score import calculate_bleu_score
 
 # opening config file
 parser = argparse.ArgumentParser()
