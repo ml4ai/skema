@@ -31,7 +31,7 @@ def evaluate(model, model_type, vocab, batch_size, test_dataloader,
             we will pass "mml" just to provide initial <sos> token.
             There will no teacher forcing while validation and testing.
             """
-            outputs,preds = model(img, mml, is_train=False, is_test=is_test)  # O: (B, max_len, output_dim), preds: (B, max_len)
+            outputs,preds = model(img, mml, is_test=is_test)  # O: (B, max_len, output_dim), preds: (B, max_len)
 
             if is_test:
                 preds = garbage2pad(preds, vocab, is_test=is_test)
