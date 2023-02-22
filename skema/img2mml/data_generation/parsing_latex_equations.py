@@ -6,6 +6,15 @@ Latex eqns Parsing code
 NOTE: Please change the paths as per your system before running the code.
 """
 
+"""
+TODOs:
+check line #168 -->extracting Macros
+check line #178 --> DMO
+check line #304 and 313 --> condition 4/5 work on \label, etc.
+                        --> and condition 6 matrix
+"""
+
+
 import pandas as pd
 import json, os
 from subprocess import call
@@ -157,12 +166,18 @@ def Parse_equation(args_list):
                     line = l.decode(encoding, errors = 'ignore')
 
                     # extracting MACROS
+                    """
+                    check if Marcro are defined in multiple lines
+                    """
                     if "\\newcommand" in line or "\\renewcommand" in line:
                         L = Macro(line)
                         if L is not None:
                             MacroFile.write(L)
 
-                    # extract declare math op:erator
+                    # extract declare math operator
+                    """
+                    check if DMO are defined in multiple lines
+                    """
                     if "\\DeclareMathOperator" in line:
                         DMOFile.write(line)
 
@@ -270,7 +285,8 @@ def Parse_equation(args_list):
                                 Line_inlineEqn_dict[Pequations] = index
 
                     # condition 4: if \begin{equation(*)} \begin{case or split} --- \end{equation(*)} \begin{case or split}
-                    # comdition 5: if \begin{equation(*)} --- \end{equation(*)}
+                    # comdition 5: if \beginx{equation(*)} --- \end{equation(*)}
+                    # if \label \ref \caption --> remove these lines
                     for ec in equation_cmds:
                         if "\\begin{}".format(ec) in line:
                             begin_index_alpha = index+1
@@ -285,10 +301,18 @@ def Parse_equation(args_list):
                             eqn = ''
                             for i in range(len(equation)):
                                 eqn = eqn + equation[i].decode(encoding, errors = "ignore")
+
+                            """
+                            condition for removing unwanted tokens like \label
+                            """
+
                             total_equations.append(eqn)
                             Line_largeEqn_dict[eqn] = index
 
                     # condition 6: if '\\begin{..matrix(*)}' but independent under condition 4
+                    """
+                    Need to work on this condition
+                    """
                     for mc in matrix_cmds:
                         if "\\begin{}".format(mc) in line and alpha == 0:
                             matrix = 1

@@ -208,12 +208,21 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     # generating equation
     print("loading trained model...")
 
-    if not torch.cuda.is_available():
-        info("CUDA is not available, falling back to using the CPU.")
-        model.load_state_dict(
-            torch.load(model_path, map_location=torch.device("cpu"))
-        )
+    # if state_dict keys has "module.<key_name>"
+    # we need to remove the "module." from key_names
+    if config["clean_state_dict"]:
+        new_model = dict()
+        for key,value in torch.load(model_path, map_location=torch.device('cpu')).items():
+            new_model[key[7:]] = value
+            model.load_state_dict(new_model, strict=False)
+
     else:
-        model.load_state_dict(torch.load(model_path))
+        if not torch.cuda.is_available():
+            info("CUDA is not available, falling back to using the CPU.")
+            model.load_state_dict(
+                torch.load(model_path, map_location=torch.device("cpu"))
+            )
+        else:
+            model.load_state_dict(torch.load(model_path))
 
     return evaluate(model, vocab, imagetensor, device)
