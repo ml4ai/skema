@@ -23,17 +23,7 @@ print('Starting at:  ', start_time)
 # Defining global lock
 lock = Lock()
 
-# Setting up Logger - To get log files
-Log_Format = '%(levelname)s:%(message)s'
 
-logFile_dst = os.path.join(args.destination, str(args.year))
-
-logging.basicConfig(filename = os.path.join(logFile_dst, 'unknown_Tex_Files.log'),
-                    level = logging.DEBUG,
-                    format = Log_Format,
-                    filemode = 'w')
-
-logger = logging.getLogger()
 
 def main(config, year):
 
@@ -56,6 +46,16 @@ def main(config, year):
     destination = config["destination_directory"]
     directories = list(config["month"])
     verbose = config["verbose"]
+
+    # Setting up Logger - To get log files
+    logFile_dst = os.path.join(destination, year)
+    Log_Format = '%(levelname)s:%(message)s'
+    logging.basicConfig(filename = os.path.join(logFile_dst, 'unknown_Tex_Files.log'),
+                        level = logging.DEBUG,
+                        format = Log_Format,
+                        filemode = 'w')
+
+    logger = logging.getLogger()
 
     for DIR in directories:
         DIR = str(DIR)
