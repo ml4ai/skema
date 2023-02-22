@@ -37,6 +37,10 @@ torchtext
 Before starting the training, we need to get the dataset and put it under _data_ folder.
 Please ensure that current working directory is `skema/img2mml`
 
+```
+cd skema/img2mml; mkdir training_data
+```
+
 #### To preprocess images:   
 ```
 python preprocessing/preprocess_images.py --config configs/ourmml_xfmer_config
