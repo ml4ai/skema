@@ -43,7 +43,7 @@ def resize_image(image, resize_factor):
                         Image.LANCZOS)
     return image
 
-def pad_image(IMAGE):
+def pad_image(image):
     pad = config["padding"]
     width = config["preprocessed_image_width"]
     hgt = config["preprocessed_image_height"]
