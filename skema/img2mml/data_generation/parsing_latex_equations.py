@@ -534,6 +534,7 @@ if __name__ == "__main__":
         config = json.load(cfg)
 
     for year in list(config["years"]):
+        print("year: ", year)
         main(config, str(year))
 
     # Printing stoping time
