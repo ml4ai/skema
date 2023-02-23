@@ -26,7 +26,7 @@ from models.image2mml_lstm import Image2MathML_LSTM
 from models.image2mml_xfmer import Image2MathML_Xfmer
 from src.train import train
 from src.test import evaluate
-from utils.bleu_score import calculate_bleu_score
+# from utils.bleu_score import calculate_bleu_score
 
 # opening config file
 parser = argparse.ArgumentParser()
@@ -310,15 +310,15 @@ def train_model(rank=None,):
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
     # calculate_bleu_score
-    if (not ddp) or (ddp and rank==0):
-        print(" calculating Bleu Score...  ")
-        try:
-            tt_bleu = calculate_bleu_score()
-            print(' torchtext BLEU score: ', tt_bleu )
-            print(" multi-bleu.perl BLEU score... ")
-            os.system("perl utils/multi-bleu.perl logs/trimmed_targets.txt < logs/trimmed_preds.txt")
-        except:
-            pass
+    # if (not ddp) or (ddp and rank==0):
+    #     print(" calculating Bleu Score...  ")
+    #     try:
+    #         tt_bleu = calculate_bleu_score()
+    #         print(' torchtext BLEU score: ', tt_bleu )
+    #         print(" multi-bleu.perl BLEU score... ")
+    #         os.system("perl utils/multi-bleu.perl logs/trimmed_targets.txt < logs/trimmed_preds.txt")
+    #     except:
+    #         pass
 
     # dist.barrier()
     # dist.destroy_process_group()

@@ -25,3 +25,10 @@ def calculate_bleu_score():
 
     bleu = bleu_score(candidate_corpus, references_corpus)
     return bleu
+
+if __name__ == "__main__":
+    print(" calculating Bleu Score...  ")
+    bleu = calculate_bleu_score()
+    print(' torchtext BLEU score: ', tt_bleu )
+
+    

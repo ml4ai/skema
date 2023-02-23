@@ -56,6 +56,17 @@ python preprocessing/preprocess_mml.py
 python training.py --config configs/ourmml_xfmer_config.json
 ```
 
+#### To calculate Torchtext BLEU score
+```
+python utils/bleu_score.py
+```
+
+For multiperl bleu score:
+```
+perl utils/multi-bleu.perl logs/trimmed_targets.txt < logs/trimmed_preds.txt"
+```
+
+
 ## Inference
 
 The model itself is not checked into the repository, but you can get it from
