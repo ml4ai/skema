@@ -126,26 +126,27 @@ class GrfnAssignmentPass:
         # populate `arg_assignments` attribute of node
         for i, n in enumerate(node.arguments):
             # grab GrFN variable for argument
-            arg_fullid = node.arg_index_to_fullid[i]
-            arg_grfn_var = self.pipeline_state.get_grfn_var(arg_fullid)
+            if i in node.arg_index_to_fullid.keys(): # NOTE: M7 Placeholder
+                arg_fullid = node.arg_index_to_fullid[i]
+                arg_grfn_var = self.pipeline_state.get_grfn_var(arg_fullid)
 
-            # create GrfnAssignment based on assignment type
-            metadata = create_lambda_node_metadata(node.source_refs)
-            if is_literal_assignment(n):
-                arg_assignment = GrfnAssignment(
-                    create_grfn_literal_node(metadata), LambdaType.LITERAL
-                )
-            else:
-                arg_assignment = GrfnAssignment(
-                    create_grfn_assign_node(metadata), LambdaType.ASSIGN
-                )
+                # create GrfnAssignment based on assignment type
+                metadata = create_lambda_node_metadata(node.source_refs)
+                if is_literal_assignment(n):
+                    arg_assignment = GrfnAssignment(
+                        create_grfn_literal_node(metadata), LambdaType.LITERAL
+                    )
+                else:
+                    arg_assignment = GrfnAssignment(
+                        create_grfn_assign_node(metadata), LambdaType.ASSIGN
+                    )
 
-            # store argument as output to GrfnAssignment
-            arg_assignment.outputs[arg_fullid] = arg_grfn_var.uid
-            # populate GrfnAssignment inputs for arguments
-            self.visit(n, arg_assignment.inputs)
-            # store GrfnAssignment for this argument
-            node.arg_assignments[i] = arg_assignment
+                # store argument as output to GrfnAssignment
+                arg_assignment.outputs[arg_fullid] = arg_grfn_var.uid
+                # populate GrfnAssignment inputs for arguments
+                self.visit(n, arg_assignment.inputs)
+                # store GrfnAssignment for this argument
+                node.arg_assignments[i] = arg_assignment
 
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:

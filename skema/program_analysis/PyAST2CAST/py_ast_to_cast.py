@@ -109,6 +109,8 @@ def get_node_name(ast_node):
         for e in ast_node.value:
             names.extend(get_node_name(e))
         return names
+    #elif isinstance(ast_node, str):
+     #   return [ast_node]
     elif isinstance(ast_node, Subscript):
         raise TypeError(f"Type {ast_node} not supported")
     else:
@@ -327,6 +329,69 @@ class PyASTToCAST:
                 return stmt
 
         return None
+
+    def create_cond(self, node, prev_scope_id_dict, curr_scope_id_dict):
+        """ Used in while and if statement creation.
+            This function determines what kind of conditional we have for an if statement or a while loop
+            Either the conditional explicitly checks a value using a comparison operator or it doesnt
+            In the case that it doesn't explicitly then we have to add in an explicit check
+        """        
+        ref = [
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
+        test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        bool_func = "bool"
+        source_code_data_type = ["Python", "3.8", str(type(True))]
+        true_val = LiteralValue(ScalarType.BOOLEAN, "True", source_code_data_type=source_code_data_type, source_refs=ref)
+        if isinstance(node.test, (ast.Name, ast.Constant)):
+            if bool_func not in prev_scope_id_dict.keys():
+                # If a built-in is called, then it gets added to the global dictionary if
+                # it hasn't been called before. This is to maintain one consistent ID per built-in
+                # function
+                if bool_func not in self.global_identifier_dict.keys():
+                    self.insert_next_id(
+                        self.global_identifier_dict, bool_func
+                    )
+
+                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
+                    bool_func
+                ]
+            bool_call = Call(Name("bool",
+                                id=prev_scope_id_dict[bool_func], 
+                                source_refs=ref),
+                            [test_cond],
+                            source_refs=ref)
+            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
+        elif isinstance(node.test, ast.UnaryOp) and isinstance(node.test.operand, (ast.Name, ast.Constant, ast.Call)): 
+            if bool_func not in prev_scope_id_dict.keys():
+                # If a built-in is called, then it gets added to the global dictionary if
+                # it hasn't been called before. This is to maintain one consistent ID per built-in
+                # function
+                if bool_func not in self.global_identifier_dict.keys():
+                    self.insert_next_id(
+                        self.global_identifier_dict, bool_func
+                    )
+
+                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
+                    bool_func
+                ]
+            bool_call = Call(Name("bool",
+                                id=prev_scope_id_dict[bool_func], 
+                                source_refs=ref),
+                            [test_cond],
+                            source_refs=ref)
+            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
+        else:
+            test = test_cond
+
+        return test
+
 
     @singledispatchmethod
     def visit(
@@ -842,14 +907,14 @@ class PyASTToCAST:
 
         if isinstance(node.value, ast.DictComp):
             to_ret = []
-            to_ret.extend(right)
+            # to_ret.extend(right)
             to_ret.extend(
                 [
                     Assignment(
                         left[0],
                         Name(
                             name="dict__temp_",
-                            id=curr_scope_id_dict["dict__temp_"],
+                            id=-1,
                         ),
                         source_refs=ref,
                     )
@@ -858,14 +923,14 @@ class PyASTToCAST:
             return to_ret
         if isinstance(node.value, ast.ListComp):
             to_ret = []
-            to_ret.extend(right)
+            # to_ret.extend(right)
             to_ret.extend(
                 [
                     Assignment(
                         left[0],
                         Name(
                             name="list__temp_",
-                            id=curr_scope_id_dict["list__temp_"],
+                            id=-1,
                         ),
                         source_refs=ref,
                     )
@@ -1250,9 +1315,12 @@ class PyASTToCAST:
                     val = self.visit(
                         arg.value, prev_scope_id_dict, curr_scope_id_dict
                     )[0]
+                    
+
+
                     assign_node = Assignment(
                         left=Var(
-                            Name(name=arg.arg, id=-1, source_refs=ref),
+                            Name(name=arg.arg, id=100, source_refs=ref), # TODO: add a proper ID here
                             type="float",
                             source_refs=ref,
                         ),
@@ -1275,15 +1343,18 @@ class PyASTToCAST:
                         assign_node = Name(
                             name=arg.value.func.id, id=-1, source_refs=ref
                         )
+                    elif isinstance(arg.value, ast.Attribute):
+                        assign_node = Name(
+                            name=arg.value.value, id=-1, source_refs=ref
+                        )
+                    elif isinstance(arg.value, ast.Subscript):
+                        assign_node = Name(
+                            name=arg.value.value.id, id=-1, source_refs=ref
+                        )
                     else:
-                        if isinstance(arg.value, ast.Attribute):
-                            assign_node = Name(
-                                name=arg.value.value, id=-1, source_refs=ref
-                            )
-                        else:
-                            assign_node = Name(
-                                name=arg.value.id, id=-1, source_refs=ref
-                            )
+                        assign_node = Name(
+                            name=arg.value.id, id=-1, source_refs=ref
+                        )
                 kw_args.append(assign_node)
                 # kw_args.extend(self.visit(arg.value, prev_scope_id_dict, curr_scope_id_dict))
 
@@ -2445,6 +2516,15 @@ class PyASTToCAST:
         if self.legacy:
             return [FunctionDef("LAMBDA", args, body, source_refs=ref)]
         else:
+            source_code_data_type = ["Python", "3.8", "List"]
+            return [
+                LiteralValue(
+                    StructureType.LIST,
+                    "NotImplemented",
+                    source_code_data_type,
+                    ref,
+                )
+            ]
             return [
                 FunctionDef(Name("LAMBDA", id=-1), args, body, source_refs=ref)
             ]
@@ -2467,11 +2547,23 @@ class PyASTToCAST:
         """
 
         ref = [
-            self.filenames[-1],
-            node.col_offset,
-            node.end_col_offset,
-            node.lineno,
-            node.end_lineno,
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
+
+        source_code_data_type = ["Python", "3.8", "List"]
+        return [
+            LiteralValue(
+                StructureType.LIST,
+                "Temporarily Disabled",
+                source_code_data_type,
+                source_refs=ref
+            )
         ]
 
         temp_list_name = f"list__temp_"
@@ -2670,11 +2762,23 @@ class PyASTToCAST:
         curr_scope_id_dict: Dict,
     ):
         ref = [
-            self.filenames[-1],
-            node.col_offset,
-            node.end_col_offset,
-            node.lineno,
-            node.end_lineno,
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
+
+        source_code_data_type = ["Python", "3.8", "List"]
+        return [
+            LiteralValue(
+                StructureType.LIST,
+                "Temporarily Disabled",
+                source_code_data_type,
+                source_refs=ref,
+            )
         ]
 
         # node (ast.DictComp)
@@ -2871,9 +2975,10 @@ class PyASTToCAST:
             ModelIf: A CAST If statement node.
         """
 
-        node_test = self.visit(
-            node.test, prev_scope_id_dict, curr_scope_id_dict
-        )
+        # node_test = self.visit(
+        #     node.test, prev_scope_id_dict, curr_scope_id_dict
+        # )
+        node_test = self.create_cond(node, prev_scope_id_dict, curr_scope_id_dict)
 
         node_body = []
         if len(node.body) > 0:
@@ -2899,7 +3004,7 @@ class PyASTToCAST:
             )
         ]
 
-        return [ModelIf(node_test[0], node_body, node_orelse, source_refs=ref)]
+        return [ModelIf(node_test, node_body, node_orelse, source_refs=ref)]
 
     @visit.register
     def visit_Global(
@@ -3850,8 +3955,69 @@ class PyASTToCAST:
             body.extend(
                 self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
             )
+        for piece in node.orelse:
+            body.extend(
+                self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+            )
+        for piece in node.finalbody:
+            body.extend(
+                self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+            )
 
         return body
+
+    @visit.register
+    def visit_Yield(
+        self,
+        node: ast.Yield,
+        prev_scope_id_dict: Dict,
+        curr_scope_id_dict: Dict,
+    ):
+        source_code_data_type = ["Python", "3.8", "List"]
+        ref = [
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
+        return [
+            LiteralValue(
+                StructureType.LIST,
+                "NotImplemented",
+                source_code_data_type,
+                ref,
+            )
+        ]
+
+    @visit.register
+    def visit_Assert(
+        self,
+        node: ast.Assert,
+        prev_scope_id_dict: Dict,
+        curr_scope_id_dict: Dict,
+    ):
+        source_code_data_type = ["Python", "3.8", "List"]
+        ref = [
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
+        return [
+            LiteralValue(
+                StructureType.LIST,
+                "NotImplemented",
+                source_code_data_type,
+                ref,
+            )
+        ]
+
 
     @visit.register
     def visit_While(
@@ -3879,7 +4045,10 @@ class PyASTToCAST:
             )
         ]
 
-        test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        # test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        test = self.create_cond(node, prev_scope_id_dict, curr_scope_id_dict)
+        
+        """
         bool_func = "bool"
         source_code_data_type = ["Python", "3.8", str(type(True))]
         true_val = LiteralValue(ScalarType.BOOLEAN, "True", source_code_data_type=source_code_data_type, source_refs=ref)
@@ -3902,7 +4071,7 @@ class PyASTToCAST:
                             [test_cond],
                             source_refs=ref)
             test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
-        elif isinstance(node.test, ast.UnaryOp) and isinstance(node.test.operand, (ast.Name, ast.Constant)): 
+        elif isinstance(node.test, ast.UnaryOp) and isinstance(node.test.operand, (ast.Name, ast.Constant, ast.Call)): 
             if bool_func not in prev_scope_id_dict.keys():
                 # If a built-in is called, then it gets added to the global dictionary if
                 # it hasn't been called before. This is to maintain one consistent ID per built-in
@@ -3923,6 +4092,8 @@ class PyASTToCAST:
             test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
         else:
             test = test_cond
+        """
+
 
         # Loops have their own enclosing scopes
         curr_scope_copy = copy.deepcopy(curr_scope_id_dict)

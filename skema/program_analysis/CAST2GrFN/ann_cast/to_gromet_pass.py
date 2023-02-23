@@ -1756,6 +1756,21 @@ class ToGrometPass:
                             tgt=len(parent_gromet_fn.opi),
                         ),
                     )
+                elif( # NOTE: Added for M7, handling operations like x * x
+                    comp_name_nodes(node.left, node.right)
+                    and not found_opi
+                ):
+                    parent_gromet_fn.opi = insert_gromet_object(
+                        parent_gromet_fn.opi,
+                        GrometPort(name=name, box=len(parent_gromet_fn.b)),
+                    )
+                    parent_gromet_fn.wfopi = insert_gromet_object(
+                        parent_gromet_fn.wfopi,
+                        GrometWire(
+                            src=len(parent_gromet_fn.pif),
+                            tgt=len(parent_gromet_fn.opi),
+                        ),
+                    )
                 else:
                     parent_gromet_fn.wfopi = insert_gromet_object(
                         parent_gromet_fn.wfopi,
@@ -1803,6 +1818,21 @@ class ToGrometPass:
                         GrometPort(
                             name=node.right.name, box=len(parent_gromet_fn.b)
                         ),
+                    )
+                    parent_gromet_fn.wfopi = insert_gromet_object(
+                        parent_gromet_fn.wfopi,
+                        GrometWire(
+                            src=len(parent_gromet_fn.pif),
+                            tgt=len(parent_gromet_fn.opi),
+                        ),
+                    )
+                elif( # NOTE: Added for M7, handling operations like x * x
+                    comp_name_nodes(node.left, node.right)
+                    and not found_opi
+                ):
+                    parent_gromet_fn.opi = insert_gromet_object(
+                        parent_gromet_fn.opi,
+                        GrometPort(name=name, box=len(parent_gromet_fn.b)),
                     )
                     parent_gromet_fn.wfopi = insert_gromet_object(
                         parent_gromet_fn.wfopi,
@@ -2614,6 +2644,18 @@ class ToGrometPass:
                             box=len(new_gromet.b),
                             name=arg.val.name,
                             default_value=None,  # TODO: What's the actual default value? 
+                            metadata=self.insert_metadata(
+                                self.create_source_code_reference(arg_ref)
+                            ),
+                        ),
+                    )
+                elif isinstance(arg.default_value, AnnCastBinaryOp):
+                    new_gromet.opi = insert_gromet_object(
+                        new_gromet.opi,
+                        GrometPort(
+                            box=len(new_gromet.b),
+                            name=arg.val.name,
+                            default_value=None, # TODO: M7 placeholder
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
                             ),
