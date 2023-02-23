@@ -1,5 +1,7 @@
 use petgraph::dot::{Config, Dot};
+use petgraph::matrix_graph::IndexType;
 use petgraph::prelude::*;
+use petgraph::visit::Dfs;
 use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
 
@@ -30,22 +32,37 @@ fn main() {
         expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id.clone()).unwrap());
     }
 
+    // now to trim off the un-named filler nodes and filler expressions
+    let mut trimmed_expressions_wiring =
+        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+    for i in 0..expressions_wiring.clone().len() {
+        let (nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
+        if nodes1.len() > 3 {
+            trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
+        }
+    }
+
     // debugging outputs
-    /*for i in 0..expression_nodes.len() {
+    /*for node_idx in expressions_wiring[1].clone().node_indices() {
+        if expressions_wiring[1].clone()[node_idx].properties["name"].to_string()
+            == "'un-named'".to_string()
+        {
+            println!("{:?}", node_idx);
+        }
+    }*/
+    for i in 0..trimmed_expressions_wiring.len() {
         println!("{:?}", graph[expression_nodes[i]].id);
         println!(
             "Nodes in wiring subgraph: {}",
-            expressions_wiring[i].node_count()
+            trimmed_expressions_wiring[i].node_count()
         );
         println!(
             "Edges in wiring subgraph: {}",
-            expressions_wiring[i].edge_count()
+            trimmed_expressions_wiring[i].edge_count()
         );
     }
-
-    let (nodes1, edges1) = expressions_wiring[1].clone().into_nodes_edges();
-
-    for edge in edges1 {
+    //let (nodes1, edges1) = expressions_wiring[1].clone().into_nodes_edges();
+    /*for edge in edges1 {
         let source = edge.source();
         let target = edge.target();
         let edge_weight = edge.weight;
@@ -53,16 +70,61 @@ fn main() {
             "Edge from {:?} to {:?} with weight {:?}",
             source, target, edge_weight
         );
-    }
-
-    for node in nodes1 {
+    }*/
+    /*for node in nodes1 {
         println!("{:?}", node);
-    }
-
-    println!(
+    }*/
+    /*println!(
         "{:?}",
         Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
     );*/
+}
+
+// this currently only works for un-named nodes that are not chained or have multiple incoming/outgoing edges
+fn trim_un_named(
+    mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+) -> petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> {
+    // first create a cloned version of the graph we can modify while iterating over it.
+    let mut bypass_graph = graph.clone();
+
+    // iterate over the graph and add a new edge to bypass the un-named nodes
+    for node_index in graph.clone().node_indices() {
+        if graph.clone()[node_index].properties["name"].to_string() == "'un-named'".to_string() {
+            let mut bypass = Vec::<NodeIndex>::new();
+            for node1 in graph.neighbors_directed(node_index, Incoming) {
+                bypass.push(node1);
+            }
+            for node2 in graph.neighbors_directed(node_index, Outgoing) {
+                bypass.push(node2);
+            }
+            if bypass.len() == 2 {
+                bypass_graph.add_edge(
+                    bypass[0].clone(),
+                    bypass[1].clone(),
+                    graph
+                        .edge_weight(graph.find_edge(node_index, bypass[1]).unwrap())
+                        .unwrap()
+                        .clone(),
+                );
+            }
+        }
+    }
+
+    // now we perform a filter_map to remove the un-named nodes and only the bypass edge will remain to connect the nodes
+    let trimmed_graph = bypass_graph.filter_map(
+        |node_index, edge_index| {
+            if !(bypass_graph.clone()[node_index].properties["name"].to_string()
+                == "'un-named'".to_string())
+            {
+                Some(graph[node_index].clone())
+            } else {
+                None
+            }
+        },
+        |node_index, edge_index| Some(edge_index.clone()),
+    );
+
+    return trimmed_graph;
 }
 
 fn subgraph_wiring(
