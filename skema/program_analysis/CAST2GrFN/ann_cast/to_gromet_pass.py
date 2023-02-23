@@ -597,8 +597,8 @@ class ToGrometPass:
         """
         # print current node being visited.
         # this can be useful for debugging
-        class_name = node.__class__.__name__
-        print(f"\nProcessing node type {class_name}")
+        # class_name = node.__class__.__name__
+        # print(f"\nProcessing node type {class_name}")
 
         # call internal visit
         try:
@@ -1572,6 +1572,20 @@ class ToGrometPass:
                             GrometPort(box=len(parent_gromet_fn.bf)),
                         )
 
+                
+        elif isinstance(node.value, AnnCastCall):
+            # NOTE: M7 placeholder
+            parent_gromet_fn.bf = insert_gromet_object(
+                parent_gromet_fn.bf,
+                GrometBoxFunction(
+                    function_type=FunctionType.FUNCTION,
+                    contents=None,
+                    metadata=self.insert_metadata(
+                        self.create_source_code_reference(ref)
+                    ),
+                ),
+            )
+
                 # if node.value.name not in self.record.keys():
                 #  pass
                 # if func_name in self.record.keys():
@@ -2081,6 +2095,24 @@ class ToGrometPass:
 
                     entry = var_env[arg.right.name]
                     arg_fn_pofs.append(entry[2] + 1)
+                elif isinstance(arg.right, AnnCastTuple):
+                    # self.visit(arg.right, parent_gromet_fn, node)
+                    # NOTE: M7 placeholder
+                    parent_gromet_fn.bf = insert_gromet_object(
+                        parent_gromet_fn.bf,
+                        GrometBoxFunction(
+                            function_type=FunctionType.FUNCTION,
+                            contents=None,
+                            metadata=self.insert_metadata(
+                                self.create_source_code_reference(ref)
+                            ),
+                        ),
+                    )
+                    parent_gromet_fn.pof = insert_gromet_object(
+                        parent_gromet_fn.pof,
+                        GrometPort(box=len(parent_gromet_fn.bf))
+                    )
+                    arg_fn_pofs.append(len(parent_gromet_fn.pof))
                 else:
                     self.visit(arg.right, parent_gromet_fn, node)
                     arg_fn_pofs.append(len(parent_gromet_fn.pof))
@@ -2570,6 +2602,18 @@ class ToGrometPass:
                             box=len(new_gromet.b),
                             name=arg.val.name,
                             default_value=arg.default_value.values,
+                            metadata=self.insert_metadata(
+                                self.create_source_code_reference(arg_ref)
+                            ),
+                        ),
+                    )
+                elif isinstance(arg.default_value, AnnCastCall):
+                    new_gromet.opi = insert_gromet_object(
+                        new_gromet.opi,
+                        GrometPort(
+                            box=len(new_gromet.b),
+                            name=arg.val.name,
+                            default_value=None,  # TODO: What's the actual default value? 
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
                             ),
