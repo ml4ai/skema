@@ -214,24 +214,66 @@ pub struct Files {
     pub path: Option<String>,
 }
 
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct TextExtraction {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub document_reference_uid: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub block: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub char_begin: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub char_end: Option<u32>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct Grounding {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub argument_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub score: Option<f32>,
+}
+
+#[derive(Deserialize, Serialize, Clone, Debug)]
+pub struct ValueMeta {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<String>,
+}
+
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata_type: Option<String>, // Could be enum?
+    pub metadata_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gromet_version: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>, // only in highest meta
+    pub text_extraction: Option<TextExtraction>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub global_reference_id: Option<String>, // only in highest meta
+    pub variable_identifier: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub files: Option<Vec<Files>>, // only in highest meta
+    pub variable_definition: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub source_language: Option<String>, // Could be enum?
+    pub value: Option<ValueMeta>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grounding: Option<Vec<Grounding>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub global_reference_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub files: Option<Vec<Files>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_language: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_language_version: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub data_type: Option<String>, // Could be enum?
+    pub data_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code_file_reference_uid: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]

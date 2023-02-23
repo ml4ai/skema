@@ -2,7 +2,6 @@
 use clap::{Parser, ValueEnum};
 use mathml::mml2pn::ACSet;
 
-
 #[derive(Debug, Clone, ValueEnum, Default)]
 enum OutputFormat {
     #[default]

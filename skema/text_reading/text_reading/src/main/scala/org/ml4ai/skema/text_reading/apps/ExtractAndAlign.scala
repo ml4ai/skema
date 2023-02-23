@@ -404,7 +404,7 @@ object ExtractAndAlign {
       logger.info(s"Extracting from ${file.getName}")
       val texts: Seq[String] = dataLoader.loadFile(file)
       // Route text based on the amount of sentence punctuation and the # of numbers (too many numbers = non-prose from the paper)
-      texts.flatMap(text => textRouter.route(text).extractFromText(text, filename = Some(file.getName)))
+      texts.flatMap(text => textRouter.route(text).extractFromText(text, filename = Some(file.getName)).mentions)
     }
     logger.info(s"Extracted ${textMentions.length} text mentions")
     val onlyEventsAndRelations = textMentions.seq.filter(m => m.matches("EventMention") || m.matches("RelationMention"))
