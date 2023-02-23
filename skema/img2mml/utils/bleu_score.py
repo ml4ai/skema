@@ -28,7 +28,5 @@ def calculate_bleu_score():
 
 if __name__ == "__main__":
     print(" calculating Bleu Score...  ")
-    bleu = calculate_bleu_score()
+    tt_bleu = calculate_bleu_score()
     print(' torchtext BLEU score: ', tt_bleu )
-
-    
