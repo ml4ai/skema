@@ -2298,6 +2298,7 @@ class ToGrometPass:
             # Generate a "None" for no parent class
             val = LiteralValue(
                 "None",
+                "None"
             )
 
             parent_gromet_fn.bf = insert_gromet_object(
@@ -3748,7 +3749,7 @@ class ToGrometPass:
                 new_gromet.bf,
                 GrometBoxFunction(
                     function_type=FunctionType.LITERAL,
-                    value=LiteralValue("None", None),
+                    value=LiteralValue("None", "None"),
                 ),
             )
             new_gromet.pof = insert_gromet_object(

@@ -109,8 +109,6 @@ def get_node_name(ast_node):
         for e in ast_node.value:
             names.extend(get_node_name(e))
         return names
-    #elif isinstance(ast_node, str):
-     #   return [ast_node]
     elif isinstance(ast_node, Subscript):
         raise TypeError(f"Type {ast_node} not supported")
     else:
@@ -1316,8 +1314,6 @@ class PyASTToCAST:
                         arg.value, prev_scope_id_dict, curr_scope_id_dict
                     )[0]
                     
-
-
                     assign_node = Assignment(
                         left=Var(
                             Name(name=arg.arg, id=100, source_refs=ref), # TODO: add a proper ID here
