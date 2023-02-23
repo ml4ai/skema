@@ -1,9 +1,17 @@
 #include <iostream>
 
-// C++ comment
+// module comment
+
+/* multiline module
+   comment */
 
 int main() {
-    // C++ comment
+    // function comment
+
+    /* multiline
+     * function
+     * comment
+     */
 
     std::cout << "Hello World from C++!" << std::endl;
     return 0;
