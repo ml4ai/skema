@@ -31,8 +31,9 @@ def draw_graph(gromet, program_name: str):
     g.attr(rankdir="BT")
     # LHS
     i=0
+    # print(data.get('fn'))
     for b in data.get("fn").get("b"):
-        print(b)
+        # print(b)
         if b["function_type"] == "MODULE":
             with g.subgraph(name="clusterA") as a:
                 a.attr(color='gray', style='rounded', penwidth='3', label=f"id: {b.get('box')}")
@@ -46,8 +47,10 @@ def draw_graph(gromet, program_name: str):
                     drawBL(data.get("fn"), a)
                 else:
                     if data.get("fn").get("bf") != None:
+                        # print(data.get("fn").get("bf"))
                         for bf in data.get("fn").get("bf"):
                             drawBF(data.get("fn"), a, bf)
+                            # print("bf: ", bf)
     # print(data.get('fn').get('pof'))
     drawWFC(data["fn"], g)
     drawWFL(data["fn"], g)
