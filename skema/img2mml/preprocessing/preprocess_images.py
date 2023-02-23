@@ -113,9 +113,9 @@ def preprocess_images(image):
     IMAGE = Image.open(f"{config['data_path']}/{config['dataset_type']}/images/{image}").convert("L")
 
     # checking the size of the image
-    w, h = IMAGE.size
-    if h >= config["max_input_hgt"]:
-        IMAGE = downsampling(IMAGE)
+    # w, h = IMAGE.size
+    # if h >= config["max_input_hgt"]:
+    #     IMAGE = downsampling(IMAGE)
 
     # crop the image
     IMAGE = crop_image(IMAGE)
@@ -144,7 +144,7 @@ def main():
     # create an image_tensors folder
     if not os.path.exists(f'{data_path}/image_tensors'):
         os.mkdir(f'{data_path}/image_tensors')
-    
+
     with Pool(multiprocessing.cpu_count()) as pool:
             result = pool.map(preprocess_images, images)
 
