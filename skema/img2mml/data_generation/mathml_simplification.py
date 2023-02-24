@@ -232,35 +232,26 @@ def Attribute_Definition(MMLcode, ELEMENTS, Attr_tobeRemoved, Attr_tobeChecked, 
             if Length >0:
 
                 # Grabbing definition
-                Definition = MMLcode[Attr_end: Attr_end+Length]
-
-                if verbose:
-                    lock.acquire()
-                    print("MathML element:  ", ele)
-                    print("Defnition:  ", Definition)
-                    lock.release()
+                Definition = MMLcode[Attr_end: Attr_end+Length].split()
 
                 # Append unique definition
-                if Definition not in Definition_array:
-                    Definition_array.append(Definition)
+                for Def in Definition:
+                    if Def not in Definition_array:
+                        Definition_array.append(Def)
 
 
+    # remove all the attributes that need to be removed
     for Darr in Definition_array:
-
         if '=' in Darr:
-
-        # Attribute and its value -- of the element
+            # Attribute and its value -- of the element
             AttributeParameter = Darr.replace(" ", "").split("=")[0]
             AttributeValue = Darr.replace(" ", "").split("=")[1]
 
             # If Attribute has a defualt value, we can remove it
             # Checking which attributes can be removed
             if AttributeParameter not in Attr_tobeRemoved:
-
                 if AttributeParameter in Attr_tobeChecked.keys():
-
                     if AttributeValue.replace('\\','').replace('"', '') == Attr_tobeChecked[AttributeParameter]:
-
                         MMLcode = MMLcode.replace(Darr, '')
             else:
                 MMLcode = MMLcode.replace(Darr, '')
