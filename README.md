@@ -94,7 +94,6 @@ To run the img2mml Dockerized service, run
 docker-compose -f docker-compose.img2mml.yml up --build
 ```
 
-
 (make sure the appropriate img2mml model is in the
 `skema/img2mml/trained_models` directory - see the `README.md` file in
 `skema/img2mml` for details)
