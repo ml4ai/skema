@@ -604,11 +604,10 @@ class VariableVersionPass:
         for i, n in enumerate(node.arguments):
             # parameter name and scopestr
             func_def = self.pipeline_state.func_def_node_from_id(node.func.id)
-            if i < len(func_def.func_args): # NOTE: M7 Placeholder
+            if i < len(func_def.func_args):  # NOTE: M7 Placeholder
                 # argument name and scope str
                 arg_name = call_argument_name(node, i)
                 arg_con_scopestr = con_scope_to_str(node.func.con_scope)
-
 
                 param = func_def.func_args[i]
                 assert isinstance(param, AnnCastVar)
@@ -625,7 +624,9 @@ class VariableVersionPass:
                 arg_grfn_var = create_grfn_var(
                     arg_name, id, version, arg_con_scopestr
                 )
-                arg_fullid = build_fullid(arg_name, id, version, arg_con_scopestr)
+                arg_fullid = build_fullid(
+                    arg_name, id, version, arg_con_scopestr
+                )
                 self.pipeline_state.store_grfn_var(arg_fullid, arg_grfn_var)
                 # store arg_fullid
                 node.arg_index_to_fullid[i] = arg_fullid
@@ -642,7 +643,9 @@ class VariableVersionPass:
                 param_fullid = build_fullid(
                     param_name, id, version, param_con_scopestr
                 )
-                self.pipeline_state.store_grfn_var(param_fullid, param_grfn_var)
+                self.pipeline_state.store_grfn_var(
+                    param_fullid, param_grfn_var
+                )
                 # store param_fullid
                 node.param_index_to_fullid[i] = param_fullid
                 # create From Source metadata for the GrFN var

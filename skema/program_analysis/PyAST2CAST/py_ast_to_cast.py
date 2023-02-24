@@ -329,11 +329,11 @@ class PyASTToCAST:
         return None
 
     def create_cond(self, node, prev_scope_id_dict, curr_scope_id_dict):
-        """ Used in while and if statement creation.
-            This function determines what kind of conditional we have for an if statement or a while loop
-            Either the conditional explicitly checks a value using a comparison operator or it doesnt
-            In the case that it doesn't explicitly then we have to add in an explicit check
-        """        
+        """Used in while and if statement creation.
+        This function determines what kind of conditional we have for an if statement or a while loop
+        Either the conditional explicitly checks a value using a comparison operator or it doesnt
+        In the case that it doesn't explicitly then we have to add in an explicit check
+        """
         ref = [
             SourceRef(
                 source_file_name=self.filenames[-1],
@@ -343,53 +343,65 @@ class PyASTToCAST:
                 row_end=node.end_lineno,
             )
         ]
-        test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
+        test_cond = self.visit(
+            node.test, prev_scope_id_dict, curr_scope_id_dict
+        )[0]
         bool_func = "bool"
         source_code_data_type = ["Python", "3.8", str(type(True))]
-        true_val = LiteralValue(ScalarType.BOOLEAN, "True", source_code_data_type=source_code_data_type, source_refs=ref)
+        true_val = LiteralValue(
+            ScalarType.BOOLEAN,
+            "True",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
         if isinstance(node.test, (ast.Name, ast.Constant)):
             if bool_func not in prev_scope_id_dict.keys():
                 # If a built-in is called, then it gets added to the global dictionary if
                 # it hasn't been called before. This is to maintain one consistent ID per built-in
                 # function
                 if bool_func not in self.global_identifier_dict.keys():
-                    self.insert_next_id(
-                        self.global_identifier_dict, bool_func
-                    )
+                    self.insert_next_id(self.global_identifier_dict, bool_func)
 
                 prev_scope_id_dict[bool_func] = self.global_identifier_dict[
                     bool_func
                 ]
-            bool_call = Call(Name("bool",
-                                id=prev_scope_id_dict[bool_func], 
-                                source_refs=ref),
-                            [test_cond],
-                            source_refs=ref)
-            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
-        elif isinstance(node.test, ast.UnaryOp) and isinstance(node.test.operand, (ast.Name, ast.Constant, ast.Call)): 
+            bool_call = Call(
+                Name(
+                    "bool", id=prev_scope_id_dict[bool_func], source_refs=ref
+                ),
+                [test_cond],
+                source_refs=ref,
+            )
+            test = BinaryOp(
+                BinaryOperator.EQ, bool_call, true_val, source_refs=ref
+            )
+        elif isinstance(node.test, ast.UnaryOp) and isinstance(
+            node.test.operand, (ast.Name, ast.Constant, ast.Call)
+        ):
             if bool_func not in prev_scope_id_dict.keys():
                 # If a built-in is called, then it gets added to the global dictionary if
                 # it hasn't been called before. This is to maintain one consistent ID per built-in
                 # function
                 if bool_func not in self.global_identifier_dict.keys():
-                    self.insert_next_id(
-                        self.global_identifier_dict, bool_func
-                    )
+                    self.insert_next_id(self.global_identifier_dict, bool_func)
 
                 prev_scope_id_dict[bool_func] = self.global_identifier_dict[
                     bool_func
                 ]
-            bool_call = Call(Name("bool",
-                                id=prev_scope_id_dict[bool_func], 
-                                source_refs=ref),
-                            [test_cond],
-                            source_refs=ref)
-            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
+            bool_call = Call(
+                Name(
+                    "bool", id=prev_scope_id_dict[bool_func], source_refs=ref
+                ),
+                [test_cond],
+                source_refs=ref,
+            )
+            test = BinaryOp(
+                BinaryOperator.EQ, bool_call, true_val, source_refs=ref
+            )
         else:
             test = test_cond
 
         return test
-
 
     @singledispatchmethod
     def visit(
@@ -1313,10 +1325,12 @@ class PyASTToCAST:
                     val = self.visit(
                         arg.value, prev_scope_id_dict, curr_scope_id_dict
                     )[0]
-                    
+
                     assign_node = Assignment(
                         left=Var(
-                            Name(name=arg.arg, id=100, source_refs=ref), # TODO: add a proper ID here
+                            Name(
+                                name=arg.arg, id=100, source_refs=ref
+                            ),  # TODO: add a proper ID here
                             type="float",
                             source_refs=ref,
                         ),
@@ -1718,7 +1732,10 @@ class PyASTToCAST:
         if isinstance(node.value, bool):
             return [
                 LiteralValue(
-                    ScalarType.BOOLEAN, str(node.value), source_code_data_type, ref
+                    ScalarType.BOOLEAN,
+                    str(node.value),
+                    source_code_data_type,
+                    ref,
                 )
             ]
         elif isinstance(node.value, int):
@@ -2261,7 +2278,6 @@ class PyASTToCAST:
                     )
                 )
 
-
         # Store '*args' as a name
         arg = node.args.vararg
         if arg != None:
@@ -2558,7 +2574,7 @@ class PyASTToCAST:
                 StructureType.LIST,
                 "Temporarily Disabled",
                 source_code_data_type,
-                source_refs=ref
+                source_refs=ref,
             )
         ]
 
@@ -2974,7 +2990,9 @@ class PyASTToCAST:
         # node_test = self.visit(
         #     node.test, prev_scope_id_dict, curr_scope_id_dict
         # )
-        node_test = self.create_cond(node, prev_scope_id_dict, curr_scope_id_dict)
+        node_test = self.create_cond(
+            node, prev_scope_id_dict, curr_scope_id_dict
+        )
 
         node_body = []
         if len(node.body) > 0:
@@ -4014,7 +4032,6 @@ class PyASTToCAST:
             )
         ]
 
-
     @visit.register
     def visit_While(
         self,
@@ -4043,7 +4060,7 @@ class PyASTToCAST:
 
         # test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
         test = self.create_cond(node, prev_scope_id_dict, curr_scope_id_dict)
-        
+
         """
         bool_func = "bool"
         source_code_data_type = ["Python", "3.8", str(type(True))]
@@ -4089,7 +4106,6 @@ class PyASTToCAST:
         else:
             test = test_cond
         """
-
 
         # Loops have their own enclosing scopes
         curr_scope_copy = copy.deepcopy(curr_scope_id_dict)

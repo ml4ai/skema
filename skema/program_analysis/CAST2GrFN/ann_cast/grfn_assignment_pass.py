@@ -126,7 +126,7 @@ class GrfnAssignmentPass:
         # populate `arg_assignments` attribute of node
         for i, n in enumerate(node.arguments):
             # grab GrFN variable for argument
-            if i in node.arg_index_to_fullid.keys(): # NOTE: M7 Placeholder
+            if i in node.arg_index_to_fullid.keys():  # NOTE: M7 Placeholder
                 arg_fullid = node.arg_index_to_fullid[i]
                 arg_grfn_var = self.pipeline_state.get_grfn_var(arg_fullid)
 
