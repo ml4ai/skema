@@ -1,13 +1,29 @@
 use petgraph::dot::{Config, Dot};
 use petgraph::matrix_graph::IndexType;
 use petgraph::prelude::*;
-use petgraph::visit::Dfs;
 use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
+use std::collections::HashMap;
 
 fn main() {
     let module_id = 460;
     let graph = subgraph2petgraph(module_id);
+
+    // create the metadata rust rep
+    // this will be a map of the name of the node and the metadata node it's attached to with the mapping to our standard metadata struct
+    // grab metadata nodes
+    let mut metadata_map = HashMap::new();
+    for node in graph.node_indices() {
+        if graph[node].labels == ["Metadata"] {
+            for neighbor_node in graph.neighbors_directed(node, Incoming) {
+                // NOTE: these names have slightly off formating, the key is: "'name'"
+                metadata_map.insert(
+                    graph[neighbor_node].properties["name"].to_string().clone(),
+                    graph[node].clone(),
+                );
+            }
+        }
+    }
 
     // find all the expressions
     let mut expression_nodes = Vec::<NodeIndex>::new();
@@ -112,7 +128,7 @@ fn trim_un_named(
 
     // now we perform a filter_map to remove the un-named nodes and only the bypass edge will remain to connect the nodes
     let trimmed_graph = bypass_graph.filter_map(
-        |node_index, edge_index| {
+        |node_index, _edge_index| {
             if !(bypass_graph.clone()[node_index].properties["name"].to_string()
                 == "'un-named'".to_string())
             {
@@ -121,7 +137,7 @@ fn trim_un_named(
                 None
             }
         },
-        |node_index, edge_index| Some(edge_index.clone()),
+        |_node_index, edge_index| Some(edge_index.clone()),
     );
 
     return trimmed_graph;
