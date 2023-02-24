@@ -1,14 +1,24 @@
 def init(data):
-    i = 1
-    for item in data["fn"]["bf"]:
-        item["box"] = f"fn-bf-{i}"
-        i += 1
+
+    i=1
+    if data.get('fn').get('b') != None:
+        for item in data.get('fn').get('b'):
+            item['box'] = f"fn-b-{i}"
+            i += 1
 
     i = 1
-    for pof in data["fn"]["pof"]:
-        pof["id"] = i
-        i += 1
+    if data.get("fn").get("bf") != None:
+        for item in data.get('fn').get('bf'):
+                item["box"] = f"fn-bf-{i}"
+                i += 1
 
+    i = 1
+    if data.get("fn").get("pof") != None:
+        for pof in data["fn"]["pof"]:
+                pof["id"] = i
+                i += 1
+
+    # print(data.get('fn').get('pof'))
     i = 1
     if data.get("fn").get("pif") != None:
         for pif in data["fn"]["pif"]:

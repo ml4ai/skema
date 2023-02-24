@@ -5,13 +5,14 @@ name: skema-rs
 
 steps:
 - name: test_rust_components
-  image: rust:1.65
+  image: rust:1.67
   commands:
   - apt update && apt install -y cmake openssl libclang-13-dev
   - cd skema/skema-rs
   - cargo test --verbose --all
   when:
     paths:
+    - .drone.yml
     - skema/skema-rs/**
 
 ---
@@ -27,4 +28,46 @@ steps:
   - sbt webapp/test
   when:
     paths:
-      skema/text_reading/text_reading/**
+    - .drone.yml
+    - skema/text_reading/text_reading/**
+
+---
+kind: pipeline
+name: skema-pa
+
+steps:
+- name: test_program_analysis
+  image: python:3.8-bullseye
+  commands:
+  - apt-get update
+  - apt-get -y install build-essential graphviz libgraphviz-dev
+  - pip install -e .[dev]
+  - pip install pytest-cov pytest-xdist
+  - pytest --cov=skema --ignore=skema/img2mml skema/program_analysis/tests
+  when:
+    paths:
+    - pyproject.toml
+    - .drone.yml
+    - skema/program_analysis/**
+    - skema/gromet/**
+    - skema/model_assembly/**
+
+---
+kind: pipeline
+name: skema-er
+
+steps:
+- name: test_equation_reading
+  image: python:3.8-bullseye
+  commands:
+  - apt-get update
+  - apt-get -y install build-essential graphviz libgraphviz-dev
+  - pip install -e .[dev,img2mml]
+  - pip install pytest-cov
+  - curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+  - pytest -s --cov=skema skema/img2mml/tests
+  when:
+    paths:
+    - pyproject.toml
+    - .drone.yml
+    - skema/img2mml/**

@@ -1,6 +1,6 @@
 use std::fmt;
 
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash)]
 pub enum Operator {
     Add,
     Multiply,
@@ -21,14 +21,14 @@ impl fmt::Display for Operator {
             Operator::Divide => write!(f, "/"),
             Operator::Subtract => write!(f, "-"),
             Operator::Sqrt => write!(f, "√"),
-            Operator::Other(op) => write!(f, "{}", op),
+            Operator::Other(op) => write!(f, "{op}"),
         }
     }
 }
 
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default)]
 pub enum MathExpression {
     Mi(String),
     Mo(Operator),
@@ -38,13 +38,35 @@ pub enum MathExpression {
     Mfrac(Box<MathExpression>, Box<MathExpression>),
     Msup(Box<MathExpression>, Box<MathExpression>),
     Msub(Box<MathExpression>, Box<MathExpression>),
-    Munder(Vec<MathExpression>),
-    Mover(Vec<MathExpression>),
-    Msubsup(Vec<MathExpression>),
+    Munder(Box<MathExpression>, Box<MathExpression>),
+    Mover(Box<MathExpression>, Box<MathExpression>),
+    Msubsup(
+        Box<MathExpression>,
+        Box<MathExpression>,
+        Box<MathExpression>,
+    ),
     Mtext(String),
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
+    #[default]
+    None,
+}
+
+impl fmt::Display for MathExpression {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            MathExpression::Mi(identifier) => write!(f, "{}", identifier),
+            MathExpression::Mn(number) => write!(f, "{}", number),
+            MathExpression::Msup(base, superscript) => {
+                write!(f, "{base}^{{{superscript}}}")
+            }
+            MathExpression::Msub(base, subscript) => {
+                write!(f, "{base}_{{{subscript}}}")
+            }
+            expression => write!(f, "{expression:?}"),
+        }
+    }
 }
 
 /// The Math struct represents the corresponding element type in MathML 3
@@ -53,4 +75,3 @@ pub enum MathExpression {
 pub struct Math {
     pub content: Vec<MathExpression>,
 }
-

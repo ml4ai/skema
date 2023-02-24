@@ -18,7 +18,7 @@ import org.clulab.processors.{Document, Sentence}
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
 import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder, sparqlWikiResult}
-import org.ml4ai.skema.text_reading.OdinEngine
+import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
@@ -27,9 +27,21 @@ import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDat
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
+import org.slf4j.{Logger, LoggerFactory}
+import ujson.json4s.Json4sJson
+import upickle.default._
+
+import java.io.File
+import javax.inject._
+import scala.collection.mutable.ArrayBuffer
 //import org.ml4ai.grounding.MiraEmbeddingsGrounder
+import play.api.libs.json._
 import play.api.mvc._
 import play.api.libs.json._
+import org.clulab.pdf2txt.Pdf2txt
+import org.clulab.pdf2txt.common.pdf.TextConverter
+import org.clulab.pdf2txt.languageModel.GigawordLanguageModel
+import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 
 
 
@@ -66,9 +78,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   private val groundToWikiDefault: Boolean = generalConfig[Boolean]("apps.groundToWiki")
   private val saveWikiGroundingsDefault: Boolean = generalConfig[Boolean]("apps.saveWikiGroundingsDefault")
 
-  private val ontologyFilePath = groundingConfig.getString("ontologyPath")
-  private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, 10, 0.25f) // TODO: Fix this @Enrique
+
+
+  private val cosmosPipeline = new CosmosTextReadingPipeline
+
+
   logger.info("Completed Initialization ...")
   // -------------------------------------------------
 
@@ -196,7 +210,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       scienceParseDoc.sections.get.map(_.headingAndText) ++ scienceParseDoc.abstractText
     } else scienceParseDoc.abstractText.toSeq
     logger.info("Finished converting to text")
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile)))
+    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile)).mentions)
     val outFile = json("outfile").str
     AutomatesExporter(outFile).export(mentions)
     //    mentions.saveJSON(outFile, pretty=true)
@@ -216,71 +230,21 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     logger.info(s"Extracting mentions from $jsonFile")
     val loader = new ScienceParsedDataLoader
     val texts = loader.loadFile(jsonFile)
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile)))
+    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile)).mentions)
     val outFile = json("outfile").str
     AutomatesExporter(outFile).export(mentions)
     Ok("")
   }
 
 
-
-
   def cosmos_json_to_mentions: Action[AnyContent] = Action { request =>
     val data = request.body.asJson.get.toString()
-
 
     val pathJson = ujson.read(data)
     val jsonPath = pathJson("pathToCosmosJson").str
     logger.info(s"Extracting mentions from $jsonPath")
 
-    // cosmos stores information about each block on each pdf page
-    // for each block, we load the text (content) and the location of the text (page_num and block order/index on the page)
-    val loader = new CosmosJsonDataLoader
-    val textsAndLocations = loader.loadFile(jsonPath)
-    val textsAndFilenames = textsAndLocations.map(_.split("<::>").slice(0,2).mkString("<::>"))
-    val locations = textsAndLocations.map(_.split("<::>").takeRight(2).mkString("<::>")) //location = pageNum::blockIdx
-
-    println("started extracting")
-    // extract mentions form each text block
-    val mentions = for (tf <- textsAndFilenames) yield {
-      val Array(text, filename) = tf.split("<::>")
-      // Extract mentions and apply grounding
-      ieSystem.extractFromText(text, keepText = true, Some(filename)).par.map{
-        case tbm:TextBoundMention => {
-          val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter{
-            case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
-          }
-
-
-          if(topGroundingCandidates.nonEmpty)
-            tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
-          else
-            tbm
-        }
-        case m => m
-      }.seq
-    }
-
-    // store location information from cosmos as an attachment for each mention
-    val menWInd = mentions.zipWithIndex
-    val mentionsWithLocations = new ArrayBuffer[Mention]()
-    for (tuple <- menWInd) {
-      // get page and block index for each block; cosmos location information will be the same for all the mentions within one block
-      val menInTextBlocks = tuple._1
-      val id = tuple._2
-      val location = locations(id).split("<::>").map(loc => loc.split(",").map(_.toInt)) //(_.toDouble.toInt)
-      val pageNum = location.head
-      val blockIdx = location.last
-
-      for (m <- menInTextBlocks) {
-        val filename = m.document.id.getOrElse("unknown_file")
-        val newMen = m.withAttachment(new MentionLocationAttachment(filename, pageNum, blockIdx, "MentionLocation"))
-        mentionsWithLocations.append(newMen)
-      }
-    }
-
-
-    val exportedData  = ujson.write(AutomatesJSONSerializer.serializeMentions(mentionsWithLocations))
+    val exportedData = cosmosPipeline.extractMentionsFromJsonAndSerialize(jsonPath)
 
     Ok(exportedData)
 
@@ -462,15 +426,22 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def processPlayText(ieSystem: OdinEngine, text: String, gazetteer: Option[Seq[String]] = None): (Document, Vector[Mention]) = {
     // preprocessing
     logger.info(s"Processing sentence : ${text}")
-    val doc = ieSystem.cleanAndAnnotate(text, keepText = true, filename = None)
+//    val doc = ieSystem.cleanAndAnnotate(text, keepText = true, filename = None)
+//
+//    logger.info(s"DOC : ${doc}")
+//    // extract mentions from annotated document
+//    val mentions = if (gazetteer.isDefined) {
+//      ieSystem.extractFromDocWithGazetteer(doc, gazetteer = gazetteer.get)
+//    } else {
+//      ieSystem.extractFrom(doc)
+//    }
+//    val sorted = mentions.sortBy(m => (m.sentence, m.getClass.getSimpleName)).toVector
+//
+//    logger.info(s"Done extracting the mentions ... ")
+//    logger.info(s"They are : ${mentions.map(m => m.text).mkString(",\t")}")
 
-    logger.info(s"DOC : ${doc}")
-    // extract mentions from annotated document
-    val mentions = if (gazetteer.isDefined) {
-      ieSystem.extractFromDocWithGazetteer(doc, gazetteer = gazetteer.get)
-    } else {
-      ieSystem.extractFrom(doc)
-    }
+    val (doc, mentions) = cosmosPipeline.extractMentions(text, None)
+
     val sorted = mentions.sortBy(m => (m.sentence, m.getClass.getSimpleName)).toVector
 
     logger.info(s"Done extracting the mentions ... ")
@@ -730,7 +701,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
         case m: RelationMention => new TextBoundMention(m.labels, m.tokenInterval, m.sentence, m.document, m.keep, m.foundBy)
         case m: EventMention => m.trigger
       }
-      mkArgMention(argRole, s"T${tbmToId(arg)}")
+      mkArgMention(argRole, s"T${tbmToId.getOrElse(arg, "X")}")
     }
     args.toSeq
   }
