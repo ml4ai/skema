@@ -5,12 +5,12 @@ import numpy as np
 import torch
 from torchvision import transforms
 from PIL import Image
-from models.encoders.cnn_encoder import CNN_Encoder
-from models.image2mml_xfmer import (
+from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
+from skema.img2mml.models.image2mml_xfmer import (
     Image2MathML_Xfmer,
 )
-from models.encoders.xfmer_encoder import Transformer_Encoder
-from models.decoders.xfmer_decoder import Transformer_Decoder
+from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
+from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
 from typing import List
 import logging
