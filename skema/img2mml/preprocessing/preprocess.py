@@ -9,6 +9,7 @@ import os
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 from collections import Counter
+
 # from torchtext.legacy.vocab import Vocab
 from torchtext.vocab import Vocab
 from torch.nn.utils.rnn import pad_sequence
@@ -33,9 +34,9 @@ class Img2MML_dataset(Dataset):
             if self.vocab.stoi[token] != None:
                 indexed_eqn.append(self.vocab.stoi[token])
             else:
-                indexed_eqn.append(self.vocab.stoi['<unk>'])
+                indexed_eqn.append(self.vocab.stoi["<unk>"])
 
-        return self.dataframe.iloc[index, 0],torch.Tensor(indexed_eqn)
+        return self.dataframe.iloc[index, 0], torch.Tensor(indexed_eqn)
 
 
 class My_pad_collate(object):
@@ -44,8 +45,8 @@ class My_pad_collate(object):
     return: mml_tensors of shape [batch, max_len]
             stacked image_tensors [batch]
     """
-    def __init__(self, device, vocab,
-                    max_len):
+
+    def __init__(self, device, vocab, max_len):
         self.device = device
         self.vocab = vocab
         self.max_len = max_len
@@ -59,27 +60,35 @@ class My_pad_collate(object):
         # max_len will be chopped down to max_length.
 
         batch_size = len(_mml)
-        padded_mml_tensors = torch.ones([batch_size, self.max_len], dtype=torch.long) * self.pad_idx
+        padded_mml_tensors = (
+            torch.ones([batch_size, self.max_len], dtype=torch.long)
+            * self.pad_idx
+        )
         for b in range(batch_size):
             if len(_mml[b]) <= self.max_len:
-                padded_mml_tensors[b][:len(_mml[b])] = _mml[b]
+                padded_mml_tensors[b][: len(_mml[b])] = _mml[b]
             else:
-                padded_mml_tensors[b][:self.max_len] = _mml[b][:self.max_len]
+                padded_mml_tensors[b][: self.max_len] = _mml[b][: self.max_len]
 
         # images tensors
         _img = [i for i in _img]
 
-        return torch.stack(_img).to(self.device), padded_mml_tensors.to(self.device)
+        return (
+            torch.stack(_img).to(self.device),
+            padded_mml_tensors.to(self.device),
+        )
 
 
 def preprocess_mml(config):
 
-    print('preprocessing data...')
+    print("preprocessing data...")
 
     # reading raw text files
-    MMLPath = f"{config['data_path']}/{config['dataset_type']}/{config['mml_path']}"
+    MMLPath = (
+        f"{config['data_path']}/{config['dataset_type']}/{config['mml_path']}"
+    )
     IMGTnsrPath = f"{config['data_path']}/{config['dataset_type']}/{config['image_path']}"
-    mml_txt = open(MMLPath).read().split('\n')[:-1]
+    mml_txt = open(MMLPath).read().split("\n")[:-1]
     # image_num = range(0,len(mml_txt))
     # raw_mml_data = {'IMG': [torch.load(f'{IMGTnsrPath}/{num}.txt') for num in image_num],
     #                 'EQUATION': [('<sos> '+ mml + ' <eos>') for mml in mml_txt]}
@@ -90,80 +99,89 @@ def preprocess_mml(config):
     for num in range(len(mml_txt)):
         if "REJECTED MATHML" not in mml_txt[num]:
             # appending mmls
-            mml = '<sos> '+ mml_txt[num] + ' <eos>'
+            mml = "<sos> " + mml_txt[num] + " <eos>"
             equation_array.append(mml)
             # appending image tensors
-            image_array.append(torch.load(f'{IMGTnsrPath}/{num}.txt'))
+            image_array.append(torch.load(f"{IMGTnsrPath}/{num}.txt"))
 
-    raw_mml_data = {'IMG': image_array,'EQUATION': equation_array}
+    raw_mml_data = {"IMG": image_array, "EQUATION": equation_array}
 
-    df = pd.DataFrame(raw_mml_data, columns=['IMG','EQUATION'])
+    df = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
 
-    train_val, test = train_test_split(df, test_size = 0.1, random_state=42)
+    train_val, test = train_test_split(df, test_size=0.1, random_state=42)
     train, val = train_test_split(train_val, test_size=0.1, random_state=42)
 
     # build vocab
     print("building vocab...")
 
     counter = Counter()
-    for line in train['EQUATION']:
+    for line in train["EQUATION"]:
         counter.update(line.split())
 
     # <unk>, <pad> will be prepended in the vocab file
-    vocab = Vocab(counter, min_freq=config["vocab_freq"], specials=['<pad>', '<unk>', '<sos>', '<eos>'])
+    vocab = Vocab(
+        counter,
+        min_freq=config["vocab_freq"],
+        specials=["<pad>", "<unk>", "<sos>", "<eos>"],
+    )
 
     # special_tokens = ["<pad>", "<unk>", "<sos>", "<eos>"]
     # vocab = CreateVocab(train, special_tokens, min_freq=10)
     # print("vocab size: ", vocab.__len__())
 
     # writing vocab file...
-    vfile = open('vocab.txt', 'w')
+    vfile = open("vocab.txt", "w")
     for vidx, vstr in vocab.stoi.items():
-        vfile.write(f'{vidx} \t {vstr} \n')
+        vfile.write(f"{vidx} \t {vstr} \n")
 
     # define tokenizer function
     tokenizer = lambda x: x.split()
 
     print("saving dataset files to data/ folder...")
 
-    train.to_csv(f"{config['data_path']}/{config['dataset_type']}/train.csv", index=False)
-    test.to_csv(f"{config['data_path']}/{config['dataset_type']}/test.csv", index=False)
-    val.to_csv(f"{config['data_path']}/{config['dataset_type']}/val.csv", index=False)
-
+    train.to_csv(
+        f"{config['data_path']}/{config['dataset_type']}/train.csv",
+        index=False,
+    )
+    test.to_csv(
+        f"{config['data_path']}/{config['dataset_type']}/test.csv", index=False
+    )
+    val.to_csv(
+        f"{config['data_path']}/{config['dataset_type']}/val.csv", index=False
+    )
 
     print("building dataloaders...")
 
     # initializing pad collate class
-    mypadcollate = My_pad_collate(config["device"], vocab,
-                                    config["max_len"])
+    mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])
 
     # initailizing class Img2MML_dataset: train dataloader
-    imml_train = Img2MML_dataset(train,
-                                 vocab,
-                                 tokenizer)
+    imml_train = Img2MML_dataset(train, vocab, tokenizer)
     # creating dataloader
     if config["DDP"]:
-        train_sampler = DistributedSampler(dataset=imml_train,
-                                        num_replicas=config["world_size"],
-                                        rank=config["rank"],
-                                        shuffle=True)
+        train_sampler = DistributedSampler(
+            dataset=imml_train,
+            num_replicas=config["world_size"],
+            rank=config["rank"],
+            shuffle=True,
+        )
         sampler = train_sampler
         shuffle = False
     else:
-        sampler=None
+        sampler = None
         shuffle = config["shuffle"]
-    train_dataloader = DataLoader(imml_train,
-                                  batch_size=config["batch_size"],
-                                  num_workers=config["num_workers"],
-                                  shuffle=shuffle,
-                                  sampler=sampler,
-                                  collate_fn=mypadcollate,
-                                  pin_memory=config["pin_memory"])
+    train_dataloader = DataLoader(
+        imml_train,
+        batch_size=config["batch_size"],
+        num_workers=config["num_workers"],
+        shuffle=shuffle,
+        sampler=sampler,
+        collate_fn=mypadcollate,
+        pin_memory=config["pin_memory"],
+    )
 
     # initailizing class Img2MML_dataset: test dataloader
-    imml_test = Img2MML_dataset(test,
-                                vocab,
-                                tokenizer)
+    imml_test = Img2MML_dataset(test, vocab, tokenizer)
 
     if config["DDP"]:
         # test_sampler = DistributedSampler(dataset=imml_test,
@@ -174,21 +192,21 @@ def preprocess_mml(config):
         sampler = test_sampler
         shuffle = False
     else:
-        sampler=None
+        sampler = None
         shuffle = config["shuffle"]
 
-    test_dataloader = DataLoader(imml_test,
-                                 batch_size=config["batch_size"],
-                                 num_workers=config["num_workers"],
-                                 shuffle=shuffle,
-                                 sampler=sampler,
-                                 collate_fn=mypadcollate,
-                                 pin_memory=config["pin_memory"])
+    test_dataloader = DataLoader(
+        imml_test,
+        batch_size=config["batch_size"],
+        num_workers=config["num_workers"],
+        shuffle=shuffle,
+        sampler=sampler,
+        collate_fn=mypadcollate,
+        pin_memory=config["pin_memory"],
+    )
 
     # initailizing class Img2MML_dataset: val dataloader
-    imml_val = Img2MML_dataset(val,
-                               vocab,
-                               tokenizer)
+    imml_val = Img2MML_dataset(val, vocab, tokenizer)
 
     if config["DDP"]:
         # val_sampler = DistributedSampler(dataset=imml_val,
@@ -199,15 +217,17 @@ def preprocess_mml(config):
         sampler = val_sampler
         shuffle = False
     else:
-        sampler=None
+        sampler = None
         shuffle = config["shuffle"]
 
-    val_dataloader = DataLoader(imml_val,
-                                batch_size=config["batch_size"],
-                                num_workers=config["num_workers"],
-                                shuffle=shuffle,
-                                sampler=sampler,
-                                collate_fn=mypadcollate,
-                                pin_memory=config["pin_memory"])
+    val_dataloader = DataLoader(
+        imml_val,
+        batch_size=config["batch_size"],
+        num_workers=config["num_workers"],
+        shuffle=shuffle,
+        sampler=sampler,
+        collate_fn=mypadcollate,
+        pin_memory=config["pin_memory"],
+    )
 
     return train_dataloader, test_dataloader, val_dataloader, vocab

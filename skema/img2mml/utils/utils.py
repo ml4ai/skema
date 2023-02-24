@@ -8,9 +8,10 @@ class CreateVocab(object):
     stoi: string to index dictionary
     itos: index to string dictionary
     """
+
     def __init__(self, train, special_tokens=None, min_freq=1):
         self.counter = Counter()
-        for line in train['EQUATION']:
+        for line in train["EQUATION"]:
             self.counter.update(line.split())
 
         self.min_freq = min_freq
@@ -23,10 +24,12 @@ class CreateVocab(object):
             for i in special_tokens:
                 self.tok2ind[i] = self.s_count
                 self.ind2tok[self.s_count] = i
-                self.s_count+=1
+                self.s_count += 1
 
         # appending rest of the vocab
-        self.tok_array = [tok for (tok, freq) in self.counter.items() if freq >= min_freq]
+        self.tok_array = [
+            tok for (tok, freq) in self.counter.items() if freq >= min_freq
+        ]
         self.stoi, self.itos = self.vocab()
 
     def vocab(self):
@@ -34,7 +37,7 @@ class CreateVocab(object):
         for t in self.tok_array:
             self.tok2ind[t] = _count
             self.ind2tok[_count] = t
-            _count+=1
+            _count += 1
         return self.tok2ind, self.ind2tok
 
     def __getitem__(self):
@@ -70,6 +73,7 @@ class CreateVocab(object):
 #
 #     return output, mml
 
+
 def garbage2pad(preds, vocab, is_test=False):
     """
     all garbage tokens will be converted to <pad> token
@@ -87,15 +91,21 @@ def garbage2pad(preds, vocab, is_test=False):
     for b in range(preds.shape[0]):
         try:
             # cleaning pred
-            eos_pos = (preds[b,:]==eos_idx).nonzero(as_tuple=False)[0]
-            preds[b,:] = preds[b, :eos_pos+1]#pad_idx
-        except: pass
+            eos_pos = (preds[b, :] == eos_idx).nonzero(as_tuple=False)[0]
+            preds[b, :] = preds[b, : eos_pos + 1]  # pad_idx
+        except:
+            pass
 
     return preds
 
-def generate_square_subsequent_mask(sz:int) -> torch.Tensor:
+
+def generate_square_subsequent_mask(sz: int) -> torch.Tensor:
     mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
-    mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+    mask = (
+        mask.float()
+        .masked_fill(mask == 0, float("-inf"))
+        .masked_fill(mask == 1, float(0.0))
+    )
     return mask
 
 
@@ -117,6 +127,7 @@ def calculating_accuracy(pred, mml):
     """
     train_acc = torch.sum(pred == mml)
     return train_acc
+
 
 def beam_search(data, k, alpha, min_length):
     """
@@ -144,10 +155,11 @@ def beam_search(data, k, alpha, min_length):
                 all_candidates.append(candidate)
 
             # order all candiadates by score
-            ordered = sorted(all_candidates, key=lambda t:t[1])
+            ordered = sorted(all_candidates, key=lambda t: t[1])
             sequences = ordered[:1]
     return sequences
 
+
 def length_normalization(sequence_length, alpha, min_length):
-    ln = (1+sequence_length)**alpha / (1+min_length)**alpha
+    ln = (1 + sequence_length) ** alpha / (1 + min_length) ** alpha
     return ln

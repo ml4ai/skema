@@ -1,5 +1,4 @@
-
-import xml.etree.ElementTree as ET
+month_dirimport xml.etree.ElementTree as ET
 import subprocess, os
 import sys
 import xml.dom.minidom
@@ -14,9 +13,10 @@ from multiprocessing import Pool, Lock, TimeoutError
 lock = Lock()
 
 # Printing starting time
-print(' ')
+print(" ")
 start_time = datetime.now()
-print('Starting at:  ', start_time)
+print("Starting at:  ", start_time)
+
 
 def main(config, year):
 
@@ -26,114 +26,127 @@ def main(config, year):
     verbose = config["verbose"]
 
     # Setting up Logger - To get log files
-    Log_Format = '%(message)s'
-    logFile_dst = os.path.join(args.source, f'{year}/Logs')
+    log_format = "%(message)s"
+    logfile_dst = os.path.join(args.source, f"{year}/Logs")
     begin_month, end_month = directories[0], directories[-1]
-    logging.basicConfig(filename = os.path.join(logFile_dst, f'{begin_month}-{end_month}_etree.log'),
-                        level = logging.DEBUG,
-                        format = Log_Format,
-                        filemode = 'w')
+    logging.basicConfig(
+        filename=os.path.join(
+            logfile_dst, f"{begin_month}-{end_month}_etree.log"
+        ),
+        level=logging.DEBUG,
+        format=log_format,
+        filemode="w",
+    )
 
     logger = logging.getLogger()
 
     # Creating 'etree' directory
-    for DIR in directories:
-        DIR = str(DIR)
-        etreePath = f'{destination}/{year}/{DIR}/etree'
-        sample_etreePath = f'{destination}/{year}/{DIR}/sample_etree'
+    for month_dir in directories:
+        month_dir = str(month_dir)
+        etreePath = f"{destination}/{year}/{month_dir}/etree"
+        sample_etreePath = f"{destination}/{year}/{month_dir}/sample_etree"
 
         for path in [etreePath, sample_etreePath]:
             if not os.path.exists(path):
-                subprocess.call(['mkdir', path])
+                subprocess.call(["mkdir", path])
 
+    for month_dir in directories:
+        month_dir = str(month_dir)
+        simp_Mathml_path = f"{destination}/{year}/{month_dir}/Simplified_mml"
 
-    for DIR in directories:
-        DIR = str(DIR)
-        Simp_Mathml_path = f'{destination}/{year}/{DIR}/Simplified_mml'
+        args_array = pooling(month_dir, simp_Mathml_path, destination, year)
 
-        args_array = pooling(DIR, Simp_Mathml_path,
-                                destination, year)
-
-        with Pool(multiprocessing.cpu_count()-10) as pool:
+        with Pool(multiprocessing.cpu_count() - 10) as pool:
             result = pool.map(etree, args_array)
 
 
-def pooling(DIR, Simp_Mathml_path, destination, year):
+def pooling(month_dir, simp_Mathml_path, destination, year):
 
     temp = []
 
-    for subDIR in os.listdir(Simp_Mathml_path):
+    for subdir in os.listdir(simp_Mathml_path):
 
-        subDIR_path = os.path.join(Simp_Mathml_path, subDIR)
-        temp.append([DIR, subDIR, subDIR_path, destination, year])
+        subdir_path = os.path.join(simp_Mathml_path, subdir)
+        temp.append([month_dir, subdir, subdir_path, destination, year])
 
     return temp
+
 
 def etree(args_array):
 
     global lock
 
     # Unpacking the args array
-    (DIR, subDIR, subDIR_path, destination, year) = args_array
+    (month_dir, subdir, subdir_path, destination, year) = args_array
 
-    etree_path = f'{destination}/{year}/{DIR}/etree'
-    sample_etree_path = f'{destination}/{year}/{DIR}/sample_etree'
+    etree_path = f"{destination}/{year}/{month_dir}/etree"
+    sample_etree_path = f"{destination}/{year}/{month_dir}/sample_etree"
 
-    for tyf in ['Large_MML', 'Small_MML']:
+    for tyf in ["Large_MML", "Small_MML"]:
 
-        tyf_path = os.path.join(subDIR_path, tyf)
+        tyf_path = os.path.join(subdir_path, tyf)
 
         # create folders
-        Create_Folders(subDIR, tyf, etree_path, sample_etree_path)
+        create_folders(subdir, tyf, etree_path, sample_etree_path)
 
-        for FILE in os.listdir(tyf_path):
+        for mml_file in os.listdir(tyf_path):
 
             try:
-                FILE_path = os.path.join(tyf_path, FILE)
+                mml_file_path = os.path.join(tyf_path, mml_file)
 
-                FILE_name = FILE.split('.')[0]
+                mml_file_name = mml_file.split(".")[0]
 
                 # converting text file to xml formatted file
                 tree1 = ElementTree()
-                tree1.parse(FILE_path)
-                sample_path = f'{destination}/{year}/{DIR}/sample_etree/{subDIR}/{tyf}/{FILE_name}_sample.xml'
+                tree1.parse(mml_file_path)
+                sample_path = f"{destination}/{year}/{month_dir}/sample_etree/{subdir}/{tyf}/{mml_file_name}_sample.xml"
 
                 # writing the sample files that will be used to render etree
                 tree1.write(sample_path)
 
-
                 # Writing etree for the xml files
                 tree = ET.parse(sample_path)
                 xml_data = tree.getroot()
-                xmlstr = ET.tostring(xml_data, encoding='utf-8', method='xml')
-                input_string=xml.dom.minidom.parseString(xmlstr)
+                xmlstr = ET.tostring(xml_data, encoding="utf-8", method="xml")
+                input_string = xml.dom.minidom.parseString(xmlstr)
                 xmlstr = input_string.toprettyxml()
-                xmlstr= os.linesep.join([s for s in xmlstr.splitlines() if s.strip()])
+                xmlstr = os.linesep.join(
+                    [s for s in xmlstr.splitlines() if s.strip()]
+                )
 
-                result_path = os.path.join(etree_path, f'{subDIR}/{tyf}/{FILE_name}.xml')
+                result_path = os.path.join(
+                    etree_path, f"{subdir}/{tyf}/{mml_file_name}.xml"
+                )
 
                 with open(result_path, "wb") as file_out:
-                    file_out.write(xmlstr.encode(sys.stdout.encoding, errors='replace'))
+                    file_out.write(
+                        xmlstr.encode(sys.stdout.encoding, errors="replace")
+                    )
 
             except:
                 lock.acquire()
-                logger.warning(f'{FILE_path} not working.')
+                logger.warning(f"{mml_file_path} not working.")
                 lock.release()
 
 
-def Create_Folders(subDIR, tyf, etree_path, sample_etree_path):
+def create_folders(subdir, tyf, etree_path, sample_etree_path):
 
     global lock
 
-    etree_subDIR_path = os.path.join(etree_path, subDIR)
-    etree_tyf_path = os.path.join(etree_subDIR_path, tyf)
+    etree_subdir_path = os.path.join(etree_path, subdir)
+    etree_tyf_path = os.path.join(etree_subdir_path, tyf)
 
-    sample_etree_subDIR_path = os.path.join(sample_etree_path, subDIR)
-    sample_etree_tyf_path = os.path.join(sample_etree_subDIR_path, tyf)
+    sample_etree_subdir_path = os.path.join(sample_etree_path, subdir)
+    sample_etree_tyf_path = os.path.join(sample_etree_subdir_path, tyf)
 
-    for F in [etree_subDIR_path, etree_tyf_path, sample_etree_subDIR_path, sample_etree_tyf_path]:
+    for F in [
+        etree_subdir_path,
+        etree_tyf_path,
+        sample_etree_subdir_path,
+        sample_etree_tyf_path,
+    ]:
         if not os.path.exists(F):
-            subprocess.call(['mkdir', F])
+            subprocess.call(["mkdir", F])
 
 
 if __name__ == "__main__":
@@ -145,10 +158,9 @@ if __name__ == "__main__":
     for year in config["years"].split(","):
         main(config, str(year))
 
-
     # Printing stoping time
-    print(' ')
+    print(" ")
     stop_time = datetime.now()
-    print('Stoping at:  ', stop_time)
-    print(' ')
-    print('etree writing process -- completed.')
+    print("Stoping at:  ", stop_time)
+    print(" ")
+    print("etree writing process -- completed.")

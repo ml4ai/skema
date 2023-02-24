@@ -6,9 +6,7 @@ import torch
 from torchvision import transforms
 from PIL import Image
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.img2mml.models.image2mml_xfmer import (
-    Image2MathML_Xfmer,
-)
+from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
@@ -27,12 +25,15 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     w, h = image.size
     max_h = config["max_input_hgt"]
     if h >= max_h:
-        resize_factor = max_h/h
+        resize_factor = max_h / h
 
         # downsampling the image
-        image = image.resize((int(image.size[0] * resize_factor),
-                              int(image.size[1] * resize_factor,
-                              Image.LANCZOS)))
+        image = image.resize(
+            (
+                int(image.size[0] * resize_factor),
+                int(image.size[1] * resize_factor, Image.LANCZOS),
+            )
+        )
 
     # converting to np array
     image_arr = np.asarray(image, dtype=np.uint8)
@@ -45,39 +46,43 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     y_max = np.max(indices[0])
 
     # cropping tha image
-    image =  image.crop(( x_min, y_min, x_max,  y_max ))
+    image = image.crop((x_min, y_min, x_max, y_max))
 
     # finding the bucket
     # [width, hgt, resize_factor]
     buckets = [
-        [820,86,0.6],
-        [615, 65,0.8],
-        [492, 52,1],
-        [410, 43,1.2],
-        [350, 37,1.4]
-        ]
+        [820, 86, 0.6],
+        [615, 65, 0.8],
+        [492, 52, 1],
+        [410, 43, 1.2],
+        [350, 37, 1.4],
+    ]
     # current width, hgt
     crop_width, crop_hgt = image.size[0], image.size[1]
 
     # find correct bucket
     resize_factor = config["resizing_factor"]
     for b in buckets:
-        w,h,r = b
+        w, h, r = b
         if crop_width <= w and crop_hgt <= h:
             resize_factor = r
 
     # resizing the image
     resize_factor = config["resizing_factor"]
-    image = image.resize((int(image.size[0] * resize_factor),
-                          int(image.size[1] * resize_factor)),
-                          Image.LANCZOS)
+    image = image.resize(
+        (
+            int(image.size[0] * resize_factor),
+            int(image.size[1] * resize_factor),
+        ),
+        Image.LANCZOS,
+    )
 
     # padding
     pad = config["padding"]
     width = config["preprocessed_image_width"]
     height = config["preprocessed_image_height"]
-    new_image = Image.new("RGB", (width, height), (255,255,255))
-    new_image.paste(image, (pad,pad))
+    new_image = Image.new("RGB", (width, height), (255, 255, 255))
+    new_image.paste(image, (pad, pad))
 
     return new_image
 
@@ -128,13 +133,7 @@ def define_model(
     n_xfmer_decoder_layers = config["n_xfmer_decoder_layers"]
 
     enc = {
-        "CNN": CNN_Encoder(
-                        input_channels,
-                        dec_hid_dim,
-                        dropout,
-                        device
-                        ),
-
+        "CNN": CNN_Encoder(input_channels, dec_hid_dim, dropout, device),
         "XFMER": Transformer_Encoder(
             emb_dim,
             dec_hid_dim,
@@ -165,7 +164,7 @@ def define_model(
 def evaluate(
     model: Image2MathML_Xfmer,
     vocab_itos: dict,
-    vocab_stoi:dict,
+    vocab_stoi: dict,
     img: torch.Tensor,
     device: torch.device,
 ) -> str:
@@ -179,7 +178,9 @@ def evaluate(
         img = img.to(device)
 
         output = model(
-            img, device, is_inference=True,
+            img,
+            device,
+            is_inference=True,
             SOS_token=int(vocab_stoi["<sos>"]),
             EOS_token=int(vocab_stoi["<eos>"]),
             PAD_token=int(vocab_stoi["<pad>"]),
@@ -220,7 +221,9 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     # we need to remove the "module." from key_names
     if config["clean_state_dict"]:
         new_model = dict()
-        for key,value in torch.load(model_path, map_location=torch.device('cpu')).items():
+        for key, value in torch.load(
+            model_path, map_location=torch.device("cpu")
+        ).items():
             new_model[key[7:]] = value
             model.load_state_dict(new_model, strict=False)
 

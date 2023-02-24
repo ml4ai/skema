@@ -11,13 +11,17 @@ from multiprocessing import Pool, Lock, TimeoutError
 
 # opening config file
 parser = argparse.ArgumentParser()
-parser.add_argument("--config", help="configuration file for paths and hyperparameters",
-                        default="configs/ourmml_xfmer_config.json")
+parser.add_argument(
+    "--config",
+    help="configuration file for paths and hyperparameters",
+    default="configs/ourmml_xfmer_config.json",
+)
 
 args = parser.parse_args()
 
 with open(args.config, "r") as cfg:
     config = json.load(cfg)
+
 
 def crop_image(image):
     # converting to np array
@@ -33,23 +37,30 @@ def crop_image(image):
     y_max = np.max(indices[0])
 
     # crop the image
-    image =  image.crop(( x_min, y_min, x_max,  y_max ))
+    image = image.crop((x_min, y_min, x_max, y_max))
 
     return image
+
 
 def resize_image(image, resize_factor):
-    image = image.resize((int(image.size[0] * resize_factor),
-                        int(image.size[1] * resize_factor)),
-                        Image.LANCZOS)
+    image = image.resize(
+        (
+            int(image.size[0] * resize_factor),
+            int(image.size[1] * resize_factor),
+        ),
+        Image.LANCZOS,
+    )
     return image
+
 
 def pad_image(image):
     pad = config["padding"]
     width = config["preprocessed_image_width"]
     hgt = config["preprocessed_image_height"]
-    new_image = Image.new("RGB", (width,hgt), (255,255,255))
-    new_image.paste(image, (pad,pad))
+    new_image = Image.new("RGB", (width, hgt), (255, 255, 255))
+    new_image.paste(image, (pad, pad))
     return new_image
+
 
 def bucket(image):
     """
@@ -59,23 +70,24 @@ def bucket(image):
     """
     # [width, hgt, resize_factor]
     buckets = [
-        [820,86,0.6],
-        [615, 65,0.8],
-        [492, 52,1],
-        [410, 43,1.2],
-        [350, 37,1.4]
-        ]
+        [820, 86, 0.6],
+        [615, 65, 0.8],
+        [492, 52, 1],
+        [410, 43, 1.2],
+        [350, 37, 1.4],
+    ]
     # current width, hgt
     crop_width, crop_hgt = image.size[0], image.size[1]
 
     # find correct bucket
     resize_factor = config["resizing_factor"]
     for b in buckets:
-        w,h,r = b
+        w, h, r = b
         if crop_width <= w and crop_hgt <= h:
             resize_factor = r
 
     return resize_factor
+
 
 def downsampling(image):
     """
@@ -92,12 +104,17 @@ def downsampling(image):
     # from the buckets dimensions
     if h >= max_h:
         # need to calculate the ratio
-        resize_factor = max_h/h
+        resize_factor = max_h / h
 
-    image = image.resize((int(image.size[0] * resize_factor),
-                          int(image.size[1] * resize_factor)),
-                          Image.LANCZOS)
+    image = image.resize(
+        (
+            int(image.size[0] * resize_factor),
+            int(image.size[1] * resize_factor),
+        ),
+        Image.LANCZOS,
+    )
     return image
+
 
 def preprocess_images(image):
 
@@ -110,7 +127,9 @@ def preprocess_images(image):
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
 
-    IMAGE = Image.open(f"{config['data_path']}/{config['dataset_type']}/images/{image}").convert("L")
+    IMAGE = Image.open(
+        f"{config['data_path']}/{config['dataset_type']}/images/{image}"
+    ).convert("L")
 
     # checking the size of the image
     # w, h = IMAGE.size
@@ -134,19 +153,23 @@ def preprocess_images(image):
     IMAGE = convert(IMAGE)
 
     # saving the image
-    torch.save(IMAGE, f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt")
+    torch.save(
+        IMAGE,
+        f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
+    )
+
 
 def main():
 
     data_path = f"{config['data_path']}/{config['dataset_type']}"
-    images = os.listdir(f'{data_path}/images')
+    images = os.listdir(f"{data_path}/images")
 
     # create an image_tensors folder
-    if not os.path.exists(f'{data_path}/image_tensors'):
-        os.mkdir(f'{data_path}/image_tensors')
+    if not os.path.exists(f"{data_path}/image_tensors"):
+        os.mkdir(f"{data_path}/image_tensors")
 
     with Pool(multiprocessing.cpu_count()) as pool:
-            result = pool.map(preprocess_images, images)
+        result = pool.map(preprocess_images, images)
 
 
 if __name__ == "__main__":

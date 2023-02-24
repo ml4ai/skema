@@ -13,6 +13,7 @@ app = FastAPI()
 def ping():
     return "The img2mml service is running."
 
+
 @app.put("/get-mml", summary="Get MathML representation of an equation image")
 async def get_mathml(file: bytes = File()):
     """

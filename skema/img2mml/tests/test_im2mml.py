@@ -1,6 +1,7 @@
 from pathlib import Path
 from skema.img2mml.api import get_mathml_from_file
 
+
 def test_get_mathml():
     cwd = Path(__file__).parents[0]
     mathml = get_mathml_from_file(cwd / "data/261.png")

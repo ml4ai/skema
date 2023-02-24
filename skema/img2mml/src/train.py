@@ -3,7 +3,17 @@ import torch
 import torch.nn as nn
 from skema.img2mml.utils.utils import *
 
-def train(model, model_type, train_dataloader, vocab, optimizer, clip, ddp=False, rank=None):
+
+def train(
+    model,
+    model_type,
+    train_dataloader,
+    vocab,
+    optimizer,
+    clip,
+    ddp=False,
+    rank=None,
+):
 
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
@@ -28,7 +38,7 @@ def train(model, model_type, train_dataloader, vocab, optimizer, clip, ddp=False
         # setting gradients to zero
         optimizer.zero_grad()
 
-        outputs, _ = model(img, mml) #(B, max_len, output_dim)
+        outputs, _ = model(img, mml)  # (B, max_len, output_dim)
         # print("shape:", (mml.shape, outputs.shape))
 
         # if masking:
@@ -37,10 +47,10 @@ def train(model, model_type, train_dataloader, vocab, optimizer, clip, ddp=False
         # else:
         output_dim = outputs.shape[-1]
         # avoiding <sos> token while Calculating loss
-        mml = mml[:,1:].contiguous().view(-1)
-        if model_type=="opennmt":
-            outputs = outputs[:,1:,:].contiguous().view(-1, output_dim)
-        elif model_type=="cnn_xfmer":
+        mml = mml[:, 1:].contiguous().view(-1)
+        if model_type == "opennmt":
+            outputs = outputs[:, 1:, :].contiguous().view(-1, output_dim)
+        elif model_type == "cnn_xfmer":
             outputs = outputs.contiguous().view(-1, output_dim)
 
         # print("outputs mml devices are: ", outputs.get_device(), mml.get_device())
@@ -54,5 +64,5 @@ def train(model, model_type, train_dataloader, vocab, optimizer, clip, ddp=False
 
         epoch_loss += loss.item()
 
-    net_loss = epoch_loss/len(train_dataloader)
+    net_loss = epoch_loss / len(train_dataloader)
     return net_loss

@@ -1,4 +1,3 @@
-
 # Render PNGs from Tex files using pdflatex and pdf2image
 
 import os, subprocess, random
@@ -12,12 +11,13 @@ from threading import Timer
 from pdf2image import convert_from_path
 
 # Printing starting time
-print(' ')
+print(" ")
 start_time = datetime.now()
-print('Starting at:  ', start_time)
+print("Starting at:  ", start_time)
 
 # Defining global lock
 lock = Lock()
+
 
 def main(config, year):
 
@@ -27,69 +27,80 @@ def main(config, year):
     verbose = config["verbose"]
 
     # Setting up Logger - To get log files
-    Log_Format = '%(levelname)s:%(message)s'
+    log_format = "%(levelname)s:%(message)s"
 
-    logging.basicConfig(filename = f'tex2png{year}.log',
-                        level = logging.DEBUG,
-                        format = Log_Format,
-                        filemode = 'w')
+    logging.basicConfig(
+        filename=f"tex2png{year}.log",
+        level=logging.DEBUG,
+        format=log_format,
+        filemode="w",
+    )
 
     logger = logging.getLogger()
 
-
-
-    for DIR in directories:
-        DIR = str(DIR)
-        path = os.path.join(destination, f'{year}/{DIR}')
-        latex_images = os.path.join(path, 'latex_images')
+    for month_dir in directories:
+        month_dir = str(month_dir)
+        path = os.path.join(destination, f"{year}/{month_dir}")
+        latex_images = os.path.join(path, "latex_images")
         if not os.path.exists(latex_images):
-            subprocess.call(['mkdir', latex_images])
+            subprocess.call(["mkdir", latex_images])
 
         pool_path(path)
+
 
 def pool_path(path):
 
     global lock
 
     # Folder path to TeX files
-    TexFolderPath = os.path.join(path, "tex_files")
+    tex_folder_path = os.path.join(path, "tex_files")
 
-    for folder in os.listdir(TexFolderPath):
+    for folder in os.listdir(tex_folder_path):
 
         # make results PNG directories
         pdf_dst_root = os.path.join(path, f"latex_images/{folder}")
-        PDF_Large = os.path.join(pdf_dst_root, "Large_eqns")
-        PDF_Small = os.path.join(pdf_dst_root, "Small_eqns")
-        for F in [pdf_dst_root, PDF_Large, PDF_Small]:
-            if not os.path.exists(F):
-                subprocess.call(['mkdir', F])
+        pdf_large = os.path.join(pdf_dst_root, "Large_eqns")
+        pdf_small = os.path.join(pdf_dst_root, "Small_eqns")
+        for f in [pdf_dst_root, pdf_large, pdf_small]:
+            if not os.path.exists(f):
+                subprocess.call(["mkdir", f])
 
         # Paths to Large and Small TeX files
-        Large_tex_files = os.path.join(TexFolderPath, f"{folder}/Large_eqns")
-        Small_tex_files = os.path.join(TexFolderPath, f"{folder}/Small_eqns")
+        large_tex_files = os.path.join(tex_folder_path, f"{folder}/Large_eqns")
+        small_tex_files = os.path.join(tex_folder_path, f"{folder}/Small_eqns")
 
-        for type_of_folder in [Large_tex_files, Small_tex_files]:
-            PDF_dst = PDF_Large if type_of_folder == Large_tex_files else PDF_Small
+        for type_of_folder in [large_tex_files, small_tex_files]:
+            pdf_dst = (
+                pdf_large if type_of_folder == large_tex_files else pdf_small
+            )
 
             # array to store pairs of [type_of_folder, file in type_of_folder] Will be used as arguments in pool.map
             temp = []
             for texfile in os.listdir(type_of_folder):
-                temp.append([folder, type_of_folder, texfile, PDF_dst])
+                temp.append([folder, type_of_folder, texfile, pdf_dst])
 
             with Pool(multiprocessing.cpu_count()) as pool:
                 result = pool.map(run_pdflatex, temp)
+
 
 # This function will run pdflatex
 def run_pdflatex(run_pdflatex_list):
 
     global lock
 
-    (folder, type_of_folder, texfile, PDF_dst) = run_pdflatex_list
+    (folder, type_of_folder, texfile, pdf_dst) = run_pdflatex_list
 
-    os.chdir(PDF_dst)
-    command = ['pdflatex', '-interaction=nonstopmode', '-halt-on-error', os.path.join(type_of_folder,texfile)]
+    os.chdir(pdf_dst)
+    command = [
+        "pdflatex",
+        "-interaction=nonstopmode",
+        "-halt-on-error",
+        os.path.join(type_of_folder, texfile),
+    ]
 
-    output = subprocess.Popen(command, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    output = subprocess.Popen(
+        command, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+    )
     my_timer = Timer(5, kill, [output])
 
     try:
@@ -97,26 +108,45 @@ def run_pdflatex(run_pdflatex_list):
         stdout, stderr = output.communicate()
 
         # Calling pdf2png
-        pdf2png(folder, f'{texfile.split(".")[0]}.pdf', texfile.split(".")[0], PDF_dst, type_of_folder)
+        pdf2png(
+            folder,
+            f'{texfile.split(".")[0]}.pdf',
+            texfile.split(".")[0],
+            pdf_dst,
+            type_of_folder,
+        )
 
     finally:
         my_timer.cancel()
 
+
 # Function to convert PDFs to PNGs
-def pdf2png(folder, pdf_file, png_name, PNG_dst, type_of_folder):
+def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder):
 
     global lock
 
-    os.chdir(PNG_dst)
+    os.chdir(png_dst)
 
     try:
 
-        command_args = ['convert','-background', 'white',
-                        '-alpha', 'remove', 'off','-density',
-                        '200','-quality', '100',pdf_file,
-                        f'{PNG_dst}/{png_name}.png']
+        command_args = [
+            "convert",
+            "-background",
+            "white",
+            "-alpha",
+            "remove",
+            "off",
+            "-density",
+            "200",
+            "-quality",
+            "100",
+            pdf_file,
+            f"{png_dst}/{png_name}.png",
+        ]
 
-        subprocess.Popen(command_args, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+        subprocess.Popen(
+            command_args, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+        )
 
         # Removing log and aux file if exist
 
@@ -132,19 +162,26 @@ def pdf2png(folder, pdf_file, png_name, PNG_dst, type_of_folder):
                 lock.release()
 
             lock.acquire()
-            logger.warning(f'{folder}:{type_of_folder}:{pdf_file.split(".")[0]}.aux doesn\'t exists.')
+            logger.warning(
+                f'{folder}:{type_of_folder}:{pdf_file.split(".")[0]}.aux doesn\'t exists.'
+            )
             lock.release()
 
     except:
 
         if verbose:
             lock.acquire()
-            print(f"OOPS!!... This {folder}:{PNG_dst}:{pdf_file} file couldn't convert to png.")
+            print(
+                f"OOPS!!... This {folder}:{png_dst}:{pdf_file} file couldn't convert to png."
+            )
             lock.release()
 
         lock.acquire()
-        logger.warning(f"{folder}:{PNG_dst}:{pdf_file} file couldn't convert to png.")
+        logger.warning(
+            f"{folder}:{png_dst}:{pdf_file} file couldn't convert to png."
+        )
         lock.release()
+
 
 # Function to kill process if TimeoutError occurs
 kill = lambda process: process.kill()
@@ -160,10 +197,9 @@ if __name__ == "__main__":
     for year in config["years"].split(","):
         main(config, str(year))
 
-
     # Printing stoping time
-    print(' ')
+    print(" ")
     stop_time = datetime.now()
-    print('Stoping at:  ', stop_time)
-    print(' ')
-    print('Rendering PNGs -- completed.')
+    print("Stoping at:  ", stop_time)
+    print(" ")
+    print("Rendering PNGs -- completed.")
