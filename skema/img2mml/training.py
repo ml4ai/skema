@@ -17,7 +17,7 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
-from preprocessing.preprocess import preprocess_mml
+from skema.img2mml.preprocessing.preprocess import preprocess_mml
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.lstm_decoder import LSTM_Decoder
