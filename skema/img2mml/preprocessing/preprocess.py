@@ -1,7 +1,6 @@
 # creating tab dataset having image_num and mml
 # split train, test, val
 # dataloader to load data
-import numpy as np
 import pandas as pd
 import random
 import torch
