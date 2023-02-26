@@ -32,7 +32,7 @@ from skema.img2mml.src.test import evaluate
 # opening config file
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "config", help="configuration file for paths and hyperparameters"
+    "--config", help="configuration file for paths and hyperparameters"
 )
 args = parser.parse_args()
 
