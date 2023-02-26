@@ -1,4 +1,4 @@
-# img2mml
+[#](#) img2mml
 
 This directory contains the code for the img2mml service, which processes images
 of equations and returns presentation MathML corresponding to those equations.
@@ -41,7 +41,7 @@ Please ensure that current working directory is `skema/img2mml`
 cd skema/img2mml; mkdir training_data
 ```
 
-#### To preprocess images:   
+#### To preprocess images:
 ```
 python preprocessing/preprocess_images.py --config configs/ourmml_xfmer_config
 ```
@@ -53,7 +53,7 @@ python preprocessing/preprocess_mml.py
 
 #### To train the model:
 ```
-python training.py --config configs/ourmml_xfmer_config.json
+python training.py configs/ourmml_xfmer_config.json
 ```
 
 #### To calculate Torchtext BLEU score

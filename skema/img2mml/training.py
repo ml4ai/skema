@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-" main script to run the model. "
+"Main script to train the model. "
 
 import os, random
 import subprocess
@@ -32,7 +32,7 @@ from skema.img2mml.src.test import evaluate
 # opening config file
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--config", help="configuration file for paths and hyperparameters"
+    "config", help="configuration file for paths and hyperparameters"
 )
 args = parser.parse_args()
 
