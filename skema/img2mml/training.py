@@ -396,59 +396,59 @@ def train_model(rank=None,):
         )
 
     # testing
-    # dist.barrier()
-    # if (not ddp) or (ddp and rank==0):
-    print(
-        "loading final saved model: ",
-        f"trained_models/{model_type}_{dataset_type}_best.pt",
-    )
-    model.load_state_dict(
-        torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
-    )
+    dist.barrier()
+    if (not ddp) or (ddp and rank==0):
+        print(
+            "loading final saved model: ",
+            f"trained_models/{model_type}_{dataset_type}_best.pt",
+        )
+        model.load_state_dict(
+            torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
+        )
 
-    epoch = "test_0"
-    if config["beam_search"]:
-        beam_params = [beam_k, alpha, min_length_bean_search_normalization]
-    else:
-        beam_params = None
+        epoch = "test_0"
+        if config["beam_search"]:
+            beam_params = [beam_k, alpha, min_length_bean_search_normalization]
+        else:
+            beam_params = None
 
-    test_loss = evaluate(
-        model,
-        model_type,
-        vocab,
-        batch_size,
-        test_dataloader,
-        beam_params,
-        is_test=True,
-        ddp=ddp,
-        rank=rank,
-        g2p=g2p,
-    )
+        test_loss = evaluate(
+            model,
+            model_type,
+            vocab,
+            batch_size,
+            test_dataloader,
+            beam_params,
+            is_test=True,
+            ddp=ddp,
+            rank=rank,
+            g2p=g2p,
+        )
 
-    # if (not ddp) or (ddp and rank==0):
-    print(
-        f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-    )
-    loss_file.write(
-        f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-    )
+        # if (not ddp) or (ddp and rank==0):
+        print(
+            f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
+        )
+        loss_file.write(
+            f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
+        )
 
-    # stopping time
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
+        # stopping time
+        print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
-    # calculate_bleu_score
-    # if (not ddp) or (ddp and rank==0):
-    #     print(" calculating Bleu Score...  ")
-    #     try:
-    #         tt_bleu = calculate_bleu_score()
-    #         print(' torchtext BLEU score: ', tt_bleu )
-    #         print(" multi-bleu.perl BLEU score... ")
-    #         os.system("perl utils/multi-bleu.perl logs/trimmed_targets.txt < logs/trimmed_preds.txt")
-    #     except:
-    #         pass
+        # calculate_bleu_score
+        # if (not ddp) or (ddp and rank==0):
+        #     print(" calculating Bleu Score...  ")
+        #     try:
+        #         tt_bleu = calculate_bleu_score()
+        #         print(' torchtext BLEU score: ', tt_bleu )
+        #         print(" multi-bleu.perl BLEU score... ")
+        #         os.system("perl utils/multi-bleu.perl logs/trimmed_targets.txt < logs/trimmed_preds.txt")
+        #     except:
+        #         pass
 
-    # dist.barrier()
-    # dist.destroy_process_group()
+    dist.barrier()
+    dist.destroy_process_group()
 
 
 # for DDP
