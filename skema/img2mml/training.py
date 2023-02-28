@@ -396,8 +396,10 @@ def train_model(rank=None,):
         )
 
     # testing
-    dist.barrier()
     if (not ddp) or (ddp and rank==0):
+        if ddp:
+            dist.barrier()
+
         print(
             "loading final saved model: ",
             f"trained_models/{model_type}_{dataset_type}_best.pt",
@@ -436,19 +438,9 @@ def train_model(rank=None,):
         # stopping time
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
-        # calculate_bleu_score
-        # if (not ddp) or (ddp and rank==0):
-        #     print(" calculating Bleu Score...  ")
-        #     try:
-        #         tt_bleu = calculate_bleu_score()
-        #         print(' torchtext BLEU score: ', tt_bleu )
-        #         print(" multi-bleu.perl BLEU score... ")
-        #         os.system("perl utils/multi-bleu.perl logs/trimmed_targets.txt < logs/trimmed_preds.txt")
-        #     except:
-        #         pass
-
-    dist.barrier()
-    dist.destroy_process_group()
+    if ddp:
+        dist.barrier()
+        dist.destroy_process_group()
 
 
 # for DDP
