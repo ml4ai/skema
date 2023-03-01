@@ -11,7 +11,7 @@ use std::path::Path;
 
 use comment_extraction::conventions::dssat::get_comments as get_fortran_comments;
 use comment_extraction::languages::python::get_comments as get_python_comments;
-use comment_extraction::languages::cpp::get_comments as get_cpp_comments;
+//use comment_extraction::languages::cpp::get_comments as get_cpp_comments;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -51,7 +51,7 @@ fn main() {
             println!("{comments}");
         }
     } else if extension == "cpp" {
-        let comments = get_cpp_comments(input);
+//        let comments = get_cpp_comments(input);
 //        let comments = serde_json::to_string(&comments).unwrap();
 //        if let Some(path) = args.output {
 //            write(path, comments).expect("Unable to write to file!");
