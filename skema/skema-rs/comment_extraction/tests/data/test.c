@@ -9,11 +9,11 @@ int main(
 {
 
     // "quotes in comment "
-    char* foo = " /* comment in quotes */ ";
+    char* foo = " // comment in quotes ";
 
-    /* multi-line comment
+    /* quotes in multi-line
        " "
-       with quotes
+       comment
      */  int x = 5;
 
     char* bar = " /* multi-line comment \
@@ -25,4 +25,3 @@ int main(
 
     return 0;
 }
-
