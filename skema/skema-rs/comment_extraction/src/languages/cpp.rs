@@ -69,7 +69,7 @@ fn advance_by_1(s: &str) -> IResult<&str, &str> {
     }
 }
 
-fn parse(s: &str) -> IResult<&str,Vec<&str>> {
+fn parse(s: &str) -> IResult<&str,Vec<(u32, &str)>> {
     fold_many0(
         alt((
             find_c_comment,  // try to enter C comment
@@ -78,9 +78,9 @@ fn parse(s: &str) -> IResult<&str,Vec<&str>> {
             advance_by_1  // nothing found, keep looking
         )),
         Vec::new,
-        | mut acc: Vec<_>, item | {
+        | mut acc: Vec<(u32, &str)>, item | {
             if item.len() > 0  {
-                acc.push(item);
+                acc.push((0, item));  // 0 should be the line number
             }
             else {}
             acc
@@ -92,7 +92,7 @@ fn parse(s: &str) -> IResult<&str,Vec<&str>> {
 fn process_string(s: &str) {
     let(_,elements) = parse(&s).unwrap();
     for e in elements {
-        println!("{}", e);
+        println!("{:?}", e);
     }
 }
 
