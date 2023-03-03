@@ -16,7 +16,6 @@ use nom::{
 };
 use nom_locate::LocatedSpan;
 
-
 type Span<'a> = LocatedSpan<&'a str>;
 
 #[derive(Debug, PartialEq, Eq)]
