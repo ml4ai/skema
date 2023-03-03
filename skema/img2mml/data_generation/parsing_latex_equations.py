@@ -623,8 +623,6 @@ def cleaning_writing_eqn(
                         ),
                         "w",
                     ) as file:
-                        lock.release()
-
                         file.write(cleaned_eq)
                         file.close()
 
