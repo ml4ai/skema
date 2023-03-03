@@ -32,6 +32,13 @@ print("Starting at:  ", start_time)
 # Defining global lock
 lock = Lock()
 
+# read config file
+config_path = "data_generation_config.json"
+with open(config_path, "r") as cfg:
+    config = json.load(cfg)
+
+# defining verbose
+verbose = config["verbose"]
 
 def main(config, year):
 
@@ -709,11 +716,6 @@ def clean_eqn_2(eqn_2, matrix_cmds):
 
 
 if __name__ == "__main__":
-
-    # read config file
-    config_path = "data_generation_config.json"
-    with open(config_path, "r") as cfg:
-        config = json.load(cfg)
 
     for year in config["years"].split(","):
         print("year: ", year)

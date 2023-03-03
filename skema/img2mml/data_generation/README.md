@@ -12,6 +12,8 @@ Packages to install: xlrd==1.2.0, openpyxl
 
 -yr (year) = for example: 2014
 
+### Requirements
+chardet
 
 ### Scripts
 
