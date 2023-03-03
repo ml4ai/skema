@@ -1,8 +1,13 @@
-use actix_web::{put, get, web, HttpResponse};
-use mathml::{ast::Math, expression::{preprocess_content, wrap_math}, parsing::parse, acset::ACSet};
+use actix_web::{get, put, web, HttpResponse};
+use mathml::{
+    acset::ACSet,
+    ast::Math,
+    expression::{preprocess_content, wrap_math},
+    parsing::parse,
+};
 use petgraph::dot::{Config, Dot};
-use std::string::String;
 use serde::{Deserialize, Serialize};
+use std::string::String;
 use utoipa;
 use utoipa::ToSchema;
 
@@ -50,7 +55,6 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     dot_representation.to_string()
 }
 
-
 /// Return a JSON representation of an ACSet constructed from an array of MathML strings.
 #[utoipa::path(
     request_body = Vec<String>,
@@ -66,4 +70,3 @@ pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
     let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
     HttpResponse::Ok().json(web::Json(ACSet::from(asts)))
 }
-
