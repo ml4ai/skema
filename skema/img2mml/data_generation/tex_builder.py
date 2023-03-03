@@ -1,6 +1,6 @@
 # CREATING TEX FILES OF THE LATEX EQUATIONS
 
-import os, subprocess
+import os, subprocess, json
 import multiprocessing
 from datetime import datetime
 from multiprocessing import Pool, Lock, TimeoutError
