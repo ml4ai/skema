@@ -18,6 +18,11 @@ print("Starting at:  ", start_time)
 # Defining global lock
 lock = Lock()
 
+# read config file
+config_path = "data_generation_config.json"
+with open(config_path, "r") as cfg:
+    config = json.load(cfg)
+verbose = config["verbose"]
 
 def main(config, year):
 
@@ -189,10 +194,7 @@ kill = lambda process: process.kill()
 
 if __name__ == "__main__":
 
-    # read config file
-    config_path = "data_generation_config.json"
-    with open(config_path, "r") as cfg:
-        config = json.load(cfg)
+
 
     for year in config["years"].split(","):
         main(config, str(year))
