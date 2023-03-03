@@ -614,11 +614,6 @@ def cleaning_writing_eqn(
                         ),
                         "w",
                     ) as file:
-                        lock.acquire()
-                        print("+++===+++ " * 10)
-                        print(cleaned_eq)
-                        lock.release()
-
                         file.write(cleaned_eq)
                         file.close()
                 else:
@@ -628,9 +623,6 @@ def cleaning_writing_eqn(
                         ),
                         "w",
                     ) as file:
-                        lock.acquire()
-                        print("+++===+++ " * 10)
-                        print(cleaned_eq)
                         lock.release()
 
                         file.write(cleaned_eq)
