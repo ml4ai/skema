@@ -32,7 +32,7 @@ python tex2png.py
 
 3) Render MathML from the latex equations. NOTE: We first need to run MathJax or TeMML server in a separate terminal and then will proceed with the MathML rendering script.
 ```
-node MathJax_server.js
+node mathJax_server.js
 ```
 if using Temml service, run temml service:
 ```

@@ -71,7 +71,7 @@ perl utils/multi-bleu.perl logs/trimmed_targets.txt < logs/trimmed_preds.txt"
 
 The model itself is not checked into the repository, but you can get it from
 here:
-https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt.
+https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best.pt.
 
 Place the model file in the `trained_models` directory.
 
