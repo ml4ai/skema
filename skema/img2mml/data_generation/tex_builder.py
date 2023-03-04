@@ -93,11 +93,6 @@ def tex_builder(args_list):
 
             eqns = open(main_file).readlines()
 
-            # with open(main_file, "r") as FILE:
-            #     eqn = FILE.readlines()
-            #     FILE.close()
-
-
             tex_name = eqn_file.split(".")[0]
 
             # calling function to create tex doc for the particular folder --> giving all latex eqns, DMOs, Macros and tex_folder path as arguments

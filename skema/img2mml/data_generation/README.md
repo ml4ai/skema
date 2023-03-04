@@ -14,7 +14,10 @@ Packages to install: xlrd==1.2.0, openpyxl
 
 ### Requirements
 chardet
+
 pdf2image
+
+texlive-latex-base has to be installed on the system.
 
 ### Scripts
 
