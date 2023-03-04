@@ -163,7 +163,7 @@ def parse_equation(args_list):
 
     tex_file = [file for file in os.listdir(tex_folder_path) if ".tex" in file]
 
-    # considering folders/papers with inly single tex file
+    # considering folders/papers with only single tex file
     if len(tex_file) == 1:
 
         tex_doc = os.path.join(tex_folder_path, tex_file[0])

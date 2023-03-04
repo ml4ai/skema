@@ -91,17 +91,27 @@ def tex_builder(args_list):
 
             main_file = os.path.join(eqn_path, eqn_file)
 
-            with open(main_file, "r") as FILE:
-                eqn = FILE.readlines()
-                FILE.close()
+            eqns = open(main_file).readlines()
+
+            # with open(main_file, "r") as FILE:
+            #     eqn = FILE.readlines()
+            #     FILE.close()
+
 
             tex_name = eqn_file.split(".")[0]
 
             # calling function to create tex doc for the particular folder --> giving all latex eqns, DMOs, Macros and tex_folder path as arguments
-            if len(eqn) != 0:
+            if len(eqns) != 0:
+                if len(eqns) > 1:
+                    eqn = " "
+                    for e in eqns:
+                        eqn = eqn + e.replace("\n", "")
+                else:
+                    eqn = eqns[0]
+
                 if eqn_path == large_eqn_path:
                     create_tex_doc(
-                        eqn[0],
+                        eqn,
                         keyword_dict,
                         keyword_macro_dict,
                         tex_folder_large_eqn,
@@ -109,7 +119,7 @@ def tex_builder(args_list):
                     )
                 else:
                     create_tex_doc(
-                        eqn[0],
+                        eqn,
                         keyword_dict,
                         keyword_macro_dict,
                         tex_folder_small_eqn,
