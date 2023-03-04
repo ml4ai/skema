@@ -20,13 +20,19 @@ print("Starting at:  ", start_time)
 # Defining global lock
 lock = Lock()
 
+# read config file and define paths
+config_path = "data_generation_config.json"
+with open(config_path, "r") as cfg:
+    config = json.load(cfg)
 
-def main(config, year):
+src_path = config["source_directory"]
+destination = config["destination_directory"]
+directories = config["months"].split(",")
+years = config["years"].split(",")
+verbose = config["verbose"]
 
-    src_path = config["source_directory"]
-    destination = config["destination_directory"]
-    directories = config["months"].split(",")
-    verbose = config["verbose"]
+
+def main(year):
 
     # Setting up Logger - To get log files
     log_format = "%(message)s"
@@ -329,12 +335,8 @@ def attribute_definition(
 
 
 if __name__ == "__main__":
-    # read config file
-    config_path = "data_generation_config.json"
-    with open(config_path, "r") as cfg:
-        config = json.load(cfg)
 
-    for year in config["years"].split(","):
+    for year in years:
         main(config, str(year))
 
     # Printing stoping time

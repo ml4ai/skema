@@ -32,15 +32,19 @@ print("Starting at:  ", start_time)
 # Defining global lock
 lock = Lock()
 
-# read config file
+# read config file and define paths
 config_path = "data_generation_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
 
-# defining verbose
+src_path = config["source_directory"]
+destination = config["destination_directory"]
+directories = config["months"].split(",")
+years = config["years"].split(",")
 verbose = config["verbose"]
 
-def main(config, year):
+
+def main(year):
 
     # possible matrix and equation keyword that can be used in LaTeX source codes
     matrix_cmds = [
@@ -69,17 +73,11 @@ def main(config, year):
     unknown_iconv = ["unknown-8bit", "binary"]
 
     # get symbols, greek letter, and encoding list
-    excel_file = "Latex_symbols.xlsx"
+    excel_file = "latex_symbols.xlsx"
     df = pd.read_excel(excel_file, "rel_optr")
     relational_operators = df.iloc[:, 0].values.tolist()
     df_greek = pd.read_excel(excel_file, "greek")
     greek_letters = df_greek.iloc[:, 0].values.tolist()
-
-    # looping through the latex paper directories
-    src_path = config["source_directory"]
-    destination = config["destination_directory"]
-    directories = config["months"].split(",")
-    verbose = config["verbose"]
 
     #  create directories
     results_dir = os.path.join(destination, year)
@@ -98,6 +96,7 @@ def main(config, year):
 
     logger = logging.getLogger()
 
+    # looping through the latex paper directories
     for month_dir in directories:
         month_dir = str(month_dir)
         dir_path = os.path.join(src_path, month_dir)
@@ -707,9 +706,8 @@ def clean_eqn_2(eqn_2, matrix_cmds):
 
 if __name__ == "__main__":
 
-    for year in config["years"].split(","):
-        print("year: ", year)
-        main(config, str(year))
+    for year in years:
+        main(str(year))
 
     # Printing stoping time
     stop_time = datetime.now()

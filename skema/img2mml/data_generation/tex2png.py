@@ -18,13 +18,18 @@ print("Starting at:  ", start_time)
 # Defining global lock
 lock = Lock()
 
-# read config file
+# read config file and define paths
 config_path = "data_generation_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
+
+src_path = config["source_directory"]
+destination = config["destination_directory"]
+directories = config["months"].split(",")
+years = config["years"].split(",")
 verbose = config["verbose"]
 
-def main(config, year):
+def main(year):
 
     src_path = config["source_directory"]
     destination = config["destination_directory"]
@@ -194,10 +199,8 @@ kill = lambda process: process.kill()
 
 if __name__ == "__main__":
 
-
-
-    for year in config["years"].split(","):
-        main(config, str(year))
+    for year in years:
+        main(str(year))
 
     # Printing stoping time
     print(" ")
