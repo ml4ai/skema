@@ -36,7 +36,7 @@ def main(year):
 
     # Setting up Logger - To get log files
     log_format = "%(message)s"
-    logfile_dst = os.path.join(destination, f"{year}/Logs")
+    logfile_dst = os.path.join(destination, f"{year}")
     begin_month, end_month = directories[0], directories[-1]
     logging.basicConfig(
         filename=os.path.join(
