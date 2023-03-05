@@ -1,5 +1,5 @@
 month_dirimport xml.etree.ElementTree as ET
-import subprocess, os
+import subprocess, os, json
 import sys
 import xml.dom.minidom
 import multiprocessing
@@ -156,7 +156,7 @@ def create_folders(subdir, tyf, etree_path, sample_etree_path):
 
 if __name__ == "__main__":
     for year in years:
-        main(config, str(year))
+        main(str(year))
 
     # Printing stoping time
     print(" ")
