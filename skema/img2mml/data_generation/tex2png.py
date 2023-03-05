@@ -89,7 +89,7 @@ def pool_path(path):
             for texfile in os.listdir(type_of_folder):
                 temp.append([folder, type_of_folder, texfile, pdf_dst])
 
-            with Pool(multiprocessing.cpu_count()) as pool:
+            with Pool(multiprocessing.cpu_count()-200) as pool:
                 result = pool.map(run_pdflatex, temp)
 
 
