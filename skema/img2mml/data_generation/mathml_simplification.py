@@ -5,7 +5,7 @@ Created on Sat Nov  7 21:24:26 2020
 @author: gauravs
 """
 
-import re
+import re, json
 import subprocess, os
 import multiprocessing
 import logging
@@ -337,7 +337,7 @@ def attribute_definition(
 if __name__ == "__main__":
 
     for year in years:
-        main(config, str(year))
+        main(str(year))
 
     # Printing stoping time
     print(" ")
