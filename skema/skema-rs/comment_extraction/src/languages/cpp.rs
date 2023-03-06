@@ -8,7 +8,7 @@ use nom::{
 use nom_locate::LocatedSpan;
 use std::env;
 
-/// Parse C/C++ code and output comments along with their line numbers.  
+/// Parse C/C++ code and output the comments along with their line numbers.  
 
 type Span<'a> = LocatedSpan<&'a str>;
 
