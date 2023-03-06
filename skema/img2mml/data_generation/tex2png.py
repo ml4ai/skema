@@ -37,6 +37,7 @@ def main(year):
     verbose = config["verbose"]
 
     # Setting up Logger - To get log files
+    logger = logging.getLogger()
     log_format = "%(levelname)s:%(message)s"
 
     logging.basicConfig(
@@ -46,7 +47,7 @@ def main(year):
         filemode="w",
     )
 
-    logger = logging.getLogger()
+
 
     for month_dir in directories:
         month_dir = str(month_dir)

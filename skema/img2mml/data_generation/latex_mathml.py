@@ -253,7 +253,6 @@ def creating_final_equations(args_list):
                     mjxmml(file_name, folder, final_eqn, type_of_folder, mml)
 
                 except:
-                    print("passing to except....")
                     lock.acquire()
                     if verbose:
                         print(" ")
@@ -343,7 +342,6 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
     else:
         # Cleaning and Dumping the MathML strings to JSON file
         mml = cleaning_mml(res.text)
-        print(mml)
 
         if verbose:
             lock.acquire()
