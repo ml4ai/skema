@@ -13,7 +13,7 @@
 
 ### Requirements
 
-For requirements, please check out requirements.txt file. A few more packages will be required to run mathjax-server that can be installed using following commnads
+For requirements, please check out requirements.txt file. After installing _requirements.txt_, a few more packages will be required to run mathjax-server that can be installed using following commnads. 
 
 ```
 npm install express
