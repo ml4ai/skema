@@ -269,15 +269,16 @@ def creating_final_equations(args_list):
                     lock.release()
 
 
-def mjxmml(file_name, folder, final_eqn, type_of_folder, mml_path):
+def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
 
     global lock
 
+    print(eqn)
+
+    
     # Define the webservice address
     webservice = "http://localhost:8081"
     # Load the LaTeX string data
-    eqn = final_eqn
-
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
         f"{webservice}/tex2mml",
@@ -342,7 +343,7 @@ def mjxmml(file_name, folder, final_eqn, type_of_folder, mml_path):
         # Cleaning and Dumping the MathML strings to JSON file
         mml = cleaning_mml(res.text)
         print(mml)
-        
+
         if verbose:
             lock.acquire()
             print(f"writing {file_name}")
