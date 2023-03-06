@@ -8,6 +8,8 @@ use nom::{
 use nom_locate::LocatedSpan;
 use std::env;
 
+/// Parse C/C++ code and output comments along with their line numbers.  
+
 type Span<'a> = LocatedSpan<&'a str>;
 
 // find "/*", "*/" comments
@@ -56,7 +58,8 @@ fn parse(s: Span) -> IResult<Span, Vec<Span>> {
     )(s)
 }
 
-// Parse the input string into a LocatedSpan vector and report the results
+// Find the C and C++ style comments in the input string and report
+// them along with their line numbers
 fn process_string(s: &str) {
     let span = LocatedSpan::new(s);
     let(_, elements) = parse(span).unwrap();
@@ -75,7 +78,7 @@ fn process_file(file_path: &str) {
     }
 }
 
-// process arguments as input files
+// process command line arguments as input files
 fn main() {
     let args: Vec<String> = env::args().collect();
     let filenames = &args[1..];
