@@ -1,6 +1,5 @@
 # Data Generation Scripts
 
-Packages to install: xlrd==1.2.0, openpyxl
 
 ### Updates paths in the config files
 
@@ -13,21 +12,16 @@ Packages to install: xlrd==1.2.0, openpyxl
 -yr (year) = for example: 2014
 
 ### Requirements
-chardet
 
-openpyxl
+For requirements, please check out requirements.txt file. A few more packages will be required to run mathjax-server that can be installed using following commnads
 
-pdf2image
-
-nodejs
-
-pip install nodeenv
-
+```
 npm install express
-
+```
+```
 npm install mathjax-node
-
-texlive-latex-base has to be installed on the system.
+```
+Also, for TeX to PDF to PNG conversion, _pdflatex_ and _ImageMagick_ has to be installed on the system.
 
 ### Scripts
 
