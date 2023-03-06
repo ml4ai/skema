@@ -19,6 +19,14 @@ openpyxl
 
 pdf2image
 
+nodejs
+
+pip install nodeenv
+
+npm install express
+
+npm install mathjax-node
+
 texlive-latex-base has to be installed on the system.
 
 ### Scripts

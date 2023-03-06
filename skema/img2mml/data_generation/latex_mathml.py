@@ -341,7 +341,8 @@ def mjxmml(file_name, folder, final_eqn, type_of_folder, mml_path):
     else:
         # Cleaning and Dumping the MathML strings to JSON file
         mml = cleaning_mml(res.text)
-
+        print(mml)
+        
         if verbose:
             lock.acquire()
             print(f"writing {file_name}")
