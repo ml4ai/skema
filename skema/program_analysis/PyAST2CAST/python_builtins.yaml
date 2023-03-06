@@ -104,10 +104,13 @@ Operators:
   - ast.USub: operator.neg
   - ast.Not: operator.not_
   - ast.Invert: operator.invert
+  # Special AST Nodes that don't have built in operator functions because they're keywords:
+  - ast.And: gromet_and 
+  - ast.Or: gromet_or
 
 # There are some operators that don't have equivilent AST nodes
 # or still need to be matched with an AST node:
-# "operator.concat",
+# "operator.concat", "a" + "b" ? 
 # "operator.getitem"
 # "operator.setitem",
 # "operator.delitem",
@@ -122,12 +125,10 @@ Operators:
 # "operator.itemgetter"
 # "operator.methodcaller"
 
-# There are also the following AST Nodes that don't have operators because they are keywords:
-# "ast.And": "", 
-# "ast.Or": "",
-
 # And finally one AST node that only has an equivilent operator for the positive case:
 # "ast.NotIn": "", 
+# Translate in CAST using ast.Not and ast.In to eliminate ast.NotIn appearing in the translation
+# Operator(ast.Not, [Operator(ast.In, [...])])
 ---
 
     
