@@ -253,6 +253,7 @@ def creating_final_equations(args_list):
                     mjxmml(file_name, folder, final_eqn, type_of_folder, mml)
 
                 except:
+                    print("passing to except....")
                     lock.acquire()
                     if verbose:
                         print(" ")
@@ -275,7 +276,7 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
 
     print(eqn)
 
-    
+
     # Define the webservice address
     webservice = "http://localhost:8081"
     # Load the LaTeX string data
