@@ -1,86 +1,54 @@
-//
-//  find C and C++ comments by tag
-//
-
 use nom::{
-    branch::alt,
-    bytes::complete::{tag, take, take_until},
-    multi::fold_many0,
+    branch::alt, 
+    bytes::complete::{tag, take, take_until}, 
+    multi::fold_many0, 
+    sequence::delimited, 
     IResult
 };
-
+use nom_locate::LocatedSpan;
 use std::env;
 
-// newlines can occur within these comments
-fn find_c_comment(s: &str) -> IResult<&str, &str> {
-    match tag("/*")(s) {
-        Ok((i,_)) => {
-            match take_until("*/")(i) {
-                Ok((_,o)) => {
-                    let n: usize = o.len() + 4;
-                    take(n)(s)
-                }
-                Err(e) => Err(e)
-            }
-        }
+type Span<'a> = LocatedSpan<&'a str>;
+
+// find "/*", "*/" comments
+fn locate_c_comment(input: Span) -> IResult<Span, Span> {
+    delimited(tag("/*"), take_until("*/"), tag("*/"))(input)
+}
+
+// find "//", "\n" comments
+fn locate_cpp_comment(input: Span) -> IResult<Span, Span> {
+    delimited(tag("//"), take_until("\n"), tag("\n"))(input)
+}
+
+// removed quoted text
+fn locate_quoted_slice(input: Span) -> IResult<Span, Span> {
+    match delimited(tag("\""), take_until("\""), tag("\""))(input) {
+        Ok((i, _)) => Ok((i, "".into())), 
         Err(e) => Err(e)
     }
 }
 
-fn find_cpp_comment(s: &str) -> IResult<&str, &str> {
-    match tag("//")(s) {
-        Ok((i,_)) => {
-            match take_until("\n")(i) {
-                Ok((_,o)) => {
-                    let n: usize = o.len() + 2;
-                    take(n)(s)
-                }
-                Err(e) => Err(e)
-            }
-        }
+// move to the next character
+fn advance_by_1(input: Span) -> IResult<Span, Span> {
+    match take(1usize)(input) {
+        Ok((i, _)) => Ok((i, "".into())), 
         Err(e) => Err(e)
     }
 }
 
-// ignore comments within strings, i.e. char* a = " // not a comment ";
-fn skip_quoted_slice(s: &str) -> IResult<&str, &str> {
-    match tag("\"")(s) {
-        Ok((i,_)) => {
-            match take_until("\"")(i) {
-                Ok((_,o)) => {
-                    let n: usize = o.len() + 2;
-                    match take(n)(s) {
-                        Ok((i,_)) => Ok((i,"")),
-                        Err(e) => Err(e)
-                    }
-                }
-                Err(e) => Err(e)
-            }
-        }
-        Err(e) => Err(e)
-    }
-}
-
-// advance slice by one element
-fn advance_by_1(s: &str) -> IResult<&str, &str> {
-    match take(1usize)(s) {
-        Ok((i,_)) => Ok((i,"")),
-        Err(e) => Err(e)
-    }
-}
-
-fn parse(s: &str) -> IResult<&str,Vec<(u32, &str)>> {
+// Return a vector of LocatedSpan objects with C and C++ style comments
+fn parse(s: Span) -> IResult<Span, Vec<Span>> {
     fold_many0(
         alt((
-            find_c_comment,  // try to enter C comment
-            find_cpp_comment,  // try to enter C++ comment
-            skip_quoted_slice,  // ignore comments within strings
-            advance_by_1  // nothing found, keep looking
-        )),
-        Vec::new,
-        | mut acc: Vec<(u32, &str)>, item | {
-            if item.len() > 0  {
-                acc.push((0, item));  // 0 should be the line number
+            locate_c_comment, 
+            locate_cpp_comment, 
+            locate_quoted_slice, 
+            advance_by_1
+        )), 
+        Vec::new, 
+        | mut acc: Vec<Span>, span | {
+            if span.fragment().len() > 0 {
+                acc.push(span);
             }
             else {}
             acc
@@ -88,9 +56,10 @@ fn parse(s: &str) -> IResult<&str,Vec<(u32, &str)>> {
     )(s)
 }
 
-// parse the input string byte by byte
+// Parse the input string into a LocatedSpan vector and report the results
 fn process_string(s: &str) {
-    let(_,elements) = parse(&s).unwrap();
+    let span = LocatedSpan::new(s);
+    let(_, elements) = parse(span).unwrap();
     for e in elements {
         println!("{:?}", e);
     }
@@ -98,10 +67,10 @@ fn process_string(s: &str) {
 
 // read a file as one big string and process it
 fn process_file(file_path: &str) {
-    println!("Processing file {:?}",file_path);
+    println!("Processing file {:?}", file_path);
     let string = std::fs::read_to_string(file_path);
     match string {
-        Ok(s) => process_string(&s),
+        Ok(s) => process_string(&s), 
         Err(e) => println!("Error: {e:?}")
     }
 }
@@ -114,3 +83,4 @@ fn main() {
         process_file(filename);
     }
 }
+
