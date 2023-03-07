@@ -28,6 +28,7 @@ destination = config["destination_directory"]
 directories = config["months"].split(",")
 years = config["years"].split(",")
 verbose = config["verbose"]
+num_cpus = config["num_cpus"]
 
 def main(year):
 
@@ -90,7 +91,7 @@ def pool_path(path):
             for texfile in os.listdir(type_of_folder):
                 temp.append([folder, type_of_folder, texfile, pdf_dst])
 
-            with Pool(multiprocessing.cpu_count()-200) as pool:
+            with Pool(num_cpus) as pool:
                 result = pool.map(run_pdflatex, temp)
 
 
