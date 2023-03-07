@@ -50,30 +50,30 @@ def main(year):
     # Creating 'etree' directory
     for month_dir in directories:
         month_dir = str(month_dir)
-        etreePath = f"{destination}/{year}/{month_dir}/etree"
-        sample_etreePath = f"{destination}/{year}/{month_dir}/sample_etree"
+        etree_path = f"{destination}/{year}/{month_dir}/etree"
+        sample_etree_path = f"{destination}/{year}/{month_dir}/sample_etree"
 
-        for path in [etreePath, sample_etreePath]:
+        for path in [etree_path, sample_etree_path]:
             if not os.path.exists(path):
                 subprocess.call(["mkdir", path])
 
     for month_dir in directories:
         month_dir = str(month_dir)
-        simp_Mathml_path = f"{destination}/{year}/{month_dir}/mathjax_mml"
+        simp_mathml_path = f"{destination}/{year}/{month_dir}/mathjax_mml"
 
-        args_array = pooling(month_dir, simp_Mathml_path, destination, year)
+        args_array = pooling(month_dir, simp_mathml_path, destination, year)
 
         with Pool(num_cpus) as pool:
             result = pool.map(etree, args_array)
 
 
-def pooling(month_dir, simp_Mathml_path, destination, year):
+def pooling(month_dir, simp_mathml_path, destination, year):
 
     temp = []
 
-    for subdir in os.listdir(simp_Mathml_path):
+    for subdir in os.listdir(simp_mathml_path):
 
-        subdir_path = os.path.join(simp_Mathml_path, subdir)
+        subdir_path = os.path.join(simp_mathml_path, subdir)
         temp.append([month_dir, subdir, subdir_path, destination, year])
 
     return temp
@@ -95,6 +95,7 @@ def etree(args_array):
 
         # create folders
         create_folders(subdir, tyf, etree_path, sample_etree_path)
+        print("create_folders done!")
 
         for mml_file in os.listdir(tyf_path):
 
@@ -110,6 +111,7 @@ def etree(args_array):
 
                 # writing the sample files that will be used to render etree
                 tree1.write(sample_path)
+                print("sample writing done!")
 
                 # Writing etree for the xml files
                 tree = ET.parse(sample_path)
@@ -126,7 +128,7 @@ def etree(args_array):
                 )
 
                 print(xmlstr.encode(sys.stdout.encoding, errors="replace"))
-                
+
                 with open(result_path, "wb") as file_out:
                     file_out.write(
                         xmlstr.encode(sys.stdout.encoding, errors="replace")
