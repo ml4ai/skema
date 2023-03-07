@@ -12,27 +12,20 @@ use std::env;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
-// find "/*", "*/" comments
-fn locate_c_comment(input: Span) -> IResult<Span, Span> {
-    delimited(tag("/*"), take_until("*/"), tag("*/"))(input)
+// find C (/* - */) and C++ (// - \nl) style comments
+fn parse_comment(input: Span) -> IResult<Span, Span> {
+    alt((
+        delimited(tag("/*"), take_until("*/"), tag("*/")), // C
+        delimited(tag("//"), take_until("\n"), tag("\n"))  // C++ 
+    ))(input)
 }
 
-// find "//", "\n" comments
-fn locate_cpp_comment(input: Span) -> IResult<Span, Span> {
-    delimited(tag("//"), take_until("\n"), tag("\n"))(input)
-}
-
-// removed quoted text
-fn locate_quoted_slice(input: Span) -> IResult<Span, Span> {
-    match delimited(tag("\""), take_until("\""), tag("\""))(input) {
-        Ok((i, _)) => Ok((i, "".into())), 
-        Err(e) => Err(e)
-    }
-}
-
-// move to the next character
-fn advance_by_1(input: Span) -> IResult<Span, Span> {
-    match take(1usize)(input) {
+// Move to next input element, bypassing quoted text if found
+fn parse_next(input: Span) -> IResult<Span, Span> {
+    match alt((
+        delimited(tag("\""), take_until("\""), tag("\"")), // quoted text
+        take(1usize)  // Move to next element 
+    ))(input) {
         Ok((i, _)) => Ok((i, "".into())), 
         Err(e) => Err(e)
     }
@@ -41,12 +34,7 @@ fn advance_by_1(input: Span) -> IResult<Span, Span> {
 // Return a vector of LocatedSpan objects with C and C++ style comments
 fn parse(s: Span) -> IResult<Span, Vec<Span>> {
     fold_many0(
-        alt((
-            locate_c_comment, 
-            locate_cpp_comment, 
-            locate_quoted_slice, 
-            advance_by_1
-        )), 
+        alt((parse_comment, parse_next)), 
         Vec::new, 
         | mut acc: Vec<Span>, span | {
             if span.fragment().len() > 0 {
@@ -69,7 +57,7 @@ fn process_string(s: &str) {
 }
 
 // read a file as one big string and process it
-fn process_file(file_path: &str) {
+pub fn get_comments(file_path: &str) {
     println!("Processing file {:?}", file_path);
     let string = std::fs::read_to_string(file_path);
     match string {
@@ -83,7 +71,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     let filenames = &args[1..];
     for filename in filenames {
-        process_file(filename);
+        get_comments(filename);
     }
 }
 
