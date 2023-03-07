@@ -30,7 +30,7 @@ destination = config["destination_directory"]
 directories = config["months"].split(",")
 years = config["years"].split(",")
 verbose = config["verbose"]
-
+num_cpus = config["num_cpus"]
 
 def main(year):
 
@@ -71,7 +71,7 @@ def main(year):
                 [os.path.join(mathjax_mml_path, folder), folder, simp_mml_path]
             )
 
-        with Pool(multiprocessing.cpu_count() - 30) as pool:
+        with Pool(num_cpus) as pool:
             result = pool.map(simplification, temp)
 
 
@@ -216,6 +216,8 @@ def simplification(pooling_list):
                     attr_tobe_checked,
                     os.path.join(type_of_folder_path, file_path),
                 )
+
+                print(mml_mod)
 
                 if verbose:
                     lock.acquire()
