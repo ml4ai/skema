@@ -152,6 +152,8 @@ def creating_final_equations(args_list):
 
         for index, eqn in enumerate(os.listdir(type_of_folder)):
 
+            print("eqn at line 155: ", eqn)
+
             if ".png" in eqn:
 
                 try:
@@ -372,7 +374,6 @@ def cleaning_mml(res):
 
 if __name__ == "__main__":
 
-    print("main")
     for year in years:
         main(str(year))
 
