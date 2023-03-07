@@ -170,7 +170,15 @@ def creating_final_equations(args_list):
 
                     final_eqn = ""
 
-                    text_eqn = open(file_path, "r").readlines()[0]
+                    text_eqns = open(file_path, "r").readlines()
+                    if len(text_eqns) != 0:
+                        if len(text_eqns) > 1:
+                            text_eqn = " "
+                            for e in text_eqns:
+                                text_eqn = text_eqn + e.replace("\n", "")
+                        else:
+                            text_eqn = text_eqns[0]
+
                     macros_in_eqn = [
                         kw
                         for kw in keyword_macro_dict.keys()
