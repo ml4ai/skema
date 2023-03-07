@@ -125,6 +125,8 @@ def etree(args_array):
                     etree_path, f"{subdir}/{tyf}/{mml_file_name}.xml"
                 )
 
+                print(xmlstr.encode(sys.stdout.encoding, errors="replace"))
+                
                 with open(result_path, "wb") as file_out:
                     file_out.write(
                         xmlstr.encode(sys.stdout.encoding, errors="replace")
