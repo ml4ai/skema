@@ -13,7 +13,7 @@
 
 ### Requirements
 
-For requirements, please check out requirements.txt file. After installing _requirements.txt_, a few more packages will be required to run mathjax-server that can be installed using following commnads. 
+For requirements, please check out requirements.txt file. After installing _requirements.txt_, a few more packages will be required to run mathjax-server that can be installed using following commnads.
 
 ```
 npm install express
@@ -42,7 +42,7 @@ python tex2png.py
 
 3) Render MathML from the latex equations. NOTE: We first need to run MathJax or TeMML server in a separate terminal and then will proceed with the MathML rendering script.
 ```
-node mathJax_server.js
+node mathjax_server.js
 ```
 if using Temml service, run temml service:
 ```

@@ -280,9 +280,6 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
 
     global lock
 
-    print(eqn)
-
-
     # Define the webservice address
     webservice = "http://localhost:8081"
     # Load the LaTeX string data

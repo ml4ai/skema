@@ -40,9 +40,10 @@ def main(year):
     # Setting up Logger - To get log files
     logger = logging.getLogger()
     log_format = "%(levelname)s:%(message)s"
-
+    logfile_dst = os.path.join(destination, f"{year}")
     logging.basicConfig(
-        filename=f"tex2png{year}.log",
+        filename=os.path.join(
+            logfile_dst,f"tex2png{year}.log"),
         level=logging.DEBUG,
         format=log_format,
         filemode="w",
