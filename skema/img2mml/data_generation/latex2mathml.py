@@ -120,6 +120,8 @@ def creating_final_equations(args_list):
 
     global lock
 
+    print("in creating_final_equations...")
+
     # Unpacking the args_list
     (
         month_dir,
