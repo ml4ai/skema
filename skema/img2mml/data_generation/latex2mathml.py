@@ -73,8 +73,6 @@ def main(year):
                 keyword_dict,
             ) = creating_macro_dmo_dictionaries(root, folder)
 
-            print(keyword_macro_dict, keyword_dict)
-
             temp.append(
                 [
                     month_dir,
@@ -154,8 +152,6 @@ def creating_final_equations(args_list):
     for type_of_folder in [large_eqns, small_eqns]:
 
         for index, eqn in enumerate(os.listdir(type_of_folder)):
-
-            print("eqn at line 155: ", eqn)
 
             if ".png" in eqn:
 
@@ -255,8 +251,6 @@ def creating_final_equations(args_list):
                         if type_of_folder == large_eqns
                         else small_mml
                     )
-
-                    print("before mjxmml line 254: ", final_eqn)
 
                     mjxmml(file_name, folder, final_eqn, type_of_folder, mml)
 
