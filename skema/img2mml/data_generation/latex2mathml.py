@@ -72,6 +72,9 @@ def main(year):
                     keyword_macro_dict,
                     keyword_dict,
                 ) = creating_macro_dmo_dictionaries(root, folder)
+
+                print(keyword_macro_dict, keyword_dict)
+
                 temp.append(
                     [
                         month_dir,
