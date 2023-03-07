@@ -49,7 +49,7 @@ fn main() {
         } else {
             println!("{comments}");
         }
-    } else if extension == "cpp" {
+    } else if extension == "cpp" || extension == "c" {
         let comments = get_cpp_comments(input);
         let comments = serde_json::to_string(&comments).unwrap();
         if let Some(path) = args.output {
