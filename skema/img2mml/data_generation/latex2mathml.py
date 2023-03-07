@@ -84,7 +84,6 @@ def main(year):
                     ]
                 )
 
-        print("pooline...")
         with Pool(num_cpus) as pool:
             result = pool.map(creating_final_equations, temp)
 
