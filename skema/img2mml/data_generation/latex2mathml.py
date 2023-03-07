@@ -65,27 +65,27 @@ def main(year):
 
         for folder in os.listdir(folder_images):
 
-            if folder not in mml_folder_list:
+            #if folder not in mml_folder_list:
 
-                # Creating macros dictionary
-                (
+            # Creating macros dictionary
+            (
+                keyword_macro_dict,
+                keyword_dict,
+            ) = creating_macro_dmo_dictionaries(root, folder)
+
+            print(keyword_macro_dict, keyword_dict)
+
+            temp.append(
+                [
+                    month_dir,
+                    root,
+                    mml_dir,
+                    folder_images,
+                    folder,
                     keyword_macro_dict,
                     keyword_dict,
-                ) = creating_macro_dmo_dictionaries(root, folder)
-
-                print(keyword_macro_dict, keyword_dict)
-
-                temp.append(
-                    [
-                        month_dir,
-                        root,
-                        mml_dir,
-                        folder_images,
-                        folder,
-                        keyword_macro_dict,
-                        keyword_dict,
-                    ]
-                )
+                ]
+            )
 
         with Pool(num_cpus) as pool:
             result = pool.map(creating_final_equations, temp)
@@ -122,8 +122,6 @@ def creating_macro_dmo_dictionaries(root, folder):
 def creating_final_equations(args_list):
 
     global lock
-
-    print("in creating_final_equations...")
 
     # Unpacking the args_list
     (
