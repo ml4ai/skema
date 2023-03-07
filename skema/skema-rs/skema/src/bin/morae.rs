@@ -1,3 +1,6 @@
+use mathml::ast::Operator;
+use mathml::expression::Atom;
+use mathml::expression::Expr;
 use petgraph::dot::{Config, Dot};
 use petgraph::matrix_graph::IndexType;
 use petgraph::prelude::*;
@@ -9,6 +12,7 @@ fn main() {
     let module_id = 460;
     let graph = subgraph2petgraph(module_id);
 
+    /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
     // this will be a map of the name of the node and the metadata node it's attached to with the mapping to our standard metadata struct
     // grab metadata nodes
@@ -58,6 +62,22 @@ fn main() {
         }
     }
 
+    // now we convert the following into a Expr to get converted into a petri net
+    // first we have to get the parent node index to pass into the function
+    let mut root_node = Vec::<NodeIndex>::new();
+    for node_index in graph.clone().node_indices() {
+        if graph.clone()[node_index].labels == ["Opo"] {
+            root_node.push(node_index);
+        }
+    }
+    if root_node.len() >= 2 {
+        panic!("More than one Opo!");
+    }
+
+    let expr1 = tree_2_expr(trimmed_expressions_wiring[1], root_node[0]).unwrap();
+
+    println!("{:?}", expr1);
+
     // debugging outputs
     /*for node_idx in expressions_wiring[1].clone().node_indices() {
         if expressions_wiring[1].clone()[node_idx].properties["name"].to_string()
@@ -66,7 +86,7 @@ fn main() {
             println!("{:?}", node_idx);
         }
     }*/
-    for i in 0..trimmed_expressions_wiring.len() {
+    /*for i in 0..trimmed_expressions_wiring.len() {
         println!("{:?}", graph[expression_nodes[i]].id);
         println!(
             "Nodes in wiring subgraph: {}",
@@ -76,7 +96,7 @@ fn main() {
             "Edges in wiring subgraph: {}",
             trimmed_expressions_wiring[i].edge_count()
         );
-    }
+    }*/
     //let (nodes1, edges1) = expressions_wiring[1].clone().into_nodes_edges();
     /*for edge in edges1 {
         let source = edge.source();
@@ -94,6 +114,124 @@ fn main() {
         "{:?}",
         Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
     );*/
+}
+
+fn tree_2_expr(
+    mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    root_node: NodeIndex,
+) -> Result<Expr, MgError> {
+    // initialize intermediate struct, need to figure out
+    let mut op_vec = Vec::<Operator>::new();
+    let mut args_vec = Vec::<Expr>::new();
+    let mut expr_name = String::from("");
+
+    if graph.clone()[root_node].labels == ["Opo"] {
+        // starting node in expression tree, traverse down one node and then start parse
+        for node in graph.neighbors_directed(root_node, Outgoing) {
+            if graph.clone()[node].labels == ["Primitive"]
+                && !graph.clone()[node].properties["name"].to_string() == "'unpack'".to_string()
+            {
+                // make an operator type based on operation
+                if graph.clone()[node].properties["name"].to_string() == "'+'".to_string() {
+                    op_vec.push(Operator::Add);
+                } else if graph.clone()[node].properties["name"].to_string() == "'-'".to_string() {
+                    op_vec.push(Operator::Subtract);
+                } else if graph.clone()[node].properties["name"].to_string() == "'*'".to_string() {
+                    op_vec.push(Operator::Multiply);
+                } else if graph.clone()[node].properties["name"].to_string() == "'/'".to_string() {
+                    op_vec.push(Operator::Divide);
+                } else {
+                    panic!("Unknown Primitive!");
+                }
+                // name expression
+                expr_name = graph.clone()[root_node].properties["name"].to_string();
+
+                // now for the more complicated part, getting the arguments
+                for node1 in graph.neighbors_directed(node, Outgoing) {
+                    if graph.clone()[node1].properties["name"].to_string() == "'USub'".to_string() {
+                        // this means there is a '-' outside one of the arguments and we need to traverse
+                        // a node deeper to get the argument
+                        for node2 in graph.neighbors_directed(node1, Outgoing) {
+                            if graph.clone()[node2].labels == ["Opi"] {
+                                let arg_string = format!(
+                                    "-{}",
+                                    graph.clone()[node2].properties["name"].to_string()
+                                );
+                                args_vec.push(Expr::Atom(Atom::Identifier(arg_string)));
+                            } else {
+                                panic!("Unsupported edge case where 'USub' preceeds something besides an 'Opi'!");
+                            }
+                        }
+                    } else if graph.clone()[node1].labels == ["Primitive"] {
+                        // this is the case where there are more operators and will likely require a recursive call.
+                        let expr1 = tree_2_expr(graph.clone(), node1).unwrap();
+                        args_vec.push(expr1);
+                    } else if graph.clone()[node1].labels == ["Opi"] {
+                        // nice and straight to an argument
+                        args_vec.push(Expr::Atom(Atom::Identifier(
+                            graph.clone()[node1].properties["name"].to_string(),
+                        )));
+                    } else {
+                        panic!("Encoutered node that is not an 'Opi' or 'Primitive'!");
+                    }
+                }
+            }
+        }
+    } else {
+        if graph.clone()[root_node].labels == ["Primitive"]
+            && !graph.clone()[root_node].properties["name"].to_string() == "'unpack'".to_string()
+        {
+            // make an operator type based on operation
+            if graph.clone()[root_node].properties["name"].to_string() == "'+'".to_string() {
+                op_vec.push(Operator::Add);
+            } else if graph.clone()[root_node].properties["name"].to_string() == "'-'".to_string() {
+                op_vec.push(Operator::Subtract);
+            } else if graph.clone()[root_node].properties["name"].to_string() == "'*'".to_string() {
+                op_vec.push(Operator::Multiply);
+            } else if graph.clone()[root_node].properties["name"].to_string() == "'/'".to_string() {
+                op_vec.push(Operator::Divide);
+            } else {
+                panic!("Unknown Primitive!");
+            }
+            // name expression
+            expr_name = graph.clone()[root_node].properties["name"].to_string();
+
+            // now for the more complicated part, getting the arguments
+            for node1 in graph.neighbors_directed(root_node, Outgoing) {
+                if graph.clone()[node1].properties["name"].to_string() == "'USub'".to_string() {
+                    // this means there is a '-' outside one of the arguments and we need to traverse
+                    // a node deeper to get the argument
+                    for node2 in graph.neighbors_directed(node1, Outgoing) {
+                        if graph.clone()[node2].labels == ["Opi"] {
+                            let arg_string =
+                                format!("-{}", graph.clone()[node2].properties["name"].to_string());
+                            args_vec.push(Expr::Atom(Atom::Identifier(arg_string)));
+                        } else {
+                            panic!("Unsupported edge case where 'USub' preceeds something besides an 'Opi'!");
+                        }
+                    }
+                } else if graph.clone()[node1].labels == ["Primitive"] {
+                    // this is the case where there are more operators and will likely require a recursive call.
+                } else if graph.clone()[node1].labels == ["Opi"] {
+                    // nice and straight to an argument
+                    args_vec.push(Expr::Atom(Atom::Identifier(
+                        graph.clone()[node1].properties["name"].to_string(),
+                    )));
+                } else {
+                    panic!("Encoutered node that is not an 'Opi' or 'Primitive'!");
+                }
+            }
+        }
+    }
+
+    // now to construct the Expr
+    let mut temp_expr = Expr::Expression {
+        op: op_vec,
+        args: args_vec,
+        name: expr_name,
+    };
+
+    return Ok(temp_expr);
 }
 
 // this currently only works for un-named nodes that are not chained or have multiple incoming/outgoing edges
@@ -127,10 +265,13 @@ fn trim_un_named(
     }
 
     // now we perform a filter_map to remove the un-named nodes and only the bypass edge will remain to connect the nodes
+    // we also remove the unpack node if it is present here as well
     let trimmed_graph = bypass_graph.filter_map(
         |node_index, _edge_index| {
             if !(bypass_graph.clone()[node_index].properties["name"].to_string()
-                == "'un-named'".to_string())
+                == "'un-named'".to_string()
+                || bypass_graph.clone()[node_index].properties["name"].to_string()
+                    == "'unpack'".to_string())
             {
                 Some(graph[node_index].clone())
             } else {

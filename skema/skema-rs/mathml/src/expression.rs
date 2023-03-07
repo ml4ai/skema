@@ -7,22 +7,22 @@ use std::clone::Clone;
 
 use petgraph::{graph::NodeIndex, Graph};
 
-use std::collections::VecDeque;
 use crate::petri_net::recognizers::is_leibniz_diff_operator;
+use std::collections::VecDeque;
 /// Struct for representing mathematical expressions in order to align with source code.
 pub type MathExpressionGraph<'a> = Graph<String, String>;
 
 use std::string::ToString;
 
 #[derive(Debug, PartialEq, Clone)]
-enum Atom {
+pub enum Atom {
     Number(String),
     Identifier(String),
     Operator(Operator),
 }
 
 #[derive(Debug, PartialEq, Clone)]
-enum Expr {
+pub enum Expr {
     Atom(Atom),
     Expression {
         op: Vec<Operator>,
@@ -45,7 +45,7 @@ pub fn is_derivative(
     numerator: &mut Box<MathExpression>,
     denominator: &mut Box<MathExpression>,
 ) -> bool {
-    if is_leibniz_diff_operator(numerator, denominator){
+    if is_leibniz_diff_operator(numerator, denominator) {
         if let Mrow(x) = &mut **numerator {
             x.remove(0);
         }
