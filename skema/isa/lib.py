@@ -97,7 +97,7 @@ Seeded graph matching. Pattern recognition, 87, 203-215.
 
 Input: the paths of the two equation MathMLs
 Output:
-    matching_ratio: the match ratio between the equations 1 and the equation 2
+    matching_ratio: the matching ratio between the equations 1 and the equation 2
     num_diff_edges: the number of different edges between the equations 1 and the equation 2
     node_labels1: the name list of the variables and terms in the equation 1
     node_labels2: the name list of the variables and terms in the equation 2
