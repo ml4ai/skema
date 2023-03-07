@@ -11,7 +11,7 @@ use nom_locate::LocatedSpan;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
-// find C (/* - */) and C++ (// - \nl) style comments
+// find C and C++ style comments
 fn parse_comment(input: Span) -> IResult<Span, Span> {
     alt((
         delimited(tag("/*"), take_until("*/"), tag("*/")), // C
