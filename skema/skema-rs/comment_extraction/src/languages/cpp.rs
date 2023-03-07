@@ -6,7 +6,6 @@ use nom::{
     IResult
 };
 use nom_locate::LocatedSpan;
-use std::env;
 
 /// Parse C/C++ code and output the comments along with their line numbers.  
 
@@ -65,13 +64,3 @@ pub fn get_comments(file_path: &str) {
         Err(e) => println!("Error: {e:?}")
     }
 }
-
-// process command line arguments as input files
-fn main() {
-    let args: Vec<String> = env::args().collect();
-    let filenames = &args[1..];
-    for filename in filenames {
-        get_comments(filename);
-    }
-}
-
