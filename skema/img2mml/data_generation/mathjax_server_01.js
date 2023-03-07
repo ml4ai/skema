@@ -23,7 +23,7 @@ mjAPI.start();
 function tex2mml(tex) {
   try {
     my_promise = mjAPI.typeset({ math: tex, format: "TeX", mml: true });
-    
+
   } catch (error) {
     my_promise = new Promise(() => {throw `Error occurred during MJx typesetting:\n{error}`;});
   }
