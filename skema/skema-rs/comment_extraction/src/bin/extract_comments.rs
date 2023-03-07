@@ -3,8 +3,6 @@
 //! AutoMATES project (https://ml4ai.github.io/automates), and ported over to this Rust version by
 //! Adarsh Pyarelal for the SKEMA project.
 
-
-
 use clap::Parser;
 use std::fs::write;
 use std::path::Path;
