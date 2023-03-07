@@ -372,6 +372,7 @@ def cleaning_mml(res):
 
 if __name__ == "__main__":
 
+    print("main")
     for year in years:
         main(str(year))
 
