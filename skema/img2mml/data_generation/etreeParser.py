@@ -63,7 +63,7 @@ def main(year):
 
         args_array = pooling(month_dir, simp_Mathml_path, destination, year)
 
-        with Pool(multiprocessing.cpu_count() - 10) as pool:
+        with Pool(num_cpus) as pool:
             result = pool.map(etree, args_array)
 
 
@@ -161,7 +161,7 @@ if __name__ == "__main__":
         main(str(year))
 
     # removing sample_trees folder that we was temporarily created while parsing etrees
-    os.rmdir(f"{destination}/{year}/{month_dir}/sample_etree") 
+    os.rmdir(f"{destination}/{year}/{month_dir}/sample_etree")
 
     # Printing stoping time
     print(" ")
