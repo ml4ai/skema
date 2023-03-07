@@ -29,6 +29,7 @@ destination = config["destination_directory"]
 directories = config["months"].split(",")
 years = config["years"].split(",")
 verbose = config["verbose"]
+num_cpus = config["num_cpus"]
 
 def main(year):
     # Setting up Logger - To get log files
@@ -83,7 +84,7 @@ def main(year):
                     ]
                 )
 
-        with Pool(multiprocessing.cpu_count() - 10) as pool:
+        with Pool(num_cpus) as pool:
             result = pool.map(creating_final_equations, temp)
 
 
@@ -249,6 +250,8 @@ def creating_final_equations(args_list):
                         if type_of_folder == large_eqns
                         else small_mml
                     )
+
+                    print("before mjxmml line 254: ", final_eqn)
 
                     mjxmml(file_name, folder, final_eqn, type_of_folder, mml)
 
