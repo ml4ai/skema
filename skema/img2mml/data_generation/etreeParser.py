@@ -99,45 +99,45 @@ def etree(args_array):
 
         for mml_file in os.listdir(tyf_path):
 
-            try:
-                mml_file_path = os.path.join(tyf_path, mml_file)
+            # try:
+            mml_file_path = os.path.join(tyf_path, mml_file)
 
-                mml_file_name = mml_file.split(".")[0]
+            mml_file_name = mml_file.split(".")[0]
 
-                # converting text file to xml formatted file
-                tree1 = ElementTree()
-                tree1.parse(mml_file_path)
-                sample_path = f"{destination}/{year}/{month_dir}/sample_etree/{subdir}/{tyf}/{mml_file_name}_sample.xml"
+            # converting text file to xml formatted file
+            tree1 = ElementTree()
+            tree1.parse(mml_file_path)
+            sample_path = f"{destination}/{year}/{month_dir}/sample_etree/{subdir}/{tyf}/{mml_file_name}_sample.xml"
 
-                # writing the sample files that will be used to render etree
-                tree1.write(sample_path)
-                print("sample writing done!")
+            # writing the sample files that will be used to render etree
+            tree1.write(sample_path)
+            print("sample writing done!")
 
-                # Writing etree for the xml files
-                tree = ET.parse(sample_path)
-                xml_data = tree.getroot()
-                xmlstr = ET.tostring(xml_data, encoding="utf-8", method="xml")
-                input_string = xml.dom.minidom.parseString(xmlstr)
-                xmlstr = input_string.toprettyxml()
-                xmlstr = os.linesep.join(
-                    [s for s in xmlstr.splitlines() if s.strip()]
+            # Writing etree for the xml files
+            tree = ET.parse(sample_path)
+            xml_data = tree.getroot()
+            xmlstr = ET.tostring(xml_data, encoding="utf-8", method="xml")
+            input_string = xml.dom.minidom.parseString(xmlstr)
+            xmlstr = input_string.toprettyxml()
+            xmlstr = os.linesep.join(
+                [s for s in xmlstr.splitlines() if s.strip()]
+            )
+
+            result_path = os.path.join(
+                etree_path, f"{subdir}/{tyf}/{mml_file_name}.xml"
+            )
+
+            print(xmlstr.encode(sys.stdout.encoding, errors="replace"))
+
+            with open(result_path, "wb") as file_out:
+                file_out.write(
+                    xmlstr.encode(sys.stdout.encoding, errors="replace")
                 )
 
-                result_path = os.path.join(
-                    etree_path, f"{subdir}/{tyf}/{mml_file_name}.xml"
-                )
-
-                print(xmlstr.encode(sys.stdout.encoding, errors="replace"))
-
-                with open(result_path, "wb") as file_out:
-                    file_out.write(
-                        xmlstr.encode(sys.stdout.encoding, errors="replace")
-                    )
-
-            except:
-                lock.acquire()
-                logger.warning(f"{mml_file_path} not working.")
-                lock.release()
+            # except:
+            #     lock.acquire()
+            #     logger.warning(f"{mml_file_path} not working.")
+            #     lock.release()
 
 
 def create_folders(subdir, tyf, etree_path, sample_etree_path):
