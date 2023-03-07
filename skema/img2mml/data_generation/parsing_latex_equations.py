@@ -8,8 +8,6 @@ NOTE: Please change the paths as per your system before running the code.
 
 """
 TODOs:
-check line #168 -->extracting Macros
-check line #178 --> DMO
 check line #304 and 313 --> condition 4/5 work on \label, etc.
                         --> and condition 6 matrix
 """
@@ -27,7 +25,7 @@ from multiprocessing import Pool, Lock, TimeoutError
 
 # Printing starting time
 start_time = datetime.now()
-print("Starting at:  ", start_time)
+print("starting at:  ", start_time)
 
 # Defining global lock
 lock = Lock()
@@ -42,7 +40,7 @@ destination = config["destination_directory"]
 directories = config["months"].split(",")
 years = config["years"].split(",")
 verbose = config["verbose"]
-
+num_cpus = config["num_cpus"]
 
 def main(year):
 
@@ -88,7 +86,7 @@ def main(year):
     logfile_dst = os.path.join(destination, year)
     log_format = "%(levelname)s:%(message)s"
     logging.basicConfig(
-        filename=os.path.join(logfile_dst, "unknown_Tex_Files.log"),
+        filename=os.path.join(logfile_dst, "unknown_tex_files.log"),
         level=logging.DEBUG,
         format=log_format,
         filemode="w",
@@ -106,9 +104,9 @@ def main(year):
         if verbose:
             lock.acquire()
             print(" ===++=== " * 15)
-            print("Directory: ", month_dir)
-            print("Path to directoty: ", dir_path)
-            print("Results folder: ", latex_equations)
+            print("directory: ", month_dir)
+            print("path to directoty: ", dir_path)
+            print("results folder: ", latex_equations)
             lock.release()
 
         for f in [results_dir, results_folder, latex_equations]:
@@ -132,7 +130,7 @@ def main(year):
                 ]
             )
 
-        with Pool(multiprocessing.cpu_count()) as pool:
+        with Pool(num_cpus) as pool:
             pool.map(parse_equation, temp)
 
 
@@ -158,7 +156,7 @@ def parse_equation(args_list):
     if verbose:
         lock.acquire()
         print(" ")
-        print("Running tex folder: ", tex_folder)
+        print("running tex folder: ", tex_folder)
         lock.release()
 
     tex_file = [file for file in os.listdir(tex_folder_path) if ".tex" in file]
@@ -173,7 +171,7 @@ def parse_equation(args_list):
 
         if verbose:
             lock.acquire()
-            print("Encoding of the file:  ", encoding)
+            print("encoding of the file:  ", encoding)
             lock.release()
 
         # Finding the type of encoding i.e. utf-8, ISO8859-1, ASCII, etc.
@@ -199,22 +197,22 @@ def parse_equation(args_list):
                     call(["mkdir", paper_dir])
 
                 # Making direstories for large and small eqns
-                if not os.path.exists(os.path.join(paper_dir, "Large_eqns")):
-                    call(["mkdir", os.path.join(paper_dir, "Large_eqns")])
-                if not os.path.exists(os.path.join(paper_dir, "Small_eqns")):
-                    call(["mkdir", os.path.join(paper_dir, "Small_eqns")])
+                if not os.path.exists(os.path.join(paper_dir, "large_eqns")):
+                    call(["mkdir", os.path.join(paper_dir, "large_eqns")])
+                if not os.path.exists(os.path.join(paper_dir, "small_eqns")):
+                    call(["mkdir", os.path.join(paper_dir, "small_eqns")])
 
                 # opening files to write Macros and declare math operator
                 macro_file = open(
                     os.path.join(
-                        root, "{}/Macros_paper.txt".format(tex_folder)
+                        root, "{}/macros.txt".format(tex_folder)
                     ),
                     "w",
                 )
                 dmo_file = open(
                     os.path.join(
                         root,
-                        "{}/DeclareMathOperator_paper.txt".format(tex_folder),
+                        "{}/declare_math_operator.txt".format(tex_folder),
                     ),
                     "w",
                 )
@@ -443,7 +441,7 @@ def parse_equation(args_list):
                     final_eqn_num_line_num_dict_large,
                     open(
                         os.path.join(
-                            root, f"{tex_folder}/Eqn_LineNum_dict_large.txt"
+                            root, f"{tex_folder}/eqn_linenum_dict_large.txt"
                         ),
                         "w",
                     ),
@@ -452,7 +450,7 @@ def parse_equation(args_list):
                     final_eqn_num_line_num_dict_small,
                     open(
                         os.path.join(
-                            root, f"{tex_folder}/Eqn_LineNum_dict_small.txt"
+                            root, f"{tex_folder}/eqn_linenum_dict_small.txt"
                         ),
                         "w",
                     ),
@@ -609,7 +607,7 @@ def cleaning_writing_eqn(
                 if large_flag:
                     with open(
                         os.path.join(
-                            root, f"{tex_folder}/Large_eqns/eqn{i}.txt"
+                            root, f"{tex_folder}/large_eqns/eqn{i}.txt"
                         ),
                         "w",
                     ) as file:
@@ -618,7 +616,7 @@ def cleaning_writing_eqn(
                 else:
                     with open(
                         os.path.join(
-                            root, f"{tex_folder}/Small_eqns/eqn{i}.txt"
+                            root, f"{tex_folder}/small_eqns/eqn{i}.txt"
                         ),
                         "w",
                     ) as file:
@@ -711,6 +709,6 @@ if __name__ == "__main__":
 
     # Printing stoping time
     stop_time = datetime.now()
-    print("Stoping at:  ", stop_time)
+    print("stoping at:  ", stop_time)
     print(" ")
     print("parsing latex equations completed.")

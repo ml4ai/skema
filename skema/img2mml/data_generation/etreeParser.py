@@ -15,7 +15,7 @@ lock = Lock()
 # Printing starting time
 print(" ")
 start_time = datetime.now()
-print("Starting at:  ", start_time)
+print("starting at:  ", start_time)
 
 # read config file and define paths
 config_path = "data_generation_config.json"
@@ -27,6 +27,8 @@ destination = config["destination_directory"]
 directories = config["months"].split(",")
 years = config["years"].split(",")
 verbose = config["verbose"]
+num_cpus = config["num_cpus"]
+
 
 def main(year):
 
@@ -57,7 +59,7 @@ def main(year):
 
     for month_dir in directories:
         month_dir = str(month_dir)
-        simp_Mathml_path = f"{destination}/{year}/{month_dir}/Simplified_mml"
+        simp_Mathml_path = f"{destination}/{year}/{month_dir}/mathjax_mml"
 
         args_array = pooling(month_dir, simp_Mathml_path, destination, year)
 
@@ -87,7 +89,7 @@ def etree(args_array):
     etree_path = f"{destination}/{year}/{month_dir}/etree"
     sample_etree_path = f"{destination}/{year}/{month_dir}/sample_etree"
 
-    for tyf in ["Large_MML", "Small_MML"]:
+    for tyf in ["large_mml", "small_mml"]:
 
         tyf_path = os.path.join(subdir_path, tyf)
 
@@ -158,9 +160,12 @@ if __name__ == "__main__":
     for year in years:
         main(str(year))
 
+    # removing sample_trees folder that we was temporarily created while parsing etrees
+    os.rmdir(f"{destination}/{year}/{month_dir}/sample_etree") 
+
     # Printing stoping time
     print(" ")
     stop_time = datetime.now()
-    print("Stoping at:  ", stop_time)
+    print("stopping at:  ", stop_time)
     print(" ")
     print("etree writing process -- completed.")

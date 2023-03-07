@@ -11,7 +11,7 @@ from multiprocessing import Pool, Lock, TimeoutError
 # Printing starting time
 print(" ")
 start_time = datetime.now()
-print("Starting at:  ", start_time)
+print("starting at:  ", start_time)
 
 # Defining global lock
 lock = Lock()
@@ -38,7 +38,7 @@ def main(year):
     begin_month, end_month = directories[0], directories[-1]
     logging.basicConfig(
         filename=os.path.join(
-            logfile_dst, f"{begin_month}_{end_month}_MathJax_MML_newLock.log"
+            logfile_dst, f"{begin_month}_{end_month}_mathjax_mml_newLock.log"
         ),
         level=logging.DEBUG,
         format=log_format,
@@ -54,7 +54,7 @@ def main(year):
         folder_images = os.path.join(root, "latex_images")
 
         # Path to directory contain MathML eqns
-        mml_dir = os.path.join(root, "Mathjax_mml")
+        mml_dir = os.path.join(root, "mathjax_mml")
 
         if not os.path.exists(mml_dir):
             subprocess.call(["mkdir", mml_dir])
@@ -92,7 +92,7 @@ def main(year):
 def creating_macro_dmo_dictionaries(root, folder):
 
     macro_file = os.path.join(
-        root, f"latex_equations/{folder}/Macros_paper.txt"
+        root, f"latex_equations/{folder}/macros.txt"
     )
     with open(macro_file, "r") as file:
         macro = file.readlines()
@@ -104,7 +104,7 @@ def creating_macro_dmo_dictionaries(root, folder):
 
     # Creating dmo dictionary
     dmo_file = os.path.join(
-        root, f"latex_equations/{folder}/DeclareMathOperator_paper.txt"
+        root, f"latex_equations/{folder}/declare_math_operator.txt"
     )
     with open(dmo_file, "r") as file:
         dmo = file.readlines()
@@ -136,8 +136,8 @@ def creating_final_equations(args_list):
     mml_folder = os.path.join(mml_dir, folder)
 
     # Creating folder for Large and Small eqns
-    large_mml = os.path.join(mml_folder, "Large_MML")
-    small_mml = os.path.join(mml_folder, "Small_MML")
+    large_mml = os.path.join(mml_folder, "large_mml")
+    small_mml = os.path.join(mml_folder, "small_mml")
     for F in [mml_folder, large_mml, small_mml]:
         if not os.path.exists(F):
             subprocess.call(["mkdir", F])
@@ -146,8 +146,8 @@ def creating_final_equations(args_list):
     # along with their respective macros and Declare Math Operator commands.
 
     # Creating array of final eqns
-    large_eqns = os.path.join(folder_images, f"{folder}/Large_eqns")
-    small_eqns = os.path.join(folder_images, f"{folder}/Small_eqns")
+    large_eqns = os.path.join(folder_images, f"{folder}/large_eqns")
+    small_eqns = os.path.join(folder_images, f"{folder}/small_eqns")
 
     for type_of_folder in [large_eqns, small_eqns]:
 
@@ -159,9 +159,9 @@ def creating_final_equations(args_list):
                     file_name = eqn.split("-")[0].split(".")[0]
 
                     eqnstype = (
-                        "Large_eqns"
+                        "large_eqns"
                         if type_of_folder == large_eqns
-                        else "Small_eqns"
+                        else "small_eqns"
                     )
                     file_path = os.path.join(
                         root,
@@ -296,10 +296,10 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
     if verbose:
         lock.acquire()
         print(
-            f"Converting latex equation to MathML using MathJax webserver of {file_name}...."
+            f"converting latex equation to MathML using MathJax webserver of {file_name}...."
         )
         print(" ")
-        print(f"Response of the webservice request: {res.text}")
+        print(f"response of the webservice request: {res.text}")
         lock.release()
 
     # Capturing the keywords not supported by MathJax
@@ -382,6 +382,6 @@ if __name__ == "__main__":
     # Printing stoping time
     print(" ")
     stop_time = datetime.now()
-    print("Stoping at:  ", stop_time)
+    print("stoping at:  ", stop_time)
     print(" ")
     print("LaTeX-MathML conversion has completed.")

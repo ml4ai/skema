@@ -8,7 +8,7 @@ from multiprocessing import Pool, Lock, TimeoutError
 # Printing starting time
 print(" ")
 start_time = datetime.now()
-print("Starting at:  ", start_time)
+print("starting at:  ", start_time)
 
 
 # Defining global lock
@@ -24,6 +24,8 @@ destination = config["destination_directory"]
 directories = config["months"].split(",")
 years = config["years"].split(",")
 verbose = config["verbose"]
+num_cpus = config["num_cpus"]
+
 
 def main(year):
 
@@ -50,19 +52,19 @@ def tex_builder(args_list):
 
     # creating tex folders for Large and Small equations
     tex_folder = os.path.join(tex_files, folder)
-    tex_folder_large_eqn = os.path.join(tex_folder, "Large_eqns")
-    tex_folder_small_eqn = os.path.join(tex_folder, "Small_eqns")
+    tex_folder_large_eqn = os.path.join(tex_folder, "large_eqns")
+    tex_folder_small_eqn = os.path.join(tex_folder, "small_eqns")
     for F in [tex_folder, tex_folder_large_eqn, tex_folder_small_eqn]:
         if not os.path.exists(F):
             subprocess.call(["mkdir", F])
 
     # reading eqns of paper from folder in latex_equations
     path_to_folder = os.path.join(latex_equations, folder)
-    large_eqn_path = os.path.join(path_to_folder, "Large_eqns")
-    small_eqn_path = os.path.join(path_to_folder, "Small_eqns")
+    large_eqn_path = os.path.join(path_to_folder, "large_eqns")
+    small_eqn_path = os.path.join(path_to_folder, "small_eqns")
 
     # Dealing with "/DeclareMathOperator"
-    dmo_file = os.path.join(path_to_folder, "DeclareMathOperator_paper.txt")
+    dmo_file = os.path.join(path_to_folder, "declare_math_operator.txt")
     with open(dmo_file, "r") as file:
         dmo = file.readlines()
         file.close()
@@ -74,7 +76,7 @@ def tex_builder(args_list):
         keyword_dict[i[ibegin + 1 : iend]] = i
 
     # Dealing with "Macros"
-    macro_file = os.path.join(path_to_folder, "Macros_paper.txt")
+    macro_file = os.path.join(path_to_folder, "macros.txt")
     with open(macro_file, "r") as file:
         macro = file.readlines()
         file.close()
@@ -167,4 +169,4 @@ if __name__ == "__main__":
         main(str(year))
 
     # Printing stopping time
-    print("Stopping at:  ", datetime.now())
+    print("stopping at:  ", datetime.now())

@@ -13,7 +13,7 @@ from pdf2image import convert_from_path
 # Printing starting time
 print(" ")
 start_time = datetime.now()
-print("Starting at:  ", start_time)
+print("starting at:  ", start_time)
 
 # Defining global lock
 lock = Lock()
@@ -72,15 +72,15 @@ def pool_path(path):
 
         # make results PNG directories
         pdf_dst_root = os.path.join(path, f"latex_images/{folder}")
-        pdf_large = os.path.join(pdf_dst_root, "Large_eqns")
-        pdf_small = os.path.join(pdf_dst_root, "Small_eqns")
+        pdf_large = os.path.join(pdf_dst_root, "large_eqns")
+        pdf_small = os.path.join(pdf_dst_root, "small_eqns")
         for f in [pdf_dst_root, pdf_large, pdf_small]:
             if not os.path.exists(f):
                 subprocess.call(["mkdir", f])
 
         # Paths to Large and Small TeX files
-        large_tex_files = os.path.join(tex_folder_path, f"{folder}/Large_eqns")
-        small_tex_files = os.path.join(tex_folder_path, f"{folder}/Small_eqns")
+        large_tex_files = os.path.join(tex_folder_path, f"{folder}/large_eqns")
+        small_tex_files = os.path.join(tex_folder_path, f"{folder}/small_eqns")
 
         for type_of_folder in [large_tex_files, small_tex_files]:
             pdf_dst = (
@@ -208,6 +208,6 @@ if __name__ == "__main__":
     # Printing stoping time
     print(" ")
     stop_time = datetime.now()
-    print("Stoping at:  ", stop_time)
+    print("stoping at:  ", stop_time)
     print(" ")
-    print("Rendering PNGs -- completed.")
+    print("rendering PNGs -- completed.")
