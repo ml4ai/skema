@@ -183,7 +183,7 @@ def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder):
         if verbose:
             lock.acquire()
             print(
-                f"OOPS!!... This {folder}:{png_dst}:{pdf_file} file couldn't convert to png."
+                f"This {folder}:{png_dst}:{pdf_file} file couldn't convert to png."
             )
             lock.release()
 
