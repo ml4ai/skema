@@ -26,6 +26,7 @@ the program prints the JSON to standard output instead.
 The comment extraction module is designed to work with multiple languages and
 documentation conventions. Currently, we handle the following:
 
+- **C/C++**: Single line and multi-line comments.
 - **Python**: Single line comments and top-level function docstrings. Docstrings
   for modules and classes are not extracted. Additionally, we do not handle the
   case where two functions with the same name are defined in a module.
