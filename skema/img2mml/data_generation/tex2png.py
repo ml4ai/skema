@@ -40,7 +40,7 @@ def main(year):
     # Setting up Logger - To get log files
     logger = logging.getLogger()
     log_format = "%(levelname)s:%(message)s"
-    logfile_dst = os.path.join(destination, f"{year}")
+    logfile_dst = os.path.join(destination, f"{year}/logs")
     logging.basicConfig(
         filename=os.path.join(
             logfile_dst,f"tex2png{year}.log"),
@@ -52,7 +52,7 @@ def main(year):
 
 
     for month_dir in directories:
-        month_dir = str(month_dir)
+        month_dir = str(month_dir).strip()
         path = os.path.join(destination, f"{year}/{month_dir}")
         latex_images = os.path.join(path, "latex_images")
         if not os.path.exists(latex_images):
