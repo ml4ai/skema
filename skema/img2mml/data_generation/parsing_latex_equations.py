@@ -96,6 +96,7 @@ def main(year):
 
     # looping through the latex paper directories
     for month_dir in directories:
+        print(month_dir)
         month_dir = str(month_dir).strip()
         dir_path = os.path.join(src_path, month_dir)
         results_folder = os.path.join(results_dir, month_dir)
