@@ -57,10 +57,10 @@ def main(year):
         if not os.path.exists(latex_images):
             subprocess.call(["mkdir", latex_images])
 
-        pool_path(path)
+        pool_path(path, logger)
 
 
-def pool_path(path):
+def pool_path(path, logger):
 
     global lock
 
