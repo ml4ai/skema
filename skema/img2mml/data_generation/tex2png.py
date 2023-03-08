@@ -49,8 +49,6 @@ def main(year):
         filemode="w",
     )
 
-
-
     for month_dir in directories:
         month_dir = str(month_dir).strip()
         path = os.path.join(destination, f"{year}/{month_dir}")
@@ -90,7 +88,7 @@ def pool_path(path):
             # array to store pairs of [type_of_folder, file in type_of_folder] Will be used as arguments in pool.map
             temp = []
             for texfile in os.listdir(type_of_folder):
-                temp.append([folder, type_of_folder, texfile, pdf_dst])
+                temp.append([folder, type_of_folder, texfile, pdf_dst, logger])
 
             with Pool(num_cpus) as pool:
                 result = pool.map(run_pdflatex, temp)
@@ -101,7 +99,7 @@ def run_pdflatex(run_pdflatex_list):
 
     global lock
 
-    (folder, type_of_folder, texfile, pdf_dst) = run_pdflatex_list
+    (folder, type_of_folder, texfile, pdf_dst, logger) = run_pdflatex_list
 
     os.chdir(pdf_dst)
     command = [
@@ -127,6 +125,8 @@ def run_pdflatex(run_pdflatex_list):
             texfile.split(".")[0],
             pdf_dst,
             type_of_folder,
+            logger,
+
         )
 
     finally:
@@ -134,7 +134,7 @@ def run_pdflatex(run_pdflatex_list):
 
 
 # Function to convert PDFs to PNGs
-def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder):
+def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder, logger):
 
     global lock
 
