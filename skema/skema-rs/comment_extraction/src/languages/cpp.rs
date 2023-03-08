@@ -2,19 +2,19 @@ use nom::{
     branch::alt, 
     bytes::complete::{tag, take, take_until}, 
     multi::fold_many0, 
-    sequence::{delimited, tuple},
+    sequence::delimited,
     IResult
 };
 use nom_locate::LocatedSpan;
+use serde::{Deserialize, Serialize};
 
 /// Parse C/C++ code and output the comments along with their line numbers.  
 
 type Span<'a> = LocatedSpan<&'a str>;
 
- #[derive(Debug)]
-struct Comment {
-    line_number: u32,
-    contents: String,
+#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
+pub struct Comments {
+    pub comments: Vec<(u32, String)>
 }
 
 // find C and C++ style comments
@@ -37,16 +37,16 @@ fn parse_next(input: Span) -> IResult<Span, Span> {
 }
 
 // Return a vector of LocatedSpan objects with C and C++ style comments
-fn parse(s: Span) -> IResult<Span, Vec<Comment>> {
+fn parse(s: Span) -> IResult<Span, Vec<(u32, String)>> {
     fold_many0(
         alt((parse_comment, parse_next)), 
         Vec::new, 
-        | mut acc: Vec<Comment>, span | {
+        | mut acc: Vec<(u32, String)>, span | {
             if span.fragment().len() > 0 {
-                acc.push(Comment{
-                    line_number: span.location_line(), 
-                    contents: span.fragment().to_string()
-                });
+                acc.push((
+                    span.location_line(),
+                    span.fragment().to_string()
+                ));
             }
             else {}
             acc
@@ -56,19 +56,25 @@ fn parse(s: Span) -> IResult<Span, Vec<Comment>> {
 
 // Find the C and C++ style comments in the input string and report
 // them along with their line numbers
-fn process_string(s: &str) {
-    let span = LocatedSpan::new(s);
-    let(_, elements) = parse(span).unwrap();
-    for e in elements {
-        println!("{:?}", e);
+fn process_string(s: &str) -> Comments {
+    match parse(LocatedSpan::new(s)) {
+        Ok((_, vec)) => Comments{comments: vec},
+        Err(e) => { 
+            println!("Error: {e:?}");
+            Comments{comments: Vec::new()}
+        }
     }
 }
 
-// read a file as one big string and process it
-pub fn get_comments(file_path: &str) {
+// Find the C and C++ style comments in the input string and report
+// them along with their line numbers
+pub fn get_comments(file_path: &str) -> Comments {
     let string = std::fs::read_to_string(file_path);
     match string {
-        Ok(s) => process_string(&s), 
-        Err(e) => println!("Error: {e:?}")
+        Ok(s) => process_string(&s),
+        Err(e) => {
+            println!("Error: {e:?}");
+            Comments{comments: Vec::new()}
+        }
     }
 }
