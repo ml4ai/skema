@@ -39,7 +39,7 @@ fn main() {
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
         } else {
-            println!("{:?}", comments);
+            println!("{}", comments);
         }
     } else if extension == "py" {
         let comments = get_python_comments(input);
@@ -47,7 +47,7 @@ fn main() {
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
         } else {
-            println!("{:?}", comments);
+            println!("{}", comments);
         }
     } else if extension == "cpp" || extension == "c" {
         let comments = get_cpp_comments(input);
@@ -55,7 +55,7 @@ fn main() {
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
         } else {
-            println!("{:?}", comments);
+            println!("{}", comments);
         }
     } else {
         panic!(
