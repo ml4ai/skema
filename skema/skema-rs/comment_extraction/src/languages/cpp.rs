@@ -2,7 +2,7 @@ use nom::{
     branch::alt, 
     bytes::complete::{tag, take, take_until}, 
     multi::fold_many0, 
-    sequence::delimited, 
+    sequence::{delimited, tuple},
     IResult
 };
 use nom_locate::LocatedSpan;
@@ -10,6 +10,12 @@ use nom_locate::LocatedSpan;
 /// Parse C/C++ code and output the comments along with their line numbers.  
 
 type Span<'a> = LocatedSpan<&'a str>;
+
+ #[derive(Debug)]
+struct Comment {
+    line_number: u32,
+    contents: String,
+}
 
 // find C and C++ style comments
 fn parse_comment(input: Span) -> IResult<Span, Span> {
@@ -31,13 +37,16 @@ fn parse_next(input: Span) -> IResult<Span, Span> {
 }
 
 // Return a vector of LocatedSpan objects with C and C++ style comments
-fn parse(s: Span) -> IResult<Span, Vec<Span>> {
+fn parse(s: Span) -> IResult<Span, Vec<Comment>> {
     fold_many0(
         alt((parse_comment, parse_next)), 
         Vec::new, 
-        | mut acc: Vec<Span>, span | {
+        | mut acc: Vec<Comment>, span | {
             if span.fragment().len() > 0 {
-                acc.push(span);
+                acc.push(Comment{
+                    line_number: span.location_line(), 
+                    contents: span.fragment().to_string()
+                });
             }
             else {}
             acc
