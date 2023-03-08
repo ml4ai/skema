@@ -65,8 +65,8 @@ fn main() {
     // now we convert the following into a Expr to get converted into a petri net
     // first we have to get the parent node index to pass into the function
     let mut root_node = Vec::<NodeIndex>::new();
-    for node_index in graph.clone().node_indices() {
-        if graph.clone()[node_index].labels == ["Opo"] {
+    for node_index in trimmed_expressions_wiring[0].clone().node_indices() {
+        if trimmed_expressions_wiring[0].clone()[node_index].labels == ["Opo"] {
             root_node.push(node_index);
         }
     }
@@ -74,7 +74,7 @@ fn main() {
         panic!("More than one Opo!");
     }
 
-    let expr1 = tree_2_expr(trimmed_expressions_wiring[1], root_node[0]).unwrap();
+    let expr1 = tree_2_expr(trimmed_expressions_wiring[0].clone(), root_node[0]).unwrap();
 
     println!("{:?}", expr1);
 
@@ -120,8 +120,9 @@ fn tree_2_expr(
     mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
 ) -> Result<Expr, MgError> {
-    // initialize intermediate struct, need to figure out
+    // initialize struct properties
     let mut op_vec = Vec::<Operator>::new();
+    op_vec.push(Operator::Other("".to_string())); // empty first element to initialize
     let mut args_vec = Vec::<Expr>::new();
     let mut expr_name = String::from("");
 
@@ -129,7 +130,7 @@ fn tree_2_expr(
         // starting node in expression tree, traverse down one node and then start parse
         for node in graph.neighbors_directed(root_node, Outgoing) {
             if graph.clone()[node].labels == ["Primitive"]
-                && !graph.clone()[node].properties["name"].to_string() == "'unpack'".to_string()
+                && !(graph.clone()[node].properties["name"].to_string() == "'unpack'".to_string())
             {
                 // make an operator type based on operation
                 if graph.clone()[node].properties["name"].to_string() == "'+'".to_string() {
@@ -162,6 +163,8 @@ fn tree_2_expr(
                                 panic!("Unsupported edge case where 'USub' preceeds something besides an 'Opi'!");
                             }
                         }
+                        op_vec[0] = Operator::Subtract;
+                    // add this as a new unary operator to the expression
                     } else if graph.clone()[node1].labels == ["Primitive"] {
                         // this is the case where there are more operators and will likely require a recursive call.
                         let expr1 = tree_2_expr(graph.clone(), node1).unwrap();
@@ -179,7 +182,7 @@ fn tree_2_expr(
         }
     } else {
         if graph.clone()[root_node].labels == ["Primitive"]
-            && !graph.clone()[root_node].properties["name"].to_string() == "'unpack'".to_string()
+            && !(graph.clone()[root_node].properties["name"].to_string() == "'unpack'".to_string())
         {
             // make an operator type based on operation
             if graph.clone()[root_node].properties["name"].to_string() == "'+'".to_string() {
@@ -210,8 +213,11 @@ fn tree_2_expr(
                             panic!("Unsupported edge case where 'USub' preceeds something besides an 'Opi'!");
                         }
                     }
+                    op_vec[0] = Operator::Subtract; // add this as a new unary operator to the expression
                 } else if graph.clone()[node1].labels == ["Primitive"] {
                     // this is the case where there are more operators and will likely require a recursive call.
+                    let expr1 = tree_2_expr(graph.clone(), node1).unwrap();
+                    args_vec.push(expr1);
                 } else if graph.clone()[node1].labels == ["Opi"] {
                     // nice and straight to an argument
                     args_vec.push(Expr::Atom(Atom::Identifier(
