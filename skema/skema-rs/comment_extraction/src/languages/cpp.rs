@@ -36,7 +36,7 @@ fn parse_next(input: Span) -> IResult<Span, Span> {
     }
 }
 
-// Return a vector of LocatedSpan objects with C and C++ style comments
+// Return a vector of comments and their line numbes
 fn parse(s: Span) -> IResult<Span, Vec<(u32, String)>> {
     fold_many0(
         alt((parse_comment, parse_next)), 
@@ -54,8 +54,7 @@ fn parse(s: Span) -> IResult<Span, Vec<(u32, String)>> {
     )(s)
 }
 
-// Find the C and C++ style comments in the input string and report
-// them along with their line numbers
+// parse C and C++ style comments from string input
 fn process_string(s: &str) -> Comments {
     match parse(LocatedSpan::new(s)) {
         Ok((_, vec)) => Comments{comments: vec},
@@ -66,8 +65,7 @@ fn process_string(s: &str) -> Comments {
     }
 }
 
-// Find the C and C++ style comments in the input string and report
-// them along with their line numbers
+// Parse C and C++ style comments from file input
 pub fn get_comments(file_path: &str) -> Comments {
     let string = std::fs::read_to_string(file_path);
     match string {
