@@ -57,7 +57,6 @@ fn process_string(s: &str) {
 
 // read a file as one big string and process it
 pub fn get_comments(file_path: &str) {
-    println!("Processing file {:?}", file_path);
     let string = std::fs::read_to_string(file_path);
     match string {
         Ok(s) => process_string(&s), 
