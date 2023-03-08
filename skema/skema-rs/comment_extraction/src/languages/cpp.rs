@@ -19,10 +19,10 @@ fn parse_comment(input: Span) -> IResult<Span, Span> {
     ))(input)
 }
 
-// Move to next input element, bypassing quoted text if found
+// Move to next input element, bypassing quoted elements if found
 fn parse_next(input: Span) -> IResult<Span, Span> {
     match alt((
-        delimited(tag("\""), take_until("\""), tag("\"")), // quoted text
+        delimited(tag("\""), take_until("\""), tag("\"")), // quoted
         take(1usize)  // Move to next element 
     ))(input) {
         Ok((i, _)) => Ok((i, "".into())), 
