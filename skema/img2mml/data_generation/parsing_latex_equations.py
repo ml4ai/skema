@@ -127,6 +127,7 @@ def main(year):
                     greek_letters,
                     dir_path,
                     tex_folder,
+                    logger
                 ]
             )
 
@@ -148,6 +149,7 @@ def parse_equation(args_list):
         greek_letters,
         dir_path,
         tex_folder,
+        logger,
     ) = args_list
 
     # Tex Folder path
