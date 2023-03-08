@@ -83,11 +83,14 @@ def main(year):
         os.mkdir(results_dir)
 
     # Setting up Logger - To get log files
-    logfile_dst = os.path.join(destination, year)
+    logfile_dst = os.path.join(destination, f"{year}/logs")
+    if not os.path.exists(logfile_dst):
+        os.mkdir(logfile_dst)
+
     log_format = "%(levelname)s:%(message)s"
     logging.basicConfig(
         filename=os.path.join(logfile_dst, "unknown_tex_files.log"),
-        level=logging.DEBUG,
+        level=logging.INFO,
         format=log_format,
         filemode="w",
     )

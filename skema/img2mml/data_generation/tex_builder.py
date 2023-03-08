@@ -30,7 +30,7 @@ num_cpus = config["num_cpus"]
 def main(year):
 
     for month_dir in directories:
-        month_dir = str(month_dir)
+        month_dir = str(month_dir).strip()
         base_dir = os.path.join(destination, f"{year}/{month_dir}")
 
         # Latex_equations directory
