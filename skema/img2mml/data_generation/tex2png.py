@@ -50,6 +50,7 @@ def main(year):
     )
 
     for month_dir in directories:
+        print(month_dir.strip())
         month_dir = str(month_dir).strip()
         path = os.path.join(destination, f"{year}/{month_dir}")
         latex_images = os.path.join(path, "latex_images")
