@@ -13,7 +13,11 @@
 
 ### Requirements
 
-For requirements, please check out requirements.txt file. After installing _requirements.txt_, a few more packages will be required to run mathjax-server that can be installed using following commnads.
+```
+python3 -m pip install -r requirements.txt
+```
+
+After installing _requirements.txt_, a few more packages will be required to run mathjax-server that can be installed using following commnads.
 
 ```
 npm install express
@@ -50,7 +54,7 @@ node temml_service.js
 ```
 
 ```
-python latex_mathml.py
+python latex2mathml.py
 ```
 
 4) Simplify the MathML equations by removing unnecessary details or tokens. Those simplified MathML equations will then be used to render XML ElementTrees using pretty print.
@@ -58,5 +62,5 @@ python latex_mathml.py
 python mathml_simplification.py
 ```
 ```
-python etreeParser.py
+python etree_parser.py
 ```
