@@ -26,6 +26,7 @@ with open(args.config, "r") as cfg:
 # blank images if any
 blank_images = list()
 
+
 def crop_image(image, reject=False):
     # converting to np array
     image_arr = np.asarray(image, dtype=np.uint8)
@@ -35,12 +36,11 @@ def crop_image(image, reject=False):
 
     # see if image is not blank
     # if both arrays of indices are null: blank image
-    # if either is not null: it is only line
-    #                       either horizontal or vertical
-    # In any case, thse image will be treated as garbage
-    # and will be discarded.
-    if len(indices[0]) == 0 or len(indices[1]) == 0:
-        reject=True
+    # if either is not null: it is only line either horizontal or vertical
+    # In any case, thse image will be treated as garbage and will be discarded.
+    
+    if (len(indices[0]) == 0) or (len(indices[1]) == 0):
+        reject = True
 
     else:
         # get the boundaries
@@ -140,7 +140,6 @@ def preprocess_images(image):
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
 
-
     IMAGE = Image.open(
         f"{config['data_path']}/{config['dataset_type']}/images/{image}"
     ).convert("L")
@@ -190,11 +189,8 @@ def main():
     with Pool(config["num_cpus"]) as pool:
         result = pool.map(preprocess_images, images)
 
-    json.dump(
-            blank_images,
-            open("logs/blank_images.lst", "w"),
-            indent=4
-        )
+    json.dump(blank_images, open("logs/blank_images.lst", "w"), indent=4)
+
 
 if __name__ == "__main__":
     main()
