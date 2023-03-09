@@ -130,9 +130,9 @@ def preprocess_images(image):
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
 
-    p = "/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/training_data/im2mml-100K/image_tensors"+image.split('.')[0]+".txt"
+    p = os.listdir("/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/training_data/im2mml-100K/image_tensors")
 
-    if not os.path.exists(p):
+    if image.split('.')[0]+".txt" not in p:
         print(image)
         IMAGE = Image.open(
             f"{config['data_path']}/{config['dataset_type']}/images/{image}"
