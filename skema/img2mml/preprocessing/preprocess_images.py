@@ -24,26 +24,35 @@ with open(args.config, "r") as cfg:
 
 # opening log file to keep track of
 # blank images if any
-image_log = open("logs/rejected_images.txt", "w")
-error_list = []
+blank_images = list()
 
-def crop_image(image):
+def crop_image(image, reject=False):
     # converting to np array
     image_arr = np.asarray(image, dtype=np.uint8)
 
     # find where the data lies
     indices = np.where(image_arr != 255)
 
-    # get the boundaries
-    x_min = np.min(indices[1])
-    x_max = np.max(indices[1])
-    y_min = np.min(indices[0])
-    y_max = np.max(indices[0])
+    # see if image is not blank
+    # if both arrays of indices are null: blank image
+    # if either is not null: it is only line
+    #                       either horizontal or vertical
+    # In any case, thse image will be treated as garbage
+    # and will be discarded.
+    if len(indices[0]) == 0 or len(indices[1]) == 0:
+        reject=True
 
-    # crop the image
-    image = image.crop((x_min, y_min, x_max, y_max))
+    else:
+        # get the boundaries
+        x_min = np.min(indices[1])
+        x_max = np.max(indices[1])
+        y_min = np.min(indices[0])
+        y_max = np.max(indices[0])
 
-    return image
+        # crop the image
+        image = image.crop((x_min, y_min, x_max, y_max))
+
+    return image, reject
 
 
 def resize_image(image, resize_factor):
@@ -131,51 +140,42 @@ def preprocess_images(image):
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
 
-    try:
-        IMAGE = Image.open(
-            f"{config['data_path']}/{config['dataset_type']}/images/{image}"
-        ).convert("L")
 
-        # checking if image is not blank
-        # getextrema() --> (0,0) == all black
-        #              --> (1,1) == all white
-        if not sum(IMAGE.getextrema()) in (0,2):
+    IMAGE = Image.open(
+        f"{config['data_path']}/{config['dataset_type']}/images/{image}"
+    ).convert("L")
 
-            # checking the size of the image
-            w, h = IMAGE.size
-            if h >= config["max_input_hgt"]:
-                IMAGE = downsampling(IMAGE)
+    # checking the size of the image
+    w, h = IMAGE.size
+    if h >= config["max_input_hgt"]:
+        IMAGE = downsampling(IMAGE)
 
-            # crop the image
-            IMAGE = crop_image(IMAGE)
+    # crop the image
+    IMAGE, reject = crop_image(IMAGE)
 
-            # bucketing
-            resize_factor = bucket(IMAGE)
+    if not reject:
+        # bucketing
+        resize_factor = bucket(IMAGE)
 
-            # resize
-            IMAGE = resize_image(IMAGE, resize_factor)
+        # resize
+        IMAGE = resize_image(IMAGE, resize_factor)
 
-            # padding
-            IMAGE = pad_image(IMAGE)
+        # padding
+        IMAGE = pad_image(IMAGE)
 
-            # convert to tensor
-            convert = transforms.ToTensor()
-            IMAGE = convert(IMAGE)
+        # convert to tensor
+        convert = transforms.ToTensor()
+        IMAGE = convert(IMAGE)
 
-            # saving the image
-            torch.save(
-                IMAGE,
-                f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
-            )
-
-        else:
-            pass
-            # image_log.write(
-            #     f"{config['data_path']}/{config['dataset_type']}/images/{image} \
-            #     is a blank image and will be dropped."
-            # )
-    except:
-        error_list.append(image)
+        # saving the image
+        torch.save(
+            IMAGE,
+            f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
+        )
+    else:
+        # image is blank and rejected
+        # update the index
+        blank_list.append(image)
 
 
 def main():
@@ -190,6 +190,11 @@ def main():
     with Pool(config["num_cpus"]) as pool:
         result = pool.map(preprocess_images, images)
 
-    print(error_list)
+    json.dump(
+            blank_images,
+            open("logs/blank_images.lst", "w"),
+            indent=4
+        )
+
 if __name__ == "__main__":
     main()
