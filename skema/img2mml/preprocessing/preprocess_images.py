@@ -130,8 +130,7 @@ def preprocess_images(image):
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
 
-    p = os.listdir("/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/training_data/im2mml-100K/image_tensors")
-
+    error_list = []
     try:
         IMAGE = Image.open(
             f"{config['data_path']}/{config['dataset_type']}/images/{image}"
@@ -175,8 +174,8 @@ def preprocess_images(image):
                 is a blank image and will be dropped."
             )
     except:
-        print(image.split('.')[0]+".txt")
-        
+        error_list.append(image)
+    print(error_list)
 
 def main():
 
