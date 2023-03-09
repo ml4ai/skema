@@ -32,7 +32,7 @@ cd skema/img2mml; mkdir training_data
 
 #### To preprocess images:
 ```
-python preprocessing/preprocess_images.py --config configs/ourmml_xfmer_config
+python preprocessing/preprocess_images.py --config configs/xfmer_config.json
 ```
 
 #### To preprocess mathml:
@@ -42,7 +42,7 @@ python preprocessing/preprocess_mml.py
 
 #### To train the model:
 ```
-python training.py configs/ourmml_xfmer_config.json
+python training.py configs/xfmer_config.json
 ```
 
 #### To calculate Torchtext BLEU score
