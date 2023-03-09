@@ -130,47 +130,51 @@ def preprocess_images(image):
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
 
-    IMAGE = Image.open(
-        f"{config['data_path']}/{config['dataset_type']}/images/{image}"
-    ).convert("L")
+    p = "/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/training_data/im2mml-100K/image_tensors"+image.split('.')[0]+".txt"
 
-    # checking if image is not blank
-    # getextrema() --> (0,0) == all black
-    #              --> (1,1) == all white
-    if not sum(IMAGE.getextrema()) in (0,2):
+    if not os.path.exists(p):
+        print(image)
+        IMAGE = Image.open(
+            f"{config['data_path']}/{config['dataset_type']}/images/{image}"
+        ).convert("L")
 
-        # checking the size of the image
-        w, h = IMAGE.size
-        if h >= config["max_input_hgt"]:
-            IMAGE = downsampling(IMAGE)
+        # checking if image is not blank
+        # getextrema() --> (0,0) == all black
+        #              --> (1,1) == all white
+        if not sum(IMAGE.getextrema()) in (0,2):
 
-        # crop the image
-        IMAGE = crop_image(IMAGE)
+            # checking the size of the image
+            w, h = IMAGE.size
+            if h >= config["max_input_hgt"]:
+                IMAGE = downsampling(IMAGE)
 
-        # bucketing
-        resize_factor = bucket(IMAGE)
+            # crop the image
+            IMAGE = crop_image(IMAGE)
 
-        # resize
-        IMAGE = resize_image(IMAGE, resize_factor)
+            # bucketing
+            resize_factor = bucket(IMAGE)
 
-        # padding
-        IMAGE = pad_image(IMAGE)
+            # resize
+            IMAGE = resize_image(IMAGE, resize_factor)
 
-        # convert to tensor
-        convert = transforms.ToTensor()
-        IMAGE = convert(IMAGE)
+            # padding
+            IMAGE = pad_image(IMAGE)
 
-        # saving the image
-        torch.save(
-            IMAGE,
-            f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
-        )
+            # convert to tensor
+            convert = transforms.ToTensor()
+            IMAGE = convert(IMAGE)
 
-    else:
-        image_log.write(
-            f"{config['data_path']}/{config['dataset_type']}/images/{image} \
-            is a blank image and will be dropped."
-        )
+            # saving the image
+            torch.save(
+                IMAGE,
+                f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
+            )
+
+        else:
+            image_log.write(
+                f"{config['data_path']}/{config['dataset_type']}/images/{image} \
+                is a blank image and will be dropped."
+            )
 
 
 def main():
