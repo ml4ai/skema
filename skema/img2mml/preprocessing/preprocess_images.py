@@ -25,6 +25,7 @@ with open(args.config, "r") as cfg:
 # opening log file to keep track of
 # blank images if any
 image_log = open("logs/rejected_images.txt", "w")
+error_list = []
 
 def crop_image(image):
     # converting to np array
@@ -130,7 +131,6 @@ def preprocess_images(image):
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
 
-    error_list = []
     try:
         IMAGE = Image.open(
             f"{config['data_path']}/{config['dataset_type']}/images/{image}"
@@ -169,13 +169,14 @@ def preprocess_images(image):
             )
 
         else:
-            image_log.write(
-                f"{config['data_path']}/{config['dataset_type']}/images/{image} \
-                is a blank image and will be dropped."
-            )
+            pass
+            # image_log.write(
+            #     f"{config['data_path']}/{config['dataset_type']}/images/{image} \
+            #     is a blank image and will be dropped."
+            # )
     except:
         error_list.append(image)
-    print(error_list)
+
 
 def main():
 
@@ -189,6 +190,6 @@ def main():
     with Pool(config["num_cpus"]) as pool:
         result = pool.map(preprocess_images, images)
 
-
+    print(error_list)
 if __name__ == "__main__":
     main()
