@@ -132,8 +132,7 @@ def preprocess_images(image):
 
     p = os.listdir("/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/training_data/im2mml-100K/image_tensors")
 
-    if image.split('.')[0]+".txt" not in p:
-        print(image.split('.')[0]+".txt")
+    try:
         IMAGE = Image.open(
             f"{config['data_path']}/{config['dataset_type']}/images/{image}"
         ).convert("L")
@@ -175,7 +174,9 @@ def preprocess_images(image):
                 f"{config['data_path']}/{config['dataset_type']}/images/{image} \
                 is a blank image and will be dropped."
             )
-
+    except:
+        print(image.split('.')[0]+".txt")
+        
 
 def main():
 
