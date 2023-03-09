@@ -38,7 +38,7 @@ def crop_image(image, reject=False):
     # if both arrays of indices are null: blank image
     # if either is not null: it is only line either horizontal or vertical
     # In any case, thse image will be treated as garbage and will be discarded.
-    
+
     if (len(indices[0]) == 0) or (len(indices[1]) == 0):
         reject = True
 
@@ -61,7 +61,7 @@ def resize_image(image, resize_factor):
             int(image.size[0] * resize_factor),
             int(image.size[1] * resize_factor),
         ),
-        Image.LANCZOS,
+        Image.Resampling.LANCZOS,
     )
     return image
 
@@ -124,7 +124,7 @@ def downsampling(image):
             int(image.size[0] * resize_factor),
             int(image.size[1] * resize_factor),
         ),
-        Image.LANCZOS,
+        Image.Resampling.LANCZOS,
     )
     return image
 
