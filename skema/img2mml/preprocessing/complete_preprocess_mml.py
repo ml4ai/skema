@@ -488,7 +488,7 @@ if __name__ == "__main__":
     for img in org_images:
         img_idx = img.split(".")[0]
         if (img_idx + ".txt") not in preprocessed_images:
-            eqn = org_mml[img_idx]
+            eqn = org_mml[int(img_idx)]
             if len(eqn) > 2:
                 mml = simplification(eqn)
 
