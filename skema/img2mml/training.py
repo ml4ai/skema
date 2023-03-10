@@ -33,7 +33,7 @@ from skema.img2mml.src.test import evaluate
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "--config", help="configuration file for paths and hyperparameters",
-    default="config/xfmer_config.json"
+    default="configs/xfmer_config.json"
 )
 args = parser.parse_args()
 
@@ -326,6 +326,7 @@ def train_model(rank=None,):
                     vocab,
                     optimizer,
                     CLIP,
+                    device,
                     ddp=ddp,
                     rank=rank,
                 )
@@ -338,6 +339,7 @@ def train_model(rank=None,):
                     vocab,
                     batch_size,
                     val_dataloader,
+                    device,
                     ddp=ddp,
                     rank=rank,
                     g2p=g2p,
