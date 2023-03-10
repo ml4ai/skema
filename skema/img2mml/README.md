@@ -18,13 +18,13 @@ conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit
 
 To install Torchtext:
 ```
-conda install -c pytorch torchtext
+pip install torchtext==0.6.0
 ```
 ## Generating raw dataset
 Please check out the `data_generation/README.md` file.
 
 ## Creating dataset for training
-We will sample the dataset from the raw dataset that we have generated in above step using `data_generation/
+We will sample the dataset from the raw dataset that we have generated in above step.
 
 ## Training
 

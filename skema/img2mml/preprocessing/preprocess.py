@@ -8,7 +8,6 @@ import os
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 from collections import Counter
-
 # from torchtext.legacy.vocab import Vocab
 from torchtext.vocab import Vocab
 from torch.nn.utils.rnn import pad_sequence
@@ -88,22 +87,22 @@ def preprocess_mml(config):
     )
     IMGTnsrPath = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     mml_txt = open(MMLPath).read().split("\n")[:-1]
-    # image_num = range(0,len(mml_txt))
-    # raw_mml_data = {'IMG': [torch.load(f'{IMGTnsrPath}/{num}.txt') for num in image_num],
-    #                 'EQUATION': [('<sos> '+ mml + ' <eos>') for mml in mml_txt]}
+    image_num = range(0,len(mml_txt))
+    raw_mml_data = {'IMG': [torch.load(f'{IMGTnsrPath}/{num}.txt') for num in image_num],
+                    'EQUATION': [('<sos> '+ mml + ' <eos>') for mml in mml_txt]}
 
     # adding <sos> and <eos> tokens then creating a dataframe
-    equation_array = list()
-    image_array = list()
-    for num in range(len(mml_txt)):
-        if "REJECTED MATHML" not in mml_txt[num]:
-            # appending mmls
-            mml = "<sos> " + mml_txt[num] + " <eos>"
-            equation_array.append(mml)
-            # appending image tensors
-            image_array.append(torch.load(f"{IMGTnsrPath}/{num}.txt"))
-
-    raw_mml_data = {"IMG": image_array, "EQUATION": equation_array}
+    # equation_array = list()
+    # image_array = list()
+    # for num in range(len(mml_txt)):
+    #     if "REJECTED MATHML" not in mml_txt[num]:
+    #         # appending mmls
+    #         mml = "<sos> " + mml_txt[num] + " <eos>"
+    #         equation_array.append(mml)
+    #         # appending image tensors
+    #         image_array.append(torch.load(f"{IMGTnsrPath}/{num}.txt"))
+    #
+    # raw_mml_data = {"IMG": image_array, "EQUATION": equation_array}
 
     df = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
 
