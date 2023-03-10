@@ -480,18 +480,17 @@ if __name__ == "__main__":
 
     # get the rejected images
     data_path = f"{config['data_path']}/{config['dataset_type']}"
-    org_images = os.listdir(f"{data_path}/images")
-    preprocessed_images = os.listdir(f"{data_path}/image_tensors")
     org_mml = open(f"{data_path}/original_mml.lst", "r").readlines()
     modified_mml_file = open(f"{data_path}/mml.lst", "w")
 
-    for img in org_images:
-        img_idx = img.split(".")[0]
-        if (img_idx + ".txt") in preprocessed_images:
-            eqn = org_mml[int(img_idx)]
+    blank_images = open("logs/blank_images").readlines()
+    idx_to_be_ignored = [int(i.split(".")[0]) for i in blank_images]
+
+    for eqn_idx in range(len(org_mml)):
+        if eqn_idx not in idx_to_be_ignored:
+            eqn = org_mml[eqn_idx]
             if len(eqn) > 2:
                 mml = simplification(eqn)
-
                 # writing
                 if "\n" not in mml:
                     modified_mml_file.write(mml + "\n")
