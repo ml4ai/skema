@@ -20,17 +20,21 @@ To install Torchtext:
 ```
 conda install -c pytorch torchtext
 ```
+## Generating raw dataset
+Please check out the `data_generation/README.md` file.
+
+## Creating dataset for training
+We will sample the dataset from the raw dataset that we have generated in above step using `data_generation/
 
 ## Training
 
-Before starting the training, we need to get the dataset and put it under _data_ folder.
-Please ensure that current working directory is `skema/img2mml`
+Before starting the training, please ensure that the dataset is at _skema/skema/img2mml/training_data_ folder. The _training_data_ folder will have a folder named after the dataset we are using for example "OMML-100K" which consists of "images" folder and "original_mml.lst" file.
 
 ```
 cd skema/img2mml; mkdir training_data
 ```
 
-To prepare the dataset for training, we will first preprocess it. The first step will be the image preprocessing where all the empty and corrupted images will be removed. The second step will be preprocessing the target MathML equations where again all the equations corresponding to rejected images will be removed from the dataset and all equations which have less than 2 tokens will be rejected as well since a MathML equations can't be defined in just 2 tokens. An example can be seen as _<math> </math>_ which doesn't represent anything. 
+To prepare the dataset for training, we will first preprocess it. The first step will be the image preprocessing where all the empty and corrupted images will be removed. The second step will be preprocessing the target MathML equations where again all the equations corresponding to rejected images will be removed from the dataset and all equations which have less than 2 tokens will be rejected as well since a MathML equations can't be defined in just 2 tokens. An example can be seen as `<math> </math>` which doesn't represent anything.
 
 #### To preprocess images:
 ```
