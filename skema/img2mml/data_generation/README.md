@@ -17,7 +17,7 @@
 python3 -m pip install -r requirements.txt
 ```
 
-After installing _requirements.txt_, a few more packages will be required to run mathjax-server that can be installed using following commnads.
+After installing `requirements.txt`, a few more packages will be required to run mathjax-server that can be installed using following commnads.
 
 ```
 npm install express
@@ -25,13 +25,13 @@ npm install express
 ```
 npm install mathjax-node
 ```
-Also, for TeX to PDF to PNG conversion, _pdflatex_ and _ImageMagick_ has to be installed on the system.
+Also, for TeX to PDF to PNG conversion, `pdflatex` and `ImageMagick` has to be installed on the system.
 
 ### Scripts
 
 This repository is for generating the dataset from raw arXiV latex source. It has scripts that will do the following jobs:
 
-1) parse the mathematical equations from the raw arXiV latex source paper(s). All symbols, greek letters are provided in the _Latex_symbols.xlsx_ file.
+1) parse the mathematical equations from the raw arXiV latex source paper(s). All symbols, greek letters are provided in the `latex_symbols.xlsx` file.
 ```
 python parsing_latex_equations.py
 ```

@@ -28,7 +28,7 @@ We will sample the dataset from the raw dataset that we have generated in above 
 
 ## Training
 
-Before starting the training, please ensure that the dataset is at _skema/skema/img2mml/training_data_ folder. The _training_data_ folder will have a folder named after the dataset we are using for example "OMML-100K" which consists of "images" folder and "original_mml.lst" file.
+Before starting the training, please ensure that the dataset is at `skema/skema/img2mml/training_data` folder. The `training_data` folder will have a folder named after the dataset we are using for example "OMML-100K" which consists of "images" folder and "original_mml.lst" file.
 
 ```
 cd skema/img2mml; mkdir training_data
@@ -76,7 +76,7 @@ The curl command below should do the trick.
 curl -L https://kraken.sista.arizona.edu/skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best.pt > trained_models/cnn_xfmer_OMML-90K_best.pt
 ```
 
-If model is trained on different server, then _vocab.txt_ file need to transferred here.
+If model is trained on different server, then `vocab.txt` file need to transferred here.
 ```
 curl -L https://kraken.sista.arizona.edu/skema/img2mml/vocab.txt > vocab.txt
 ```
