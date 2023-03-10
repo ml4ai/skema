@@ -86,7 +86,7 @@ def preprocess_mml(config):
         f"{config['data_path']}/{config['dataset_type']}/mml.lst"
     )
     IMGTnsrPath = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
-    mml_txt = open(MMLPath).read().split("\n")[:-1]
+    mml_txt = open(MMLPath).read().split("\n")[:-1][:100]
     image_num = range(0,len(mml_txt))
     raw_mml_data = {'IMG': [torch.load(f'{IMGTnsrPath}/{num}.txt') for num in image_num],
                     'EQUATION': [('<sos> '+ mml + ' <eos>') for mml in mml_txt]}

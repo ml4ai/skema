@@ -11,6 +11,7 @@ def train(
     vocab,
     optimizer,
     clip,
+    device,
     ddp=False,
     rank=None,
 ):
@@ -20,20 +21,16 @@ def train(
 
     epoch_loss = 0
 
-    # for i, (img, mml) in enumerate(train_dataloader):
     for i, (img, mml) in enumerate(train_dataloader):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
-        # print("mml shape: ", mml.shape)
-        # print("img shape: ", img.shape)
-
         batch_size = mml.shape[0]
         if ddp:
             mml = mml.to(f"cuda:{rank}", dtype=torch.long)
             img = img.to(f"cuda:{rank}")
         else:
-            mml = mml.to("cuda", dtype=torch.long)
-            img = img.to("cuda")
+            mml = mml.to(device, dtype=torch.long)
+            img = img.to(device)
 
         # setting gradients to zero
         optimizer.zero_grad()

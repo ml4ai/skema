@@ -11,6 +11,7 @@ def evaluate(
     vocab,
     batch_size,
     test_dataloader,
+    device,
     beam_params=None,
     is_test=False,
     ddp=False,
@@ -35,8 +36,8 @@ def evaluate(
                 mml = mml.to(f"cuda:{rank}", dtype=torch.long)
                 img = img.to(f"cuda:{rank}")
             else:
-                mml = mml.to("cuda", dtype=torch.long)
-                img = img.to("cuda")
+                mml = mml.to(device, dtype=torch.long)
+                img = img.to(device)
 
             """
             we will pass "mml" just to provide initial <sos> token.

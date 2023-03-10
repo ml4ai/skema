@@ -134,7 +134,7 @@ def preprocess_images(image):
     :params img_batch: batch of images
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
-
+    
     IMAGE = Image.open(
         f"{config['data_path']}/{config['dataset_type']}/images/{image}"
     ).convert("L")
