@@ -22,7 +22,6 @@ args = parser.parse_args()
 with open(args.config, "r") as cfg:
     config = json.load(cfg)
 
-
 def crop_image(image, reject=False):
     # converting to np array
     image_arr = np.asarray(image, dtype=np.uint8)
@@ -168,6 +167,10 @@ def preprocess_images(image):
             IMAGE,
             f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
         )
+        return None
+
+    else:
+        return image
 
 
 def main():
@@ -182,8 +185,16 @@ def main():
     with Pool(config["num_cpus"]) as pool:
         result = pool.map(preprocess_images, images)
 
-    json.dump(blank_images, open("logs/blank_images.lst", "w"), indent=4)
+    blank_images = [i for i in result if i != None]
 
+    with open("logs/blank_images", "w") as out:
+        out.write("\n".join(str(item) for item in blank_images))
+
+    # renaming the final image_tensors to make sequential
+    tnsrs = sorted([int(i.split(".")[0]) for i in os.listdir(f"{data_path}/image_tensors")])
+    os.chdir(f"{data_path}/image_tensors")
+    for t in range(len(tnsrs)):
+        os.rename(f"{tnsrs[t]}.txt", f"{t}.txt")
 
 if __name__ == "__main__":
     main()
