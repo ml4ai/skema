@@ -84,7 +84,7 @@ def preprocess_mml(config):
 
     # reading raw text files
     MMLPath = (
-        f"{config['data_path']}/{config['dataset_type']}/{config['mml_path']}"
+        f"{config['data_path']}/{config['dataset_type']}/{config['modified_mml_path']}"
     )
     IMGTnsrPath = f"{config['data_path']}/{config['dataset_type']}/{config['image_path']}"
     mml_txt = open(MMLPath).read().split("\n")[:-1]
