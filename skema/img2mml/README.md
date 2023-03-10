@@ -30,6 +30,8 @@ Please ensure that current working directory is `skema/img2mml`
 cd skema/img2mml; mkdir training_data
 ```
 
+To prepare the dataset for training, we will first preprocess it. The first step will be the image preprocessing where all the empty and corrupted images will be removed. The second step will be preprocessing the target MathML equations where again all the equations corresponding to rejected images will be removed from the dataset and all equations which have less than 2 tokens will be rejected as well since a MathML equations can't be defined in just 2 tokens. An example can be seen as _<math> </math>_ which doesn't represent anything. 
+
 #### To preprocess images:
 ```
 python preprocessing/preprocess_images.py --config configs/xfmer_config.json

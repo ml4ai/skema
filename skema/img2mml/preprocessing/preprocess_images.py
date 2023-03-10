@@ -14,17 +14,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--config",
     help="configuration file for paths and hyperparameters",
-    default="configs/ourmml_xfmer_config.json",
+    default="configs/xfmer_config.json",
 )
 
 args = parser.parse_args()
 
 with open(args.config, "r") as cfg:
     config = json.load(cfg)
-
-# opening log file to keep track of
-# blank images if any
-blank_images = list()
 
 
 def crop_image(image, reject=False):
@@ -144,6 +140,7 @@ def preprocess_images(image):
         f"{config['data_path']}/{config['dataset_type']}/images/{image}"
     ).convert("L")
 
+
     # checking the size of the image
     w, h = IMAGE.size
     if h >= config["max_input_hgt"]:
@@ -171,10 +168,6 @@ def preprocess_images(image):
             IMAGE,
             f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
         )
-    else:
-        # image is blank and rejected
-        # update the index
-        blank_list.append(image)
 
 
 def main():
