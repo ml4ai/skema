@@ -424,6 +424,7 @@ def train_model(rank=None,):
         vocab,
         batch_size,
         test_dataloader,
+        device
         beam_params,
         is_test=True,
         ddp=ddp,
