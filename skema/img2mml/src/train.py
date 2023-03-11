@@ -25,12 +25,12 @@ def train(
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
         batch_size = mml.shape[0]
-        if ddp:
-            mml = mml.to(f"cuda:{rank}", dtype=torch.long)
-            img = img.to(f"cuda:{rank}")
-        else:
-            mml = mml.to(device, dtype=torch.long)
-            img = img.to(device)
+        # if ddp:
+        #     mml = mml.to(f"cuda:{rank}", dtype=torch.long)
+        #     img = img.to(f"cuda:{rank}")
+        # else:
+        mml = mml.to(device, dtype=torch.long)
+        img = img.to(device)
 
         # setting gradients to zero
         optimizer.zero_grad()

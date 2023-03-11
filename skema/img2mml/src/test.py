@@ -32,12 +32,12 @@ def evaluate(
 
         for i, (img, mml) in enumerate(test_dataloader):
             batch_size = mml.shape[0]
-            if ddp:
-                mml = mml.to(f"cuda:{rank}", dtype=torch.long)
-                img = img.to(f"cuda:{rank}")
-            else:
-                mml = mml.to(device, dtype=torch.long)
-                img = img.to(device)
+            # if ddp:
+            #     mml = mml.to(f"cuda:{rank}", dtype=torch.long)
+            #     img = img.to(f"cuda:{rank}")
+            # else:
+            mml = mml.to(device, dtype=torch.long)
+            img = img.to(device)
 
             """
             we will pass "mml" just to provide initial <sos> token.

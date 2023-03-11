@@ -239,6 +239,7 @@ def train_model(rank=None,):
         dist.init_process_group("gloo", rank=rank, world_size=world_size)
         # add rank to config
         config["rank"] = rank
+        device = f"cuda:{rank}"
         (
             train_dataloader,
             test_dataloader,
@@ -399,38 +400,38 @@ def train_model(rank=None,):
         )
 
     # testing
+    # if (not ddp) or (ddp and rank==0):
+    if ddp:
+        dist.barrier()
+
+    print(
+        "loading final saved model: ",
+        f"trained_models/{model_type}_{dataset_type}_best.pt",
+    )
+    model.load_state_dict(
+        torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
+    )
+
+    epoch = "test_0"
+    if config["beam_search"]:
+        beam_params = [beam_k, alpha, min_length_bean_search_normalization]
+    else:
+        beam_params = None
+
+    test_loss = evaluate(
+        model,
+        model_type,
+        vocab,
+        batch_size,
+        test_dataloader,
+        beam_params,
+        is_test=True,
+        ddp=ddp,
+        rank=rank,
+        g2p=g2p,
+    )
+
     if (not ddp) or (ddp and rank==0):
-        if ddp:
-            dist.barrier()
-
-        print(
-            "loading final saved model: ",
-            f"trained_models/{model_type}_{dataset_type}_best.pt",
-        )
-        model.load_state_dict(
-            torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
-        )
-
-        epoch = "test_0"
-        if config["beam_search"]:
-            beam_params = [beam_k, alpha, min_length_bean_search_normalization]
-        else:
-            beam_params = None
-
-        test_loss = evaluate(
-            model,
-            model_type,
-            vocab,
-            batch_size,
-            test_dataloader,
-            beam_params,
-            is_test=True,
-            ddp=ddp,
-            rank=rank,
-            g2p=g2p,
-        )
-
-        # if (not ddp) or (ddp and rank==0):
         print(
             f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
         )
@@ -438,11 +439,11 @@ def train_model(rank=None,):
             f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
         )
 
-        # stopping time
-        print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
+    # stopping time
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
     if ddp:
-        dist.barrier()
+        #dist.barrier()
         dist.destroy_process_group()
 
 
