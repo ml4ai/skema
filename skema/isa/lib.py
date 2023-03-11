@@ -95,7 +95,8 @@ align two equation graphs using the seeded graph matching (SGD) algorithm [1].
 [1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., & Priebe, C. E. (2019). 
 Seeded graph matching. Pattern recognition, 87, 203-215.
 
-Input: the paths of the two equation MathMLs
+Input: the paths of the two equation MathMLs; mode 0: without considering any priors; mode 1: having a heuristic prior 
+with the similarity of node labels; mode 2: TBD
 Output:
     matching_ratio: the matching ratio between the equations 1 and the equation 2
     num_diff_edges: the number of different edges between the equations 1 and the equation 2
@@ -106,7 +107,7 @@ Output:
 '''
 
 
-def align_mathml_eqs(file1: str = "", file2: str = "") \
+def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 0) \
         -> Tuple[Any, ndarray, List[str], List[str], Any, Any]:
     graph1 = generate_graph(file1)
     graph2 = generate_graph(file2)
@@ -114,7 +115,15 @@ def align_mathml_eqs(file1: str = "", file2: str = "") \
     amatrix1, node_labels1 = generate_amatrix(graph1)
     amatrix2, node_labels2 = generate_amatrix(graph2)
 
-    seed1, seed2 = get_seeds(node_labels1, node_labels2)
+    if mode == 0:
+        seed1 = []
+        seed2 = []
+    elif mode == 1:
+        seed1, seed2 = get_seeds(node_labels1, node_labels2)
+    else:
+        seed1 = []
+        seed2 = []
+
     partial_match = np.column_stack((seed1, seed2))
 
     matched_indices1, matched_indices2, _, _ = graph_match(
