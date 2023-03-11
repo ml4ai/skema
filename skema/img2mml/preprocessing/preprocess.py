@@ -95,7 +95,7 @@ def preprocess_mml(config):
     # split the image_num into train, test, validate
     df = pd.DataFrame(image_num, columns=["IMG"])
     train_val_images, test_images = train_test_split(df, test_size=0.1, random_state=42)
-    train_images, val_images = train_test_split(train_val, test_size=0.1, random_state=42)
+    train_images, val_images = train_test_split(train_val_images, test_size=0.1, random_state=42)
 
     for t_idx, t_images in enumerate([train_images, test_images, val_images]):
         raw_mml_data = {'IMG': [torch.load(f'{IMGTnsrPath}/{num}.txt') for num in t_images ],
