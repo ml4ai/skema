@@ -9,6 +9,8 @@ use std::path::Path;
 
 use comment_extraction::conventions::dssat::get_comments as get_fortran_comments;
 use comment_extraction::languages::python::get_comments as get_python_comments;
+use comment_extraction::languages::cpp::get_comments as
+get_cpp_comments;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -33,7 +35,6 @@ fn main() {
     if extension == "f" || extension == "for" {
         let comments = get_fortran_comments(input).unwrap();
         let comments = serde_json::to_string(&comments).unwrap();
-
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
         } else {
@@ -41,6 +42,14 @@ fn main() {
         }
     } else if extension == "py" {
         let comments = get_python_comments(input);
+        let comments = serde_json::to_string(&comments).unwrap();
+        if let Some(path) = args.output {
+            write(path, comments).expect("Unable to write to file!");
+        } else {
+            println!("{comments}");
+        }
+    } else if extension == "cpp" || extension == "c" {
+        let comments = get_cpp_comments(input);
         let comments = serde_json::to_string(&comments).unwrap();
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
