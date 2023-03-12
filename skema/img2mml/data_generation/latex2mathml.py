@@ -356,7 +356,7 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
             lock.release()
 
         with open(
-            os.path.join(mml_path, f"{file_name}.txt"), "w"
+            os.path.join(mml_path, f"{file_name}.xml"), "w"
         ) as mml_output:
             mml_output.write(mml)
             mml_output.close()

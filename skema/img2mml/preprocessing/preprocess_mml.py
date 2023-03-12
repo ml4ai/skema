@@ -483,7 +483,7 @@ if __name__ == "__main__":
     org_mml = open(f"{data_path}/original_mml.lst", "r").readlines()
     modified_mml_file = open(f"{data_path}/mml.lst", "w")
 
-    blank_images = open("logs/blank_images").readlines()
+    blank_images = open("logs/blank_images.lst").readlines()
     idx_to_be_ignored = [int(i.split(".")[0]) for i in blank_images]
 
     for eqn_idx in range(len(org_mml)):
