@@ -7,9 +7,10 @@ Updated date: March 3, 2023
 
 import warnings
 
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Union
 
 from numpy import ndarray
+from pydot import Dot
 
 warnings.filterwarnings('ignore')
 import requests
@@ -17,6 +18,8 @@ import pydot
 import numpy as np
 from graspologic.match import graph_match
 from graphviz import Source
+import graphviz
+from copy import deepcopy
 
 # Set up the random seed
 np.random.seed(1)
@@ -89,6 +92,86 @@ def get_seeds(node_labels1: List[str], node_labels2: List[str]) -> Tuple[List[in
     return seed1, seed2
 
 
+def has_edge(dot: pydot.Dot, src: str, dst: str) -> bool:
+    """
+    Check if an edge exists between two nodes in a PyDot graph object.
+
+    Args:
+        dot (pydot.Dot): PyDot graph object.
+        src (str): Source node ID.
+        dst (str): Destination node ID.
+
+    Returns:
+        bool: True if an edge exists between src and dst, False otherwise.
+    """
+    edges = dot.get_edges()
+    for edge in edges:
+        if edge.get_source() == src and edge.get_destination() == dst:
+            return True
+    return False
+
+
+'''
+return the union graph for visualizing the alignment results
+input: 
+output: dot graph
+'''
+
+
+def get_union_graph(graph1: pydot.Dot, graph2: pydot.Dot,
+                    aligned_idx1: List[int], aligned_idx2: List[int]) -> pydot.Dot:
+    g2idx2g1idx = {str(x): str(-1) for x in range(len(graph2.get_nodes()))}
+    union_graph = deepcopy(graph1)
+    '''
+    set the aligned variables or terms as a blue circle; 
+    if their names are the same, show one name; 
+    if not, show two names' connection
+    '''
+    for i in range(len(aligned_idx1)):
+        if union_graph.get_nodes()[aligned_idx1[i]].obj_dict['attributes']['label'].replace('"', '').lower() != \
+                graph2.get_nodes()[aligned_idx2[i]].obj_dict['attributes']['label'].replace('"', '').lower():
+            union_graph.get_nodes()[aligned_idx1[i]].obj_dict['attributes']['label'] = \
+                union_graph.get_nodes()[aligned_idx1[i]].obj_dict['attributes']['label'].replace('"',
+                                                                                                 '') + ' <<|>> ' + \
+                graph2.get_nodes()[aligned_idx2[i]].obj_dict['attributes']['label'].replace('"', '')
+
+        union_graph.get_nodes()[aligned_idx1[i]].obj_dict['attributes']['color'] = 'blue'
+        g2idx2g1idx[str(aligned_idx2[i])] = str(aligned_idx1[i])
+
+    # represent the nodes only in graph 1 as a red circle
+    for i in range(len(union_graph.get_nodes())):
+        if i not in aligned_idx1:
+            union_graph.get_nodes()[i].obj_dict['attributes']['color'] = 'red'
+
+    # represent the nodes only in graph 2 as a green circle
+    for i in range(len(graph2.get_nodes())):
+        if i not in aligned_idx2:
+            graph2.get_nodes()[i].obj_dict['attributes']['color'] = 'green'
+            union_graph.add_node(graph2.get_nodes()[i])
+            g2idx2g1idx[str(i)] = str(len(union_graph.get_nodes()) - 1)
+
+    # add the edges of graph 2 to graph 1
+    for edge in union_graph.get_edges():
+        edge.obj_dict['attributes']['color'] = 'red'
+
+    for edge in graph2.get_edges():
+        x, y = edge.obj_dict['points']
+        if has_edge(union_graph, g2idx2g1idx[x], g2idx2g1idx[y]):
+            if union_graph.get_edge(g2idx2g1idx[x], g2idx2g1idx[y])[0].obj_dict['attributes']['label'].lower() == \
+                    edge.obj_dict['attributes']['label'].lower():
+                union_graph.get_edge(g2idx2g1idx[x], g2idx2g1idx[y])[0].obj_dict['attributes']['color'] = 'blue'
+            else:
+                e = pydot.Edge(g2idx2g1idx[x], g2idx2g1idx[y], label=edge.obj_dict['attributes']['label'],
+                               color='green')
+                union_graph.add_edge(e)
+        else:
+            e = pydot.Edge(g2idx2g1idx[x], g2idx2g1idx[y], label=edge.obj_dict['attributes']['label'],
+                           color='green')
+            union_graph.add_edge(e)
+
+    return union_graph
+
+
 '''
 align two equation graphs using the seeded graph matching (SGD) algorithm [1].
 
@@ -107,8 +190,8 @@ Output:
 '''
 
 
-def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 0) \
-        -> Tuple[Any, ndarray, List[str], List[str], Any, Any]:
+def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 1) \
+        -> Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], Dot]:
     graph1 = generate_graph(file1)
     graph2 = generate_graph(file2)
 
@@ -161,4 +244,7 @@ def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 0) \
                 aligned_indices1[i] = matched_indices2[np.where(matched_indices1 == i)[0][0]]
                 aligned_indices2[matched_indices2[np.where(matched_indices1 == i)[0][0]]] = i
 
-    return matching_ratio, num_diff_edges, node_labels1, node_labels2, aligned_indices1, aligned_indices2
+    union_graph = get_union_graph(graph1, graph2, [int(i) for i in matched_indices1.tolist()],
+                                  [int(i) for i in matched_indices2.tolist()])
+
+    return matching_ratio, num_diff_edges, node_labels1, node_labels2, aligned_indices1, aligned_indices2, union_graph

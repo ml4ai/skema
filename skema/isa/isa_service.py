@@ -18,6 +18,6 @@ async def align_eqns(file1: str, file2: str):
     """
     Endpoint for align two MathML equations.
     """
-    matching_ratio, num_diff_edges, node_labels1, node_labels2, aligned_indices1, aligned_indices2 = align_mathml_eqs(
+    matching_ratio, num_diff_edges, node_labels1, node_labels2, aligned_indices1, aligned_indices2, union_graph = align_mathml_eqs(
         file1, file2)
     return matching_ratio
