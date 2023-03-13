@@ -380,6 +380,7 @@ if __name__ == "__main__":
 
     for year in years:
         year = year.strip()
+        print(year)
         main(str(year))
 
     # Printing stoping time
