@@ -48,6 +48,8 @@ def main(year):
     for month_dir in directories:
 
         month_dir = str(month_dir)
+        print(month_dir)
+
         root = os.path.join(destination, f"{year}/{month_dir}")
 
         # Path to image directory
@@ -377,7 +379,7 @@ def cleaning_mml(res):
 if __name__ == "__main__":
 
     for year in years:
-        main(str(year))
+        main(str(year)).strip()
 
     # Printing stoping time
     print(" ")
