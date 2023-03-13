@@ -379,7 +379,7 @@ def cleaning_mml(res):
 if __name__ == "__main__":
 
     for year in years:
-        main(str(year)).strip()
+        main(str(year).strip())
 
     # Printing stoping time
     print(" ")
