@@ -8,7 +8,18 @@ app.use(express.json());
 // =============================================================================
 
 // ==== Configure and start the MathJax API ====================================
-mjAPI.config({ MathJax: { loader: { load: ['input/tex'] } } });
+mjAPI.config({
+  tex:
+    {
+      MaxBuffer: 1000000
+    },
+    
+  MathJax:
+    {
+      loader: { load: ['input/tex'] }
+    }
+});
+
 mjAPI.start();
 // =============================================================================
 
