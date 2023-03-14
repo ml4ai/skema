@@ -1,6 +1,45 @@
 ---
 # Python 3.11.2 Primitives
 
+# Built-in Reserved Keywords
+# Source: https://docs.python.org/3/reference/lexical_analysis.html#keywords
+Keywords:
+  - False 
+  - None
+  - True
+  - and
+  - as
+  - assert
+  - async
+  - await
+  - break
+  - class
+  - continue
+  - def
+  - del
+  - elif
+  - else
+  - except
+  - finally
+  - for
+  - from
+  - global
+  - if
+  - import
+  - in
+  - is
+  - lambda
+  - nonlocal
+  - not
+  - or
+  - pass
+  - raise
+  - return
+  - try
+  - while
+  - with
+  - yield
+
 # Built-in Functions
 # Source: https://docs.python.org/3/library/functions.html
 Functions:
@@ -104,9 +143,18 @@ Operators:
   - ast.USub: operator.neg
   - ast.Not: operator.not_
   - ast.Invert: operator.invert
-  # Special AST Nodes that don't have built in operator functions because they're keywords:
-  - ast.And: gromet_and 
-  - ast.Or: gromet_or
+
+# And finally one AST node that only has an equivilent operator for the positive case:
+# "ast.NotIn": "", 
+# Translate in CAST using ast.Not and ast.In to eliminate ast.NotIn appearing in the translation
+# Operator(ast.Not, [Operator(ast.In, [...])])
+  
+# Special AST Nodes that don't have built in operator functions because they're keywords:
+# NOTE: and/or are not being explicitly represented as operator functions, so these implementations
+# are not being used. Instead we do an actual translation into CAST nodes, which are then translated into
+# nested conditionals (with metdata) for GroMEt generation
+# - ast.And: gromet_and 
+# - ast.Or: gromet_or
 
 # There are some operators that don't have equivilent AST nodes
 # or still need to be matched with an AST node:
@@ -125,10 +173,5 @@ Operators:
 # "operator.itemgetter"
 # "operator.methodcaller"
 
-# And finally one AST node that only has an equivilent operator for the positive case:
-# "ast.NotIn": "", 
-# Translate in CAST using ast.Not and ast.In to eliminate ast.NotIn appearing in the translation
-# Operator(ast.Not, [Operator(ast.In, [...])])
----
 
     

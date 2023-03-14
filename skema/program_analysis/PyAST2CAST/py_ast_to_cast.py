@@ -7,12 +7,10 @@ from functools import singledispatchmethod
 
 from skema.utils.misc import uuid
 from skema.program_analysis.astpp import parseprint
-from skema.program_analysis.CAST2GrFN.model.cast import (
+from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    BinaryOp,
-    BinaryOperator,
     Boolean,
     Call,
     Dict,
@@ -29,6 +27,7 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
     Module,
     Name,
     Number,
+    Operator,
     RecordDef,
     ScalarType,
     Set,
@@ -38,18 +37,33 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
     SourceCodeDataType,
     Subscript,
     Tuple,
-    UnaryOp,
-    UnaryOperator,
     VarType,
     Var,
     ValueConstructor,
-    source_code_data_type,
-    source_ref,
 )
 from skema.program_analysis.PyAST2CAST.modules_list import (
     BUILTINS,
     find_std_lib_module,
 )
+
+def get_python_version():
+    """
+    get_python_version gets the current version of Python that 
+    is running when this script is executed
+    The expect version is 3.8.2 as that is what my (Tito) version
+    of Python is when running this pipeline
+    The plan is to eventually move onto the latest version (3.11?)    
+    But 3.8.2 is the current stable version for generation
+    The latest version of Python makes some changes that this
+    pipeline still needs to adjust for
+    """
+    major = sys.version_info.major
+    minor = sys.version_info.minor
+    micro = sys.version_info.micro
+
+    string_version = f"{major}.{minor}.{micro}"
+
+    return string_version
 
 
 def merge_dicts(prev_scope, curr_scope):
@@ -117,37 +131,37 @@ def get_node_name(ast_node):
 
 def get_op(operator):
     ops = {
-        ast.Add: BinaryOperator.ADD,
-        ast.Sub: BinaryOperator.SUB,
-        ast.Mult: BinaryOperator.MULT,
-        ast.Div: BinaryOperator.DIV,
-        ast.FloorDiv: BinaryOperator.FLOORDIV,
-        ast.Mod: BinaryOperator.MOD,
-        ast.Pow: BinaryOperator.POW,
-        ast.LShift: BinaryOperator.LSHIFT,
-        ast.RShift: BinaryOperator.RSHIFT,
-        ast.BitOr: BinaryOperator.BITOR,
-        ast.BitAnd: BinaryOperator.BITAND,
-        ast.BitXor: BinaryOperator.BITXOR,
-        ast.And: BinaryOperator.AND,
-        ast.Or: BinaryOperator.OR,
-        ast.Eq: BinaryOperator.EQ,
-        ast.NotEq: BinaryOperator.NOTEQ,
-        ast.Lt: BinaryOperator.LT,
-        ast.LtE: BinaryOperator.LTE,
-        ast.Gt: BinaryOperator.GT,
-        ast.GtE: BinaryOperator.GTE,
-        ast.In: BinaryOperator.IN,
-        ast.NotIn: BinaryOperator.NOTIN,
-        ast.UAdd: UnaryOperator.UADD,
-        ast.USub: UnaryOperator.USUB,
-        ast.Not: UnaryOperator.NOT,
-        ast.Invert: UnaryOperator.INVERT,
+        ast.Add: 'ast.Add',
+        ast.Sub: 'ast.Sub',
+        ast.Mult: 'ast.Mult',
+        ast.Div: 'ast.Div',
+        ast.FloorDiv: 'ast.FloorDiv',
+        ast.Mod: 'ast.Mod',
+        ast.Pow: 'ast.Pow',
+        ast.LShift: 'ast.LShift',
+        ast.RShift: 'ast.RShift',
+        ast.BitOr: 'ast.BitOr',
+        ast.BitAnd: 'ast.BitAnd',
+        ast.BitXor: 'ast.BitXor',
+        ast.And: 'ast.And',
+        ast.Or: 'ast.Or',
+        ast.Eq: 'ast.Eq',
+        ast.NotEq: 'ast.NotEq',
+        ast.Lt: 'ast.Lt',
+        ast.LtE: 'ast.LtE',
+        ast.Gt: 'ast.Gt',
+        ast.GtE: 'ast.GtE',
+        ast.In: 'ast.In',
+        ast.NotIn: 'ast.NotIn',
+        ast.UAdd: 'ast.UAdd',
+        ast.USub: 'ast.USub',
+        ast.Not: 'ast.Not',
+        ast.Invert: 'ast.Invert',
     }
 
     if type(operator) in ops.keys():
         return ops[type(operator)]
-    return None
+    return str(operator)
 
 
 class PyASTToCAST:
@@ -198,6 +212,9 @@ class PyASTToCAST:
         - global_identifier_dict: A dictionary used to map global variables to unique identifiers
         - legacy: A flag used to determine whether we generate old style CAST (uses strings for function def names)
                   or new style CAST (uses Name CAST nodes for function def names)
+        - generated_fns: A list that holds any generated CAST Function Defs. Currently used for list/dict comprehensions
+                  and lambda functions
+        - "*_count": Identifier numbers used for list/dict comprehensions, and lambda functions
         """
 
         self.aliases = {}
@@ -209,6 +226,10 @@ class PyASTToCAST:
         self.global_identifier_dict = {}
         self.id_count = 0
         self.legacy = legacy
+        self.generated_fns = []
+        self.list_comp_count = 0
+        self.dict_comp_count = 0
+        self.lambda_count = 0
 
     def insert_next_id(self, scope_dict: Dict, dict_key: str):
         """Given a scope_dictionary and a variable name as a key,
@@ -366,15 +387,19 @@ class PyASTToCAST:
                     bool_func
                 ]
             bool_call = Call(
-                Name(
+                func=Name(
                     "bool", id=prev_scope_id_dict[bool_func], source_refs=ref
                 ),
-                [test_cond],
+                arguments=[test_cond],
                 source_refs=ref,
             )
-            test = BinaryOp(
-                BinaryOperator.EQ, bool_call, true_val, source_refs=ref
-            )
+            test = [Operator(source_language="Python", 
+                        interpreter="Python", 
+                        version=get_python_version(), 
+                        op="ast.Eq", 
+                        operands=[bool_call,true_val], 
+                        source_refs=ref)]
+
         elif isinstance(node.test, ast.UnaryOp) and isinstance(
             node.test.operand, (ast.Name, ast.Constant, ast.Call)
         ):
@@ -389,15 +414,19 @@ class PyASTToCAST:
                     bool_func
                 ]
             bool_call = Call(
-                Name(
+                func=Name(
                     "bool", id=prev_scope_id_dict[bool_func], source_refs=ref
                 ),
-                [test_cond],
+                arguments=[test_cond],
                 source_refs=ref,
             )
-            test = BinaryOp(
-                BinaryOperator.EQ, bool_call, true_val, source_refs=ref
-            )
+            test = [Operator(source_language="Python", 
+                        interpreter="Python", 
+                        version=get_python_version(), 
+                        op="ast.Eq", 
+                        operands=[bool_call,true_val], 
+                        source_refs=ref)]
+
         else:
             test = test_cond
 
@@ -464,12 +493,12 @@ class PyASTToCAST:
             ]
         return [
             Call(
-                Name(
+                func=Name(
                     "Concatenate",
                     id=prev_scope_id_dict[unique_name],
                     source_refs=ref,
                 ),
-                str_pieces,
+                arguments=str_pieces,
                 source_refs=ref,
             )
         ]
@@ -675,12 +704,12 @@ class PyASTToCAST:
                     args = [val, idx]
 
                     val = Call(
-                        Name(
+                        func=Name(
                             "_get",
                             id=prev_scope_id_dict[unique_name],
                             source_refs=ref,
                         ),
-                        args,
+                        arguments=args,
                         source_refs=ref,
                     )
                 else:
@@ -741,12 +770,12 @@ class PyASTToCAST:
                     Assignment(
                         Var(val=list_name, type="Any", source_refs=ref),
                         Call(
-                            Name(
+                            func=Name(
                                 "_set",
                                 id=prev_scope_id_dict[unique_name],
                                 source_refs=ref,
                             ),
-                            args,
+                            arguments=args,
                             source_refs=ref,
                         ),
                         source_refs=ref,
@@ -788,12 +817,12 @@ class PyASTToCAST:
                     Assignment(
                         var_name,
                         Call(
-                            Name(
+                            func=Name(
                                 "_get",
                                 id=prev_scope_id_dict[unique_name],
                                 source_refs=ref,
                             ),
-                            args,
+                            arguments=args,
                             source_refs=ref,
                         ),
                         source_refs=ref,
@@ -872,12 +901,12 @@ class PyASTToCAST:
                     # Then second arg is how many times to repeat that
                     # When we say List for the first argument: It should be a literal value List that holds the elements
                     to_ret = Call(
-                        Name(
+                        func=Name(
                             "_List_num",
                             id=prev_scope_id_dict[unique_name],
                             source_refs=ref,
                         ),
-                        [cons.initial_value, cons.size],
+                        arguments=[cons.initial_value, cons.size],
                         source_refs=ref,
                     )
 
@@ -915,40 +944,7 @@ class PyASTToCAST:
 
         # ref = [SourceRef(source_file_name=self.filenames[-1], col_start=node.col_offset, col_end=node.end_col_offset, row_start=node.lineno, row_end=node.end_lineno)]
 
-        if isinstance(node.value, ast.DictComp):
-            to_ret = []
-            # to_ret.extend(right)
-            to_ret.extend(
-                [
-                    Assignment(
-                        left[0],
-                        Name(
-                            name="dict__temp_",
-                            id=-1,
-                        ),
-                        source_refs=ref,
-                    )
-                ]
-            )
-            return to_ret
-        if isinstance(node.value, ast.ListComp):
-            to_ret = []
-            # to_ret.extend(right)
-            to_ret.extend(
-                [
-                    Assignment(
-                        left[0],
-                        Name(
-                            name="list__temp_",
-                            id=-1,
-                        ),
-                        source_refs=ref,
-                    )
-                ]
-            )
-            return to_ret
-        else:
-            return [Assignment(left[0], right[0], source_refs=ref)]
+        return [Assignment(left[0], right[0], source_refs=ref)]
 
     @visit.register
     def visit_Attribute(
@@ -1123,7 +1119,7 @@ class PyASTToCAST:
             node (ast.BinOp): A PyAST Binary operator node
 
         Returns:
-            BinaryOp: A CAST binary operator node representing a math
+            Operator: A CAST operator node representing a math
                       operation (arithmetic or bitwise)
         """
 
@@ -1149,9 +1145,14 @@ class PyASTToCAST:
             rightb = right[0:-1]
 
         return (
-            leftb
+            leftb 
             + rightb
-            + [BinaryOp(op, left[-1], right[-1], source_refs=ref)]
+            + [Operator(source_language="Python", 
+                        interpreter="Python", 
+                        version=get_python_version(), 
+                        op=op, 
+                        operands=[left[-1], right[-1]], 
+                        source_refs=ref)]
         )
 
     @visit.register
@@ -1288,12 +1289,12 @@ class PyASTToCAST:
                     func_args.extend(
                         [
                             Call(
-                                Name(
+                                func=Name(
                                     "_get",
                                     id=prev_scope_id_dict[unique_name],
                                     source_refs=ref,
                                 ),
-                                args,
+                                arguments=args,
                                 source_refs=ref,
                             )
                         ]
@@ -1373,7 +1374,7 @@ class PyASTToCAST:
         if isinstance(node.func, ast.Attribute):
             # print(node.func.attr)
             res = self.visit(node.func, prev_scope_id_dict, curr_scope_id_dict)
-            return [Call(res[0], args, source_refs=ref)]
+            return [Call(func=res[0], arguments=args, source_refs=ref)]
         else:
             # In the case we're calling a function that doesn't have an identifier already
             # This should only be the case for built-in python functions (i.e print, len, etc...)
@@ -1423,24 +1424,24 @@ class PyASTToCAST:
                     )
                     return [
                         Call(
-                            Name(
+                            func=Name(
                                 "cast",
                                 id=prev_scope_id_dict[unique_name],
                                 source_refs=ref,
                             ),
-                            args,
+                            arguments=args,
                             source_refs=ref,
                         )
                     ]
                 else:
                     return [
                         Call(
-                            Name(
+                            func=Name(
                                 node.func.func.id,
                                 id=prev_scope_id_dict[unique_name],
                                 source_refs=ref,
                             ),
-                            args,
+                            arguments=args,
                             source_refs=ref,
                         )
                     ]
@@ -1456,24 +1457,24 @@ class PyASTToCAST:
                     )
                     return [
                         Call(
-                            Name(
+                            func=Name(
                                 "cast",
                                 id=prev_scope_id_dict[unique_name],
                                 source_refs=ref,
                             ),
-                            args,
+                            arguments=args,
                             source_refs=ref,
                         )
                     ]
                 else:
                     return [
                         Call(
-                            Name(
+                            func=Name(
                                 node.func.id,
                                 id=prev_scope_id_dict[unique_name],
                                 source_refs=ref,
                             ),
-                            args,
+                            arguments=args,
                             source_refs=ref,
                         )
                     ]
@@ -1646,39 +1647,9 @@ class PyASTToCAST:
             node (ast.Compare): A PyAST Compare node
 
         Returns:
-            BinaryOp: A BinaryOp node, which in this case will hold a boolean
+            Operator: An Operator node, which in this case will hold a boolean
             operation
         """
-
-        ops = {
-            ast.And: BinaryOperator.AND,
-            ast.Or: BinaryOperator.OR,
-            ast.Eq: BinaryOperator.EQ,
-            ast.NotEq: BinaryOperator.NOTEQ,
-            ast.Lt: BinaryOperator.LT,
-            ast.LtE: BinaryOperator.LTE,
-            ast.Gt: BinaryOperator.GT,
-            ast.GtE: BinaryOperator.GTE,
-            ast.In: BinaryOperator.IN,
-            ast.NotIn: BinaryOperator.NOTIN,
-            ast.IsNot: BinaryOperator.NOTIS,
-            ast.Is: BinaryOperator.IS,
-        }
-
-        # Fetch the first element (which is in left)
-        left = node.left
-
-        # Grab the first comparison operation
-        op = ops[type(node.ops.pop())]
-
-        # If we have more than one operand left, then we 'recurse' without the leftmost
-        # operand and the first operator
-        if len(node.comparators) > 1:
-            node.left = node.comparators.pop()
-            right = node
-        else:
-            right = node.comparators[0]
-
         ref = [
             SourceRef(
                 source_file_name=self.filenames[-1],
@@ -1688,9 +1659,91 @@ class PyASTToCAST:
                 row_end=node.end_lineno,
             )
         ]
-        l = self.visit(left, prev_scope_id_dict, curr_scope_id_dict)
-        r = self.visit(right, prev_scope_id_dict, curr_scope_id_dict)
-        return [BinaryOp(op, l[0], r[0], source_refs=ref)]
+
+
+        # Fetch the first element (which is in node.left)
+        left = node.left
+
+        # Grab the first comparison operation
+        op = get_op(node.ops.pop())
+
+        
+        # maintain a stack of if statements that we build up
+        if_stack = []
+        source_code_data_type = ["Python", "3.8", str(type(True))]
+        true_val = LiteralValue(
+            ScalarType.BOOLEAN,
+            "True",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+        false_val = LiteralValue(
+            ScalarType.BOOLEAN,
+            "False",
+            source_code_data_type=source_code_data_type,
+            source_refs=ref,
+        )
+        
+        # Iterate through the comparators to build up more if statements
+        # The logic is that 
+        while len(node.comparators) > 0:
+            right = node.comparators[0]
+
+            l = self.visit(left,prev_scope_id_dict,curr_scope_id_dict)[0]
+            r = self.visit(right,prev_scope_id_dict,curr_scope_id_dict)[0]
+
+            test = Operator(source_language="Python", interpreter="Python",
+                            version=get_python_version(),
+                            op=op,
+                            operands=[l,r],
+                            source_refs=ref)
+
+            if len(node.comparators) == 1 and len(if_stack) > 0:
+                print("Hi")
+                if_stack[-1].body = test
+            elif len(node.comparators) == 1 and len(if_stack) == 0:
+                # orelse has to be False value
+                if_expr = ModelIf(expr=test,body=[true_val],orelse=[false_val])
+                if_stack.append(if_expr)
+            else:
+                # orelse has to be False value
+                if_expr = ModelIf(expr=test,body=None,orelse=[false_val])
+
+                # The previous if expression contains the newest if expression
+                # as a value
+                if len(if_stack) > 0:
+                    if_stack[-1].body = [if_expr]
+                if_stack.append(if_expr)
+
+
+            left = node.comparators.pop()
+            op = get_op(node.ops.pop()) if len(node.ops) > 0 else None
+            
+        # The final if_expression contains the true value
+        if_stack[-1].body = [true_val]
+
+        return [if_stack[0]]
+
+
+        # If we have more than one operand left, then we 'recurse' without the leftmost
+        # operand and the first operator
+        # if len(node.comparators) > 1:
+          #   node.left = node.comparators.pop()
+            #right = node
+        #else:
+         #   right = node.comparators[0]
+
+        #l = self.visit(left, prev_scope_id_dict, curr_scope_id_dict)
+        #r = self.visit(right, prev_scope_id_dict, curr_scope_id_dict)
+        # return [Operator(op, l[0], r[0], source_refs=ref)]
+
+       ## return [Operator(source_language="Python", 
+         #               interpreter="Python", 
+          #              version=get_python_version(), 
+           #             op=op, 
+            #            operands=[l[0], r[0]], 
+             #           source_refs=ref)]
+        
 
     @visit.register
     def visit_Constant(
@@ -1991,8 +2044,8 @@ class PyASTToCAST:
         iter_var = Assignment(
             iter_var_cast,
             Call(
-                Name(name="iter", id=iter_id, source_refs=ref),
-                [iterable],
+                func=Name(name="iter", id=iter_id, source_refs=ref),
+                arguments=[iterable],
                 source_refs=ref,
             ),
             source_refs=ref,
@@ -2003,8 +2056,8 @@ class PyASTToCAST:
                 [target, iter_var_cast, stop_cond_var_cast], source_refs=ref
             ),
             Call(
-                Name(name="next", id=next_id, source_refs=ref),
-                [
+                func=Name(name="next", id=next_id, source_refs=ref),
+                arguments=[
                     Var(
                         Name(
                             name=iterator_name, id=iterator_id, source_refs=ref
@@ -2017,26 +2070,26 @@ class PyASTToCAST:
             ),
             source_refs=ref,
         )
-
-        loop_cond = BinaryOp(
-            op=BinaryOperator.NOTEQ,
-            left=stop_cond_var_cast,
-            right=LiteralValue(
-                ScalarType.BOOLEAN,
-                True,
-                ["Python", "3.8", "boolean"],
-                source_refs=ref,
-            ),
-            source_refs=ref,
-        )
+        loop_cond = Operator(source_language="Python", 
+                    interpreter="Python", 
+                    version=get_python_version(), 
+                    op="ast.Eq", 
+                    operands=[stop_cond_var_cast,
+                    LiteralValue(
+                        ScalarType.BOOLEAN,
+                        True,
+                        ["Python", "3.8", "boolean"],
+                        source_refs=ref,
+                    )], 
+                    source_refs=ref)
 
         loop_assign = Assignment(
             Tuple(
                 [target, iter_var_cast, stop_cond_var_cast], source_refs=ref
             ),
             Call(
-                Name(name="next", id=next_id, source_refs=ref),
-                [
+                func=Name(name="next", id=next_id, source_refs=ref),
+                arguments=[
                     Var(
                         Name(
                             name=iterator_name, id=iterator_id, source_refs=ref
@@ -2528,18 +2581,15 @@ class PyASTToCAST:
         if self.legacy:
             return [FunctionDef("LAMBDA", args, body, source_refs=ref)]
         else:
-            source_code_data_type = ["Python", "3.8", "List"]
-            return [
-                LiteralValue(
-                    StructureType.LIST,
-                    "NotImplemented",
-                    source_code_data_type,
-                    ref,
-                )
-            ]
-            return [
-                FunctionDef(Name("LAMBDA", id=-1), args, body, source_refs=ref)
-            ]
+            lambda_name = f"%lambda{self.lambda_count}"
+            self.lambda_count += 1
+            lambda_id = -1 # TODO
+            self.generated_fns.append(FunctionDef(Name(lambda_name, id=lambda_id), args, body, source_refs=ref))
+        
+            # NOTE: What should the arguments be?
+            to_ret = [Call(func=Name(lambda_name, lambda_id, source_refs=ref),arguments=args,source_refs=ref)]
+
+            return to_ret
 
     @visit.register
     def visit_ListComp(
@@ -2559,23 +2609,11 @@ class PyASTToCAST:
         """
 
         ref = [
-            SourceRef(
-                source_file_name=self.filenames[-1],
-                col_start=node.col_offset,
-                col_end=node.end_col_offset,
-                row_start=node.lineno,
-                row_end=node.end_lineno,
-            )
-        ]
-
-        source_code_data_type = ["Python", "3.8", "List"]
-        return [
-            LiteralValue(
-                StructureType.LIST,
-                "Temporarily Disabled",
-                source_code_data_type,
-                source_refs=ref,
-            )
+            self.filenames[-1],
+            node.col_offset,
+            node.end_col_offset,
+            node.lineno,
+            node.end_lineno,
         ]
 
         temp_list_name = f"list__temp_"
@@ -2760,9 +2798,28 @@ class PyASTToCAST:
             loop_collection[0], prev_scope_id_dict, curr_scope_id_dict
         )
 
-        to_ret = []
-        to_ret.extend(temp_cast)
-        to_ret.extend(loop_cast)
+        ref = [
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
+
+        # TODO: arguments for a comprehension, IDs
+        return_cast = [ModelReturn(value=Var(val=Name(name=temp_list_name, source_refs=ref), source_refs=ref), source_refs=ref)]
+
+        comp_func_name = f"%comprehension_list_{self.list_comp_count}"
+        self.list_comp_count += 1
+        comp_func_id = -1 #TODO
+
+        func_def_cast = FunctionDef(name=comp_func_name, func_args=[], body=temp_cast+loop_cast+return_cast, source_refs=ref)
+        
+        self.generated_fns.append(func_def_cast)
+
+        to_ret = [Call(func=Name(comp_func_name, comp_func_id, source_refs=ref),arguments=[],source_refs=ref)]
 
         return to_ret
 
@@ -2774,23 +2831,11 @@ class PyASTToCAST:
         curr_scope_id_dict: Dict,
     ):
         ref = [
-            SourceRef(
-                source_file_name=self.filenames[-1],
-                col_start=node.col_offset,
-                col_end=node.end_col_offset,
-                row_start=node.lineno,
-                row_end=node.end_lineno,
-            )
-        ]
-
-        source_code_data_type = ["Python", "3.8", "List"]
-        return [
-            LiteralValue(
-                StructureType.LIST,
-                "Temporarily Disabled",
-                source_code_data_type,
-                source_refs=ref,
-            )
+            self.filenames[-1],
+            node.col_offset,
+            node.end_col_offset,
+            node.lineno,
+            node.end_lineno,
         ]
 
         # node (ast.DictComp)
@@ -2958,6 +3003,16 @@ class PyASTToCAST:
             loop_collection.insert(0, next_loop)
             i = i - 1
 
+        ref = [
+            SourceRef(
+                source_file_name=self.filenames[-1],
+                col_start=node.col_offset,
+                col_end=node.end_col_offset,
+                row_start=node.lineno,
+                row_end=node.end_lineno,
+            )
+        ]
+
         temp_cast = self.visit(
             temp_assign, prev_scope_id_dict, curr_scope_id_dict
         )
@@ -2965,9 +3020,18 @@ class PyASTToCAST:
             loop_collection[0], prev_scope_id_dict, curr_scope_id_dict
         )
 
-        to_ret = []
-        to_ret.extend(temp_cast)
-        to_ret.extend(loop_cast)
+        # TODO: Arguments for comprehension, IDs
+        return_cast = [ModelReturn(value=Var(val=Name(name=temp_dict_name, id=-1, source_refs=ref), source_refs=ref), source_refs=ref)]
+
+        comp_func_name = f"%comprehension_dict_{self.dict_comp_count}"
+        self.dict_comp_count += 1
+        comp_func_id = -1 # TODO
+
+        func_def_cast = FunctionDef(name=comp_func_name, func_args=[], body=temp_cast+loop_cast+return_cast, source_refs=ref)
+        
+        self.generated_fns.append(func_def_cast)
+
+        to_ret = [Call(func=Name(comp_func_name, comp_func_id, source_refs=ref),arguments=[],source_refs=ref)]
 
         return to_ret
 
@@ -3377,7 +3441,7 @@ class PyASTToCAST:
 
         self.module_stack.pop()
         return Module(
-            name=self.filenames[-1].split(".")[0], body=body, source_refs=ref
+            name=self.filenames[-1].split(".")[0], body=self.generated_fns+body, source_refs=ref
         )
 
     @visit.register
@@ -3552,8 +3616,8 @@ class PyASTToCAST:
 
         return [
             Call(
-                Name("raise", raise_id, source_refs=ref),
-                [
+                func=Name("raise", raise_id, source_refs=ref),
+                arguments=[
                     LiteralValue(
                         StructureType.LIST,
                         exc_name,
@@ -3624,13 +3688,7 @@ class PyASTToCAST:
             UnaryOp: A CAST UnaryOp node.
         """
 
-        ops = {
-            ast.UAdd: UnaryOperator.UADD,
-            ast.USub: UnaryOperator.USUB,
-            ast.Not: UnaryOperator.NOT,
-            ast.Invert: UnaryOperator.INVERT,
-        }
-        op = ops[type(node.op)]
+        op = get_op(node.op)
         operand = node.operand
 
         opd = self.visit(operand, prev_scope_id_dict, curr_scope_id_dict)
@@ -3644,7 +3702,13 @@ class PyASTToCAST:
                 row_end=node.end_lineno,
             )
         ]
-        return [UnaryOp(op, opd[0], source_refs=ref)]
+
+        return [Operator(source_language="Python", 
+                interpreter="Python", 
+                version=get_python_version(), 
+                op=op, 
+                operands=[opd[0]], 
+                source_refs=ref)]
 
     @visit.register
     def visit_Set(
@@ -3748,20 +3812,20 @@ class PyASTToCAST:
                 if isinstance(node.value, ast.Call):
                     if isinstance(node.value.func, ast.Attribute):
                         stop = Call(
-                            Name("len", source_refs=ref),
-                            [Name(node.value.func.attr, source_refs=ref)],
+                            func=Name("len", source_refs=ref),
+                            arguments=[Name(node.value.func.attr, source_refs=ref)],
                             source_refs=ref,
                         )
                     else:
                         stop = Call(
-                            Name("len", source_refs=ref),
-                            [Name(node.value.func.id, source_refs=ref)],
+                            func=Name("len", source_refs=ref),
+                            arguments=[Name(node.value.func.id, source_refs=ref)],
                             source_refs=ref,
                         )
                 elif isinstance(node.value, ast.Attribute):
                     stop = Call(
-                        Name("len", source_refs=ref),
-                        [Name(node.value.attr, source_refs=ref)],
+                        func=Name("len", source_refs=ref),
+                        arguments=[Name(node.value.attr, source_refs=ref)],
                         source_refs=ref,
                     )
                 else:
@@ -3772,8 +3836,8 @@ class PyASTToCAST:
                     else:
                         id = node.value.id
                     stop = Call(
-                        Name("len", source_refs=ref),
-                        [Name(id, source_refs=ref)],
+                        func=Name("len", source_refs=ref),
+                        arguments=[Name(id, source_refs=ref)],
                         source_refs=ref,
                     )
 
@@ -4060,52 +4124,6 @@ class PyASTToCAST:
 
         # test_cond = self.visit(node.test, prev_scope_id_dict, curr_scope_id_dict)[0]
         test = self.create_cond(node, prev_scope_id_dict, curr_scope_id_dict)
-
-        """
-        bool_func = "bool"
-        source_code_data_type = ["Python", "3.8", str(type(True))]
-        true_val = LiteralValue(ScalarType.BOOLEAN, "True", source_code_data_type=source_code_data_type, source_refs=ref)
-        if isinstance(node.test, (ast.Name, ast.Constant)):
-            if bool_func not in prev_scope_id_dict.keys():
-                # If a built-in is called, then it gets added to the global dictionary if
-                # it hasn't been called before. This is to maintain one consistent ID per built-in
-                # function
-                if bool_func not in self.global_identifier_dict.keys():
-                    self.insert_next_id(
-                        self.global_identifier_dict, bool_func
-                    )
-
-                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
-                    bool_func
-                ]
-            bool_call = Call(Name("bool",
-                                id=prev_scope_id_dict[bool_func], 
-                                source_refs=ref),
-                            [test_cond],
-                            source_refs=ref)
-            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
-        elif isinstance(node.test, ast.UnaryOp) and isinstance(node.test.operand, (ast.Name, ast.Constant, ast.Call)): 
-            if bool_func not in prev_scope_id_dict.keys():
-                # If a built-in is called, then it gets added to the global dictionary if
-                # it hasn't been called before. This is to maintain one consistent ID per built-in
-                # function
-                if bool_func not in self.global_identifier_dict.keys():
-                    self.insert_next_id(
-                        self.global_identifier_dict, bool_func
-                    )
-
-                prev_scope_id_dict[bool_func] = self.global_identifier_dict[
-                    bool_func
-                ]
-            bool_call = Call(Name("bool",
-                                id=prev_scope_id_dict[bool_func], 
-                                source_refs=ref),
-                            [test_cond],
-                            source_refs=ref)
-            test = BinaryOp(BinaryOperator.EQ, bool_call, true_val, source_refs=ref)
-        else:
-            test = test_cond
-        """
 
         # Loops have their own enclosing scopes
         curr_scope_copy = copy.deepcopy(curr_scope_id_dict)
