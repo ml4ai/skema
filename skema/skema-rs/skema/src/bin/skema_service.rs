@@ -1,6 +1,6 @@
 use actix_web::{get, web::Data, App, HttpResponse, HttpServer};
 use skema::config::Config;
-use skema::services::{comment_extraction, gromet, mathml};
+use skema::services::{comment_extraction, gromet};
 
 use clap::Parser;
 use utoipa::OpenApi;
@@ -38,8 +38,9 @@ async fn main() -> std::io::Result<()> {
     #[openapi(
         paths(
             comment_extraction::get_comments,
-            mathml::get_ast_graph,
-            mathml::get_math_exp_graph,
+            skema::services::mathml::get_ast_graph,
+            skema::services::mathml::get_math_exp_graph,
+            skema::services::mathml::get_acset,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -56,21 +57,29 @@ async fn main() -> std::io::Result<()> {
                 comment_extraction::SingleLineComment,
                 comment_extraction::Docstring,
                 comment_extraction::CommentExtractionResponse,
-                skema::ModuleCollection,
-                skema::Gromet,
+                mathml::acset::ACSet,
+                mathml::acset::Specie,
+                mathml::acset::Transition,
+                mathml::acset::InputArc,
+                mathml::acset::OutputArc,
                 skema::Attribute,
                 skema::FunctionNet,
-                skema::Metadata,
-                skema::GrometWire,
-                skema::Files,
+                skema::FunctionType,
                 skema::FnType,
+                skema::Gromet,
                 skema::GrometBox,
-                skema::GrometPort,
                 skema::GrometBoxConditional,
                 skema::GrometBoxLoop,
+                skema::GrometPort,
+                skema::GrometWire,
+                skema::Grounding,
+                skema::Metadata,
+                skema::ModuleCollection,
+                skema::TextExtraction,
+                skema::Files,
                 skema::Provenance,
-                skema::FunctionType,
                 skema::ValueL,
+                skema::ValueMeta,
             )
         ),
         tags(
@@ -90,8 +99,9 @@ async fn main() -> std::io::Result<()> {
             }))
             .configure(gromet::configure())
             .service(comment_extraction::get_comments)
-            .service(mathml::get_ast_graph)
-            .service(mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_ast_graph)
+            .service(skema::services::mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_acset)
             .service(ping)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })

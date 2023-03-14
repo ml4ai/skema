@@ -114,7 +114,10 @@ fn create_metadata_node(gromet: &ModuleCollection, metadata_idx: u32) -> Vec<Met
     let mut provenance_vec: Vec<Option<Provenance>> = vec![];
 
     // fill out metadata arrays
-    for data in gromet.modules[0].metadata_collection.as_ref().unwrap()[(metadata_idx.clone() - 1) as usize].clone() {
+    for data in gromet.modules[0].metadata_collection.as_ref().unwrap()
+        [(metadata_idx.clone() - 1) as usize]
+        .clone()
+    {
         metadata_type_vec.push(data.metadata_type.clone());
         gromet_version_vec.push(data.gromet_version.clone());
         text_extraction_vec.push(data.text_extraction.clone());
@@ -165,7 +168,6 @@ fn create_metadata_node(gromet: &ModuleCollection, metadata_idx: u32) -> Vec<Met
 }
 // creates the metadata node query
 fn create_metadata_node_query(meta_node: MetadataNode) -> Vec<String> {
-
     // determine vec length
     let metadata_len = meta_node.gromet_version.len();
 
@@ -191,25 +193,85 @@ fn create_metadata_node_query(meta_node: MetadataNode) -> Vec<String> {
     let mut provenance_q: Vec<String> = vec![];
 
     for i in 0..metadata_len {
-        metadata_type_q.push(meta_node.metadata_type[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        gromet_version_q.push(meta_node.gromet_version[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        text_extraction_q.push(meta_node.text_extraction[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
-        variable_identifier_q.push(meta_node.variable_identifier[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        variable_definition_q.push(meta_node.variable_definition[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        value_q.push(meta_node.value[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
-        grounding_q.push(meta_node.grounding[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
-        name_q.push(meta_node.name[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        global_reference_id_q.push(meta_node.global_reference_id[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        files_q.push(meta_node.files[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
-        source_language_q.push(meta_node.source_language[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        source_language_version_q.push(meta_node.source_language_version[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        data_type_q.push(meta_node.data_type[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        code_file_reference_uid_q.push(meta_node.code_file_reference_uid[i].as_ref().map_or_else(|| String::from(""),|x| format!("{}", x)));
-        line_begin_q.push(meta_node.line_begin[i].as_ref().map_or_else(|| 0,|x| *x));
-        line_end_q.push(meta_node.line_end[i].as_ref().map_or_else(|| 0,|x| *x));
-        col_begin_q.push(meta_node.col_begin[i].as_ref().map_or_else(|| 0,|x| *x));
-        col_end_q.push(meta_node.col_end[i].as_ref().map_or_else(|| 0,|x| *x));
-        provenance_q.push(meta_node.provenance[i].as_ref().map_or_else(|| String::from(""),|x| format!("{:?}", x)));
+        metadata_type_q.push(
+            meta_node.metadata_type[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        gromet_version_q.push(
+            meta_node.gromet_version[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        text_extraction_q.push(
+            meta_node.text_extraction[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{:?}", x)),
+        );
+        variable_identifier_q.push(
+            meta_node.variable_identifier[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        variable_definition_q.push(
+            meta_node.variable_definition[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        value_q.push(
+            meta_node.value[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{:?}", x)),
+        );
+        grounding_q.push(
+            meta_node.grounding[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{:?}", x)),
+        );
+        name_q.push(
+            meta_node.name[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        global_reference_id_q.push(
+            meta_node.global_reference_id[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        files_q.push(
+            meta_node.files[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{:?}", x)),
+        );
+        source_language_q.push(
+            meta_node.source_language[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        source_language_version_q.push(
+            meta_node.source_language_version[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        data_type_q.push(
+            meta_node.data_type[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        code_file_reference_uid_q.push(
+            meta_node.code_file_reference_uid[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{}", x)),
+        );
+        line_begin_q.push(meta_node.line_begin[i].as_ref().map_or_else(|| 0, |x| *x));
+        line_end_q.push(meta_node.line_end[i].as_ref().map_or_else(|| 0, |x| *x));
+        col_begin_q.push(meta_node.col_begin[i].as_ref().map_or_else(|| 0, |x| *x));
+        col_end_q.push(meta_node.col_end[i].as_ref().map_or_else(|| 0, |x| *x));
+        provenance_q.push(
+            meta_node.provenance[i]
+                .as_ref()
+                .map_or_else(|| String::from(""), |x| format!("{:?}", x)),
+        );
     }
 
     // construct the queries
@@ -219,7 +281,7 @@ fn create_metadata_node_query(meta_node: MetadataNode) -> Vec<String> {
         "{} ({}:{} {{metadata_idx:{:?},metadata_type:{:?},gromet_version:{:?},text_extraction:{:?},variable_identifier:{:?},variable_definition:{:?},value:{:?},grounding:{:?},name:{:?},global_reference_id:{:?},files:{:?},source_language:{:?}
             ,source_language_version:{:?},data_type:{:?},code_file_reference_uid:{:?},line_begin:{:?},line_end:{:?}
             ,col_begin:{:?},col_end:{:?},provenance:{:?}}})",
-        create, meta_node.node_id, meta_node.n_type, meta_node.metadata_idx, 
+        create, meta_node.node_id, meta_node.n_type, meta_node.metadata_idx,
         metadata_type_q,
         gromet_version_q,
         text_extraction_q,

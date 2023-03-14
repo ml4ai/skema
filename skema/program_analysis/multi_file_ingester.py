@@ -29,7 +29,7 @@ def get_args():
     parser.add_argument(
         "--write",
         action="store_true",
-        help="If true, the script write the output to a JSON file"
+        help="If true, the script write the output to a JSON file",
     )
 
     options = parser.parse_args()
@@ -54,9 +54,9 @@ def process_file_system(
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
         try:
             cast = python_to_cast(full_file, cast_obj=True)
-            
+
             cur_dir = os.getcwd()
-            os.chdir(os.path.join(os.getcwd(),path))
+            os.chdir(os.path.join(os.getcwd(), path))
             generated_gromet = ann_cast_pipeline(
                 cast, gromet=True, to_file=False, from_obj=True
             )
@@ -91,7 +91,9 @@ def process_file_system(
                 if fn.b[0].function_type == "FUNCTION"
             ]
             if "main" in defined_functions:
-                module_collection.executables.append(len(module_collection.module_index))
+                module_collection.executables.append(
+                    len(module_collection.module_index)
+                )
 
         except ImportError as e:
             print("FAILURE")
