@@ -5,8 +5,8 @@ from torchtext.data.metrics import bleu_score
 def calculate_bleu_score():
     tt = open("logs/test_targets_100K.txt").readlines()
     tp = open("logs/test_predicted_100K.txt").readlines()
-    _tt = open("logs/trimmed_targets.txt", "w")
-    _tp = open("logs/trimmed_preds.txt", "w")
+    _tt = open("logs/final_targets.txt", "w")
+    _tp = open("logs/final_preds.txt", "w")
 
     for i, j in zip(tt, tp):
         eos_i = i.find("<eos>")
@@ -15,8 +15,8 @@ def calculate_bleu_score():
         eos_j = j.find("<eos>")
         _tp.write(j[6:eos_j] + "\n")
 
-    test = open("logs/trimmed_targets.txt").readlines()
-    predicted = open("logs/trimmed_preds.txt").readlines()
+    test = open("logs/final_targets.txt").readlines()
+    predicted = open("logs/final_preds.txt").readlines()
 
     candidate_corpus, references_corpus = [], []
 
