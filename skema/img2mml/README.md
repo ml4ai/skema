@@ -61,6 +61,10 @@ For multiperl bleu score:
 perl utils/multi-bleu.perl logs/final_targets.txt < logs/final_preds.txt"
 ```
 
+#### To calculate edit distance
+```
+python utils/edit_distance.py
+```
 
 ## Inference
 
