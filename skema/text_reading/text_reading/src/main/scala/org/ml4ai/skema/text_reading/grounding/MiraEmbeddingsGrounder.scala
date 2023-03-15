@@ -1,19 +1,16 @@
-package org.ml4ai.grounding
+package org.ml4ai.skema.text_reading.grounding
 
 import breeze.linalg.DenseVector
+import MiraEmbeddingsGrounder.generateNormalizedEmbedding
 
 import scala.collection.mutable
 // to import all packages in linalg
-import breeze.linalg._
-import org.clulab.embeddings.{ExplicitWordEmbeddingMap, WordEmbeddingMap}
+import org.clulab.embeddings.{CompactWordEmbeddingMap, ExplicitWordEmbeddingMap, WordEmbeddingMap}
 import org.clulab.processors.clu.CluProcessor
-import org.ml4ai.grounding.MiraEmbeddingsGrounder.generateNormalizedEmbedding
-import org.clulab.embeddings.CompactWordEmbeddingMap
-import org.clulab.utils.Closer.AutoCloser
-import org.clulab.utils.{ClassLoaderObjectInputStream, FileUtils, InputStreamer, MED, Serializer}
+import org.clulab.utils.{FileUtils, InputStreamer, MED, Serializer}
 import ujson.Arr
 
-import java.io.{BufferedInputStream, File}
+import java.io.File
 
 class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, alpha: Float) extends Grounder {
 

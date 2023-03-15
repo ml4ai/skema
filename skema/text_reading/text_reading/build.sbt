@@ -18,6 +18,7 @@ libraryDependencies ++= {
     "org.scalanlp"               %% "breeze-viz"         % breezeVer,
     "ai.lum"                     %% "common"             % "0.0.10",
     "org.clulab"                  % "glove-840b-300d"    % "0.1.0" % Test,
+    "org.clulab"                 %% "model-streamed-trigram-ser" % "1.0.0",
     "org.clulab"                 %% "pdf2txt"            % "1.1.3",
     "com.typesafe.play"          %% "play-json"          % "2.9.3",
     "org.clulab"                 %% "processors-main"    % procVer,
@@ -29,15 +30,12 @@ libraryDependencies ++= {
     "com.lihaoyi"                %% "upickle"            % uJsonVer,
     "com.lihaoyi"                %% "ujson-json4s"       % uJsonVer,
     "com.lihaoyi"                %% "ujson-play"         % uJsonVer,
-    "xml-apis"                    % "xml-apis"           % "1.4.01"
+    "xml-apis"                    % "xml-apis"           % "1.4.01",
+    "com.lihaoyi"                %% "requests"           % "0.1.8"
   )
 }
 
-lazy val root = (project in file("."))
-  .aggregate(grounding)
-  .dependsOn(grounding % "compile -> compile; test -> test")
-
-lazy val grounding = project.in(file("grounding"))
+lazy val root = project in file(".")
 
  lazy val webapp = project
    .enablePlugins(PlayScala)

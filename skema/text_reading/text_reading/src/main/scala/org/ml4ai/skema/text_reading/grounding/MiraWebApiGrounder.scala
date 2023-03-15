@@ -1,13 +1,8 @@
-package org.ml4ai.grounding
-
+package org.ml4ai.skema.text_reading.grounding
 
 import scala.collection.mutable
-import ujson._
-import requests._
 
-import java.util
-
-class MiraWebApiGrounder(apiEndPoint:String, batchSize: Option[Int] = None) extends Grounder{
+class MiraWebApiGrounder(apiEndPoint: String, batchSize: Option[Int] = None) extends Grounder {
 
   // Cache to store previously resolved items
   // TODO this is a potential memory leak. We need to change for an LRU cache
@@ -15,11 +10,12 @@ class MiraWebApiGrounder(apiEndPoint:String, batchSize: Option[Int] = None) exte
 
   /**
     * Hits the MIRA API with the post request to fetch groundings
+    *
     * @param keys to be queried
     * @return groundings for each input key
     */
-  private def requestGrounding(keys:Seq[String]):Seq[Seq[GroundingCandidate]] ={
-    if(keys.nonEmpty) {
+  private def requestGrounding(keys: Seq[String]): Seq[Seq[GroundingCandidate]] = {
+    if (keys.nonEmpty) {
       val batchSize = this.batchSize.getOrElse(keys.size)
 
       keys.grouped(batchSize).flatMap {
@@ -60,18 +56,11 @@ class MiraWebApiGrounder(apiEndPoint:String, batchSize: Option[Int] = None) exte
     // Build request body with remaining ungrounded concepts
     val groundings = requestGrounding(missingKeys)
     // Update the cache with the missing groundings
-    for((key, gr) <- missingKeys zip groundings) {
+    for ((key, gr) <- missingKeys zip groundings) {
       resolutionCache(key) = gr
     }
 
     // Build return value
     normalizedKeys map resolutionCache
   }
-}
-
-object Test extends App {
-  val g = new MiraWebApiGrounder(apiEndPoint = "http://34.230.33.149:8771/api/ground_list")
-  val y = g.groundingCandidates(Seq("covid-19", "flu", "hospital"), k=1)
-  val x = g.groundingCandidates(Seq("covid-19", "flu", "hospital"), k=1)
-  val i = 100
 }

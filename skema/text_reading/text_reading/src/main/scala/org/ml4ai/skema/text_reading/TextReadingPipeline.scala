@@ -5,8 +5,8 @@ import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.processors.Document
 import org.clulab.utils.Logging
-import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, MiraWebApiGrounder}
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
+import org.ml4ai.skema.text_reading.grounding.{GroundingCandidate, MiraWebApiGrounder}
 
 import scala.util.matching.Regex
 
