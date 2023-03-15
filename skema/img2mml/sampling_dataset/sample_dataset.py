@@ -1,7 +1,7 @@
 import os, json, random
 import multiprocessing as mp
 from shutil import copyfile as CP
-from skema.skema.img2mml.preprocessing.preprocess_mml import simplification
+from preprocessing.preprocess_mml import simplification
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -12,7 +12,7 @@ with open(config_path, "r") as cfg:
 root = config["src_path"]
 
 # create destination files and directory
-data_path = "skema/skema/img2mml/training_data/sample_data"
+data_path = "training_data/sample_data"
 images_path = os.path.join(data_path, "images")
 for i in [data_path, images_path]:
     if not os.path.exists(i):
@@ -141,8 +141,3 @@ def main():
 
         else:
             break
-
-
-if __name__ == "__main__":
-    main()
-    print("sampled_data is ready.")
