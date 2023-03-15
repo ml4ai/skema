@@ -35,7 +35,7 @@ for i in range(0, 350, 50):
     counter_dist_dict[key] = 0
 
 
-def get_paths(yr, month):
+def get_paths(yr, yr_path, month):
 
     temp_files = list()
 
@@ -46,7 +46,7 @@ def get_paths(yr, month):
         folder_path = os.path.join(mml_path, folder)
         for tyf in os.listdir(folder_path):
             type_of_eqn = "large" if tyf == "large_mml" else "small"
-            for eqn in os.path.join(folder_path, tyf):
+            for eqn in os.listdir(os.path.join(folder_path, tyf)):
                 eqn_num = eqn.split(".")[0]
                 mml_eqn_path = f"{yr}_{month}_{folder}_{type_of_eqn}_{eqn_num}"
 
@@ -84,7 +84,7 @@ def main():
 
             for m in range(1,13,1):
                 month = yr[0:2] + f"{m:02}"  # yr=2018, month=1801,..
-                temp_paths = get_paths(yr, month)
+                temp_paths = get_paths(yr, yr_path, month)
                 for p in temp_paths:
                     all_paths.append(p)
 
@@ -94,7 +94,8 @@ def main():
         for month in months:
             month = month.strip()
             yr = f"20{month[0:2]}"
-            temp_paths = get_paths(yr, month)
+            yr_path = os.path.join(root, yr)
+            temp_paths = get_paths(yr, yr_path, month)
             for p in temp_paths:
                 all_paths.append(p)
 

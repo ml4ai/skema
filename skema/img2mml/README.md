@@ -38,7 +38,7 @@ The `src_path` will be the destination path of the `data_generation/data_generat
 
 After updating the `sampling_config.json` file,
 ```
-python sample_dataset.py
+python create_dataset.py
 ```
 
 
