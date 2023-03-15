@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--config",
     help="configuration file for paths and hyperparameters",
-    default="configs/xfmer_config.json",
+    default="configs/xfmer_mml_config.json",
 )
 
 args = parser.parse_args()

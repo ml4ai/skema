@@ -38,17 +38,17 @@ To prepare the dataset for training, we will first preprocess it. The first step
 
 #### To preprocess images:
 ```
-python preprocessing/preprocess_images.py --config configs/xfmer_config.json
+python preprocessing/preprocess_images.py --config configs/xfmer_mml_config.json
 ```
 
 #### To preprocess mathml:
 ```
-python preprocessing/preprocess_mml.py
+python preprocessing/preprocess_mml.py --config configs/xfmer_mml_config.json
 ```
 
 #### To train the model:
 ```
-python training.py configs/xfmer_config.json
+python training.py --config configs/xfmer_mml_config.json
 ```
 
 #### To calculate Torchtext BLEU score
