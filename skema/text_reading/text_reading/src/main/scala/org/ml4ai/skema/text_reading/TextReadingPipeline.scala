@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.processors.Document
 import org.clulab.utils.Logging
-import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder}
+import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, MiraWebApiGrounder}
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
 
 import scala.util.matching.Regex
@@ -23,7 +23,8 @@ class TextReadingPipeline extends Logging {
   // Grounding parameters
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
+//  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
+  private val grounder = new MiraWebApiGrounder("http://34.230.33.149:8771/api/ground_list")
 
   val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
 
@@ -47,7 +48,7 @@ class TextReadingPipeline extends Logging {
         // Don't ground unless it is not a number
         numberPattern.findFirstIn(tbm.text.trim) match {
           case None =>
-            val topGroundingCandidates = grounder.groundingCandidates(tbm.text).filter {
+            val topGroundingCandidates = grounder.groundingCandidates(tbm.text, k=5).filter {
               case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
             }
 

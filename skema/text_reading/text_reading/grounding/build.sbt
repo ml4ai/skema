@@ -23,5 +23,6 @@ libraryDependencies ++= {
     "org.scalanlp"               %% "breeze"                     % "1.1",
     "org.scalanlp"               %% "breeze-natives"             % "1.1",
     "org.scalanlp"               %% "breeze-viz"                 % "1.1",
+    "com.lihaoyi"                %% "requests"                   % "0.1.8"
   )
 }

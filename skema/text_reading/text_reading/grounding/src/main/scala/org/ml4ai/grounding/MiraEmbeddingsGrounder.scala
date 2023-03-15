@@ -24,44 +24,45 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
    * @param k    number of max candidates to return
    * @return ranked list with the top k candidates
    */
-  override def groundingCandidates(text: String, k: Int = 5): Seq[GroundingCandidate] = {
-    // Generate the embedding of text
-    val queryEmbedding = generateNormalizedEmbedding(text, embeddingsModel)
-    // Normalize the query embedding to speed up the cosine similarity computation
-    WordEmbeddingMap.norm(queryEmbedding)
+  override def groundingCandidates(texts: Seq[String], k: Int = 5): Seq[Seq[GroundingCandidate]] = texts map {
+    text =>
+      // Generate the embedding of text
+      val queryEmbedding = generateNormalizedEmbedding(text, embeddingsModel)
+      // Normalize the query embedding to speed up the cosine similarity computation
+      WordEmbeddingMap.norm(queryEmbedding)
 
-    // Loop over the grounding concepts and get cosine similarity between input embedding and each concept     // Using breeze
-    val tempVal = for (groundingConcept <- groundingConcepts) yield {
-      WordEmbeddingMap.dotProduct(groundingConcept.embedding.get, queryEmbedding)
-    }
-
-    val cosineSimilarities: DenseVector[Float] = DenseVector( tempVal.toArray)
-
-    val similarities =
-      if (alpha < 1.0){ // If alpha is 1, then don't even bother computing edit distances
-        // Using breeze
-        val normalizedEditDistances = DenseVector[Float](groundingConcepts.par.map(concept => getNormalizedDistance(text, concept.name).floatValue()).seq.toArray)
-        val alphas = DenseVector.fill(groundingConcepts.length)(alpha)
-        val oneMinusAlphas = DenseVector.fill(groundingConcepts.length)(1 - alpha)
-        val oneMinusEditDistances = DenseVector.ones[Float](normalizedEditDistances.length) -:- normalizedEditDistances
-        (cosineSimilarities *:* alphas) + (oneMinusEditDistances *:* oneMinusAlphas)
-
+      // Loop over the grounding concepts and get cosine similarity between input embedding and each concept     // Using breeze
+      val tempVal = for (groundingConcept <- groundingConcepts) yield {
+        WordEmbeddingMap.dotProduct(groundingConcept.embedding.get, queryEmbedding)
       }
-      else
-        cosineSimilarities
+
+      val cosineSimilarities: DenseVector[Float] = DenseVector( tempVal.toArray)
+
+      val similarities =
+        if (alpha < 1.0){ // If alpha is 1, then don't even bother computing edit distances
+          // Using breeze
+          val normalizedEditDistances = DenseVector[Float](groundingConcepts.par.map(concept => getNormalizedDistance(text, concept.name).floatValue()).seq.toArray)
+          val alphas = DenseVector.fill(groundingConcepts.length)(alpha)
+          val oneMinusAlphas = DenseVector.fill(groundingConcepts.length)(1 - alpha)
+          val oneMinusEditDistances = DenseVector.ones[Float](normalizedEditDistances.length) -:- normalizedEditDistances
+          (cosineSimilarities *:* alphas) + (oneMinusEditDistances *:* oneMinusAlphas)
+
+        }
+        else
+          cosineSimilarities
 
 
-    // Choose the top k and return GroundingCandidates
-    // The sorted values are reversed to have it on decreasing size
-    val (sortedCosineSimilarities, sortedIndices) = similarities.toArray.zipWithIndex.sorted.reverse.unzip
+      // Choose the top k and return GroundingCandidates
+      // The sorted values are reversed to have it on decreasing size
+      val (sortedCosineSimilarities, sortedIndices) = similarities.toArray.zipWithIndex.sorted.reverse.unzip
 
-    val topKIndices = sortedIndices.take(k)
-    val topSimilarities = sortedCosineSimilarities.take(k)
-    val topConcepts = topKIndices.map(groundingConcepts)
+      val topKIndices = sortedIndices.take(k)
+      val topSimilarities = sortedCosineSimilarities.take(k)
+      val topConcepts = topKIndices.map(groundingConcepts)
 
-    (topConcepts zip topSimilarities) map {
-      case (concept, similarity) => GroundingCandidate(concept, similarity)
-    }
+      ((topConcepts zip topSimilarities) map {
+        case (concept, similarity) => GroundingCandidate(concept, similarity)
+      }).toSeq
   }
 
   private val editDistancesCache = mutable.HashMap[(String, String), Float]()
