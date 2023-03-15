@@ -38,7 +38,7 @@ def main(year):
     begin_month, end_month = directories[0], directories[-1]
     logging.basicConfig(
         filename=os.path.join(
-            logfile_dst, f"{begin_month}_{end_month}_mathjax_mml_newLock.log"
+            logfile_dst, f"logs/{begin_month}_{end_month}_mathjax_mml_newLock.log"
         ),
         level=logging.DEBUG,
         format=log_format,

@@ -24,7 +24,7 @@ pip install torchtext==0.6.0
 Please check out the `data_generation/README.md` file.
 
 ## Creating dataset for training
-We will sample the dataset from the raw dataset that we have generated in above step.
+We will sample the dataset from the raw dataset that we have generated in above step. Please check out the `sampling_dataset/README.md` file.
 
 ## Training
 
