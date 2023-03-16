@@ -127,7 +127,7 @@ def main():
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
             mml_path = os.path.join(root, f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml")
-            latex_path = os.path.join(root, f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_mml/{eqn_num}.txt")
+            latex_path = os.path.join(root, f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt")
             mml = open(mml_path).readlines()[0]
             latex = open(latex_path).readlines()[0]
             simp_mml = simplification(mml)
