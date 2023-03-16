@@ -17,6 +17,11 @@ images_path = os.path.join(data_path, "images")
 for i in [data_path, images_path]:
     if not os.path.exists(i):
         os.mkdir(i)
+    else:
+        print("sample_data already exists. Replacing the older sample_data by new data.")
+        os.rmdir(i)
+        os.mkdir(i)
+
 mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
 paths_file = open(os.path.join(data_path, "paths.lst"), "w")
 
@@ -123,7 +128,7 @@ def main():
 
             # finding the bin
             temp_dict = {}
-            for i in range(50, 350, 50):
+            for i in range(50, 400, 50):
                 if length_mml/i < 1:
                     temp_dict[i] = length_mml/i
 
