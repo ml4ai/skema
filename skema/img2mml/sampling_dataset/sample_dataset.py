@@ -15,13 +15,16 @@ root = config["src_path"]
 # create destination files and directory
 data_path = "training_data/sample_data"
 images_path = os.path.join(data_path, "images")
-for i in [data_path, images_path]:
-    if not os.path.exists(i):
-        os.mkdir(i)
-    else:
-        print("sample_data already exists. Removing old sample_data and replacing it with new one.")
-        shutil.rmtree(images_path)
-        os.mkdir(i)
+
+if not os.path.exists(data_path):
+    os.mkdir(data_path)
+
+if not os.path.exists(images_path):
+    os.mkdir(images_path)
+else:
+    print("sample_data already exists. Removing old sample_data and replacing it with new one.")
+    shutil.rmtree(images_path)
+    os.mkdir(images_path)
 
 mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
 paths_file = open(os.path.join(data_path, "paths.lst"), "w")
