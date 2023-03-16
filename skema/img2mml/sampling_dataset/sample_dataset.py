@@ -161,8 +161,5 @@ def main():
 
                 count+=1
 
-            else:
-                print(f"{tgt_bin} bin equations has sampled. Wokring on remaining bins.")
-
         else:
             break
