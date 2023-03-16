@@ -41,6 +41,7 @@ After updating the `sampling_config.json` file,
 python create_dataset.py
 ```
 
+It will create sample data at `training_data/sample_data` as per desired distribution. Under sample_data folder, there should be following itmes: an "original_mml.lst" and "original_latex.lst" file containing all the MathMLs and LaTeXs, a "paths.lst" file containing all the paths from where the MathML are fetched, and an "images" folder. The paths defined in "paths.lst" can be seen in a specific way i.e. "<yr> <month> <folder> <type_of_eqn> <eqn_num>". This gives all the information we need to grab the specific file.
 
 ## Training
 

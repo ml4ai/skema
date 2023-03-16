@@ -27,6 +27,7 @@ else:
     os.mkdir(images_path)
 
 mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
+latex_file = open(os.path.join(data_path, "original_latex.lst"), "w")
 paths_file = open(os.path.join(data_path, "paths.lst"), "w")
 
 # distribution
@@ -124,10 +125,11 @@ def main():
     count = 0
     for ap in all_paths:
         if count <= total_eqns:
-            tqdm(desc="Processing", total=total_eqns)
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
             mml_path = os.path.join(root, f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml")
+            latex_path = os.path.join(root, f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_mml/{eqn_num}.txt")
             mml = open(mml_path).readlines()[0]
+            latex = open(latex_path).readlines()[0]
             simp_mml = simplification(mml)
             length_mml = len(simp_mml.split())
 
@@ -154,6 +156,12 @@ def main():
                 if "\n" not in mml:
                     mml = mml + "\n"
                 mml_file.write(mml)
+
+                # writing latex
+                if "\n" not in latex:
+                    latex = latex + "\n"
+                latex_file.write(latex)
+
 
                 # copying image
                 img_src = os.path.join(root, f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png")
