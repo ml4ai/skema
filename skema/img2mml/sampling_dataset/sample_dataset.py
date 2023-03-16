@@ -124,6 +124,7 @@ def main():
     count = 0
     for ap in all_paths:
         if count <= total_eqns:
+            tqdm(desc="Processing", total=total_eqns)
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
             mml_path = os.path.join(root, f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml")
             mml = open(mml_path).readlines()[0]
