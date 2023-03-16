@@ -26,7 +26,7 @@ counter_dist_dict = dict()
 total_eqns = 0
 
 # initialize the dist_dict
-for i in range(0, 300, 50):
+for i in range(0, 350, 50):
     begin = str(i)
     end = str(i+50)
     key = f"{begin}-{end}"
@@ -34,6 +34,7 @@ for i in range(0, 300, 50):
     total_eqns += config[f"{begin}-{end}"]
     counter_dist_dict[key] = 0
 dist_dict["350+"] = config["350+"]
+total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
 
@@ -131,7 +132,7 @@ def main():
                 max_bin_size = max(temp_dict, key=lambda k:temp_dict[k])
                 tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
             else:
-                tgt_bin = "350-1000"
+                tgt_bin = "350+"
 
             if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                 counter_dist_dict[tgt_bin] += 1
