@@ -29,7 +29,7 @@ total_eqns = 0
 for i in range(0, 350, 50):
     begin = str(i)
     end = str(i+50)
-    key = f"{begin}_{end}"
+    key = f"{begin}-{end}"
     dist_dict[key] = config[f"{begin}-{end}"]
     total_eqns += config[f"{begin}-{end}"]
     counter_dist_dict[key] = 0
@@ -107,8 +107,8 @@ def main():
 
     ######## step 3 and 4: simplify MML and and find length  #####
     ######## and grab the corresponding PNG and latex ############
-    print("simplifying the MathML to check the final bin based on distribution provided \
-            and grabbing the corresponding images...")
+    print("simplifying the MathML to check the final bin based on distribution provided \n
+            and grabbing corresponding images...")
 
     count = 0
     for ap in all_paths:
@@ -120,25 +120,35 @@ def main():
             length_mml = len(simp_mml.split())
 
             # finding the bin
-            for k, v in dist_dict.items:
-                begin, end = k.split("_")
-                if length_mml > int(begin) and length_mml <= int(end):
-                    if counter_dist_dict[key] <= v:
-                        counter_dist_dict[key] += 1
-                        count += 1
+            temp_dict = {}
+            for i in range(50, 350, 50):
+                if length_mml/i < 1:
+                    temp_dict[i] = length_mml/i
 
-                        # wrting path
-                        paths_file.write(ap + "\n")
+            # get the bin
+            if len(d) >= 1:
+                max_bin_size = max(d, key=lambda k:d[k])
+                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+            else:
+                tgt_bin = "350-1000"
 
-                        # writing MathML
-                        if "\n" not in mml:
-                            mml = mml + "\n"
-                        mml_file.write(mml)
+            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                counter_dist_dict[tgt_bin] += 1
 
-                        # copying image
-                        img_src = os.path.join(root, f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png")
-                        img_dst = os.path.join(images_path, f"{count}.png")
-                        CP(img_src, images_path)
+                # wrting path
+                paths_file.write(ap + "\n")
+
+                # writing MathML
+                if "\n" not in mml:
+                    mml = mml + "\n"
+                mml_file.write(mml)
+
+                # copying image
+                img_src = os.path.join(root, f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png")
+                img_dst = os.path.join(images_path, f"{count}.png")
+                CP(img_src, img_dst)
+
+                count+=1
 
         else:
             break
