@@ -12,6 +12,9 @@ with open(config_path, "r") as cfg:
 # src path
 root = config["src_path"]
 
+# setting seed
+random.seed(config["seed"])
+
 # create destination files and directory
 data_path = "training_data/sample_data"
 images_path = os.path.join(data_path, "images")
