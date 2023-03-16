@@ -134,7 +134,7 @@ def main():
             )
 
             mml = open(mml_path).readlines()[0]
-            latex = open(latex_path).readlines()[0]
+
             simp_mml = simplification(mml)
             length_mml = len(simp_mml.split())
 
@@ -167,6 +167,7 @@ def main():
                     root,
                     f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
                 )
+                latex = open(latex_path).readlines()[0]
                 if "\n" not in latex:
                     latex = latex + "\n"
                 latex_file.write(latex)
