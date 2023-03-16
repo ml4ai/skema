@@ -8,6 +8,7 @@ import os
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 from collections import Counter
+
 # from torchtext.legacy.vocab import Vocab
 from torchtext.vocab import Vocab
 from torch.nn.utils.rnn import pad_sequence
@@ -82,28 +83,41 @@ def preprocess_mml(config):
     print("preprocessing data...")
 
     # reading raw text files
-    MMLPath = (
-        f"{config['data_path']}/{config['dataset_type']}/mml.lst"
+    MMLPath = f"{config['data_path']}/{config['dataset_type']}/mml.lst"
+    IMGTnsrPath = (
+        f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     )
-    IMGTnsrPath = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     mml_txt = open(MMLPath).read().split("\n")[:-1]
-    image_num = range(0,len(mml_txt))
+    image_num = range(0, len(mml_txt))
 
     """
     checking hypothesis: dealing with large dataset
     """
     # split the image_num into train, test, validate
-    df = image_num#pd.DataFrame(image_num, columns=["IMG"])
-    train_val_images, test_images = train_test_split(df, test_size=0.1, random_state=42)
-    train_images, val_images = train_test_split(train_val_images, test_size=0.1, random_state=42)
+    df = image_num  # pd.DataFrame(image_num, columns=["IMG"])
+    train_val_images, test_images = train_test_split(
+        df, test_size=0.1, random_state=42
+    )
+    train_images, val_images = train_test_split(
+        train_val_images, test_size=0.1, random_state=42
+    )
 
     for t_idx, t_images in enumerate([train_images, test_images, val_images]):
-        raw_mml_data = {'IMG': [torch.load(f'{IMGTnsrPath}/{num}.txt') for num in t_images ],
-                        'EQUATION': [('<sos> '+ mml_txt[num] + ' <eos>') for num in t_images]}
+        raw_mml_data = {
+            "IMG": [
+                torch.load(f"{IMGTnsrPath}/{num}.txt") for num in t_images
+            ],
+            "EQUATION": [
+                ("<sos> " + mml_txt[num] + " <eos>") for num in t_images
+            ],
+        }
 
-        if t_idx==0: train = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
-        elif t_idx==1: test = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
-        else: val = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
+        if t_idx == 0:
+            train = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
+        elif t_idx == 1:
+            test = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
+        else:
+            val = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
 
     """
     checking hypothesis: dealing with large dataset

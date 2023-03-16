@@ -42,6 +42,7 @@ years = config["years"].split(",")
 verbose = config["verbose"]
 num_cpus = config["num_cpus"]
 
+
 def main(year):
 
     # possible matrix and equation keyword that can be used in LaTeX source codes
@@ -130,7 +131,7 @@ def main(year):
                     greek_letters,
                     dir_path,
                     tex_folder,
-                    logger
+                    logger,
                 ]
             )
 
@@ -209,9 +210,7 @@ def parse_equation(args_list):
 
                 # opening files to write Macros and declare math operator
                 macro_file = open(
-                    os.path.join(
-                        root, "{}/macros.txt".format(tex_folder)
-                    ),
+                    os.path.join(root, "{}/macros.txt".format(tex_folder)),
                     "w",
                 )
                 dmo_file = open(

@@ -32,8 +32,9 @@ from skema.img2mml.src.test import evaluate
 # opening config file
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--config", help="configuration file for paths and hyperparameters",
-    default="configs/xfmer_config.json"
+    "--config",
+    help="configuration file for paths and hyperparameters",
+    default="configs/xfmer_config.json",
 )
 args = parser.parse_args()
 
@@ -413,7 +414,10 @@ def train_model(rank=None,):
             torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
         )
     except:
-        pretrained_dict = {key.replace("module.", ""): value for key, value in model.state_dict().items()}
+        pretrained_dict = {
+            key.replace("module.", ""): value
+            for key, value in model.state_dict().items()
+        }
         model.load_state_dict(pretrained_dict)
 
     epoch = "test_0"
@@ -436,7 +440,7 @@ def train_model(rank=None,):
         g2p=g2p,
     )
 
-    if (not ddp) or (ddp and rank==0):
+    if (not ddp) or (ddp and rank == 0):
         print(
             f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
         )
@@ -448,7 +452,7 @@ def train_model(rank=None,):
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
     if ddp:
-        #dist.barrier()
+        # dist.barrier()
         dist.destroy_process_group()
 
 

@@ -125,7 +125,9 @@ def tex_builder(args_list):
 
 
 # function to create tex documents for each eqn in the folder
-def create_tex_doc(eqn, keyword_dict, keyword_macro_dict, tex_folder, tex_name):
+def create_tex_doc(
+    eqn, keyword_dict, keyword_macro_dict, tex_folder, tex_name
+):
 
     # checking \DeclareMathOperator and Macros
     declare_math_operator_in_eqn = [

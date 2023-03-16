@@ -22,7 +22,9 @@ if not os.path.exists(data_path):
 if not os.path.exists(images_path):
     os.mkdir(images_path)
 else:
-    print("sample_data already exists. Removing old sample_data and replacing it with new one.")
+    print(
+        "sample_data already exists. Removing old sample_data and replacing it with new one."
+    )
     shutil.rmtree(images_path)
     os.mkdir(images_path)
 
@@ -38,7 +40,7 @@ total_eqns = 0
 # initialize the dist_dict
 for i in range(0, 350, 50):
     begin = str(i)
-    end = str(i+50)
+    end = str(i + 50)
     key = f"{begin}-{end}"
     dist_dict[key] = config[f"{begin}-{end}"]
     total_eqns += config[f"{begin}-{end}"]
@@ -82,7 +84,6 @@ def main():
 
     """
 
-
     all_paths = list()
 
     ######## step 1: get all MathML paths ########
@@ -95,12 +96,11 @@ def main():
             yr = yr.strip()
             yr_path = os.path.join(root, yr)
 
-            for m in range(1,13,1):
+            for m in range(1, 13, 1):
                 month = yr[0:2] + f"{m:02}"  # yr=2018, month=1801,..
                 temp_paths = get_paths(yr, yr_path, month)
                 for p in temp_paths:
                     all_paths.append(p)
-
 
     elif config["sample_from_months"]:
         months = config["months"].split(",")
@@ -120,14 +120,22 @@ def main():
 
     ######## step 3 and 4: simplify MML and and find length  #####
     ######## and grab the corresponding PNG and latex ############
-    print("simplifying the MathML to check the final bin based on distribution provided and grabbing corresponding images...")
+    print(
+        "simplifying the MathML to check the final bin based on distribution provided and grabbing corresponding images..."
+    )
 
     count = 0
     for ap in all_paths:
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-            mml_path = os.path.join(root, f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml")
-            latex_path = os.path.join(root, f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt")
+            mml_path = os.path.join(
+                root,
+                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+            )
+            latex_path = os.path.join(
+                root,
+                f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+            )
             mml = open(mml_path).readlines()[0]
             latex = open(latex_path).readlines()[0]
             simp_mml = simplification(mml)
@@ -136,12 +144,12 @@ def main():
             # finding the bin
             temp_dict = {}
             for i in range(50, 400, 50):
-                if length_mml/i < 1:
-                    temp_dict[i] = length_mml/i
+                if length_mml / i < 1:
+                    temp_dict[i] = length_mml / i
 
             # get the bin
             if len(temp_dict) >= 1:
-                max_bin_size = max(temp_dict, key=lambda k:temp_dict[k])
+                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
                 tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
             else:
                 tgt_bin = "350+"
@@ -162,13 +170,15 @@ def main():
                     latex = latex + "\n"
                 latex_file.write(latex)
 
-
                 # copying image
-                img_src = os.path.join(root, f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png")
+                img_src = os.path.join(
+                    root,
+                    f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+                )
                 img_dst = os.path.join(images_path, f"{count}.png")
                 CP(img_src, img_dst)
 
-                count+=1
+                count += 1
 
         else:
             break

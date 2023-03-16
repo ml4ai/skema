@@ -32,6 +32,7 @@ years = config["years"].split(",")
 verbose = config["verbose"]
 num_cpus = config["num_cpus"]
 
+
 def main(year):
 
     # Setting up Logger - To get log files
@@ -132,7 +133,9 @@ def simplification(pooling_list):
                 mml_org = mml_org.replace(mml_org[begin:end], "")
 
                 # Checking and logging unicodes along with their asciii-code
-                unicode_logger(mml_org, os.path.join(type_of_folder_path, file_path))
+                unicode_logger(
+                    mml_org, os.path.join(type_of_folder_path, file_path)
+                )
 
                 # ATTRIBUTES
 
@@ -245,7 +248,9 @@ def unicode_logger(mml_code, running_path):
     code_dict = {}
 
     symbol_index = [
-        i for i, c in enumerate(mml_code.split()) if ";<!--" in c and "&#x" in c
+        i
+        for i, c in enumerate(mml_code.split())
+        if ";<!--" in c and "&#x" in c
     ]
 
     if verbose:

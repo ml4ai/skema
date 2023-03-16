@@ -31,6 +31,7 @@ years = config["years"].split(",")
 verbose = config["verbose"]
 num_cpus = config["num_cpus"]
 
+
 def main(year):
     # Setting up Logger - To get log files
     log_format = "%(levelname)s:%(message)s"
@@ -38,7 +39,8 @@ def main(year):
     begin_month, end_month = directories[0], directories[-1]
     logging.basicConfig(
         filename=os.path.join(
-            logfile_dst, f"logs/{begin_month}_{end_month}_mathjax_mml_newLock.log"
+            logfile_dst,
+            f"logs/{begin_month}_{end_month}_mathjax_mml_newLock.log",
         ),
         level=logging.DEBUG,
         format=log_format,
@@ -67,7 +69,7 @@ def main(year):
 
         for folder in os.listdir(folder_images):
 
-            #if folder not in mml_folder_list:
+            # if folder not in mml_folder_list:
 
             # Creating macros dictionary
             (
@@ -93,9 +95,7 @@ def main(year):
 
 def creating_macro_dmo_dictionaries(root, folder):
 
-    macro_file = os.path.join(
-        root, f"latex_equations/{folder}/macros.txt"
-    )
+    macro_file = os.path.join(root, f"latex_equations/{folder}/macros.txt")
     with open(macro_file, "r") as file:
         macro = file.readlines()
         file.close()

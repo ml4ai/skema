@@ -30,6 +30,7 @@ years = config["years"].split(",")
 verbose = config["verbose"]
 num_cpus = config["num_cpus"]
 
+
 def main(year):
 
     src_path = config["source_directory"]
@@ -42,8 +43,7 @@ def main(year):
     log_format = "%(levelname)s:%(message)s"
     logfile_dst = os.path.join(destination, f"{year}/logs")
     logging.basicConfig(
-        filename=os.path.join(
-            logfile_dst,f"tex2png{year}.log"),
+        filename=os.path.join(logfile_dst, f"tex2png{year}.log"),
         level=logging.DEBUG,
         format=log_format,
         filemode="w",
@@ -127,7 +127,6 @@ def run_pdflatex(run_pdflatex_list):
             pdf_dst,
             type_of_folder,
             logger,
-
         )
 
     finally:
