@@ -168,7 +168,7 @@ def main():
                     f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
                 )
                 latex_arr = open(latex_path).readlines()
-                if len(latex) > 1:
+                if len(latex_arr) > 1:
                     latex = " "
                     for l in latex_arr:
                         latex = latex + l.replace("\n", "")
