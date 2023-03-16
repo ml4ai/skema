@@ -125,8 +125,8 @@ def main():
                     temp_dict[i] = length_mml/i
 
             # get the bin
-            if len(d) >= 1:
-                max_bin_size = max(d, key=lambda k:d[k])
+            if len(temp_dict) >= 1:
+                max_bin_size = max(temp_dict, key=lambda k:temp_dict[k])
                 tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
             else:
                 tgt_bin = "350-1000"
