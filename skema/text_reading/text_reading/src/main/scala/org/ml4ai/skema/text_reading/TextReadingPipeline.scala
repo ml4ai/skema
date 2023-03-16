@@ -6,8 +6,9 @@ import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention
 import org.clulab.processors.Document
 import org.clulab.utils.Logging
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
-import org.ml4ai.skema.text_reading.grounding.{GroundingCandidate, MiraWebApiGrounder}
+import org.ml4ai.skema.text_reading.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, MiraWebApiGrounder}
 
+import scala.language.implicitConversions
 import scala.util.matching.Regex
 
 class TextReadingPipeline extends Logging {
@@ -23,8 +24,8 @@ class TextReadingPipeline extends Logging {
   // Grounding parameters
   private val ontologyFilePath = groundingConfig.getString("ontologyPath")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-//  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
-  private val grounder = new MiraWebApiGrounder("http://34.230.33.149:8771/api/ground_list")
+  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
+//  private val grounder = new MiraWebApiGrounder("http://34.230.33.149:8771/api/ground_list")
 
   val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
 
@@ -33,30 +34,32 @@ class TextReadingPipeline extends Logging {
   // Initialize the odin engine
   odinEngine.annotate("x = 10")
 
+  def isGroundable(m:TextBoundMention): Boolean = {
+    val isGrounded =
+      m.attachments.exists(!_.isInstanceOf[GroundingAttachment])
+
+    if (!isGrounded) {
+      // Don't ground unless it is not a number
+      numberPattern.findFirstIn(m.text.trim) match {
+        case None => true
+        case Some(_) => false// If it is a number, then don't ground
+      }
+    }
+    else
+      false
+  }
+
+  def fetchNestedArguments(ms: Seq[Mention]): Seq[TextBoundMention] = ms flatMap {
+    case tbm: TextBoundMention => List(tbm)
+    case e@(_: EventMention | _: RelationMention) => e.arguments.values.flatMap(fetchNestedArguments)
+  }
+
   def groundMentions(mentions: Seq[Mention]):Seq[Mention] = {
     // Helper function to fetch all the arguments of mentions that have to be grounded
-    def fetchGroundableArguments(ms: Seq[Mention]):Seq[TextBoundMention] = ms flatMap {
-      case tbm: TextBoundMention =>
-        val isGrounded =
-          tbm.attachments.exists(!_.isInstanceOf[GroundingAttachment])
 
-        if (!isGrounded) {
-          // Don't ground unless it is not a number
-          numberPattern.findFirstIn(tbm.text.trim) match {
-            case None => List(tbm)
-            case Some(_) => Nil // If it is a number, then don't ground
-          }
-
-        }
-        else
-          Nil
-      case e @ (_:EventMention | _:RelationMention) => e.arguments.values.flatMap(fetchGroundableArguments)
-      case _ => Nil
-
-    }
 
     // Get the mentions to ground from the events and relations
-    val candidatesToGround = fetchGroundableArguments(mentions).distinct
+    val candidatesToGround = fetchNestedArguments(mentions).filter(isGroundable).distinct
 
     // Do batch grounding
     val mentionsGroundings = grounder.groundingCandidates(candidatesToGround.map(_.text), k=5).map{
@@ -97,6 +100,9 @@ class TextReadingPipeline extends Logging {
     mentions map (m => rebuildArguments(m, groundedTextBoundMentions))
   }
 
+  private case class MentionKey(doc:Document, sent:Int, start:Int, end:Int)
+
+  private def mentionToMentionKey(m:Mention):MentionKey = MentionKey(m.document, m.sentence, m.start, m.end)
 
   /**
     * Runs the mention extraction engine on the  parameter
@@ -113,8 +119,14 @@ class TextReadingPipeline extends Logging {
     val (textBound, nonTextBound) = mentions.partition(m => if(m.isInstanceOf[TextBoundMention]) true else false)
 
     // Ground them
-    val groundedMentions = groundMentions(nonTextBound)
+    val groundedNotTextBound = groundMentions(nonTextBound)
 
-    (doc, groundedMentions ++ textBound)
+    // Add them together
+    val groundedTextBound = fetchNestedArguments(groundedNotTextBound)
+    val groundedCache:Set[MentionKey] = groundedTextBound.map(mentionToMentionKey).toSet
+    val ungroundedTextBound = textBound.filterNot(m => groundedCache.contains(mentionToMentionKey(m))) // Try to avoid duplicates
+
+    // Return them!
+    (doc, groundedNotTextBound ++ ungroundedTextBound  ++ groundedTextBound)
   }
 }
