@@ -26,13 +26,15 @@ counter_dist_dict = dict()
 total_eqns = 0
 
 # initialize the dist_dict
-for i in range(0, 350, 50):
+for i in range(0, 300, 50):
     begin = str(i)
     end = str(i+50)
     key = f"{begin}-{end}"
     dist_dict[key] = config[f"{begin}-{end}"]
     total_eqns += config[f"{begin}-{end}"]
     counter_dist_dict[key] = 0
+dist_dict["350+"] = config["350+"]
+counter_dist_dict["350+"] = 0
 
 
 def get_paths(yr, yr_path, month):
