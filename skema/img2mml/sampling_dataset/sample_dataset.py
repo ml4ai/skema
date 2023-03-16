@@ -1,5 +1,6 @@
 import os, json, random
 import multiprocessing as mp
+import shutil
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
 
@@ -18,8 +19,8 @@ for i in [data_path, images_path]:
     if not os.path.exists(i):
         os.mkdir(i)
     else:
-        print("sample_data already exists. Replacing the older sample_data by new data.")
-        os.rmdir(i)
+        print("sample_data already exists. Removing old sample_data and replacing it with new one.")
+        shutil.rmtree(images_path)
         os.mkdir(i)
 
 mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
