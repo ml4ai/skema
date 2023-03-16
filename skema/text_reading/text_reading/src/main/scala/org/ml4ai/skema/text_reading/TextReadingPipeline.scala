@@ -33,49 +33,70 @@ class TextReadingPipeline extends Logging {
   // Initialize the odin engine
   odinEngine.annotate("x = 10")
 
-  /**
-    * Assigns grounding elements to a mention
-    *
-    * @param m mention to ground
-    * @return instance of the mention with grounding attachment if applicable
-    */
-  def groundMention(m: Mention): Mention = m match {
-    case tbm: TextBoundMention =>
-      val isGrounded =
-        tbm.attachments.exists(!_.isInstanceOf[GroundingAttachment])
+  def groundMentions(mentions: Seq[Mention]):Seq[Mention] = {
+    // Helper function to fetch all the arguments of mentions that have to be grounded
+    def fetchGroundableArguments(ms: Seq[Mention]):Seq[TextBoundMention] = ms flatMap {
+      case tbm: TextBoundMention =>
+        val isGrounded =
+          tbm.attachments.exists(!_.isInstanceOf[GroundingAttachment])
 
-      if (!isGrounded) {
-        // Don't ground unless it is not a number
-        numberPattern.findFirstIn(tbm.text.trim) match {
-          case None =>
-            val topGroundingCandidates = grounder.groundingCandidates(tbm.text, k=5).filter {
-              case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
-            }
+        if (!isGrounded) {
+          // Don't ground unless it is not a number
+          numberPattern.findFirstIn(tbm.text.trim) match {
+            case None => List(tbm)
+            case Some(_) => Nil // If it is a number, then don't ground
+          }
 
-            if (topGroundingCandidates.nonEmpty)
-              tbm.withAttachment(new GroundingAttachment(topGroundingCandidates))
-            else
-              tbm
-          case Some(_) => tbm // If it is a number, then don't ground
         }
+        else
+          Nil
+      case e @ (_:EventMention | _:RelationMention) => e.arguments.values.flatMap(fetchGroundableArguments)
+      case _ => Nil
 
+    }
+
+    // Get the mentions to ground from the events and relations
+    val candidatesToGround = fetchGroundableArguments(mentions).distinct
+
+    // Do batch grounding
+    val mentionsGroundings = grounder.groundingCandidates(candidatesToGround.map(_.text), k=5).map{
+      gs => gs.filter{
+        // Filter by grounding threshold
+        case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
       }
-      else
-        tbm
-    case e: EventMention =>
-      val groundedArguments =
-        e.arguments.mapValues(_.map(groundMention))
+    }
 
+    val groundedTextBoundMentions =
+      (candidatesToGround zip mentionsGroundings).map{
+        case (original, groundings) =>
+          if (groundings.nonEmpty)
+            original ->original.withAttachment(new GroundingAttachment(groundings))
+          else
+            original -> original
+      }.toMap
 
-      e.copy(arguments = groundedArguments)
-    // This is duplicated while we fix the Mention trait to define the abstract method copy
-    case e: RelationMention =>
-      val groundedArguments =
-        e.arguments.mapValues(_.map(groundMention))
+    // Helper function to recursively replace the mentions with their grounded arguments, regardless of the nesting level
+    def rebuildArguments(m:Mention,
+                         groundedMentions:Map[TextBoundMention, Mention]):Mention =  m match {
+      case tb:TextBoundMention => groundedTextBoundMentions.getOrElse(tb, tb)
+      case e:EventMention =>
+        e.copy(arguments = e.arguments mapValues {
+          _.map{
+            e => rebuildArguments(e, groundedMentions)
+          }
+        })
+      case r: RelationMention =>
+        r.copy(arguments = r.arguments mapValues {
+          _.map {
+            e => rebuildArguments(e, groundedMentions)
+          }
+        })
+    }
 
-      e.copy(arguments = groundedArguments)
-    case m => m
+    // Now, rebuild the events, replacing the arguments with the grounded mentions
+    mentions map (m => rebuildArguments(m, groundedTextBoundMentions))
   }
+
 
   /**
     * Runs the mention extraction engine on the  parameter
@@ -87,13 +108,13 @@ class TextReadingPipeline extends Logging {
   def extractMentions(text: String, fileName: Option[String]): (Document, Seq[Mention]) = {
     // Extract mentions and apply grounding
     val ExtractionResults(doc, mentions) = odinEngine.extractFromText(text, keepText = true, fileName)
-    // Run grounding
-    val groundedMentions = mentions.par.map {
-      // Only ground arguments of events and relations, to save time
-      case e@(_: EventMention | _: RelationMention) => groundMention(e)
-      case m => m
-    }.seq
 
-    (doc, groundedMentions)
+    // Choose which mentions to ground
+    val (textBound, nonTextBound) = mentions.partition(m => if(m.isInstanceOf[TextBoundMention]) true else false)
+
+    // Ground them
+    val groundedMentions = groundMentions(nonTextBound)
+
+    (doc, groundedMentions ++ textBound)
   }
 }
