@@ -6,7 +6,8 @@ import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention
 import org.clulab.processors.Document
 import org.clulab.utils.Logging
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
-import org.ml4ai.skema.text_reading.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, MiraWebApiGrounder}
+import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, GroundingCandidate, MiraEmbeddingsGrounder, MiraWebApiGrounder}
+import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
 
 import scala.language.implicitConversions
 import scala.util.matching.Regex
@@ -19,15 +20,11 @@ class TextReadingPipeline extends Logging {
   val readerType: String = generalConfig[String]("ReaderType")
   val defaultConfig: Config = generalConfig[Config](readerType)
   val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
-  val groundingConfig: Config = generalConfig.getConfig("Grounding")
 
-  // Grounding parameters
-  private val ontologyFilePath = groundingConfig.getString("ontologyPath")
+  private val groundingConfig: Config = generalConfig.getConfig("Grounding")
   private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda = 10, alpha = 1.0f) // TODO: Fix this @Enrique
-//  private val grounder = new MiraWebApiGrounder("http://34.230.33.149:8771/api/ground_list")
-
-  val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
+  private val grounder = GrounderFactory.getInstance(groundingConfig)
+  private val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
 
   // Odin Engine instantiation
   private val odinEngine = OdinEngine.fromConfig(config)
@@ -51,7 +48,7 @@ class TextReadingPipeline extends Logging {
 
   def fetchNestedArguments(ms: Seq[Mention]): Seq[TextBoundMention] = ms flatMap {
     case tbm: TextBoundMention => List(tbm)
-    case e@(_: EventMention | _: RelationMention) => e.arguments.values.flatMap(fetchNestedArguments)
+    case e@(_: EventMention | _: RelationMention | _:CrossSentenceEventMention) => e.arguments.values.flatMap(fetchNestedArguments)
   }
 
   def groundMentions(mentions: Seq[Mention]):Seq[Mention] = {
@@ -94,6 +91,13 @@ class TextReadingPipeline extends Logging {
             e => rebuildArguments(e, groundedMentions)
           }
         })
+      case cs: CrossSentenceEventMention =>
+        cs.copy(arguments = cs.arguments mapValues {
+          _.map {
+            e => rebuildArguments(e, groundedMentions)
+          }
+        })
+
     }
 
     // Now, rebuild the events, replacing the arguments with the grounded mentions
