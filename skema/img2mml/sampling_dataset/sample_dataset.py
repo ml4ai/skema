@@ -120,9 +120,7 @@ def main():
 
     ######## step 3 and 4: simplify MML and and find length  #####
     ######## and grab the corresponding PNG and latex ############
-    print(
-        "simplifying the MathML to check the final bin based on distribution provided and grabbing corresponding images..."
-    )
+    print("preparing dataset...")
 
     count = 0
     for ap in all_paths:
