@@ -71,7 +71,7 @@ def get_paths(months):
                     mml_eqn_path = f"{yr}_{month}_{folder}_{type_of_eqn}_{eqn_num}"
 
                     # getting the length
-                    mml = open(mml_path).readlines()[0]
+                    mml = open(eqn).readlines()[0]
                     simp_mml = simplification(mml)
                     length_mml = len(simp_mml.split())
 
