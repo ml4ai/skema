@@ -38,31 +38,29 @@ RUN sbt publishLocal
 # =============================================================================
 # CREATE A PYTHON VENV AND UPGRADE PYTHON TOOLS
 # =============================================================================
-ENV VIRTUAL_ENV=/opt/automates_venv
-RUN python3 -m venv $VIRTUAL_ENV
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-RUN pip install --upgrade setuptools
-RUN pip install wheel
+#ENV VIRTUAL_ENV=/opt/automates_venv
+#RUN python3 -m venv $VIRTUAL_ENV
+#ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+#
+#RUN pip install --upgrade setuptools
+#RUN pip install wheel
 # =============================================================================
 
 # =============================================================================
-# SETUP THE AUTOMATES TR ENVIRONMENT
+# SETUP THE SKEMA TR ENVIRONMENT
 # =============================================================================
-RUN mkdir -p /automates/automates/text_reading
-RUN mkdir -p /automates/automates/apps/pdfalign
-COPY automates/text_reading /automates/automates/text_reading
-COPY automates/apps/pdfalign /automates/automates/apps/pdfalign
-WORKDIR /automates/automates/text_reading
-RUN pip install -r requirements.txt
-
-# In order for the test suite to work, you need vector files. Run the following to get them:
-# RUN wget http://vanga.sista.arizona.edu/automates_data/vectors.txt -O /automates/automates/text_reading/src/test/resources/vectors.txt
-RUN sbt -Dapps.projectDir=/automates test
+RUN mkdir -p /skema/text_reading
+COPY . /skema/text_reading
+WORKDIR /skema/text_reading
+# Compile the fat jar
+RUN sbt assembly
 # =============================================================================
 
+RUN mkdir -p /data/inputs
+RUN mkdir -p /data/outputs
+
 # =============================================================================
-# PREPARE FOR USE
+# ENTRY POINT IS THE  WEB API
 # =============================================================================
 CMD ["sbt", "webapp/run"]
 # =============================================================================
