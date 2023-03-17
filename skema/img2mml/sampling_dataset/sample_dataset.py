@@ -80,7 +80,7 @@ def main():
 
     (1) All the MathML eqn paths will be collected in 'all_paths'.
     (2) They will be randomly shuffled twice to ensure proper shuffling.
-    (3) They will sequentially fetched and will be distributed according to the
+    (3) They will sequentially be fetched and will be distributed according to the
         length as per the distribution. The length of the preprocessed simplified
         MathML used will be used to final distribution bin.
     (4) Corresponding Latex and PNG will fetched and stored.
