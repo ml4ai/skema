@@ -73,7 +73,7 @@ def get_paths(months):
                     mml_eqn_path = f"{yr}_{month}_{folder}_{type_of_eqn}_{eqn_num}"
                     mp_temp.append([
                                 mml_eqn_path,
-                                os.path.join(folder_path, f"{tyf}/{eqn}"
+                                os.path.join(folder_path, f"{tyf}/{eqn}")
                                 ])
 
     with Pool(config["num_cpus"]) as pool:
