@@ -46,11 +46,11 @@ for i in range(0, 350, 50):
     end = str(i + 50)
     key = f"{begin}-{end}"
     dist_dict[key] = list()
-    total_eqns += config[f"{begin}-{end}"]
-    counter_dist_dict[key] = 0
+    # total_eqns += config[f"{begin}-{end}"]
+    counter_dist_dict[key] = config[f"{begin}-{end}"]
 dist_dict["350+"] = list()
-total_eqns += config["350+"]
-counter_dist_dict["350+"] = 0
+# total_eqns += config["350+"]
+counter_dist_dict["350+"] = config[f"{begin}-{end}"]
 
 
 def get_paths(months):
@@ -76,12 +76,16 @@ def get_paths(months):
                                 os.path.join(folder_path, f"{tyf}/{eqn}")
                                 ])
 
-    with Pool(config["num_cpus"]) as pool:
-        result = pool.map(creating_final_equations, temp)
+    with mp.Pool(config["num_cpus"]) as pool:
+        result = pool.map(get_lengths, mp_temp)
+        if result == 0:
+            pool.terminate()
+            break
 
 
-def get_lengths(path, eqn_path):
+def get_lengths(args):
 
+    [path, eqn_path] = args
     # getting the length
     mml = open(eqn_path).readlines()[0]
     simp_mml = simplification(mml)
@@ -100,7 +104,10 @@ def get_lengths(path, eqn_path):
     else:
         tgt_bin = "350+"
 
-    dist_dict[tgt_bin].append(mml_eqn_path)
+    dist_dict[tgt_bin].append(path)
+    counter_dist_dict[tgt_bin] -= 1
+
+    return sum(counter_dist_dict.values())
 
 def prepare_dataset():
 
