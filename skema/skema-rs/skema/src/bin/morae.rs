@@ -7,10 +7,119 @@ use petgraph::prelude::*;
 use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
 use std::collections::HashMap;
+use std::env;
+
+// overall this will be a function that takes in a module id and weather it is manually or auto extraction to use
+// for now we will deal with manual module ids
 
 fn main() {
+    // setup command line argument on if the core dynamics has been found manually or needs to be found automatically
+    let args: Vec<String> = env::args().collect();
+    println!("{:?}", args[1]);
+
     let module_id = 460;
-    let graph = subgraph2petgraph(module_id);
+    // now to prototype an algorithm to find the function that contains the core dynamics
+
+    if args[1] == "auto".to_string() {
+        println!("auto branch");
+        let graph = subgraph2petgraph(module_id);
+        // 1. find each function node
+        let mut function_nodes = Vec::<NodeIndex>::new();
+        for node in graph.node_indices() {
+            if graph[node].labels == ["Function"] {
+                function_nodes.push(node.clone());
+            }
+        }
+        // 2. check and make sure only expressions in function
+        // 3. check number of expressions and decide off that
+        let mut functions =
+            Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+        for i in 0..function_nodes.len() {
+            // grab the subgraph of the given expression
+            functions.push(subgraph2petgraph(graph[function_nodes[i]].id.clone()));
+        }
+        // get a sense of the number of expressions in each function
+        let mut func_counter = 0;
+        let mut core_func = 0;
+        for func in functions.clone() {
+            let mut expression_counter = 0;
+            for node in func.node_indices() {
+                if func[node].labels == ["Expression"] {
+                    expression_counter += 1;
+                }
+            }
+            if expression_counter >= 4 {
+                core_func = func_counter;
+            }
+            func_counter += 1;
+        }
+        // 4. get the id of the core dynamics function
+        let mut core_id = module_id;
+        for node in functions[core_func].clone().node_indices() {
+            if functions[core_func][node].labels == ["Function"] {
+                core_id = functions[core_func][node].id.clone();
+            }
+        }
+
+        // 5. pass id to subgrapg2_core_dyn to get core dynamics
+        let (core_dynamics, metadata_map) = subgraph2_core_dyn(core_id).unwrap();
+
+        println!("{:?}", core_dynamics[0].clone());
+    }
+    // This is the graph id for the top level function for the core dynamics for our test case.
+    else if args[1] == "manual".to_string() {
+        // still need to grab the module id
+
+        let (core_dynamics, metadata_map) = subgraph2_core_dyn(module_id).unwrap();
+
+        println!("{:?}", core_dynamics[0].clone());
+    } else {
+        println!("Unknown command");
+    }
+
+    // FOR DEBUGGING
+    /*for node_idx in expressions_wiring[1].clone().node_indices() {
+        if expressions_wiring[1].clone()[node_idx].properties["name"].to_string()
+            == "'un-named'".to_string()
+        {
+            println!("{:?}", node_idx);
+        }
+    }*/
+    /*for i in 0..trimmed_expressions_wiring.len() {
+        println!("{:?}", graph[expression_nodes[i]].id);
+        println!(
+            "Nodes in wiring subgraph: {}",
+            trimmed_expressions_wiring[i].node_count()
+        );
+        println!(
+            "Edges in wiring subgraph: {}",
+            trimmed_expressions_wiring[i].edge_count()
+        );
+    }*/
+    //let (nodes1, edges1) = expressions_wiring[1].clone().into_nodes_edges();
+    /*for edge in edges1 {
+        let source = edge.source();
+        let target = edge.target();
+        let edge_weight = edge.weight;
+        println!(
+            "Edge from {:?} to {:?} with weight {:?}",
+            source, target, edge_weight
+        );
+    }*/
+    /*for node in nodes1 {
+        println!("{:?}", node);
+    }*/
+    /*println!(
+        "{:?}",
+        Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
+    );*/
+}
+
+fn subgraph2_core_dyn(
+    root_node_id: i64,
+) -> Result<(Vec<Expr>, HashMap<String, rsmgclient::Node>), MgError> {
+    // get the petgraph of the subgraph
+    let graph = subgraph2petgraph(root_node_id);
 
     /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
@@ -74,46 +183,23 @@ fn main() {
         panic!("More than one Opo!");
     }
 
-    let expr1 = tree_2_expr(trimmed_expressions_wiring[0].clone(), root_node[0]).unwrap();
+    let mut core_dynamics = Vec::<Expr>::new();
 
-    println!("{:?}", expr1);
-
-    // debugging outputs
-    /*for node_idx in expressions_wiring[1].clone().node_indices() {
-        if expressions_wiring[1].clone()[node_idx].properties["name"].to_string()
-            == "'un-named'".to_string()
-        {
-            println!("{:?}", node_idx);
+    for expr in trimmed_expressions_wiring.clone() {
+        let mut root_node = Vec::<NodeIndex>::new();
+        for node_index in expr.clone().node_indices() {
+            if expr.clone()[node_index].labels == ["Opo"] {
+                root_node.push(node_index);
+            }
         }
-    }*/
-    /*for i in 0..trimmed_expressions_wiring.len() {
-        println!("{:?}", graph[expression_nodes[i]].id);
-        println!(
-            "Nodes in wiring subgraph: {}",
-            trimmed_expressions_wiring[i].node_count()
-        );
-        println!(
-            "Edges in wiring subgraph: {}",
-            trimmed_expressions_wiring[i].edge_count()
-        );
-    }*/
-    //let (nodes1, edges1) = expressions_wiring[1].clone().into_nodes_edges();
-    /*for edge in edges1 {
-        let source = edge.source();
-        let target = edge.target();
-        let edge_weight = edge.weight;
-        println!(
-            "Edge from {:?} to {:?} with weight {:?}",
-            source, target, edge_weight
-        );
-    }*/
-    /*for node in nodes1 {
-        println!("{:?}", node);
-    }*/
-    /*println!(
-        "{:?}",
-        Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
-    );*/
+        if root_node.len() >= 2 {
+            panic!("More than one Opo!");
+        }
+
+        core_dynamics.push(tree_2_expr(expr.clone(), root_node[0].clone()).unwrap());
+    }
+
+    return Ok((core_dynamics, metadata_map));
 }
 
 fn tree_2_expr(
@@ -155,7 +241,7 @@ fn tree_2_expr(
                         for node2 in graph.neighbors_directed(node1, Outgoing) {
                             if graph.clone()[node2].labels == ["Opi"] {
                                 let arg_string = format!(
-                                    "-{}",
+                                    "{}",
                                     graph.clone()[node2].properties["name"].to_string()
                                 );
                                 args_vec.push(Expr::Atom(Atom::Identifier(arg_string)));
@@ -207,7 +293,7 @@ fn tree_2_expr(
                     for node2 in graph.neighbors_directed(node1, Outgoing) {
                         if graph.clone()[node2].labels == ["Opi"] {
                             let arg_string =
-                                format!("-{}", graph.clone()[node2].properties["name"].to_string());
+                                format!("{}", graph.clone()[node2].properties["name"].to_string());
                             args_vec.push(Expr::Atom(Atom::Identifier(arg_string)));
                         } else {
                             panic!("Unsupported edge case where 'USub' preceeds something besides an 'Opi'!");
@@ -218,12 +304,15 @@ fn tree_2_expr(
                     // this is the case where there are more operators and will likely require a recursive call.
                     let expr1 = tree_2_expr(graph.clone(), node1).unwrap();
                     args_vec.push(expr1);
-                } else if graph.clone()[node1].labels == ["Opi"] {
+                } else if (graph.clone()[node1].labels == ["Opi"]
+                    || graph.clone()[node1].labels == ["Literal"])
+                {
                     // nice and straight to an argument
                     args_vec.push(Expr::Atom(Atom::Identifier(
                         graph.clone()[node1].properties["name"].to_string(),
                     )));
                 } else {
+                    println!("{:?}", graph.clone()[node1].labels);
                     panic!("Encoutered node that is not an 'Opi' or 'Primitive'!");
                 }
             }
