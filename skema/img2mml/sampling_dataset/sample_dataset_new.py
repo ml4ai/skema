@@ -54,7 +54,8 @@ counter_dist_dict["350+"] = 0
 
 
 def get_paths(months):
-    count=0
+
+    mp_temp = list()
 
     for month in months:
         yr = f"20{month[0:2]}"
@@ -70,35 +71,36 @@ def get_paths(months):
                 for eqn in os.listdir(os.path.join(folder_path, tyf)):
                     eqn_num = eqn.split(".")[0]
                     mml_eqn_path = f"{yr}_{month}_{folder}_{type_of_eqn}_{eqn_num}"
+                    mp_temp.append([
+                                mml_eqn_path,
+                                os.path.join(folder_path, f"{tyf}/{eqn}"
+                                ])
 
-                    # getting the length
-                    eqn_path = os.path.join(folder_path, f"{tyf}/{eqn}")
-                    mml = open(eqn_path).readlines()[0]
-                    simp_mml = simplification(mml)
-                    length_mml = len(simp_mml.split())
+    with Pool(config["num_cpus"]) as pool:
+        result = pool.map(creating_final_equations, temp)
 
-                    # finding the bin
-                    temp_dict = {}
-                    for i in range(50, 400, 50):
-                        if length_mml / i < 1:
-                            temp_dict[i] = length_mml / i
 
-                    # get the bin
-                    if len(temp_dict) >= 1:
-                        max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                        tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                    else:
-                        tgt_bin = "350+"
+def get_lengths(path, eqn_path):
 
-                    dist_dict[tgt_bin].append(mml_eqn_path)
+    # getting the length
+    mml = open(eqn_path).readlines()[0]
+    simp_mml = simplification(mml)
+    length_mml = len(simp_mml.split())
 
-                    if counter_dist_dict[tgt_bin] <= config[tgt_bin]:
-                        counter_dist_dict[tgt_bin] += 1
-                    else:
-                        count += config[tgt_bin]
-                    if count == total_eqns:
-                        break
+    # finding the bin
+    temp_dict = {}
+    for i in range(50, 400, 50):
+        if length_mml / i < 1:
+            temp_dict[i] = length_mml / i
 
+    # get the bin
+    if len(temp_dict) >= 1:
+        max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+        tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+    else:
+        tgt_bin = "350+"
+
+    dist_dict[tgt_bin].append(mml_eqn_path)
 
 def prepare_dataset():
 
