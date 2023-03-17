@@ -54,7 +54,7 @@ total_eqns += config["350+"]
 
 
 def get_paths(months):
-
+    
     for month in months:
         yr = f"20{month[0:2]}"
         yr_path = os.path.join(root, yr)
