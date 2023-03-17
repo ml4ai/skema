@@ -79,6 +79,7 @@ def get_paths(months):
     print("pooling")
     p = mp.Pool(config["num_cpus"])
     for result in p.imap_unordered(get_lengths, mp_temp):
+        print(result)
         if result < 0:
             print('terminating')
             p.terminate()
