@@ -50,7 +50,7 @@ for i in range(0, 350, 50):
     counter_dist_dict[key] = config[f"{begin}-{end}"]
 dist_dict["350+"] = list()
 # total_eqns += config["350+"]
-counter_dist_dict["350+"] = config[f"{begin}-{end}"]
+counter_dist_dict["350+"] = config["350+"]
 
 
 def get_paths(months):
@@ -76,11 +76,18 @@ def get_paths(months):
                                 os.path.join(folder_path, f"{tyf}/{eqn}")
                                 ])
 
-    with mp.Pool(config["num_cpus"]) as pool:
-        result = pool.map(get_lengths, mp_temp)
-        if result == 0:
-            pool.terminate()
+    print("pooling")
+    p = mp.Pool(config["num_cpus"])
+    for result in p.imap_unordered(get_lengths, mp_temp):
+        if result < 0:
+            print('terminating')
+            p.terminate()
             break
+    # with mp.Pool(config["num_cpus"]) as pool:
+    #     result = pool.map(get_lengths, mp_temp)
+    #     if result == 0:
+    #         pool.terminate()
+            # break
 
 
 def get_lengths(args):
