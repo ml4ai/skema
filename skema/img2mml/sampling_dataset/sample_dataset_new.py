@@ -37,7 +37,7 @@ paths_file = open(os.path.join(data_path, "paths.lst"), "w")
 
 # distribution
 dist_dict = dict()
-# counter_dist_dict = dict()
+counter_dist_dict = dict()
 total_eqns = 0
 
 # initialize the dist_dict
@@ -47,14 +47,15 @@ for i in range(0, 350, 50):
     key = f"{begin}-{end}"
     dist_dict[key] = list()
     total_eqns += config[f"{begin}-{end}"]
-    # counter_dist_dict[key] = 0
+    counter_dist_dict[key] = 0
 dist_dict["350+"] = list()
 total_eqns += config["350+"]
-# counter_dist_dict["350+"] = 0
+counter_dist_dict["350+"] = 0
 
 
 def get_paths(months):
-    
+    count=0
+
     for month in months:
         yr = f"20{month[0:2]}"
         yr_path = os.path.join(root, yr)
@@ -90,6 +91,13 @@ def get_paths(months):
                         tgt_bin = "350+"
 
                     dist_dict[tgt_bin].append(mml_eqn_path)
+
+                    if counter_dist_dict[tgt_bin] <= config[tgt_bin]:
+                        counter_dist_dict[tgt_bin] += 1
+                    else:
+                        count += config[tgt_bin]
+                    if count == total_eqns:
+                        break
 
 
 def prepare_dataset():
