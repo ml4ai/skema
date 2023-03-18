@@ -1,4 +1,4 @@
-package org.ml4ai.grounding
+package org.ml4ai.skema.text_reading.grounding
 
 import java.io.File
 import com.typesafe.config.{Config, ConfigFactory}

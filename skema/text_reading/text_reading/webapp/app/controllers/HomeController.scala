@@ -17,13 +17,13 @@ import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention
 import org.clulab.processors.{Document, Sentence}
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
-import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder, sparqlWikiResult}
 import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
 import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
+import org.ml4ai.skema.text_reading.grounding.{SVOGrounder, WikidataGrounder}
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}

@@ -7,7 +7,7 @@ import java.io.File
 import org.clulab.processors.Document
 import org.clulab.processors.fastnlp.FastNLPProcessor
 import org.json4s.jackson.Json
-import org.ml4ai.grounding.{SVOGrounding, sparqlResult}
+import org.ml4ai.skema.text_reading.grounding.{SVOGrounding, sparqlResult}
 import ujson.{Obj, Value}
 
 import scala.collection.mutable.ArrayBuffer

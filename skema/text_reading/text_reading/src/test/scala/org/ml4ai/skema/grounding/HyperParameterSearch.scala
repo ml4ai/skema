@@ -1,9 +1,10 @@
-package org.ml4ai.grounding
+package org.ml4ai.skema.grounding
 
 import breeze.linalg.DenseVector
 import breeze.stats.distributions.{Gaussian, Uniform}
 import com.typesafe.config.ConfigFactory
 import org.clulab.utils.FileUtils
+import org.ml4ai.skema.text_reading.grounding.MiraEmbeddingsGrounder
 
 import scala.collection.immutable.ListMap
 
