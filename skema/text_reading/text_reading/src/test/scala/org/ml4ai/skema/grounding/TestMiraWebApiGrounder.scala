@@ -8,6 +8,7 @@ import scala.language.reflectiveCalls
 
 class TestMiraWebApiGrounder extends Test {
 
+  // TODO: Remove the API endpoint form here and add it to a testing configuration file
   val miraWebApiGrounder: MiraWebApiGrounder = {
     new MiraWebApiGrounder(apiEndPoint = "http://34.230.33.149:8771/api/ground_list")
   }

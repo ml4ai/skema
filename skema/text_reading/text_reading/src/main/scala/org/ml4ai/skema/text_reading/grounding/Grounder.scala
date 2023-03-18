@@ -25,10 +25,7 @@ trait Grounder {
     * @param texts of the extractions to be grounded
     * @return For each input element, some grounding concept if matched, None if didn't match any element of the ontology
     */
-  def ground(texts: Seq[String]): Seq[Option[GroundingConcept]] = groundingCandidates(texts, k = 1) map {
-    case GroundingCandidate(topChoice, _) +: _ => Some(topChoice)
-    case _ => None
-  }
+  def ground(texts: Seq[String]): Seq[Option[GroundingConcept]] = groundingCandidates(texts, k = 1).map(_.headOption.map(_.concept))
 
   /**
     * Shortcut for single case grounding

@@ -6,7 +6,7 @@ import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention
 import org.clulab.processors.Document
 import org.clulab.utils.Logging
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
-import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, GroundingCandidate, MiraEmbeddingsGrounder, MiraWebApiGrounder}
+import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, GroundingCandidate}
 import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
 
 import scala.language.implicitConversions
@@ -48,7 +48,7 @@ class TextReadingPipeline extends Logging {
 
   def fetchNestedArguments(ms: Seq[Mention]): Seq[TextBoundMention] = ms flatMap {
     case tbm: TextBoundMention => List(tbm)
-    case e@(_: EventMention | _: RelationMention | _:CrossSentenceEventMention) => e.arguments.values.flatMap(fetchNestedArguments)
+    case e:Mention => e.arguments.values.flatMap(fetchNestedArguments)
   }
 
   def groundMentions(mentions: Seq[Mention]):Seq[Mention] = {
@@ -60,10 +60,7 @@ class TextReadingPipeline extends Logging {
 
     // Do batch grounding
     val mentionsGroundings = grounder.groundingCandidates(candidatesToGround.map(_.text), k=5).map{
-      gs => gs.filter{
-        // Filter by grounding threshold
-        case GroundingCandidate(_, score) => score >= groundingAssignmentThreshold
-      }
+      gs => gs.filter(_.score >= groundingAssignmentThreshold)
     }
 
     val groundedTextBoundMentions =
@@ -106,7 +103,9 @@ class TextReadingPipeline extends Logging {
 
   private case class MentionKey(doc:Document, sent:Int, start:Int, end:Int)
 
-  private def mentionToMentionKey(m:Mention):MentionKey = MentionKey(m.document, m.sentence, m.start, m.end)
+  private object MentionKey {
+    def apply(m: Mention): MentionKey = MentionKey(m.document, m.sentence, m.start, m.end)
+  }
 
   /**
     * Runs the mention extraction engine on the  parameter
@@ -120,15 +119,15 @@ class TextReadingPipeline extends Logging {
     val ExtractionResults(doc, mentions) = odinEngine.extractFromText(text, keepText = true, fileName)
 
     // Choose which mentions to ground
-    val (textBound, nonTextBound) = mentions.partition(m => if(m.isInstanceOf[TextBoundMention]) true else false)
+    val (textBound, nonTextBound) = mentions.partition(_.isInstanceOf[TextBoundMention])
 
     // Ground them
     val groundedNotTextBound = groundMentions(nonTextBound)
 
     // Add them together
     val groundedTextBound = fetchNestedArguments(groundedNotTextBound)
-    val groundedCache:Set[MentionKey] = groundedTextBound.map(mentionToMentionKey).toSet
-    val ungroundedTextBound = textBound.filterNot(m => groundedCache.contains(mentionToMentionKey(m))) // Try to avoid duplicates
+    val groundedCache:Set[MentionKey] = groundedTextBound.map(MentionKey(_)).toSet
+    val ungroundedTextBound = textBound.filterNot(m => groundedCache.contains(MentionKey(m))) // Try to avoid duplicates
 
     // Return them!
     (doc, groundedNotTextBound ++ ungroundedTextBound  ++ groundedTextBound)
