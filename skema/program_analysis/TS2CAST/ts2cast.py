@@ -5,9 +5,10 @@ from cast import CAST
 
 #TODO:
 # 1. DONE: Check why function argument types aren't being infered from definitions
-# 2. Update variable logic to pass down type
-# 2. Update logic for var id creation
+# 2. DONE: Update variable logic to pass down type
+# 2. DONE: Update logic for var id creation
 # 3. Update logic for accessing node and node children
+# 5. Fix extraneous import children
 # --------------------------------------------------------
 
 class TS2CAST(object):
@@ -138,15 +139,19 @@ class TS2CAST(object):
 
     # After creating the body, we can go back and update the var nodes we created for the arguments
     # We do this by looking for intent,in nodes
+    # TODO: Can we replace this by accessing variable context
     for i, arg in enumerate(cast_func.func_args):
        arg_name = arg.val.name
-
+       cast_func.func_args[i].type = self.variable_context[-1][arg_name]["type"]
+       
+       '''       
        # Find the argument in the body
        for cast_node in cast_func.body:
         if isinstance(cast_node, Var) and cast_node.val.name == arg_name:
           
           # Update the argument
           cast_func.func_args[i].type = cast_node.type
+      '''
     
     # Pop variable context off of stack before leaving this scope
     self.variable_context.pop()
@@ -179,8 +184,10 @@ class TS2CAST(object):
      else:
       imports = []
       for child in child_map["included_items"].children:
-          _, child_source_ref, child_identifer = self.get_node_data(child)
-
+          child_type, child_source_ref, child_identifer = self.get_node_data(child)
+          if child_type != "identifier":
+             continue
+          
           cast_import = ModelImport()
           cast_import.source_refs = [child_source_ref]
           
@@ -253,17 +260,19 @@ class TS2CAST(object):
      cast_var.val.name = self.get_identifier(source_ref)
      
      # TODO: Move this to a function
+     # TODO: VARIABLE CONTEXT CODE
      # The name id is incremented after every use to create a unique ID for every
      # instance of a name. In the AnnCAST passes, incremental ids for each name will be
      # created
      found = False
      for context in self.variable_context:
         if cast_var.val.name in context:
-           cast_var.val.id = context[cast_var.val.name]
+           cast_var.val.id = context[cast_var.val.name]["id"]
+           cast_var.type = context[cast_var.val.name]["type"]
            found = True
      if not found:
       cast_var.val.id = self.variable_id
-      self.variable_context[-1][cast_var.val.name] = self.variable_id
+      self.variable_context[-1][cast_var.val.name] = {"id": self.variable_id, "type": None}
       self.variable_id += 1
      
      return cast_var
@@ -317,6 +326,13 @@ class TS2CAST(object):
          # Since we have information about the variable type, we are able to update the left side of this assignment
          cast_assignment.left.type = cast_variable_type
 
+         # TODO: VARIABLE CONTEXT CODE
+         # We need to update the variable context with these variables as well
+         _,_,name_identifier = self.get_node_data(TS2CAST.search_children_by_type(child, "identifier"))
+         for i, context in enumerate(self.variable_context):
+            if name_identifier in context:
+               self.variable_context[i][name_identifier]["type"] = cast_variable_type
+
          vars.append(cast_assignment)
       elif child_type == "identifier":
         # If just a declaration, create CAST Var node to represent the variable and attach source_ref
@@ -336,17 +352,20 @@ class TS2CAST(object):
         cast_var.val.name = child_identifier
 
         # TODO: Move this to a function
+        # TODO: VARIABLE CONTEXT CODE
         # The name id is incremented after every use to create a unique ID for every
         # instance of a name. In the AnnCAST passes, incremental ids for each name will be
         # created
         found = False
         for context in self.variable_context:
             if cast_var.val.name in context:
-              cast_var.val.id = context[cast_var.val.name]
+              cast_var.val.id = context[cast_var.val.name]["id"]
               found = True
+              # Update typing information
+              context[cast_var.val.name]["type"] = cast_variable_type
         if not found:
           cast_var.val.id = self.variable_id
-          self.variable_context[-1][cast_var.val.name] = self.variable_id
+          self.variable_context[-1][cast_var.val.name] = {"id": self.variable_id, "type": cast_variable_type}
           self.variable_id += 1
 
         vars.append(cast_var)
