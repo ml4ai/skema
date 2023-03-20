@@ -57,11 +57,3 @@ node temml_service.js
 ```
 python latex2mathml.py
 ```
-
-4) Simplify the MathML equations by removing unnecessary details or tokens. Those simplified MathML equations will then be used to render XML ElementTrees using pretty print.
-```
-python mathml_simplification.py
-```
-```
-python etree_parser.py
-```
