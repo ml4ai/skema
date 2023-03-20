@@ -1,4 +1,4 @@
-package org.ml4ai.grounding
+package org.ml4ai.skema.text_reading.grounding
 
 import java.io.File
 import com.typesafe.config.{Config, ConfigFactory}
@@ -12,6 +12,7 @@ import upickle.default.{ReadWriter, macroRW}
 import ai.lum.common.ConfigUtils._
 import org.clulab.embeddings.SanitizedWordEmbeddingMap
 import org.ml4ai.skema.text_reading.apps.{ExtractAndAlign, JSONDocExporter}
+import org.ml4ai.skema.text_reading.grounding
 import org.ml4ai.skema.text_reading.utils.TsvUtils
 
 import scala.concurrent.duration.DurationInt
@@ -161,7 +162,7 @@ def groundTermsToWikidataRanked(variable: String, terms_with_underscores: Seq[St
   /** Grounding a sequence of mentions and return a pretty-printable json string*/
   def mentionsToGlobalVarsWithWikidataGroundings(mentions: Seq[Mention]): String = {
     val globalVars = ExtractAndAlign.getGlobalVars(mentions, Some(Map.empty), true)
-    val groundings = SeqOfWikiGroundings(globalVars.map(gv => WikiGrounding(gv.identifier, gv.groundings.getOrElse(Seq.empty))))
+    val groundings = SeqOfWikiGroundings(globalVars.map(gv => grounding.WikiGrounding(gv.identifier, gv.groundings.getOrElse(Seq.empty))))
     write(groundings, indent = 4)
   }
 

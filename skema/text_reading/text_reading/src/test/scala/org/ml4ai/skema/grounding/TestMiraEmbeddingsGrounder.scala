@@ -1,16 +1,12 @@
-package org.ml4ai.grounding
+package org.ml4ai.skema.grounding
 
-import breeze.linalg._
 import com.typesafe.config.ConfigFactory
 import org.clulab.utils.FileUtils
-import org.json4s.JsonDSL.boolean2jvalue
-import org.ml4ai.skema.common.test.Test
+import org.ml4ai.skema.test.Test
+import org.ml4ai.skema.text_reading.grounding.MiraEmbeddingsGrounder
 import org.scalatest.OptionValues._
-import breeze.stats.distributions._
-import ujson.False
-import ujson.IndexedValue.True
 
-import scala.collection.immutable.ListMap
+import scala.language.reflectiveCalls
 
 class TestMiraEmbeddingsGrounder extends Test {
 

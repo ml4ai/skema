@@ -1,4 +1,4 @@
-package org.ml4ai.skema.common.test
+package org.ml4ai.skema.test
 
 import org.scalactic.source.Position
 import org.scalatest.{FlatSpec, Matchers, Tag}
