@@ -1,19 +1,13 @@
 import json
 from tree_sitter import Language, Parser
-from test import Module, SourceRef, Assignment, LiteralValue, Var, VarType, Name, Expr, Operator, AstNode, SourceCodeDataType, ModelImport, List
+from test import Module, SourceRef, Assignment, LiteralValue, Var, VarType, Name, Expr, Operator, AstNode, SourceCodeDataType, ModelImport, List, FunctionDef
 from cast import CAST
 
-# Naming conventions
-# --------------------------------------------------------
-# CAST nodes: 
-# cast_nodetype
-
-# CAST SourceRef:
-# cast_sourceref_attachednode
-
-# Tree-Sitter nodes:
-# tree_nodetype_type
-# tree_nodetype_identifier
+#TODO:
+# 1. DONE: Check why function argument types aren't being infered from definitions
+# 2. Update variable logic to pass down type
+# 2. Update logic for var id creation
+# 3. Update logic for accessing node and node children
 # --------------------------------------------------------
 
 class TS2CAST(object):
@@ -33,25 +27,16 @@ class TS2CAST(object):
     )
     self.tree_sitter_fortran = Language('build/my-languages.so', 'fortran')
 
+    # We load the source code from a file
+    self.source = None
+    with open(source_file_path, "r") as f:
+       self.source = f.read()
+    
     # Set up tree sitter parser
     self.parser = Parser() 
     self.parser.set_language(self.tree_sitter_fortran)
-    self.source = """
-        program test
-          integer,dimension(10) :: x = (/1,2,3,4,5,6,7,8,9,10/)
-          integer,dimension(10) :: y
-          real,dimension(lev0:lev1,lon0-2:lon1+2),intent(in) :: tn, o2, o1, n2, he
-        end program test
-        """
-    self.tree = self.parser.parse(bytes("""
-        program test
-          integer,dimension(10) :: x = (/1,2,3,4,5,6,7,8,9,10/)
-          integer,dimension(10) :: y
-          real,dimension(lev0:lev1,lon0-2:lon1+2),intent(in) :: tn, o2, o1, n2, he
-        end program test
-        """, "utf8")) # TODO: Set up loading from file
+    self.tree = self.parser.parse(bytes(self.source, "utf8"))
     
-
     # CAST objects
     self.module_name = None
     self.source_file_name = source_file_path
@@ -60,9 +45,10 @@ class TS2CAST(object):
 
     # Walking data
     self.variable_id = 0
+    self.variable_context = [{}] # Stack of dictionaries
 
     # Start visiting
-    self.visit(self.tree.root_node)
+    self.run(self.tree.root_node)
 
     # Create outer cast wrapping
     out_cast = CAST([self.module], "Fortran")
@@ -71,9 +57,21 @@ class TS2CAST(object):
                     out_cast.to_json_object(), sort_keys=True, indent=None
                 )
             )
+  
+  def run(self, root):
+    for child in root.children:
+      child_cast = self.visit(child)
+      if child_cast:
+      # There are some instances where we will recieve more than one CAST node back from a visit,
+      # such as in the case of importing multiple symbols from a module
+       if isinstance(child_cast, list):
+        self.module.body.extend(child_cast)
+       else:
+        self.module.body.append(child_cast)
 
+    self.module.source_refs = [self.generate_source_ref(root)]
+  
   def visit(self, node):
-   
     # Generate source_ref
     source_ref = self.generate_source_ref(node)
 
@@ -82,8 +80,9 @@ class TS2CAST(object):
     
     output = None
     node_type = node.type
-    if node_type == "program": # TODO: Should module == translation_unit or program?
-      self.visit_program(node, child_map, source_ref)
+    
+    if node_type == "subroutine" or node_type == "function":
+       output = self.visit_function_def(node, child_map, source_ref)
     elif node_type == "use_statement":
        output = self.visit_use_statement(node, child_map, source_ref)
     elif node_type == "assignment_statement":
@@ -107,18 +106,52 @@ class TS2CAST(object):
 
     return output
 
-  def visit_program(self, node, child_map, source_ref):
-    for child in node.children:
-       cast_ast = self.visit(child)
-       if cast_ast:
-        # There are some instances where we will recieve more than one CAST node back from a visit,
-        # such as in the case of importing multiple symbols from a module
-        if isinstance(cast_ast, list):
-           self.module.body.extend(cast_ast)
-        else:
-          self.module.body.append(cast_ast)
+  def visit_function_def(self, node, child_map, source_ref):
+    # Push new variable context onto context stack
+    self.variable_context.append({})
 
-    self.module.source_refs = [source_ref]
+    cast_func = FunctionDef()
+    cast_func.source_refs = [source_ref]
+    cast_func.body = []
+    cast_func.func_args = []
+
+    # Function def will always have a name node, but may not have a parameters node
+    name_node = TS2CAST.search_children_by_type(node, "name")
+    _, _, name_identifier = self.get_node_data(name_node)
+    cast_func.name = name_identifier
+
+    parameters_node = TS2CAST.search_children_by_type(node, "parameters")
+    if parameters_node:
+       for child in parameters_node.children:
+          child_cast = self.visit(child)
+          if child_cast:
+            cast_func.func_args.append(child_cast)
+
+    # The first child of function will be the function statement, the rest will be body nodes 
+    for child in node.children[1:]:
+       child_cast = self.visit(child)
+       if child_cast:
+          if isinstance(child_cast, list):
+            cast_func.body.extend(child_cast)
+          else:
+            cast_func.body.append(child_cast)
+
+    # After creating the body, we can go back and update the var nodes we created for the arguments
+    # We do this by looking for intent,in nodes
+    for i, arg in enumerate(cast_func.func_args):
+       arg_name = arg.val.name
+
+       # Find the argument in the body
+       for cast_node in cast_func.body:
+        if isinstance(cast_node, Var) and cast_node.val.name == arg_name:
+          
+          # Update the argument
+          cast_func.func_args[i].type = cast_node.type
+    
+    # Pop variable context off of stack before leaving this scope
+    self.variable_context.pop()
+
+    return cast_func
 
   def visit_use_statement(self, node, child_map, source_ref):
      # Getting the module information
@@ -215,15 +248,24 @@ class TS2CAST(object):
      cast_var.default_value = None 
 
      cast_var.val = Name()
+     cast_var.val.source_refs = [source_ref]
 
+     cast_var.val.name = self.get_identifier(source_ref)
+     
+     # TODO: Move this to a function
      # The name id is incremented after every use to create a unique ID for every
      # instance of a name. In the AnnCAST passes, incremental ids for each name will be
      # created
-     cast_var.val.id = self.variable_id
-     self.variable_id += 1
+     found = False
+     for context in self.variable_context:
+        if cast_var.val.name in context:
+           cast_var.val.id = context[cast_var.val.name]
+           found = True
+     if not found:
+      cast_var.val.id = self.variable_id
+      self.variable_context[-1][cast_var.val.name] = self.variable_id
+      self.variable_id += 1
      
-     cast_var.val.name = self.get_identifier(source_ref)
-
      return cast_var
   
   def visit_math_expression(self, node, child_map, source_ref):
@@ -293,11 +335,19 @@ class TS2CAST(object):
         # The variable name comes from the identifier child node
         cast_var.val.name = child_identifier
 
+        # TODO: Move this to a function
         # The name id is incremented after every use to create a unique ID for every
         # instance of a name. In the AnnCAST passes, incremental ids for each name will be
         # created
-        cast_var.val.id = self.variable_id
-        self.variable_id += 1
+        found = False
+        for context in self.variable_context:
+            if cast_var.val.name in context:
+              cast_var.val.id = context[cast_var.val.name]
+              found = True
+        if not found:
+          cast_var.val.id = self.variable_id
+          self.variable_context[-1][cast_var.val.name] = self.variable_id
+          self.variable_id += 1
 
         vars.append(cast_var)
       else: 
@@ -340,6 +390,18 @@ class TS2CAST(object):
      
      return node_type, source_ref, identifier
   
-walker = TS2CAST("exp0.f95", "tree-sitter-fortran")
+  @staticmethod
+  def get_children_by_type(node, node_type):
+    return [child for child in node.children if child.type==node_type]
+  @staticmethod
+  def search_children_by_type(node, node_type):
+     if node.type == node_type:
+        return node
+     for child in node.children:
+        output = TS2CAST.search_children_by_type(child, node_type)
+        if output:
+           return output
+      
+walker = TS2CAST("test.f95", "tree-sitter-fortran")
 
 
