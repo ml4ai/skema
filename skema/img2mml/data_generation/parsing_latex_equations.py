@@ -6,12 +6,6 @@ Latex eqns Parsing code
 NOTE: Please change the paths as per your system before running the code.
 """
 
-"""
-TODOs:
-check line #304 and 313 --> condition 4/5 work on \label, etc.
-                        --> and condition 6 matrix
-"""
-
 
 import pandas as pd
 import json, os
