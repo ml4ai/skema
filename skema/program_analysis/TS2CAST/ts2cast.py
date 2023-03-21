@@ -1,6 +1,6 @@
 import json
 from tree_sitter import Language, Parser
-from test import Module, SourceRef, Assignment, LiteralValue, Var, VarType, Name, Expr, Operator, AstNode, SourceCodeDataType, ModelImport, List, FunctionDef
+from test import Module, SourceRef, Assignment, LiteralValue, Var, VarType, Name, Expr, Operator, AstNode, SourceCodeDataType, ModelImport, List, FunctionDef, Loop, Subscript, Boolean, String
 from cast import CAST
 
 #TODO:
@@ -8,7 +8,10 @@ from cast import CAST
 # 2. DONE: Update variable logic to pass down type
 # 2. DONE: Update logic for var id creation
 # 3. Update logic for accessing node and node children
-# 5. Fix extraneous import children
+# 5. DONE: Fix extraneous import children
+# 6. Add logic for return statement in functions and subroutines
+# 7. Implement logic for do unitl loop
+# 8. Fix logic for continuation lines and comments
 # --------------------------------------------------------
 
 class TS2CAST(object):
@@ -86,16 +89,22 @@ class TS2CAST(object):
        output = self.visit_function_def(node, child_map, source_ref)
     elif node_type == "use_statement":
        output = self.visit_use_statement(node, child_map, source_ref)
+    elif node_type == "do_loop_statement":
+       output = self.visit_do_loop_statement(node, child_map, source_ref)
     elif node_type == "assignment_statement":
       output = self.visit_assignment_statement(node, child_map, source_ref)
     elif node_type == "number_literal":
       output = self.visit_number_literal(node, child_map, source_ref)
     elif node_type == "array_literal":
       output= self.visit_array_literal(node, child_map, source_ref)
+    elif node_type == "string_literal":
+      output= self.visit_string_literal(node, child_map, source_ref)
+    elif node_type == "boolean_literal":
+      output= self.visit_boolean_literal(node, child_map, source_ref)
     elif node_type == "identifier":
        output = self.visit_identifier(node, child_map, source_ref)
-    elif node_type == "math_expression":
-       output = self.visit_math_expression(node, child_map, source_ref)
+    elif node_type == "math_expression" or node_type == "relational_expression":
+       output = self.visit_math_expression(node, child_map, source_ref) #TODO: Update name of this function
     elif node_type == "variable_declaration":
        output = self.visit_variable_declaration(node, child_map, source_ref)
     else:
@@ -199,6 +208,72 @@ class TS2CAST(object):
           imports.append(cast_import)
       return imports 
   
+  def visit_do_loop_statement(self, node, child_map, source_ref):
+     cast_loop = Loop()
+     cast_loop.source_refs = [source_ref] 
+     cast_loop.init = []
+     cast_loop.expr = None
+     cast_loop.body = []
+     
+     # The body will be the same for both loops, like the function definition, its simply every child node after the first
+     # TODO: This may not be the case
+     for child in node.children[1:]:
+       child_cast = self.visit(child)
+       if child_cast:
+          if isinstance(child_cast, list):
+            cast_loop.body.extend(child_cast)
+          else:
+            cast_loop.body.append(child_cast)
+
+     # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
+     if "loop_control_expression" in child_map:
+        '''
+        # We need to determine the start, stop, and step for this statement using the loop_control_expression node
+        loop_control_node = child_map["loop_control_expression"]
+        loop_range = TS2CAST.get_real_children(loop_control_node)
+        print(loop_range)
+        for i, child in enumerate(loop_control_node.children):
+            child_type, _, child_identifier = self.get_node_data(child)
+
+            # We know we will have an init if = is found in the children
+            if child_type == "=":
+              cast_assignment = Assignment()
+              # TODO: SourceRef
+              cast_assignment.left = self.visit(loop_control_node.children[i-1])
+              cast_assignment.right = self.visit(loop_control_node.children[i+1])
+              cast_loop.init.append(cast_assignment)
+        
+        # Add itt += step to the end of the body
+        cast_assignment = Assignment()
+        
+        #TODO: SourceRef
+        cast_loop.body.append(cast_assignment)
+        '''
+        pass
+     elif "while_statement" in child_map:
+        cast_loop.expr = self.visit(child_map["while_statement"])
+     
+     
+     '''
+     # We need to determine the start, stop, and step for this statement using the loop_control_expression node
+     loop_control_node = TS2CAST.search_children_by_type(node, "loop_control_expression")
+     for i, child in enumerate(loop_control_node.children):
+        child_type, _, child_identifier = self.get_node_data(child)
+        # We know we will have an init if = is found in the children
+        if child_type == "=":
+           cast_assignment = Assignment()
+           cast_assignment.left = self.visit(loop_control_node.children[i-1])
+           cast_assignment.right = self.visit(loop_control_node.children[i+1])
+        
+           cast_loop.init.append(cast_assignment)
+           
+     # Next, we can create the expression thats checked after each itteration
+     # Since this is a traditional do loop, the expression will be while(start<stop){x+=step} 
+     cast_assignment = Assignment()
+     cast_loop.body.append(cast_assignment) # TODO: Should be put at end of body
+    '''
+     return cast_loop
+        
   def visit_assignment_statement(self, node, child_map, source_ref):
     cast_assignment = Assignment()
     cast_assignment.source_refs = [source_ref]
@@ -206,6 +281,11 @@ class TS2CAST(object):
     left, identifier, right = node.children
     cast_assignment.left = self.visit(left)
     cast_assignment.right = self.visit(right)
+    
+    # We need to check if the left side is a multidimensional array,
+    # Since tree-sitter incorrectly shows this assignment as a call_expression
+    if left.type == "call_expression":
+       pass
     
     return cast_assignment
   
@@ -220,10 +300,10 @@ class TS2CAST(object):
     number_literal = self.get_identifier(source_ref)
     cast_literal.value = number_literal
     if "e" in number_literal.lower() or "." in number_literal.lower():
-      cast_literal.value_type = "Float"
+      cast_literal.value_type = None #TODO: WHAT SHOULD THESE BE
       cast_literal.source_code_data_type = ["Fortran", "Fortran95", "Real"]
     else:
-      cast_literal.value_type = "Integer" 
+      cast_literal.value_type = None #TODO
       cast_literal.source_code_data_type = ["Fortran", "Fortran95", "Integer"]
     
     return cast_literal
@@ -243,6 +323,30 @@ class TS2CAST(object):
      
      return cast_list
   
+  def visit_string_literal(self, node, child_map, source_ref):
+     cast_string = String()
+     cast_string.source_refs = [source_ref]
+
+     _,_,string_identifier = self.get_node_data(node)
+
+     cast_string.string = string_identifier
+
+     return cast_string
+  
+  def visit_boolean_literal(self, node, child_map, source_ref):
+     cast_bool = Boolean()
+     cast_bool.source_refs = [source_ref]
+
+     _,_,bool_identifier = self.get_node_data(node)
+
+     if bool_identifier == ".true.":
+        cast_bool.boolean = True
+     else:
+        cast_bool.boolean = False
+
+     return cast_bool
+     
+
   def visit_identifier(self, node, child_map, source_ref):
      cast_var = Var()
      cast_var.source_refs = [source_ref]
@@ -302,7 +406,7 @@ class TS2CAST(object):
        "integer": "Number",
        "real": "Number",
        "complex": "Number",
-       "logical": "Bool",
+       "logical": "Boolean",
        "character": "String", 
     }
     _, _, type_identifier = self.get_node_data(child_map["intrinsic_type"])
@@ -312,7 +416,7 @@ class TS2CAST(object):
     is_dimension = False
     for child in node.children:
        child_type, _, child_identifier = self.get_node_data(child)
-       if child_type == "type_qualifier" and "dimension(": #TODO: Update this logic here
+       if child_type == "type_qualifier" and "dimension(" in child_identifier: #TODO: Update this logic here
           cast_variable_type = "List"
 
     # You can declare multiple variables of the same type in a single statement, so we need to create a Var node for each instance
@@ -420,7 +524,15 @@ class TS2CAST(object):
         output = TS2CAST.search_children_by_type(child, node_type)
         if output:
            return output
-      
-walker = TS2CAST("test.f95", "tree-sitter-fortran")
-
-
+  @staticmethod
+  def is_control_character(node):
+     return node.type in set([",","(",")","="])
+  @staticmethod
+  def get_real_children(node):
+     output = []
+     for child in node.children:
+      if not TS2CAST.is_control_character(child):
+         output.append(child)
+     return output
+  
+walker = TS2CAST("idioms.f95", "tree-sitter-fortran")
