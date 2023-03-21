@@ -4,13 +4,14 @@
 //! Adarsh Pyarelal for the SKEMA project.
 
 use clap::Parser;
-use std::fs::write;
+use std::fs::{read_to_string, write};
 use std::path::Path;
 
 use comment_extraction::conventions::dssat::get_comments as get_fortran_comments;
+use comment_extraction::languages::cpp::get_comments as get_cpp_comments;
+use comment_extraction::languages::fortran::line_is_comment;
+use comment_extraction::languages::fortran::Comment;
 use comment_extraction::languages::python::get_comments as get_python_comments;
-use comment_extraction::languages::cpp::get_comments as
-get_cpp_comments;
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -34,6 +35,25 @@ fn main() {
 
     if extension == "f" || extension == "for" {
         let comments = get_fortran_comments(input).unwrap();
+        let comments = serde_json::to_string(&comments).unwrap();
+        if let Some(path) = args.output {
+            write(path, comments).expect("Unable to write to file!");
+        } else {
+            println!("{comments}");
+        }
+    } else if extension == "F" || extension == "F70" {
+        let fortran = read_to_string(input).expect("Unable to read file");
+        let mut comments = Vec::new();
+
+        for (num, line) in fortran.lines().enumerate() {
+            if line_is_comment(line) {
+                let comment = Comment {
+                    line: num + 1,
+                    comment_line: line.trim().to_string(),
+                };
+                comments.push(comment);
+            }
+        }
         let comments = serde_json::to_string(&comments).unwrap();
         if let Some(path) = args.output {
             write(path, comments).expect("Unable to write to file!");
