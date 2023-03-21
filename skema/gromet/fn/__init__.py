@@ -14,7 +14,6 @@
 from __future__ import absolute_import
 
 # import models into model package
-from skema.gromet.fn.attribute_type import AttributeType
 from skema.gromet.fn.function_type import FunctionType
 from skema.gromet.fn.gromet_box import GrometBox
 from skema.gromet.fn.gromet_box_conditional import GrometBoxConditional

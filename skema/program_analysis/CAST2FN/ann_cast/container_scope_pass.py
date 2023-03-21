@@ -270,6 +270,10 @@ class ContainerScopePass:
             )
             for node in node_list
         ]
+        #print("---------")
+        #print(node_list)
+        #print(grfn_src_refs)
+        #print("---------")
         return combine_grfn_con_src_refs(grfn_src_refs)
 
     @_visit.register
@@ -819,8 +823,10 @@ class ContainerScopePass:
         # NOTE: does this list need to be reversed?
         if len(src_refs) > 1:
             return combine_grfn_con_src_refs(src_refs)
+        # elif len(src_refs) == 1:
+          #  return src_refs[0]
         else:
-            return src_refs
+            return src_refs[0]
         # return combine_grfn_con_src_refs([right_src_ref, left_src_ref])
 
     @_visit.register

@@ -7,7 +7,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    BinaryOp,
     Boolean,
     Call,
     Dict,
@@ -29,7 +28,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
     String,
     Subscript,
     Tuple,
-    UnaryOp,
     Var,
 )
 
@@ -93,10 +91,9 @@ class CastToAnnotatedCastVisitor:
         return AnnCastAttribute(value, attr, node.source_refs)
 
     @_visit.register
-    def visit_binary_op(self, node: BinaryOp):
-        left = self.visit(node.left)
-        right = self.visit(node.right)
-        return AnnCastBinaryOp(node.op, left, right, node.source_refs)
+    def visit_operator(self, node: Operator):
+        operands = self.visit_node_list(node.operands)
+        return AnnCastOperator(node.source_language, node.interpreter, node.version, node.op, operands, node.source_refs)
 
     @_visit.register
     def visit_boolean(self, node: Boolean):
@@ -232,11 +229,6 @@ class CastToAnnotatedCastVisitor:
     def visit_tuple(self, node: Tuple):
         values = self.visit_node_list(node.values)
         return AnnCastTuple(values, node.source_refs)
-
-    @_visit.register
-    def visit_unary_op(self, node: UnaryOp):
-        value = self.visit(node.value)
-        return AnnCastUnaryOp(node.op, value, node.source_refs)
 
     @_visit.register
     def visit_var(self, node: Var):

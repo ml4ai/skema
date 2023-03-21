@@ -33,7 +33,7 @@ class GrometFNModule(GrometObject):
         'schema_version': 'str',
         'name': 'str',
         'fn': 'GrometFN',
-        'attributes': 'list[TypedValue]',
+        'fn_array': 'list[GrometFN]',
         'metadata_collection': 'list[list[Metadata]]'
     }
     if hasattr(GrometObject, "swagger_types"):
@@ -44,19 +44,19 @@ class GrometFNModule(GrometObject):
         'schema_version': 'schema_version',
         'name': 'name',
         'fn': 'fn',
-        'attributes': 'attributes',
+        'fn_array': 'fn_array',
         'metadata_collection': 'metadata_collection'
     }
     if hasattr(GrometObject, "attribute_map"):
         attribute_map.update(GrometObject.attribute_map)
 
-    def __init__(self, schema='FN', schema_version=None, name=None, fn=None, attributes=None, metadata_collection=None, *args, **kwargs):  # noqa: E501
+    def __init__(self, schema='FN', schema_version=None, name=None, fn=None, fn_array=None, metadata_collection=None, *args, **kwargs):  # noqa: E501
         """GrometFNModule - a model defined in Swagger"""  # noqa: E501
         self._schema = None
         self._schema_version = None
         self._name = None
         self._fn = None
-        self._attributes = None
+        self._fn_array = None
         self._metadata_collection = None
         self.discriminator = None
         if schema is not None:
@@ -67,8 +67,8 @@ class GrometFNModule(GrometObject):
             self.name = name
         if fn is not None:
             self.fn = fn
-        if attributes is not None:
-            self.attributes = attributes
+        if fn_array is not None:
+            self.fn_array = fn_array
         if metadata_collection is not None:
             self.metadata_collection = metadata_collection
         GrometObject.__init__(self, *args, **kwargs)
@@ -160,27 +160,27 @@ class GrometFNModule(GrometObject):
         self._fn = fn
 
     @property
-    def attributes(self):
-        """Gets the attributes of this GrometFNModule.  # noqa: E501
+    def fn_array(self):
+        """Gets the fn_array of this GrometFNModule.  # noqa: E501
 
-        (sum-type) Array of TypedValues. Currently expect:<br> (1) other GrometFN (type = \"FN\")<br> (2) references to ImportReference (type = \"IMPORT\")   # noqa: E501
+        Array of GrometFNs   # noqa: E501
 
-        :return: The attributes of this GrometFNModule.  # noqa: E501
-        :rtype: list[TypedValue]
+        :return: The fn_array of this GrometFNModule.  # noqa: E501
+        :rtype: list[GrometFN]
         """
-        return self._attributes
+        return self._fn_array
 
-    @attributes.setter
-    def attributes(self, attributes):
-        """Sets the attributes of this GrometFNModule.
+    @fn_array.setter
+    def fn_array(self, fn_array):
+        """Sets the fn_array of this GrometFNModule.
 
-        (sum-type) Array of TypedValues. Currently expect:<br> (1) other GrometFN (type = \"FN\")<br> (2) references to ImportReference (type = \"IMPORT\")   # noqa: E501
+        Array of GrometFNs   # noqa: E501
 
-        :param attributes: The attributes of this GrometFNModule.  # noqa: E501
-        :type: list[TypedValue]
+        :param fn_array: The fn_array of this GrometFNModule.  # noqa: E501
+        :type: list[GrometFN]
         """
 
-        self._attributes = attributes
+        self._fn_array = fn_array
 
     @property
     def metadata_collection(self):

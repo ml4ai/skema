@@ -33,9 +33,9 @@ class GrometBoxFunction(GrometBox):
         'contents': 'int',
         'import_type': 'ImportType',
         'import_version': 'str',
+        'import_source': 'TypedValue',
         'source_language': 'str',
         'source_language_version': 'str',
-        'uri': 'TypedValue',
         'value': 'LiteralValue'
     }
     if hasattr(GrometBox, "swagger_types"):
@@ -46,23 +46,23 @@ class GrometBoxFunction(GrometBox):
         'contents': 'contents',
         'import_type': 'import_type',
         'import_version': 'import_version',
+        'import_source': 'import_source',
         'source_language': 'source_language',
         'source_language_version': 'source_language_version',
-        'uri': 'uri',
         'value': 'value'
     }
     if hasattr(GrometBox, "attribute_map"):
         attribute_map.update(GrometBox.attribute_map)
 
-    def __init__(self, function_type=None, contents=None, import_type=None, import_version=None, source_language=None, source_language_version=None, uri=None, value=None, *args, **kwargs):  # noqa: E501
+    def __init__(self, function_type=None, contents=None, import_type=None, import_version=None, import_source=None, source_language=None, source_language_version=None, value=None, *args, **kwargs):  # noqa: E501
         """GrometBoxFunction - a model defined in Swagger"""  # noqa: E501
         self._function_type = None
         self._contents = None
         self._import_type = None
         self._import_version = None
+        self._import_source = None
         self._source_language = None
         self._source_language_version = None
-        self._uri = None
         self._value = None
         self.discriminator = None
         if function_type is not None:
@@ -73,12 +73,12 @@ class GrometBoxFunction(GrometBox):
             self.import_type = import_type
         if import_version is not None:
             self.import_version = import_version
+        if import_source is not None:
+            self.import_source = import_source
         if source_language is not None:
             self.source_language = source_language
         if source_language_version is not None:
             self.source_language_version = source_language_version
-        if uri is not None:
-            self.uri = uri
         if value is not None:
             self.value = value
         GrometBox.__init__(self, *args, **kwargs)
@@ -172,6 +172,27 @@ class GrometBoxFunction(GrometBox):
         self._import_version = import_version
 
     @property
+    def import_source(self):
+        """Gets the import_source of this GrometBoxFunction.  # noqa: E501
+
+
+        :return: The import_source of this GrometBoxFunction.  # noqa: E501
+        :rtype: TypedValue
+        """
+        return self._import_source
+
+    @import_source.setter
+    def import_source(self, import_source):
+        """Sets the import_source of this GrometBoxFunction.
+
+
+        :param import_source: The import_source of this GrometBoxFunction.  # noqa: E501
+        :type: TypedValue
+        """
+
+        self._import_source = import_source
+
+    @property
     def source_language(self):
         """Gets the source_language of this GrometBoxFunction.  # noqa: E501
 
@@ -216,27 +237,6 @@ class GrometBoxFunction(GrometBox):
         """
 
         self._source_language_version = source_language_version
-
-    @property
-    def uri(self):
-        """Gets the uri of this GrometBoxFunction.  # noqa: E501
-
-
-        :return: The uri of this GrometBoxFunction.  # noqa: E501
-        :rtype: TypedValue
-        """
-        return self._uri
-
-    @uri.setter
-    def uri(self, uri):
-        """Sets the uri of this GrometBoxFunction.
-
-
-        :param uri: The uri of this GrometBoxFunction.  # noqa: E501
-        :type: TypedValue
-        """
-
-        self._uri = uri
 
     @property
     def value(self):

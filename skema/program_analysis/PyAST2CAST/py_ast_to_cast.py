@@ -1663,9 +1663,14 @@ class PyASTToCAST:
 
         # Fetch the first element (which is in node.left)
         left = node.left
+        print(left)
+        print(len(node.comparators))
 
+        print(node.ops)
+        # ops = [op for op in node.ops]
         # Grab the first comparison operation
-        op = get_op(node.ops.pop())
+        op = get_op(node.ops.pop(0))
+        # op = get_op(ops.pop())
 
         
         # maintain a stack of if statements that we build up
@@ -1685,7 +1690,6 @@ class PyASTToCAST:
         )
         
         # Iterate through the comparators to build up more if statements
-        # The logic is that 
         while len(node.comparators) > 0:
             right = node.comparators[0]
 
@@ -1699,15 +1703,14 @@ class PyASTToCAST:
                             source_refs=ref)
 
             if len(node.comparators) == 1 and len(if_stack) > 0:
-                print("Hi")
                 if_stack[-1].body = test
             elif len(node.comparators) == 1 and len(if_stack) == 0:
                 # orelse has to be False value
-                if_expr = ModelIf(expr=test,body=[true_val],orelse=[false_val])
+                if_expr = ModelIf(expr=test,body=[true_val],orelse=[false_val], source_refs=ref)
                 if_stack.append(if_expr)
             else:
                 # orelse has to be False value
-                if_expr = ModelIf(expr=test,body=None,orelse=[false_val])
+                if_expr = ModelIf(expr=test,body=[],orelse=[false_val], source_refs=ref)
 
                 # The previous if expression contains the newest if expression
                 # as a value
@@ -1716,8 +1719,9 @@ class PyASTToCAST:
                 if_stack.append(if_expr)
 
 
-            left = node.comparators.pop()
-            op = get_op(node.ops.pop()) if len(node.ops) > 0 else None
+            left = node.comparators.pop(0)
+            op = get_op(node.ops.pop(0)) if len(node.ops) > 0 else None
+            # op = get_op(ops.pop()) if len(ops) > 0 else None
             
         # The final if_expression contains the true value
         if_stack[-1].body = [true_val]
@@ -2584,7 +2588,9 @@ class PyASTToCAST:
             lambda_name = f"%lambda{self.lambda_count}"
             self.lambda_count += 1
             lambda_id = -1 # TODO
-            self.generated_fns.append(FunctionDef(Name(lambda_name, id=lambda_id), args, body, source_refs=ref))
+
+            name_node = Name(lambda_name, lambda_id, source_refs=ref)
+            self.generated_fns.append(FunctionDef(name_node, args, body, source_refs=ref))
         
             # NOTE: What should the arguments be?
             to_ret = [Call(func=Name(lambda_name, lambda_id, source_refs=ref),arguments=args,source_refs=ref)]
@@ -2815,7 +2821,8 @@ class PyASTToCAST:
         self.list_comp_count += 1
         comp_func_id = -1 #TODO
 
-        func_def_cast = FunctionDef(name=comp_func_name, func_args=[], body=temp_cast+loop_cast+return_cast, source_refs=ref)
+        name_node = Name(comp_func_name, comp_func_id, source_refs=ref)
+        func_def_cast = FunctionDef(name=name_node, func_args=[], body=temp_cast+loop_cast+return_cast, source_refs=ref)
         
         self.generated_fns.append(func_def_cast)
 
@@ -3027,7 +3034,8 @@ class PyASTToCAST:
         self.dict_comp_count += 1
         comp_func_id = -1 # TODO
 
-        func_def_cast = FunctionDef(name=comp_func_name, func_args=[], body=temp_cast+loop_cast+return_cast, source_refs=ref)
+        name_node = Name(comp_func_name, comp_func_id, source_refs=ref)
+        func_def_cast = FunctionDef(name=name_node, func_args=[], body=temp_cast+loop_cast+return_cast, source_refs=ref)
         
         self.generated_fns.append(func_def_cast)
 
@@ -3082,7 +3090,11 @@ class PyASTToCAST:
             )
         ]
 
-        return [ModelIf(node_test, node_body, node_orelse, source_refs=ref)]
+
+        if isinstance(node_test, list):
+            return [ModelIf(node_test[0], node_body, node_orelse, source_refs=ref)]
+        else:
+            return [ModelIf(node_test, node_body, node_orelse, source_refs=ref)]
 
     @visit.register
     def visit_Global(
