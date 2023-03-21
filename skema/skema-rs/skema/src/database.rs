@@ -19,6 +19,10 @@ There being a second function call of the same function which contains an expres
     I believe the wiring will be messed up going into the expression from the second function
 */
 
+/* 3/20/23
+    - '+' at the top level main are getting duplicate wires to the top level literals
+ */
+
 use rsmgclient::{ConnectParams, Connection, MgError};
 use crate::FunctionType;
 use crate::{Attribute, FnType::Import, FunctionNet, GrometBox};
@@ -1371,6 +1375,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                         }
                     }
                 } else {
+                    // mark
                     // get attribute function net to pass into function
                     let pfn = gromet.modules[0].attributes[(boxf.contents.unwrap() - 1) as usize]
                         .value
@@ -4757,55 +4762,58 @@ pub fn wff_cross_att_wiring(
                                            // now to construct the wire
                 let mut wff_src_tgt: Vec<String> = vec![];
                 // find the src node
-                for node in nodes.iter() {
-                    // make sure in correct box
-                    if src_nbox == node.nbox {
-                        // make sure only looking in current attribute nodes for srcs and tgts
-                        if src_att == node.contents {
-                            if (src_box as u32) == node.att_bf_idx {
-                                // only opo's
-                                if node.n_type == "Opi" {
-                                    // iterate through port to check for tgt
-                                    for p in node.in_indx.as_ref().unwrap().iter() {
-                                        // push the src first, being pif
-                                        if (src_opi_idx as u32) == *p {
-                                            wff_src_tgt.push(node.node_id.clone());
+                // perhaps add a conditional on if the tgt and src att's are the same no wiring is done?
+                // making sure the wiring is cross attributal and therefore won't get double wired from
+                // internal wiring module as well?
+                    for node in nodes.iter() {
+                        // make sure in correct box
+                        if src_nbox == node.nbox {
+                            // make sure only looking in current attribute nodes for srcs and tgts
+                            if src_att == node.contents {
+                                if (src_box as u32) == node.att_bf_idx {
+                                    // only opo's
+                                    if node.n_type == "Opi" {
+                                        // iterate through port to check for tgt
+                                        for p in node.in_indx.as_ref().unwrap().iter() {
+                                            // push the src first, being pif
+                                            if (src_opi_idx as u32) == *p {
+                                                wff_src_tgt.push(node.node_id.clone());
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                for node in nodes.iter() {
-                    // make sure in correct box
-                    if tgt_nbox == node.nbox {
-                        // make sure only looking in current attribute nodes for srcs and tgts
-                        if tgt_att == node.contents {
-                            if (tgt_box as u32) == node.att_bf_idx {
-                                // only opo's
-                                if node.n_type == "Opo" {
-                                    // iterate through port to check for tgt
-                                    for p in node.out_idx.as_ref().unwrap().iter() {
-                                        // push the src first, being pif
-                                        if (tgt_opo_idx as u32) == *p {
-                                            wff_src_tgt.push(node.node_id.clone());
+                    for node in nodes.iter() {
+                        // make sure in correct box
+                        if tgt_nbox == node.nbox {
+                            // make sure only looking in current attribute nodes for srcs and tgts
+                            if tgt_att == node.contents {
+                                if (tgt_box as u32) == node.att_bf_idx {
+                                    // only opo's
+                                    if node.n_type == "Opo" {
+                                        // iterate through port to check for tgt
+                                        for p in node.out_idx.as_ref().unwrap().iter() {
+                                            // push the src first, being pif
+                                            if (tgt_opo_idx as u32) == *p {
+                                                wff_src_tgt.push(node.node_id.clone());
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
-                if wff_src_tgt.len() == 2 {
-                    let e8 = Edge {
-                        src: wff_src_tgt[0].clone(),
-                        tgt: wff_src_tgt[1].clone(),
-                        e_type: String::from("Wire"),
-                        prop: None,
-                    };
-                    edges.push(e8);
-                }
+                    if wff_src_tgt.len() == 2 {
+                        let e8 = Edge {
+                            src: wff_src_tgt[0].clone(),
+                            tgt: wff_src_tgt[1].clone(),
+                            e_type: String::from("Wire"),
+                            prop: None,
+                        };
+                        edges.push(e8);
+                    }
             }
             else 
             {
