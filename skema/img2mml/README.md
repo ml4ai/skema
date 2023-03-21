@@ -6,7 +6,21 @@ of equations and returns presentation MathML corresponding to those equations.
 The model was developed by Gaurav Sharma and Clay Morrison, and this wrapper
 service was developed by Deepsana Shahi and Adarsh Pyarelal.
 
-## Requirements
+## Build conda virtual environment and installling requirements
+
+```
+conda create -n image2mathml_venv python=3.8 -y ; conda activate image2mathml_venv
+```
+Please ensure that the `pwd` is `skema`.
+```
+pip install -e .[img2mml]
+```
+In case of Zsh, run
+```
+pip install -e ."[img2mml]"
+```
+
+To install requirements
 ```
 python3 -m pip install -r requirements.txt
 ```
@@ -16,12 +30,13 @@ To install Pytorch
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6 -c pytorch -c conda-forge
 ```
 
-To install Torchtext:
+To install Torchtext
 ```
 pip install torchtext==0.6.0
 ```
+
 ## Generating raw dataset
-Please check out the `data_generation/README.md` file.
+Please check out the `data_generation/README.md` file. 
 
 ## Creating dataset for training
 We need to create dataset for training purpose from the raw dataset that has been generated from the arxiv source files. For further details about data generation, check out `data_generation/README.md`.

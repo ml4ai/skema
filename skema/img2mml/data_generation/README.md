@@ -14,18 +14,22 @@
 ### Requirements
 
 ```
-python3 -m pip install -r requirements.txt
+python3 -m pip install -r data_gen_requirements.txt
 ```
 
-After installing `requirements.txt`, a few more packages will be required to run mathjax-server that can be installed using following commnads.
+After installing requirements, a few more packages will be required to run mathjax-server that can be installed using following commnads.
 
-Check if node is properly installed. If in case it is not installed, try using `conda install -c conda-forge nodejs`
+Check if node is properly installed. If in case it is not installed, try using
 ```
-npm install express
+conda install -c conda-forge nodejs
 ```
 ```
 npm install mathjax-node
 ```
+```
+npm install express
+```
+
 Also, for TeX to PDF to PNG conversion, `pdflatex` and `ImageMagick` has to be installed on the system.
 
 ### Scripts
