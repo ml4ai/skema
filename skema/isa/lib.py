@@ -125,7 +125,7 @@ def get_union_graph(graph1: pydot.Dot, graph2: pydot.Dot,
     '''
     set the aligned variables or terms as a blue circle; 
     if their names are the same, show one name; 
-    if not, show two names' connection
+    if not, show two names' connection using '<<|>>'
     '''
     for i in range(len(aligned_idx1)):
         if union_graph.get_nodes()[aligned_idx1[i]].obj_dict['attributes']['label'].replace('"', '').lower() != \
@@ -147,6 +147,7 @@ def get_union_graph(graph1: pydot.Dot, graph2: pydot.Dot,
     for i in range(len(graph2.get_nodes())):
         if i not in aligned_idx2:
             graph2.get_nodes()[i].obj_dict['attributes']['color'] = 'green'
+            graph2.get_nodes()[i].obj_dict['name'] = str(len(union_graph.get_nodes()))
             union_graph.add_node(graph2.get_nodes()[i])
             g2idx2g1idx[str(i)] = str(len(union_graph.get_nodes()) - 1)
 
@@ -172,6 +173,30 @@ def get_union_graph(graph1: pydot.Dot, graph2: pydot.Dot,
     return union_graph
 
 
+def check_square_array(arr: np.ndarray) -> List[int]:
+    """
+    Given a square numpy array, returns a list of size equal to the length of the array,
+    where each element of the list is either 0 or 1, depending on whether the corresponding
+    row and column of the input array are all 0s or not.
+
+    Parameters:
+    arr (np.ndarray): a square numpy array
+
+    Returns:
+    List[int]: a list of 0s and 1s
+    """
+
+    n = arr.shape[0]  # get the size of the array
+    result = []
+    for i in range(n):
+        # Check if the ith row and ith column are all 0s
+        if np.all(arr[i, :] == 0) and np.all(arr[:, i] == 0):
+            result.append(0)  # if so, append 0 to the result list
+        else:
+            result.append(1)  # otherwise, append 1 to the result list
+    return result
+
+
 '''
 align two equation graphs using the seeded graph matching (SGD) algorithm [1].
 
@@ -191,7 +216,7 @@ Output:
 
 
 def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 1) \
-        -> Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], Dot]:
+        -> Tuple[Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], Dot, List[int]]:
     graph1 = generate_graph(file1)
     graph2 = generate_graph(file2)
 
@@ -232,6 +257,7 @@ def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 1) \
     num_edges = ((big_graph + small_graph_aligned_full) > 0).sum()
     diff_edges = abs(big_graph - small_graph_aligned_full)
     diff_edges[diff_edges > 0] = 1
+    perfectly_matched_indices1 = check_square_array(diff_edges)
     num_diff_edges = np.sum(diff_edges)
     matching_ratio = round(1 - (num_diff_edges / num_edges), 2)
 
@@ -247,4 +273,4 @@ def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 1) \
     union_graph = get_union_graph(graph1, graph2, [int(i) for i in matched_indices1.tolist()],
                                   [int(i) for i in matched_indices2.tolist()])
 
-    return matching_ratio, num_diff_edges, node_labels1, node_labels2, aligned_indices1, aligned_indices2, union_graph
+    return matching_ratio, num_diff_edges, node_labels1, node_labels2, aligned_indices1, aligned_indices2, union_graph, perfectly_matched_indices1
