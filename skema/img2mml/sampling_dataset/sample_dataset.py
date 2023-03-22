@@ -137,7 +137,13 @@ def main():
     count = 0
     print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
-        if ap != "2018_1807_1807.00989_large_eqn118":
+        if ap not in [ "2018_1807_1807.00989_large_eqn118",
+                "2018_1807_1807.10398_large_eqn44",
+                "2018_1808_1808.02050_large_eqn36",
+                "2018_1806_1806.07089_large_eqn34",
+                "2018_1807_1807.09554_large_eqn44",
+                "2018_1807_1807.09554_large_eqn35"]:
+                
             print(ap)
             if count%1000==0:print(f"{count}, {ap}, {counter_dist_dict}")
             if count <= total_eqns:
@@ -151,8 +157,9 @@ def main():
                 mml = open(mml_path).readlines()[0]
 
                 # try:
-                #     cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))"'
-                #     simp_mml = subprocess.run(shlex.split(cmd),
+                #     # cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))"'
+                #     # simp_mml = subprocess.run(shlex.split(cmd),
+                #     simp_mml = subprocess.run(["python", "simplify.py", "--mml", mml],
                 #           timeout=60,
                 #           check=True,
                 #           capture_output=True,
@@ -168,7 +175,7 @@ def main():
                 simp_mml = simplification(mml)
                 length_mml = len(simp_mml.split())
                 print(length_mml)
-                
+
                 # finding the bin
                 temp_dict = {}
                 for i in range(50, 400, 50):
