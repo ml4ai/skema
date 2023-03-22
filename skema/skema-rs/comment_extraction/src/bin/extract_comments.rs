@@ -77,6 +77,7 @@ fn extract_comments_from_file(filepath: &str) -> Result<String, &str> {
 
 /// Walk a directory recursively and extract comments from the files within it.
 fn extract_comments_from_directory(directory: &str) {
+    let mut comments = serde_json::Value::default();
     for entry in walkdir::WalkDir::new(directory)
         .into_iter()
         .filter_map(|e| e.ok())
@@ -84,8 +85,9 @@ fn extract_comments_from_directory(directory: &str) {
         let path = entry.path().to_str().unwrap();
         let metadata = std::fs::metadata(path).unwrap();
         if metadata.is_file() {
-            let comments = extract_comments_from_file(entry.path().to_str().unwrap());
-            if let Ok(comments) = comments {
+            let file_comments = extract_comments_from_file(path);
+            if let Ok(file_comments) = file_comments {
+                comments[path] = serde_json::from_str(&file_comments).unwrap();
                 println!("{comments}");
             }
         }
@@ -99,6 +101,10 @@ fn main() {
 
     let metadata = std::fs::metadata(input).unwrap();
     if metadata.is_file() {
+        // We use unwrap below since we want the program to complain loudly if only a single file
+        // is given as input and the comment extraction fails.
+        // In contrast, when we extract comments from a directory, we do not want the program to
+        // complain for every unprocessable file.
         let comments = extract_comments_from_file(input).unwrap();
         println!("{comments}");
     } else if metadata.is_dir() {
