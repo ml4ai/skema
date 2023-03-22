@@ -149,13 +149,20 @@ def main():
 
             mml = open(mml_path).readlines()[0]
 
-            cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))'
-            result = subprocess.run(shlex.split(cmd),
-                  timeout=60,
-                  check=True,
-                  capture_output=True,
-                  text=True
-            )
+            try:
+                cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))'
+                result = subprocess.run(shlex.split(cmd),
+                      timeout=60,
+                      check=True,
+                      capture_output=True,
+                      text=True
+                )
+            except subprocess.TimeoutExpired:
+                print("Timeout expired")
+
+            except subprocess.CalledProcessError as e:
+                 print("Command exited with status", e.returncode)
+                 print("Error output:", e.stderr)
 
             # simp_mml = simplification(mml)
             length_mml = len(simp_mml.split())
