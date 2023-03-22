@@ -162,18 +162,27 @@ def main():
                 counter_dist_dict[tgt_bin] += 1
 
                 # copying image
-                img_src = os.path.join(
-                    root,
-                    f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
-                )
-                img_dst = os.path.join(images_path, f"{count}.png")
-                output = subprocess.run(shlex.split('python -c "import sys, sys.exit(not copy_image(img_src, img_dst))"'),
-                      timeout=60,
-                      check=True,
-                      capture_output=True,
-                      text=True
-                )
-                print(output)
+                try:
+                    img_src = os.path.join(
+                        root,
+                        f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+                    )
+                    img_dst = os.path.join(images_path, f"{count}.png")
+                    output = subprocess.run(shlex.split('python -c "import sys, sys.exit(not copy_image(img_src, img_dst))"'),
+                          timeout=60,
+                          check=True,
+                          capture_output=True,
+                          text=True
+                    )
+                    print(output)
+                    print(result.stdout)
+
+                except subprocess.TimeoutExpired:
+                    print("Timeout expired")
+
+                except subprocess.CalledProcessError as e:
+                     print("Command exited with status", e.returncode)
+                     print("Error output:", e.stderr)
 
                 # wrting path
                 paths_file.write(ap + "\n")
