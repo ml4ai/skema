@@ -137,6 +137,7 @@ def main():
     count = 0
     print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
+        print(ap)
         if count%1000==0:print(f"{count}, {ap}, {counter_dist_dict}")
         if count <= total_eqns:
             # try:
@@ -148,7 +149,15 @@ def main():
 
             mml = open(mml_path).readlines()[0]
 
-            simp_mml = simplification(mml)
+            cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))'
+            result = subprocess.run(shlex.split(cmd),
+                  timeout=60,
+                  check=True,
+                  capture_output=True,
+                  text=True
+            )
+
+            # simp_mml = simplification(mml)
             length_mml = len(simp_mml.split())
 
             # finding the bin
