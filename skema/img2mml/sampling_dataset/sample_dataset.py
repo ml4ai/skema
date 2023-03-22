@@ -73,8 +73,13 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+
 def copy_image(img_src, img_dst):
-    CP(img_src, img_dst)
+    try:
+        CP(img_src, img_dst)
+        return True
+    except:
+        return False
 
 def main():
 
@@ -128,6 +133,7 @@ def main():
     ######## and grab the corresponding PNG and latex ############
     print("preparing dataset...")
 
+
     count = 0
     print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
@@ -168,14 +174,41 @@ def main():
                         f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
                     )
                     img_dst = os.path.join(images_path, f"{count}.png")
-                    output = subprocess.run(shlex.split('python -c "import sys, sys.exit(not copy_image(img_src, img_dst))"'),
+                    # cmd = f'python -c "import sys; sys.exit(not copy_image(\'{img_src}\', \'{img_dst}\'))'
+                    result = subprocess.run(["cp", img_src, img_dst],
                           timeout=60,
                           check=True,
                           capture_output=True,
                           text=True
                     )
-                    print(output)
-                    print(result.stdout)
+
+                    #print(result.stdout)
+                    # wrting path
+                    paths_file.write(ap + "\n")
+
+                    # writing MathML
+                    if "\n" not in mml:
+                        mml = mml + "\n"
+                    mml_file.write(mml)
+
+                    # writing latex
+                    latex_path = os.path.join(
+                        root,
+                        f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+                    )
+                    latex_arr = open(latex_path).readlines()
+                    if len(latex_arr) > 1:
+                        latex = " "
+                        for l in latex_arr:
+                            latex = latex + l.replace("\n", "")
+                    else:
+                        latex = latex_arr[0]
+
+                    if "\n" not in latex:
+                        latex = latex + "\n"
+                    latex_file.write(latex)
+
+                    count += 1
 
                 except subprocess.TimeoutExpired:
                     print("Timeout expired")
@@ -184,32 +217,7 @@ def main():
                      print("Command exited with status", e.returncode)
                      print("Error output:", e.stderr)
 
-                # wrting path
-                paths_file.write(ap + "\n")
 
-                # writing MathML
-                if "\n" not in mml:
-                    mml = mml + "\n"
-                mml_file.write(mml)
-
-                # writing latex
-                latex_path = os.path.join(
-                    root,
-                    f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-                )
-                latex_arr = open(latex_path).readlines()
-                if len(latex_arr) > 1:
-                    latex = " "
-                    for l in latex_arr:
-                        latex = latex + l.replace("\n", "")
-                else:
-                    latex = latex_arr[0]
-
-                if "\n" not in latex:
-                    latex = latex + "\n"
-                latex_file.write(latex)
-
-                count += 1
             # except:
                 # pass
 
