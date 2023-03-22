@@ -137,95 +137,26 @@ def main():
     count = 0
     print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
-        print(ap)
-        if count%1000==0:print(f"{count}, {ap}, {counter_dist_dict}")
-        if count <= total_eqns:
-            # try:
-            yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-            mml_path = os.path.join(
-                root,
-                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-            )
-
-            mml = open(mml_path).readlines()[0]
-
-            try:
-                cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))'
-                result = subprocess.run(shlex.split(cmd),
-                      timeout=60,
-                      check=True,
-                      capture_output=True,
-                      text=True
+        if ap != "2018_1807_1807.00989_large_eqn118":
+            if count%1000==0:print(f"{count}, {ap}, {counter_dist_dict}")
+            if count <= total_eqns:
+                # try:
+                yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
+                mml_path = os.path.join(
+                    root,
+                    f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
                 )
-            except subprocess.TimeoutExpired:
-                print("Timeout expired")
 
-            except subprocess.CalledProcessError as e:
-                 print("Command exited with status", e.returncode)
-                 print("Error output:", e.stderr)
+                mml = open(mml_path).readlines()[0]
 
-            # simp_mml = simplification(mml)
-            length_mml = len(simp_mml.split())
-
-            # finding the bin
-            temp_dict = {}
-            for i in range(50, 400, 50):
-                if length_mml / i < 1:
-                    temp_dict[i] = length_mml / i
-
-            # get the bin
-            if len(temp_dict) >= 1:
-                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-            else:
-                tgt_bin = "350+"
-
-            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                counter_dist_dict[tgt_bin] += 1
-
-                # copying image
                 try:
-                    img_src = os.path.join(
-                        root,
-                        f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
-                    )
-                    img_dst = os.path.join(images_path, f"{count}.png")
-                    # cmd = f'python -c "import sys; sys.exit(not copy_image(\'{img_src}\', \'{img_dst}\'))'
-                    result = subprocess.run(["cp", img_src, img_dst],
+                    cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))"'
+                    simp_mml = subprocess.run(shlex.split(cmd),
                           timeout=60,
                           check=True,
                           capture_output=True,
                           text=True
                     )
-
-                    #print(result.stdout)
-                    # wrting path
-                    paths_file.write(ap + "\n")
-
-                    # writing MathML
-                    if "\n" not in mml:
-                        mml = mml + "\n"
-                    mml_file.write(mml)
-
-                    # writing latex
-                    latex_path = os.path.join(
-                        root,
-                        f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-                    )
-                    latex_arr = open(latex_path).readlines()
-                    if len(latex_arr) > 1:
-                        latex = " "
-                        for l in latex_arr:
-                            latex = latex + l.replace("\n", "")
-                    else:
-                        latex = latex_arr[0]
-
-                    if "\n" not in latex:
-                        latex = latex + "\n"
-                    latex_file.write(latex)
-
-                    count += 1
-
                 except subprocess.TimeoutExpired:
                     print("Timeout expired")
 
@@ -233,9 +164,78 @@ def main():
                      print("Command exited with status", e.returncode)
                      print("Error output:", e.stderr)
 
+                # simp_mml = simplification(mml)
+                length_mml = len(simp_mml.split())
 
-            # except:
-                # pass
+                # finding the bin
+                temp_dict = {}
+                for i in range(50, 400, 50):
+                    if length_mml / i < 1:
+                        temp_dict[i] = length_mml / i
 
-        else:
-            break
+                # get the bin
+                if len(temp_dict) >= 1:
+                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+                else:
+                    tgt_bin = "350+"
+
+                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                    counter_dist_dict[tgt_bin] += 1
+
+                    # copying image
+                    try:
+                        img_src = os.path.join(
+                            root,
+                            f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+                        )
+                        img_dst = os.path.join(images_path, f"{count}.png")
+                        # cmd = f'python -c "import sys; sys.exit(not copy_image(\'{img_src}\', \'{img_dst}\'))'
+                        result = subprocess.run(["cp", img_src, img_dst],
+                              timeout=60,
+                              check=True,
+                              capture_output=True,
+                              text=True
+                        )
+
+                        #print(result.stdout)
+                        # wrting path
+                        paths_file.write(ap + "\n")
+
+                        # writing MathML
+                        if "\n" not in mml:
+                            mml = mml + "\n"
+                        mml_file.write(mml)
+
+                        # writing latex
+                        latex_path = os.path.join(
+                            root,
+                            f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+                        )
+                        latex_arr = open(latex_path).readlines()
+                        if len(latex_arr) > 1:
+                            latex = " "
+                            for l in latex_arr:
+                                latex = latex + l.replace("\n", "")
+                        else:
+                            latex = latex_arr[0]
+
+                        if "\n" not in latex:
+                            latex = latex + "\n"
+                        latex_file.write(latex)
+
+                        count += 1
+
+                    except subprocess.TimeoutExpired:
+                        print("Timeout expired")
+
+                    except subprocess.CalledProcessError as e:
+                         print("Command exited with status", e.returncode)
+                         print("Error output:", e.stderr)
+
+
+                # except:
+                    # pass
+
+            else:
+                break
