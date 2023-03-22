@@ -167,7 +167,7 @@ def main():
                     f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
                 )
                 img_dst = os.path.join(images_path, f"{count}.png")
-                output = check_output(copy_image(img_src, img_dst), stderr=STDOUT, timeout=seconds)
+                output = check_output(copy_image(img_src, img_dst), stderr=STDOUT, timeout=60)
                 print(output)
 
                 # wrting path
