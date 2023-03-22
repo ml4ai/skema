@@ -126,7 +126,9 @@ def main():
     print("preparing dataset...")
 
     count = 0
-    for ap in all_paths:
+    for apidx, ap in enumerate(all_paths):
+        print(len(all_paths))
+        if apidx%100==0:print(f"{apidx}, count={count}")
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
             mml_path = os.path.join(
