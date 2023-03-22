@@ -1,9 +1,9 @@
 import os, json, random
 import multiprocessing as mp
 import shutil
+import subprocess, shlex
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
-from subprocess import STDOUT, check_output
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -167,7 +167,12 @@ def main():
                     f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
                 )
                 img_dst = os.path.join(images_path, f"{count}.png")
-                output = check_output(copy_image(img_src, img_dst), stderr=STDOUT, timeout=60)
+                output = subprocess.run(shlex.split('python -c "import sys, sys.exit(not copy_image(img_src, img_dst))"'),
+                      timeout=60,
+                      check=True,
+                      capture_output=True,
+                      text=True
+                )
                 print(output)
 
                 # wrting path
