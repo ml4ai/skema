@@ -1,6 +1,6 @@
 import json
 from tree_sitter import Language, Parser
-from test import Module, SourceRef, Assignment, LiteralValue, Var, VarType, Name, Expr, Operator, AstNode, SourceCodeDataType, ModelImport, List, FunctionDef, Loop, Subscript, Boolean, String
+from test import Module, SourceRef, Assignment, LiteralValue, Var, VarType, Name, Expr, Operator, AstNode, SourceCodeDataType, ModelImport, List, FunctionDef, Loop, Subscript, Boolean, String, Call, ModelReturn
 from cast import CAST
 
 #TODO:
@@ -13,6 +13,86 @@ from cast import CAST
 # 7. Implement logic for do unitl loop
 # 8. Fix logic for continuation lines and comments
 # --------------------------------------------------------
+
+class NodeHelper(object):
+   def __init__(self, source_file_name:str, source: str):
+      self.source_file_name = source_file_name
+      self.source = source
+    
+   def parse_tree_to_dict(self, node) -> dict:
+      node_dict = {
+         "type": self.get_node_type(node),
+         "source_ref": self.get_node_source_ref(node),
+         "identifier": self.get_node_identifier(node),
+         "children": [],
+         "comments": [],
+         "control": []
+      }
+      
+      for child in node.children:
+         child_dict = self.parse_tree_to_dict(child)
+         if self.is_comment_node(child):  
+            node_dict["comments"].append(child_dict)
+         elif self.is_control_character_node(child):
+            node_dict["control"].append(child_dict)
+         else:
+            node_dict["children"].append(child_dict)
+   
+      return node_dict
+   
+   def is_comment_node(self, node):
+      if node.type == "comment":
+         return True
+      return False
+   
+   def is_control_character_node(self, node):
+      control_characters = [
+         ',',
+         '=',
+         '(',
+         ')',
+         ":"
+      ]
+      return node.type in control_characters
+      
+   
+   def get_node_source_ref(self, node) -> SourceRef:
+    row_start, col_start = node.start_point
+    row_end, col_end = node.end_point
+    return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)
+   
+   def get_node_identifier(self, node) -> str:
+    source_ref = self.get_node_source_ref(node)
+    
+    line_num = 0
+    column_num = 0
+    in_identifier = False
+    identifier = ""
+    for i, char in enumerate(self.source):
+        if line_num == source_ref.row_start and column_num == source_ref.col_start:
+            in_identifier = True
+        elif line_num == source_ref.row_end and column_num == source_ref.col_end:
+            break
+        
+        if char == "\n":
+            line_num += 1
+            column_num = 0
+        else:
+            column_num += 1
+
+        if in_identifier:
+            identifier += char
+    
+    return identifier
+   
+   def get_node_type(self, node) -> str:
+      return node.type
+   
+class VariableContext(object):
+   def __init__(self):
+      self.context = []
+  
+
 
 class TS2CAST(object):
   def __init__(self, source_file_path: str, tree_sitter_fortran_path: str):
@@ -51,6 +131,10 @@ class TS2CAST(object):
     self.variable_id = 0
     self.variable_context = [{}] # Stack of dictionaries
 
+    self.node_helper = NodeHelper(source_file_path, self.source)
+    self.parse_dict = self.node_helper.parse_tree_to_dict(self.tree.root_node)
+
+    '''
     # Start visiting
     self.run(self.tree.root_node)
 
@@ -61,9 +145,13 @@ class TS2CAST(object):
                     out_cast.to_json_object(), sort_keys=True, indent=None
                 )
             )
+    '''
   
   def run(self, root):
+    self.module.source_refs = [root["source_ref"]]
     for child in root.children:
+      self.module.body.extend(self.visit(child))
+      '''
       child_cast = self.visit(child)
       if child_cast:
       # There are some instances where we will recieve more than one CAST node back from a visit,
@@ -72,8 +160,8 @@ class TS2CAST(object):
         self.module.body.extend(child_cast)
        else:
         self.module.body.append(child_cast)
-
-    self.module.source_refs = [self.generate_source_ref(root)]
+      '''
+    
   
   def visit(self, node):
     # Generate source_ref
@@ -87,6 +175,10 @@ class TS2CAST(object):
     
     if node_type == "subroutine" or node_type == "function":
        output = self.visit_function_def(node, child_map, source_ref)
+    elif node_type == "subroutine_call" or node_type == "call_expression":
+       output = self.visit_function_call(node, child_map, source_ref)
+    elif node_type == "keyword_statement":
+       output = self.visit_keyword_statement(node, child_map, source_ref)
     elif node_type == "use_statement":
        output = self.visit_use_statement(node, child_map, source_ref)
     elif node_type == "do_loop_statement":
@@ -128,8 +220,17 @@ class TS2CAST(object):
     # Function def will always have a name node, but may not have a parameters node
     name_node = TS2CAST.search_children_by_type(node, "name")
     _, _, name_identifier = self.get_node_data(name_node)
-    cast_func.name = name_identifier
+    # Like variables functions will also entries in the variable_context table
+    cast_name = Name()
+    cast_name.name = name_identifier
+    cast_name.id = self.variable_id
+   
+    self.variable_context[-1][name_identifier] = {"id":self.variable_id, "type":"Function"}
+    self.variable_id += 1
+    
+    cast_func.name = cast_name
 
+    # Generating the function arguments by walking the parameters node
     parameters_node = TS2CAST.search_children_by_type(node, "parameters")
     if parameters_node:
        for child in parameters_node.children:
@@ -148,24 +249,60 @@ class TS2CAST(object):
 
     # After creating the body, we can go back and update the var nodes we created for the arguments
     # We do this by looking for intent,in nodes
-    # TODO: Can we replace this by accessing variable context
     for i, arg in enumerate(cast_func.func_args):
        arg_name = arg.val.name
        cast_func.func_args[i].type = self.variable_context[-1][arg_name]["type"]
-       
-       '''       
-       # Find the argument in the body
-       for cast_node in cast_func.body:
-        if isinstance(cast_node, Var) and cast_node.val.name == arg_name:
-          
-          # Update the argument
-          cast_func.func_args[i].type = cast_node.type
-      '''
     
+    # After everything is finished, we need to update the return value for any Return nodes
+    # We will use either the name of the function, or any variables with intent out or inout
+    
+
     # Pop variable context off of stack before leaving this scope
     self.variable_context.pop()
 
     return cast_func
+
+  def visit_function_call(self, node, child_map, source_ref):
+     # Tree-Sitter incorrectly parses mutlidimensional array accesses as function calls
+     # We will need to check if this is truly a function call or a subscript
+     cast_call = Call()
+     cast_call.source_refs = [source_ref]
+     cast_call.arguments = []
+
+     # For both subroutine and functions, the first child will be the identifier, and the second will be an argument list
+     _,_,function_identifier = self.get_node_data(node.children[0])
+     cast_call.func = function_identifier
+
+     for context in self.variable_context:
+        if function_identifier in context:
+           if context[function_identifier]["type"] == "List":
+            pass #TODO: Handle multidimensional accesss
+        
+     for child in node.children[1:]:
+        cast_child = self.visit(child)
+        if cast_child:
+           if isinstance(cast_child, list):
+              cast_call.arguments.extend(cast_child)
+           else:
+              cast_call.arguments.append(cast_child)
+
+     return cast_call
+  
+  def visit_keyword_statement(self, node, child_map, source_ref):
+     _,_,keyword_identifer = self.get_node_data(node)
+     # Currently, the only keyword_identifier produced by tree-sitter is Return
+     # However, there may be other instances, so for now, we will explicitly check first
+     if keyword_identifer.lower() == "return":  
+      cast_return = ModelReturn()
+      cast_return.source_refs = [source_ref]
+
+      # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
+      # We return None here, but will update this value in the function definition visitor
+      cast_return.value = None
+
+      return cast_return
+     
+     return None 
 
   def visit_use_statement(self, node, child_map, source_ref):
      # Getting the module information
@@ -535,4 +672,5 @@ class TS2CAST(object):
          output.append(child)
      return output
   
-walker = TS2CAST("idioms.f95", "tree-sitter-fortran")
+walker = TS2CAST("test.f95", "tree-sitter-fortran")
+
