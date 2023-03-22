@@ -138,6 +138,7 @@ def main():
     print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
         if ap != "2018_1807_1807.00989_large_eqn118":
+            print(ap)
             if count%1000==0:print(f"{count}, {ap}, {counter_dist_dict}")
             if count <= total_eqns:
                 # try:
@@ -149,24 +150,25 @@ def main():
 
                 mml = open(mml_path).readlines()[0]
 
-                try:
-                    cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))"'
-                    simp_mml = subprocess.run(shlex.split(cmd),
-                          timeout=60,
-                          check=True,
-                          capture_output=True,
-                          text=True
-                    )
-                except subprocess.TimeoutExpired:
-                    print("Timeout expired")
+                # try:
+                #     cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))"'
+                #     simp_mml = subprocess.run(shlex.split(cmd),
+                #           timeout=60,
+                #           check=True,
+                #           capture_output=True,
+                #           text=True
+                #     )
+                # except subprocess.TimeoutExpired:
+                #     print("Timeout expired")
+                #
+                # except subprocess.CalledProcessError as e:
+                #      print("Command exited with status", e.returncode)
+                #      print("Error output:", e.stderr)
 
-                except subprocess.CalledProcessError as e:
-                     print("Command exited with status", e.returncode)
-                     print("Error output:", e.stderr)
-
-                # simp_mml = simplification(mml)
+                simp_mml = simplification(mml)
                 length_mml = len(simp_mml.split())
-
+                print(length_mml)
+                
                 # finding the bin
                 temp_dict = {}
                 for i in range(50, 400, 50):
