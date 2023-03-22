@@ -128,7 +128,7 @@ def main():
     count = 0
     print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
-        if apidx%100==0:print(f"{apidx}, {ap}, count={count}")
+        if apidx%1000==0:print(f"{apidx}, {ap}, counter_dist_dict")
         if count <= total_eqns:
             try:
                 yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
