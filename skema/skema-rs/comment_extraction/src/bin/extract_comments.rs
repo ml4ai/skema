@@ -88,10 +88,10 @@ fn extract_comments_from_directory(directory: &str) {
             let file_comments = extract_comments_from_file(path);
             if let Ok(file_comments) = file_comments {
                 comments[path] = serde_json::from_str(&file_comments).unwrap();
-                println!("{comments}");
             }
         }
     }
+    println!("{comments}");
 }
 
 fn main() {
