@@ -126,8 +126,8 @@ def main():
     print("preparing dataset...")
 
     count = 0
+    print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
-        print(len(all_paths))
         if apidx%100==0:print(f"{apidx}, {ap}, count={count}")
         if count <= total_eqns:
             try:
