@@ -128,7 +128,7 @@ def main():
     count = 0
     for apidx, ap in enumerate(all_paths):
         print(len(all_paths))
-        if apidx%100==0:print(f"{apidx}, count={count}")
+        if apidx%100==0:print(f"{apidx}, {ap}, count={count}")
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
             mml_path = os.path.join(
