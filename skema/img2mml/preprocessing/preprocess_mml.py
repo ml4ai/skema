@@ -305,10 +305,13 @@ def remove_additional_tokens(eqn):
     considered and not be removed.
     """
     if "mtext" in eqn:
-        c = count(eqn, "mtext")
-        for _ in range(c):
-            e1, e2 = eqn.find("<mtext>"), eqn.find("</mtext>")
-            eqn = eqn[:e1] + eqn[e2 + len("</mtext>") :]
+        try:
+            c = count(eqn, "mtext")
+            for _ in range(c):
+                e1, e2 = eqn.find("<mtext>"), eqn.find("</mtext>")
+                eqn = eqn[:e1] + eqn[e2 + len("</mtext>") :]
+        except:
+            pass
 
     if "mrow" in eqn:
         try:
