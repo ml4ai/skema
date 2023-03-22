@@ -72,6 +72,86 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+def get_lengths(main_path):
+
+    yr, month, folder, type_of_eqn, eqn_num = main_path.split("_")
+
+    mml_path = os.path.join(
+        root,
+        f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+    )
+
+    mml = open(mml_path).readlines()[0]
+
+    simp_mml = simplification(mml)
+    length_mml = len(simp_mml.split())
+
+    # finding the bin
+    temp_dict = {}
+    for i in range(50, 400, 50):
+        if length_mml / i < 1:
+            temp_dict[i] = length_mml / i
+
+    # get the bin
+    if len(temp_dict) >= 1:
+        max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+        tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+    else:
+        tgt_bin = "350+"
+
+    counter_dist_dict[tgt_bin].append(main_path)
+
+
+def final_dataset():
+
+    print("preparing dataset...")
+
+    for key,value in dist_dict.items():
+
+        print(f"preparing {key} having {value} eqns...")
+
+        final_paths = counter_dist_dict[key][:value]
+        for fp in final_paths:
+            yr, month, folder, type_of_eqn, eqn_num = fp.split("_")
+
+            # wrting path
+            paths_file.write(ap + "\n")
+
+            # writing MathML
+            mml_path = os.path.join(
+                root,
+                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+            )
+
+            mml = open(mml_path).readlines()[0]
+            if "\n" not in mml:
+                mml = mml + "\n"
+            mml_file.write(mml)
+
+            # writing latex
+            latex_path = os.path.join(
+                root,
+                f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+            )
+            latex_arr = open(latex_path).readlines()
+            if len(latex_arr) > 1:
+                latex = " "
+                for l in latex_arr:
+                    latex = latex + l.replace("\n", "")
+            else:
+                latex = latex_arr[0]
+
+            if "\n" not in latex:
+                latex = latex + "\n"
+            latex_file.write(latex)
+
+            # copying image
+            img_src = os.path.join(
+                root,
+                f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+            )
+            img_dst = os.path.join(images_path, f"{count}.png")
+            CP(img_src, img_dst)
 
 def main():
 
@@ -125,88 +205,7 @@ def main():
     ######## and grab the corresponding PNG and latex ############
     print("creating bins...")
     with mp.Pool(200) as pool:
-        resuts = pool(get_lengths, all_paths)
+        resuts = pool.map(get_lengths, all_paths)
 
     # write the final dataset
     final_dataset()
-
-def get_lengths(main_path):
-
-    yr, month, folder, type_of_eqn, eqn_num = main_path.split()
-
-    mml_path = os.path.join(
-        root,
-        f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-    )
-
-    mml = open(mml_path).readlines()[0]
-
-    simp_mml = simplification(mml)
-    length_mml = len(simp_mml.split())
-
-    # finding the bin
-    temp_dict = {}
-    for i in range(50, 400, 50):
-        if length_mml / i < 1:
-            temp_dict[i] = length_mml / i
-
-    # get the bin
-    if len(temp_dict) >= 1:
-        max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-        tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-    else:
-        tgt_bin = "350+"
-
-    counter_dist_dict[tgt_bin].append(main_path)
-
-
-def final_dataset():
-
-    print("preparing dataset...")
-
-    for key,value in dist_dict.items():
-
-        print(f"preparing {key} having {value} eqns...")
-        
-        final_paths = counter_dist_dict[key][:value]
-        for fp in final_paths:
-            yr, month, folder, type_of_eqn, eqn_num = fp.split("_")
-
-            # wrting path
-            paths_file.write(ap + "\n")
-
-            # writing MathML
-            mml_path = os.path.join(
-                root,
-                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-            )
-
-            mml = open(mml_path).readlines()[0]
-            if "\n" not in mml:
-                mml = mml + "\n"
-            mml_file.write(mml)
-
-            # writing latex
-            latex_path = os.path.join(
-                root,
-                f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-            )
-            latex_arr = open(latex_path).readlines()
-            if len(latex_arr) > 1:
-                latex = " "
-                for l in latex_arr:
-                    latex = latex + l.replace("\n", "")
-            else:
-                latex = latex_arr[0]
-
-            if "\n" not in latex:
-                latex = latex + "\n"
-            latex_file.write(latex)
-
-            # copying image
-            img_src = os.path.join(
-                root,
-                f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
-            )
-            img_dst = os.path.join(images_path, f"{count}.png")
-            CP(img_src, img_dst)

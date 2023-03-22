@@ -3,6 +3,7 @@ import multiprocessing as mp
 import shutil
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
+from subprocess import STDOUT, check_output
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -72,6 +73,8 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+def copy_image(img_src, img_dst):
+    CP(img_src, img_dst)
 
 def main():
 
@@ -158,6 +161,15 @@ def main():
                 if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                     counter_dist_dict[tgt_bin] += 1
 
+                    # copying image
+                    img_src = os.path.join(
+                        root,
+                        f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+                    )
+                    img_dst = os.path.join(images_path, f"{count}.png")
+                    output = check_output(copy_image(img_src, img_dst), stderr=STDOUT, timeout=seconds)
+                    print(output)
+                    
                     # wrting path
                     paths_file.write(ap + "\n")
 
@@ -182,14 +194,6 @@ def main():
                     if "\n" not in latex:
                         latex = latex + "\n"
                     latex_file.write(latex)
-
-                    # copying image
-                    img_src = os.path.join(
-                        root,
-                        f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
-                    )
-                    img_dst = os.path.join(images_path, f"{count}.png")
-                    CP(img_src, img_dst)
 
                     count += 1
             except:
