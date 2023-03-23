@@ -9,5 +9,5 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-f=open(args.mml).readlines()[0]
+f=open(args.config).readlines()[0]
 simp_mml = simplification(f)
