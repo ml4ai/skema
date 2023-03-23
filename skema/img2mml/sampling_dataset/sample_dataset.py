@@ -144,6 +144,7 @@ def main():
                 "2018_1807_1807.09554_large_eqn44",
                 "2018_1807_1807.09554_large_eqn35"]:
 
+            print(ap)
             if count%10000==0:print(f"{count}, {ap}, {counter_dist_dict}")
             if count <= total_eqns:
                 yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
@@ -154,39 +155,7 @@ def main():
 
                 mml = open(mml_path).readlines()[0]
 
-                proc = subprocess.Popen(["python", "simplify.py", mml],
-                        shell=True,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.STDOUT
-                )
-                
-                timer = Timer(10, proc.kill)
-                timer.start()
-                proc.communicate()
-                if timer.is_alive():
-                    # Process completed naturally - cancel timer and return exit code
-                    timer.cancel()
-                    return proc.returncode
-                # Process killed by timer - raise exception
-                raise SubprocessTimeoutError('Process #%d killed after %f seconds' % (proc.pid, timeout_sec))
-
-                # try:
-                #     _temp = open("temp.txt", "w")
-                #     _temp.write(mml)
-                #     simp_mml = subprocess.run(["python", "simplify.py", "--mml_path", "temp.txt"],
-                #           timeout=60,
-                #           check=True,
-                #           capture_output=True,
-                #           text=True
-                #     )
-                # except subprocess.TimeoutExpired:
-                #     print("Timeout expired")
-                #
-                # except subprocess.CalledProcessError as e:
-                #      print("Command exited with status", e.returncode)
-                #      print("Error output:", e.stderr)
-
-                # simp_mml = simplification(mml)
+                simp_mml = simplification(mml)
                 length_mml = len(simp_mml.split())
 
                 # finding the bin
