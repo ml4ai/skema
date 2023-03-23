@@ -5,22 +5,35 @@ import org.clulab.processors.fastnlp.FastNLPProcessor
 
 object GrounderFactory {
   def getInstance(config:Config):Grounder = {
+    val prependManualGrounder = config.getBoolean("forceManualGroundings")
+    lazy val manualGrounder = buildManualGrounder(config)
     // Grounding parameters
     config.getString("engine").toLowerCase match {
       case "miraembeddings" =>
         val ontologyFilePath = config.getString("ontologyPath")
         val lambda = config.getInt("lambda")
         val alpha = config.getDouble("alpha").toFloat
-        MiraEmbeddingsGrounder(ontologyFilePath, None, lambda, alpha)
+        val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda, alpha)
+        if(prependManualGrounder)
+          new PipelineGrounder(Seq(manualGrounder, grounder))
+        else
+          grounder
       case "mirawebapi" =>
         val endpoint = config.getString("apiEndpoint")
-        new MiraWebApiGrounder(endpoint)
-      case "manual" =>
-        val manualGroundingsResourcePath = config.getString("manualGroundings")
-        val processor = new FastNLPProcessor(withChunks = false, internStrings = false)
-        ManualGrounder.fromFileOrResource(manualGroundingsResourcePath, processor)
+        val grounder = new MiraWebApiGrounder(endpoint)
+        if (prependManualGrounder)
+          new PipelineGrounder(Seq(manualGrounder, grounder))
+        else
+          grounder
+      case "manual" => manualGrounder
       case other =>
         throw new RuntimeException(s"$other - is not implemented as a grounding engine")
     }
+  }
+
+  def buildManualGrounder(config:Config): ManualGrounder = {
+    val manualGroundingsResourcePath = config.getString("manualGroundings")
+    val processor = new FastNLPProcessor(withChunks = false, internStrings = false)
+    ManualGrounder.fromFileOrResource(manualGroundingsResourcePath, processor)
   }
 }
