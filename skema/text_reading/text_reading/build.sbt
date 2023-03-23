@@ -29,7 +29,8 @@ libraryDependencies ++= {
     "com.lihaoyi"                %% "upickle"            % uJsonVer,
     "com.lihaoyi"                %% "ujson-json4s"       % uJsonVer,
     "com.lihaoyi"                %% "ujson-play"         % uJsonVer,
-    "xml-apis"                    % "xml-apis"           % "1.4.01"
+    "xml-apis"                    % "xml-apis"           % "1.4.01",
+    "com.github.scopt"           %% "scopt"              % "4.1.0",
   )
 }
 
