@@ -1,13 +1,10 @@
 from preprocessing.preprocess_mml import simplification
-import argparse
+import sys
 
-# opening config file
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--config",
-    help="configuration file for paths and hyperparameters",
-)
-args = parser.parse_args()
+def main(mml):
+    while(True):
+        return(simplification(mml))
 
-f=open(args.config).readlines()[0]
-simp_mml = simplification(f)
+if __name__ == '__main__':
+    mml = sys.argv[1]
+    main(mml)

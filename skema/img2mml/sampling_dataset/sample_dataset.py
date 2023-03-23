@@ -154,7 +154,12 @@ def main():
 
                 mml = open(mml_path).readlines()[0]
 
-                proc = subprocess.Popen(simplification(mml))
+                proc = subprocess.Popen(["python", "simplify.py", mml],
+                        shell=True,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.STDOUT
+                )
+                
                 timer = Timer(10, proc.kill)
                 timer.start()
                 proc.communicate()
