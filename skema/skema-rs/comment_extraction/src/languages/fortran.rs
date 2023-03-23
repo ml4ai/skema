@@ -1,3 +1,7 @@
+//! Original logic for handling Fortran code was implemented by Saumya Debray in Python for the
+//! AutoMATES project (https://ml4ai.github.io/automates), and ported over to this Rust version by
+//! Adarsh Pyarelal for the SKEMA project.
+
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};

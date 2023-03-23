@@ -1,7 +1,4 @@
 //! Program to get comments from a source code file.
-//! Original logic for handling Fortran code was implemented by Saumya Debray in Python for the
-//! AutoMATES project (https://ml4ai.github.io/automates), and ported over to this Rust version by
-//! Adarsh Pyarelal for the SKEMA project.
 
 use clap::{Parser, ValueEnum};
 use std::{collections::HashSet, fs::read_to_string};
@@ -11,7 +8,7 @@ use serde_json as json;
 use std::path::Path;
 
 use comment_extraction::{
-    comment::Comment,
+    comments::Comment,
     conventions::dssat::get_comments as get_dssat_comments,
     languages::{
         cpp::get_comments as get_cpp_comments, fortran::line_is_comment,
