@@ -83,16 +83,13 @@ def preprocess_mml(config):
     print("preprocessing data...")
 
     # reading raw text files
-    MMLPath = f"{config['data_path']}/{config['dataset_type']}/mml.lst"
+    MMLPath = f"{config['data_path']}/{config['dataset_type']}/{config["markup"]}.lst"
     IMGTnsrPath = (
         f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     )
     mml_txt = open(MMLPath).read().split("\n")[:-1]
     image_num = range(0, len(mml_txt))
 
-    """
-    checking hypothesis: dealing with large dataset
-    """
     # split the image_num into train, test, validate
     df = image_num  # pd.DataFrame(image_num, columns=["IMG"])
     train_val_images, test_images = train_test_split(
@@ -119,30 +116,6 @@ def preprocess_mml(config):
         else:
             val = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
 
-    """
-    checking hypothesis: dealing with large dataset
-    """
-
-    # raw_mml_data = {'IMG': [torch.load(f'{IMGTnsrPath}/{num}.txt') for num in image_num],
-    #                 'EQUATION': [('<sos> '+ mml + ' <eos>') for mml in mml_txt]}
-
-    # adding <sos> and <eos> tokens then creating a dataframe
-    # equation_array = list()
-    # image_array = list()
-    # for num in range(len(mml_txt)):
-    #     if "REJECTED MATHML" not in mml_txt[num]:
-    #         # appending mmls
-    #         mml = "<sos> " + mml_txt[num] + " <eos>"
-    #         equation_array.append(mml)
-    #         # appending image tensors
-    #         image_array.append(torch.load(f"{IMGTnsrPath}/{num}.txt"))
-    #
-    # raw_mml_data = {"IMG": image_array, "EQUATION": equation_array}
-
-    # df = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
-
-    # train_val, test = train_test_split(df, test_size=0.1, random_state=42)
-    # train, val = train_test_split(train_val, test_size=0.1, random_state=42)
 
     # build vocab
     print("building vocab...")
