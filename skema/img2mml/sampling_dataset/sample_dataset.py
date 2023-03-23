@@ -154,21 +154,21 @@ def main():
 
                 mml = open(mml_path).readlines()[0]
 
-                # try:
-                #     # cmd = f'python -c "import sys; sys.exit(not simplification(\'{mml}\'))"'
-                #     # simp_mml = subprocess.run(shlex.split(cmd),
-                #     simp_mml = subprocess.run(["python", "simplify.py", "--mml", mml],
-                #           timeout=60,
-                #           check=True,
-                #           capture_output=True,
-                #           text=True
-                #     )
-                # except subprocess.TimeoutExpired:
-                #     print("Timeout expired")
-                #
-                # except subprocess.CalledProcessError as e:
-                #      print("Command exited with status", e.returncode)
-                #      print("Error output:", e.stderr)
+                try:
+                    _temp = open("temp.txt", "w")
+                    _temp.write(mml)
+                    simp_mml = subprocess.run(["python", "simplify.py", "--mml_path", "temp.txt"],
+                          timeout=60,
+                          check=True,
+                          capture_output=True,
+                          text=True
+                    )
+                except subprocess.TimeoutExpired:
+                    print("Timeout expired")
+
+                except subprocess.CalledProcessError as e:
+                     print("Command exited with status", e.returncode)
+                     print("Error output:", e.stderr)
 
                 simp_mml = simplification(mml)
                 length_mml = len(simp_mml.split())
