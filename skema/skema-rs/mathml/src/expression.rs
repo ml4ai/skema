@@ -33,8 +33,15 @@ enum Expr {
 
 /// Intermediate data structure to support the generation of graphs of mathematical expressions
 #[derive(Debug, Default, PartialEq, Clone)]
+pub struct Operators {
+    unary: Option<Operator>,
+    nary: Vec<Operator>,
+}
+
+/// Intermediate data structure to support the generation of graphs of mathematical expressions
+#[derive(Debug, Default, PartialEq, Clone)]
 pub struct PreExp {
-    ops: Vec<Operator>,
+    ops: Operators,
     args: Vec<Expr>,
     name: String,
 }
@@ -77,8 +84,7 @@ impl MathExpression {
                     let args_last_idx = pre.args.len() - 1;
                     if let Expr::Atom(Atom::Operator(Operator::Subtract)) = &pre.args[args_last_idx]
                     {
-                        let mut neg_identifier = String::from("-");
-                        neg_identifier.push_str(&x);
+                        let neg_identifier = format!("-{x}");
                         pre.args[args_last_idx] = Expr::Atom(Atom::Identifier(neg_identifier));
                         return;
                     }
@@ -214,36 +220,36 @@ impl Expr {
     /// Group expression by multiplication and division operations.
     fn group_expr(&mut self) {
         if let Expr::Expression { ops, args, .. } = self {
-            let mut removed_idx = Vec::new();
+            let mut indices_to_remove = Vec::new();
             let ops_copy = ops.clone();
             let args_copy = args.clone();
             if ops.len() > 2 {
-                let mut start_idx: i32 = -1;
-                let mut end_idx: i32 = -1;
+                let mut start_index: i32 = -1;
+                let mut end_index: i32 = -1;
                 let mut new_exp = Expr::Expression {
                     ops: vec![Operator::Other("".to_string())],
                     args: Vec::<Expr>::new(),
                     name: "".to_string(),
                 };
-                for o in 0..=ops.len() - 1 {
-                    if ops[o] == Operator::Multiply || ops[o] == Operator::Divide {
-                        removed_idx.push(o);
-                        if start_idx == -1 {
-                            start_idx = o as i32;
-                            end_idx = o as i32;
+                for (o, operator) in ops.iter().enumerate() {
+                    if *operator == Operator::Multiply || *operator == Operator::Divide {
+                        indices_to_remove.push(o);
+                        if start_index == -1 {
+                            start_index = o as i32;
+                            end_index = o as i32;
                             if let Expr::Expression { ops, args, .. } = &mut new_exp {
-                                ops.push(ops_copy[o].clone());
+                                ops.push(operator.clone());
                                 args.push(args_copy[o - 1].clone());
                                 args.push(args_copy[o].clone());
                             }
-                        } else if o as i32 - end_idx == 1 {
-                            end_idx = o as i32;
+                        } else if o as i32 - end_index == 1 {
+                            end_index = o as i32;
                             if let Expr::Expression { ops, args, .. } = &mut new_exp {
                                 ops.push(ops_copy[o].clone());
                                 args.push(args_copy[o].clone())
                             }
                         } else {
-                            args[start_idx as usize - 1] = new_exp.clone();
+                            args[start_index as usize - 1] = new_exp.clone();
                             new_exp = Expr::Expression {
                                 ops: vec![Operator::Other("".to_string())],
                                 args: Vec::<Expr>::new(),
@@ -254,22 +260,22 @@ impl Expr {
                                 args.push(args_copy[o - 1].clone());
                                 args.push(args_copy[o].clone());
                             }
-                            start_idx = o as i32;
-                            end_idx = o as i32;
+                            start_index = o as i32;
+                            end_index = o as i32;
                         }
                     }
                 }
 
-                if removed_idx.len() == ops.len() - 1 {
+                if indices_to_remove.len() == ops.len() - 1 {
                     return;
                 }
 
                 if let Expr::Expression { ops, .. } = &mut new_exp {
-                    if !ops.is_empty() && start_idx > 0 {
-                        args[start_idx as usize - 1] = new_exp.clone();
+                    if !ops.is_empty() && start_index > 0 {
+                        args[start_index as usize - 1] = new_exp.clone();
                     }
                 }
-                for ri in removed_idx.iter().rev() {
+                for ri in indices_to_remove.iter().rev() {
                     ops.remove(*ri);
                     args.remove(*ri);
                 }
