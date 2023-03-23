@@ -73,17 +73,14 @@ impl MathExpression {
             Mi(x) => {
                 // Process unary minus operation.
                 if !pre.args.is_empty() {
+                    // Check the last arg
                     let args_last_idx = pre.args.len() - 1;
-                    if let Expr::Atom(y) = &pre.args[args_last_idx] {
-                        if let Atom::Operator(z) = y {
-                            if let Operator::Subtract = z {
-                                let mut neg_identifier = String::from("-");
-                                neg_identifier.push_str(&x);
-                                pre.args[args_last_idx] =
-                                    Expr::Atom(Atom::Identifier(neg_identifier));
-                                return;
-                            }
-                        }
+                    if let Expr::Atom(Atom::Operator(Operator::Subtract)) = &pre.args[args_last_idx]
+                    {
+                        let mut neg_identifier = String::from("-");
+                        neg_identifier.push_str(&x);
+                        pre.args[args_last_idx] = Expr::Atom(Atom::Identifier(neg_identifier));
+                        return;
                     }
                 }
                 // deal with the invisible multiply operator
@@ -218,7 +215,7 @@ impl Expr {
     fn group_expr(&mut self) {
         if let Expr::Expression { ops, args, .. } = self {
             let mut removed_idx = Vec::new();
-            let op_copy = ops.clone();
+            let ops_copy = ops.clone();
             let args_copy = args.clone();
             if ops.len() > 2 {
                 let mut start_idx: i32 = -1;
@@ -235,14 +232,14 @@ impl Expr {
                             start_idx = o as i32;
                             end_idx = o as i32;
                             if let Expr::Expression { ops, args, .. } = &mut new_exp {
-                                ops.push(op_copy[o].clone());
+                                ops.push(ops_copy[o].clone());
                                 args.push(args_copy[o - 1].clone());
                                 args.push(args_copy[o].clone());
                             }
                         } else if o as i32 - end_idx == 1 {
                             end_idx = o as i32;
                             if let Expr::Expression { ops, args, .. } = &mut new_exp {
-                                ops.push(op_copy[o].clone());
+                                ops.push(ops_copy[o].clone());
                                 args.push(args_copy[o].clone())
                             }
                         } else {
@@ -253,7 +250,7 @@ impl Expr {
                                 name: "".to_string(),
                             };
                             if let Expr::Expression { ops, args, .. } = &mut new_exp {
-                                ops.push(op_copy[o].clone());
+                                ops.push(ops_copy[o].clone());
                                 args.push(args_copy[o - 1].clone());
                                 args.push(args_copy[o].clone());
                             }
@@ -290,7 +287,7 @@ impl Expr {
     /// nested all multiplication or division terms inside. If so, collapse them into a single term.
     fn collapse_expr(&mut self) {
         if let Expr::Expression { ops, args, .. } = self {
-            let mut op_copy = ops.clone();
+            let mut ops_copy = ops.clone();
             let mut args_copy = args.clone();
 
             let mut shift = 0;
@@ -304,17 +301,17 @@ impl Expr {
                             {
                                 args_copy[i] = args[0].clone();
                                 for j in 1..ops.len() {
-                                    op_copy.insert(i + shift + j, ops[j].clone());
+                                    ops_copy.insert(i + shift + j, ops[j].clone());
                                     args_copy.insert(i + shift + j, args[j].clone());
                                 }
                                 shift = shift + ops.len() - 1;
                             }
                         }
                     }
-                    if ops.clone() == op_copy.clone() {
+                    if ops.clone() == ops_copy.clone() {
                         changed = false;
                     }
-                    *ops = op_copy.clone();
+                    *ops = ops_copy.clone();
                     *args = args_copy.clone();
                 }
             }
@@ -449,8 +446,8 @@ impl Expr {
                     graph.update_edge(parent_node_index, node_idx, ops[0].to_string());
                 }
             }
-            let op_copy = ops.clone();
-            for i in eq_loc..=op_copy.len() - 1 {
+            let ops_copy = ops.clone();
+            for i in eq_loc..=ops_copy.len() - 1 {
                 match &mut args[i] {
                     Expr::Atom(x) => match x {
                         Atom::Number(x) => {
@@ -461,9 +458,9 @@ impl Expr {
                             }
                             let node_idx = get_node_idx(graph, x);
                             if i == 0 {
-                                if op_copy.len() > 1 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                                if ops_copy.len() > 1 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !x.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -471,8 +468,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -483,14 +480,14 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
-                            } else if op_copy[i] == Operator::Equals {
-                                if i <= op_copy.len() - 2 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                            } else if ops_copy[i] == Operator::Equals {
+                                if i <= ops_copy.len() - 2 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !x.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -498,8 +495,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -510,7 +507,7 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
@@ -518,7 +515,7 @@ impl Expr {
                                 graph.update_edge(
                                     node_idx,
                                     parent_node_index,
-                                    op_copy[i].to_string(),
+                                    ops_copy[i].to_string(),
                                 );
                             }
                         }
@@ -530,9 +527,9 @@ impl Expr {
                             }
                             let node_idx = get_node_idx(graph, x);
                             if i == 0 {
-                                if op_copy.len() > 1 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                                if ops_copy.len() > 1 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !x.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -540,8 +537,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -552,14 +549,14 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
-                            } else if op_copy[i] == Operator::Equals {
-                                if i <= op_copy.len() - 2 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                            } else if ops_copy[i] == Operator::Equals {
+                                if i <= ops_copy.len() - 2 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !x.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -567,8 +564,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -579,7 +576,7 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
@@ -587,7 +584,7 @@ impl Expr {
                                 graph.update_edge(
                                     node_idx,
                                     parent_node_index,
-                                    op_copy[i].to_string(),
+                                    ops_copy[i].to_string(),
                                 );
                             }
                         }
@@ -602,9 +599,9 @@ impl Expr {
                         if ops[0] == Operator::Other("".to_string()) {
                             let node_idx = get_node_idx(graph, name);
                             if i == 0 {
-                                if op_copy.len() > 1 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                                if ops_copy.len() > 1 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !name.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -612,8 +609,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -624,14 +621,14 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
-                            } else if op_copy[i] == Operator::Equals {
-                                if i <= op_copy.len() - 2 && op_copy.len() > 1 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                            } else if ops_copy[i] == Operator::Equals {
+                                if i <= ops_copy.len() - 2 && ops_copy.len() > 1 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !name.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -639,8 +636,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -651,7 +648,7 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
@@ -659,7 +656,7 @@ impl Expr {
                                 graph.update_edge(
                                     node_idx,
                                     parent_node_index,
-                                    op_copy[i].to_string(),
+                                    ops_copy[i].to_string(),
                                 );
                             }
                         } else {
@@ -671,9 +668,9 @@ impl Expr {
                             unitary_name.push_str(")".clone());
                             let node_idx = get_node_idx(graph, &mut unitary_name);
                             if i == 0 {
-                                if op_copy.len() > 1 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                                if ops_copy.len() > 1 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !unitary_name.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -681,8 +678,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -693,14 +690,14 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
-                            } else if op_copy[i] == Operator::Equals {
-                                if i <= op_copy.len() - 2 {
-                                    if (op_copy[i + 1].to_string() == "+"
-                                        || op_copy[i + 1].to_string() == "-")
+                            } else if ops_copy[i] == Operator::Equals {
+                                if i <= ops_copy.len() - 2 {
+                                    if (ops_copy[i + 1].to_string() == "+"
+                                        || ops_copy[i + 1].to_string() == "-")
                                         && !unitary_name.starts_with('-')
                                     {
                                         graph.update_edge(
@@ -708,8 +705,8 @@ impl Expr {
                                             parent_node_index,
                                             "+".to_string(),
                                         );
-                                    } else if op_copy[i + 1].to_string() == "*"
-                                        || op_copy[i + 1].to_string() == "/"
+                                    } else if ops_copy[i + 1].to_string() == "*"
+                                        || ops_copy[i + 1].to_string() == "/"
                                     {
                                         graph.update_edge(
                                             node_idx,
@@ -720,7 +717,7 @@ impl Expr {
                                         graph.update_edge(
                                             node_idx,
                                             parent_node_index,
-                                            op_copy[i + 1].to_string(),
+                                            ops_copy[i + 1].to_string(),
                                         );
                                     }
                                 }
@@ -728,7 +725,7 @@ impl Expr {
                                 graph.update_edge(
                                     node_idx,
                                     parent_node_index,
-                                    op_copy[i].to_string(),
+                                    ops_copy[i].to_string(),
                                 );
                             }
                         }
