@@ -1,10 +1,10 @@
 package org.ml4ai.skema.text_reading.grounding
 
+import org.clulab.dynet.Utils.newSource
 import org.clulab.processors.Processor
 
 import scala.collection.mutable
-import scala.io.{BufferedSource, Source}
-import scala.util.{Failure, Success, Try}
+import scala.util.control.Breaks._
 
 /**
   * Entry that can be matched to a text
@@ -33,9 +33,12 @@ class ManualGrounder(targetEntries:Iterable[ManualGroundingEntry], processor:Pro
           val lemmas = processor.annotate(normalizedQuery).sentences.head.lemmas.getOrElse(Array.empty)
           // TODO, replace this grossly inefficient code with a prefix tree/trie
           var matchingEntry: Option[ManualGroundingEntry] = None
-          for (entry <- targetEntries) {
-            if (matchingEntry.isEmpty && (lemmas sameElements entry.lemmas)) {
-              matchingEntry = Some(entry)
+          breakable {
+            for (entry <- targetEntries) {
+              if (matchingEntry.isEmpty && (lemmas sameElements entry.lemmas)) {
+                matchingEntry = Some(entry)
+                break
+              }
             }
           }
 
@@ -58,13 +61,7 @@ object ManualGrounder {
     * @return instance of ManualGrounder prepared to use
     */
   def fromFileOrResource(path:String, processor: Processor): ManualGrounder = {
-
-    var src =
-      if(this.getClass.getResource("/" + path) != null)
-        Source.fromResource(path)
-      else
-        Source.fromFile(path)
-
+    val src = newSource(path)
     val entries =
       src.getLines() map {
         line =>
@@ -77,7 +74,6 @@ object ManualGrounder {
           else
             None
       } collect { case Some(e) => e}
-
     new ManualGrounder(entries.toList, processor)
   }
 }
