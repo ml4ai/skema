@@ -142,9 +142,17 @@ def main():
                 "2018_1808_1808.02050_large_eqn36",
                 "2018_1806_1806.07089_large_eqn34",
                 "2018_1807_1807.09554_large_eqn44",
-                "2018_1807_1807.09554_large_eqn35"]:
+                "2018_1807_1807.09554_large_eqn35",
+                "2018_1808_1808.06517_large_eqn14",
+                "2018_1807_1807.08694_large_eqn12",
+                "2018_1807_1807.04044_large_eqn54",
+                "2018_1807_1807.08225_large_eqn11",
+                "2014_1403_1403.6048_small_eqn29",
+                "2018_1812_1812.05056_large_eqn60",
+                "2018_1808_1808.09810_large_eqn46",
+                "2018_1808_1808.01120_large_eqn13"]:
 
-            print(ap)
+            print(ap, count)
             if count%10000==0:print(f"{count}, {ap}, {counter_dist_dict}")
             if count <= total_eqns:
                 yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
