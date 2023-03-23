@@ -127,27 +127,25 @@ def main():
     print("shuffling all the paths to create randomness...")
 
     random.shuffle(all_paths)
-    random.shuffle(all_paths)
 
     ######## step 3 and 4: simplify MML and and find length  #####
     ######## and grab the corresponding PNG and latex ############
     print("preparing dataset...")
 
-
+    final_paths = list()
     count = 0
-    print(len(all_paths))
     for apidx, ap in enumerate(all_paths):
-        if ap not in [ "2018_1807_1807.00989_large_eqn118",
+        if ap not in ["2018_1805_1805.03129_large_eqn18",
+                "2018_1803_1803.03006_large_eqn13",
+                "2018_1807_1807.00989_large_eqn118",
                 "2018_1807_1807.10398_large_eqn44",
                 "2018_1808_1808.02050_large_eqn36",
                 "2018_1806_1806.07089_large_eqn34",
                 "2018_1807_1807.09554_large_eqn44",
                 "2018_1807_1807.09554_large_eqn35"]:
-                
-            print(ap)
-            if count%1000==0:print(f"{count}, {ap}, {counter_dist_dict}")
+
+            if count%10000==0:print(f"{count}, {ap}, {counter_dist_dict}")
             if count <= total_eqns:
-                # try:
                 yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
                 mml_path = os.path.join(
                     root,
@@ -174,7 +172,6 @@ def main():
 
                 simp_mml = simplification(mml)
                 length_mml = len(simp_mml.split())
-                print(length_mml)
 
                 # finding the bin
                 temp_dict = {}
@@ -191,60 +188,82 @@ def main():
 
                 if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                     counter_dist_dict[tgt_bin] += 1
+                    final_paths.append(ap)
 
-                    # copying image
-                    try:
-                        img_src = os.path.join(
-                            root,
-                            f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
-                        )
-                        img_dst = os.path.join(images_path, f"{count}.png")
-                        # cmd = f'python -c "import sys; sys.exit(not copy_image(\'{img_src}\', \'{img_dst}\'))'
-                        result = subprocess.run(["cp", img_src, img_dst],
-                              timeout=60,
-                              check=True,
-                              capture_output=True,
-                              text=True
-                        )
+                    # # copying image
+                    # img_src = os.path.join(
+                    #     root,
+                    #     f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+                    # )
+                    # img_dst = os.path.join(images_path, f"{count}.png")
+                    # CP(img_src, img_dst)
+                    #
+                    # # wrting path
+                    # paths_file.write(ap + "\n")
+                    #
+                    # # writing MathML
+                    # if "\n" not in mml:
+                    #     mml = mml + "\n"
+                    # mml_file.write(mml)
+                    #
+                    # # writing latex
+                    # latex_path = os.path.join(
+                    #     root,
+                    #     f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+                    # )
+                    # latex_arr = open(latex_path).readlines()
+                    # if len(latex_arr) > 1:
+                    #     latex = " "
+                    #     for l in latex_arr:
+                    #         latex = latex + l.replace("\n", "")
+                    # else:
+                    #     latex = latex_arr[0]
+                    #
+                    # if "\n" not in latex:
+                    #     latex = latex + "\n"
+                    # latex_file.write(latex)
 
-                        #print(result.stdout)
-                        # wrting path
-                        paths_file.write(ap + "\n")
-
-                        # writing MathML
-                        if "\n" not in mml:
-                            mml = mml + "\n"
-                        mml_file.write(mml)
-
-                        # writing latex
-                        latex_path = os.path.join(
-                            root,
-                            f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-                        )
-                        latex_arr = open(latex_path).readlines()
-                        if len(latex_arr) > 1:
-                            latex = " "
-                            for l in latex_arr:
-                                latex = latex + l.replace("\n", "")
-                        else:
-                            latex = latex_arr[0]
-
-                        if "\n" not in latex:
-                            latex = latex + "\n"
-                        latex_file.write(latex)
-
-                        count += 1
-
-                    except subprocess.TimeoutExpired:
-                        print("Timeout expired")
-
-                    except subprocess.CalledProcessError as e:
-                         print("Command exited with status", e.returncode)
-                         print("Error output:", e.stderr)
-
-
-                # except:
-                    # pass
+                    count += 1
 
             else:
                 break
+
+    random.shuffle(final_paths)
+    random.shuffle(final_paths)
+
+    for fpidx, fp in enumerate(final_paths):
+
+        yr, month, folder, type_of_eqn, eqn_num = fp.split("_")
+
+        # copying image
+        img_src = os.path.join(
+            root,
+            f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+        )
+        img_dst = os.path.join(images_path, f"{fpidx}.png")
+        CP(img_src, img_dst)
+
+        # wrting path
+        paths_file.write(ap + "\n")
+
+        # writing MathML
+        if "\n" not in mml:
+            mml = mml + "\n"
+        mml_file.write(mml)
+
+        # writing latex
+        latex_path = os.path.join(
+            root,
+            f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+        )
+        latex_arr = open(latex_path).readlines()
+        if len(latex_arr) > 1:
+            latex = " "
+            for l in latex_arr:
+                latex = latex + l.replace("\n", "")
+        else:
+            latex = latex_arr[0]
+
+        if "\n" not in latex:
+            latex = latex + "\n"
+        latex_file.write(latex)
