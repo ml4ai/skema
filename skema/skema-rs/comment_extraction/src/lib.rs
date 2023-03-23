@@ -2,3 +2,4 @@
 
 pub mod conventions;
 pub mod languages;
+pub mod comment;

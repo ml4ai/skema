@@ -1,9 +1,9 @@
 use nom::{
-    branch::alt, 
-    bytes::complete::{tag, take, take_until}, 
-    multi::fold_many0, 
+    branch::alt,
+    bytes::complete::{tag, take, take_until},
+    multi::fold_many0,
     sequence::delimited,
-    IResult
+    IResult,
 };
 use nom_locate::LocatedSpan;
 use serde::{Deserialize, Serialize};
@@ -14,14 +14,14 @@ type Span<'a> = LocatedSpan<&'a str>;
 
 #[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
 pub struct Comments {
-    pub comments: Vec<(u32, String)>
+    pub comments: Vec<(u32, String)>,
 }
 
 // find C and C++ style comments
 fn parse_comment(input: Span) -> IResult<Span, Span> {
     alt((
         delimited(tag("/*"), take_until("*/"), tag("*/")), // C
-        delimited(tag("//"), take_until("\n"), tag("\n"))  // C++ 
+        delimited(tag("//"), take_until("\n"), tag("\n")), // C++
     ))(input)
 }
 
@@ -29,38 +29,38 @@ fn parse_comment(input: Span) -> IResult<Span, Span> {
 fn parse_next(input: Span) -> IResult<Span, Span> {
     match alt((
         delimited(tag("\""), take_until("\""), tag("\"")), // quoted
-        take(1usize)  // Move to next element 
-    ))(input) {
-        Ok((i, _)) => Ok((i, "".into())), 
-        Err(e) => Err(e)
+        take(1usize),                                      // Move to next element
+    ))(input)
+    {
+        Ok((i, _)) => Ok((i, "".into())),
+        Err(e) => Err(e),
     }
 }
 
 // Return a vector of comments and their line numbes
 fn parse(s: Span) -> IResult<Span, Vec<(u32, String)>> {
     fold_many0(
-        alt((parse_comment, parse_next)), 
-        Vec::new, 
-        | mut acc: Vec<(u32, String)>, span | {
+        alt((parse_comment, parse_next)),
+        Vec::new,
+        |mut acc: Vec<(u32, String)>, span| {
             if span.fragment().len() > 0 {
-                acc.push((
-                    span.location_line(),
-                    span.fragment().to_string()
-                ));
+                acc.push((span.location_line(), span.fragment().to_string()));
+            } else {
             }
-            else {}
             acc
-        }
+        },
     )(s)
 }
 
 // parse C and C++ style comments from string input
 fn process_string(s: &str) -> Comments {
     match parse(LocatedSpan::new(s)) {
-        Ok((_, vec)) => Comments{comments: vec},
-        Err(e) => { 
+        Ok((_, vec)) => Comments { comments: vec },
+        Err(e) => {
             println!("Error: {e:?}");
-            Comments{comments: Vec::new()}
+            Comments {
+                comments: Vec::new(),
+            }
         }
     }
 }
@@ -72,7 +72,9 @@ pub fn get_comments(file_path: &str) -> Comments {
         Ok(s) => process_string(&s),
         Err(e) => {
             println!("Error: {e:?}");
-            Comments{comments: Vec::new()}
+            Comments {
+                comments: Vec::new(),
+            }
         }
     }
 }

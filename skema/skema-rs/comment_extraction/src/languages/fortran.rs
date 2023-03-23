@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use regex::Regex;
-use std::collections::HashSet;
 use serde::{Deserialize, Serialize};
+use std::collections::HashSet;
 
 /// From FORTRAN Language Reference
 /// (https://docs.oracle.com/cd/E19957-01/805-4939/z40007332024/index.html)
@@ -16,12 +16,6 @@ use serde::{Deserialize, Serialize};
 ///
 /// A totally blank line is a comment line as well.
 
-#[derive(Serialize, Deserialize)]
-pub struct Comment {
-    pub line: usize,
-    pub comment_line: String,
-}
-
 pub fn line_is_comment(line: &str) -> bool {
     lazy_static! {
         static ref FORTRAN_COMMENT_CHAR_SET: HashSet<char> =
@@ -30,6 +24,7 @@ pub fn line_is_comment(line: &str) -> bool {
 
     match &line.chars().next() {
         Some(c) => FORTRAN_COMMENT_CHAR_SET.contains(c),
+        // Blank lines are interpreted as comments
         None => true,
     }
 }
