@@ -51,7 +51,7 @@ class MiraWebApiGrounder(apiEndPoint: String, batchSize: Option[Int] = None) ext
     */
   override def groundingCandidates(texts: Seq[String], k: Int): Seq[Seq[GroundingCandidate]] = {
     // Inspect cache of previously resolved elements
-    val normalizedKeys = texts map (k => normalizeText(k, caseFold = false))
+    val normalizedKeys = texts map (k => Grounder.normalizeText(k, caseFold = false))
     val missingKeys = normalizedKeys filterNot resolutionCache.contains
     // Build request body with remaining ungrounded concepts
     val groundings = requestGrounding(missingKeys)
