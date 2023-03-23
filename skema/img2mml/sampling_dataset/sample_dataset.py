@@ -232,6 +232,13 @@ def main():
         paths_file.write(ap + "\n")
 
         # writing MathML
+        mml_path = os.path.join(
+            root,
+            f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+        )
+
+        mml = open(mml_path).readlines()[0]
+
         if "\n" not in mml:
             mml = mml + "\n"
         mml_file.write(mml)
