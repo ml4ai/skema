@@ -33,15 +33,8 @@ enum Expr {
 
 /// Intermediate data structure to support the generation of graphs of mathematical expressions
 #[derive(Debug, Default, PartialEq, Clone)]
-pub struct Operators {
-    unary: Option<Operator>,
-    nary: Vec<Operator>,
-}
-
-/// Intermediate data structure to support the generation of graphs of mathematical expressions
-#[derive(Debug, Default, PartialEq, Clone)]
 pub struct PreExp {
-    ops: Operators,
+    ops: Vec<Operator>,
     args: Vec<Expr>,
     name: String,
 }
