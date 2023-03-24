@@ -13,11 +13,12 @@ import sys
 import re
 import os
 import argparse
+from pathlib import Path
 
 from tqdm import tqdm
 
 
-def main(parquet_file_folder: str):
+def main(parquet_file_folder: str, output_dir:str):
 
     parquet_files = os.listdir(parquet_file_folder)
 
@@ -113,16 +114,16 @@ def main(parquet_file_folder: str):
                         name2results[row_data["pdf_name"]] = [row_data]
                 for pdf_name, pdf_data in name2results.items():
                     no_end_pdf_name = pdf_name.replace(".pdf", "")
-                    pdf_json_data_path = parquet_filepath.replace(
+                    pdf_json_data_path = os.path.join(output_dir, Path(parquet_filepath.replace(
                         ".parquet",
-                        f"{no_end_pdf_name}--COSMOS-data.json",
+                        f"{no_end_pdf_name}--COSMOS-data.json")).name,
                     )
                     json.dump(pdf_data, open(pdf_json_data_path, "w"))
 
             else:
-                parquet_json_filepath = parquet_filepath.replace(
+                parquet_json_filepath = os.path.join(output_dir, Path(parquet_filepath.replace(
                     ".parquet", ".json"
-                )
+                )).name)
                 json.dump(
                     row_order_parquet_data, open(parquet_json_filepath, "w")
                 )
@@ -139,5 +140,10 @@ if __name__ == "__main__":
         help="The input directory with the COSMOS Parquet files to process.",
     )
 
+    parser.add_argument(
+        "-o",
+        "--output",
+    )
+
     args = parser.parse_args()
-    main(args.input)
+    main(args.input, args.output)

@@ -1,4 +1,4 @@
-FROM  ubuntu:20.04
+FROM  ubuntu:22.04
 CMD   bash
 
 # ==============================================================================
@@ -54,10 +54,25 @@ COPY . /skema/text_reading
 WORKDIR /skema/text_reading
 # Compile the fat jar
 RUN sbt assembly
+
 # =============================================================================
 
+# =============================================================================
+# SETUP THE PYTHON ENVIRONMENT TO PROCESS THE PARQUET FILES
+# =============================================================================
+RUN pip3 install pandas fastparquet tqdm
+
+# =============================================================================
+# PREPARE THE WORKING ENVIRONMENT
+# =============================================================================
 RUN mkdir -p /data/inputs
+RUN mkdir -p /data/json_inputs
 RUN mkdir -p /data/outputs
+RUN chmod 777 /data/json_inputs
+
+RUN chmod +x annotate_cosmos_json
+
+
 
 # =============================================================================
 # ENTRY POINT IS THE  WEB API
