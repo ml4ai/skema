@@ -400,10 +400,12 @@ def train_model(rank=None,):
             f"trained_models/{model_type}_{dataset_type}_best.pt",
         )
 
+    dist.destroy_process_group()
+
     # testing
     # if (not ddp) or (ddp and rank==0):
-    if ddp:
-        dist.barrier()
+    # if ddp:
+    #     dist.barrier()
 
     print(
         "loading final saved model: ",
@@ -451,9 +453,9 @@ def train_model(rank=None,):
     # stopping time
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
-    if ddp:
+    # if ddp:
         # dist.barrier()
-        dist.destroy_process_group()
+        # dist.destroy_process_group()
 
 
 # for DDP
