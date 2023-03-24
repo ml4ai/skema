@@ -83,7 +83,7 @@ def preprocess_mml(config):
     print("preprocessing data...")
 
     # reading raw text files
-    MMLPath = f"{config['data_path']}/{config['dataset_type']}/{config["markup"]}.lst"
+    MMLPath = f"{config['data_path']}/{config['dataset_type']}/{config['markup']}.lst"
     IMGTnsrPath = (
         f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     )
@@ -91,9 +91,9 @@ def preprocess_mml(config):
     image_num = range(0, len(mml_txt))
 
     # split the image_num into train, test, validate
-    df = image_num  # pd.DataFrame(image_num, columns=["IMG"])
+    # df = image_num  # pd.DataFrame(image_num, columns=["IMG"])
     train_val_images, test_images = train_test_split(
-        df, test_size=0.1, random_state=42
+        image_num, test_size=0.1, random_state=42
     )
     train_images, val_images = train_test_split(
         train_val_images, test_size=0.1, random_state=42

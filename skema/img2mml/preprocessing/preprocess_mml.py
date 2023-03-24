@@ -481,8 +481,8 @@ if __name__ == "__main__":
 
     # get the rejected images
     data_path = f"{config['data_path']}/{config['dataset_type']}"
-    org_mml = open(f"{data_path}/original_{config["markup"]}.lst", "r").readlines()
-    modified_mml_file = open(f"{data_path}/{config["markup"]}.lst", "w")
+    org_mml = open(f"{data_path}/original_{config['markup']}.lst", "r").readlines()
+    modified_mml_file = open(f"{data_path}/{config['markup']}.lst", "w")
 
     blank_images = open("logs/blank_images.lst").readlines()
     idx_to_be_ignored = [int(i.split(".")[0]) for i in blank_images]
