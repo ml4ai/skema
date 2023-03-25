@@ -400,7 +400,8 @@ def train_model(rank=None,):
             f"trained_models/{model_type}_{dataset_type}_best.pt",
         )
 
-    dist.destroy_process_group()
+    if ddp:
+        dist.destroy_process_group()
 
     # testing
     # if (not ddp) or (ddp and rank==0):
