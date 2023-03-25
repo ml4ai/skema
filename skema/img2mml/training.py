@@ -412,14 +412,24 @@ def train_model(rank=None,):
         f"trained_models/{model_type}_{dataset_type}_best.pt",
     )
     try:
+        # loading pre_tained_model
         model.load_state_dict(
             torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
         )
     except:
-        pretrained_dict = {
-            key.replace("module.", ""): value
-            for key, value in model.state_dict().items()
-        }
+        try:
+            # removing "module." from keys
+            pretrained_dict = {
+                key.replace("module.", ""): value
+                for key, value in model.state_dict().items()
+            }
+        except:
+            # adding "module." in keys
+            pretrained_dict = {
+                f"module.{key}": value
+                for key, value in model.state_dict().items()
+            }
+
         model.load_state_dict(pretrained_dict)
 
     epoch = "test_0"
