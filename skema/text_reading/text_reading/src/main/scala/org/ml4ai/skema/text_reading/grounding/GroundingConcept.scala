@@ -1,5 +1,8 @@
 package org.ml4ai.skema.text_reading.grounding
 
+import org.json4s.JValue
+import org.json4s.JsonDSL._
+
 /**
   * Ontology concept that serves as grounding element for extractions
   *
@@ -15,4 +18,12 @@ case class GroundingConcept(id: String, name: String, description: Option[String
   }
 
   override def hashCode(): Int = this.id.hashCode
+
+  def toJValue: JValue = {
+    ("id" -> id) ~
+    ("name" -> name) ~
+    ("description" -> description) ~
+    ("synonyms" -> synonyms.map(_.toList)) ~
+    ("embedding" -> embedding.map(_.toList))
+  }
 }
