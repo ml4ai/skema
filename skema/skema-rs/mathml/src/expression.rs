@@ -326,7 +326,7 @@ impl Expr {
     }
 
     /// Construct a string representation of the Expression and store it under its 'name' property.
-    fn set_name(&mut self) -> String {
+    pub fn set_name(&mut self) -> String {
         let mut add_paren = false;
         match self {
             Expr::Atom(_) => "".to_string(),

@@ -1,6 +1,6 @@
 use mathml::ast::Operator;
 use mathml::expression::Atom;
-use mathml::expression::Expr;
+use mathml::expression::{Expr, PreExp};
 use petgraph::dot::{Config, Dot};
 use petgraph::matrix_graph::IndexType;
 use petgraph::prelude::*;
@@ -14,10 +14,15 @@ use std::env;
 
 fn main() {
     // setup command line argument on if the core dynamics has been found manually or needs to be found automatically
+    /*
+    Command line args;
+        - auto -> This will attempt an automated search for the dynamics
+        - manual -> This assumes the input is the function of the dynamics
+    */
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args[1]);
 
-    let module_id = 460;
+    let module_id = 1525;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
     if args[1] == "auto".to_string() {
@@ -70,9 +75,18 @@ fn main() {
     else if args[1] == "manual".to_string() {
         // still need to grab the module id
 
-        let (core_dynamics, metadata_map) = subgraph2_core_dyn(module_id).unwrap();
+        let (mut core_dynamics, metadata_map) = subgraph2_core_dyn(module_id).unwrap();
 
-        println!("{:?}", core_dynamics[0].clone());
+        let test = match &core_dynamics[0] {
+            Expr::Expression { op, args, name } => Expr::Expression {
+                op: (*op.clone()).to_vec(),
+                args: (*args.clone()).to_vec(),
+                name: core_dynamics[0].clone().set_name(),
+            },
+            Expr::Atom(x) => Expr::Atom(x.clone()),
+        };
+
+        println!("{:?}", test.clone());
     } else {
         println!("Unknown command");
     }
@@ -203,7 +217,7 @@ fn subgraph2_core_dyn(
 }
 
 fn tree_2_expr(
-    mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
 ) -> Result<Expr, MgError> {
     // initialize struct properties
@@ -320,9 +334,9 @@ fn tree_2_expr(
     }
 
     // now to construct the Expr
-    let mut temp_expr = Expr::Expression {
-        op: op_vec,
-        args: args_vec,
+    let temp_expr = Expr::Expression {
+        op: op_vec.clone(),
+        args: args_vec.clone(),
         name: expr_name,
     };
 
@@ -331,7 +345,7 @@ fn tree_2_expr(
 
 // this currently only works for un-named nodes that are not chained or have multiple incoming/outgoing edges
 fn trim_un_named(
-    mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
 ) -> petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> {
     // first create a cloned version of the graph we can modify while iterating over it.
     let mut bypass_graph = graph.clone();
