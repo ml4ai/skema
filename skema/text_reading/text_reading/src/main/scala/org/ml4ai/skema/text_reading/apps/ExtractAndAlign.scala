@@ -17,15 +17,14 @@ import org.clulab.odin.serialization.json.JSONSerializer
 
 import java.util.UUID.randomUUID
 import org.clulab.embeddings.{SanitizedWordEmbeddingMap, WordEmbeddingMap}
-import org.ml4ai.grounding.SVOGrounder.getTerms
 import org.clulab.utils.{FileUtils, Sourcer}
-import org.ml4ai.grounding
-import org.ml4ai.grounding.{SVOGrounder, SeqOfWikiGroundings, WikiGrounding, WikidataGrounder, sparqlResult, sparqlWikiResult}
 import org.ml4ai.skema.text_reading.OdinEngine
 import org.ml4ai.skema.text_reading.alignment.{Aligner, Alignment, AlignmentHandler}
 import org.ml4ai.skema.text_reading.attachments.AutomatesAttachment
 import org.ml4ai.skema.text_reading.data.{DataLoader, TextRouter, TokenizedLatexDataLoader}
 import org.ml4ai.skema.text_reading.grfn.GrFNParser
+import org.ml4ai.skema.text_reading.grounding.SVOGrounder.getTerms
+import org.ml4ai.skema.text_reading.grounding.{SVOGrounder, SeqOfWikiGroundings, WikiGrounding, WikidataGrounder, sparqlResult, sparqlWikiResult}
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, MentionUtils}
 import upickle.default.write
 
@@ -169,7 +168,7 @@ object ExtractAndAlign {
     } else Seq.empty
 
     if (saveWikiGroundings) {
-      val groundings = SeqOfWikiGroundings(allGlobalVars.map(gv => grounding.WikiGrounding(gv.identifier, gv.groundings.getOrElse(Seq.empty))))
+      val groundings = SeqOfWikiGroundings(allGlobalVars.map(gv => WikiGrounding(gv.identifier, gv.groundings.getOrElse(Seq.empty))))
       val asString = write(groundings, indent = 4)
       val exporter = JSONDocExporter()
       val fileName = if (descriptionMentions.isDefined && descriptionMentions.get.nonEmpty) descriptionMentions.get.head.document.id.getOrElse("unknown_document") else "unknown_document"
@@ -404,7 +403,7 @@ object ExtractAndAlign {
       logger.info(s"Extracting from ${file.getName}")
       val texts: Seq[String] = dataLoader.loadFile(file)
       // Route text based on the amount of sentence punctuation and the # of numbers (too many numbers = non-prose from the paper)
-      texts.flatMap(text => textRouter.route(text).extractFromText(text, filename = Some(file.getName)))
+      texts.flatMap(text => textRouter.route(text).extractFromText(text, filename = Some(file.getName)).mentions)
     }
     logger.info(s"Extracted ${textMentions.length} text mentions")
     val onlyEventsAndRelations = textMentions.seq.filter(m => m.matches("EventMention") || m.matches("RelationMention"))

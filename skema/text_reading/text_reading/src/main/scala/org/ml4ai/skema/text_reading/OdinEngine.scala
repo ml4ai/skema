@@ -13,6 +13,7 @@ import org.ml4ai.skema.text_reading.data.{EdgeCaseParagraphPreprocessor, LightPr
 import org.ml4ai.skema.text_reading.entities.{EntityFinder, StringMatchEntityFinder}
 import org.ml4ai.skema.text_reading.utils.{DocumentFilter, FilterByLength, PassThroughFilter, TsvUtils}
 
+case class ExtractionResults(doc:Document, mentions:Seq[Mention])
 
 class OdinEngine(
                   val proc: Processor,
@@ -111,10 +112,10 @@ class OdinEngine(
 
   }
 
-  def extractFromText(text: String, keepText: Boolean = false, filename: Option[String]): Seq[Mention] = {
+  def extractFromText(text: String, keepText: Boolean = false, filename: Option[String]): ExtractionResults = {
     val doc = cleanAndAnnotate(text, keepText, filename)
     val odinMentions = extractFrom(doc)  // CTM: runs the Odin grammar
-    odinMentions  // CTM: collection of mentions ; to be converted to some form (json)
+    ExtractionResults(doc, odinMentions)  // CTM: collection of mentions ; to be converted to some form (json)
   }
 
   // Supports web service, when existing entities are already known but from outside the project

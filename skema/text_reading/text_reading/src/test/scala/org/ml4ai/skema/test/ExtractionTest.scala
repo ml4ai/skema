@@ -4,7 +4,6 @@ import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory}
 import org.ml4ai.skema.text_reading.OdinEngine._
 import org.clulab.odin.Mention
-import org.ml4ai.skema.common.test.Test
 import org.ml4ai.skema.text_reading.OdinEngine
 import org.ml4ai.skema.text_reading.attachments.AutomatesAttachment
 import org.ml4ai.skema.text_reading.utils.MentionUtils

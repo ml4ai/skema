@@ -17,13 +17,13 @@ import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention
 import org.clulab.processors.{Document, Sentence}
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
-import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder, sparqlWikiResult}
 import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
 import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
+import org.ml4ai.skema.text_reading.grounding.{SVOGrounder, WikidataGrounder}
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
@@ -210,7 +210,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
       scienceParseDoc.sections.get.map(_.headingAndText) ++ scienceParseDoc.abstractText
     } else scienceParseDoc.abstractText.toSeq
     logger.info("Finished converting to text")
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile)))
+    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile)).mentions)
     val outFile = json("outfile").str
     AutomatesExporter(outFile).export(mentions)
     //    mentions.saveJSON(outFile, pretty=true)
@@ -230,7 +230,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     logger.info(s"Extracting mentions from $jsonFile")
     val loader = new ScienceParsedDataLoader
     val texts = loader.loadFile(jsonFile)
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile)))
+    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile)).mentions)
     val outFile = json("outfile").str
     AutomatesExporter(outFile).export(mentions)
     Ok("")
@@ -244,7 +244,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val jsonPath = pathJson("pathToCosmosJson").str
     logger.info(s"Extracting mentions from $jsonPath")
 
-    val exportedData = cosmosPipeline.serializeToJson(jsonPath)
+    val exportedData = cosmosPipeline.extractMentionsFromJsonAndSerialize(jsonPath)
 
     Ok(exportedData)
 
@@ -426,15 +426,22 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def processPlayText(ieSystem: OdinEngine, text: String, gazetteer: Option[Seq[String]] = None): (Document, Vector[Mention]) = {
     // preprocessing
     logger.info(s"Processing sentence : ${text}")
-    val doc = ieSystem.cleanAndAnnotate(text, keepText = true, filename = None)
+//    val doc = ieSystem.cleanAndAnnotate(text, keepText = true, filename = None)
+//
+//    logger.info(s"DOC : ${doc}")
+//    // extract mentions from annotated document
+//    val mentions = if (gazetteer.isDefined) {
+//      ieSystem.extractFromDocWithGazetteer(doc, gazetteer = gazetteer.get)
+//    } else {
+//      ieSystem.extractFrom(doc)
+//    }
+//    val sorted = mentions.sortBy(m => (m.sentence, m.getClass.getSimpleName)).toVector
+//
+//    logger.info(s"Done extracting the mentions ... ")
+//    logger.info(s"They are : ${mentions.map(m => m.text).mkString(",\t")}")
 
-    logger.info(s"DOC : ${doc}")
-    // extract mentions from annotated document
-    val mentions = if (gazetteer.isDefined) {
-      ieSystem.extractFromDocWithGazetteer(doc, gazetteer = gazetteer.get)
-    } else {
-      ieSystem.extractFrom(doc)
-    }
+    val (doc, mentions) = cosmosPipeline.extractMentions(text, None)
+
     val sorted = mentions.sortBy(m => (m.sentence, m.getClass.getSimpleName)).toVector
 
     logger.info(s"Done extracting the mentions ... ")
@@ -694,7 +701,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
         case m: RelationMention => new TextBoundMention(m.labels, m.tokenInterval, m.sentence, m.document, m.keep, m.foundBy)
         case m: EventMention => m.trigger
       }
-      mkArgMention(argRole, s"T${tbmToId(arg)}")
+      mkArgMention(argRole, s"T${tbmToId.getOrElse(arg, "X")}")
     }
     args.toSeq
   }

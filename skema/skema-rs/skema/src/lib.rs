@@ -214,7 +214,7 @@ pub struct Files {
     pub path: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct TextExtraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub document_reference_uid: Option<String>,
@@ -228,7 +228,7 @@ pub struct TextExtraction {
     pub char_end: Option<u32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct Grounding {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub argument_name: Option<String>,
@@ -240,7 +240,7 @@ pub struct Grounding {
     pub score: Option<f32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct ValueMeta {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<String>,

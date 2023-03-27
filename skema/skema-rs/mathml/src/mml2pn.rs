@@ -183,23 +183,8 @@ pub enum PetriNetElement {
     Transition(acset::Transition),
 }
 
-impl acset::ACSet {
-    /// Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
-    ///
-    /// M(S) is the set of monomials
-    /// m: T -> M(S)
-    /// The ODEs corresponding to a Petri net can be written as follows:
-    ///     \dot{x_i} = \sum_{y} f(i, y)m(y)
-    /// where f(i, y) are integers such that f(i, y) + e(i, y) is a natural number.
-    ///
-    /// e(i, y): T -> N is a function representing the exponent of species i in monomial corresponding to transition y.
-    /// For each transition y, draw e(i, y) arrows from specie x_i to transition y.
-    /// Finally, for each transition y, draw n(i, y) = f(i, y) + e(i, y) arrows from y to x_i.
-    ///
-    /// This function returns a JSON serializable representation of an ACSet for TA2 teams to
-    /// consume.
-    pub fn from_file(filepath: &str) -> acset::ACSet {
-        let mathml_asts = get_mathml_asts_from_file(filepath);
+impl From<Vec<Math>> for acset::ACSet {
+    fn from(mathml_asts: Vec<Math>) -> Self {
         let mut specie_vars = HashSet::<Var>::new();
         let mut vars = HashSet::<Var>::new();
         let mut eqns = HashMap::<Var, Vec<Term>>::new();
@@ -317,6 +302,27 @@ impl acset::ACSet {
         }
         acset
     }
+}
+
+impl acset::ACSet {
+    /// Equation to Petri net algorithm (taken from https://arxiv.org/pdf/2206.03269.pdf)
+    ///
+    /// M(S) is the set of monomials
+    /// m: T -> M(S)
+    /// The ODEs corresponding to a Petri net can be written as follows:
+    ///     \dot{x_i} = \sum_{y} f(i, y)m(y)
+    /// where f(i, y) are integers such that f(i, y) + e(i, y) is a natural number.
+    ///
+    /// e(i, y): T -> N is a function representing the exponent of species i in monomial corresponding to transition y.
+    /// For each transition y, draw e(i, y) arrows from specie x_i to transition y.
+    /// Finally, for each transition y, draw n(i, y) = f(i, y) + e(i, y) arrows from y to x_i.
+    ///
+    /// This function returns a JSON serializable representation of an ACSet for TA2 teams to
+    /// consume.
+    pub fn from_file(filepath: &str) -> acset::ACSet {
+        let mathml_asts = get_mathml_asts_from_file(filepath);
+        acset::ACSet::from(mathml_asts)
+    }
 
     /// Construct a graph object from an ACSet
     pub fn to_graph(&self) -> Graph<PetriNetElement, usize> {
@@ -403,7 +409,7 @@ fn test_acset_equality(mut acset_1: ACSet, mut acset_2: ACSet) -> bool {
 
 #[test]
 fn test_simple_sir_v1() {
-    let acset_1 = acset::ACSet::from_file("tests/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+    let acset_1 = acset::ACSet::from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v1_acset.json").unwrap())
             .unwrap();
@@ -412,7 +418,7 @@ fn test_simple_sir_v1() {
 
 #[test]
 fn test_simple_sir_v2() {
-    let acset_1 = acset::ACSet::from_file("tests/mml2pn_inputs/simple_sir_v2/mml_list.txt");
+    let acset_1 = acset::ACSet::from_file("../../../data/mml2pn_inputs/simple_sir_v2/mml_list.txt");
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v2_acset.json").unwrap())
             .unwrap();
@@ -421,7 +427,7 @@ fn test_simple_sir_v2() {
 
 #[test]
 fn test_simple_sir_v3() {
-    let acset_1 = acset::ACSet::from_file("tests/mml2pn_inputs/simple_sir_v3/mml_list.txt");
+    let acset_1 = acset::ACSet::from_file("../../../data/mml2pn_inputs/simple_sir_v3/mml_list.txt");
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v3_acset.json").unwrap())
             .unwrap();

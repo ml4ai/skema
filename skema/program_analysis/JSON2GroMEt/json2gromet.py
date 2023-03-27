@@ -266,7 +266,7 @@ def parse_metadata(obj):
         if "value" in obj:
             metadata_object.value = LiteralValue()
             import_basic_datatypes(obj["value"], metadata_object.value)
-           
+
     elif metadata_type == "text_units":
         if "text_extraction" in obj:
             metadata_object.text_extraction = TextExtraction()

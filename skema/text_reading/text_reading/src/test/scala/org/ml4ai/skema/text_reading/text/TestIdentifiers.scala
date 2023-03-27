@@ -263,7 +263,7 @@ class TestIdentifiers extends ExtractionTest {
 //  val tX = ""
 //  passingTest should "extract identifiers from tX: ${tX}" taggedAs(Somebody) in {
 //    val desired = Seq()
-//    val mentions = extractMentions(tX)
+//    val mentions = extractMentionsFromCosmosJson(tX)
 //    testTextBoundMention(mentions, IDENTIFIER_LABEL, desired)
 //  }
 

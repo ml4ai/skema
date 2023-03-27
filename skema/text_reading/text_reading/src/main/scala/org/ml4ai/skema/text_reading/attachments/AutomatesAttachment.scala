@@ -1,8 +1,7 @@
 package org.ml4ai.skema.text_reading.attachments
 
-import org.clulab.odin.Attachment
-import org.ml4ai.grounding.GroundingCandidate
-import org.ml4ai.skema.text_reading.quantities.Interval
+import org.clulab.odin.{Attachment, Mention}
+import org.ml4ai.skema.text_reading.grounding.GroundingCandidate
 import play.api.libs.json.{JsValue, Json}
 import ujson.Value
 
@@ -35,7 +34,32 @@ class GroundingAttachment(candidates:Seq[GroundingCandidate]) extends AutomatesA
   })
 }
 
-class MentionLocationAttachment(filename: String, pageNum: Seq[Int], blockIdx: Seq[Int], attType: String) extends AutomatesAttachment {
+class LocationContextAttachment(locations:Seq[Mention]) extends AutomatesAttachment {
+  override def toJson: JsValue = Json.arr(locations map {
+    l => Json.obj(
+      "scenarioLocation" -> l.text
+    )
+  })
+
+  override def toUJson: Value = ujson.Obj(
+    "scenarioLocation" -> (locations map (_.text)).distinct
+  )
+}
+
+class TimeContextAttachment(times:Seq[Mention]) extends AutomatesAttachment {
+  override def toJson: JsValue = Json.arr(times map {
+    l => Json.obj(
+      "scenarioTime" -> l.text
+    )
+  })
+
+
+  override def toUJson: Value = ujson.Obj(
+    "scenarioTime" -> (times map (_.text)).distinct
+  )
+}
+
+class MentionLocationAttachment(val filename: String, val  pageNum: Seq[Int], val blockIdx: Seq[Int], attType: String) extends AutomatesAttachment {
 
   override def toJson: JsValue =  Json.obj(
     "filename" -> filename,
