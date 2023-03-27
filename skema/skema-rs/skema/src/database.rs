@@ -1742,6 +1742,7 @@ pub fn create_function(
             for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
                 match sboxf.function_type {
                     FunctionType::Function => {
+                        println!("nested function triggered");
                         (nodes, edges, start, meta_nodes) = create_function(
                             &gromet.clone(),                 // gromet for metadata
                             eboxf.value.clone(),             // function net for attribute
