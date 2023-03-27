@@ -63,7 +63,7 @@ object ManualGrounder {
   def fromFileOrResource(path:String, processor: Processor): ManualGrounder = {
     val src = newSource(path)
     val entries =
-      src.getLines() map {
+      src.getLines() flatMap {
         line =>
           val tokens = Grounder.normalizeText(line, caseFold = true).split("\t")
           if(tokens.size >= 2) {
@@ -73,7 +73,7 @@ object ManualGrounder {
           }
           else
             None
-      } collect { case Some(e) => e}
+      }
     new ManualGrounder(entries.toList, processor)
   }
 }

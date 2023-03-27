@@ -17,29 +17,22 @@ class PipelineGrounder(grounders:Seq[Grounder]) extends Grounder {
     */
   override def groundingCandidates(texts: Seq[String], k: Int): Seq[Seq[GroundingCandidate]] = {
     // Follow a sieve-based approach, to leverage batch grounding
-    sieveGrounding(texts.toArray, k, this.grounders)
+    sieveGrounder(texts.toArray, k, this.grounders)
   }
 
-  private def sieveGrounding(texts:Array[String], k:Int, grounders:Seq[Grounder]):Array[Seq[GroundingCandidate]] = {
+  private def sieveGrounder(texts:Array[String], k:Int, grounders:Seq[Grounder]):Array[Seq[GroundingCandidate]] = {
     // Apply grounding with the first element of the pipeline, then fall back to the rest if necessary
     if(texts.nonEmpty && grounders.nonEmpty){
-      val grounder = grounders.head
-      val initialGroundings = new mutable.Queue[Seq[GroundingCandidate]] ++= grounder.groundingCandidates(texts, k)      // Collect the elements that couldn't be grounded
-      val (missingTexts, missingIndices) = ((texts zip initialGroundings).zipWithIndex collect {
-        case ((query, groundings), ix) if groundings.isEmpty =>  (query, ix)
-      }).unzip
-      // Fall back to the next grounders
-      val subsequentGroundings = new mutable.Queue[Seq[GroundingCandidate]] ++= sieveGrounding(missingTexts, k, grounders.tail)
-      // Merge the results
-      val missingIndicesSet = missingIndices.toSet
-      (texts.indices map {
-        ix =>
-          if(missingIndicesSet contains ix) {
-            initialGroundings.dequeue() // Necessary to consume the empty element
-            subsequentGroundings.dequeue()
-          } else
-            initialGroundings.dequeue()
-      }).toArray
+      val firstPassGroundings = grounders.head.groundingCandidates(texts, k).toArray
+      val secondPassIndices = firstPassGroundings.indices.filter(firstPassGroundings(_).isEmpty).toArray
+      val secondPassTexts = secondPassIndices.map(texts)
+      val secondPassGroundings = sieveGrounder(secondPassTexts, k, grounders.tail)
+
+      // Insert the secondPassGroundings into the array of firstPassGroundings.
+      secondPassIndices.zip(secondPassGroundings).foreach { case (index, grounding) =>
+        firstPassGroundings(index) = grounding
+      }
+      firstPassGroundings
     }
     // Base cases of the recursion
     else if(grounders.isEmpty)
