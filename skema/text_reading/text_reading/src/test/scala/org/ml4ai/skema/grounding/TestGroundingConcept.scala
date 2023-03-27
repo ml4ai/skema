@@ -13,7 +13,7 @@ class TestGroundingConcept extends Test {
       .replaceAllLiterally("\r", "")
       .replaceAllLiterally("\n", "")
 
-  it should "convert to json with Some for Options" in {
+  it should "convert to json with Some(full) for Options" in {
     val expectedJson = """
       |{
       |  "id" : "id",
@@ -36,7 +36,7 @@ class TestGroundingConcept extends Test {
     canonicalize(actualJson) should be (canonicalize(expectedJson))
   }
 
-  it should "convert to json with Some(full) for Options" in {
+  it should "convert to json with None for Options" in {
     val expectedJson = """
       |{
       |  "id" : "id",
