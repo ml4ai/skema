@@ -32,18 +32,22 @@ trait Grounder {
     */
   def ground(text: String): Option[GroundingConcept] = ground(Seq(text)).head
 
+
+
+}
+
+object Grounder {
   /**
     * Shared query normalization logic for grounders
     *
     * @param text original query
     * @return
     */
-  protected def normalizeText(text: String, caseFold: Boolean): String = {
+  def normalizeText(text: String, caseFold: Boolean): String = {
     val ret = text.trim
     if (caseFold)
       ret.toLowerCase
     else
       ret
   }
-
 }
