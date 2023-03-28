@@ -3,9 +3,10 @@ package org.ml4ai.skema.text_reading.grounding
 import com.typesafe.config.Config
 
 object GrounderFactory {
-  def getInstance(config:Config):Grounder = {
+  def getInstance(config:Config, chosenEngine:Option[String] = None):Grounder = {
+    val engine = chosenEngine getOrElse config.getString("engine")
     // Grounding parameters
-    config.getString("engine").toLowerCase match {
+    engine.toLowerCase match {
       case "miraembeddings" =>
         val ontologyFilePath = config.getString("ontologyPath")
         val lambda = config.getInt("lambda")

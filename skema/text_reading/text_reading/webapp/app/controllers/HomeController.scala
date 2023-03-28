@@ -62,7 +62,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   val defaultConfig: Config = generalConfig[Config](readerType)
   val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
   val groundingConfig = generalConfig.getConfig("Grounding")
-  val miraEmbeddingsGrounder = GrounderFactory.getInstance(groundingConfig)
+  val miraEmbeddingsGrounder = GrounderFactory.getInstance(groundingConfig, chosenEngine = Some("miraembeddings"))
   val ieSystem = OdinEngine.fromConfig(config)
   var proc = ieSystem.proc
   val serializer = JSONSerializer
