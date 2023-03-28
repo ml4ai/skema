@@ -36,7 +36,7 @@ pip install torchtext==0.6.0
 ```
 
 ## Generating raw dataset
-Please check out the `data_generation/README.md` file. 
+Please check out the `data_generation/README.md` file.
 
 ## Creating dataset for training
 We need to create dataset for training purpose from the raw dataset that has been generated from the arxiv source files. For further details about data generation, check out `data_generation/README.md`.
@@ -100,32 +100,23 @@ python utils/edit_distance.py
 
 ## Inference
 
-The model itself is not checked into the repository, but you can get it from
-here:
-https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best.pt.
+If not training and directly want to use the model for translating the image, in that case please get the trained model, and the vocab file from the server.
+Place the trained model file in the `trained_models` directory and the `vocab.txt` file under `img2mml`
 
-Place the model file in the `trained_models` directory.
-
-The curl command below should do the trick.
+The curl commands below should do the trick.
 
 ```
-curl -L https://kraken.sista.arizona.edu/skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best.pt > trained_models/cnn_xfmer_OMML-90K_best.pt
-```
+curl -L https://kraken.sista.arizona.edu/skema/img2mml/trained_models/cnn_xfmer_omml-100K_best.pt > trained_models/cnn_xfmer_omml-100K_best.pt
 
-If model is trained on different server, then `vocab.txt` file need to transferred here.
-```
 curl -L https://kraken.sista.arizona.edu/skema/img2mml/vocab.txt > vocab.txt
 ```
 
-Then, run the invocation below to launch the Dockerized service:
-
+Then to run the invocation below to launch the Dockerized service:
 ```
 docker-compose up --build
 ```
 
-To test the service without Docker (e.g., for development purposes), ensure
-that you have installed the required packages (run `pip install -e .[img2mml]`
-in the root of the repository. In case of Zsh, run `pip install -e ."[img2mml]"`).
+To test the service without Docker (e.g., for development purposes), ensure that you have installed the required packages (run `pip install -e .[img2mml]` in the root of the repository. In case of Zsh, run `pip install -e ."[img2mml]"`). This step can be skipped if you have already built the conda venv and installed the requirements as described under "Build conda virtual environment and installling requirements" section.
 
 Then, run the following command to launch the img2mml server program:
 
