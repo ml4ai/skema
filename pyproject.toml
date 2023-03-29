@@ -28,7 +28,8 @@ license={text="MIT"}
 # - pygraphviz: for creating function network visualizations for debugging.
 #   Pygraphviz is often tricky to install, so we reserve it for the dev extras
 #   list.
-dev = ["fastapi", "requests", "uvicorn", "pytest", "black", "pygraphviz"]
+# - six: Adarsh says: I don't know why six is needed...
+dev = ["fastapi", "requests", "uvicorn", "pytest", "black", "pygraphviz", "six"]
 
 # MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
 # the skema/moviz directory).
