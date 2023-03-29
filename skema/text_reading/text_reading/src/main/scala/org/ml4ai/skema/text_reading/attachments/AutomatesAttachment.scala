@@ -1,8 +1,7 @@
 package org.ml4ai.skema.text_reading.attachments
 
 import org.clulab.odin.{Attachment, Mention}
-import org.ml4ai.grounding.GroundingCandidate
-import org.ml4ai.skema.text_reading.quantities.Interval
+import org.ml4ai.skema.text_reading.grounding.GroundingCandidate
 import play.api.libs.json.{JsValue, Json}
 import ujson.Value
 

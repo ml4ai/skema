@@ -7,15 +7,16 @@
 GET     /                           controllers.HomeController.index
 GET     /parseSentence              controllers.HomeController.parseSentence(sent: String, showEverything: Boolean)
 GET     /getMentions                controllers.HomeController.getMentions(text: String)
-POST     /groundStringToSVO         controllers.HomeController.groundStringToSVO
-POST     /groundMentionsToSVO       controllers.HomeController.groundMentionsToSVO
-POST     /groundMentionsToWikidata  controllers.HomeController.groundMentionsToWikidata
+POST    /groundStringToSVO          controllers.HomeController.groundStringToSVO
+POST    /groundStringsToMira        controllers.HomeController.groundStringsToMira(k: Int)
+POST    /groundMentionsToSVO        controllers.HomeController.groundMentionsToSVO
+POST    /groundMentionsToWikidata   controllers.HomeController.groundMentionsToWikidata
 POST    /process_text               controllers.HomeController.process_text
 POST    /pdf_to_mentions            controllers.HomeController.pdf_to_mentions
 POST    /align                      controllers.HomeController.align
-POST    /json_doc_to_mentions        controllers.HomeController.json_doc_to_mentions
+POST    /json_doc_to_mentions       controllers.HomeController.json_doc_to_mentions
 POST    /cosmos_json_to_mentions    controllers.HomeController.cosmos_json_to_mentions
-POST    /alignMentionsFromTwoModels    controllers.HomeController.alignMentionsFromTwoModels
+POST    /alignMentionsFromTwoModels controllers.HomeController.alignMentionsFromTwoModels
 
 
 # Map static resources from the /public folder to the /assets URL path

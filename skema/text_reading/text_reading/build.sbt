@@ -31,14 +31,11 @@ libraryDependencies ++= {
     "com.lihaoyi"                %% "ujson-play"         % uJsonVer,
     "xml-apis"                    % "xml-apis"           % "1.4.01",
     "com.github.scopt"           %% "scopt"              % "4.1.0",
+    "com.lihaoyi"                %% "requests"           % "0.1.8",
   )
 }
 
-lazy val root = (project in file("."))
-  .aggregate(grounding)
-  .dependsOn(grounding % "compile -> compile; test -> test")
-
-lazy val grounding = project.in(file("grounding"))
+lazy val root = project in file(".")
 
  lazy val webapp = project
    .enablePlugins(PlayScala)

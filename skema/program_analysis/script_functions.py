@@ -179,6 +179,7 @@ def python_to_cast(
 
     if agraph:
         import skema.utils.misc.test_pygraphviz
+
         test_pygraphviz(
             "For the agraph generation in the python_to_cast "
             "function to work, pygraphviz must be installed."

@@ -602,53 +602,58 @@ class VariableVersionPass:
         # argument variables are inputs to the top interface
         # paramter variables are outputs of the top interface
         for i, n in enumerate(node.arguments):
-            # argument name and scope str
-            arg_name = call_argument_name(node, i)
-            arg_con_scopestr = con_scope_to_str(node.func.con_scope)
-
             # parameter name and scopestr
             func_def = self.pipeline_state.func_def_node_from_id(node.func.id)
-            param = func_def.func_args[i]
-            assert isinstance(param, AnnCastVar)
-            param_name = param.val.name
-            param_con_scopestr = con_scope_to_str(
-                node.func.con_scope + [call_con_name]
-            )
+            if i < len(func_def.func_args):  # NOTE: M7 Placeholder
+                # argument name and scope str
+                arg_name = call_argument_name(node, i)
+                arg_con_scopestr = con_scope_to_str(node.func.con_scope)
 
-            # argument and parameter share id, and start with initial version
-            id = self.pipeline_state.next_collapsed_id()
-            version = VAR_INIT_VERSION
+                param = func_def.func_args[i]
+                assert isinstance(param, AnnCastVar)
+                param_name = param.val.name
+                param_con_scopestr = con_scope_to_str(
+                    node.func.con_scope + [call_con_name]
+                )
 
-            # build and store GrFN variables for argument and parameter
-            arg_grfn_var = create_grfn_var(
-                arg_name, id, version, arg_con_scopestr
-            )
-            arg_fullid = build_fullid(arg_name, id, version, arg_con_scopestr)
-            self.pipeline_state.store_grfn_var(arg_fullid, arg_grfn_var)
-            # store arg_fullid
-            node.arg_index_to_fullid[i] = arg_fullid
-            # create From Source metadata for the GrFN var
-            from_source = False
-            from_source_mdata = generate_from_source_metadata(
-                from_source, VariableCreationReason.FUNC_ARG
-            )
-            add_metadata_to_grfn_var(arg_grfn_var, from_source_mdata)
+                # argument and parameter share id, and start with initial version
+                id = self.pipeline_state.next_collapsed_id()
+                version = VAR_INIT_VERSION
 
-            param_grfn_var = create_grfn_var(
-                param_name, id, version, param_con_scopestr
-            )
-            param_fullid = build_fullid(
-                param_name, id, version, param_con_scopestr
-            )
-            self.pipeline_state.store_grfn_var(param_fullid, param_grfn_var)
-            # store param_fullid
-            node.param_index_to_fullid[i] = param_fullid
-            # create From Source metadata for the GrFN var
-            add_metadata_from_name_node(param_grfn_var, param.val)
+                # build and store GrFN variables for argument and parameter
+                arg_grfn_var = create_grfn_var(
+                    arg_name, id, version, arg_con_scopestr
+                )
+                arg_fullid = build_fullid(
+                    arg_name, id, version, arg_con_scopestr
+                )
+                self.pipeline_state.store_grfn_var(arg_fullid, arg_grfn_var)
+                # store arg_fullid
+                node.arg_index_to_fullid[i] = arg_fullid
+                # create From Source metadata for the GrFN var
+                from_source = False
+                from_source_mdata = generate_from_source_metadata(
+                    from_source, VariableCreationReason.FUNC_ARG
+                )
+                add_metadata_to_grfn_var(arg_grfn_var, from_source_mdata)
 
-            # link argument and parameter through top interface
-            node.top_interface_in[id] = arg_fullid
-            node.top_interface_out[id] = param_fullid
+                param_grfn_var = create_grfn_var(
+                    param_name, id, version, param_con_scopestr
+                )
+                param_fullid = build_fullid(
+                    param_name, id, version, param_con_scopestr
+                )
+                self.pipeline_state.store_grfn_var(
+                    param_fullid, param_grfn_var
+                )
+                # store param_fullid
+                node.param_index_to_fullid[i] = param_fullid
+                # create From Source metadata for the GrFN var
+                add_metadata_from_name_node(param_grfn_var, param.val)
+
+                # link argument and parameter through top interface
+                node.top_interface_in[id] = arg_fullid
+                node.top_interface_out[id] = param_fullid
 
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:

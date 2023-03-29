@@ -116,13 +116,14 @@ def drawPOL(data, bl, c):
 def drawWFF(data, g):
     if data.get("wff") != None:
         for wff in data["wff"]:
+            print(wff)
             if data.get("pif") != None:
                 for pif in data["pif"]:
                     if data.get("pof") != None:
                         for pof in data["pof"]:
                             # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
                             if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
-                                # print(pif.get("node"), pof.get("node"))
+                                # print(pif.get("node"), pof.get("node"), "\n",pif, '\n', pof)
                                 g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
 
 
@@ -234,7 +235,7 @@ def drawBF(data, a, bf):
                 literal = ""
                 for value in bf.get('value').get('value'):
                     print(value)
-                    literal = literal+", "+str(value.get('value'))
+                    literal = literal+", "+str(value)
                     print('vals: ',literal)
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
                     print(bf.get('box'))

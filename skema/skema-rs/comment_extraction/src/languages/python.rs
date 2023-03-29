@@ -1,3 +1,4 @@
+use crate::comments::{Comment, Comments};
 use nom::{
     branch::alt,
     bytes::complete::{is_not, tag, take_until, take_while},
@@ -8,14 +9,13 @@ use nom::{
 };
 use nom_locate::{position, LocatedSpan};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 
 type Span<'a> = LocatedSpan<&'a str>;
 
 #[derive(Debug, strum_macros::Display, Clone, Serialize, Deserialize)]
 enum Statement {
     Comment {
-        line_number: u32,
+        line_number: usize,
         contents: String,
     },
     Docstring {
@@ -41,12 +41,6 @@ fn name(input: Span) -> IResult<Span, Span> {
     take_while(is_valid_name_character)(input)
 }
 
-#[derive(Debug, PartialEq, Default, Serialize, Deserialize)]
-pub struct Comments {
-    pub comments: Vec<(u32, String)>,
-    pub docstrings: HashMap<String, Vec<String>>,
-}
-
 /// Whole line comments
 fn whole_line_comment(input: Span) -> IResult<Span, Statement> {
     let (s, x) = delimited(
@@ -60,7 +54,7 @@ fn whole_line_comment(input: Span) -> IResult<Span, Statement> {
     Ok((
         s,
         Statement::Comment {
-            line_number,
+            line_number: line_number.try_into().unwrap(),
             contents,
         },
     ))
@@ -76,7 +70,7 @@ fn partial_line_comment(input: Span) -> IResult<Span, Statement> {
     Ok((
         s,
         Statement::Comment {
-            line_number,
+            line_number: line_number.try_into().unwrap(),
             contents,
         },
     ))
@@ -125,7 +119,10 @@ fn comments(input: Span) -> IResult<Span, Comments> {
                 line_number,
                 contents,
             } => {
-                acc.comments.push((line_number, contents));
+                acc.comments.push(Comment {
+                    line_number: line_number.try_into().unwrap(),
+                    contents,
+                });
             }
             Statement::Docstring {
                 object_name,
