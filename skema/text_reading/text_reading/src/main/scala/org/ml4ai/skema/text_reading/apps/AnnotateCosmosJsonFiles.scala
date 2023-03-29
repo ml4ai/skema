@@ -2,6 +2,7 @@ package org.ml4ai.skema.text_reading.apps
 
 import org.clulab.utils.Logging
 import org.ml4ai.skema.text_reading.CosmosTextReadingPipeline
+import scala.util.Using
 import scopt.OParser
 
 import java.io.{File, FileOutputStream, PrintWriter}
@@ -59,10 +60,12 @@ object AnnotateCosmosJsonFiles extends App with Logging{
             val outputFile = new File(config.outDir, "extractions_" + inputFile.getName)
             logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
             val jsonContents = textReadingPipeline.extractMentionsFromJsonAndSerialize(inputFile.getAbsolutePath)
-            val writer = new PrintWriter(new FileOutputStream(outputFile))
-            writer.write(jsonContents)
-            writer.close()
-            logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
+            Using(new PrintWriter(new FileOutputStream(outputFile))) {
+              writer =>
+                writer.write(jsonContents)
+                writer.close()
+                logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
+            }
           }
           else
             logger.error(s"Didn't find ${inputFile.getAbsolutePath}")
