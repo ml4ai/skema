@@ -18,6 +18,7 @@ libraryDependencies ++= {
     "org.scalanlp"               %% "breeze-viz"         % breezeVer,
     "ai.lum"                     %% "common"             % "0.0.10",
     "org.clulab"                  % "glove-840b-300d"    % "0.1.0" % Test,
+    "org.clulab"                 %% "model-streamed-trigram-ser"   % "1.0.0",
     "org.clulab"                 %% "pdf2txt"            % "1.1.3",
     "com.typesafe.play"          %% "play-json"          % "2.9.3",
     "org.clulab"                 %% "processors-main"    % procVer,
