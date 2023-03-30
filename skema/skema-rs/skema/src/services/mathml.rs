@@ -61,8 +61,42 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     responses(
         (
             status = 200,
+            description = "Successfully returns JSON representation.",
             body = ACSet
-        )
+        ),
+        (
+            status = 400,
+            description = "Client side error: bad request"
+        ),
+        (
+            status = 404,
+            description = "Client side error: not found"
+        ),
+        (
+            status = 408,
+            description = "Client side error: request timeout"
+        ),
+        (
+            status = 500,
+            description = "Server side error: internal server error"
+        ),
+        (
+            status = 501,
+            description = "Server side error: not implemented"
+        ),
+        (
+            status = 502,
+            description = "Server side error: bad gateway"  
+        ),
+        (
+            status = 503,
+            description = "Server side error: service is nort available"
+        ),
+        (
+            status = 504,
+            description = "Server side error: gateway timeout"
+        ),
+
     )
 )]
 #[put("/mathml/acset")]
