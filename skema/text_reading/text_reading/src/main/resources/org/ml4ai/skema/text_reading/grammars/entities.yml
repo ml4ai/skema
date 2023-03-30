@@ -3,6 +3,15 @@ vars: org/ml4ai/skema/text_reading/grammars/vars.yml
 rules:
 
 ####IDENTIFIERS####
+#  - name: identifier-definition-abbreviation
+#    label: Identifier
+#    priority: ${priority1}
+#    type: token
+#    example: "susceptible (S)"
+#    action: looksLikeAnIdentifier
+#    pattern: |
+#      [word=susceptible] [tag=/-LRB-/]
+
   - name: identifier-duck-rule
     label: Identifier
     priority: ${priority1}

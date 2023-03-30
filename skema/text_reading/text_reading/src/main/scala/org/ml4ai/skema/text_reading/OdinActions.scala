@@ -1615,22 +1615,22 @@ a method for handling `ConjDescription`s - descriptions that were found with a s
       if (v == null) return false
       if ((v matches OdinEngine.VARIABLE_GAZETTEER_LABEL) && isArg) return true
       // to allow vars like R(t) and e°(Tmax)---to pass, there have to be at least four chars and the paren can't be the first char
-      if (v.words.exists(_ == "and")) return false
+      if (v.words.contains("and")) return false
       if (v.words.length > 3 && v.words.tail.intersect(compoundIdentifierComponents).nonEmpty) return true
-      if (v.words.length < 3 && v.entities.exists(ent => ent.exists(_ == "B-GreekLetter"))) return true
-      if (v.entities.get.exists(_ == "B-unit")) return false
+      if (v.words.length < 3 && v.entities.exists(ent => ent.contains("B-GreekLetter"))) return true
+      if (v.entities.get.contains("B-unit")) return false
       if (allCaps(v.words.mkString("").replace(" ", ""))) return true
       // account for all caps variables, e.g., EORATIO
       if (v.words.length == 1 && allCaps(v.words.head)) return true
       if (v.words.length == 1 && !(v.words.head.count(_.isLetter) > 0)) return false
-      if ((v.words.length >= 1) && v.entities.get.exists(m => m matches "B-GreekLetter")) return true //account for identifiers that include a greek letter---those are found as separate words even if there is not space
-      if (v.words.length != 1) return false
+      if (v.words.nonEmpty && v.entities.get.exists(m => m matches "B-GreekLetter")) return true //account for identifiers that include a greek letter---those are found as separate words even if there is not space
+//      if (v.words.length != 1) return false
       if (v.words.head.contains("-") & v.words.head.last.isDigit) return false
       // Else, the identifier candidate has length 1
       val word = v.words.head
       if (word.contains("_")) return true
       if (freqWords.contains(word.toLowerCase())) return false //filter out potential variables that are freq words
-      if (word.length > 6) return false
+      //if (word.length > 6) return false
       // an identifier/variable cannot be a unit
 
       val tag = v.tags.get.head
@@ -1642,10 +1642,11 @@ a method for handling `ConjDescription`s - descriptions that were found with a s
           |
           word.length == 1 && (tag.startsWith("NN") | tag == "FW") //or the word is one character long and is a noun or a foreign word (the second part of the constraint helps avoid standalone one-digit numbers, punct, and the article 'a'
           |
-          word.length < 3 && word.exists(_.isDigit) && !word.contains("-") && word.replaceAll("\\d|\\s", "").length > 0 //this is too specific; trying to get to single-letter identifiers with a subscript (e.g., u2) without getting units like m-2
+          word.length < 3 && word.exists(_.isDigit) && !word.contains("-") && word.replaceAll("\\d|\\s", "").nonEmpty //this is too specific; trying to get to single-letter identifiers with a subscript (e.g., u2) without getting units like m-2
           |
           (word.length < 6 && tag != "CD") //here, we allow words for under 6 char bc we already checked above that they are not among the freq words
         )
+//      true
     }
 
 

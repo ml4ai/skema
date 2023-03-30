@@ -195,6 +195,18 @@ rules:
     pattern: |
       @variable:Identifier ([word = "("] ([word = /.*/])* [word = ")"])? [lemma = "be"] [word = "defined"] [word = "as"] ([word=/a|an|the/])? (?<description> [word = /.*/ & tag = /^NN|^JJ/]* ([tag = IN] [tag = /^NN/] [word = "="] [entity =  NUMBER])?)
 
+  - name: identifier_det_description
+    label: Description
+    priority: ${priority}
+    type: dependency
+    example: "susceptible (S): is the fraction of the population that could be potentially subjected to the infection;"
+    action: ${action}
+    pattern: |
+      trigger = [lemma="the"]
+      variable:Identifier = <det <dep? >>+
+      description: Phrase? = <det
+      context:Context? = <det >>+
+
   - name: identifier_cop_description
     label: Description
     priority: ${priority}
