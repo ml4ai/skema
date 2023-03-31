@@ -169,7 +169,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   def groundStringsToMira(k: Int): Action[AnyContent] = Action { request =>
     val text = request.body.asText.get
-    val texts = Source.fromString(text).getLines.toVector
+    val texts = Source.fromString(text).getLines.map(_.trim).filter(_.nonEmpty).toVector
     val groundingCandidates = miraEmbeddingsGrounder.groundingCandidates(texts, k)
     val jGroundingCandidates = groundingCandidates.map(_.map(_.toJValue).toList).toList
     val json4sResult = JArray(jGroundingCandidates.map(JArray(_)))
