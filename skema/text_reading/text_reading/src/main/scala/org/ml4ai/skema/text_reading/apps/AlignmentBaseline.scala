@@ -1,24 +1,17 @@
 package org.ml4ai.skema.text_reading.apps
 
 import ai.lum.common.FileUtils._
+import com.typesafe.config.{Config, ConfigFactory}
+import org.clulab.odin.Mention
+import org.ml4ai.skema.text_reading.data.DataLoader
+import org.ml4ai.skema.text_reading.utils.StringsUtils
 
 import java.io.{File, PrintWriter}
 import java.nio.file.{Files, Paths}
-import ai.lum.common.ConfigUtils._
-import com.typesafe.config.{Config, ConfigFactory}
-import org.clulab.odin.Mention
-import org.clulab.processors.fastnlp.FastNLPProcessor
-
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
-import sys.process._
-import scala.io.StdIn.readLine
-import ExtractAndExport.getExporter
-import org.ml4ai.skema.text_reading.data.DataLoader
-import org.ml4ai.skema.text_reading.utils.{DisplayUtils, StringsUtils}
-
-import scala.collection.parallel.ParSeq
+import scala.sys.process._
 
 
 
@@ -40,13 +33,13 @@ class AlignmentBaseline() {
   //getting configs and such (borrowed from ExtractAndAlign)
   val config: Config = ConfigFactory.load()
 
-  val pdfalignDir = config[String]("apps.pdfalignDir")
-  val extractedMentionsDir = config[String]("apps.exportedMentionsDir")
+  val pdfalignDir = config.getString("apps.pdfalignDir")
+  val extractedMentionsDir = config.getString("apps.exportedMentionsDir")
   //this is where the latex equation files are
-  val eqFileDir = config[String]("apps.baselineEquationDir")
+  val eqFileDir = config.getString("apps.baselineEquationDir")
 
-  val eqSrcFile = config[String]("apps.eqnSrcFile")
-  val eqFile = config[String]("apps.eqnPredFile")
+  val eqSrcFile = config.getString("apps.eqnSrcFile")
+  val eqFile = config.getString("apps.eqnPredFile")
 
   //these will be deleted from the latex equation to get to the values; not currently used
   val mathSymbolsFile = StringsUtils.loadStringsFromResource("/AlignmentBaseline/mathSymbols.tsv")
@@ -67,12 +60,12 @@ class AlignmentBaseline() {
 
   val greekWords = word2greekDict.keys.toList
 
-  val inputDir = config[String]("apps.baselineTextInputDirectory")
-  val inputType = config[String]("apps.inputType")
+  val inputDir = config.getString("apps.baselineTextInputDirectory")
+  val inputType = config.getString("apps.inputType")
   val dataLoader = DataLoader.selectLoader(inputType) // txt, json (from science parse), pdf supported
   //    val paper_jsons = findFiles(inputDir, dataLoader.extension).sorted
 
-  val outDir = config[String]("apps.baselineOutputDirectory")
+  val outDir = config.getString("apps.baselineOutputDirectory")
 
   //all equations from file
   val eqn_ids = StringsUtils.loadStrings(eqSrcFile).map(_.replace(".png", ""))
@@ -519,7 +512,7 @@ class AlignmentBaseline() {
 
 object AlignmentBaseline {
   val config: Config = ConfigFactory.load()
-  val pdfalignDir = config[String]("apps.pdfalignDir")
+  val pdfalignDir = config.getString("apps.pdfalignDir")
   val greekLetterLines = StringsUtils.loadStringsFromResource("/AlignmentBaseline/greek2words.tsv")
   //these will be used to map greek letters to words and back
   val word2greekDict = mutable.Map[String, String]()

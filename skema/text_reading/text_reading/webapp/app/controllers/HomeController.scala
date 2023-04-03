@@ -15,15 +15,17 @@ import ujson.json4s.Json4sJson
 import ujson.play.PlayJson
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.processors.{Document, Sentence}
+import org.clulab.serialization.json.stringify
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
+import org.json4s.{JArray, JValue}
 import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
 import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
-import org.ml4ai.skema.text_reading.grounding.{SVOGrounder, WikidataGrounder}
+import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, SVOGrounder, WikidataGrounder}
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
 import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
@@ -34,6 +36,7 @@ import upickle.default._
 import java.io.File
 import javax.inject._
 import scala.collection.mutable.ArrayBuffer
+import scala.io.Source
 //import org.ml4ai.grounding.MiraEmbeddingsGrounder
 import play.api.libs.json._
 import play.api.mvc._
@@ -59,6 +62,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   val defaultConfig: Config = generalConfig[Config](readerType)
   val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
   val groundingConfig = generalConfig.getConfig("Grounding")
+  val miraEmbeddingsGrounder = GrounderFactory.getInstance(groundingConfig, chosenEngine = Some("miraembeddings"))
   val ieSystem = OdinEngine.fromConfig(config)
   var proc = ieSystem.proc
   val serializer = JSONSerializer
@@ -97,6 +101,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     */
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
+  }
+
+  def openAPI(version: String) = Action {
+    Ok(views.html.api(version))
   }
 
   // -------------------------------------------
@@ -152,6 +160,23 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(SVOGrounder.groundString(string)).as(JSON)
   }
 
+  def json4sToPlayJson(jValue: JValue): JsValue = {
+    val json = stringify(jValue, pretty = true)
+    val playJson = Json.parse(json)
+
+    playJson
+  }
+
+  def groundStringsToMira(k: Int): Action[AnyContent] = Action { request =>
+    val text = request.body.asText.get
+    val texts = Source.fromString(text).getLines.map(_.trim).filter(_.nonEmpty).toVector
+    val groundingCandidates = miraEmbeddingsGrounder.groundingCandidates(texts, k)
+    val jGroundingCandidates = groundingCandidates.map(_.map(_.toJValue).toList).toList
+    val json4sResult = JArray(jGroundingCandidates.map(JArray(_)))
+    val playJsonResult = json4sToPlayJson(json4sResult)
+
+    Ok(playJsonResult)
+  }
 
   // we need documentation on how to use this, or we can remove it
 
