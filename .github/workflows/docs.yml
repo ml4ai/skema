@@ -1,0 +1,46 @@
+name: Project documentation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  haskell:
+    name: "Build static site"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+    needs: setup
+    steps:
+    # Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Haskell
+      # see https://github.com/actions/setup-haskell
+      uses: actions/setup-haskell@v1.1
+      with:
+        ghc-version: "9.6.1"
+        cabal-version: "3.10.1.0"
+        enable-stack: true
+        stack-version: "2.9.3" # "latest"
+    # Install necessary dependencies
+    # docs (API)
+    - name: "Create documentation (descriptions, API docs, etc)"
+      working-directory: ./docs
+      # FIXME: is this correct?
+      run: |
+        stack build
+        stack exec generator build
+    - name: "Deploy docs"
+      if: github.ref == 'refs/heads/main'
+      uses: peaceiris/actions-gh-pages@v3    
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/site
+        user_name: 'github-actions[bot]'
+        user_email: 'github-actions[bot]@users.noreply.github.com'
+        commit_message: ${{ github.event.head_commit.message }}
