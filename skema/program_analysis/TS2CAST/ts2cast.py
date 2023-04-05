@@ -61,7 +61,11 @@ class NodeHelper(object):
          "-",
          "*",
          "**",
-         "/"
+         "/",
+         ">",
+         "<",
+         "<=",
+         ">="
       ]
       return node.type in control_characters
       
@@ -98,6 +102,11 @@ class NodeHelper(object):
    def get_node_type(self, node) -> str:
       return node.type
 
+   def get_first_child_by_type(self, node: dict, node_type: str) -> dict:
+      children = self.get_children_by_type(node, node_type)
+      if len(children) >= 1:
+         return children[0]
+     
    def get_children_by_type(self, node: dict, node_type: str) -> list:
       children = []
 
@@ -111,17 +120,21 @@ class VariableContext(object):
    def __init__(self):
       self.variable_id = 0
       self.context = [{}] # Stack of context dictionaries
+      self.context_return_values = [set()] # Stack of context return values
       self.all_symbols = {}
    
    def push_context(self):
       self.context.append({})
-  
+      self.context_return_values.append(set())
+
    def pop_context(self):
       context = self.context.pop()
 
       # Remove symbols from all_symbols variable
       for symbol in context:
          self.all_symbols.pop(symbol)
+
+      self.context_return_values.pop()
 
    def is_variable(self, symbol: str) -> bool:
       return symbol in self.all_symbols
@@ -133,10 +146,12 @@ class VariableContext(object):
       return self.all_symbols[symbol]["type"]
    
    def update_type(self, symbol:str, type: str):
-     self.context[-1][symbol]["type"] = type
+     self.all_symbols[symbol]["type"] = type
 
    def add_return_value(self, symbol):
-      self.context[-1]["_return_values"].append(symbol)
+      self.context_return_values[-1].add(symbol)
+   def remove_return_value(self, symbol):
+      self.context_return_values[-1].discard(symbol)
 
    def add_variable(self, symbol: str, type: str, source_refs: list) -> Name:
       cast_name = Name(source_refs=source_refs)
@@ -158,8 +173,6 @@ class VariableContext(object):
       return cast_name
    
    
-      
-
 class TS2CAST(object):
   def __init__(self, source_file_path: str, tree_sitter_fortran_path: str):
     
@@ -233,7 +246,7 @@ class TS2CAST(object):
           return self.visit_identifier(node)
        case "name":
           return self.visit_name(node)
-       case "math_expression":
+       case "math_expression" | "relational_expression":
           return self.visit_math_expression(node)
        case "number_literal" | "array_literal" | "string_literal" | "boolean_literal":
           return self.visit_literal(node)
@@ -241,8 +254,10 @@ class TS2CAST(object):
           return self.visit_keyword_statement(node)
        case "extent_specifier":
           return self.visit_extent_specifier(node)
+       case "do_loop_statement":
+          return self.visit_do_loop_statement(node)
        case _:
-          return []
+          return self._visit_passthrough(node)
   
   def visit_name(self, node):
      # Node structure
@@ -259,28 +274,62 @@ class TS2CAST(object):
     # Node structure
     # (subroutine)
     #   (subroutine_statement)
-    #     (subroutine) - 
+    #     (subroutine) 
     #     (name)
     #     (parameters) - Optional
-    #   (body_node)...
-    
-    ## Pull relevent child nodes
-    function_statement_node = node["children"][0]
-    name_node = function_statement_node["children"][1]
-    parameters_nodes = self.node_helper.get_children_by_type(function_statement_node, "parameters")
-    assert len(parameters_nodes) <= 1 # Should have one or none parameters nodes
-  
+    #   (body_node) ...
+    # (function)
+    #   (function_statement)
+    #     (function)
+    #     (intrinsic_type) - Optional
+    #     (name)
+    #     (parameters) - Optional
+    #     (function_result) - Optional
+    #       (identifier)
+    #  (body_node) ...
+
     # Create a new variable context
     self.variable_context.push_context()
+
+    # Top level statement node
+    statement_node = node["children"][0]
+    name_node = self.node_helper.get_first_child_by_type(statement_node, "name")
+    self.visit(name_node) # Visit the name node 
+
+    # If this is a function, check for return type and return value
+    intrinsic_type = None
+    return_value = None
+    if node["type"] == "function":
+       if intrinsic_type_node := self.node_helper.get_first_child_by_type(statement_node, "intrinsic_type"):
+         intrinsic_type = intrinsic_type_node["identifier"]
+         self.variable_context.add_variable(name_node["identifier"], intrinsic_type, None)
+       if return_value_node := self.node_helper.get_first_child_by_type(statement_node, "function_result"):
+          return_value = self.visit(return_value_node["children"][1])
+          self.variable_context.add_return_value(return_value.val.name)
+       else:
+          # #TODO: What happens if function doesn't return anything?
+          # If this is a function, and there is no explicit results variable, then we will assume the return value is the name of the function
+          self.variable_context.add_return_value(name_node["identifier"])
+      
+    # If funciton has both, then we also need to update the type of the return value in the variable context
+    # It does not explicity have to be declared 
+    if return_value and intrinsic_type:
+       self.variable_context.update_type(return_value.val.name, intrinsic_type)
 
     cast_func = FunctionDef()
     cast_func.source_refs = node["source_refs"]
     cast_func.func_args = []
+
     cast_func.name= self.visit(name_node)
     
     # Generating the function arguments by walking the parameters node
-    if len(parameters_nodes) > 0:
-       for child in parameters_nodes[0]["children"]:
+    parameters_node = self.node_helper.get_first_child_by_type(statement_node, "parameters")
+    if parameters_node:
+       for child in parameters_node["children"]:
+          # For both subroutine and functions, all arguments are assumes intent(inout) by default unless otherwise specified with intent(in)
+          # The variable declaration visitor will check for this and remove any arguments that are input only from the return values 
+          self.variable_context.add_return_value(child["identifier"])
+          
           cast_func.func_args = TS2CAST.update_field(cast_func.func_args, self.visit(child))
 
     # The first child of function will be the function statement, the rest will be body nodes 
@@ -293,17 +342,22 @@ class TS2CAST(object):
        cast_func.func_args[i].type = self.variable_context.get_type(arg.val.name)
     
     # TODO:
-    # After everything is finished, we need to update the return value for any Return nodes
-    # We will use either the name of the function, or any variables with intent out or inout
-
+    # This logic can be made cleaner
+    # Fortran doesn't require a return statement, so we need to check if there is a top-level return statement
+    # If there is not, then we will create a dummy one
+    return_found = False
+    for child in cast_func.body:
+       if isinstance(child, ModelReturn):
+          return_found = True
+    if not return_found:
+       cast_func.body.append(self.visit_keyword_statement(node))
+   
     # Pop variable context off of stack before leaving this scope
     self.variable_context.pop_context()
 
     return cast_func
 
   def visit_function_call(self, node):
-     # TODO: Can functions be called before they are definied
-
      # Pull relevent nodes
      match(node["type"]):
         case "subroutine_call":
@@ -338,21 +392,34 @@ class TS2CAST(object):
      return cast_call
   
   def visit_keyword_statement(self, node):
-     keyword_identifier = node["identifier"]
 
-     # Currently, the only keyword_identifier produced by tree-sitter is Return
-     # However, there may be other instances, so for now, we will explicitly check first
-     if keyword_identifier.lower() == "return":  
-      cast_return = ModelReturn()
-      cast_return.source_refs = node["source_refs"]
+    # Currently, the only keyword_identifier produced by tree-sitter is Return
+    # However, there may be other instances
+    cast_return = ModelReturn()
+    cast_return.source_refs = node["source_refs"]
 
-      # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
-      # We return None here, but will update this value in the function definition visitor
-      cast_return.value = None
+    # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
+    # We keep track of values that need to be returned in the variable context
+    return_values = self.variable_context.context_return_values[-1] #TODO: Make function for this
 
-      return cast_return
+    if len(return_values) == 1:
+      cast_return.value = self.variable_context.get_node(return_values[0])
+    elif len(return_values) > 1:
+        cast_tuple = LiteralValue()
+        cast_tuple.value_type = "Tuple"
+        cast_tuple.value = []
+
+        for return_value in return_values:
+          cast_var = Var()
+          cast_var.val = self.variable_context.get_node(return_value)
+          cast_var.type = self.variable_context.get_type(return_value)
+          cast_tuple.value.append(cast_var)
+        cast_return.value = cast_tuple
+    else:
+        cast_return.value = None
+  
+    return cast_return
      
-     return None 
 
   def visit_use_statement(self, node):
      ## Pull relevent child nodes
@@ -386,70 +453,65 @@ class TS2CAST(object):
           imports.append(cast_import)
       return imports 
   
-  def visit_do_loop_statement(self, node, child_map, source_ref):
+  def visit_do_loop_statement(self, node):
+     # Node structure
+     # Do loop
+     # (do_loop_statement)
+     #   (do) - TODO: Get rid of extraneous nodes like this
+     #   (loop_control_expression)
+     #     (...) ...
+     #   (body) ...
+     #
+     # Do while
+     # (do_loop_statement)
+     #   (do)
+     #   (while_statement)
+     #     (while)
+     #     (parenthesized_expression)
+     #      (...) ...
+     #   (body) ...
+     assert(len(node["children"]) > 2)
+     loop_type = node["children"][1]["type"]
+
      cast_loop = Loop()
-     cast_loop.source_refs = [source_ref] 
+     cast_loop.source_refs = node["source_refs"] 
      cast_loop.init = []
      cast_loop.expr = None
      cast_loop.body = []
      
      # The body will be the same for both loops, like the function definition, its simply every child node after the first
      # TODO: This may not be the case
-     for child in node.children[1:]:
-       child_cast = self.visit(child)
-       if child_cast:
-          if isinstance(child_cast, list):
-            cast_loop.body.extend(child_cast)
-          else:
-            cast_loop.body.append(child_cast)
+     for child in node["children"][2:]:
+       cast_loop.body = self.update_field(cast_loop.body, self.visit(child))
 
      # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
-     if "loop_control_expression" in child_map:
-        '''
-        # We need to determine the start, stop, and step for this statement using the loop_control_expression node
-        loop_control_node = child_map["loop_control_expression"]
-        loop_range = TS2CAST.get_real_children(loop_control_node)
-        print(loop_range)
-        for i, child in enumerate(loop_control_node.children):
-            child_type, _, child_identifier = self.get_node_data(child)
-
-            # We know we will have an init if = is found in the children
-            if child_type == "=":
-              cast_assignment = Assignment()
-              # TODO: SourceRef
-              cast_assignment.left = self.visit(loop_control_node.children[i-1])
-              cast_assignment.right = self.visit(loop_control_node.children[i+1])
-              cast_loop.init.append(cast_assignment)
-        
-        # Add itt += step to the end of the body
-        cast_assignment = Assignment()
-        
-        #TODO: SourceRef
-        cast_loop.body.append(cast_assignment)
-        '''
-        pass
-     elif "while_statement" in child_map:
-        cast_loop.expr = self.visit(child_map["while_statement"])
-     
-     
-     '''
-     # We need to determine the start, stop, and step for this statement using the loop_control_expression node
-     loop_control_node = TS2CAST.search_children_by_type(node, "loop_control_expression")
-     for i, child in enumerate(loop_control_node.children):
-        child_type, _, child_identifier = self.get_node_data(child)
-        # We know we will have an init if = is found in the children
-        if child_type == "=":
+     match(loop_type):
+        case "loop_control_expression":
+           identifier, start, stop = node["children"][1]["children"]
            cast_assignment = Assignment()
-           cast_assignment.left = self.visit(loop_control_node.children[i-1])
-           cast_assignment.right = self.visit(loop_control_node.children[i+1])
-        
-           cast_loop.init.append(cast_assignment)
+           # TODO: Add source ref
+           #cast_assignment.left = self.visit(identifier)
+           #cast_assignment.right = self.visit(start) 
            
-     # Next, we can create the expression thats checked after each itteration
-     # Since this is a traditional do loop, the expression will be while(start<stop){x+=step} 
-     cast_assignment = Assignment()
-     cast_loop.body.append(cast_assignment) # TODO: Should be put at end of body
-    '''
+           # Left side is going to be an itterator
+           cast_assignment.left = Var()
+           cast_assignment.left.type = "iterator"
+           cast_assignment.left.val = Name()
+           cast_assignment.left.val.name = "generated_iter_0"
+
+           cast_assignment.right = Call()
+           cast_assignment.right.arguments = []
+           cast_assignment.right.func = Name()
+           
+
+           cast_loop.init = self.update_field(cast_loop.init, cast_assignment)
+
+
+        case "while_statement":
+           while_expression = node["children"][1]["children"][1] # 1 because superflous nodes
+           cast_loop.expr = self.visit(while_expression)
+           # TODO: parenthesised expression handler
+
      return cast_loop
         
   def visit_assignment_statement(self, node):
@@ -466,8 +528,6 @@ class TS2CAST(object):
     
     cast_assignment.left = self.visit(left)
     cast_assignment.right = self.visit(right)
-    
-
     
     return cast_assignment
   
@@ -563,6 +623,8 @@ class TS2CAST(object):
     }
     
     intrinsic_type = type_map[node["children"][0]["identifier"]] 
+    variable_intent = "TODO"
+
     type_qualifiers = self.node_helper.get_children_by_type(node, "type_qualifier")
     identifiers = self.node_helper.get_children_by_type(node, "identifier")
     assignment_statements = self.node_helper.get_children_by_type(node, "asignment_statement")
@@ -575,10 +637,7 @@ class TS2CAST(object):
           case "dimension":
             intrinsic_type = "List"
           case "intent":
-             if value == "out":
-                pass
-                #print("OUT")
-                #self.variable_context.add_return_value()
+               variable_intent = value
 
     # You can declare multiple variables of the same type in a single statement, so we need to create a Var node for each instance
     vars = [] 
@@ -596,6 +655,12 @@ class TS2CAST(object):
 
        vars.append(cast_assignment)
 
+    # If the intent is out, we need to add all these variables to the return values
+    # TODO: But what if one branch has a different return value? Are ifs going to be a seperate context
+    if variable_intent == "in":
+      for var in vars:
+        self.variable_context.remove_return_value(var.val.name)
+    
     return vars
 
   def visit_extent_specifier(self, node):
@@ -684,6 +749,12 @@ class TS2CAST(object):
      cast_call.arguments.append(self.visit(right))
 
      return cast_call
+  
+  def _visit_passthrough(self, node):
+     if len(node["children"]) == 0:
+        return []
+     
+     return self.visit(node["children"][0])
   
   def get_gromet_function_node(self, func_name:str) -> Name:
      node_dict = {
