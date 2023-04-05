@@ -31,16 +31,15 @@ jobs:
     # docs (API)
     - name: "Create documentation (descriptions, API docs, etc)"
       working-directory: ./docs
-      # FIXME: is this correct?
       run: |
         stack build
-        stack exec generator build
+        stack exec generator rebuild
     - name: "Deploy docs"
       if: github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v3    
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/site
+        publish_dir: ./docs/_site
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
         commit_message: ${{ github.event.head_commit.message }}
