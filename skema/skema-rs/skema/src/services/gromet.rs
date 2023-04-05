@@ -1,6 +1,5 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 
-use crate::ModuleCollection;
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
 use crate::{Gromet, ModuleCollection};

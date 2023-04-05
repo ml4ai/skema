@@ -34,9 +34,9 @@ pub enum Expr {
 /// Intermediate data structure to support the generation of graphs of mathematical expressions
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct PreExp {
-    ops: Vec<Operator>,
-    args: Vec<Expr>,
-    name: String,
+    pub ops: Vec<Operator>,
+    pub args: Vec<Expr>,
+    pub name: String,
 }
 
 /// Check if the fraction is a derivative expressed in Leibniz notation. If yes, mutate it to
@@ -211,7 +211,7 @@ impl MathExpression {
 
 impl Expr {
     /// Group expression by multiplication and division operations.
-    fn group_expr(&mut self) {
+    pub fn group_expr(&mut self) {
         if let Expr::Expression { ops, args, .. } = self {
             let mut indices_to_remove = Vec::new();
             let ops_copy = ops.clone();
@@ -284,7 +284,7 @@ impl Expr {
 
     /// If the current term's operators are all multiplication or division, check if it contains
     /// nested all multiplication or division terms inside. If so, collapse them into a single term.
-    fn collapse_expr(&mut self) {
+    pub fn collapse_expr(&mut self) {
         if let Expr::Expression { ops, args, .. } = self {
             let mut ops_copy = ops.clone();
             let mut args_copy = args.clone();
@@ -385,7 +385,7 @@ impl Expr {
         }
     }
 
-    fn to_graph(&mut self, graph: &mut MathExpressionGraph) {
+    pub fn to_graph(&mut self, graph: &mut MathExpressionGraph) {
         if let Expr::Expression { ops, args, name } = self {
             if name == "place_holder" {
                 return;
@@ -769,7 +769,7 @@ pub fn all_ops_are_mult_or_div(ops: Vec<Operator>) -> bool {
 }
 
 impl PreExp {
-    fn group_expr(&mut self) {
+    pub fn group_expr(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
                 arg.group_expr();
@@ -777,7 +777,7 @@ impl PreExp {
         }
     }
 
-    fn collapse_expr(&mut self) {
+    pub fn collapse_expr(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
                 arg.collapse_expr();
@@ -785,7 +785,7 @@ impl PreExp {
         }
     }
 
-    fn set_name(&mut self) {
+    pub fn set_name(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
                 arg.set_name();

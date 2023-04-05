@@ -51,10 +51,10 @@ impl fmt::Display for Var {
 /// be noise, this accommodates possibly reading several names of things
 /// that should be combined into a single rate.
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default)]
-struct Term {
-    polarity: Polarity,
-    species: Vec<Specie>,
-    vars: Vec<Var>,
+pub struct Term {
+    pub polarity: Polarity,
+    pub species: Vec<Specie>,
+    pub vars: Vec<Var>,
 }
 
 // MathML to Petri Net algorithm
@@ -257,6 +257,7 @@ impl From<Vec<Math>> for acset::ACSet {
         for (i, monomial) in monomials.0.iter().enumerate() {
             acset.T.push(acset::Transition {
                 tname: monomial.0 .0.to_string(),
+                uid: i,
             });
             for (specie, exponent) in monomial.0 .1.clone() {
                 let n_arrows = exponent.0;

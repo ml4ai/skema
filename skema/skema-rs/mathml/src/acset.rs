@@ -13,6 +13,7 @@ pub struct Specie {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema)]
 pub struct Transition {
     pub tname: String,
+    pub uid: usize,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema)]

@@ -1,15 +1,35 @@
-use mathml::ast::Operator;
+use mathml::acset::{InputArc, OutputArc, Specie, Transition};
+use mathml::ast::{Math, Operator};
+use mathml::expression::wrap_math;
 use mathml::expression::Atom;
 use mathml::expression::{Expr, PreExp};
+use mathml::mml2pn::get_mathml_asts_from_file;
+pub use mathml::mml2pn::{ACSet, Term};
 use petgraph::dot::{Config, Dot};
 use petgraph::matrix_graph::IndexType;
 use petgraph::prelude::*;
 use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::env;
 
+// new imports
+use mathml::ast::MathExpression::Mo;
+use mathml::ast::MathExpression::Mrow;
+use mathml::petri_net::recognizers::get_polarity;
+use mathml::petri_net::recognizers::get_specie_var;
+use mathml::petri_net::recognizers::is_add_or_subtract_operator;
+use mathml::petri_net::recognizers::is_var_candidate;
+use mathml::petri_net::Var;
+
+// just for making schema's
+use schemars::schema_for; // for printing
+use serde_json; // need for printing
+use skema::Metadata; // struct to make schema from
+
 // overall this will be a function that takes in a module id and weather it is manually or auto extraction to use
+
 // for now we will deal with manual module ids
 
 fn main() {
@@ -77,18 +97,66 @@ fn main() {
 
         let (mut core_dynamics, metadata_map) = subgraph2_core_dyn(module_id).unwrap();
 
-        let test = match &core_dynamics[0] {
-            Expr::Expression { op, args, name } => Expr::Expression {
-                op: (*op.clone()).to_vec(),
-                args: (*args.clone()).to_vec(),
-                name: core_dynamics[0].clone().set_name(),
-            },
-            Expr::Atom(x) => Expr::Atom(x.clone()),
-        };
+        let mut named_core_dynamics = Vec::<PreExp>::new();
 
-        println!("{:?}", test.clone());
+        for (i, expression) in core_dynamics.clone().iter().enumerate() {
+            let test_pre_exp = match &expression {
+                Expr::Expression { ops, args, name } => PreExp {
+                    ops: (*ops.clone()).to_vec(),
+                    args: (*args.clone()).to_vec(),
+                    name: expression.clone().set_name(),
+                },
+                &Expr::Atom(_) => PreExp {
+                    ops: Vec::<Operator>::new(),
+                    args: Vec::<Expr>::new(),
+                    name: "".to_string(),
+                },
+            };
+            named_core_dynamics.push(test_pre_exp.clone());
+        }
+
+        println!("{:?}", named_core_dynamics.clone());
+    }
+    // This is for testing the converter and it will import from the test files since we should be able to make sure things are
+    // parsing correctly
+    else if args[1] == "test".to_string() {
+        // load up the parsed file
+        let mathml_ast =
+            get_mathml_asts_from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+
+        // make my own converter to PreExp with an '=' as the anchor as I don't understand Liang's converter
+        let mut core_dynamics_exp = ast2exp(mathml_ast.clone());
+
+        // convert the parsed file into pre_exp
+        let mut named_core_dynamics = Vec::<PreExp>::new();
+        for equation in mathml_ast.iter() {
+            println!("\nast: {:?}", equation.content[0].clone());
+            // this next bit is for Liang's converter to expressions
+            let mut pre_exp = PreExp {
+                ops: Vec::<Operator>::new(),
+                args: Vec::<Expr>::new(),
+                name: "".to_string(),
+            };
+            let new_math = wrap_math(equation.clone());
+            new_math.clone().to_expr(&mut pre_exp);
+            pre_exp.group_expr();
+            pre_exp.collapse_expr();
+            pre_exp.set_name();
+            // pre_exp.distribute_expr();
+            println!("\nLiang exp: {:?}", pre_exp.clone());
+        }
+
+        let acset_dyn = exp2pn(named_core_dynamics);
+
+        // printing the ACSet for future comparison
+        println!("\nACSet: {:?}", ACSet::from(mathml_ast));
+        println!("\n exp ACSet: {:?}", acset_dyn);
+
+        // printing json schema's for Ben
+        /*let schema = schema_for!(Metadata);
+        println!("{}", serde_json::to_string_pretty(&schema).unwrap());*/
     } else {
-        println!("Unknown command");
+        println!("Unknown command!");
     }
 
     // FOR DEBUGGING
@@ -127,6 +195,85 @@ fn main() {
         "{:?}",
         Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
     );*/
+}
+
+// This will parse the mathml based on a '=' anchor
+fn ast2exp(mathml_ast: Vec<Math>) -> Vec<PreExp> {
+    let mut named_core_dynamics = Vec::<PreExp>::new();
+
+    // This is a lot of adarsh's code on somehow iteratoring over an enum
+    let mut terms = Vec::<Term>::new();
+    let mut current_term = Term::default();
+    let mut lhs_specie: Option<Var> = None;
+    let mut species: HashSet<Var>;
+    let mut vars: HashSet<Var> = Default::default();
+    let mut eqns: HashMap<Var, Vec<Term>>;
+
+    let mut equals_index = 0;
+    for equation in mathml_ast {
+        let mut pre_exp = PreExp {
+            ops: Vec::<Operator>::new(),
+            args: Vec::<Expr>::new(),
+            name: "".to_string(),
+        };
+        if let Mrow(expr_1) = &equation.content[0] {
+            // Get the index of the equals term
+            for (i, expr_2) in (*expr_1).iter().enumerate() {
+                if let Mo(Operator::Equals) = expr_2 {
+                    equals_index = i;
+                    println!("{:?}", expr_1.clone());
+                    let lhs = &expr_1[0]; // does this not imply equals_index is always 1?
+                    println!("lhs: {:?}", lhs);
+                    let mut pre_exp_args = Vec::<Expr>::new();
+                    pre_exp.ops.push(Operator::Other("".to_string()));
+                    pre_exp.ops.push(Operator::Equals);
+                    pre_exp.args.push(Expr::Expression {
+                        ops: [Operator::Other("Derivative".to_string())].to_vec(),
+                        args: pre_exp_args,
+                        name: "".to_string(),
+                    })
+                }
+            }
+
+            println!("rhs: {:?}", expr_1[equals_index + 1]);
+            // Iterate over MathExpressions in the RHS
+            for (_i, expr_2) in expr_1[equals_index + 1..].iter().enumerate() {
+                if is_add_or_subtract_operator(expr_2) {
+                    if current_term.vars.is_empty() {
+                        current_term.polarity = get_polarity(expr_2);
+                    } else {
+                        terms.push(current_term);
+                        current_term = Term {
+                            vars: vec![],
+                            polarity: get_polarity(expr_2),
+                            ..Default::default()
+                        };
+                    }
+                } else if is_var_candidate(expr_2) {
+                    current_term.vars.push(Var(expr_2.clone()));
+                    vars.insert(Var(expr_2.clone()));
+                } else {
+                    panic!("Unhandled rhs element {:?}", expr_2);
+                }
+            }
+            if !current_term.vars.is_empty() {
+                terms.push(current_term.clone());
+            }
+        }
+    }
+
+    return named_core_dynamics;
+}
+
+fn exp2pn(named_core_dynamics: Vec<PreExp>) -> ACSet {
+    let mut ascet = ACSet {
+        S: Vec::<Specie>::new(),
+        T: Vec::<Transition>::new(),
+        I: Vec::<InputArc>::new(),
+        O: Vec::<OutputArc>::new(),
+    };
+
+    return ascet;
 }
 
 fn subgraph2_core_dyn(
@@ -335,7 +482,7 @@ fn tree_2_expr(
 
     // now to construct the Expr
     let temp_expr = Expr::Expression {
-        op: op_vec.clone(),
+        ops: op_vec.clone(),
         args: args_vec.clone(),
         name: expr_name,
     };
