@@ -1,5 +1,6 @@
 package org.ml4ai.skema.text_reading.scenario_context
 
+import edu.stanford.nlp.ie.machinereading.structure.EventMention
 import org.apache.poi.openxml4j.exceptions.InvalidOperationException
 import org.clulab.odin.Mention
 import org.ml4ai.skema.text_reading.attachments.EventMentionAttachment
@@ -13,22 +14,22 @@ import org.ml4ai.skema.text_reading.attachments.EventMentionAttachment
 class LinearOrderer(ms:Iterable[Mention]) extends MentionOrderer{
 
   private def getMentionCosmosLocations(m:Mention) = m.attachments.filter(_.isInstanceOf[EventMentionAttachment]).head.asInstanceOf[EventMentionAttachment]
-
   private case class OrderingHelper(page:Int, block:Int, sent:Int, sid:Int, s:Int  = 0)
 
   // Will use the `MentionLocationAttachment` on each mention to generate an offset for each (page, block)
   private val offsets = {
     ms.toSeq.map(
       m => {
-        if (!m.attachments.exists(_.isInstanceOf[Mention]))
-          throw new InvalidOperationException("Mention without MentionLocationAttachment")
+        if (!m.attachments.exists(_.isInstanceOf[Mention]) && !m.document.isInstanceOf[EventMention])
+          throw new InvalidOperationException("This is not an Event Mention or is without MentionLocationAttachment")
 
         val location = getMentionCosmosLocations(m)
         val page = location.pageNum.head
         val block = location.blockIdx.head
         val numSentences = m.document.sentences.length
-        val sentenceId = location.sentenceId
-        val id = location.id
+        val sentenceId = m.sentence
+        val id = m.document.id
+        val text = m.document.text
         OrderingHelper(page, block, numSentences, sentenceId)
       }
     ).distinct.sortBy{
@@ -50,7 +51,7 @@ class LinearOrderer(ms:Iterable[Mention]) extends MentionOrderer{
     */
   override def resolveLinearOrder(m: Mention): Int = {
     val thisMention = getMentionCosmosLocations(m)
-    val offset = offsets((thisMention.pageNum.head, thisMention.blockIdx.head, thisMention.sentenceId)) // TODO: Make these scalars, not arrays
+    val offset = offsets((thisMention.pageNum.head, thisMention.blockIdx.head)) // TODO: Make these scalars, not arrays
     offset + m.sentence
   }
 }

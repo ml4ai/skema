@@ -76,15 +76,12 @@ class MentionLocationAttachment(val filename: String, val  pageNum: Seq[Int], va
     "attType" -> attType) //"MentionLocation"
 }
 
-class EventMentionAttachment(val filename: String, val  pageNum: Seq[Int], val blockIdx: Seq[Int], val sentenceId: Int, val id : Int, text:String, attType: String) extends AutomatesAttachment {
+class EventMentionAttachment(val filename: String, val  pageNum: Seq[Int], val blockIdx: Seq[Int]) extends AutomatesAttachment {
 
   override def toJson: JsValue =  Json.obj(
     "filename" -> filename,
     "pageNum" -> pageNum,
     "blockIdx" -> blockIdx,
-    "sentenceId" -> sentenceId,
-    "id" -> id,
-    "text" -> text
   )
 
   // use 'asInstanceOf' + this method to retrieve the information from the attachment
@@ -93,9 +90,6 @@ class EventMentionAttachment(val filename: String, val  pageNum: Seq[Int], val b
     "filename" -> filename,
     "pageNum" -> pageNum,
     "blockIdx" -> blockIdx,
-    "sentenceId" -> sentenceId,
-    "id" -> id,
-    "text" -> text,
     ) //"MentionLocation"
 }
 
