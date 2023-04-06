@@ -7,26 +7,43 @@ on:
     branches: [main]
 
 jobs:
-  haskell:
+  site:
     name: "Build static site"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-    needs: setup
     steps:
     # Checkout code
     - name: Checkout code
       uses: actions/checkout@v2
 
     - name: Set up Haskell
-      # see https://github.com/actions/setup-haskell
-      uses: actions/setup-haskell@v1.1
+      id: setup
+      # see https://github.com/haskell/actions/tree/87b3442d9877a4ab61f04a4e3d0da2e14be5d51e/setup#basic-with-stack
+      uses: haskell/actions/setup@v2
       with:
         ghc-version: "9.2.7"
         cabal-version: "3.6.2.0"
         enable-stack: true
         stack-version: "2.9.3" # "latest"
+
+    # Load cache
+    - uses: actions/cache/restore@v3
+      name: "Load cache of ~/.stack"
+      id: cache_load_stack
+      with:
+        path: ~/.stack
+        # FIXME: how use use env variable to reference /home/runner/work/skema/skema ?
+        key: ${{ runner.os }}-stack-global-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
+
+    - uses: actions/cache/restore@v3
+      name: "Load cache of ~/docs/.stack-work"
+      id: cache_load_stack_work
+      with:
+        path: $GITHUB_WORKSPACE/docs/.stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
+
     # Install necessary dependencies
     # docs (API)
     - name: "Create documentation (descriptions, API docs, etc)"
@@ -34,6 +51,26 @@ jobs:
       run: |
         stack build
         stack exec generator rebuild
+        # store versions used in case we need to reference in our cache key, etc.
+        GHC_VERSION=$(ghc --numeric-version)
+        CABAL_VERSION=$(cabal --numeric-version)
+        echo "GHC_VERSION=${GHC_VERSION}"     >> "${GITHUB_ENV}"
+        echo "CABAL_VERSION=${CABAL_VERSION}" >> "${GITHUB_ENV}"
+
+    # save cache
+    - uses: actions/cache/save@v3
+      name: "Cache ~/.stack"
+      id: cache_save_stack
+      with:
+        path: ~/.stack
+        key: ${{ runner.os }}-stack-global-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
+    - uses: actions/cache/save@v3
+      name: "Cache ~/docs/.stack-work"
+      id: cache_save_stack_work
+      with:
+        path: /home/runner/work/skema/skema/docs/.stack-work
+        key: ${{ runner.os }}-stack-work-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
+        
     - name: "Deploy docs"
       if: github.ref == 'refs/heads/main'
       uses: peaceiris/actions-gh-pages@v3    
