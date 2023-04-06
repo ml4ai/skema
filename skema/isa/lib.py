@@ -212,6 +212,8 @@ Output:
     node_labels2: the name list of the variables and terms in the equation 2
     aligned_indices1: the aligned indices in the name list of the equation 1
     aligned_indices2: the aligned indices in the name list of the equation 2
+    union_graph: the visualization of the alignment result 
+    perfectly_matched_indices1: strictly matched node indices in Graph 1
 '''
 
 
@@ -257,7 +259,7 @@ def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 1) \
     num_edges = ((big_graph + small_graph_aligned_full) > 0).sum()
     diff_edges = abs(big_graph - small_graph_aligned_full)
     diff_edges[diff_edges > 0] = 1
-    perfectly_matched_indices1 = check_square_array(diff_edges)
+    perfectly_matched_indices1 = check_square_array(diff_edges)  # strictly aligned node indices of Graph 1
     num_diff_edges = np.sum(diff_edges)
     matching_ratio = round(1 - (num_diff_edges / num_edges), 2)
 
@@ -270,6 +272,7 @@ def align_mathml_eqs(file1: str = "", file2: str = "", mode: int = 1) \
                 aligned_indices1[i] = matched_indices2[np.where(matched_indices1 == i)[0][0]]
                 aligned_indices2[matched_indices2[np.where(matched_indices1 == i)[0][0]]] = i
 
+    # The visualization of the alignment result.
     union_graph = get_union_graph(graph1, graph2, [int(i) for i in matched_indices1.tolist()],
                                   [int(i) for i in matched_indices2.tolist()])
 
