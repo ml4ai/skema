@@ -204,9 +204,10 @@ impl MathExpression {
         self.to_expr(&mut pre_exp);
         pre_exp.group_expr();
         pre_exp.collapse_expr();
-        pre_exp.distribute_expr();
-        pre_exp.group_expr();
-        pre_exp.collapse_expr();
+        /// if need to convert to canonical form, please uncomment the following
+        // pre_exp.distribute_expr();
+        // pre_exp.group_expr();
+        // pre_exp.collapse_expr();
         pre_exp.set_name();
 
         pre_exp.to_graph()
