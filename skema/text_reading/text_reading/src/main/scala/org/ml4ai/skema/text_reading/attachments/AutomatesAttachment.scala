@@ -76,6 +76,29 @@ class MentionLocationAttachment(val filename: String, val  pageNum: Seq[Int], va
     "attType" -> attType) //"MentionLocation"
 }
 
+class EventMentionAttachment(val filename: String, val  pageNum: Seq[Int], val blockIdx: Seq[Int], val sentenceId: Int, val id : Int, text:String, attType: String) extends AutomatesAttachment {
+
+  override def toJson: JsValue =  Json.obj(
+    "filename" -> filename,
+    "pageNum" -> pageNum,
+    "blockIdx" -> blockIdx,
+    "sentenceId" -> sentenceId,
+    "id" -> id,
+    "text" -> text
+  )
+
+  // use 'asInstanceOf' + this method to retrieve the information from the attachment
+
+  def toUJson: ujson.Value = ujson.Obj(
+    "filename" -> filename,
+    "pageNum" -> pageNum,
+    "blockIdx" -> blockIdx,
+    "sentenceId" -> sentenceId,
+    "id" -> id,
+    "text" -> text,
+    ) //"MentionLocation"
+}
+
 class DiscontinuousCharOffsetAttachment(charOffsets: Seq[(Int, Int)], attType: String) extends AutomatesAttachment {
 
   override def toJson: JsValue = ???
