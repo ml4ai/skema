@@ -11,3 +11,4 @@ def test_get_mathml():
     print(mathml)
     print(output)
     assert mathml == output
+test_get_mathml()

@@ -135,92 +135,38 @@ def main():
     final_paths = list()
     count = 0
     for apidx, ap in enumerate(all_paths):
-        if ap not in ["2018_1805_1805.03129_large_eqn18",
-                "2018_1803_1803.03006_large_eqn13",
-                "2018_1807_1807.00989_large_eqn118",
-                "2018_1807_1807.10398_large_eqn44",
-                "2018_1808_1808.02050_large_eqn36",
-                "2018_1806_1806.07089_large_eqn34",
-                "2018_1807_1807.09554_large_eqn44",
-                "2018_1807_1807.09554_large_eqn35",
-                "2018_1808_1808.06517_large_eqn14",
-                "2018_1807_1807.08694_large_eqn12",
-                "2018_1807_1807.04044_large_eqn54",
-                "2018_1807_1807.08225_large_eqn11",
-                "2014_1403_1403.6048_small_eqn29",
-                "2018_1812_1812.05056_large_eqn60",
-                "2018_1808_1808.09810_large_eqn46",
-                "2018_1808_1808.01120_large_eqn13"]:
+        if count <= total_eqns:
+            yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
+            mml_path = os.path.join(
+                root,
+                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+            )
 
-            print(ap, count)
-            if count%10000==0:print(f"{count}, {ap}, {counter_dist_dict}")
-            if count <= total_eqns:
-                yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-                mml_path = os.path.join(
-                    root,
-                    f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-                )
+            mml = open(mml_path).readlines()[0]
+            simp_mml = simplification(mml)
+            length_mml = len(simp_mml.split())
 
-                mml = open(mml_path).readlines()[0]
+            # finding the bin
+            temp_dict = {}
+            for i in range(50, 400, 50):
+                if length_mml / i < 1:
+                    temp_dict[i] = length_mml / i
 
-                simp_mml = simplification(mml)
-                length_mml = len(simp_mml.split())
+            # get the bin
+            if len(temp_dict) >= 1:
+                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+            else:
+                tgt_bin = "350+"
 
-                # finding the bin
-                temp_dict = {}
-                for i in range(50, 400, 50):
-                    if length_mml / i < 1:
-                        temp_dict[i] = length_mml / i
-
-                # get the bin
-                if len(temp_dict) >= 1:
-                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                else:
-                    tgt_bin = "350+"
-
-                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                    counter_dist_dict[tgt_bin] += 1
-                    final_paths.append(ap)
-
-                    # # copying image
-                    # img_src = os.path.join(
-                    #     root,
-                    #     f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
-                    # )
-                    # img_dst = os.path.join(images_path, f"{count}.png")
-                    # CP(img_src, img_dst)
-                    #
-                    # # wrting path
-                    # paths_file.write(ap + "\n")
-                    #
-                    # # writing MathML
-                    # if "\n" not in mml:
-                    #     mml = mml + "\n"
-                    # mml_file.write(mml)
-                    #
-                    # # writing latex
-                    # latex_path = os.path.join(
-                    #     root,
-                    #     f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-                    # )
-                    # latex_arr = open(latex_path).readlines()
-                    # if len(latex_arr) > 1:
-                    #     latex = " "
-                    #     for l in latex_arr:
-                    #         latex = latex + l.replace("\n", "")
-                    # else:
-                    #     latex = latex_arr[0]
-                    #
-                    # if "\n" not in latex:
-                    #     latex = latex + "\n"
-                    # latex_file.write(latex)
-
-                    count += 1
-
+            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                counter_dist_dict[tgt_bin] += 1
+                final_paths.append(ap)
+                count+=1
             else:
                 break
 
+    # random shuffle twice
     random.shuffle(final_paths)
     random.shuffle(final_paths)
 

@@ -20,9 +20,9 @@ In case of Zsh, run
 pip install -e ."[img2mml]"
 ```
 
-To install requirements
+To install requirements,
 ```
-python3 -m pip install -r requirements.txt
+cd skema/img2mml ; python3 -m pip install -r requirements.txt
 ```
 
 To install Pytorch
