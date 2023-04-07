@@ -90,7 +90,7 @@ python utils/bleu_score.py
 
 For multiperl bleu score:
 ```
-perl utils/multi-bleu.perl logs/final_targets.txt < logs/final_preds.txt"
+perl utils/multi-bleu.perl logs/final_targets.txt < logs/final_preds.txt
 ```
 
 #### To calculate edit distance
