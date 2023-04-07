@@ -119,6 +119,8 @@ class NodeHelper(object):
 class VariableContext(object):
    def __init__(self):
       self.variable_id = 0
+      self.iterator_id = 0
+      self.stop_condition_id = 0
       self.context = [{}] # Stack of context dictionaries
       self.context_return_values = [set()] # Stack of context return values
       self.all_symbols = {}
@@ -135,23 +137,6 @@ class VariableContext(object):
          self.all_symbols.pop(symbol)
 
       self.context_return_values.pop()
-
-   def is_variable(self, symbol: str) -> bool:
-      return symbol in self.all_symbols
-   
-   def get_node(self, symbol: str) -> dict:
-      return self.all_symbols[symbol]["node"]
-   
-   def get_type(self, symbol: str) -> str:
-      return self.all_symbols[symbol]["type"]
-   
-   def update_type(self, symbol:str, type: str):
-     self.all_symbols[symbol]["type"] = type
-
-   def add_return_value(self, symbol):
-      self.context_return_values[-1].add(symbol)
-   def remove_return_value(self, symbol):
-      self.context_return_values[-1].discard(symbol)
 
    def add_variable(self, symbol: str, type: str, source_refs: list) -> Name:
       cast_name = Name(source_refs=source_refs)
@@ -170,12 +155,42 @@ class VariableContext(object):
       # Add reference to all_symbols
       self.all_symbols[symbol] = self.context[-1][symbol]
 
-      return cast_name
+      return cast_name 
+   
+   def is_variable(self, symbol: str) -> bool:
+      return symbol in self.all_symbols
+   
+   def get_node(self, symbol: str) -> dict:
+      return self.all_symbols[symbol]["node"]
+   
+   def get_type(self, symbol: str) -> str:
+      return self.all_symbols[symbol]["type"]
+   
+   def update_type(self, symbol:str, type: str):
+     self.all_symbols[symbol]["type"] = type
+
+   def add_return_value(self, symbol):
+      self.context_return_values[-1].add(symbol)
+   def remove_return_value(self, symbol):
+      self.context_return_values[-1].discard(symbol)
+
+   def generate_iterator(self):
+       symbol = f"generated_iter_{self.iterator_id}"
+       self.iterator_id += 1
+
+       return self.add_variable(symbol, "iterator", [None])
+   def generate_stop_condition(self):
+       symbol = f"sc_{self.stop_condition_id}"
+       self.stop_condition_id += 1
+
+       return self.add_variable(symbol, "boolean", [None])
+       
+   
    
    
 class TS2CAST(object):
   def __init__(self, source_file_path: str, tree_sitter_fortran_path: str):
-    
+
     # Initialize tree-sitter
     self.tree_sitter_fortran = None
     self.tree_sitter_fortran_path = tree_sitter_fortran_path
@@ -216,6 +231,8 @@ class TS2CAST(object):
     # Start visiting
     self.run(self.parse_dict)
 
+    generate_dummy_source_refs(self.module)
+
     # Create outer cast wrapping
     out_cast = CAST([self.module], "Fortran")
     print(
@@ -224,7 +241,7 @@ class TS2CAST(object):
                 )
             )
             
-  
+      
   def run(self, root: dict):
     self.module.source_refs = root["source_refs"]
     for child in root["children"]:
@@ -319,7 +336,7 @@ class TS2CAST(object):
     cast_func = FunctionDef()
     cast_func.source_refs = node["source_refs"]
     cast_func.func_args = []
-
+    cast_func.body = []
     cast_func.name= self.visit(name_node)
     
     # Generating the function arguments by walking the parameters node
@@ -335,7 +352,7 @@ class TS2CAST(object):
     # The first child of function will be the function statement, the rest will be body nodes 
     for child in node["children"][1:]:
        cast_func.body = TS2CAST.update_field(cast_func.body, self.visit(child))
-
+      
     # After creating the body, we can go back and update the var nodes we created for the arguments
     # We do this by looking for intent,in nodes
     for i, arg in enumerate(cast_func.func_args):
@@ -395,8 +412,7 @@ class TS2CAST(object):
 
     # Currently, the only keyword_identifier produced by tree-sitter is Return
     # However, there may be other instances
-    cast_return = ModelReturn()
-    cast_return.source_refs = node["source_refs"]
+    cast_return = ModelReturn(source_refs=node["source_refs"])
 
     # In Fortran the return statement doesn't return a value (there is the obsolete "alternative return")
     # We keep track of values that need to be returned in the variable context
@@ -405,9 +421,7 @@ class TS2CAST(object):
     if len(return_values) == 1:
       cast_return.value = self.variable_context.get_node(return_values[0])
     elif len(return_values) > 1:
-        cast_tuple = LiteralValue()
-        cast_tuple.value_type = "Tuple"
-        cast_tuple.value = []
+        cast_tuple = LiteralValue("Tuple", [])
 
         for return_value in return_values:
           cast_var = Var()
@@ -416,7 +430,7 @@ class TS2CAST(object):
           cast_tuple.value.append(cast_var)
         cast_return.value = cast_tuple
     else:
-        cast_return.value = None
+        cast_return.value = LiteralValue("None", "None")
   
     return cast_return
      
@@ -470,12 +484,14 @@ class TS2CAST(object):
      #     (parenthesized_expression)
      #      (...) ...
      #   (body) ...
+     #print(self.variable_context.context)
      assert(len(node["children"]) > 2)
      loop_type = node["children"][1]["type"]
 
      cast_loop = Loop()
      cast_loop.source_refs = node["source_refs"] 
-     cast_loop.init = []
+     cast_loop.pre = []
+     cast_loop.post = []
      cast_loop.expr = None
      cast_loop.body = []
      
@@ -487,30 +503,62 @@ class TS2CAST(object):
      # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
      match(loop_type):
         case "loop_control_expression":
-           identifier, start, stop = node["children"][1]["children"]
-           cast_assignment = Assignment()
-           # TODO: Add source ref
-           #cast_assignment.left = self.visit(identifier)
-           #cast_assignment.right = self.visit(start) 
+           # PRE:
+           # TODO: Why is this different from the schema
+           # _next(_iter(range(start, stop, step)))
+           loop_control_node = node["children"][1]
+           itterator = self.visit(loop_control_node["children"][0])
+           start = self.visit(loop_control_node["children"][1])
+           stop = self.visit(loop_control_node["children"][2])
+
+           if len(loop_control_node["children"]) == 3: # No step value
+              step = LiteralValue("Integer", "1")
+           elif len(loop_control_node["children"]) == 4:
+              step = self.visit(loop_control_node["children"][3])
+
+           range_name_node = self.get_gromet_function_node("range")
+           iter_name_node = self.get_gromet_function_node("iter")
+           next_name_node = self.get_gromet_function_node("next")
+           generated_iter_name_node = self.variable_context.generate_iterator()
+           stop_condition_name_node = self.variable_context.generate_stop_condition()
+
+           # generated_iter_0 = iter(range(start, stop, step))
+           cast_loop.pre.append(Assignment(
+              left=Var(generated_iter_name_node, "Iterator"),
+              right=Call(iter_name_node,[Call(range_name_node, [start, stop, step])])
+              ))
            
-           # Left side is going to be an itterator
-           cast_assignment.left = Var()
-           cast_assignment.left.type = "iterator"
-           cast_assignment.left.val = Name()
-           cast_assignment.left.val.name = "generated_iter_0"
+           # (i, generated_iter_0, sc_0) = next(generated_iter_0)
+           cast_loop.pre.append(Assignment(
+              left=LiteralValue("Tuple", [itterator, Var(generated_iter_name_node, "Iterator"), Var(stop_condition_name_node, "Boolean")]),
+              right=Call(next_name_node, [Var(generated_iter_name_node, "Iterator")])
+           ))
 
-           cast_assignment.right = Call()
-           cast_assignment.right.arguments = []
-           cast_assignment.right.func = Name()
-           
+           # EXPR
+           cast_loop.expr = Operator(
+              op="!=", #TODO: Should this be == or !=
+              operands=[
+                Var(stop_condition_name_node, "Boolean"),
+                LiteralValue("Boolean", True),
+              ]
+           )
 
-           cast_loop.init = self.update_field(cast_loop.init, cast_assignment)
+           # BODY
+           # At this point, the body nodes have already been visited
+           # We just need to append the iterator next call
+           cast_loop.body.append(Assignment(
+              left=LiteralValue("Tuple", [itterator, Var(generated_iter_name_node, "Iterator"), Var(stop_condition_name_node, "Boolean")]),
+              right=Call(next_name_node, [Var(generated_iter_name_node, "Iterator")])
+           ))
 
-
-        case "while_statement":
-           while_expression = node["children"][1]["children"][1] # 1 because superflous nodes
-           cast_loop.expr = self.visit(while_expression)
-           # TODO: parenthesised expression handler
+           # POST
+           cast_loop.post.append(Assignment(
+              left=itterator,
+              right=Operator(
+                op="+", 
+                operands=[itterator , step]),
+              ) 
+           )
 
      return cast_loop
         
@@ -627,8 +675,8 @@ class TS2CAST(object):
 
     type_qualifiers = self.node_helper.get_children_by_type(node, "type_qualifier")
     identifiers = self.node_helper.get_children_by_type(node, "identifier")
-    assignment_statements = self.node_helper.get_children_by_type(node, "asignment_statement")
-
+    assignment_statements = self.node_helper.get_children_by_type(node, "assignment_statement")
+ 
     # We then need to determine if we are creating an array (dimension) or a single variable
     for type_qualifier in type_qualifiers:
        qualifier = type_qualifier["children"][0]["identifier"]
@@ -651,7 +699,7 @@ class TS2CAST(object):
     for assignment_statement in assignment_statements:
        cast_assignment = self.visit(assignment_statement)
        cast_assignment.left.type = intrinsic_type
-       self.variable_context.update_type(cast_assignment.left.name, intrinsic_type)
+       self.variable_context.update_type(cast_assignment.left.val.name, intrinsic_type)
 
        vars.append(cast_assignment)
 
@@ -756,6 +804,8 @@ class TS2CAST(object):
      
      return self.visit(node["children"][0])
   
+  def loop_helper_init(node):
+     pass
   def get_gromet_function_node(self, func_name:str) -> Name:
      node_dict = {
         "identifier": func_name,
@@ -780,5 +830,18 @@ class TS2CAST(object):
     
     return field
   
-walker = TS2CAST("test2.f95", "tree-sitter-fortran")
+def generate_dummy_source_refs(node: AstNode) -> None:
+    if not node.source_refs:
+      node.source_refs = [SourceRef("",-1,-1,-1,-1)]
+
+    for attribute_str in node.attribute_map:
+      attribute = getattr(node, attribute_str)
+      if isinstance(attribute, AstNode):
+          generate_dummy_source_refs(attribute)
+      elif isinstance(attribute, list):
+         for element in attribute:
+            if isinstance(element, AstNode):
+              generate_dummy_source_refs(element)
+
+walker = TS2CAST("loop.f95", "tree-sitter-fortran")
 
