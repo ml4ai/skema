@@ -1,8 +1,8 @@
 package org.ml4ai.skema.text_reading.apps
 
 import org.clulab.utils.Logging
-import org.ml4ai.skema.text_reading.CosmosTextReadingPipeline
 import org.ml4ai.skema.text_reading.utils.{ArgsConfig, CommandLineArgumentParser}
+import org.ml4ai.skema.text_reading.PlainTextFileTextReadingPipeline
 
 import scala.util.Using
 import scopt.OParser
@@ -10,13 +10,13 @@ import scopt.OParser
 import java.io.{File, FileOutputStream, PrintWriter}
 
 
-object AnnotateCosmosJsonFiles extends App with Logging{
+object AnnotatePlainTextFiles extends App with Logging{
 
-  val parser = CommandLineArgumentParser.buildParser("AnnotateCosmosJsonFiles")
+  val parser = CommandLineArgumentParser.buildParser("AnnotatePlainTextFiles")
 
   OParser.parse(parser, args, ArgsConfig()) match {
     case Some(config) =>
-      val textReadingPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
+      val textReadingPipeline = new PlainTextFileTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
 
       logger.info(s"Starting process with ${config.inputFiles} arguments")
 
@@ -28,19 +28,18 @@ object AnnotateCosmosJsonFiles extends App with Logging{
           else
             Seq(p)
         }
-
       }
 
       for{
         inputFile <- pathsToAnnotate.par
-        if inputFile.getName.endsWith(".json")
+        if inputFile.getName.endsWith(".txt")
       } {
 
         try {
           if(inputFile.exists()){
             val outputFile = new File(config.outDir, "extractions_" + inputFile.getName)
             logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
-            val jsonContents = textReadingPipeline.extractMentionsFromJsonAndSerialize(inputFile.getAbsolutePath)
+            val jsonContents = textReadingPipeline.extractMentionsFromTextFileAndSerialize(inputFile.getAbsolutePath)
             Using(new PrintWriter(new FileOutputStream(outputFile))) {
               writer =>
                 writer.write(jsonContents)
@@ -59,6 +58,7 @@ object AnnotateCosmosJsonFiles extends App with Logging{
 
       logger.info("Finished")
     case _ =>
-      // arguments are bad, error message will have been displayed
+    // arguments are bad, error message will have been displayed
   }
 }
+

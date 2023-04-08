@@ -13,7 +13,7 @@ import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
 import scala.collection.mutable.ArrayBuffer
 import scala.util.hashing.MurmurHash3.{finalizeHash, mix, stringHash, unorderedHash}
 
-object AutomatesJSONSerializer {
+object SkemaJSONSerializer {
 
   // This is a ujson adaptation of org.clulab.odin.serialization.json.JSONSerializer
 
@@ -359,7 +359,7 @@ object AutomatesJSONSerializer {
         "document" -> tb.document.equivalenceHash.toString,
         "keep" -> tb.keep,
         "foundBy" -> tb.foundBy,
-        "attachments" -> AutomatesJSONSerializer.toUJson(tb.attachments)
+        "attachments" -> SkemaJSONSerializer.toUJson(tb.attachments)
       )
     }
   }
@@ -375,7 +375,7 @@ object AutomatesJSONSerializer {
         "text" -> rm.text,
         "labels" -> rm.labels,
         "arguments" -> argsToUJson(rm.arguments),
-        "paths" -> AutomatesJSONSerializer.pathsAsUJson(rm.paths),
+        "paths" -> SkemaJSONSerializer.pathsAsUJson(rm.paths),
         "tokenInterval" -> Map("start" -> rm.tokenInterval.start, "end" -> rm.tokenInterval.end),
         "characterStartOffset" -> rm.startOffset,
         "characterEndOffset" -> rm.endOffset,
@@ -383,7 +383,7 @@ object AutomatesJSONSerializer {
         "document" -> rm.document.equivalenceHash.toString,
         "keep" -> rm.keep,
         "foundBy" -> rm.foundBy,
-        "attachments" -> AutomatesJSONSerializer.toUJson(rm.attachments)
+        "attachments" -> SkemaJSONSerializer.toUJson(rm.attachments)
       )
     }
   }
@@ -398,7 +398,7 @@ object AutomatesJSONSerializer {
         "labels" -> em.labels,
         "trigger" -> AutomatesTextBoundMentionOps(em.trigger).toUJson,
         "arguments" -> argsToUJson(em.arguments),
-        "paths" -> AutomatesJSONSerializer.pathsAsUJson(em.paths),
+        "paths" -> SkemaJSONSerializer.pathsAsUJson(em.paths),
         "tokenInterval" -> Map("start" -> em.tokenInterval.start, "end" -> em.tokenInterval.end),
         "characterStartOffset" -> em.startOffset,
         "characterEndOffset" -> em.endOffset,
@@ -406,7 +406,7 @@ object AutomatesJSONSerializer {
         "document" -> em.document.equivalenceHash.toString,
         "keep" -> em.keep,
         "foundBy" -> em.foundBy,
-        "attachments" -> AutomatesJSONSerializer.toUJson(em.attachments)
+        "attachments" -> SkemaJSONSerializer.toUJson(em.attachments)
       )
     }
   }
@@ -461,7 +461,7 @@ object AutomatesJSONSerializer {
         "labels" -> cm.labels,
         "trigger" -> AutomatesTextBoundMentionOps(cm.trigger).toUJson,
         "arguments" -> argsToUJson(cm.arguments),
-        "paths" -> AutomatesJSONSerializer.pathsAsUJson(cm.paths),
+        "paths" -> SkemaJSONSerializer.pathsAsUJson(cm.paths),
         "tokenInterval" -> Map("start" -> cm.tokenInterval.start, "end" -> cm.tokenInterval.end),
         "characterStartOffset" -> cm.startOffset,
         "characterEndOffset" -> cm.endOffset,
@@ -470,7 +470,7 @@ object AutomatesJSONSerializer {
         "document" -> cm.document.equivalenceHash.toString,
         "keep" -> cm.keep,
         "foundBy" -> cm.foundBy,
-        "attachments" -> AutomatesJSONSerializer.toUJson(cm.attachments)
+        "attachments" -> SkemaJSONSerializer.toUJson(cm.attachments)
       )
     }
   }

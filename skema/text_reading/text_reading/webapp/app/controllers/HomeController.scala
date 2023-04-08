@@ -27,7 +27,7 @@ import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
 import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, SVOGrounder, WikidataGrounder}
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
-import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
 import org.slf4j.{Logger, LoggerFactory}
 import ujson.json4s.Json4sJson
@@ -84,7 +84,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
 
 
-  private val cosmosPipeline = new CosmosTextReadingPipeline
+  private val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
 
 
   logger.info("Completed Initialization ...")
@@ -146,7 +146,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val mentionsFile = new File(mentionsPath)
 
     val ujsonOfMenFile = ujson.read(mentionsFile)
-    val defMentions = AutomatesJSONSerializer.toMentions(ujsonOfMenFile).filter(m => m.label contains "Description")
+    val defMentions = SkemaJSONSerializer.toMentions(ujsonOfMenFile).filter(m => m.label contains "Description")
     val glVars = WikidataGrounder.mentionsToGlobalVarsWithWikidataGroundings(defMentions)
 
     Ok(glVars).as(JSON)
