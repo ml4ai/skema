@@ -51,7 +51,7 @@ class LinearOrderer(ms:Iterable[Mention]) extends MentionOrderer{
     */
   override def resolveLinearOrder(m: Mention): Int = {
     val thisMention = getMentionCosmosLocations(m)
-    val offset = offsets((thisMention.pageNum.head, thisMention.blockIdx.head)) // TODO: Make these scalars, not arrays
+    val offset = offsets((thisMention.pageNum.head, thisMention.blockIdx.head, m.sentence)) // TODO: Make these scalars, not arrays
     offset + m.sentence
   }
 }
