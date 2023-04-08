@@ -7,6 +7,7 @@ import org.ml4ai.skema.text_reading.grounding.MiraEmbeddingsGrounder
 import org.scalatest.OptionValues._
 
 import scala.language.reflectiveCalls
+import scala.collection.JavaConverters._
 
 class TestMiraEmbeddingsGrounder extends Test {
 
@@ -15,11 +16,13 @@ class TestMiraEmbeddingsGrounder extends Test {
 
   val miraEmbeddingsGrounder: MiraEmbeddingsGrounder = {
     val config = ConfigFactory.load().getConfig("Grounding")
-    val ontologyPath = config.getString("ontologyPath")
+    val domainConfig = config.getConfig(config.getString("domain"))
+    val ontologyPath = domainConfig.getString("ontologyPath")
+    val relevantNamespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
     // val embeddingsPath = config.getString("embeddingsPath")
 
     // Set alpha to 1.0 to bypass the edit distance algo for now
-    MiraEmbeddingsGrounder(ontologyPath, None, 10, 1.0f)
+    MiraEmbeddingsGrounder(ontologyPath, None, 10, 1.0f, relevantNamespaces)
   }
 
   def correctGrounding(shouldable: Shouldable, text: String, groundingID: String): Unit = {

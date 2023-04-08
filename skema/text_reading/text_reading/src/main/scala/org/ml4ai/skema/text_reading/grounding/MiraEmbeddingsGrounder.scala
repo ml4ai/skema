@@ -107,23 +107,17 @@ object MiraEmbeddingsGrounder{
   }
 
 
-  def filterRelevantTerms(terms:IndexedSeq[GroundingConcept]): IndexedSeq[GroundingConcept] = {
-    
-    val relevantPrefixes = Set(
-      "vo",
-      "trans",
-      "apollosv",
-      "ncit",
-      "cemo",
-      "covoc"
-    )
-
-    terms filter {
-      term => {
-        val prefix = term.id.split(":").head
-        relevantPrefixes contains prefix
+  def filterRelevantTerms(terms:IndexedSeq[GroundingConcept], relevantNamespaces:Set[String]): IndexedSeq[GroundingConcept] = {
+    if(relevantNamespaces.nonEmpty){
+      terms filter {
+        term => {
+          val prefix = term.id.split(":").head
+          relevantNamespaces contains prefix
+        }
       }
     }
+    else
+      terms
   }
 
   /**
@@ -153,7 +147,7 @@ object MiraEmbeddingsGrounder{
    * @param ontologyFile file containing the json file with MIRA concepts
    * @param wordEmbeddingsFile file containing the word embedding model
    */
-  def apply(ontologyPath: String, wordEmbeddingsFile:Option[File] = None, lambda : Float, alpha : Float): MiraEmbeddingsGrounder = {
+  def apply(ontologyPath: String, wordEmbeddingsFile:Option[File] = None, lambda : Float, alpha : Float, relevantNamespaces:Set[String]): MiraEmbeddingsGrounder = {
 
     val embeddingsModel = wordEmbeddingsFile match {
       case Some(file) => loadWordEmbeddingsFromTextFile(file)
@@ -168,7 +162,7 @@ object MiraEmbeddingsGrounder{
       else {
         // If this was not ser, assume it is json
         val json = FileUtils.getTextFromResource(ontologyPath)
-        val ontology = filterRelevantTerms(parseMiraJson(json))
+        val ontology = filterRelevantTerms(parseMiraJson(json), relevantNamespaces)
 
         val ontologyWithEmbeddings = createOntologyEmbeddings(ontology, embeddingsModel, lambda)
 //        val newFileName = ontologyPath.getAbsolutePath + ".ser"

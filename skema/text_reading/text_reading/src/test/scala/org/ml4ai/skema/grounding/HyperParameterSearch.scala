@@ -7,6 +7,7 @@ import org.clulab.utils.FileUtils
 import org.ml4ai.skema.text_reading.grounding.MiraEmbeddingsGrounder
 
 import scala.collection.immutable.ListMap
+import scala.collection.JavaConverters._
 
 /** *
   * HyperParameterSearch : generic, bruteforce Hyper parameter search using breeze (numpy style) calculations.
@@ -28,9 +29,11 @@ object HyperParameterSearch extends App {
   def getAccuracyForThisHyperParams(lambda: Float, alpha: Float, path: String): Float = {
     val miraEmbeddingsGrounderGS: MiraEmbeddingsGrounder = {
       val config = ConfigFactory.load().getConfig("Grounding")
-      val ontologyPath = config.getString("ontologyPath")
-      // val embeddingsPath = config.getString("embeddingsPath")
-      MiraEmbeddingsGrounder(ontologyPath, None, lambda, alpha)
+      val domainConfig = config.getConfig(config.getString("domain"))
+      val ontologyPath = domainConfig.getString("ontologyPath")
+      val relevantNamespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
+      // val embeddingsPath = domainConfig.getString("embeddingsPath")
+      MiraEmbeddingsGrounder(ontologyPath, None, lambda, alpha, relevantNamespaces)
     }
 
     val targets = {

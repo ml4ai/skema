@@ -2,25 +2,30 @@ package org.ml4ai.skema.text_reading.grounding
 
 import com.typesafe.config.Config
 import org.clulab.processors.fastnlp.FastNLPProcessor
+import scala.collection.JavaConverters._
 
 object GrounderFactory {
   def getInstance(config: Config, chosenEngine: Option[String] = None): Grounder = {
     val engine = chosenEngine getOrElse config.getString("engine")
     val prependManualGrounder = config.getBoolean("forceManualGroundings")
-    lazy val manualGrounder = buildManualGrounder(config)
+    val domain = config.getString("domain")
+    val domainConfig = config.getConfig(domain)
+
+    lazy val manualGrounder = buildManualGrounder(domainConfig)
     // Grounding parameters
     engine.toLowerCase match {
         case "miraembeddings" =>
-          val ontologyFilePath = config.getString("ontologyPath")
-          val lambda = config.getInt("lambda")
-          val alpha = config.getDouble("alpha").toFloat
-          val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda, alpha)
+          val ontologyFilePath = domainConfig.getString("ontologyPath")
+          val lambda = domainConfig.getInt("lambda")
+          val alpha = domainConfig.getDouble("alpha").toFloat
+          val namespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
+          val grounder = MiraEmbeddingsGrounder(ontologyFilePath, None, lambda, alpha, namespaces)
           if(prependManualGrounder)
             new PipelineGrounder(Seq(manualGrounder, grounder))
           else
             grounder
         case "mirawebapi" =>
-          val endpoint = config.getString("apiEndpoint")
+          val endpoint = domainConfig.getString("apiEndpoint")
           val grounder = new MiraWebApiGrounder(endpoint)
           if (prependManualGrounder)
             new PipelineGrounder(Seq(manualGrounder, grounder))
