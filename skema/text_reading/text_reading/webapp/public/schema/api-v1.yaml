@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: SKEMA API
-  version: "1.0.0"
+  version: "1.0.1"
   description: RESTful API exposing functionality of the SKEMA project
   contact:
     name: Clayton T. Morrison
@@ -56,8 +56,57 @@ paths:
                   items:
                     $ref: "#/components/schemas/GroundingCandidate"
 
+  /runTextReadingPipelineWithContext:
+    post:
+      tags:
+        - "grounding"
+      summary: |
+        run the text reading pipeline with context
+      description: |
+        run the text reading pipeline with context
+      parameters:
+        - name: contextWindowSize
+          in: query
+          description: the window size for the context
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 3
+      requestBody:
+        description: an array of texts, each probably one or more sentences, perhaps entire documents
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              description: one text, probably at least a sentence if not an entire document
+              items:
+                type: string
+              example: |
+                [
+                  "Far out in the uncharted backwaters of the unfashionable end of the western spiral arm of the Galaxy lies a small, unregarded yellow sun.",
+                  "It was a bright cold day in April, and the clocks were striking thirteen.",
+                  "The year 1866 was signalized by a remarkable incident, a mysterious and inexplicable phenomenon, which doubtless no one has yet forgotten."
+                ]
+      responses:
+        '200':
+          description: output for successful run of the text reading pipeline for the input texts
+          content:
+            application/json:
+              schema:
+                type: array
+                description: for each of the input texts, output from the text reading pipeline
+                items:
+                  type: array
+                  description: output from the text reading pipeline for a single text
+                  items:
+                    $ref: "#/components/schemas/Annotation"
+
 components:
   schemas:
+    Annotation:
+      type: string
     GroundingCandidate:
         type: object
         description: a ranked list of k grounding concepts
