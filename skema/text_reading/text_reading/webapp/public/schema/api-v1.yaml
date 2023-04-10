@@ -61,45 +61,52 @@ paths:
       tags:
         - "grounding"
       summary: |
-        summary
+        run the text reading pipeline with context
       description: |
-        description
+        run the text reading pipeline with context
       parameters:
         - name: contextWindowSize
           in: query
-          description: description
+          description: the window size for the context
           required: false
           schema:
             type: integer
             format: int32
             default: 3
       requestBody:
-        description: description
+        description: an array of texts, each probably one or more sentences, perhaps entire documents
         required: true
         content:
           application/json:
             schema:
               type: array
-              description: description
+              description: one text, probably at least a sentence if not an entire document
               items:
                 type: string
-              example: [ "document 1", "document 2", "document 3"]
+              example: |
+                [
+                  "Far out in the uncharted backwaters of the unfashionable end of the western spiral arm of the Galaxy lies a small, unregarded yellow sun.",
+                  "It was a bright cold day in April, and the clocks were striking thirteen.",
+                  "The year 1866 was signalized by a remarkable incident, a mysterious and inexplicable phenomenon, which doubtless no one has yet forgotten."
+                ]
       responses:
         '200':
-          description: the top-k groundings for the texts
+          description: output for successful run of the text reading pipeline for the input texts
           content:
             application/json:
               schema:
                 type: array
-                description: one element for each line of text
+                description: for each of the input texts, output from the text reading pipeline
                 items:
                   type: array
-                  description: one element for each k of the top-k groundings
+                  description: output from the text reading pipeline for a single text
                   items:
-                    $ref: "#/components/schemas/GroundingCandidate"
+                    $ref: "#/components/schemas/Annotation"
 
 components:
   schemas:
+    Annotation:
+      type: string
     GroundingCandidate:
         type: object
         description: a ranked list of k grounding concepts
