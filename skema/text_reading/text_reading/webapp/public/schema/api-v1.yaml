@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: SKEMA API
-  version: "1.0.0"
+  version: "1.0.1"
   description: RESTful API exposing functionality of the SKEMA project
   contact:
     name: Clayton T. Morrison
@@ -42,6 +42,48 @@ paths:
                 one
                 two
                 three
+      responses:
+        '200':
+          description: the top-k groundings for the texts
+          content:
+            application/json:
+              schema:
+                type: array
+                description: one element for each line of text
+                items:
+                  type: array
+                  description: one element for each k of the top-k groundings
+                  items:
+                    $ref: "#/components/schemas/GroundingCandidate"
+
+  /runTextReadingPipelineWithContext:
+    post:
+      tags:
+        - "grounding"
+      summary: |
+        summary
+      description: |
+        description
+      parameters:
+        - name: contextWindowSize
+          in: query
+          description: description
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 3
+      requestBody:
+        description: description
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              description: description
+              items:
+                type: string
+              example: [ "document 1", "document 2", "document 3"]
       responses:
         '200':
           description: the top-k groundings for the texts
