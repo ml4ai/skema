@@ -1,18 +1,17 @@
 package org.ml4ai.skema.text_reading.apps
 
-import org.clulab.utils.Logging
-import org.ml4ai.skema.text_reading.utils.{ArgsConfig, CommandLineArgumentParser}
+import org.clulab.utils.{FileUtils, Logging}
 import org.ml4ai.skema.text_reading.PlainTextFileTextReadingPipeline
-
-import scala.util.Using
+import org.ml4ai.skema.text_reading.utils.{ArgsConfig, CommandLineArgumentParser}
 import scopt.OParser
 
-import java.io.{File, FileOutputStream, PrintWriter}
+import java.io.File
+import scala.util.Using
 
 
 object AnnotatePlainTextFiles extends App with Logging{
 
-  val parser = CommandLineArgumentParser.buildParser("AnnotatePlainTextFiles")
+  val parser = CommandLineArgumentParser.buildParser(getClass.getSimpleName.dropRight(1))
 
   OParser.parse(parser, args, ArgsConfig()) match {
     case Some(config) =>
@@ -40,11 +39,9 @@ object AnnotatePlainTextFiles extends App with Logging{
             val outputFile = new File(config.outDir, "extractions_" + inputFile.getName)
             logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
             val jsonContents = textReadingPipeline.extractMentionsFromTextFileAndSerialize(inputFile.getAbsolutePath)
-            Using(new PrintWriter(new FileOutputStream(outputFile))) {
-              writer =>
-                writer.write(jsonContents)
-                writer.close()
-                logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
+            Using(FileUtils.printWriterFromFile(outputFile)) { printWriter =>
+              printWriter.println(jsonContents)
+              logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
             }
           }
           else

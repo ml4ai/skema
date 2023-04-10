@@ -1,6 +1,7 @@
 package org.ml4ai.skema.text_reading
 
 import org.clulab.odin.Mention
+import org.clulab.utils.FileUtils
 import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, CosmosOrderer, SentenceIndexOrderer}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
@@ -17,27 +18,17 @@ class PlainTextFileTextReadingPipeline(contextWindowSize:Int) extends TextReadin
     * @return Mentions extracted by the TR textReadingPipeline
     */
   def extractMentionsFromTextFile(filePath:String):Seq[Mention] = {
-    val fileContents =
-      Using(Source.fromFile(filePath)){
-        source =>
-          source.mkString
-      }
+    val text = FileUtils.getTextFromFile(filePath)
 
-    fileContents match {
-      case Success(text) =>
-        logger.info(s"Starting annotation of $filePath")
-        val fileName = new File(filePath).getName
-        val mentions = this.extractMentions(text, Some(fileName))._2  // TODO Make this a case class for legibility
+    logger.info(s"Starting annotation of $filePath")
+    val fileName = new File(filePath).getName
+    val mentions = this.extractMentions(text, Some(fileName))._2  // TODO Make this a case class for legibility
 
-        // Resolve scenario context
-        val scenarioContextEngine = new ContextEngine(windowSize = contextWindowSize, mentions, SentenceIndexOrderer)
-        val mentionsWithScenarioContext = mentions map scenarioContextEngine.resolveContext
-        logger.info(s"Finished annotation of $filePath")
-        mentionsWithScenarioContext
-      case Failure(exception) =>
-        logger.error(s"Failed to read the contents of $filePath\t-\t$exception")
-        Seq.empty
-    }
+    // Resolve scenario context
+    val scenarioContextEngine = new ContextEngine(windowSize = contextWindowSize, mentions, SentenceIndexOrderer)
+    val mentionsWithScenarioContext = mentions map scenarioContextEngine.resolveContext
+    logger.info(s"Finished annotation of $filePath")
+    mentionsWithScenarioContext
   }
 
   /**

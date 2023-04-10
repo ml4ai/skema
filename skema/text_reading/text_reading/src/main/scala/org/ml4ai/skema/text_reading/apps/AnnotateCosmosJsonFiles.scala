@@ -1,6 +1,6 @@
 package org.ml4ai.skema.text_reading.apps
 
-import org.clulab.utils.Logging
+import org.clulab.utils.{FileUtils, Logging}
 import org.ml4ai.skema.text_reading.CosmosTextReadingPipeline
 import org.ml4ai.skema.text_reading.utils.{ArgsConfig, CommandLineArgumentParser}
 
@@ -12,7 +12,7 @@ import java.io.{File, FileOutputStream, PrintWriter}
 
 object AnnotateCosmosJsonFiles extends App with Logging{
 
-  val parser = CommandLineArgumentParser.buildParser("AnnotateCosmosJsonFiles")
+  val parser = CommandLineArgumentParser.buildParser(getClass.getSimpleName.dropRight(1))
 
   OParser.parse(parser, args, ArgsConfig()) match {
     case Some(config) =>
@@ -41,11 +41,9 @@ object AnnotateCosmosJsonFiles extends App with Logging{
             val outputFile = new File(config.outDir, "extractions_" + inputFile.getName)
             logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
             val jsonContents = textReadingPipeline.extractMentionsFromJsonAndSerialize(inputFile.getAbsolutePath)
-            Using(new PrintWriter(new FileOutputStream(outputFile))) {
-              writer =>
-                writer.write(jsonContents)
-                writer.close()
-                logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
+            Using(FileUtils.printWriterFromFile(outputFile)) { printWriter =>
+              printWriter.println(jsonContents)
+              logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
             }
           }
           else
