@@ -8,13 +8,13 @@ import org.clulab.pdf2txt.preprocessor._
 import org.ml4ai.skema.text_reading.attachments.MentionLocationAttachment
 import org.ml4ai.skema.text_reading.data.CosmosJsonDataLoader
 import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, CosmosOrderer, SentenceIndexOrderer}
-import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
 import scala.collection.mutable.ArrayBuffer
 
 
 
-class CosmosTextReadingPipeline extends TextReadingPipeline {
+class CosmosTextReadingPipeline(contextWindowSize:Int) extends TextReadingPipeline {
 
   // PDF converted to fix pdf tokenization artifacts
   private val pdfConverter = new TextConverter()
@@ -53,7 +53,7 @@ class CosmosTextReadingPipeline extends TextReadingPipeline {
     val textsAndFilenames = textsAndLocations.map(_.split(jsonSeparator).slice(0, 2).mkString(jsonSeparator))
     val locations = textsAndLocations.map(_.split(jsonSeparator).takeRight(2).mkString(jsonSeparator)) //location = pageNum::blockIdx
 
-    logger.info("started extracting")
+    logger.info(s"Started annotation of $jsonPath")
     // extract mentions form each text block
     val mentions = for (tf <- textsAndFilenames) yield {
       val Array(rawText, filename) = tf.split(jsonSeparator)
@@ -85,8 +85,9 @@ class CosmosTextReadingPipeline extends TextReadingPipeline {
 
     // Resolve scenario context
     val cosmosOrderer = new CosmosOrderer(mentionsWithLocations)
-    val scenarioContextEngine = new ContextEngine(windowSize = 3, mentionsWithLocations, cosmosOrderer)
+    val scenarioContextEngine = new ContextEngine(windowSize = contextWindowSize, mentionsWithLocations, cosmosOrderer)
     val mentionsWithScenarioContext = mentionsWithLocations map scenarioContextEngine.resolveContext
+    logger.info(s"Finished annotation of $jsonPath")
     mentionsWithScenarioContext
   }
 
@@ -95,5 +96,5 @@ class CosmosTextReadingPipeline extends TextReadingPipeline {
     * @param jsonPath Path to the json file to annotate
     * @return string with the json representation of the extractions and the document annotations
     */
-  def extractMentionsFromJsonAndSerialize(jsonPath: String): String = ujson.write(AutomatesJSONSerializer.serializeMentions(this.extractMentionsFromCosmosJson(jsonPath)))
+  def extractMentionsFromJsonAndSerialize(jsonPath: String): String = ujson.write(SkemaJSONSerializer.serializeMentions(this.extractMentionsFromCosmosJson(jsonPath)))
 }

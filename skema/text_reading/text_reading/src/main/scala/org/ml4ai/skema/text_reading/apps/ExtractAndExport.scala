@@ -14,7 +14,7 @@ import org.ml4ai.skema.text_reading.attachments.{AutomatesAttachment, MentionLoc
 import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, DataLoader, TextRouter}
 import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
-import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{DisplayUtils, MentionUtils}
 
 import scala.collection.mutable.ArrayBuffer
@@ -178,7 +178,7 @@ case class JSONExporter(filename: String) extends Exporter {
 
 case class AutomatesExporter(filename: String) extends Exporter {
   override def export(mentions: Seq[Mention]): Unit = {
-    val serialized = ujson.write(AutomatesJSONSerializer.serializeMentions(mentions))
+    val serialized = ujson.write(SkemaJSONSerializer.serializeMentions(mentions))
     //    val groundingsJson4s = json4s.jackson.prettyJson(json4s.jackson.parseJson(serialized))
     val file = new File(filename)
     val bw = new BufferedWriter(new FileWriter(file))
