@@ -4,23 +4,25 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET     /                           controllers.HomeController.index
-GET     /parseSentence              controllers.HomeController.parseSentence(sent: String, showEverything: Boolean)
-GET     /getMentions                controllers.HomeController.getMentions(text: String)
-POST    /groundStringToSVO          controllers.HomeController.groundStringToSVO
-POST    /groundStringsToMira        controllers.HomeController.groundStringsToMira(k: Int)
-POST    /groundMentionsToSVO        controllers.HomeController.groundMentionsToSVO
-POST    /groundMentionsToWikidata   controllers.HomeController.groundMentionsToWikidata
-POST    /process_text               controllers.HomeController.process_text
-POST    /pdf_to_mentions            controllers.HomeController.pdf_to_mentions
-POST    /align                      controllers.HomeController.align
-POST    /json_doc_to_mentions       controllers.HomeController.json_doc_to_mentions
-POST    /cosmos_json_to_mentions    controllers.HomeController.cosmos_json_to_mentions
-POST    /alignMentionsFromTwoModels controllers.HomeController.alignMentionsFromTwoModels
+GET     /                                  controllers.HomeController.index
+GET     /parseSentence                     controllers.HomeController.parseSentence(sent: String, showEverything: Boolean)
+GET     /getMentions                       controllers.HomeController.getMentions(text: String)
+POST    /groundStringToSVO                 controllers.HomeController.groundStringToSVO
+POST    /groundMentionsToSVO               controllers.HomeController.groundMentionsToSVO
+POST    /groundMentionsToWikidata          controllers.HomeController.groundMentionsToWikidata
+POST    /process_text                      controllers.HomeController.process_text
+POST    /pdf_to_mentions                   controllers.HomeController.pdf_to_mentions
+POST    /align                             controllers.HomeController.align
+POST    /json_doc_to_mentions              controllers.HomeController.json_doc_to_mentions
+POST    /cosmos_json_to_mentions           controllers.HomeController.cosmos_json_to_mentions
+POST    /alignMentionsFromTwoModels        controllers.HomeController.alignMentionsFromTwoModels
 
-GET     /api/skema                  controllers.HomeController.openAPI(version = "v1")
-GET     /api/skema/:version         controllers.HomeController.openAPI(version: String)
+POST    /groundStringsToMira               controllers.HomeController.groundStringsToMira(k: Int)
+POST    /runTextReadingPipelineWithContext controllers.HomeController.runTextReadingPipelineWithContext(contextWindowSize: Int = 3)
+
+GET     /api/skema                         controllers.HomeController.openAPI(version = "v1")
+GET     /api/skema/:version                controllers.HomeController.openAPI(version: String)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /favicon.ico                controllers.Assets.at(file="/images/favicon.ico")
-GET     /assets/*file               controllers.Assets.at(file)
+GET     /favicon.ico                       controllers.Assets.at(file="/images/favicon.ico")
+GET     /assets/*file                      controllers.Assets.at(file)
