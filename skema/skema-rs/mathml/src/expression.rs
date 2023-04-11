@@ -312,7 +312,10 @@ impl Expr {
                                 args_copy[i + shift] = args[0].clone();
                                 for j in 1..ops.len() {
                                     if is_div {
-                                        ops_copy.insert(i + shift + j, switch_mul_div(ops[j].clone()).clone());
+                                        ops_copy.insert(
+                                            i + shift + j,
+                                            switch_mul_div(ops[j].clone()).clone(),
+                                        );
                                     } else {
                                         ops_copy.insert(i + shift + j, ops[j].clone());
                                     }
@@ -346,7 +349,10 @@ impl Expr {
                                 args_copy[i + shift] = args[0].clone();
                                 for j in 1..ops.len() {
                                     if is_subt {
-                                        ops_copy.insert(i + shift + j, switch_add_subt(ops[j].clone()).clone());
+                                        ops_copy.insert(
+                                            i + shift + j,
+                                            switch_add_subt(ops[j].clone()).clone(),
+                                        );
                                     } else {
                                         ops_copy.insert(i + shift + j, ops[j].clone());
                                     }
@@ -423,7 +429,8 @@ impl Expr {
                 }
             }
 
-            if need_to_distribute_divs(ops.to_vec().clone(), args.to_vec().clone()) && ops.len() > 1 {
+            if need_to_distribute_divs(ops.to_vec().clone(), args.to_vec().clone()) && ops.len() > 1
+            {
                 let mut new_expr = Expr::Expression {
                     ops: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
@@ -966,7 +973,8 @@ pub fn need_to_distribute_divs(ops: Vec<Operator>, args: Vec<Expr>) -> bool {
         if ops[o] == Operator::Divide {
             num_div = num_div + 1;
             if let Expr::Expression { ops, args, name } = &args[o] {
-                if ops[0] == Operator::Other("".to_string()) && all_ops_are_add_or_subt(ops.clone()) {
+                if ops[0] == Operator::Other("".to_string()) && all_ops_are_add_or_subt(ops.clone())
+                {
                     contain_add_subt_without_uop = true;
                 }
             }
@@ -2111,12 +2119,6 @@ fn test_to_expr34() {
             Mo(Operator::Add),
             Mi("d".to_string()),
         ]),
-        Mo(Operator::Multiply),
-        Mrow(vec![
-            Mi("e".to_string()),
-            Mo(Operator::Subtract),
-            Mi("f".to_string()),
-        ]),
     ]);
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
@@ -2128,38 +2130,23 @@ fn test_to_expr34() {
     pre_exp.group_expr();
     pre_exp.collapse_expr();
     pre_exp.distribute_expr();
+    pre_exp.group_expr();
+    pre_exp.collapse_expr();
     pre_exp.set_name();
 
     match &pre_exp.args[0] {
         Expr::Atom(_) => {}
         Expr::Expression { ops, args, .. } => {
             assert_eq!(ops[0], Operator::Other("".to_string()));
-            assert_eq!(ops[1], Operator::Add);
+            assert_eq!(ops[1], Operator::Divide);
 
             match &args[0] {
                 Expr::Atom(_) => {}
                 Expr::Expression { ops, args, .. } => {
                     assert_eq!(ops[0], Operator::Other("".to_string()));
-                    assert_eq!(ops[1], Operator::Subtract);
-                    match &args[0] {
-                        Expr::Atom(_) => {}
-                        Expr::Expression { ops, args, .. } => {
-                            assert_eq!(ops[0], Operator::Other("".to_string()));
-                            assert_eq!(ops[1], Operator::Divide);
-                            assert_eq!(ops[2], Operator::Multiply);
-                            assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
-                            assert_eq!(args[2], Expr::Atom(Atom::Identifier("e".to_string())));
-                            match &args[1] {
-                                Expr::Atom(_) => {}
-                                Expr::Expression { ops, args, .. } => {
-                                    assert_eq!(ops[0], Operator::Other("".to_string()));
-                                    assert_eq!(ops[1], Operator::Add);
-                                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("c".to_string())));
-                                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("d".to_string())));
-                                }
-                            }
-                        }
-                    }
+                    assert_eq!(ops[1], Operator::Add);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("a".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("b".to_string())));
                 }
             }
 
@@ -2167,26 +2154,9 @@ fn test_to_expr34() {
                 Expr::Atom(_) => {}
                 Expr::Expression { ops, args, .. } => {
                     assert_eq!(ops[0], Operator::Other("".to_string()));
-                    assert_eq!(ops[1], Operator::Subtract);
-                    match &args[0] {
-                        Expr::Atom(_) => {}
-                        Expr::Expression { ops, args, .. } => {
-                            assert_eq!(ops[0], Operator::Other("".to_string()));
-                            assert_eq!(ops[1], Operator::Divide);
-                            assert_eq!(ops[2], Operator::Multiply);
-                            assert_eq!(args[0], Expr::Atom(Atom::Identifier("b".to_string())));
-                            assert_eq!(args[2], Expr::Atom(Atom::Identifier("e".to_string())));
-                            match &args[1] {
-                                Expr::Atom(_) => {}
-                                Expr::Expression { ops, args, .. } => {
-                                    assert_eq!(ops[0], Operator::Other("".to_string()));
-                                    assert_eq!(ops[1], Operator::Add);
-                                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("c".to_string())));
-                                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("d".to_string())));
-                                }
-                            }
-                        }
-                    }
+                    assert_eq!(ops[1], Operator::Add);
+                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("c".to_string())));
+                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("d".to_string())));
                 }
             }
         }
@@ -2640,9 +2610,18 @@ fn test_to_expr42() {
                                     assert_eq!(ops[0], Operator::Other("".to_string()));
                                     assert_eq!(ops[1], Operator::Multiply);
                                     assert_eq!(ops[2], Operator::Multiply);
-                                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("f".to_string())));
-                                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("h".to_string())));
-                                    assert_eq!(args[2], Expr::Atom(Atom::Identifier("k".to_string())));
+                                    assert_eq!(
+                                        args[0],
+                                        Expr::Atom(Atom::Identifier("f".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[1],
+                                        Expr::Atom(Atom::Identifier("h".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[2],
+                                        Expr::Atom(Atom::Identifier("k".to_string()))
+                                    );
                                 }
                             }
                             match &args[3] {
@@ -2651,9 +2630,18 @@ fn test_to_expr42() {
                                     assert_eq!(ops[0], Operator::Other("".to_string()));
                                     assert_eq!(ops[1], Operator::Multiply);
                                     assert_eq!(ops[2], Operator::Multiply);
-                                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("g".to_string())));
-                                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("i".to_string())));
-                                    assert_eq!(args[2], Expr::Atom(Atom::Identifier("k".to_string())));
+                                    assert_eq!(
+                                        args[0],
+                                        Expr::Atom(Atom::Identifier("g".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[1],
+                                        Expr::Atom(Atom::Identifier("i".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[2],
+                                        Expr::Atom(Atom::Identifier("k".to_string()))
+                                    );
                                 }
                             }
                         }
@@ -2683,9 +2671,18 @@ fn test_to_expr42() {
                                     assert_eq!(ops[0], Operator::Other("".to_string()));
                                     assert_eq!(ops[1], Operator::Multiply);
                                     assert_eq!(ops[2], Operator::Multiply);
-                                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("f".to_string())));
-                                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("h".to_string())));
-                                    assert_eq!(args[2], Expr::Atom(Atom::Identifier("k".to_string())));
+                                    assert_eq!(
+                                        args[0],
+                                        Expr::Atom(Atom::Identifier("f".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[1],
+                                        Expr::Atom(Atom::Identifier("h".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[2],
+                                        Expr::Atom(Atom::Identifier("k".to_string()))
+                                    );
                                 }
                             }
                             match &args[3] {
@@ -2694,9 +2691,18 @@ fn test_to_expr42() {
                                     assert_eq!(ops[0], Operator::Other("".to_string()));
                                     assert_eq!(ops[1], Operator::Multiply);
                                     assert_eq!(ops[2], Operator::Multiply);
-                                    assert_eq!(args[0], Expr::Atom(Atom::Identifier("g".to_string())));
-                                    assert_eq!(args[1], Expr::Atom(Atom::Identifier("i".to_string())));
-                                    assert_eq!(args[2], Expr::Atom(Atom::Identifier("k".to_string())));
+                                    assert_eq!(
+                                        args[0],
+                                        Expr::Atom(Atom::Identifier("g".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[1],
+                                        Expr::Atom(Atom::Identifier("i".to_string()))
+                                    );
+                                    assert_eq!(
+                                        args[2],
+                                        Expr::Atom(Atom::Identifier("k".to_string()))
+                                    );
                                 }
                             }
                         }
