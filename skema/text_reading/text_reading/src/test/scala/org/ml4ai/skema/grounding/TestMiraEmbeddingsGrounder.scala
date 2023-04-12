@@ -19,10 +19,10 @@ class TestMiraEmbeddingsGrounder extends Test {
     val domainConfig = config.getConfig(config.getString("domain"))
     val ontologyPath = domainConfig.getString("ontologyPath")
     val relevantNamespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
-    // val embeddingsPath = config.getString("embeddingsPath")
+     val embeddingsPath = config.getString("embeddingsPath")
 
     // Set alpha to 1.0 to bypass the edit distance algo for now
-    MiraEmbeddingsGrounder(ontologyPath, None, 10, 1.0f, relevantNamespaces)
+    MiraEmbeddingsGrounder(ontologyPath, embeddingsPath, 10, 1.0f, relevantNamespaces)
   }
 
   def correctGrounding(shouldable: Shouldable, text: String, groundingID: String): Unit = {

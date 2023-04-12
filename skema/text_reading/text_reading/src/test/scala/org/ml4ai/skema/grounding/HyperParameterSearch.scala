@@ -32,8 +32,8 @@ object HyperParameterSearch extends App {
       val domainConfig = config.getConfig(config.getString("domain"))
       val ontologyPath = domainConfig.getString("ontologyPath")
       val relevantNamespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
-      // val embeddingsPath = domainConfig.getString("embeddingsPath")
-      MiraEmbeddingsGrounder(ontologyPath, None, lambda, alpha, relevantNamespaces)
+      val embeddingsPath = domainConfig.getString("embeddingsPath")
+      MiraEmbeddingsGrounder(ontologyPath, embeddingsPath, lambda, alpha, relevantNamespaces)
     }
 
     val targets = {

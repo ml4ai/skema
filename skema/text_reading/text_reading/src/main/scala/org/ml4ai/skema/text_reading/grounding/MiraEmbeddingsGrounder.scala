@@ -17,7 +17,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
   /**
    * Returns an ordered sequence with the top k grounding candidates for the input
    *
-   * @param text of the extraction to be grounded
+   * @param texts of the extraction to be grounded
    * @param k    number of max candidates to return
    * @return ranked list with the top k candidates
    */
@@ -147,12 +147,9 @@ object MiraEmbeddingsGrounder{
    * @param ontologyFile file containing the json file with MIRA concepts
    * @param wordEmbeddingsFile file containing the word embedding model
    */
-  def apply(ontologyPath: String, wordEmbeddingsFile:Option[File] = None, lambda : Float, alpha : Float, relevantNamespaces:Set[String]): MiraEmbeddingsGrounder = {
+  def apply(ontologyPath: String, embeddingsModelResourcePath:String, lambda : Float, alpha : Float, relevantNamespaces:Set[String]): MiraEmbeddingsGrounder = {
 
-    val embeddingsModel = wordEmbeddingsFile match {
-      case Some(file) => loadWordEmbeddingsFromTextFile(file)
-      case None => loadWordEmbeddingsFromResource("/org/clulab/epimodel/model_streamed_trigram.ser")
-    }
+    val embeddingsModel = loadWordEmbeddingsFromResource(embeddingsModelResourcePath)
 
     val ontology =
       if(ontologyPath.endsWith(".ser")){
