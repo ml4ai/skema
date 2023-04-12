@@ -1,4 +1,4 @@
-## Incremental Structral Alignment (ISA)
+## Incremental Structural Alignment (ISA)
 
 Run the following command to launch the ISA server program:
 
