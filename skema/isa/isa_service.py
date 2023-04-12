@@ -25,8 +25,16 @@ async def align_eqns(file1: str, file2: str) -> ISA_Result:
     """
     Endpoint for align two MathML equations.
     """
-    matching_ratio, num_diff_edges, node_labels1, node_labels2, aligned_indices1, aligned_indices2, union_graph, perfectly_matched_indices1 = align_mathml_eqs(
-        file1, file2)
+    (
+        matching_ratio,
+        num_diff_edges,
+        node_labels1,
+        node_labels2,
+        aligned_indices1,
+        aligned_indices2,
+        union_graph,
+        perfectly_matched_indices1,
+    ) = align_mathml_eqs(file1, file2)
     ir = ISA_Result()
     ir.matching_ratio = matching_ratio
     ir.union_graph = union_graph.to_string()
