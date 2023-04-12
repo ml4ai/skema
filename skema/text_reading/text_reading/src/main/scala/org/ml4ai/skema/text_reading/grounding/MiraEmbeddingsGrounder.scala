@@ -157,7 +157,7 @@ object MiraEmbeddingsGrounder{
 
     val embeddingsModel = wordEmbeddingsFile match {
       case Some(file) => loadWordEmbeddingsFromTextFile(file)
-      case None => loadWordEmbeddingsFromResource("/org/clulab/epimodel/model_streamed_trigram.ser")
+      case None => loadWordEmbeddingsFromResource("/org/clulab/epimodel/epidemiology_embeddings_model.ser")
     }
 
     val ontology =
