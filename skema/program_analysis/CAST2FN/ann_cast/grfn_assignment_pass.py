@@ -15,6 +15,7 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
 from skema.program_analysis.CAST2FN.model.cast import (
     ScalarType,
+    StructureType,
     ValueConstructor,
 )
 
@@ -79,7 +80,7 @@ class GrfnAssignmentPass:
         # is made by assigning to a tuple of values, as opposed to one singular value
         assert (
             isinstance(node.left, AnnCastVar)
-            or isinstance(node.left, AnnCastTuple)
+            or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
             or isinstance(node.left, AnnCastAttribute)
         ), f"container_scope: visit_assigment: node.left is not AnnCastVar or AnnCastTuple it is {type(node.left)}"
         self.visit(node.left, node.grfn_assignment.outputs)
@@ -98,20 +99,6 @@ class GrfnAssignmentPass:
 
     @_visit.register
     def visit_attribute(self, node: AnnCastAttribute, add_to: typing.Dict):
-        pass
-
-    """
-    @_visit.register
-    def visit_binary_op(self, node: AnnCastBinaryOp, add_to: typing.Dict):
-        # visit LHS first
-        self.visit(node.left, add_to)
-
-        # visit RHS second
-        self.visit(node.right, add_to)
-    """
-
-    @_visit.register
-    def visit_boolean(self, node: AnnCastBoolean, add_to: typing.Dict):
         pass
 
     @_visit.register
@@ -200,14 +187,6 @@ class GrfnAssignmentPass:
         pass
 
     @_visit.register
-    def visit_dict(self, node: AnnCastDict, add_to: typing.Dict):
-        pass
-
-    @_visit.register
-    def visit_expr(self, node: AnnCastExpr, add_to: typing.Dict):
-        self.visit(node.expr, add_to)
-
-    @_visit.register
     def visit_function_def(
         self, node: AnnCastFunctionDef, add_to: typing.Dict
     ):
@@ -233,6 +212,8 @@ class GrfnAssignmentPass:
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
 
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            self.visit_node_list(node.value, add_to)
         elif node.value_type == ScalarType.INTEGER:
             pass
         elif node.value_type == ScalarType.ABSTRACTFLOAT:
@@ -240,14 +221,11 @@ class GrfnAssignmentPass:
         pass
 
     @_visit.register
-    def visit_list(self, node: AnnCastList, add_to: typing.Dict):
-        self.visit_node_list(node.values, add_to)
-
-    @_visit.register
     def visit_loop(self, node: AnnCastLoop, add_to: typing.Dict):
-        self.visit_node_list(node.init, add_to)
+        self.visit_node_list(node.pre, add_to)
         self.visit(node.expr, add_to)
         self.visit_node_list(node.body, add_to)
+        self.visit_node_list(node.post, add_to)
 
     @_visit.register
     def visit_model_break(self, node: AnnCastModelBreak, add_to: typing.Dict):
@@ -326,30 +304,12 @@ class GrfnAssignmentPass:
         self.visit_node_list(node.operands, add_to)
 
     @_visit.register
-    def visit_number(self, node: AnnCastNumber, add_to: typing.Dict):
-        pass
-
-    @_visit.register
     def visit_set(self, node: AnnCastSet, add_to: typing.Dict):
-        pass
-
-    @_visit.register
-    def visit_string(self, node: AnnCastString, add_to: typing.Dict):
-        pass
-
-    @_visit.register
-    def visit_subscript(self, node: AnnCastSubscript, add_to: typing.Dict):
         pass
 
     @_visit.register
     def visit_tuple(self, node: AnnCastTuple, add_to: typing.Dict):
         self.visit_node_list(node.values, add_to)
-
-    """
-    @_visit.register
-    def visit_unary_op(self, node: AnnCastUnaryOp, add_to: typing.Dict):
-        self.visit(node.value, add_to)
-    """
 
     @_visit.register
     def visit_var(self, node: AnnCastVar, add_to: typing.Dict):

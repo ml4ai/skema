@@ -5,12 +5,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    Boolean,
     Call,
-    Dict,
-    Expr,
     FunctionDef,
-    List,
     LiteralValue,
     Loop,
     ModelBreak,
@@ -19,13 +15,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelReturn,
     Module,
     Name,
-    Number,
     Operator,
     RecordDef,
-    Set,
-    String,
-    Subscript,
-    Tuple,
     Var,
 )
 
@@ -264,50 +255,6 @@ class AnnCastAttribute(AnnCastNode):
     def __str__(self):
         return Attribute.__str__(self)
 
-"""
-class AnnCastBinaryOp(AnnCastNode):
-    def __init__(self, op, left, right, source_refs):
-        super().__init__(self)
-        self.op = op
-        self.left = left
-        self.right = right
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        result["op"] = str(self.op)
-        result["left"] = self.left.to_dict()
-        result["right"] = self.right.to_dict()
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastBinaryOp):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return BinaryOp.__str__(self)
-"""
-
-class AnnCastBoolean(AnnCastNode):
-    def __init__(self, boolean, source_refs):
-        super().__init__(self)
-        self.boolean = boolean
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        result["boolean"] = self.boolean
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastBoolean):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return Boolean.__str__(self)
-
 
 class AnnCastCall(AnnCastNode):
     def __init__(self, func, arguments, source_refs):
@@ -378,48 +325,6 @@ class AnnCastCall(AnnCastNode):
 
     def __str__(self):
         return Call.__str__(self)
-
-
-class AnnCastDict(AnnCastNode):
-    def __init__(self, keys, values, source_refs):
-        super().__init__(self)
-        self.keys = keys
-        self.values = values
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        # FUTURE: add keys and values to result
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastDict):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return Dict.__str__(self)
-
-
-class AnnCastExpr(AnnCastNode):
-    def __init__(self, expr, source_refs):
-        super().__init__(self)
-        self.expr = expr
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        result["expr"] = self.expr.to_dict()
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastExpr):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return Expr.__str__(self)
-
 
 class AnnCastFunctionDef(AnnCastNode):
     def __init__(self, name, func_args, body, source_refs):
@@ -501,28 +406,6 @@ class AnnCastFunctionDef(AnnCastNode):
     def __str__(self):
         return FunctionDef.__str__(self)
 
-
-class AnnCastList(AnnCastNode):
-    def __init__(self, values, source_refs):
-        super().__init__(self)
-        self.values = values
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        # FUTURE: add values to result
-        # result["values"] = [val.to_dict() for val in self.values]
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastList):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return List.__str__(self)
-
-
 class AnnCastRecordDef(AnnCastNode):
     def __init__(self, name, bases, funcs, fields, source_refs):
         super().__init__(self)
@@ -568,11 +451,12 @@ class AnnCastLiteralValue(AnnCastNode):
 
 
 class AnnCastLoop(AnnCastNode):
-    def __init__(self, init, expr, body, source_refs):
+    def __init__(self, pre, expr, body, post, source_refs):
         super().__init__(self)
-        self.init = init
+        self.pre = pre
         self.expr = expr
         self.body = body
+        self.post = post
         self.source_refs = source_refs
 
         # Loop container scope
@@ -590,9 +474,10 @@ class AnnCastLoop(AnnCastNode):
         self.bot_interface_vars: typing.Dict[int, str] = {}
 
         # dicts mapping Name id to highest version at end of "block"
-        self.init_highest_var_vers = {}
+        self.pre_highest_var_vers = {}
         self.expr_highest_var_vers = {}
         self.body_highest_var_vers = {}
+        self.post_highest_var_vers = {}
 
         # dicts mapping a Name id to variable string name
         # for variables used in the Loop expr
@@ -856,26 +741,6 @@ class AnnCastName(AnnCastNode):
     def __str__(self):
         return Name.__str__(self)
 
-
-class AnnCastNumber(AnnCastNode):
-    def __init__(self, number, source_refs):
-        super().__init__(self)
-        self.number = number
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        result["number"] = self.number
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastNumber):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return Number.__str__(self)
-
 class AnnCastOperator(AnnCastNode):
     def __init__(self, source_language, interpreter, version, op, operands, source_refs):
         super().__init__(self)
@@ -924,47 +789,6 @@ class AnnCastSet(AnnCastNode):
         return Set.__str__(self)
 
 
-class AnnCastString(AnnCastNode):
-    def __init__(self, string, source_refs):
-        super().__init__(self)
-        self.string = string
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        result["string"] = self.string
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastString):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return String.__str__(self)
-
-
-class AnnCastSubscript(AnnCastNode):
-    def __init__(self, value, slice, source_refs):
-        super().__init__(self)
-        self.value = value
-        self.slice = slice
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        # FUTURE: add value and slice to result
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastSubscript):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return Subscript.__str__(self)
-
-
 class AnnCastTuple(AnnCastNode):
     def __init__(self, values, source_refs):
         super().__init__(self)
@@ -983,29 +807,6 @@ class AnnCastTuple(AnnCastNode):
 
     def __str__(self):
         return Tuple.__str__(self)
-
-
-"""
-class AnnCastUnaryOp(AnnCastNode):
-    def __init__(self, op, value, source_refs):
-        super().__init__(self)
-        self.op = op
-        self.value = value
-        self.source_refs = source_refs
-
-    def to_dict(self):
-        result = super().to_dict()
-        result["op"] = str(self.op)
-        return result
-
-    def equiv(self, other):
-        if not isinstance(other, AnnCastUnaryOp):
-            return False
-        return self.to_dict() == other.to_dict()
-
-    def __str__(self):
-        return UnaryOp.__str__(self)
-"""
 
 
 class AnnCastVar(AnnCastNode):

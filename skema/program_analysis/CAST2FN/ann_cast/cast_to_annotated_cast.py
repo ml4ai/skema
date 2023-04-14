@@ -7,12 +7,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    Boolean,
     Call,
-    Dict,
-    Expr,
     FunctionDef,
-    List,
     LiteralValue,
     Loop,
     ModelBreak,
@@ -21,17 +17,13 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelReturn,
     Module,
     Name,
-    Number,
     RecordDef,
     ScalarType,
-    Set,
-    String,
-    Subscript,
-    Tuple,
     Var,
 )
 
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2FN.model.cast.structure_type import StructureType
 
 
 class CASTTypeError(TypeError):
@@ -94,14 +86,7 @@ class CastToAnnotatedCastVisitor:
     def visit_operator(self, node: Operator):
         operands = self.visit_node_list(node.operands)
         return AnnCastOperator(node.source_language, node.interpreter, node.version, node.op, operands, node.source_refs)
-
-    @_visit.register
-    def visit_boolean(self, node: Boolean):
-        boolean = node.boolean
-        if boolean is not None:
-            boolean = self.visit(boolean)
-        return AnnCastBoolean(boolean, node.source_refs)
-
+        
     @_visit.register
     def visit_call(self, node: Call):
         func = self.visit(node.func)
@@ -117,30 +102,14 @@ class CastToAnnotatedCastVisitor:
         return AnnCastRecordDef(
             node.name, bases, funcs, fields, node.source_refs
         )
-
-    @_visit.register
-    def visit_dict(self, node: Dict):
-        keys = self.visit_node_list(node.keys)
-        values = self.visit_node_list(node.values)
-        return AnnCastDict(keys, values, node.source_refs)
-
-    @_visit.register
-    def visit_expr(self, node: Expr):
-        expr = self.visit(node.expr)
-        return AnnCastExpr(expr, node.source_refs)
-
+        
     @_visit.register
     def visit_function_def(self, node: FunctionDef):
         name = node.name
         args = self.visit_node_list(node.func_args)
         body = self.visit_node_list(node.body)
         return AnnCastFunctionDef(name, args, body, node.source_refs)
-
-    @_visit.register
-    def visit_list(self, node: List):
-        values = self.visit_node_list(node.values)
-        return AnnCastList(values, node.source_refs)
-
+        
     @_visit.register
     def visit_literal_value(self, node: LiteralValue):
         if node.value_type == "List[Any]":
@@ -156,6 +125,14 @@ class CastToAnnotatedCastVisitor:
                 node.source_code_data_type,
                 node.source_refs,
             )
+        elif node.value_type == StructureType.TUPLE:
+            values = self.visit_node_list(node.value)
+            return AnnCastLiteralValue(
+                node.value_type,
+                values,
+                node.source_code_data_type,
+                node.source_refs,
+            )
         return AnnCastLiteralValue(
             node.value_type,
             node.value,
@@ -165,13 +142,17 @@ class CastToAnnotatedCastVisitor:
 
     @_visit.register
     def visit_loop(self, node: Loop):
-        if node.init != None:
-            init = self.visit_node_list(node.init)
+        if node.pre != None:
+            pre = self.visit_node_list(node.pre)
         else:
-            init = []
+            pre = []
+        if node.post != None and len(node.post) > 0:
+            post = self.visit_node_list(node.post)
+        else:   
+            post = []
         expr = self.visit(node.expr)
         body = self.visit_node_list(node.body)
-        return AnnCastLoop(init, expr, body, node.source_refs)
+        return AnnCastLoop(pre, expr, body, post, node.source_refs)
 
     @_visit.register
     def visit_model_break(self, node: ModelBreak):
@@ -205,30 +186,6 @@ class CastToAnnotatedCastVisitor:
     @_visit.register
     def visit_name(self, node: Name):
         return AnnCastName(node.name, node.id, node.source_refs)
-
-    @_visit.register
-    def visit_number(self, node: Number):
-        return AnnCastNumber(node.number, node.source_refs)
-
-    @_visit.register
-    def visit_set(self, node: Set):
-        values = self.visit_node_list(node.values)
-        return AnnCastSet(values, node.source_refs)
-
-    @_visit.register
-    def visit_string(self, node: String):
-        return AnnCastString(node.string, node.source_refs)
-
-    @_visit.register
-    def visit_subscript(self, node: Subscript):
-        value = self.visit(node.value)
-        slice = self.visit(node.slice)
-        return AnnCastSubscript(value, slice, node.source_refs)
-
-    @_visit.register
-    def visit_tuple(self, node: Tuple):
-        values = self.visit_node_list(node.values)
-        return AnnCastTuple(values, node.source_refs)
 
     @_visit.register
     def visit_var(self, node: Var):

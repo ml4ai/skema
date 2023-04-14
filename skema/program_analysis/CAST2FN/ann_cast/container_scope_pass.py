@@ -9,9 +9,10 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     ELSEBODY,
     IFBODY,
     IFEXPR,
-    LOOPINIT,
+    LOOPPRE,
     LOOPBODY,
     LOOPEXPR,
+    LOOPPOST,
     MODULE_SCOPE,
     GrfnContainerSrcRef,
     call_container_name,
@@ -24,6 +25,7 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
 from skema.program_analysis.CAST2FN.model.cast import (
     ScalarType,
+    StructureType,
     ValueConstructor,
 )
 
@@ -294,7 +296,7 @@ class ContainerScopePass:
         # is made by assigning to a tuple of values, as opposed to one singular value
         assert (
             isinstance(node.left, AnnCastVar)
-            or isinstance(node.left, AnnCastTuple)
+            or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
             or isinstance(node.left, AnnCastAttribute)
         ), f"container_scope: visit_assigment: node.left is {type(node.left)}"
         left_src_ref = self.visit(
@@ -315,38 +317,7 @@ class ContainerScopePass:
         self.visit(
             node.value, base_func_scopestr, enclosing_con_scope, assign_side
         )
-
-    """
-    @_visit.register
-    def visit_binary_op(
-        self,
-        node: AnnCastBinaryOp,
-        base_func_scopestr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        # visit LHS first
-        left_src_ref = self.visit(
-            node.left, base_func_scopestr, enclosing_con_scope, assign_side
-        )
-
-        # visit RHS second
-        right_src_ref = self.visit(
-            node.right, base_func_scopestr, enclosing_con_scope, assign_side
-        )
-        return combine_grfn_con_src_refs([right_src_ref, left_src_ref])
-    """
-
-    @_visit.register
-    def visit_boolean(
-        self,
-        node: AnnCastBoolean,
-        base_func_scopestr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        pass
-
+        
     @_visit.register
     def visit_call(
         self,
@@ -469,22 +440,6 @@ class ContainerScopePass:
         return combine_grfn_con_src_refs([funcs_src_ref, fields_src_ref])
 
     @_visit.register
-    def visit_dict(self, node: AnnCastDict, assign_side):
-        pass
-
-    @_visit.register
-    def visit_expr(
-        self,
-        node: AnnCastExpr,
-        base_func_scopestr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        return self.visit(
-            node.expr, base_func_scopestr, enclosing_con_scope, assign_side
-        )
-
-    @_visit.register
     def visit_function_def(
         self,
         node: AnnCastFunctionDef,
@@ -532,18 +487,6 @@ class ContainerScopePass:
         return combine_grfn_con_src_refs([args_src_ref, body_src_ref])
 
     @_visit.register
-    def visit_list(
-        self,
-        node: AnnCastList,
-        base_func_scopestr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        return self.visit_node_list(
-            node.values, base_func_scopestr, enclosing_con_scope, assign_side
-        )
-
-    @_visit.register
     def visit_literal_value(
         self,
         node: AnnCastLiteralValue,
@@ -565,7 +508,8 @@ class ContainerScopePass:
 
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
-
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            self.visit_node_list(node.value, base_func_scopestr, enclosing_con_scope, assign_side)
         elif node.value_type == ScalarType.INTEGER:
             pass
         elif node.value_type == ScalarType.ABSTRACTFLOAT:
@@ -594,12 +538,12 @@ class ContainerScopePass:
         self.initialize_con_scope_data(loopscope, node)
         node.con_scope = loopscope
 
-        if len(node.init) > 0:
-            # Additional modifications to support the loop init body
-            loopinitscope = loopscope + [LOOPINIT]
+        if len(node.pre) > 0:
+            # Additional modifications to support the loop post body
+            loopprescope = loopscope + [LOOPPRE]
             # self.initialize_con_scope_data(loopinitscope, node)
             init_src_ref = self.visit_node_list(
-                node.init, base_func_scopestr, loopinitscope, assign_side
+                node.pre, base_func_scopestr, loopprescope, assign_side
             )
 
         # we store an additional ContainerData for the loop expression, but
@@ -615,10 +559,26 @@ class ContainerScopePass:
             node.body, base_func_scopestr, loopbodyscope, assign_side
         )
 
+        if len(node.post) > 0:
+            # Additional modifications to support the loop post body
+            looppostscope = loopscope + [LOOPPOST]
+            # self.initialize_con_scope_data(loopinitscope, node)
+            post_src_ref = self.visit_node_list(
+                node.post, base_func_scopestr, looppostscope, assign_side
+            )
+
         # store GrfnContainerSrcRef for this loop
-        if len(node.init) > 0:
+        if len(node.pre) > 0 and len(node.post) > 0:
+            node.grfn_con_src_ref = combine_grfn_con_src_refs(
+                [init_src_ref, expr_src_ref, body_src_ref, post_src_ref]
+            )
+        elif len(node.pre) > 0:
             node.grfn_con_src_ref = combine_grfn_con_src_refs(
                 [init_src_ref, expr_src_ref, body_src_ref]
+            )
+        elif len(node.post) > 0:
+            node.grfn_con_src_ref = combine_grfn_con_src_refs(
+                [expr_src_ref, body_src_ref, post_src_ref]
             )
         else:
             node.grfn_con_src_ref = combine_grfn_con_src_refs(
@@ -795,16 +755,6 @@ class ContainerScopePass:
                 con_data.used_vars[node.id] = node.name
 
     @_visit.register
-    def visit_number(
-        self,
-        node: AnnCastNumber,
-        base_func_scopestr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        pass
-
-    @_visit.register
     def visit_operator(self, node: AnnCastOperator, 
         base_func_scopestr,
         enclosing_con_scope,
@@ -834,26 +784,6 @@ class ContainerScopePass:
         pass
 
     @_visit.register
-    def visit_string(
-        self,
-        node: AnnCastString,
-        base_func_scopestr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        pass
-
-    @_visit.register
-    def visit_subscript(
-        self,
-        node: AnnCastSubscript,
-        base_func_scoptr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        pass
-
-    @_visit.register
     def visit_tuple(
         self,
         node: AnnCastTuple,
@@ -864,20 +794,6 @@ class ContainerScopePass:
         self.visit_node_list(
             node.values, base_func_scopestr, enclosing_con_scope, assign_side
         )
-
-    """
-    @_visit.register
-    def visit_unary_op(
-        self,
-        node: AnnCastUnaryOp,
-        base_func_scopestr,
-        enclosing_con_scope,
-        assign_side,
-    ):
-        return self.visit(
-            node.value, base_func_scopestr, enclosing_con_scope, assign_side
-        )
-    """
 
     @_visit.register
     def visit_var(

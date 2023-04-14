@@ -29,29 +29,59 @@ class LiteralValue(object):
     """
     swagger_types = {
         'value_type': 'str',
-        'value': 'object'
+        'value': 'object',
+        'source_fn': 'int',
+        'import_type': 'ImportType',
+        'import_version': 'str',
+        'import_source': 'TypedValue',
+        'source_language': 'str',
+        'source_language_version': 'str'
     }
 
     attribute_map = {
         'value_type': 'value_type',
-        'value': 'value'
+        'value': 'value',
+        'source_fn': 'source_fn',
+        'import_type': 'import_type',
+        'import_version': 'import_version',
+        'import_source': 'import_source',
+        'source_language': 'source_language',
+        'source_language_version': 'source_language_version'
     }
 
-    def __init__(self, value_type=None, value=None):  # noqa: E501
+    def __init__(self, value_type=None, value=None, source_fn=None, import_type=None, import_version=None, import_source=None, source_language=None, source_language_version=None):  # noqa: E501
         """LiteralValue - a model defined in Swagger"""  # noqa: E501
         self._value_type = None
         self._value = None
+        self._source_fn = None
+        self._import_type = None
+        self._import_version = None
+        self._import_source = None
+        self._source_language = None
+        self._source_language_version = None
         self.discriminator = None
         if value_type is not None:
             self.value_type = value_type
         if value is not None:
             self.value = value
+        if source_fn is not None:
+            self.source_fn = source_fn
+        if import_type is not None:
+            self.import_type = import_type
+        if import_version is not None:
+            self.import_version = import_version
+        if import_source is not None:
+            self.import_source = import_source
+        if source_language is not None:
+            self.source_language = source_language
+        if source_language_version is not None:
+            self.source_language_version = source_language_version
 
     @property
     def value_type(self):
         """Gets the value_type of this LiteralValue.  # noqa: E501
 
-        The type of the value  # noqa: E501
+        The type of the value.   # noqa: E501
 
         :return: The value_type of this LiteralValue.  # noqa: E501
         :rtype: str
@@ -62,7 +92,7 @@ class LiteralValue(object):
     def value_type(self, value_type):
         """Sets the value_type of this LiteralValue.
 
-        The type of the value  # noqa: E501
+        The type of the value.   # noqa: E501
 
         :param value_type: The value_type of this LiteralValue.  # noqa: E501
         :type: str
@@ -92,6 +122,140 @@ class LiteralValue(object):
         """
 
         self._value = value
+
+    @property
+    def source_fn(self):
+        """Gets the source_fn of this LiteralValue.  # noqa: E501
+
+        Integer representing index into the fn_array   # noqa: E501
+
+        :return: The source_fn of this LiteralValue.  # noqa: E501
+        :rtype: int
+        """
+        return self._source_fn
+
+    @source_fn.setter
+    def source_fn(self, source_fn):
+        """Sets the source_fn of this LiteralValue.
+
+        Integer representing index into the fn_array   # noqa: E501
+
+        :param source_fn: The source_fn of this LiteralValue.  # noqa: E501
+        :type: int
+        """
+
+        self._source_fn = source_fn
+
+    @property
+    def import_type(self):
+        """Gets the import_type of this LiteralValue.  # noqa: E501
+
+
+        :return: The import_type of this LiteralValue.  # noqa: E501
+        :rtype: ImportType
+        """
+        return self._import_type
+
+    @import_type.setter
+    def import_type(self, import_type):
+        """Sets the import_type of this LiteralValue.
+
+
+        :param import_type: The import_type of this LiteralValue.  # noqa: E501
+        :type: ImportType
+        """
+
+        self._import_type = import_type
+
+    @property
+    def import_version(self):
+        """Gets the import_version of this LiteralValue.  # noqa: E501
+
+        When value_type is \"literal_function_imported\": the version of the resource being imported (e.g., \"Numpy 1.23.0\")   # noqa: E501
+
+        :return: The import_version of this LiteralValue.  # noqa: E501
+        :rtype: str
+        """
+        return self._import_version
+
+    @import_version.setter
+    def import_version(self, import_version):
+        """Sets the import_version of this LiteralValue.
+
+        When value_type is \"literal_function_imported\": the version of the resource being imported (e.g., \"Numpy 1.23.0\")   # noqa: E501
+
+        :param import_version: The import_version of this LiteralValue.  # noqa: E501
+        :type: str
+        """
+
+        self._import_version = import_version
+
+    @property
+    def import_source(self):
+        """Gets the import_source of this LiteralValue.  # noqa: E501
+
+
+        :return: The import_source of this LiteralValue.  # noqa: E501
+        :rtype: TypedValue
+        """
+        return self._import_source
+
+    @import_source.setter
+    def import_source(self, import_source):
+        """Sets the import_source of this LiteralValue.
+
+
+        :param import_source: The import_source of this LiteralValue.  # noqa: E501
+        :type: TypedValue
+        """
+
+        self._import_source = import_source
+
+    @property
+    def source_language(self):
+        """Gets the source_language of this LiteralValue.  # noqa: E501
+
+        When function_type is SOURCE or IMPORTED: The source language base name (e.g., \"Python\", \"C\", \"Fortran\")   # noqa: E501
+
+        :return: The source_language of this LiteralValue.  # noqa: E501
+        :rtype: str
+        """
+        return self._source_language
+
+    @source_language.setter
+    def source_language(self, source_language):
+        """Sets the source_language of this LiteralValue.
+
+        When function_type is SOURCE or IMPORTED: The source language base name (e.g., \"Python\", \"C\", \"Fortran\")   # noqa: E501
+
+        :param source_language: The source_language of this LiteralValue.  # noqa: E501
+        :type: str
+        """
+
+        self._source_language = source_language
+
+    @property
+    def source_language_version(self):
+        """Gets the source_language_version of this LiteralValue.  # noqa: E501
+
+        When function_type is SOURCE or IMPORTED: The version of the source language (e.g., \"3.10.9\")   # noqa: E501
+
+        :return: The source_language_version of this LiteralValue.  # noqa: E501
+        :rtype: str
+        """
+        return self._source_language_version
+
+    @source_language_version.setter
+    def source_language_version(self, source_language_version):
+        """Sets the source_language_version of this LiteralValue.
+
+        When function_type is SOURCE or IMPORTED: The version of the source language (e.g., \"3.10.9\")   # noqa: E501
+
+        :param source_language_version: The source_language_version of this LiteralValue.  # noqa: E501
+        :type: str
+        """
+
+        self._source_language_version = source_language_version
 
     def to_dict(self):
         """Returns the model properties as a dict"""

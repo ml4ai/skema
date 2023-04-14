@@ -8,9 +8,10 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     IFBODY,
     IFEXPR,
     LOOP_VAR_UPDATED_VERSION,
-    LOOPINIT,
+    LOOPPRE,
     LOOPBODY,
     LOOPEXPR,
+    LOOPPOST,
     VAR_EXIT_VERSION,
     VAR_INIT_VERSION,
     add_metadata_from_name_node,
@@ -28,6 +29,7 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
 from skema.program_analysis.CAST2FN.model.cast import (
     ScalarType,
+    StructureType,
     ValueConstructor,
 )
 
@@ -391,7 +393,7 @@ class GrfnVarCreationPass:
         updated_version = LOOP_VAR_UPDATED_VERSION
         for id, var_name in node.modified_vars.items():
             init_version = node.init_highest_var_vers[id]
-            init_scopestr = con_scopestr + CON_STR_SEP + LOOPINIT
+            init_scopestr = con_scopestr + CON_STR_SEP + LOOPPRE
             init_fullid = build_fullid(
                 var_name, id, init_version, init_scopestr
             )
@@ -489,27 +491,13 @@ class GrfnVarCreationPass:
         # is made by assigning to a tuple of values, as opposed to one singular value
         assert (
             isinstance(node.left, AnnCastVar)
-            or isinstance(node.left, AnnCastTuple)
+            or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
             or isinstance(node.left, AnnCastAttribute)
         ), f"container_scope: visit_assigment: node.left is not AnnCastVar or AnnCastTuple it is {type(node.left)}"
         self.visit(node.left)
 
     @_visit.register
     def visit_attribute(self, node: AnnCastAttribute):
-        pass
-
-    """
-    @_visit.register
-    def visit_binary_op(self, node: AnnCastBinaryOp):
-        # visit LHS first
-        self.visit(node.left)
-
-        # visit RHS second
-        self.visit(node.right)
-    """
-
-    @_visit.register
-    def visit_boolean(self, node: AnnCastBoolean):
         pass
 
     @_visit.register
@@ -533,14 +521,6 @@ class GrfnVarCreationPass:
     def visit_record_def(self, node: AnnCastRecordDef):
         pass
 
-    @_visit.register
-    def visit_dict(self, node: AnnCastDict):
-        pass
-
-    @_visit.register
-    def visit_expr(self, node: AnnCastExpr):
-        self.visit(node.expr)
-
     def visit_function_def_copy(self, node: AnnCastFunctionDef):
         self.visit_node_list(node.func_args)
         self.visit_node_list(node.body)
@@ -549,10 +529,6 @@ class GrfnVarCreationPass:
     def visit_function_def(self, node: AnnCastFunctionDef):
         self.visit_node_list(node.func_args)
         self.visit_node_list(node.body)
-
-    @_visit.register
-    def visit_list(self, node: AnnCastList):
-        self.visit_node_list(node.values)
 
     @_visit.register
     def visit_literal_value(self, node: AnnCastLiteralValue):
@@ -569,6 +545,8 @@ class GrfnVarCreationPass:
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
 
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            self.visit_node_list(node.value)
         elif node.value_type == ScalarType.INTEGER:
             pass
         elif node.value_type == ScalarType.ABSTRACTFLOAT:
@@ -583,11 +561,16 @@ class GrfnVarCreationPass:
         self.alias_loop_expr_highest_vers(node)
         self.alias_loop_body_highest_vers(node)
         # visit children
-        if len(node.init) > 0:
-            self.visit_node_list(node.init)
+        if len(node.pre) > 0:
+            self.visit_node_list(node.pre)
+
         self.visit(node.expr)
         self.setup_loop_condition(node)
         self.visit_node_list(node.body)
+        
+        # NOTE: might need to alias loop post
+        if len(node.post) > 0:
+            self.visit_node_list(node.post)
 
     @_visit.register
     def visit_model_break(self, node: AnnCastModelBreak):
@@ -652,30 +635,13 @@ class GrfnVarCreationPass:
         self.visit_node_list(node.operands)
 
     @_visit.register
-    def visit_number(self, node: AnnCastNumber):
-        pass
-
-    @_visit.register
     def visit_set(self, node: AnnCastSet):
-        pass
-
-    @_visit.register
-    def visit_string(self, node: AnnCastString):
-        pass
-
-    @_visit.register
-    def visit_subscript(self, node: AnnCastSubscript):
         pass
 
     @_visit.register
     def visit_tuple(self, node: AnnCastTuple):
         self.visit_node_list(node.values)
 
-    """
-    @_visit.register
-    def visit_unary_op(self, node: AnnCastUnaryOp):
-        self.visit(node.value)
-    """
     @_visit.register
     def visit_var(self, node: AnnCastVar):
         self.visit(node.val)

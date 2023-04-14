@@ -274,20 +274,6 @@ class ToGrfnPass:
     def visit_attribute(self, node: AnnCastAttribute, subgraph: GrFNSubgraph):
         pass
 
-    """
-    @_visit.register
-    def visit_binary_op(self, node: AnnCastBinaryOp, subgraph: GrFNSubgraph):
-        # visit LHS first
-        self.visit(node.left, subgraph)
-
-        # visit RHS second
-        self.visit(node.right, subgraph)
-    """
-
-    @_visit.register
-    def visit_boolean(self, node: AnnCastBoolean, subgraph: GrFNSubgraph):
-        pass
-
     @_visit.register
     def visit_call(self, node: AnnCastCall, subgraph: GrFNSubgraph):
         if node.is_grfn_2_2:
@@ -453,14 +439,6 @@ class ToGrfnPass:
     def visit_record_def(self, node: AnnCastRecordDef, subgraph: GrFNSubgraph):
         pass
 
-    @_visit.register
-    def visit_dict(self, node: AnnCastDict, subgraph: GrFNSubgraph):
-        pass
-
-    @_visit.register
-    def visit_expr(self, node: AnnCastExpr, subgraph: GrFNSubgraph):
-        self.visit(node.expr, subgraph)
-
     def visit_function_def_copy(
         self, node: AnnCastFunctionDef, subgraph: GrFNSubgraph
     ):
@@ -566,10 +544,6 @@ class ToGrfnPass:
         self, node: AnnCastLiteralValue, subgraph: GrFNSubgraph
     ):
         pass
-
-    @_visit.register
-    def visit_list(self, node: AnnCastList, subgraph: GrFNSubgraph):
-        self.visit_node_list(node.values, subgraph)
 
     @_visit.register
     def visit_loop(self, node: AnnCastLoop, subgraph: GrFNSubgraph):
@@ -811,30 +785,12 @@ class ToGrfnPass:
         pass
 
     @_visit.register
-    def visit_number(self, node: AnnCastNumber, subgraph: GrFNSubgraph):
-        pass
-
-    @_visit.register
     def visit_set(self, node: AnnCastSet, subgraph: GrFNSubgraph):
-        pass
-
-    @_visit.register
-    def visit_string(self, node: AnnCastString, subgraph: GrFNSubgraph):
-        pass
-
-    @_visit.register
-    def visit_subscript(self, node: AnnCastSubscript, subgraph: GrFNSubgraph):
         pass
 
     @_visit.register
     def visit_tuple(self, node: AnnCastTuple, subgraph: GrFNSubgraph):
         self.visit_node_list(node.values, subgraph)
-
-    """
-    @_visit.register
-    def visit_unary_op(self, node: AnnCastUnaryOp, subgraph: GrFNSubgraph):
-        self.visit(node.value, subgraph)
-    """
 
     @_visit.register
     def visit_var(self, node: AnnCastVar, subgraph: GrFNSubgraph):

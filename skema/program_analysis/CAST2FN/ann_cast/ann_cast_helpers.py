@@ -36,8 +36,9 @@ FULLID_SEP = ":"
 LOOPBODY = "loop-body"
 ELSEBODY = "else-body"
 IFBODY = "if-body"
-LOOPINIT = "loop-init"
+LOOPPRE = "loop-pre"
 LOOPEXPR = "loop-expr"
+LOOPPOST = "loop-post"
 IFEXPR = "if-expr"
 
 MODULE_SCOPE = "module"
@@ -385,7 +386,8 @@ def is_literal_assignment(node):
     # FUTURE: may need to augment this list e.g. AnnCastList/AnnCastDict etc
     if isinstance(
         node,
-        (AnnCastNumber, AnnCastBoolean, AnnCastString, AnnCastLiteralValue),
+        (AnnCastLiteralValue),
+        # (AnnCastNumber, AnnCastBoolean, AnnCastString, AnnCastLiteralValue),
     ):
         return True
 

@@ -12,6 +12,7 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
 from skema.program_analysis.CAST2FN.model.cast import (
     ScalarType,
+    StructureType,
     ValueConstructor,
 )
 
@@ -195,31 +196,6 @@ class LambdaExpressionPass:
     def visit_attribute(self, node: AnnCastAttribute) -> str:
         return node.expr_str
 
-    """
-    @_visit.register
-    def visit_binary_op(self, node: AnnCastBinaryOp) -> str:
-        op = cast_op_to_str(node.op)
-        right = self.visit(node.right)
-        left = self.visit(node.left)
-        node.expr_str = f"({left} {op} {right})"
-        return node.expr_str
-    """
-
-    @_visit.register
-    def visit_boolean(self, node: AnnCastBoolean) -> str:
-        # FUTURE: Currently, when parsing a declaration statement like
-        #   `bool b;`
-        # gcc_ast_to_cast makes a CAST node assignment and assigns "None" to `b`
-        # This assignment does not make sense.  The underlying issue is that there are no
-        # declaration nodes in CAST.
-        # We aren't 100% sure what value to assign to this boolean for the lambda expression,
-        # so for now, we just assign None to it
-        if node.boolean is None:
-            node.expr_str = "None"
-        else:
-            node.expr_str = str(node.boolean)
-        return node.expr_str
-
     def visit_call_grfn_2_2(self, node: AnnCastCall):
         # example for argument lambda expression
         #   Call: func(x + 3, y * 2)
@@ -307,15 +283,6 @@ class LambdaExpressionPass:
     def visit_record_def(self, node: AnnCastRecordDef) -> str:
         return node.expr_str
 
-    @_visit.register
-    def visit_dict(self, node: AnnCastDict) -> str:
-        return node.expr_str
-
-    @_visit.register
-    def visit_expr(self, node: AnnCastExpr) -> str:
-        node.expr_str = self.visit(node.expr)
-        return node.expr_str
-
     def visit_function_def_copy(self, node: AnnCastFunctionDef) -> typing.List:
         body_expr = self.visit_node_list(node.body)
         return body_expr
@@ -359,7 +326,8 @@ class LambdaExpressionPass:
             # print(to_ret) # NOTE: remove when not needed
             node.expr_str = to_ret
             return node.expr_str
-
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            return "" 
         elif node.value_type == ScalarType.INTEGER:
             node.expr_str = str(node.value)
             return node.expr_str
@@ -372,19 +340,14 @@ class LambdaExpressionPass:
         return node.expr_str
 
     @_visit.register
-    def visit_list(self, node: AnnCastList) -> str:
-        node.expr_str = "list()"
-        return node.expr_str
-
-    @_visit.register
     def visit_loop(self, node: AnnCastLoop) -> str:
         # top interface lambda
         node.top_interface_lambda = lambda_for_loop_top_interface(
             node.top_interface_initial, node.top_interface_updated
         )
         # init lambda
-        if len(node.init) > 0:
-            loop_init = self.visit_node_list(node.init)
+        if len(node.pre) > 0:
+            loop_pre = self.visit_node_list(node.pre)
 
         # condition lambda
         loop_expr = self.visit(node.expr)
@@ -497,11 +460,6 @@ class LambdaExpressionPass:
         return node.expr_str
 
     @_visit.register
-    def visit_number(self, node: AnnCastNumber) -> str:
-        node.expr_str = str(node.number)
-        return node.expr_str
-
-    @_visit.register
     def visit_operator(self, node: AnnCastOperator) -> str:
         # TODO
         # op = cast_op_to_str(node.op)
@@ -519,31 +477,11 @@ class LambdaExpressionPass:
         return node.expr_str
 
     @_visit.register
-    def visit_string(self, node: AnnCastString) -> str:
-        # return a multiline string, since the string may
-        # contain \n
-        node.expr_str = f'"""{str(node.string)}"""'
-        return node.expr_str
-
-    @_visit.register
-    def visit_subscript(self, node: AnnCastSubscript) -> str:
-        return node.expr_str
-
-    @_visit.register
     def visit_tuple(self, node: AnnCastTuple) -> str:
         pieces = self.visit_node_list(node.values)
         node.expr_str = f"({', '.join(pieces)})"
 
         return node.expr_str
-
-    """
-    @_visit.register
-    def visit_unary_op(self, node: AnnCastUnaryOp) -> str:
-        op = cast_op_to_str(node.op)
-        val = self.visit(node.value)
-        node.expr_str = f"({op}{val})"
-        return node.expr_str
-    """
 
     @_visit.register
     def visit_var(self, node: AnnCastVar) -> str:

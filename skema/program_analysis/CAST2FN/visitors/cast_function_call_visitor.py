@@ -7,12 +7,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    Boolean,
     Call,
-    Dict,
-    Expr,
     FunctionDef,
-    List,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -20,12 +16,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelReturn,
     Module,
     Name,
-    Number,
     RecordDef,
-    Set,
-    String,
-    Subscript,
-    Tuple,
     Var,
 )
 
@@ -102,9 +93,11 @@ class CASTFunctionCallVisitor(CASTVisitor):
     # def _(self, node: BinaryOp):
     #     return self.visit(node.left) + self.visit(node.right)
 
+    """
     @visit.register
     def _(self, node: Boolean):
         return []
+    """
 
     @visit.register
     def _(self, node: Call):
@@ -115,21 +108,27 @@ class CASTFunctionCallVisitor(CASTVisitor):
         # Fields should not have function calles
         return self.visit(node.funcs)
 
+    """
     @visit.register
     def _(self, node: Dict):
         return self.visit(node.keys) + self.visit(node.values)
+    """
 
+    """
     @visit.register
     def _(self, node: Expr):
         return self.visit(node.expr)
-
+    """
+        
     @visit.register
     def _(self, node: FunctionDef):
         return (node.name, set(flatten(self.visit(node.body))))
 
+    """
     @visit.register
     def _(self, node: List):
         return self.visit(node.values)
+    """
 
     @visit.register
     def _(self, node: Loop):
@@ -166,26 +165,6 @@ class CASTFunctionCallVisitor(CASTVisitor):
     @visit.register
     def _(self, node: Name):
         return []
-
-    @visit.register
-    def _(self, node: Number):
-        return []
-
-    @visit.register
-    def _(self, node: Set):
-        return self.visit(node.values)
-
-    @visit.register
-    def _(self, node: String):
-        return []
-
-    @visit.register
-    def _(self, node: Subscript):
-        return self.visit(node.value) + self.visit(node.slice)
-
-    @visit.register
-    def _(self, node: Tuple):
-        return self.visit(node.values)
 
     # @visit.register
     # def _(self, node: UnaryOp):

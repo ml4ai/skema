@@ -30,7 +30,7 @@ class GrometBoxFunction(GrometBox):
     """
     swagger_types = {
         'function_type': 'FunctionType',
-        'contents': 'int',
+        'body': 'int',
         'import_type': 'ImportType',
         'import_version': 'str',
         'import_source': 'TypedValue',
@@ -43,7 +43,7 @@ class GrometBoxFunction(GrometBox):
 
     attribute_map = {
         'function_type': 'function_type',
-        'contents': 'contents',
+        'body': 'body',
         'import_type': 'import_type',
         'import_version': 'import_version',
         'import_source': 'import_source',
@@ -54,10 +54,10 @@ class GrometBoxFunction(GrometBox):
     if hasattr(GrometBox, "attribute_map"):
         attribute_map.update(GrometBox.attribute_map)
 
-    def __init__(self, function_type=None, contents=None, import_type=None, import_version=None, import_source=None, source_language=None, source_language_version=None, value=None, *args, **kwargs):  # noqa: E501
+    def __init__(self, function_type=None, body=None, import_type=None, import_version=None, import_source=None, source_language=None, source_language_version=None, value=None, *args, **kwargs):  # noqa: E501
         """GrometBoxFunction - a model defined in Swagger"""  # noqa: E501
         self._function_type = None
-        self._contents = None
+        self._body = None
         self._import_type = None
         self._import_version = None
         self._import_source = None
@@ -67,8 +67,8 @@ class GrometBoxFunction(GrometBox):
         self.discriminator = None
         if function_type is not None:
             self.function_type = function_type
-        if contents is not None:
-            self.contents = contents
+        if body is not None:
+            self.body = body
         if import_type is not None:
             self.import_type = import_type
         if import_version is not None:
@@ -105,27 +105,27 @@ class GrometBoxFunction(GrometBox):
         self._function_type = function_type
 
     @property
-    def contents(self):
-        """Gets the contents of this GrometBoxFunction.  # noqa: E501
+    def body(self):
+        """Gets the body of this GrometBoxFunction.  # noqa: E501
 
         The index to the FN in the parent GrometFNCollection.function_networks array.   # noqa: E501
 
-        :return: The contents of this GrometBoxFunction.  # noqa: E501
+        :return: The body of this GrometBoxFunction.  # noqa: E501
         :rtype: int
         """
-        return self._contents
+        return self._body
 
-    @contents.setter
-    def contents(self, contents):
-        """Sets the contents of this GrometBoxFunction.
+    @body.setter
+    def body(self, body):
+        """Sets the body of this GrometBoxFunction.
 
         The index to the FN in the parent GrometFNCollection.function_networks array.   # noqa: E501
 
-        :param contents: The contents of this GrometBoxFunction.  # noqa: E501
+        :param body: The body of this GrometBoxFunction.  # noqa: E501
         :type: int
         """
 
-        self._contents = contents
+        self._body = body
 
     @property
     def import_type(self):

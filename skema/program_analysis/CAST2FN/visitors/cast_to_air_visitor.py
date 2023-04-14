@@ -29,12 +29,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    Boolean,
     Call,
-    Dict,
-    Expr,
     FunctionDef,
-    List,
     Loop,
     ModelBreak,
     ModelContinue,
@@ -42,12 +38,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelReturn,
     Module,
     Name,
-    Number,
     RecordDef,
-    Set,
-    String,
     SourceRef,
-    Subscript,
     Tuple,
     VarType,
     Var,
@@ -105,7 +97,7 @@ class CASTToAIRVisitor(CASTVisitor):
             else:
                 yield el
 
-    def visit_node_list_and_flatten(self, nodes: List):
+    def visit_node_list_and_flatten(self, nodes):
         return list(self.flatten(self.visit_list(nodes)))
 
     @singledispatchmethod
@@ -184,7 +176,66 @@ class CASTToAIRVisitor(CASTVisitor):
                     node,
                 )
             )
+        """
+        elif isinstance(node.left, Tuple):
+            # This only works if its a call with a result var
+            right_side_var = [v for v in right_res[-1].input_variables][0]
+            tuple_name = right_side_var.identifier_information.name
+            for idx, v in enumerate(left_res[-1].input_variables):
+                tuple_item_assignment_result = self.visit(
+                    Assignment(
+                        left=Var(val=Name(name=v.identifier_information.name)),
+                        right=Subscript(
+                            value=Name(name=tuple_name),
+                            slice=Number(number=idx),
+                        ),
+                    )
+                )
 
+                assign_lambda_list.append(
+                    C2AExpressionLambda(
+                        C2AIdentifierInformation(
+                            C2ALambdaType.ASSIGN,
+                            self.state.get_scope_stack(),
+                            self.state.current_module,
+                            C2AIdentifierType.LAMBDA,
+                        ),
+                        [right_side_var],
+                        tuple_item_assignment_result[-1].output_variables,
+                        [],
+                        C2ALambdaType.ASSIGN,
+                        source_ref,
+                        f"lambda {tuple_name}: {tuple_name}[{idx}]",
+                        node,
+                    )
+                )
+
+            # lambda_expr = (
+            #     f"lambda {','.join([v.get_name() for v in lambda_inputs])}:"
+            #     f" (({val_result.lambda_expr}).__setitem__({slice_result.lambda_expr}, "
+            #     f"{right_res[-1].lambda_expr}), {val_result.lambda_expr})[1]"
+            # )
+
+        else:
+            raise C2AValueError(
+                f"Unable to handle left hand of assignment of type {type(node.left)}"
+            )
+
+        if (
+            isinstance(node.right, Call)
+            and not isinstance(node.left, Tuple)
+            and right_res[-1].container_type != C2ALambdaType.OPERATOR
+        ):
+            to_assign_from_output_interface = output_variables[-1]
+            assign_lambda = right_res[-2]
+            assign_lambda.output_variables[0] = to_assign_from_output_interface
+            assign_lambda_list = []
+            # TODO remove result var
+            result_var = assign_lambda.output_variables[0]
+
+        full_results = right_res[:-1] + assign_lambda_list
+
+        return full_results
         elif isinstance(node.left, Subscript):
             slice_result = left_res[-1]
             val_result = left_res[-2]
@@ -237,66 +288,7 @@ class CASTToAIRVisitor(CASTVisitor):
                     node,
                 )
             )
-
-        elif isinstance(node.left, Tuple):
-
-            # This only works if its a call with a result var
-            right_side_var = [v for v in right_res[-1].input_variables][0]
-            tuple_name = right_side_var.identifier_information.name
-            for idx, v in enumerate(left_res[-1].input_variables):
-                tuple_item_assignment_result = self.visit(
-                    Assignment(
-                        left=Var(val=Name(name=v.identifier_information.name)),
-                        right=Subscript(
-                            value=Name(name=tuple_name),
-                            slice=Number(number=idx),
-                        ),
-                    )
-                )
-
-                assign_lambda_list.append(
-                    C2AExpressionLambda(
-                        C2AIdentifierInformation(
-                            C2ALambdaType.ASSIGN,
-                            self.state.get_scope_stack(),
-                            self.state.current_module,
-                            C2AIdentifierType.LAMBDA,
-                        ),
-                        [right_side_var],
-                        tuple_item_assignment_result[-1].output_variables,
-                        [],
-                        C2ALambdaType.ASSIGN,
-                        source_ref,
-                        f"lambda {tuple_name}: {tuple_name}[{idx}]",
-                        node,
-                    )
-                )
-
-            # lambda_expr = (
-            #     f"lambda {','.join([v.get_name() for v in lambda_inputs])}:"
-            #     f" (({val_result.lambda_expr}).__setitem__({slice_result.lambda_expr}, "
-            #     f"{right_res[-1].lambda_expr}), {val_result.lambda_expr})[1]"
-            # )
-        else:
-            raise C2AValueError(
-                f"Unable to handle left hand of assignment of type {type(node.left)}"
-            )
-
-        if (
-            isinstance(node.right, Call)
-            and not isinstance(node.left, Tuple)
-            and right_res[-1].container_type != C2ALambdaType.OPERATOR
-        ):
-            to_assign_from_output_interface = output_variables[-1]
-            assign_lambda = right_res[-2]
-            assign_lambda.output_variables[0] = to_assign_from_output_interface
-            assign_lambda_list = []
-            # TODO remove result var
-            result_var = assign_lambda.output_variables[0]
-
-        full_results = right_res[:-1] + assign_lambda_list
-
-        return full_results
+        """
 
     @visit.register
     def _(self, node: Attribute):
@@ -723,11 +715,10 @@ class CASTToAIRVisitor(CASTVisitor):
         )
         self.state.add_type(air_type_def)
 
+    """
     @visit.register
     def _(self, node: Dict):
-        """
         TODO
-        """
         # TODO refine more complex dict val definitions to pre calculate more
         # complex expressions
         input_vars = []
@@ -767,17 +758,17 @@ class CASTToAIRVisitor(CASTVisitor):
                 node,
             )
         ]
+    """
 
+    """
     @visit.register
     def _(self, node: Expr):
-        """
-        TODO
-        """
         # For now, just ignore the node expressions. Eventually will need to
         # handle in the case that it is a function call with an output
         # expr_res = self.visit(node.expr)
         return []
-
+    """
+        
     def handle_packs_exiting_container(self, con):
         """
         If there are outstanding updates to an object that need to be packed,
@@ -917,6 +908,7 @@ class CASTToAIRVisitor(CASTVisitor):
         self.state.reset_current_function()
         self.state.reset_conditional_count()
 
+    """
     def handle_collection_object(self, node):
         # TODO refine more complex list definitions to pre calculate more
         # complex expressions
@@ -955,12 +947,12 @@ class CASTToAIRVisitor(CASTVisitor):
                 node,
             )
         ]
+    """
+    """
 
     @visit.register
     def _(self, node: Tuple):
-        """
         TODO
-        """
         if self.state.current_context == C2AVariableContext.STORE:
             output_vars = []
             for v in node.values:
@@ -986,18 +978,18 @@ class CASTToAIRVisitor(CASTVisitor):
             ]
 
         return self.handle_collection_object(node)
+    """
+    """
 
     @visit.register
     def _(self, node: List):
-        """
-        TODO
-        """
         return self.handle_collection_object(node)
 
     def build_var_with_incremented_version(self, var):
         return C2AVariable(
             C2AIdentifierInformation(),
         )
+    """
 
     def handle_control_node_type(
         self,
@@ -1733,11 +1725,9 @@ class CASTToAIRVisitor(CASTVisitor):
             )
         ]
 
+    """
     @visit.register
     def _(self, node: Number):
-        """
-        TODO
-        """
         return [
             C2AExpressionLambda(
                 C2AIdentifierInformation(
@@ -1755,12 +1745,11 @@ class CASTToAIRVisitor(CASTVisitor):
                 node,
             )
         ]
+    """
 
+    """
     @visit.register
     def _(self, node: Boolean):
-        """
-        TODO
-        """
         return [
             C2AExpressionLambda(
                 C2AIdentifierInformation(
@@ -1778,19 +1767,15 @@ class CASTToAIRVisitor(CASTVisitor):
                 node,
             )
         ]
+    """
 
+    """
     @visit.register
     def _(self, node: Set):
-        """
-        TODO
-        """
         return NotImplemented
 
     @visit.register
     def _(self, node: String):
-        """
-        TODO
-        """
         return [
             C2AExpressionLambda(
                 C2AIdentifierInformation(
@@ -1808,12 +1793,11 @@ class CASTToAIRVisitor(CASTVisitor):
                 node,
             )
         ]
+    """
 
+    """
     @visit.register
     def _(self, node: Subscript):
-        """
-        TODO
-        """
         prev_context = self.state.current_context
         self.state.set_variable_context(C2AVariableContext.LOAD)
         val_result = self.visit(node.value)
@@ -1885,6 +1869,7 @@ class CASTToAIRVisitor(CASTVisitor):
                     )
                 ]
             )
+    """
 
     """
     @visit.register

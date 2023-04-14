@@ -8,9 +8,10 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     IFBODY,
     IFEXPR,
     LOOP_VAR_UPDATED_VERSION,
-    LOOPINIT,
+    LOOPPRE,
     LOOPBODY,
     LOOPEXPR,
+    LOOPPOST,
     VAR_EXIT_VERSION,
     VAR_INIT_VERSION,
     GrfnAssignment,
@@ -34,6 +35,7 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
 from skema.program_analysis.CAST2FN.model.cast import (
     ScalarType,
+    StructureType,
     ValueConstructor,
 )
 
@@ -1089,7 +1091,7 @@ class VariableVersionPass:
         # is made by assigning to a tuple of values, as opposed to one singular value
         assert (
             isinstance(node.left, AnnCastVar)
-            or isinstance(node.left, AnnCastTuple)
+            or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
             or isinstance(node.left, AnnCastAssignment)
             or isinstance(node.left, AnnCastAttribute)
         ), f"container_scope: visit_assigment: node.left is {type(node.left)}"
@@ -1097,20 +1099,6 @@ class VariableVersionPass:
 
     @_visit.register
     def visit_attribute(self, node: AnnCastAttribute, assign_lhs: bool):
-        pass
-
-    """
-    @_visit.register
-    def visit_binary_op(self, node: AnnCastBinaryOp, assign_lhs: bool):
-        # visit LHS first
-        self.visit(node.left, assign_lhs)
-
-        # visit RHS second
-        self.visit(node.right, assign_lhs)
-    """
-
-    @_visit.register
-    def visit_boolean(self, node: AnnCastBoolean, assign_lhs: bool):
         pass
 
     @_visit.register
@@ -1177,14 +1165,6 @@ class VariableVersionPass:
         # Visit the function defs within this class to make sure
         # Everything is versioned correctly
         self.visit_node_list(node.funcs, assign_lhs)
-
-    @_visit.register
-    def visit_dict(self, node: AnnCastDict, assign_lhs: bool):
-        pass
-
-    @_visit.register
-    def visit_expr(self, node: AnnCastExpr, assign_lhs: bool):
-        self.visit(node.expr, assign_lhs)
 
     def visit_function_def_copy(
         self, node: AnnCastFunctionDef, assign_lhs: bool
@@ -1265,6 +1245,8 @@ class VariableVersionPass:
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
 
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            self.visit_node_list(node.value, assign_side)
         elif node.value_type == ScalarType.INTEGER:
             pass
         elif node.value_type == ScalarType.ABSTRACTFLOAT:
@@ -1274,16 +1256,18 @@ class VariableVersionPass:
     @_visit.register
     def visit_loop(self, node: AnnCastLoop, assign_lhs: bool):
         # Initialize scope_to_highest_var_version
-        if len(node.init) > 0:
-            init_scopestr = con_scope_to_str(node.con_scope + [LOOPINIT])
+        if len(node.pre) > 0:
+            pre_scopestr = con_scope_to_str(node.con_scope + [LOOPPRE])
         expr_scopestr = con_scope_to_str(node.con_scope + [LOOPEXPR])
         body_scopestr = con_scope_to_str(node.con_scope + [LOOPBODY])
+        if len(node.post) > 0:
+            post_scopestr = con_scope_to_str(node.con_scope + [LOOPPOST])
 
         # Initialize LoopInit
         # create versions 0 of any modified or accessed variables
-        if len(node.init) > 0:
+        if len(node.pre) > 0:
             self.init_highest_var_vers_dict(
-                init_scopestr, node.used_vars.keys()
+                pre_scopestr, node.used_vars.keys()
             )
 
         # Initialize LoopExpr
@@ -1294,19 +1278,30 @@ class VariableVersionPass:
         # create versions 0 of any modified or accessed variables
         self.init_highest_var_vers_dict(body_scopestr, node.used_vars.keys())
 
-        # visit children
-        if len(node.init) > 0:
-            self.visit_node_list(node.init, assign_lhs)
-        self.visit(node.expr, assign_lhs)
+        # Initialize LoopPost
+        if len(node.post) > 0:
+            self.init_highest_var_vers_dict(
+                post_scopestr, node.used_vars.keys()
+            )
 
-        # print(node.used_vars)
+        ######## visit children ########
+        if len(node.pre) > 0:
+            self.visit_node_list(node.pre, assign_lhs)
+
+        self.visit(node.expr, assign_lhs)
         self.visit_node_list(node.body, assign_lhs)
 
+        if len(node.post) > 0:
+            self.visit_node_list(node.post, assign_lhs)
+
+        # print(node.used_vars)
+
         # store highest var version
-        if len(node.init) > 0:
-            node.init_highest_var_vers = self.con_scope_to_highest_var_vers[
-                init_scopestr
+        if len(node.pre) > 0:
+            node.pre_highest_var_vers = self.con_scope_to_highest_var_vers[
+                pre_scopestr
             ]
+
         node.expr_highest_var_vers = self.con_scope_to_highest_var_vers[
             expr_scopestr
         ]
@@ -1314,16 +1309,23 @@ class VariableVersionPass:
             body_scopestr
         ]
 
+        if len(node.post) > 0:
+            node.post_highest_var_vers = self.con_scope_to_highest_var_vers[
+                post_scopestr
+            ]
+
         # populate all of this loops interfaces
         self.populate_loop_interfaces(node)
 
         # DEBUG printing
         if self.pipeline_state.PRINT_DEBUGGING_INFO:
             print(f"\nFor LOOP: {con_scope_to_str(node.con_scope)}")
-            if len(node.init) > 0:
-                print(f"  LoopHighestVers: {node.init_highest_var_vers}")
+            if len(node.pre) > 0:
+                print(f"  PreHighestVers: {node.pre_highest_var_vers}")
             print(f"  ExprHighestVers: {node.expr_highest_var_vers}")
             print(f"  BodyHighestVers: {node.body_highest_var_vers}")
+            if len(node.Post) > 0:
+                print(f"  PostHighestVers: {node.post_highest_var_vers}")
 
     @_visit.register
     def visit_model_break(self, node: AnnCastModelBreak, assign_lhs: bool):
@@ -1405,39 +1407,17 @@ class VariableVersionPass:
         node.version = self.get_highest_ver_in_con_scope(con_scopestr, node.id)
 
     @_visit.register
-    def visit_list(self, node: AnnCastList, assign_lhs: bool):
-        self.visit_node_list(node.values, assign_lhs)
-
-    @_visit.register
     def visit_operator(self, node: AnnCastOperator, assign_lhs: bool):
         # visit operands
         self.visit_node_list(node.operands, assign_lhs)
-
-    @_visit.register
-    def visit_number(self, node: AnnCastNumber, assign_lhs: bool):
-        pass
 
     @_visit.register
     def visit_set(self, node: AnnCastSet, assign_lhs: bool):
         pass
 
     @_visit.register
-    def visit_string(self, node: AnnCastString, assign_lhs: bool):
-        pass
-
-    @_visit.register
-    def visit_subscript(self, node: AnnCastSubscript, assign_lhs: bool):
-        pass
-
-    @_visit.register
     def visit_tuple(self, node: AnnCastTuple, assign_lhs: bool):
         self.visit_node_list(node.values, assign_lhs)
-
-    """
-    @_visit.register
-    def visit_unary_op(self, node: AnnCastUnaryOp, assign_lhs: bool):
-        self.visit(node.value, assign_lhs)
-    """
 
     @_visit.register
     def visit_var(self, node: AnnCastVar, assign_lhs: bool):

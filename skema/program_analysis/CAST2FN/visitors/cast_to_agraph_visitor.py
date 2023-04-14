@@ -9,12 +9,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    Boolean,
     Call,
-    Dict,
-    Expr,
     FunctionDef,
-    List,
     LiteralValue,
     Loop,
     ModelBreak,
@@ -24,16 +20,11 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelReturn,
     Module,
     Name,
-    Number,
     Operator,
     RecordDef,
     ScalarType,
-    Set,
-    String,
     StructureType,
     SourceRef,
-    Subscript,
-    Tuple,
     VarType,
     Var,
     ValueConstructor,
@@ -187,34 +178,6 @@ class CASTToAGraphVisitor(CASTVisitor):
 
         return node_uid
 
-    """
-    @visit.register
-    def _(self, node: BinaryOp):
-        Visits BinaryOp nodes, the node's UID is returned
-        so it can be used to connect nodes in the digraph
-        left = self.visit(node.left)
-        right = self.visit(node.right)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.op)
-        self.G.add_edge(node_uid, left)
-        self.G.add_edge(node_uid, right)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: AnnCastBinaryOp):
-        Visits BinaryOp nodes, the node's UID is returned
-        so it can be used to connect nodes in the digraph
-        left = self.visit(node.left)
-        right = self.visit(node.right)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.op)
-        self.G.add_edge(node_uid, left)
-        self.G.add_edge(node_uid, right)
-
-        return node_uid
-    """
-
     @visit.register
     def _(self, node: Operator):
         """Visits BinaryOp nodes, the node's UID is returned
@@ -239,22 +202,6 @@ class CASTToAGraphVisitor(CASTVisitor):
         for opd in operands:
             self.G.add_edge(node_uid, opd)
 
-        return node_uid
-
-    @visit.register
-    def _(self, node: AnnCastBoolean):
-        """Visits Boolean nodes, the node's UID is returned
-        so it can be used to connect nodes in the digraph"""
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.boolean)
-        return node_uid
-
-    @visit.register
-    def _(self, node: Boolean):
-        """Visits Boolean nodes, the node's UID is returned
-        so it can be used to connect nodes in the digraph"""
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.boolean)
         return node_uid
 
     @visit.register
@@ -443,48 +390,6 @@ class CASTToAGraphVisitor(CASTVisitor):
         return node_uid
 
     @visit.register
-    def _(self, node: Dict):
-        """Visits Dictionary nodes. We visit all the keys and values of
-        this dictionary and then they're added to this node. Right now
-        they're just added by adding keys and then values.
-        This node's UID is returned."""
-        keys = []
-        values = []
-        if len(node.keys) > 0:
-            keys = self.visit_list(node.keys)
-        if len(node.values) > 0:
-            values = self.visit_list(node.values)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Dict")
-
-        for n in keys + values:
-            self.G.add_edge(node_uid, n)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: Expr):
-        """Visits expression nodes. The node's actual expression is visited
-        and added to this node. This node's UID is returned."""
-        expr = self.visit(node.expr)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Expression")
-        self.G.add_edge(node_uid, expr)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: AnnCastExpr):
-        """Visits expression nodes. The node's actual expression is visited
-        and added to this node. This node's UID is returned."""
-        expr = self.visit(node.expr)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Expression")
-        self.G.add_edge(node_uid, expr)
-
-        return node_uid
-
-    @visit.register
     def _(self, node: AnnCastFunctionDef):
         """Visits FunctionDef nodes. We visit all the arguments, and then
         we visit the function's statements. They're then added to the graph.
@@ -570,64 +475,47 @@ class CASTToAGraphVisitor(CASTVisitor):
         return node_uid
 
     @visit.register
-    def _(self, node: List):
-        """Visits List nodes. We visit all the elements and add them to
-        this node. This node's UID is returned."""
-        values = []
-        if len(node.values) > 0:
-            values = self.visit_list(node.values)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="List")
-        for n in values:
-            self.G.add_edge(node_uid, n)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: AnnCastList):
-        """Visits List nodes. We visit all the elements and add them to
-        this node. This node's UID is returned."""
-        values = []
-        if len(node.values) > 0:
-            values = self.visit_list(node.values)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="List")
-        for n in values:
-            self.G.add_edge(node_uid, n)
-
-        return node_uid
-
-    @visit.register
     def _(self, node: Loop):
         """Visits Loop nodes. We visit the conditional expression and the
         body of the loop, and connect them to this node in the graph.
         This node's UID is returned."""
         expr = self.visit(node.expr)
-        init = []
+        pre = []
         body = []
-        if node.init != None and len(node.init) > 0:
-            init = self.visit_list(node.init)
+        post = []
+
+        if node.pre != None and len(node.pre) > 0:
+            pre = self.visit_list(node.pre)
 
         if len(node.body) > 0:
             body = self.visit_list(node.body)
+        
+        if node.post != None and len(node.post) > 0:
+            post = self.visit_list(node.post)
+
         node_uid = uuid.uuid4()
-        init_uid = uuid.uuid4()
+        pre_uid = uuid.uuid4()
         test_uid = uuid.uuid4()
         body_uid = uuid.uuid4()
+        post_uid = uuid.uuid4()
 
         self.G.add_node(node_uid, label="Loop")
-        self.G.add_node(init_uid, label="Init")
+        self.G.add_node(pre_uid, label="Pre")
         self.G.add_node(test_uid, label="Test")
         self.G.add_node(body_uid, label="Body")
+        self.G.add_node(post_uid, label="Post")
 
-        self.G.add_edge(node_uid, init_uid)
-        for n in init:
-            self.G.add_edge(init_uid, n)
+        self.G.add_edge(node_uid, pre_uid)
+        for n in pre:
+            self.G.add_edge(pre_uid, n)
         self.G.add_edge(node_uid, test_uid)
         self.G.add_edge(test_uid, expr)
         self.G.add_edge(node_uid, body_uid)
+        self.G.add_edge(node_uid, post_uid)
         for n in body:
             self.G.add_edge(body_uid, n)
+        for n in post:
+            self.G.add_edge(post_uid, n)
 
         return node_uid
 
@@ -648,6 +536,10 @@ class CASTToAGraphVisitor(CASTVisitor):
         elif node.value_type == StructureType.LIST:
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f"List (str or list): [...]")
+            return node_uid
+        elif node.value_type == StructureType.TUPLE:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f"Tuple (...)")
             return node_uid
         elif node.value_type == StructureType.MAP:
             node_uid = uuid.uuid4()
@@ -698,6 +590,14 @@ class CASTToAGraphVisitor(CASTVisitor):
             node_uid = uuid.uuid4()
             self.G.add_node(node_uid, label=f"List (str or list): [...]")
             return node_uid
+        elif node.value_type == StructureType.TUPLE:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f"Tuple (...)")
+            return node_uid
+        elif node.value_type == None:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f"None")
+            return node_uid
         elif node.value_type == "List[Any]":
             node_uid = uuid.uuid4()
             if isinstance(node.value, ValueConstructor):
@@ -720,6 +620,7 @@ class CASTToAGraphVisitor(CASTVisitor):
             self.G.add_node(node_uid, label=f"Dict: {node.value}")
             return node_uid
         else:
+            print(node)
             assert (
                 False
             ), f"cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}"
@@ -993,10 +894,19 @@ class CASTToAGraphVisitor(CASTVisitor):
         """Visits a Module node. This is the starting point for visiting
         a CAST object. The return value isn't relevant here (I think)"""
         program_uuid = uuid.uuid4()
-        self.G.add_node(program_uuid, label="Program: " + node.name)
+        
+        if node.name != None:
+            self.G.add_node(program_uuid, label="Program: " + node.name)
+        else:
+            self.G.add_node(program_uuid, label="Program")
+
 
         module_uuid = uuid.uuid4()
-        self.G.add_node(module_uuid, label="Module: " + node.name)
+        if node.name != None:
+            self.G.add_node(module_uuid, label="Module: " + node.name)
+        else:
+            self.G.add_node(module_uuid, label="Module")
+
         self.G.add_edge(program_uuid, module_uuid)
 
         body = self.visit_list(node.body)
@@ -1057,118 +967,6 @@ class CASTToAGraphVisitor(CASTVisitor):
                 )
 
         return node_uid
-
-    @visit.register
-    def _(self, node: AnnCastNumber):
-        """Visits a Number node. We add this node's numeric value to the
-        graph and return the UID of this node."""
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.number)
-        return node_uid
-
-    @visit.register
-    def _(self, node: Number):
-        """Visits a Number node. We add this node's numeric value to the
-        graph and return the UID of this node."""
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.number)
-        return node_uid
-
-    @visit.register
-    def _(self, node: Set):
-        """Visits a Set node. We add all the elements of this set (if any)
-        to the graph and return the UID of this node."""
-        values = []
-        if len(node.values) > 0:
-            values = self.visit_list(node.values)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Set")
-        for n in values:
-            self.G.add_edge(node_uid, n)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: String):
-        """Visits a String node. We add this node's string to the
-        graph and return the UID of this node."""
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=f'"{node.string}"')
-        return node_uid
-
-    @visit.register
-    def _(self, node: AnnCastString):
-        """Visits a String node. We add this node's string to the
-        graph and return the UID of this node."""
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=f'"{node.string}"')
-        return node_uid
-
-    @visit.register
-    def _(self, node: Subscript):
-        """Visits a Subscript node. We visit its value and slice, and add
-        them to the graph along with this node. This node's UID is returned."""
-        value = self.visit(node.value)
-        s_slice = self.visit(node.slice)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Subscript")
-        self.G.add_edge(node_uid, value)
-        self.G.add_edge(node_uid, s_slice)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: AnnCastTuple):
-        """Visits a Tuple node. We add all the elements of this
-        tuple (if any) to the graph and return the UID of this node."""
-        values = []
-        if len(node.values) > 0:
-            values = self.visit_list(node.values)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Tuple")
-        for n in values:
-            self.G.add_edge(node_uid, n)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: Tuple):
-        """Visits a Tuple node. We add all the elements of this
-        tuple (if any) to the graph and return the UID of this node."""
-        values = []
-        if len(node.values) > 0:
-            values = self.visit_list(node.values)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label="Tuple")
-        for n in values:
-            self.G.add_edge(node_uid, n)
-
-        return node_uid
-
-    """
-    @visit.register
-    def _(self, node: AnnCastUnaryOp):
-        Visits a UnaryOp node. We add this node's value and operator
-        to the graph and return this node's UID.
-        val = self.visit(node.value)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.op)
-        self.G.add_edge(node_uid, val)
-
-        return node_uid
-
-    @visit.register
-    def _(self, node: UnaryOp):
-        Visits a UnaryOp node. We add this node's value and operator
-        to the graph and return this node's UID.
-        val = self.visit(node.value)
-        node_uid = uuid.uuid4()
-        self.G.add_node(node_uid, label=node.op)
-        self.G.add_edge(node_uid, val)
-
-        return node_uid
-    """
-
 
     @visit.register
     def _(self, node: AnnCastVar):

@@ -9,6 +9,7 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
 from skema.program_analysis.CAST2FN.model.cast import (
     ScalarType,
+    StructureType,
     ValueConstructor,
 )
 
@@ -102,7 +103,7 @@ class IdCollapsePass:
         # is made by assigning to a tuple of values, as opposed to one singular value
         assert (
             isinstance(node.left, AnnCastVar)
-            or isinstance(node.left, AnnCastTuple)
+            or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
             or isinstance(node.left, AnnCastAttribute)
         ), f"id_collapse: visit_assigment: node.left is {type(node.left)}"
         self.visit(node.left, at_module_scope)
@@ -111,14 +112,6 @@ class IdCollapsePass:
     def visit_attribute(self, node: AnnCastAttribute, at_module_scope):
         value = self.visit(node.value, at_module_scope)
         attr = self.visit(node.attr, at_module_scope)
-
-#    @_visit.register
- #   def visit_binary_op(self, node: AnnCastBinaryOp, at_module_scope):
-        # visit LHS first
-  #      self.visit(node.left, at_module_scope)
-
-        # visit RHS second
-#        self.visit(node.right, at_module_scope)
 
     @_visit.register
     def visit_call(self, node: AnnCastCall, at_module_scope):
@@ -136,8 +129,8 @@ class IdCollapsePass:
                 self.visit(node.func.value, at_module_scope)
             elif isinstance(node.func.value, AnnCastAttribute):
                 self.visit(node.func.value, at_module_scope)
-            elif isinstance(node.func.value, AnnCastSubscript):
-                self.visit(node.func.value, at_module_scope)
+            #elif isinstance(node.func.value, AnnCastSubscript):
+            #    self.visit(node.func.value, at_module_scope)
             elif isinstance(node.func.value, AnnCastOperator):
                 self.visit(node.func.value, at_module_scope)
             elif isinstance(node.func.value, AnnCastAssignment):
@@ -170,10 +163,6 @@ class IdCollapsePass:
         self.visit_node_list(node.fields, at_module_scope)
 
     @_visit.register
-    def visit_expr(self, node: AnnCastExpr, at_module_scope):
-        self.visit(node.expr, at_module_scope)
-
-    @_visit.register
     def visit_function_def(self, node: AnnCastFunctionDef, at_module_scope):
         # collapse the function id
         node.name.id = self.collapse_id(node.name.id)
@@ -195,6 +184,8 @@ class IdCollapsePass:
             # List literal doesn't need to add any other changes
             # to the anncast at this pass
 
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            self.visit_node_list(node.value, at_module_scope)
         elif node.value_type == ScalarType.INTEGER:
             pass
         elif node.value_type == ScalarType.ABSTRACTFLOAT:
@@ -203,9 +194,10 @@ class IdCollapsePass:
 
     @_visit.register
     def visit_loop(self, node: AnnCastLoop, at_module_scope):
-        self.visit_node_list(node.init, at_module_scope)
+        self.visit_node_list(node.pre, at_module_scope)
         self.visit(node.expr, at_module_scope)
         self.visit_node_list(node.body, at_module_scope)
+        self.visit_node_list(node.post, at_module_scope)
 
     @_visit.register
     def visit_model_break(self, node: AnnCastModelBreak, at_module_scope):
@@ -253,43 +245,10 @@ class IdCollapsePass:
         self.visit_node_list(node.operands, at_module_scope)
 
     @_visit.register
-    def visit_subscript(self, node: AnnCastSubscript, at_module_scope):
-        pass
-
-#    @_visit.register
- #   def visit_unaryop(self, node: AnnCastUnaryOp, at_module_scope):
-  #      self.visit(node.value, at_module_scope)
-
-    @_visit.register
     def visit_var(self, node: AnnCastVar, at_module_scope):
         self.visit(node.val, at_module_scope)
         if node.default_value != None:
             self.visit(node.default_value, at_module_scope)
-
-    ### Old visitors for literal values
-    @_visit.register
-    def visit_boolean(self, node: AnnCastBoolean, at_module_scope):
-        pass
-
-    @_visit.register
-    def visit_dict(self, node: AnnCastDict, at_module_scope):
-        pass
-
-    @_visit.register
-    def visit_list(self, node: AnnCastList, at_module_scope):
-        self.visit_node_list(node.values, at_module_scope)
-
-    @_visit.register
-    def visit_number(self, node: AnnCastNumber, at_module_scope):
-        pass
-
-    @_visit.register
-    def visit_set(self, node: AnnCastSet, at_module_scope):
-        pass
-
-    @_visit.register
-    def visit_string(self, node: AnnCastString, at_module_scope):
-        pass
 
     @_visit.register
     def visit_tuple(self, node: AnnCastTuple, at_module_scope):

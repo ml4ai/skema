@@ -11,12 +11,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    Boolean,
     Call,
-    Dict,
-    Expr,
     FunctionDef,
-    List,
     LiteralValue,
     Loop,
     ModelBreak,
@@ -26,17 +22,12 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelImport,
     Module,
     Name,
-    Number,
     Operator,
     RecordDef,
     ScalarType,
-    Set,
-    String,
     StructureType,
     SourceRef,
     SourceCodeDataType,
-    Subscript,
-    Tuple,
     VarType,
     Var,
     ValueConstructor,
@@ -106,25 +97,15 @@ def get_node_name(ast_node):
     elif isinstance(ast_node, Var):
         return [ast_node.val.name]
     elif isinstance(ast_node, Assignment):
-        if isinstance(ast_node.left, Subscript):
-            return [ast_node.left.value.name]
-        else:
-            return get_node_name(ast_node.left)
-    elif isinstance(ast_node, Tuple):
-        names = []
-        for e in ast_node.values:
-            names.extend(get_node_name(e))
-        return names
+        return get_node_name(ast_node.left)
     elif (
         isinstance(ast_node, LiteralValue)
-        and ast_node.value_type == StructureType.LIST
+        and (ast_node.value_type == StructureType.LIST or ast_node.value_type == StructureType.TUPLE)
     ):
         names = []
         for e in ast_node.value:
             names.extend(get_node_name(e))
         return names
-    elif isinstance(ast_node, Subscript):
-        raise TypeError(f"Type {ast_node} not supported")
     else:
         raise TypeError(f"Type {type(ast_node)} not supported")
 
@@ -195,7 +176,7 @@ class PyASTToCAST:
         - global_identifier_dict
     """
 
-    def __init__(self, file_name: str, legacy: Boolean = False):
+    def __init__(self, file_name: str, legacy: bool = False):
         """Initializes any auxiliary data structures that are used
         for generating CAST.
         The current data structures are:
@@ -231,7 +212,7 @@ class PyASTToCAST:
         self.dict_comp_count = 0
         self.lambda_count = 0
 
-    def insert_next_id(self, scope_dict: Dict, dict_key: str):
+    def insert_next_id(self, scope_dict: dict, dict_key: str):
         """Given a scope_dictionary and a variable name as a key,
         we insert a new key_value pair for the scope dictionary
         The ID that we inserted gets returned because some visitors
@@ -247,7 +228,7 @@ class PyASTToCAST:
         self.id_count += 1
         return new_id_to_insert
 
-    def insert_alias(self, originString, alias: String):
+    def insert_alias(self, originString, alias):
         """Inserts an alias into a dictionary that keeps track of aliases for
             names that are aliased. For example, the following import
             import numpy as np
@@ -260,7 +241,7 @@ class PyASTToCAST:
         # TODO
         pass
 
-    def check_alias(self, name: String):
+    def check_alias(self, name):
         """Given a python string that represents a name,
         this function checks to see if that name is an alias
         for a different name, and returns it if it is indeed an alias.
@@ -274,8 +255,8 @@ class PyASTToCAST:
     def identify_piece(
         self,
         piece: AstNode,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """This function is used to 'centralize' the handling of different node types
         in list/dictionary/set comprehensions.
@@ -434,7 +415,7 @@ class PyASTToCAST:
 
     @singledispatchmethod
     def visit(
-        self, node: AstNode, prev_scope_id_dict: Dict, curr_scope_id_dict: Dict
+        self, node: AstNode, prev_scope_id_dict, curr_scope_id_dict
     ):
         # print(f"Trying to visit a node of type {type(node)} but a visitor doesn't exist")
         # if(node != None):
@@ -445,8 +426,8 @@ class PyASTToCAST:
     def visit_JoinedStr(
         self,
         node: ast.JoinedStr,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         # print("JoinedStr not generating CAST yet")
         str_pieces = []
@@ -507,8 +488,8 @@ class PyASTToCAST:
     def visit_GeneratorExp(
         self,
         node: ast.GeneratorExp,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         ref = [
             node.col_offset,
@@ -531,8 +512,8 @@ class PyASTToCAST:
     def visit_Delete(
         self,
         node: ast.Delete,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         # print("Delete not generating CAST yet")
         source_code_data_type = ["Python", "3.8", "List"]
@@ -558,8 +539,8 @@ class PyASTToCAST:
     def visit_Ellipsis(
         self,
         node: ast.Ellipsis,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         source_code_data_type = ["Python", "3.8", "Ellipsis"]
         ref = [
@@ -581,8 +562,8 @@ class PyASTToCAST:
     def visit_Slice(
         self,
         node: ast.Slice,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         # print("Slice not generating CAST yet")
         source_code_data_type = ["Python", "3.8", "List"]
@@ -608,8 +589,8 @@ class PyASTToCAST:
     def visit_ExtSlice(
         self,
         node: ast.ExtSlice,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         # print("ExtSlice not generating CAST yet")
         source_code_data_type = ["Python", "3.8", "List"]
@@ -635,8 +616,8 @@ class PyASTToCAST:
     def visit_Assign(
         self,
         node: ast.Assign,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Assign node, and returns its CAST representation.
         Either the assignment is simple, like x = {expression},
@@ -950,8 +931,8 @@ class PyASTToCAST:
     def visit_Attribute(
         self,
         node: ast.Attribute,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Attribute node, which is used when accessing
         the attribute of a class. Whether it's a field or method of a class.
@@ -1024,8 +1005,8 @@ class PyASTToCAST:
     def visit_AugAssign(
         self,
         node: ast.AugAssign,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST AugAssign node, which is used for an
         augmented assignment, like x += 1. AugAssign node is converted
@@ -1109,8 +1090,8 @@ class PyASTToCAST:
     def visit_BinOp(
         self,
         node: ast.BinOp,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST BinOp node, which consists of all the arithmetic
         and bitwise operators.
@@ -1159,8 +1140,8 @@ class PyASTToCAST:
     def visit_Break(
         self,
         node: ast.Break,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Break node, which is just a break statement
            nothing to be done for a Break node, just return a ModelBreak()
@@ -1185,12 +1166,82 @@ class PyASTToCAST:
         ]
         return [ModelBreak(source_refs=ref)]
 
+    def create_binary_compare_tree(self, node):
+        if isinstance(node, (ast.Compare, ast.UnaryOp, ast.Call, ast.Name, ast.Attribute)):
+            return node
+        # elif isinstance(node, ast.UnaryOp):
+        #    return node
+        #elif isinstance(node, ast.Call):
+         #   return node
+        elif isinstance(node, ast.BoolOp):
+            # > 2 values implies nested 'and' or 'or'
+            if len(node.values) > 2:
+                op = [node.op]
+                # left_most = self.create_binary_compare_tree(node.values[0])
+                # Build binary trees of ast.Compare nodes their children being 
+                # the original leaves
+                # In other words decompress the tree so it's binary instead of n-ary
+
+                idx = len(node.values) - 1
+                tree_root = None
+                while idx >= 0:
+                    if tree_root == None:        
+                        left_child = self.create_binary_compare_tree(node.values[idx - 1]) 
+                        right_child = self.create_binary_compare_tree(node.values[idx]) 
+
+                        compare_op = ast.Compare(
+                            left=left_child,
+                            ops=op,
+                            comparators=[right_child],
+                            col_offset=node.col_offset,
+                            end_col_offset=node.end_col_offset,
+                            lineno=node.lineno,
+                            end_lineno=node.end_lineno,
+                        )
+
+                        tree_root = compare_op
+                        idx = idx - 2
+                    else:
+                        left_child = self.create_binary_compare_tree(node.values[idx])
+
+                        compare_op = ast.Compare(
+                            left=left_child,
+                            ops=op,
+                            comparators=[tree_root],
+                            col_offset=node.col_offset,
+                            end_col_offset=node.end_col_offset,
+                            lineno=node.lineno,
+                            end_lineno=node.end_lineno,
+                        )
+
+                        tree_root = compare_op
+                        idx = idx - 1
+
+                return tree_root
+            else:
+                op = [node.op]
+
+                left_child = self.create_binary_compare_tree(node.values[0])
+                right_child = self.create_binary_compare_tree(node.values[1])
+                compare_op = ast.Compare(
+                    left=left_child,
+                    ops=op,
+                    comparators=[right_child],
+                    col_offset=node.col_offset,
+                    end_col_offset=node.end_col_offset,
+                    lineno=node.lineno,
+                    end_lineno=node.end_lineno,
+                )
+                
+                return compare_op
+        print(f"catch type {type(node)}")
+
     @visit.register
     def visit_BoolOp(
         self,
         node: ast.BoolOp,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a BoolOp node, which is a boolean operation connected with 'and'/'or's
            The BoolOp node gets converted into an AST Compare node, and then the work is
@@ -1203,6 +1254,26 @@ class PyASTToCAST:
             BinaryOp: A BinaryOp node that is composed of operations connected with 'and'/'or's
 
         """
+        
+        x = self.create_binary_compare_tree(node)
+        """
+        print("Root")
+        print(x.ops)
+        print(x.left)
+        print(x.comparators)
+
+        print("Left")
+        print(x.left.ops)
+        print(x.left.left)
+        print(x.left.comparators)
+
+        print("Right")
+        print(x.comparators[0].ops)
+        print(x.comparators[0].left)
+        print(x.comparators[0].comparators)
+        """
+
+        return self.visit(x, prev_scope_id_dict, curr_scope_id_dict)
         op = node.op
         vals = node.values
         bool_ops = [node.op for i in range(len(vals) - 1)]
@@ -1229,8 +1300,8 @@ class PyASTToCAST:
     def visit_Call(
         self,
         node: ast.Call,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Call node, which represents a function call.
         Special care must be taken to see if it's a function call or a class's
@@ -1545,8 +1616,8 @@ class PyASTToCAST:
     def visit_ClassDef(
         self,
         node: ast.ClassDef,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST ClassDef node, which is used to define user classes.
         Acquiring the fields of the class involves going through the __init__
@@ -1638,8 +1709,8 @@ class PyASTToCAST:
     def visit_Compare(
         self,
         node: ast.Compare,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Compare node, which consists of boolean operations
 
@@ -1662,14 +1733,12 @@ class PyASTToCAST:
 
 
         # Fetch the first element (which is in node.left)
-        left = node.left
-        print(left)
-        print(len(node.comparators))
-
-        print(node.ops)
-        # ops = [op for op in node.ops]
+        #left = node.left
+        #ops = [op for op in node.ops]
         # Grab the first comparison operation
-        op = get_op(node.ops.pop(0))
+        # print(left)
+        # print(node.ops)
+        # op = get_op(node.ops.pop(0))
         # op = get_op(ops.pop())
 
         
@@ -1689,9 +1758,60 @@ class PyASTToCAST:
             source_refs=ref,
         )
         
+
+        idx = len(node.comparators) - 1
+        op_idx = len(node.ops) - 1
+        tree_root = None
+        while idx > 0:
+            op = get_op(node.ops[op_idx])
+            l = self.visit(node.comparators[idx - 1], prev_scope_id_dict, curr_scope_id_dict)[0]
+            r = self.visit(node.comparators[idx], prev_scope_id_dict, curr_scope_id_dict)[0] 
+
+            if op == "ast.And":
+                test = ModelIf(expr=l, body=[r], orelse=[false_val], source_refs=ref)
+            elif op == "ast.Or":
+                test = ModelIf(expr=l, body=[true_val], orelse=[r], source_refs=ref)
+            else:
+                test = Operator(source_language="Python", interpreter="Python",
+                                version=get_python_version(),
+                                op=op,
+                                operands=[l,r],
+                                source_refs=ref)
+            if tree_root == None:        
+                tree_root = test
+            else:
+                tree_root = ModelIf(expr=test,body=[tree_root],orelse=[false_val], source_refs=ref)
+
+            op_idx = op_idx - 1
+            idx = idx - 1
+
+        op = get_op(node.ops[op_idx])
+        l = self.visit(node.left, prev_scope_id_dict, curr_scope_id_dict)[0]
+        r = self.visit(node.comparators[idx], prev_scope_id_dict, curr_scope_id_dict)[0] 
+        if op == "ast.And":
+            test = ModelIf(expr=l, body=[r], orelse=[false_val], source_refs=ref)
+        elif op == "ast.Or":
+            test = ModelIf(expr=l, body=[true_val], orelse=[r], source_refs=ref)
+        else:
+            test = Operator(source_language="Python", interpreter="Python",
+                            version=get_python_version(),
+                            op=op,
+                            operands=[l,r],
+                            source_refs=ref)
+
+        if tree_root == None:
+            tree_root = test
+        else:
+            tree_root = ModelIf(expr=test,body=[tree_root],orelse=[false_val], source_refs=ref)
+
+
+        """
         # Iterate through the comparators to build up more if statements
         while len(node.comparators) > 0:
             right = node.comparators[0]
+            if isinstance(right, ast.Constant):
+                print(right.value)
+
 
             l = self.visit(left,prev_scope_id_dict,curr_scope_id_dict)[0]
             r = self.visit(right,prev_scope_id_dict,curr_scope_id_dict)[0]
@@ -1703,6 +1823,7 @@ class PyASTToCAST:
                             source_refs=ref)
 
             if len(node.comparators) == 1 and len(if_stack) > 0:
+                print("Hi")
                 if_stack[-1].body = test
             elif len(node.comparators) == 1 and len(if_stack) == 0:
                 # orelse has to be False value
@@ -1720,13 +1841,14 @@ class PyASTToCAST:
 
 
             left = node.comparators.pop(0)
-            op = get_op(node.ops.pop(0)) if len(node.ops) > 0 else None
-            # op = get_op(ops.pop()) if len(ops) > 0 else None
+            #op = get_op(node.ops.pop(0)) if len(node.ops) > 0 else None
+            op = get_op(ops.pop()) if len(ops) > 0 else None
             
         # The final if_expression contains the true value
         if_stack[-1].body = [true_val]
+        """
 
-        return [if_stack[0]]
+        return [tree_root]
 
 
         # If we have more than one operand left, then we 'recurse' without the leftmost
@@ -1753,8 +1875,8 @@ class PyASTToCAST:
     def visit_Constant(
         self,
         node: ast.Constant,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Constant node, which can hold either numeric or
         string values. A dictionary is used to index into which operation
@@ -1827,8 +1949,8 @@ class PyASTToCAST:
     def visit_Continue(
         self,
         node: ast.Continue,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Continue node, which is just a continue statement
            nothing to be done for a Continue node, just return a ModelContinue node
@@ -1855,8 +1977,8 @@ class PyASTToCAST:
     def visit_Dict(
         self,
         node: ast.Dict,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Dict node, which represents a dictionary.
 
@@ -1901,7 +2023,7 @@ class PyASTToCAST:
             )
         ]
         for key in k:
-            if isinstance(key, Tuple):
+            if isinstance(key, LiteralValue) and key.value_type == StructureType.TUPLE:
                 return [
                     LiteralValue(
                         StructureType.MAP,
@@ -1925,8 +2047,8 @@ class PyASTToCAST:
     def visit_Expr(
         self,
         node: ast.Expr,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Expr node, which represents some kind of standalone
         expression.
@@ -1949,14 +2071,11 @@ class PyASTToCAST:
                 row_end=node.end_lineno,
             )
         ]
-        val = self.visit(node.value, prev_scope_id_dict, curr_scope_id_dict)
-        if len(val) > 1:
-            return val
-        return [Expr(val[0], source_refs=ref)]
+        return self.visit(node.value, prev_scope_id_dict, curr_scope_id_dict)
 
     @visit.register
     def visit_For(
-        self, node: ast.For, prev_scope_id_dict: Dict, curr_scope_id_dict: Dict
+        self, node: ast.For, prev_scope_id_dict, curr_scope_id_dict
     ):
         """Visits a PyAST For node, which represents Python for loops.
         A For loop needs different handling than a while loop.
@@ -2055,10 +2174,9 @@ class PyASTToCAST:
             source_refs=ref,
         )
 
+        source_code_data_type = ["Python","3.8","Tuple"]
         first_next = Assignment(
-            Tuple(
-                [target, iter_var_cast, stop_cond_var_cast], source_refs=ref
-            ),
+            LiteralValue(StructureType.TUPLE, [target, iter_var_cast, stop_cond_var_cast], source_code_data_type, source_refs=ref),
             Call(
                 func=Name(name="next", id=next_id, source_refs=ref),
                 arguments=[
@@ -2081,16 +2199,15 @@ class PyASTToCAST:
                     operands=[stop_cond_var_cast,
                     LiteralValue(
                         ScalarType.BOOLEAN,
-                        True,
+                        False,
                         ["Python", "3.8", "boolean"],
                         source_refs=ref,
                     )], 
                     source_refs=ref)
 
+        source_code_data_type = ["Python","3.8","Tuple"]
         loop_assign = Assignment(
-            Tuple(
-                [target, iter_var_cast, stop_cond_var_cast], source_refs=ref
-            ),
+            LiteralValue(StructureType.TUPLE, [target, iter_var_cast, stop_cond_var_cast], source_code_data_type, source_refs=ref),
             Call(
                 func=Name(name="next", id=next_id, source_refs=ref),
                 arguments=[
@@ -2109,9 +2226,10 @@ class PyASTToCAST:
 
         return [
             Loop(
-                init=[iter_var, first_next],
+                pre=[iter_var, first_next],
                 expr=loop_cond,
                 body=body + [loop_assign],
+                post=[],
                 source_refs=ref,
             )
         ]
@@ -2120,8 +2238,8 @@ class PyASTToCAST:
     def visit_FunctionDef(
         self,
         node: ast.FunctionDef,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST FunctionDef node. Which is used for a Python
         function definition.
@@ -2518,8 +2636,8 @@ class PyASTToCAST:
     def visit_Lambda(
         self,
         node: ast.Lambda,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Lambda node. Which is used for a Python Lambda
         function definition. It works pretty analogously to the FunctionDef
@@ -2601,8 +2719,8 @@ class PyASTToCAST:
     def visit_ListComp(
         self,
         node: ast.ListComp,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST ListComp node, which are used for Python list comprehensions.
         List comprehensions generate a list from some generator expression.
@@ -2834,8 +2952,8 @@ class PyASTToCAST:
     def visit_DictComp(
         self,
         node: ast.DictComp,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         ref = [
             self.filenames[-1],
@@ -3045,7 +3163,7 @@ class PyASTToCAST:
 
     @visit.register
     def visit_If(
-        self, node: ast.If, prev_scope_id_dict: Dict, curr_scope_id_dict: Dict
+        self, node: ast.If, prev_scope_id_dict, curr_scope_id_dict
     ):
         """Visits a PyAST If node. Which is used to represent If statements.
         We visit each of the pieces accordingly and construct the CAST
@@ -3100,8 +3218,8 @@ class PyASTToCAST:
     def visit_Global(
         self,
         node: ast.Global,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Global node.
         What this does is write in the IDs for variables that are
@@ -3128,8 +3246,8 @@ class PyASTToCAST:
     def visit_IfExp(
         self,
         node: ast.IfExp,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST IfExp node, which is Python's ternary operator.
         The node gets translated into a CAST ModelIf node by visiting all its parts,
@@ -3170,8 +3288,8 @@ class PyASTToCAST:
     def visit_Import(
         self,
         node: ast.Import,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Import node, which is used for importing libraries
         that are used in programs. In particular, it's imports in the form of
@@ -3230,8 +3348,8 @@ class PyASTToCAST:
     def visit_ImportFrom(
         self,
         node: ast.ImportFrom,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST ImportFrom node, which is used for importing libraries
         that are used in programs. In particular, it's imports in the form of
@@ -3320,8 +3438,8 @@ class PyASTToCAST:
     def visit_List(
         self,
         node: ast.List,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST List node. Which is used to represent Python lists.
 
@@ -3369,8 +3487,8 @@ class PyASTToCAST:
     def visit_Module(
         self,
         node: ast.Module,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Module node. This is the starting point of CAST Generation,
         as the body of the Module node (usually) contains the entire Python
@@ -3460,8 +3578,8 @@ class PyASTToCAST:
     def visit_Name(
         self,
         node: ast.Name,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """This visits PyAST Name nodes, which consist of
            id: The name of a variable as a string
@@ -3566,8 +3684,8 @@ class PyASTToCAST:
     def visit_Pass(
         self,
         node: ast.Pass,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """A PyAST Pass visitor, for essentially NOPs."""
         source_code_data_type = ["Python", "3.8", "List"]
@@ -3593,8 +3711,8 @@ class PyASTToCAST:
     def visit_Raise(
         self,
         node: ast.Raise,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """A PyAST Raise visitor, for Raising exceptions
 
@@ -3645,8 +3763,8 @@ class PyASTToCAST:
     def visit_Return(
         self,
         node: ast.Return,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Return node and creates a CAST return node
            that has one field, which is the expression computing the value
@@ -3687,8 +3805,8 @@ class PyASTToCAST:
     def visit_UnaryOp(
         self,
         node: ast.UnaryOp,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST UnaryOp node. Which represents Python unary operations.
         A dictionary is used to index into which operation we're doing.
@@ -3724,7 +3842,7 @@ class PyASTToCAST:
 
     @visit.register
     def visit_Set(
-        self, node: ast.Set, prev_scope_id_dict: Dict, curr_scope_id_dict: Dict
+        self, node: ast.Set, prev_scope_id_dict, curr_scope_id_dict
     ):
         """Visits a PyAST Set node. Which is used to represent Python sets.
 
@@ -3768,8 +3886,8 @@ class PyASTToCAST:
     def visit_Subscript(
         self,
         node: ast.Subscript,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Subscript node, which represents subscripting into
         a list in Python. A Subscript is either a Slice (i.e. x[0:2]), an
@@ -3975,8 +4093,8 @@ class PyASTToCAST:
     def visit_Index(
         self,
         node: ast.Index,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Index node, which represents the value being used
         for an index. This visitor doesn't create its own CAST node, but
@@ -3996,8 +4114,8 @@ class PyASTToCAST:
     def visit_Tuple(
         self,
         node: ast.Tuple,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST Tuple node. Which is used to represent Python tuple.
 
@@ -4008,7 +4126,6 @@ class PyASTToCAST:
             Set: A CAST Tuple node.
         """
 
-        # source_code_data_type = ["Python","3.8","List"]
         ref = [
             SourceRef(
                 source_file_name=self.filenames[-1],
@@ -4024,13 +4141,12 @@ class PyASTToCAST:
             to_ret.extend(
                 self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
             )
-        return [Tuple(to_ret, source_refs=ref)]
-        # else:
-        #   return [LiteralValue(StructureType.TUPLE, [], source_code_data_type, source_refs=ref)]
+        source_code_data_type = ["Python","3.8","Tuple"]
+        return [LiteralValue(StructureType.TUPLE, to_ret, source_code_data_type, source_refs=ref)]
 
     @visit.register
     def visit_Try(
-        self, node: ast.Try, prev_scope_id_dict: Dict, curr_scope_id_dict: Dict
+        self, node: ast.Try, prev_scope_id_dict, curr_scope_id_dict
     ):
         """Visits a PyAST Try node, which represents Try/Except blocks.
         These are used for Python's exception handling
@@ -4060,8 +4176,8 @@ class PyASTToCAST:
     def visit_Yield(
         self,
         node: ast.Yield,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         source_code_data_type = ["Python", "3.8", "List"]
         ref = [
@@ -4086,8 +4202,8 @@ class PyASTToCAST:
     def visit_Assert(
         self,
         node: ast.Assert,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         source_code_data_type = ["Python", "3.8", "List"]
         ref = [
@@ -4112,8 +4228,8 @@ class PyASTToCAST:
     def visit_While(
         self,
         node: ast.While,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST While node, which represents a while loop.
 
@@ -4150,14 +4266,14 @@ class PyASTToCAST:
 
         # loop_body_fn_def = FunctionDef(name="while_temp", func_args=None, body=body)
         # return [Loop(init=[], expr=test, body=loop_body_fn_def, source_refs=ref)]
-        return [Loop(init=[], expr=test, body=body, source_refs=ref)]
+        return [Loop(pre=[], expr=test, body=body, post=[], source_refs=ref)]
 
     @visit.register
     def visit_With(
         self,
         node: ast.With,
-        prev_scope_id_dict: Dict,
-        curr_scope_id_dict: Dict,
+        prev_scope_id_dict,
+        curr_scope_id_dict,
     ):
         """Visits a PyAST With node. With nodes are used as follows:
         with a as b, c as d:
