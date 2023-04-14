@@ -39,8 +39,8 @@ pub struct Variable {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UnaryOperator {
-    pub src: String,
-    pub tgt: String,
+    pub src: usize,
+    pub tgt: usize,
     pub op1: String,
 }
 
@@ -81,7 +81,6 @@ fn main() {
         //println!(":?", mathml.clone());
         if let Mrow(components) = mml {
             for component in components.iter() {
-                println!("components = {}", component);
                 match component {
                     Mfrac(num, denom) => {
                         if let (Mrow(num_exp), Mrow(denom_exp)) = (&**num, &**denom) {
@@ -104,8 +103,8 @@ fn main() {
 
                                         let diff_op = format!("{}_{}{}", var1, var3, var4);
                                         let operation = UnaryOperator {
-                                            src: variable.name,
-                                            tgt: target,
+                                            src: 1,
+                                            tgt: 2,
                                             op1: diff_op,
                                         };
                                         un_op.push(operation.clone());
@@ -135,7 +134,7 @@ fn main() {
             Var: var,
             Op1: un_op,
         };
-        println!("diagram = {:#?}", diagram);
+        //println!("diagram = {:#?}", diagram);
         let json_wiringdiagram = serde_json::to_string_pretty(&diagram).unwrap();
         let filepath = "simple_example.json";
 
