@@ -1,194 +1,40 @@
 import json
 from typing import Any
-from dataclasses import dataclass
 
 from tree_sitter import Language, Parser
-from test import Module, SourceRef, Assignment, LiteralValue, Var, VarType, Name, Expr, Operator, AstNode, SourceCodeDataType, ModelImport, List, FunctionDef, Loop, Subscript, Boolean, String, Call, ModelReturn
-from cast import CAST
-#TODO:
-# 1. DONE: Check why function argument types aren't being infered from definitions
-# 2. DONE: Update variable logic to pass down type
-# 2. DONE: Update logic for var id creation
-# 3. Update logic for accessing node and node children
-# 5. DONE: Fix extraneous import children
-# 6. Add logic for return statement in functions and subroutines
-# 7. Implement logic for do unitl loop
-# 8. Fix logic for continuation lines and comments
-# --------------------------------------------------------
 
-class NodeHelper(object):
-   def __init__(self, source_file_name:str, source: str):
-      self.source_file_name = source_file_name
-      self.source = source
-    
-   def parse_tree_to_dict(self, node) -> dict:
-      node_dict = {
-         "type": self.get_node_type(node),
-         "source_refs": [self.get_node_source_ref(node)],
-         "identifier": self.get_node_identifier(node),
-         "original_children_order": [],
-         "children": [],
-         "comments": [],
-         "control": []
-      }
-      
-      for child in node.children:
-         child_dict = self.parse_tree_to_dict(child)
-         node_dict["original_children_order"].append(child_dict)
-         if self.is_comment_node(child):  
-            node_dict["comments"].append(child_dict)
-         elif self.is_control_character_node(child):
-            node_dict["control"].append(child_dict)
-         else:
-            node_dict["children"].append(child_dict)
-   
-      return node_dict
-   
-   def is_comment_node(self, node):
-      if node.type == "comment":
-         return True
-      return False
-   
-   def is_control_character_node(self, node):
-      control_characters = [
-         ',',
-         '=',
-         '(',
-         ')',
-         ":",
-         "::",
-         "+",
-         "-",
-         "*",
-         "**",
-         "/",
-         ">",
-         "<",
-         "<=",
-         ">="
-      ]
-      return node.type in control_characters
-      
-   
-   def get_node_source_ref(self, node) -> SourceRef:
-    row_start, col_start = node.start_point
-    row_end, col_end = node.end_point
-    return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)
-   
-   def get_node_identifier(self, node) -> str:
-    source_ref = self.get_node_source_ref(node)
-    
-    line_num = 0
-    column_num = 0
-    in_identifier = False
-    identifier = ""
-    for i, char in enumerate(self.source):
-        if line_num == source_ref.row_start and column_num == source_ref.col_start:
-            in_identifier = True
-        elif line_num == source_ref.row_end and column_num == source_ref.col_end:
-            break
-        
-        if char == "\n":
-            line_num += 1
-            column_num = 0
-        else:
-            column_num += 1
+from skema.program_analysis.CAST2GrFN.model.cast import CAST
+from skema.program_analysis.CAST2GrFN.model.cast import (
+   Module,
+   SourceRef,
+   Assignment,
+   LiteralValue,
+   Var,
+   VarType,
+   Name,
+   Expr,
+   Operator,
+   AstNode,
+   SourceCodeDataType,
+   ModelImport,
+   List,
+   FunctionDef,
+   Loop,
+   Subscript,
+   Boolean,
+   String,
+   Call,
+   ModelReturn,
+   ModelIf
+)
 
-        if in_identifier:
-            identifier += char
-    
-    return identifier
-   
-   def get_node_type(self, node) -> str:
-      return node.type
 
-   def get_first_child_by_type(self, node: dict, node_type: str) -> dict:
-      children = self.get_children_by_type(node, node_type)
-      if len(children) >= 1:
-         return children[0]
-     
-   def get_children_by_type(self, node: dict, node_type: str) -> list:
-      children = []
+from variable_context import VariableContext
+from node_helper import NodeHelper
+from util import generate_dummy_source_refs, preprocess
 
-      for child in node["children"]:
-         if child["type"] == node_type:
-            children.append(child)
-
-      return children
-   
-class VariableContext(object):
-   def __init__(self):
-      self.variable_id = 0
-      self.iterator_id = 0
-      self.stop_condition_id = 0
-      self.context = [{}] # Stack of context dictionaries
-      self.context_return_values = [set()] # Stack of context return values
-      self.all_symbols = {}
-   
-   def push_context(self):
-      self.context.append({})
-      self.context_return_values.append(set())
-
-   def pop_context(self):
-      context = self.context.pop()
-
-      # Remove symbols from all_symbols variable
-      for symbol in context:
-         self.all_symbols.pop(symbol)
-
-      self.context_return_values.pop()
-
-   def add_variable(self, symbol: str, type: str, source_refs: list) -> Name:
-      cast_name = Name(source_refs=source_refs)
-      cast_name.name = symbol
-      cast_name.id = self.variable_id
-
-      # Update variable id
-      self.variable_id += 1
-
-      # Add the node to the variable context
-      self.context[-1][symbol] = {
-        "node": cast_name,
-        "type": type,
-      }
-
-      # Add reference to all_symbols
-      self.all_symbols[symbol] = self.context[-1][symbol]
-
-      return cast_name 
-   
-   def is_variable(self, symbol: str) -> bool:
-      return symbol in self.all_symbols
-   
-   def get_node(self, symbol: str) -> dict:
-      return self.all_symbols[symbol]["node"]
-   
-   def get_type(self, symbol: str) -> str:
-      return self.all_symbols[symbol]["type"]
-   
-   def update_type(self, symbol:str, type: str):
-     self.all_symbols[symbol]["type"] = type
-
-   def add_return_value(self, symbol):
-      self.context_return_values[-1].add(symbol)
-   def remove_return_value(self, symbol):
-      self.context_return_values[-1].discard(symbol)
-
-   def generate_iterator(self):
-       symbol = f"generated_iter_{self.iterator_id}"
-       self.iterator_id += 1
-
-       return self.add_variable(symbol, "iterator", [None])
-   def generate_stop_condition(self):
-       symbol = f"sc_{self.stop_condition_id}"
-       self.stop_condition_id += 1
-
-       return self.add_variable(symbol, "boolean", [None])
-       
-   
-   
-   
 class TS2CAST(object):
+     
   def __init__(self, source_file_path: str, tree_sitter_fortran_path: str):
 
     # Initialize tree-sitter
@@ -249,6 +95,9 @@ class TS2CAST(object):
 
   def visit(self, node: dict):
     match node["type"]:
+       case "program_statement" | "module":
+          pass
+          #return self.visit_program_statement(node)
        case "subroutine" | "function":
           return self.visit_function_def(node)
        case "subroutine_call" | "call_expression":
@@ -273,9 +122,20 @@ class TS2CAST(object):
           return self.visit_extent_specifier(node)
        case "do_loop_statement":
           return self.visit_do_loop_statement(node)
+       case "if_statement":
+          return self.visit_if_statement(node)
        case _:
           return self._visit_passthrough(node)
   
+  def visit_program_statement(self, node):
+     program_body = []
+     for child in node["children"]:
+        for child in node["children"]:
+           print("HERE")
+           program_body.append(self.visit(child))
+        print(program_body)
+     return program_body
+    
   def visit_name(self, node):
      # Node structure
      # (name)
@@ -430,7 +290,7 @@ class TS2CAST(object):
           cast_tuple.value.append(cast_var)
         cast_return.value = cast_tuple
     else:
-        cast_return.value = LiteralValue("None", "None")
+        cast_return.value = LiteralValue(None, None)
   
     return cast_return
      
@@ -562,6 +422,61 @@ class TS2CAST(object):
 
      return cast_loop
         
+  def visit_if_statement(self, node):
+     #(if_statement)
+     #  (if)
+     #  (parenthesised_expression)
+     #  (then)   
+     #  (body_nodes) ...
+     #  (elseif_clauses) ..
+     #  (else_clause)
+     #  (end_if_statement)
+   
+      # TODO: Clean up some of this logic and document whats going on
+     child_types = [child["type"] for child in node["children"]]
+     
+     try:
+        elseif_index = child_types.index("elseif_clause")
+     except ValueError:
+        elseif_index = -1
+     
+     try:
+        else_index = child_types.index("else_clause")
+     except ValueError:
+        else_index = -1
+     
+     if elseif_index != -1:
+        body_stop_index = elseif_index
+     else:
+        body_stop_index = else_index
+     
+     prev = None
+     orelse = None
+     # If there are else_if statements, they need
+     if elseif_index != -1:
+        orelse = ModelIf()
+        prev = orelse
+        for condition in node["children"][elseif_index:else_index]:
+          elseif_expr = self.visit(condition["children"][2])
+          elseif_body = [self.visit(child) for child in condition["children"][4:]]
+        
+          prev.orelse = ModelIf(elseif_expr, elseif_body, None)
+          prev = prev.orelse
+      
+     if else_index != -1:
+        else_body = [self.visit(child) for child in node["children"][else_index]["children"][1:]]
+        if prev:
+          prev.orelse = else_body
+        else:
+          orelse = else_body 
+
+     return ModelIf(
+        expr=self.visit(node["children"][1]), 
+        body=[self.visit(child) for child in node["children"][3:body_stop_index]], 
+        orelse=orelse.orelse
+      )
+     
+  
   def visit_assignment_statement(self, node):
     cast_assignment = Assignment()
     cast_assignment.source_refs = node["source_refs"]
@@ -815,8 +730,6 @@ class TS2CAST(object):
      cast_name = self.visit_name(node_dict)
     
      return cast_name
-     
-
   @staticmethod
   def update_field(field: Any, element: Any) -> list:
     if not field:
@@ -829,19 +742,3 @@ class TS2CAST(object):
          field.append(element)
     
     return field
-  
-def generate_dummy_source_refs(node: AstNode) -> None:
-    if not node.source_refs:
-      node.source_refs = [SourceRef("",-1,-1,-1,-1)]
-
-    for attribute_str in node.attribute_map:
-      attribute = getattr(node, attribute_str)
-      if isinstance(attribute, AstNode):
-          generate_dummy_source_refs(attribute)
-      elif isinstance(attribute, list):
-         for element in attribute:
-            if isinstance(element, AstNode):
-              generate_dummy_source_refs(element)
-
-walker = TS2CAST("loop.f95", "tree-sitter-fortran")
-
