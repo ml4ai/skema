@@ -1,4 +1,4 @@
-from skema.program_analysis.CAST2GrFN.model.cast import (
+from skema.program_analysis.CAST2FN.model.cast import (
    Var,
    Name, 
 )

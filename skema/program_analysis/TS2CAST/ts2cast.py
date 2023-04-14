@@ -3,8 +3,8 @@ from typing import Any
 
 from tree_sitter import Language, Parser
 
-from skema.program_analysis.CAST2GrFN.model.cast import CAST
-from skema.program_analysis.CAST2GrFN.model.cast import (
+from skema.program_analysis.CAST2FN.model.cast import CAST
+from skema.program_analysis.CAST2FN.model.cast import (
    Module,
    SourceRef,
    Assignment,
@@ -12,17 +12,12 @@ from skema.program_analysis.CAST2GrFN.model.cast import (
    Var,
    VarType,
    Name,
-   Expr,
    Operator,
    AstNode,
    SourceCodeDataType,
    ModelImport,
-   List,
    FunctionDef,
    Loop,
-   Subscript,
-   Boolean,
-   String,
    Call,
    ModelReturn,
    ModelIf

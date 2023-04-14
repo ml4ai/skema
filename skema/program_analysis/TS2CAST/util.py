@@ -1,3 +1,8 @@
+from skema.program_analysis.CAST2FN.model.cast import (
+   AstNode,
+   LiteralValue,
+   SourceRef
+)
 def generate_dummy_source_refs(node: AstNode) -> None:
     if isinstance(node, LiteralValue) and not node.source_code_data_type:
        node.source_code_data_type = [
