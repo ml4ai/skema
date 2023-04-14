@@ -1,14 +1,14 @@
 name:                generator
 version:             0.1.0.0
 build-type:          Simple
-cabal-version:       >=1.16
+cabal-version:       >=1.10
 
 executable generator
   default-language:    Haskell2010
   main-is:             generator.hs
   build-depends:
-      base       >= 4.6
+      base >= 4.7 && < 5
     , containers >= 0.5
-    , pandoc     >= 1.11
-    , hakyll     >= 4.3
+    , pandoc
+    , hakyll     
     , process     >= 1.4

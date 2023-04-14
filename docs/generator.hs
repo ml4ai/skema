@@ -114,7 +114,7 @@ static = forM_ ["fonts/*", "assets/**", "css/*", "js/*"] $ \x -> match x $ do
 -- Main
 ------------
 main :: IO ()
-main = hakyllWith cfg $ do
+main = hakyll $ do
   match "apa.csl" $ compile cslCompiler
   match "refs.bib"    $ compile biblioCompiler
   static

@@ -200,6 +200,7 @@ BUILTINS = [
     "stat",
     "statistics",
     "string",
+    "str",
     "stringprep",
     "struct",
     "subprocess",

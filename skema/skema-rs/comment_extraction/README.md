@@ -14,12 +14,11 @@ Cargo invocation (assuming your current working directory is the
 `comment_extraction` directory) is:
 
 ```console
-cargo run -- <INPUT> [OUTPUT]
+cargo run -- <INPUT>
 ```
 
-Where `INPUT` is the name of the input source file, and `OUTPUT` is the name of
-the file to write the JSON output to. If the `OUTPUT` argument is not provided,
-the program prints the JSON to standard output instead.
+Where `INPUT` is the name of the input source file or directory. The program
+prints the JSON to standard output.
 
 ## Capabilities and limitations
 

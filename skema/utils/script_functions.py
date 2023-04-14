@@ -11,35 +11,35 @@ from skema.gromet.fn import (
 
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 from skema.program_analysis.PyAST2CAST import py_ast_to_cast
-from skema.program_analysis.CAST2GrFN import cast
-from skema.program_analysis.CAST2GrFN.model.cast import SourceRef
-from skema.program_analysis.CAST2GrFN.cast import CAST
-from skema.program_analysis.CAST2GrFN.visitors.cast_to_agraph_visitor import (
+from skema.program_analysis.CAST2FN import cast
+from skema.program_analysis.CAST2FN.model.cast import SourceRef
+from skema.program_analysis.CAST2FN.cast import CAST
+from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.cast_to_annotated_cast import (
+from skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast import (
     CastToAnnotatedCastVisitor,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.id_collapse_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass import (
     IdCollapsePass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.container_scope_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.container_scope_pass import (
     ContainerScopePass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.variable_version_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.variable_version_pass import (
     VariableVersionPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.grfn_var_creation_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.grfn_var_creation_pass import (
     GrfnVarCreationPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.grfn_assignment_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass import (
     GrfnAssignmentPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.lambda_expression_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.lambda_expression_pass import (
     LambdaExpressionPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.to_grfn_pass import ToGrfnPass
-from skema.program_analysis.CAST2GrFN.ann_cast.to_gromet_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass import ToGrfnPass
+from skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass import (
     ToGrometPass,
 )
 
@@ -49,7 +49,7 @@ def process_file_system(system_name, path, files, write_to_file=False):
     file_list = open(files, "r").readlines()
 
     module_collection = GrometFNModuleCollection(
-        schema_version="0.1.5",
+        schema_version="0.1.6",
         name=system_name,
         modules=[],
         module_index=[],
