@@ -1,0 +1,156 @@
+openapi: 3.0.0
+info:
+  title: SKEMA API
+  version: "1.0.1"
+  description: RESTful API exposing functionality of the SKEMA project
+  contact:
+    name: Clayton T. Morrison
+    email: claytonm@arizona.edu
+servers:
+  - url: http://localhost:9000
+    description: local host running the webapp with the default port
+tags:
+  - name: "grounding"
+    description: operations specific to SKEMA grounding
+
+paths:
+  /groundStringsToMira:
+    post:
+      tags:
+        - "grounding"
+      summary: |
+        accept some texts and a k and return the top-k groundings for the texts
+      description: |
+        accept some texts and a k and return the top-k groundings for the texts
+      parameters:
+        - name: k
+          in: query
+          description: the k in top-k
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 5
+      requestBody:
+        description: the texts to ground, one per line
+        required: true
+        content:
+          text/plain:
+            schema:
+              type: string
+              example: |
+                one
+                two
+                three
+      responses:
+        '200':
+          description: the top-k groundings for the texts
+          content:
+            application/json:
+              schema:
+                type: array
+                description: one element for each line of text
+                items:
+                  type: array
+                  description: one element for each k of the top-k groundings
+                  items:
+                    $ref: "#/components/schemas/GroundingCandidate"
+
+  /runTextReadingPipelineWithContext:
+    post:
+      tags:
+        - "grounding"
+      summary: |
+        run the text reading pipeline with context
+      description: |
+        run the text reading pipeline with context
+      parameters:
+        - name: contextWindowSize
+          in: query
+          description: the window size for the context
+          required: false
+          schema:
+            type: integer
+            format: int32
+            default: 3
+      requestBody:
+        description: an array of texts, each probably one or more sentences, perhaps entire documents
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              description: one text, probably at least a sentence if not an entire document
+              items:
+                type: string
+              example: |
+                [
+                  "Far out in the uncharted backwaters of the unfashionable end of the western spiral arm of the Galaxy lies a small, unregarded yellow sun.",
+                  "It was a bright cold day in April, and the clocks were striking thirteen.",
+                  "The year 1866 was signalized by a remarkable incident, a mysterious and inexplicable phenomenon, which doubtless no one has yet forgotten."
+                ]
+      responses:
+        '200':
+          description: output for successful run of the text reading pipeline for the input texts
+          content:
+            application/json:
+              schema:
+                type: array
+                description: for each of the input texts, output from the text reading pipeline
+                items:
+                  type: array
+                  description: output from the text reading pipeline for a single text
+                  items:
+                    $ref: "#/components/schemas/Annotation"
+
+components:
+  schemas:
+    Annotation:
+      type: string
+    GroundingCandidate:
+        type: object
+        description: a ranked list of k grounding concepts
+        required:
+          - groundingConcept
+          - score
+        properties:
+            groundingConcept:
+                $ref: "#/components/schemas/GroundingConcept"
+            score:
+                type: number
+                description: score given by the grounding algorithm to the concept
+                example: 0.8
+
+    GroundingConcept:
+        type: object
+        description: ontology concept that serves as grounding element for extractions
+        required:
+          - id
+          - name
+        properties:
+            id:
+                type: string
+                description: unique identifier of the concept
+                example: "ncit:C80485"
+            name:
+                type: string
+                description: name of the concept
+                example: "Health Level Seven"
+            description:
+                type: string
+                description: optional description of the concept
+                example: "A Standards Developing Organization (SDO) operating in the healthcare arena..."
+            synonyms:
+                type: array
+                description: an optional list of synonyms
+                example: ["Health Level 7 (HL7)", "Health Level Seven", "HL7"]
+                items:
+                  type: string
+            embedding:
+                type: array
+                description: an optional array of floats forming the grounding
+                example: [0.034831780940294266, 0.018551819026470184, -0.046141307801008224]
+                minItems: 200
+                maxItems: 200
+                items: 
+                  type: number

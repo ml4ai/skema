@@ -6,11 +6,11 @@ import org.ml4ai.skema.text_reading.apps.ExtractAndAlign.{getCommentDescriptionM
 import org.ml4ai.skema.text_reading.grfn.GrFNParser.{mkCommentTextElement, parseCommentText}
 import org.clulab.odin.serialization.json.JSONSerializer
 import org.clulab.processors.Document
-import org.ml4ai.grounding.{sparqlResult, sparqlWikiResult}
 import org.ml4ai.skema.text_reading.OdinEngine
 import org.ml4ai.skema.text_reading.apps.{AlignmentArguments, AlignmentBaseline, AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.grfn.GrFNParser
-import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.grounding.{sparqlResult, sparqlWikiResult}
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 import ujson.{Obj, Value}
 import ujson.json4s._
 import upickle.default.macroRW
@@ -68,7 +68,7 @@ object AlignmentJsonUtils {
       val mentionsFile = new File(mentionsPath)
       val textMentions =  if (serializerName == "AutomatesJSONSerializer") {
         val ujsonOfMenFile = ujson.read(mentionsFile)
-        AutomatesJSONSerializer.toMentions(ujsonOfMenFile)
+        SkemaJSONSerializer.toMentions(ujsonOfMenFile)
       } else {
         val ujsonMentions = ujson.read(mentionsFile.readString())
         //transform the mentions into json4s format, used by mention serializer
@@ -138,7 +138,7 @@ object AlignmentJsonUtils {
         val mentionsFile = new File(mentionsPath)
         val textMentions =  if (serializerName == "AutomatesJSONSerializer") {
           val ujsonOfMenFile = ujson.read(mentionsFile)
-          AutomatesJSONSerializer.toMentions(ujsonOfMenFile)
+          SkemaJSONSerializer.toMentions(ujsonOfMenFile)
         } else {
           val ujsonMentions = ujson.read(mentionsFile.readString())
           //transform the mentions into json4s format, used by mention serializer

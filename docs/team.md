@@ -3,9 +3,9 @@ title: Team
 layout: page
 ---
 
-**PI:** [Clayton Morrison](https://ml4ai.github.io/people/clayton/)
+**PI**: [Clayton Morrison](https://ml4ai.github.io/people/clayton/)
 
-**co-PIs:**
+**co-PIs**:
 
 - [Daniel Bryce](https://www.sift.net/staff/dan-bryce) (SIFT)
 - [Kate Isaacs](https://www.sci.utah.edu/people/kisaacs.html)
@@ -16,18 +16,19 @@ layout: page
 **Researchers**:
 
 - [Drisana Iverson](https://www.sift.net/staff/drisana-mosaphir)
+- [Marco Valenzuela-Escárcega](https://scholar.google.com/citations?user=uU2UhGIAAAAJ&hl=en)
 
 **Postdocs**:
 
 - Justin Lieffers
 - Liang Zhang
 
-**Graduate Students:**
+**Graduate Students**:
 
 - Deepsana Shahi
 - Isha Talegaonkar
 
-**Research Programmers:**
+**Research Programmers**:
 
 - [Tito Ferra](https://github.com/titomeister)
 - Jack Ladwig

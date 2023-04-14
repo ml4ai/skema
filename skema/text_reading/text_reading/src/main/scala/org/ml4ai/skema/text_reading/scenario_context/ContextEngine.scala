@@ -17,7 +17,7 @@ class ContextEngine(windowSize:Int, documentMentions:Iterable[Mention], orderer:
 
   private val mentionsMap: Map[Int, Iterable[Mention]] = candidateMentions.groupBy(orderer.resolveLinearOrder)
 
-  private val maxIndex = mentionsMap.keys.max
+  private val maxIndex = if(mentionsMap.nonEmpty) mentionsMap.keys.max else 0
 
 
   def resolveContext(m:Mention): Mention =  {
