@@ -48,14 +48,15 @@ pub struct UnaryOperator {
 pub struct ProjectionOperator {
     pub proj1: usize,
     pub proj2: usize,
-    pub tgt: usize,
-    pub proj: String,
+    pub res: usize,
+    pub op2: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WiringDiagram {
     pub Var: Vec<Variable>,
     pub Op1: Vec<UnaryOperator>,
+    pub Op2: Vec<ProjectionOperator>,
 }
 
 //fn diagram(Vec<Math>) -> Vec<WiringDiagram> {
@@ -76,10 +77,12 @@ fn main() {
     for mathml in mathml_exp.iter() {
         let mut var: Vec<Variable> = Vec::new();
         let mut un_op: Vec<UnaryOperator> = Vec::new();
-        for content in mathml.content.iter() {
+        let mut proj_op: Vec<ProjectionOperator> = Vec::new();
+        //for content in mathml.content.iter() {
+        for (index,content) in mathml.content.iter().enumerate() {
             //let mml = mathml.content[0].clone();
             //println!(":?", mathml.clone());
-            println!("{:?}", content);
+            println!("index={:?}, content={:?}", index, content);
             if let Mrow(components) = content {
                 for component in components.iter() {
                     match component {
@@ -134,6 +137,20 @@ fn main() {
                                             name: sub_term.clone().to_owned(),
                                         };
                                         var.push(variable5.clone());
+                                        
+                                        let temp_var1 = Variable {
+                                            r#type: Type::infer,
+                                            name: "•1".to_string(),
+                                        };
+                                        var.push(temp_var1.clone());
+                                        let projection1 = ProjectionOperator{
+                                            proj1: 3,
+                                            proj2: 4,
+                                            res: 5,
+                                            op2: "*".to_string()
+                                        };
+                                        proj_op.push(projection1.clone());
+
 
                                         let over_term = format!("{}_{}", v1, v2);
                                         let variable6 = Variable {
@@ -147,6 +164,29 @@ fn main() {
                                             name: v3.to_owned(),
                                         };
                                         var.push(variable7.clone());
+
+                                        let temp_var2 = Variable {
+                                            r#type: Type::infer,
+                                            name: "•2".to_string(),
+                                        };
+                                        var.push(temp_var2.clone());
+
+                                        let projection2 = ProjectionOperator{
+                                            proj1: 6,
+                                            proj2: 7,
+                                            res: 8,
+                                            op2: "*".to_string(),
+                                        };
+                                        proj_op.push(projection2.clone());
+
+                                        let projection3 = ProjectionOperator{
+                                            proj1: 5,
+                                            proj2: 8,
+                                            res: 9,
+                                            op2: "/".to_string(),
+                                        };
+                                        proj_op.push(projection3.clone());
+
                                     }
                                 }
                             }
@@ -182,6 +222,7 @@ fn main() {
         let diagram = WiringDiagram {
             Var: var,
             Op1: un_op,
+            Op2: proj_op,
         };
         //println!("diagram = {:#?}", diagram);
         let json_wiringdiagram = serde_json::to_string_pretty(&diagram).unwrap();
