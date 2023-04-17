@@ -43,7 +43,7 @@ def process_file_system(
     file_list = open(files, "r").readlines()
 
     module_collection = GrometFNModuleCollection(
-        schema_version="0.1.5",
+        schema_version="0.1.6",
         name=system_name,
         modules=[],
         module_index=[],
@@ -51,6 +51,7 @@ def process_file_system(
     )
 
     for f in file_list:
+        print(f)
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
         try:
             cast = python_to_cast(full_file, cast_obj=True)
@@ -81,9 +82,8 @@ def process_file_system(
             # We do this by finding all user_defined top level functions in the Gromet
             # and check if the name 'main' is among them
             function_networks = [
-                fn.value
-                for fn in generated_gromet.attributes
-                if fn.type == "FN"
+                fn
+                for fn in generated_gromet.fn_array
             ]
             defined_functions = [
                 fn.b[0].name
