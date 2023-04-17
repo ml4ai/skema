@@ -22,7 +22,7 @@ def get_mathml_from_bytes(data: bytes):
     with open(cwd / "vocab.txt") as f:
         vocab = f.readlines()
 
-    model_path = cwd / "trained_models/cnn_xfmer_OMML-90K_best.pt"
+    model_path = cwd / "trained_models/cnn_xfmer_omml-100K_best.pt"
 
     return render_mml(config, model_path, vocab, imagetensor)
 

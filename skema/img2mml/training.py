@@ -310,8 +310,8 @@ def train_model(rank=None,):
             print("continuing training from lastest saved model...")
 
         for epoch in range(EPOCHS):
-            if (not ddp) or (ddp and rank == 0):
-                print(f"Epoch: {epoch + 1} / {EPOCHS}")
+            # if (not ddp) or (ddp and rank == 0):
+            #     print(f"Epoch: {epoch + 1} / {EPOCHS}")
 
             if count_es <= early_stopping_counts:
 
