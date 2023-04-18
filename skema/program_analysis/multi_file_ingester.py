@@ -10,6 +10,7 @@ from skema.gromet.fn import (
 
 from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
 from skema.program_analysis.python2cast import python_to_cast
+from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
@@ -51,11 +52,17 @@ def process_file_system(
     )
 
     for f in file_list:
-        print(f)
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
+        
         try:
-            cast = python_to_cast(full_file, cast_obj=True)
-
+            # To maintain backwards compatibility for the process_file_system function, for now we will determine the language by file extension
+            if full_file.endswith(".py"):
+                cast = python_to_cast(full_file, cast_obj=True)
+            elif full_file.endswith(".F") or full_file.endswith(".f95"):
+                cast = fortran_to_cast(full_file, cast_obj=True)
+            else:
+                print(f"File extension not supported for {full_file}")
+            
             cur_dir = os.getcwd()
             os.chdir(os.path.join(os.getcwd(), path))
             generated_gromet = ann_cast_pipeline(
