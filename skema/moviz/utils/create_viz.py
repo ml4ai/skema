@@ -1,5 +1,10 @@
 import json
 import graphviz
+from skema.moviz.utils.helper_functions import drawB, setExpandValue
+
+#remove this before commit
+# from skema.utils.fold import del_nulls, dictionary_to_gromet_json
+
 from utils.helper_functions import (
     drawBC,
     drawBL,
@@ -14,11 +19,27 @@ from utils.helper_functions import (
     drawWOPIO,
 )
 
+
 from utils.init import init
 
+from pathlib import Path
+
+
 def draw_graph(gromet, program_name: str):
+    
+    cwd = Path(__file__).parents[0]
     data = gromet.to_dict()
     init(data)
+
+    ####remove this before commit
+    # with open(f"{program_name}--Gromet-FN-auto.json", "w") as f:
+    #     f.write(dictionary_to_gromet_json(del_nulls(data)))
+    ####
+
+    cwd = Path(__file__).parents[0]
+    filepath = cwd / "../../../data/gromet/config/config.json"
+    with open(filepath, 'r') as cf:
+        config = json.load(cf)
 
     g = graphviz.Graph(
         "G",
@@ -29,7 +50,29 @@ def draw_graph(gromet, program_name: str):
     )
     g.attr(compound='true')
     g.attr(rankdir="BT")
-    # LHS
+
+    # print(type(g))
+    if config['start_collapsed'] == 'false':
+        lhs= drawLHS(data, g)
+        rhs = drawRHS(data, g, False,)
+        output = drawArrows(data, g, False)
+        return output
+    elif config['start_collapsed'] == 'true':
+        if not config['uncollapse_list']:
+            lhs = drawLHS(data, g)
+            return lhs
+        else:
+            lhs = drawLHS(data, g)
+            for item in config['uncollapse_list']:
+                setExpandValue(data, item)
+                rhs = drawRHS(data, g, item)
+                # print(rhs)
+            # print(rhs)
+            output = drawArrows(data, rhs, True)
+            return output
+
+#LHS
+def drawLHS(data, g):
     i=0
     # print(data.get('fn'))
     for b in data.get("fn").get("b"):
@@ -55,89 +98,63 @@ def draw_graph(gromet, program_name: str):
     drawWFC(data["fn"], g)
     drawWFL(data["fn"], g)
     drawWFF(data["fn"], g)
+    return g
 
-    # print("bf: ",data.get('fn').get('bf'))
-    # RHS
-    i=0
+def drawRHS(data, g, item_id):
     i=0
     for attribute in data.get("attributes"):
         if attribute.get("type") == "FN":
             if attribute.get("value").get("b") != None:
-                for b in attribute.get("value").get("b"):
-                    if b.get("function_type") == "EXPRESSION":
-                        with g.subgraph(name=f"cluster_expr_{b.get('box')}") as a:
-                            # print("rhs b: ",b.get('box'))
-                            a.attr(color='purple', style='rounded', penwidth='3', label=f"id: {b.get('box')[-5:]}")
-                            a.attr("node",shape = 'point')
-                            a.node(name=f"cluster_expr_{b['box']}_{i}", style = 'invis')
-                            
-                            b['invisNode'] = f"cluster_expr_{b['box']}_{i}"
-                            i+=1
-                            b["node"] = f"cluster_expr_{b.get('box')}"
-                            drawOPO(b, a, attribute.get("value"))
-                            drawOPI(b, a, attribute.get("value"))
-                            if attribute.get("value").get("bf") != None:
-                                # print("attribute")
-                                for bf in attribute.get("value").get("bf"):
-                                    drawBF(attribute.get("value"), a, bf)
-                    if b.get("function_type") == "FUNCTION":
-                        with g.subgraph(name=f"cluster_func_{b.get('box')}") as a:
-                            a.attr(color='green', style='rounded', penwidth='3', label=f"id: {b.get('box')[-5:]}")
-                            a.attr("node",shape = 'point')
-                            a.node(name=f"cluster_func_{b.get('box')}_{i}", style = 'invis')
-                            
-                            b['invisNode'] = f"cluster_func_{b.get('box')}_{i}"
-                            i+=1
-                            if b.get("name") != None:
-                                a.attr(label=str(b.get("name")))
-                            b["node"] = f"cluster_func_{b.get('box')}"
-                            drawOPO(b, a, attribute.get("value"))
-                            drawOPI(b, a, attribute.get("value"))
-                            if attribute.get("value").get("bf") != None:
-                                # print("attribute")
-                                for bf in attribute.get("value").get("bf"):
-                                    drawBF(attribute.get("value"), a, bf)
-                    if b.get("function_type") == "PREDICATE":
-                        with g.subgraph(name=f"cluster_pred_{b.get('box')}") as a:
-                            a.attr(color='pink', style='rounded', penwidth='3', label=f"id: {b.get('box')[-5:]}")
-                            a.attr("node",shape = 'point')
-                            a.node(name=f"cluster_pred_{b.get('box')}_{i}", style = 'invis')
-                            
-                            b['invisNode'] = f"cluster_pred_{b.get('box')}_{i}"
-                            i+=1
-                            a.attr(label=str(b.get("name")))
-                            b["node"] = f"cluster_pred_{b.get('box')}"
-                            drawOPO(b, a, attribute.get("value"))
-                            drawOPI(b, a, attribute.get("value"))
-                            if attribute.get("value").get("bf") != None:
-                                for bf in attribute.get("value").get("bf"):
-                                    drawBF(attribute.get("value"), a, bf)
-                drawWFF(attribute.get("value"), g)
-                drawWFOPO(attribute.get("value"), g)
-                drawWFOPI(attribute.get("value"), g)
-                drawWOPIO(attribute.get("value"), g)
+                for b in attribute.get("value").get("b"):    
+                    if attribute.get('expand') == True:
+                        if b.get("function_type") == "EXPRESSION":
+                            i = drawB(g, attribute, b, "expr", "purple", i)
+                        if b.get("function_type") == "FUNCTION":
+                            i = drawB(g, b, attribute, "func", "green", i)
+                        if b.get("function_type") == "PREDICATE":
+                            i = drawB(g, b, attribute, "pred", "pink", i)
+                        drawWFF(attribute.get("value"), g)
+                        drawWFOPO(attribute.get("value"), g)
+                        drawWFOPI(attribute.get("value"), g)
+                        drawWOPIO(attribute.get("value"), g)
+                    elif attribute.get('expand') == None:
+                        if b.get("function_type") == "EXPRESSION":
+                            i = drawB(g, attribute, b, "expr", "purple", i)
+                        if b.get("function_type") == "FUNCTION":
+                            i = drawB(g, b, attribute, "func", "green", i)
+                        if b.get("function_type") == "PREDICATE":
+                            i = drawB(g, b, attribute, "pred", "pink", i)
+                        drawWFF(attribute.get("value"), g)
+                        drawWFOPO(attribute.get("value"), g)
+                        drawWFOPI(attribute.get("value"), g)
+                        drawWOPIO(attribute.get("value"), g)
         if attribute.get("value").get("type") == "IMPORT":
             with g.subgraph(name=f"cluster_import_{attribute.index()}") as b:
                 b.attr(label=str(attribute))
+    return g
 
-    # 
-    # 
-    # print(data.get("fn").get("pof"))
-    # connecting LHS and RHS
+# connecting LHS and RHS
+def drawArrows(data, g, expand):
     # g.attr(rankdir="LR")
     if data.get("fn").get("bf") != None:
         for bf in data.get("fn").get("bf"):
             # for attribute in data.get('attributes'):
             if bf.get("contents") != None:
                 attribute = data.get("attributes")[bf.get("contents") - 1]
+                # print(attribute)
                 if attribute.get("value").get("b") != None:
                     for b in attribute.get("value").get("b"):
-                        for b in attribute.get("value").get("b"):
-                            # print(bf.get("node"), b.get("node"))
+                        # for b in attribute.get("value").get("b"):
+                        print(b, expand, attribute.get("expand"))
+                        if expand == True and attribute.get("expand") == True:
+                            print("hi",bf.get("node"), b.get("node"))
+                            print(bf.get("invisNode"), b.get("invisNode"))
+                            g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3")
+                        elif expand == False:
+                            print(bf.get("invisNode"), b.get("invisNode"))
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3")
 
-    # edges between the different attributes in RHS
-    
+    # edges between the different attributes in RHS 
     for attribute in data.get("attributes"):
         if attribute.get("value").get("bf") != None:
             for bf in attribute.get("value").get("bf"):

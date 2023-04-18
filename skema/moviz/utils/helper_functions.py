@@ -116,7 +116,7 @@ def drawPOL(data, bl, c):
 def drawWFF(data, g):
     if data.get("wff") != None:
         for wff in data["wff"]:
-            print(wff)
+            # print(wff)
             if data.get("pif") != None:
                 for pif in data["pif"]:
                     if data.get("pof") != None:
@@ -221,8 +221,9 @@ def drawBF(data, a, bf):
             if bf.get("value").get("value_type") == "Integer" or bf.get("value").get("value_type") == "Boolean":
                 literal = str(bf.get("value").get("value"))
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
-                    print(bf.get('box'))
-                    label = f"{literal}"+"\n id: "+bf.get('box')
+                    # print(bf.get('box'))
+                    label = f"{literal}"
+                    #label = f"{literal}"+"\n id: "+bf.get('box')
                     c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
                     c.attr("node", shape = 'point')
                     c.node(name=f"cluster_lit_{literal}_{bf['box']}_{i}", style = 'invis')
@@ -232,13 +233,14 @@ def drawBF(data, a, bf):
                     drawPIF(bf, c, data)
                     drawPOF(bf, c, data, None)                 
             if bf.get('value').get('value_type') == 'List':
-                literal = ""
-                for value in bf.get('value').get('value'):
-                    print(value)
-                    literal = literal+", "+str(value)
-                    print('vals: ',literal)
+                literal = bf.get('value').get('value')
+                # for value in bf.get('value').get('value'):
+                #     # print(value)
+                #     literal = str(value)
+                #     # print('vals: ',literal)
+                    
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
-                    print(bf.get('box'))
+                    # print(bf.get('box'))
                     label = f"{literal}"+"\n id: "+bf.get('box')
                     c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
                     c.attr("node", shape = 'point')
@@ -325,3 +327,43 @@ def drawBL(data, a):
     for k in bf_dict.keys():
         if bf_dict.get(k) == 0:
             drawBF(data, a, data.get("bf")[k - 1])
+
+def drawB(g, attribute, b, b_type, color,i):
+    # print(i)
+    with g.subgraph(name=f"cluster_{b_type}_{b.get('box')}") as a:
+        a.attr(color=color, style='rounded', penwidth='3', label=f"id: {b.get('box')}")
+        a.attr("node",shape = 'point')
+        a.node(name=f"cluster_{b_type}_{b['box']}_{i}", style = 'invis')
+        
+        b['invisNode'] = f"cluster_{b_type}_{b['box']}_{i}"
+        i+=1
+        if b.get("name") != None:
+            a.attr(label=str(b.get("name")))
+        b["node"] = f"cluster_{b_type}_{b.get('box')}"
+        drawOPO(b, a, attribute.get("value"))
+        drawOPI(b, a, attribute.get("value"))
+        if attribute.get("value").get("bf") != None:
+            # print("attribute")
+            for bf in attribute.get("value").get("bf"):
+                drawBF(attribute.get("value"), a, bf)
+    return i
+
+def setExpandValue(data, id):
+    print(id)
+    for attribute in data.get("attributes"):
+        if attribute.get("type") == "FN":
+            if attribute.get("value").get("b") != None:
+                for b in attribute.get("value").get("b"):    
+                    if id == b.get("box"):
+                        print("found id")
+                        attribute['expand'] = True
+                    else:
+                        if attribute.get('expand') == None or attribute.get('expand') == False:
+                            attribute['expand'] = False
+            if attribute.get("value").get("bf") != None:
+                for bf in attribute.get("value").get("bf"): 
+                    if id == bf.get("box"):
+                        attribute['expand'] = True 
+                    else:
+                        if attribute.get('expand') == None or attribute.get('expand') == False:
+                            attribute['expand'] = False

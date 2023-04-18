@@ -10,8 +10,6 @@ import base64
 
 
 app = Flask(__name__)
-app.config['SESSION_TYPE'] = 'filesystem'
-app.secret_key = "super secret key"
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
@@ -19,7 +17,6 @@ def upload_file():
 
 @app.route('/uploader', methods=['GET', 'POST'])
 def upload_files():
-    print("here")
     if request.method == 'POST':
         cwd = Path(__file__).parents[0] 
         uploaded_file = request.files['file']
@@ -36,7 +33,7 @@ def upload_files():
 
 def visualize_single_file(filepath) -> str:
     """Returns base64-encoded string representing the Graphviz layout"""
-    program_name = filepath
+    program_name = filepath.stem
     cast = python_to_cast(str(filepath), cast_obj=True)
     gromet = run_cast_to_gromet_pipeline(cast)
     graph = draw_graph(gromet, program_name)
@@ -49,17 +46,10 @@ def visualize_single_file(filepath) -> str:
 @app.route("/")
 @app.route("/index")
 def execute():
-    print("in execute")
-    if(not session['filepath']):
-        cwd = Path(__file__).parents[0]
-        filepath = cwd / "../../data/gromet/examples/exp2/exp2.py"
-    else:
-        filepath = session['filepath']
-    
+    cwd = Path(__file__).parents[0]
+    filepath = cwd / "../../data/gromet/examples/exp2/exp2.py"
     output = visualize_single_file(filepath)
     return render_template("index.html", output_image=output)
-    # else:
-
 
 @app.route("/visualize/<filename>/")
 def visualize_single_python_file(filename):
