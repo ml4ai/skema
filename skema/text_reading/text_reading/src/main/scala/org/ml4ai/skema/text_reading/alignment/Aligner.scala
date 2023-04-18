@@ -9,8 +9,9 @@ import org.apache.commons.text.similarity.LevenshteinDistance
 import org.ml4ai.skema.text_reading.utils.AlignmentJsonUtils.GlobalVariable
 import org.clulab.odin.impl.OdinConfig
 import org.clulab.utils.Sourcer
-import org.ml4ai.skema.text_reading.utils.AlignmentJsonUtils.GlobalVariable
 import org.ml4ai.skema.text_reading.apps.AlignmentBaseline
+import org.ml4ai.skema.text_reading.utils.AlignmentJsonUtils.GlobalVariable
+//import org.ml4ai.skema.text_reading.apps.AlignmentBaseline
 import org.ml4ai.skema.text_reading.utils.AlignmentJsonUtils.GlobalVariable
 import org.ml4ai.skema.text_reading.utils.TsvUtils
 

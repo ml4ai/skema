@@ -2,7 +2,7 @@
 
 use actix_web::{get, web, HttpResponse};
 use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
-use comment_extraction::languages::python::Comments;
+use comment_extraction::comments::Comments;
 use serde::{Deserialize, Serialize};
 use utoipa;
 use utoipa::ToSchema;
@@ -21,7 +21,7 @@ pub struct CommentExtractionRequest {
 /// A single line comment
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct SingleLineComment {
-    line: u32,
+    line: usize,
     contents: String,
 }
 
@@ -40,10 +40,10 @@ pub struct CommentExtractionResponse {
 impl CommentExtractionResponse {
     fn new(comments: Comments) -> Self {
         let mut single_line_comments = Vec::new();
-        for (line, comment) in comments.comments.iter() {
+        for comment in comments.comments.iter() {
             single_line_comments.push(SingleLineComment {
-                line: *line,
-                contents: comment.to_string(),
+                line: comment.line_number,
+                contents: comment.contents.clone(),
             });
         }
         let mut docstrings = Vec::new();

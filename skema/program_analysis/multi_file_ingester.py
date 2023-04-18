@@ -29,7 +29,7 @@ def get_args():
     parser.add_argument(
         "--write",
         action="store_true",
-        help="If true, the script write the output to a JSON file"
+        help="If true, the script write the output to a JSON file",
     )
 
     options = parser.parse_args()
@@ -43,7 +43,7 @@ def process_file_system(
     file_list = open(files, "r").readlines()
 
     module_collection = GrometFNModuleCollection(
-        schema_version="0.1.5",
+        schema_version="0.1.6",
         name=system_name,
         modules=[],
         module_index=[],
@@ -51,12 +51,13 @@ def process_file_system(
     )
 
     for f in file_list:
+        print(f)
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
         try:
             cast = python_to_cast(full_file, cast_obj=True)
-            
+
             cur_dir = os.getcwd()
-            os.chdir(os.path.join(os.getcwd(),path))
+            os.chdir(os.path.join(os.getcwd(), path))
             generated_gromet = ann_cast_pipeline(
                 cast, gromet=True, to_file=False, from_obj=True
             )
@@ -81,9 +82,8 @@ def process_file_system(
             # We do this by finding all user_defined top level functions in the Gromet
             # and check if the name 'main' is among them
             function_networks = [
-                fn.value
-                for fn in generated_gromet.attributes
-                if fn.type == "FN"
+                fn
+                for fn in generated_gromet.fn_array
             ]
             defined_functions = [
                 fn.b[0].name
@@ -91,7 +91,9 @@ def process_file_system(
                 if fn.b[0].function_type == "FUNCTION"
             ]
             if "main" in defined_functions:
-                module_collection.executables.append(len(module_collection.module_index))
+                module_collection.executables.append(
+                    len(module_collection.module_index)
+                )
 
         except ImportError as e:
             print("FAILURE")
