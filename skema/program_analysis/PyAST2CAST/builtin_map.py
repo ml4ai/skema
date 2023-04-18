@@ -2,8 +2,8 @@
     builtin_map.py reads python_builtins.yaml into a structure
     that we can then query and use
 """
-import yaml
-from yaml.loader import SafeLoader
+# import yaml
+# from yaml.loader import SafeLoader
 import os
 from pathlib import Path
 
@@ -40,7 +40,8 @@ def build_map(filename="python_builtins.yaml"):
     skema_root = "skema/skema/program_analysis/PyAST2CAST/"
     if BUILTINS == None: 
         with open(filename) as f:
-            BUILTINS = yaml.load(f, Loader=SafeLoader)
+            # BUILTINS = yaml.load(f, Loader=SafeLoader)
+            pass
 
 def dump_map():
     if BUILTINS != None:
