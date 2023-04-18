@@ -3,7 +3,7 @@ from typing import Any
 
 from tree_sitter import Language, Parser
 
-from skema.program_analysis.CAST2FN.model.cast import CAST
+from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
    Module,
    SourceRef,
@@ -24,9 +24,9 @@ from skema.program_analysis.CAST2FN.model.cast import (
 )
 
 
-from variable_context import VariableContext
-from node_helper import NodeHelper
-from util import generate_dummy_source_refs, preprocess
+from skema.program_analysis.TS2CAST.variable_context import VariableContext
+from skema.program_analysis.TS2CAST.node_helper import NodeHelper
+from skema.program_analysis.TS2CAST.util import generate_dummy_source_refs, preprocess
 
 class TS2CAST(object):
      
@@ -75,24 +75,27 @@ class TS2CAST(object):
     generate_dummy_source_refs(self.module)
 
     # Create outer cast wrapping
-    out_cast = CAST([self.module], "Fortran")
-    print(
-                json.dumps(
-                   out_cast.to_json_object(), sort_keys=True, indent=None
-                )
-            )
-            
-      
+    self.out_cast = CAST([self.module], "Fortran")
+    #print(
+    #            json.dumps(
+    #               out_cast.to_json_object(), sort_keys=True, indent=None
+    #            )
+    #        )
+    
   def run(self, root: dict):
     self.module.source_refs = root["source_refs"]
+    self.module.body = []
     for child in root["children"]:
-      self.module.body = TS2CAST.update_field(self.module.body, self.visit(child))
+      child_cast = self.visit(child)
+      if isinstance(child_cast, list):
+         self.module.body.extend(child_cast)
+      else:
+         self.module.body.append(child_cast)
 
   def visit(self, node: dict):
     match node["type"]:
-       case "program_statement" | "module":
-          pass
-          #return self.visit_program_statement(node)
+       case "program":
+          return self.visit_program_statement(node)
        case "subroutine" | "function":
           return self.visit_function_def(node)
        case "subroutine_call" | "call_expression":
@@ -124,11 +127,12 @@ class TS2CAST(object):
   
   def visit_program_statement(self, node):
      program_body = []
-     for child in node["children"]:
-        for child in node["children"]:
-           print("HERE")
-           program_body.append(self.visit(child))
-        print(program_body)
+     for child in node["children"][1:]:
+        child_cast = self.visit(child)
+        if isinstance(child_cast, list):
+            program_body.extend(child_cast)
+        else:
+           program_body.append(child_cast)
      return program_body
     
   def visit_name(self, node):
@@ -252,10 +256,11 @@ class TS2CAST(object):
      cast_call.source_refs = node["source_refs"]
 
      # TODO: What should get a name node? Instrincit functions? Imported functions?
+     # Judging from the Gromet generation pipeline, it appears that all functions need Name nodes.
      if self.variable_context.is_variable(function_identifier):  
       cast_call.func = self.variable_context.get_node(function_identifier)
      else:
-      cast_call.func = function_identifier
+      cast_call.func = Name(function_identifier, -1)
   
      # Add arguments to arguments list
      for child in arguments_node["children"]:
@@ -319,6 +324,9 @@ class TS2CAST(object):
           cast_import.all = import_all
           cast_import.symbol = child["identifier"]
 
+          # Add the symbol to the variable context
+          self.variable_context.add_variable(cast_import.symbol, "function", child["source_refs"])
+
           imports.append(cast_import)
       return imports 
   
@@ -380,15 +388,15 @@ class TS2CAST(object):
            # generated_iter_0 = iter(range(start, stop, step))
            cast_loop.pre.append(Assignment(
               left=Var(generated_iter_name_node, "Iterator"),
-              right=Call(iter_name_node,[Call(range_name_node, [start, stop, step])])
+              right=Call(iter_name_node,arguments=[Call(range_name_node, arguments=[start, stop, step])])
               ))
            
            # (i, generated_iter_0, sc_0) = next(generated_iter_0)
            cast_loop.pre.append(Assignment(
               left=LiteralValue("Tuple", [itterator, Var(generated_iter_name_node, "Iterator"), Var(stop_condition_name_node, "Boolean")]),
-              right=Call(next_name_node, [Var(generated_iter_name_node, "Iterator")])
+              right=Call(next_name_node,arguments=[Var(generated_iter_name_node, "Iterator")])
            ))
-
+         
            # EXPR
            cast_loop.expr = Operator(
               op="!=", #TODO: Should this be == or !=
@@ -403,7 +411,7 @@ class TS2CAST(object):
            # We just need to append the iterator next call
            cast_loop.body.append(Assignment(
               left=LiteralValue("Tuple", [itterator, Var(generated_iter_name_node, "Iterator"), Var(stop_condition_name_node, "Boolean")]),
-              right=Call(next_name_node, [Var(generated_iter_name_node, "Iterator")])
+              right=Call(next_name_node, arguments=[Var(generated_iter_name_node, "Iterator")])
            ))
 
            # POST
@@ -427,7 +435,6 @@ class TS2CAST(object):
      #  (else_clause)
      #  (end_if_statement)
    
-      # TODO: Clean up some of this logic and document whats going on
      child_types = [child["type"] for child in node["children"]]
      
      try:
@@ -465,10 +472,14 @@ class TS2CAST(object):
         else:
           orelse = else_body 
 
+
+     if isinstance(orelse, ModelIf):
+        orelse = orelse.orelse
+
      return ModelIf(
         expr=self.visit(node["children"][1]), 
         body=[self.visit(child) for child in node["children"][3:body_stop_index]], 
-        orelse=orelse.orelse
+        orelse=orelse
       )
      
   
@@ -544,8 +555,9 @@ class TS2CAST(object):
      return cast_var
   
   def visit_math_expression(self, node):
+ 
     op = node["control"][0] # The operator will be the first control character
-  
+   
     cast_op = Operator()
     cast_op.source_refs = node["source_refs"]
 
@@ -590,7 +602,12 @@ class TS2CAST(object):
     # We then need to determine if we are creating an array (dimension) or a single variable
     for type_qualifier in type_qualifiers:
        qualifier = type_qualifier["children"][0]["identifier"]
-       value = type_qualifier["children"][1]["identifier"]
+       try:
+         value = type_qualifier["children"][1]["identifier"]
+       except IndexError:
+          # There are a few cases of qualifiers without values such as parameter. These are not currently being handled
+          continue
+       
        match(qualifier):
           case "dimension":
             intrinsic_type = "List"
@@ -714,8 +731,6 @@ class TS2CAST(object):
      
      return self.visit(node["children"][0])
   
-  def loop_helper_init(node):
-     pass
   def get_gromet_function_node(self, func_name:str) -> Name:
      node_dict = {
         "identifier": func_name,
@@ -725,6 +740,8 @@ class TS2CAST(object):
      cast_name = self.visit_name(node_dict)
     
      return cast_name
+     
+
   @staticmethod
   def update_field(field: Any, element: Any) -> list:
     if not field:
