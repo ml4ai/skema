@@ -22,6 +22,13 @@ pub enum Atom {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct Expression {
+    pub ops: Vec<Operator>,
+    pub args: Vec<Expr>,
+    pub name: String,
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub enum Expr {
     Atom(Atom),
     Expression {
@@ -793,7 +800,7 @@ impl PreExp {
         }
     }
 
-    fn to_graph(&mut self) -> MathExpressionGraph {
+    pub fn to_graph(&mut self) -> MathExpressionGraph {
         let mut g = MathExpressionGraph::new();
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
