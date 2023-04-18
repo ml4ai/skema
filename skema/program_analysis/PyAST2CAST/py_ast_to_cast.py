@@ -710,23 +710,6 @@ class PyASTToCAST:
                 # print(type(sub_node.value))
                 # print("-------------")
 
-                """
-                if isinstance(arg, ast.Subscript):
-                    unique_name = construct_unique_name(self.filenames[-1], "_List_get")
-                    if unique_name not in prev_scope_id_dict.keys():
-                        # If a built-in is called, then it gets added to the global dictionary if
-                        # it hasn't been called before. This is to maintain one consistent ID per built-in
-                        # function
-                        if unique_name not in self.global_identifier_dict.keys():
-                            self.insert_next_id(self.global_identifier_dict, unique_name)
-
-                        prev_scope_id_dict[unique_name] = self.global_identifier_dict[unique_name]
-                    idx = self.visit(arg.slice, prev_scope_id_dict, curr_scope_id_dict)[0]
-                    val = self.visit(arg.value, prev_scope_id_dict, curr_scope_id_dict)[0]
-                    args = [val, idx]
-
-                    func_args.extend([Call(Name("_List_get", id=prev_scope_id_dict[unique_name], source_refs=ref), args, source_refs=ref)])
-                """
                 # In the case we're calling a function that doesn't have an identifier already
                 # This should only be the case for built-in python functions (i.e print, len, etc...)
                 # Otherwise it would be an error to call a function before it is defined
@@ -1167,7 +1150,7 @@ class PyASTToCAST:
         return [ModelBreak(source_refs=ref)]
 
     def create_binary_compare_tree(self, node):
-        if isinstance(node, (ast.Compare, ast.UnaryOp, ast.Call, ast.Name, ast.Attribute)):
+        if isinstance(node, (ast.Compare, ast.UnaryOp, ast.Call, ast.Name, ast.Attribute, ast.Constant, ast.Subscript)):
             return node
         # elif isinstance(node, ast.UnaryOp):
         #    return node
@@ -1274,27 +1257,6 @@ class PyASTToCAST:
         """
 
         return self.visit(x, prev_scope_id_dict, curr_scope_id_dict)
-        op = node.op
-        vals = node.values
-        bool_ops = [node.op for i in range(len(vals) - 1)]
-        ref = [
-            self.filenames[-1],
-            node.col_offset,
-            node.end_col_offset,
-            node.lineno,
-            node.end_lineno,
-        ]
-
-        compare_op = ast.Compare(
-            left=vals[0],
-            ops=bool_ops,
-            comparators=vals[1:],
-            col_offset=node.col_offset,
-            end_col_offset=node.end_col_offset,
-            lineno=node.lineno,
-            end_lineno=node.end_lineno,
-        )
-        return self.visit(compare_op, prev_scope_id_dict, curr_scope_id_dict)
 
     @visit.register
     def visit_Call(
@@ -1757,7 +1719,7 @@ class PyASTToCAST:
             source_code_data_type=source_code_data_type,
             source_refs=ref,
         )
-        
+
 
         idx = len(node.comparators) - 1
         op_idx = len(node.ops) - 1
@@ -1804,72 +1766,8 @@ class PyASTToCAST:
         else:
             tree_root = ModelIf(expr=test,body=[tree_root],orelse=[false_val], source_refs=ref)
 
-
-        """
-        # Iterate through the comparators to build up more if statements
-        while len(node.comparators) > 0:
-            right = node.comparators[0]
-            if isinstance(right, ast.Constant):
-                print(right.value)
-
-
-            l = self.visit(left,prev_scope_id_dict,curr_scope_id_dict)[0]
-            r = self.visit(right,prev_scope_id_dict,curr_scope_id_dict)[0]
-
-            test = Operator(source_language="Python", interpreter="Python",
-                            version=get_python_version(),
-                            op=op,
-                            operands=[l,r],
-                            source_refs=ref)
-
-            if len(node.comparators) == 1 and len(if_stack) > 0:
-                print("Hi")
-                if_stack[-1].body = test
-            elif len(node.comparators) == 1 and len(if_stack) == 0:
-                # orelse has to be False value
-                if_expr = ModelIf(expr=test,body=[true_val],orelse=[false_val], source_refs=ref)
-                if_stack.append(if_expr)
-            else:
-                # orelse has to be False value
-                if_expr = ModelIf(expr=test,body=[],orelse=[false_val], source_refs=ref)
-
-                # The previous if expression contains the newest if expression
-                # as a value
-                if len(if_stack) > 0:
-                    if_stack[-1].body = [if_expr]
-                if_stack.append(if_expr)
-
-
-            left = node.comparators.pop(0)
-            #op = get_op(node.ops.pop(0)) if len(node.ops) > 0 else None
-            op = get_op(ops.pop()) if len(ops) > 0 else None
-            
-        # The final if_expression contains the true value
-        if_stack[-1].body = [true_val]
-        """
-
         return [tree_root]
 
-
-        # If we have more than one operand left, then we 'recurse' without the leftmost
-        # operand and the first operator
-        # if len(node.comparators) > 1:
-          #   node.left = node.comparators.pop()
-            #right = node
-        #else:
-         #   right = node.comparators[0]
-
-        #l = self.visit(left, prev_scope_id_dict, curr_scope_id_dict)
-        #r = self.visit(right, prev_scope_id_dict, curr_scope_id_dict)
-        # return [Operator(op, l[0], r[0], source_refs=ref)]
-
-       ## return [Operator(source_language="Python", 
-         #               interpreter="Python", 
-          #              version=get_python_version(), 
-           #             op=op, 
-            #            operands=[l[0], r[0]], 
-             #           source_refs=ref)]
-        
 
     @visit.register
     def visit_Constant(
@@ -4266,7 +4164,10 @@ class PyASTToCAST:
 
         # loop_body_fn_def = FunctionDef(name="while_temp", func_args=None, body=body)
         # return [Loop(init=[], expr=test, body=loop_body_fn_def, source_refs=ref)]
-        return [Loop(pre=[], expr=test, body=body, post=[], source_refs=ref)]
+        if isinstance(test, list):
+            return [Loop(pre=[], expr=test[0], body=body, post=[], source_refs=ref)]
+        else:
+            return [Loop(pre=[], expr=test, body=body, post=[], source_refs=ref)]
 
     @visit.register
     def visit_With(
