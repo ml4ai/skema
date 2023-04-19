@@ -374,96 +374,91 @@ class TS2CAST(object):
             cast_loop.body = self.update_field(cast_loop.body, self.visit(child))
 
         # For the init and expression fields, we first need to determine if we are in a regular "do" or a "do while" loop
-        match (loop_type):
-            case "loop_control_expression":
-                # PRE:
-                # TODO: Why is this different from the schema
-                # _next(_iter(range(start, stop, step)))
-                loop_control_node = node["children"][1]
-                itterator = self.visit(loop_control_node["children"][0])
-                start = self.visit(loop_control_node["children"][1])
-                stop = self.visit(loop_control_node["children"][2])
 
-                if len(loop_control_node["children"]) == 3:  # No step value
-                    step = LiteralValue("Integer", "1")
-                elif len(loop_control_node["children"]) == 4:
-                    step = self.visit(loop_control_node["children"][3])
+        # PRE:
+        # TODO: Why is this different from the schema
+        # _next(_iter(range(start, stop, step)))
+        loop_control_node = node["children"][1]
+        itterator = self.visit(loop_control_node["children"][0])
+        start = self.visit(loop_control_node["children"][1])
+        stop = self.visit(loop_control_node["children"][2])
 
-                range_name_node = self.get_gromet_function_node("range")
-                iter_name_node = self.get_gromet_function_node("iter")
-                next_name_node = self.get_gromet_function_node("next")
-                generated_iter_name_node = self.variable_context.generate_iterator()
-                stop_condition_name_node = (
-                    self.variable_context.generate_stop_condition()
-                )
+        if len(loop_control_node["children"]) == 3:  # No step value
+            step = LiteralValue("Integer", "1")
+        elif len(loop_control_node["children"]) == 4:
+            step = self.visit(loop_control_node["children"][3])
 
-                # generated_iter_0 = iter(range(start, stop, step))
-                cast_loop.pre.append(
-                    Assignment(
-                        left=Var(generated_iter_name_node, "Iterator"),
-                        right=Call(
-                            iter_name_node,
-                            arguments=[
-                                Call(range_name_node, arguments=[start, stop, step])
-                            ],
-                        ),
-                    )
-                )
+        range_name_node = self.get_gromet_function_node("range")
+        iter_name_node = self.get_gromet_function_node("iter")
+        next_name_node = self.get_gromet_function_node("next")
+        generated_iter_name_node = self.variable_context.generate_iterator()
+        stop_condition_name_node = self.variable_context.generate_stop_condition()
 
-                # (i, generated_iter_0, sc_0) = next(generated_iter_0)
-                cast_loop.pre.append(
-                    Assignment(
-                        left=LiteralValue(
-                            "Tuple",
-                            [
-                                itterator,
-                                Var(generated_iter_name_node, "Iterator"),
-                                Var(stop_condition_name_node, "Boolean"),
-                            ],
-                        ),
-                        right=Call(
-                            next_name_node,
-                            arguments=[Var(generated_iter_name_node, "Iterator")],
-                        ),
-                    )
-                )
+        # generated_iter_0 = iter(range(start, stop, step))
+        cast_loop.pre.append(
+            Assignment(
+                left=Var(generated_iter_name_node, "Iterator"),
+                right=Call(
+                    iter_name_node,
+                    arguments=[Call(range_name_node, arguments=[start, stop, step])],
+                ),
+            )
+        )
 
-                # EXPR
-                cast_loop.expr = Operator(
-                    op="!=",  # TODO: Should this be == or !=
-                    operands=[
+        # (i, generated_iter_0, sc_0) = next(generated_iter_0)
+        cast_loop.pre.append(
+            Assignment(
+                left=LiteralValue(
+                    "Tuple",
+                    [
+                        itterator,
+                        Var(generated_iter_name_node, "Iterator"),
                         Var(stop_condition_name_node, "Boolean"),
-                        LiteralValue("Boolean", True),
                     ],
-                )
+                ),
+                right=Call(
+                    next_name_node,
+                    arguments=[Var(generated_iter_name_node, "Iterator")],
+                ),
+            )
+        )
 
-                # BODY
-                # At this point, the body nodes have already been visited
-                # We just need to append the iterator next call
-                cast_loop.body.append(
-                    Assignment(
-                        left=LiteralValue(
-                            "Tuple",
-                            [
-                                itterator,
-                                Var(generated_iter_name_node, "Iterator"),
-                                Var(stop_condition_name_node, "Boolean"),
-                            ],
-                        ),
-                        right=Call(
-                            next_name_node,
-                            arguments=[Var(generated_iter_name_node, "Iterator")],
-                        ),
-                    )
-                )
+        # EXPR
+        cast_loop.expr = Operator(
+            op="!=",  # TODO: Should this be == or !=
+            operands=[
+                Var(stop_condition_name_node, "Boolean"),
+                LiteralValue("Boolean", True),
+            ],
+        )
 
-                # POST
-                cast_loop.post.append(
-                    Assignment(
-                        left=itterator,
-                        right=Operator(op="+", operands=[itterator, step]),
-                    )
-                )
+        # BODY
+        # At this point, the body nodes have already been visited
+        # We just need to append the iterator next call
+        cast_loop.body.append(
+            Assignment(
+                left=LiteralValue(
+                    "Tuple",
+                    [
+                        itterator,
+                        Var(generated_iter_name_node, "Iterator"),
+                        Var(stop_condition_name_node, "Boolean"),
+                    ],
+                ),
+                right=Call(
+                    next_name_node,
+                    arguments=[Var(generated_iter_name_node, "Iterator")],
+                ),
+            )
+        )
+
+        # POST
+        cast_loop.post.append(
+            Assignment(
+                left=itterator,
+                right=Operator(op="+", operands=[itterator, step]),
+            )
+        )
 
         return cast_loop
 
@@ -550,47 +545,46 @@ class TS2CAST(object):
         cast_literal = LiteralValue()
         cast_literal.source_refs = node["source_refs"]
 
-        match (literal_type):
-            case "number_literal":
-                # Check if this is a real value, or an Integer
-                if "e" in literal_value.lower() or "." in literal_value:
-                    cast_literal.value_type = "AbstractFloat"
-                    cast_literal.source_code_data_type = [
-                        "Fortran",
-                        "Fortran95",
-                        "real",
-                    ]
-                else:
-                    cast_literal.value_type = "Integer"
-                    cast_literal.source_code_data_type = [
-                        "Fortran",
-                        "Fortran95",
-                        "integer",
-                    ]
-                cast_literal.value = literal_value
-
-            case "string_literal":
-                cast_literal.value_type = "Character"
+        if literal_type == "number_literal":
+            # Check if this is a real value, or an Integer
+            if "e" in literal_value.lower() or "." in literal_value:
+                cast_literal.value_type = "AbstractFloat"
                 cast_literal.source_code_data_type = [
                     "Fortran",
                     "Fortran95",
-                    "character",
+                    "real",
                 ]
-                cast_literal.value = literal_value
-
-            case "boolean_literal":
-                cast_literal.value_type = "Boolean"
-                cast_literal.source_code_data_type = ["Fortran", "Fortran95", "logical"]
-                cast_literal.value = literal_value
-
-            case "array_literal":
-                cast_literal.value_type = "List"
+            else:
+                cast_literal.value_type = "Integer"
                 cast_literal.source_code_data_type = [
                     "Fortran",
                     "Fortran95",
-                    "dimension",
+                    "integer",
                 ]
-                cast_literal.value = None
+            cast_literal.value = literal_value
+
+        elif literal_type == "string_literal":
+            cast_literal.value_type = "Character"
+            cast_literal.source_code_data_type = [
+                "Fortran",
+                "Fortran95",
+                "character",
+            ]
+            cast_literal.value = literal_value
+
+        elif literal_type == "boolean_literal":
+            cast_literal.value_type = "Boolean"
+            cast_literal.source_code_data_type = ["Fortran", "Fortran95", "logical"]
+            cast_literal.value = literal_value
+
+        elif literal_type == "array_literal":
+            cast_literal.value_type = "List"
+            cast_literal.source_code_data_type = [
+                "Fortran",
+                "Fortran95",
+                "dimension",
+            ]
+            cast_literal.value = None
 
         return cast_literal
 
@@ -668,11 +662,10 @@ class TS2CAST(object):
                 # There are a few cases of qualifiers without values such as parameter. These are not currently being handled
                 continue
 
-            match (qualifier):
-                case "dimension":
-                    intrinsic_type = "List"
-                case "intent":
-                    variable_intent = value
+            if qualifier == "dimension":
+                intrinsic_type = "List"
+            elif qualifier == "intent":
+                variable_intent = value
 
         # You can declare multiple variables of the same type in a single statement, so we need to create a Var node for each instance
         vars = []
