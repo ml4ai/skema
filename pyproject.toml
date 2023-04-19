@@ -5,7 +5,7 @@ authors=[
     {name = "Adarsh Pyarelal", email="adarsh@arizona.edu"},
     {name="Clayton Morrison", email="claytonm@lum.ai"},
     {name="Tito Ferra", email="titofe16@gmail.com"},
-    {name="Vincent Raymond", email="vincentraymond1995@gmail.com"}
+    {name="Vincent Raymond", email="vincent@lum.ai"}
 ]
 description="Scientific Knowledge Extraction and Model Analysis"
 version="0.1.0"
@@ -14,6 +14,7 @@ dependencies=[
     "dill",
     "networkx",
     "PyYAML",
+    "tree-sitter"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
@@ -29,7 +30,7 @@ license={text="MIT"}
 # - pygraphviz: for creating function network visualizations for debugging.
 #   Pygraphviz is often tricky to install, so we reserve it for the dev extras
 #   list.
-# - six: Adarsh says: I don't know why six is needed...
+# - six: Required by auto-generated Swagger models
 dev = ["fastapi", "requests", "uvicorn", "pytest", "black", "pygraphviz", "six"]
 
 # MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
