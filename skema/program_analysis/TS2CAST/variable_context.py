@@ -1,3 +1,4 @@
+from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Name,
@@ -26,7 +27,7 @@ class VariableContext(object):
 
         self.context_return_values.pop()
 
-    def add_variable(self, symbol: str, type: str, source_refs: list) -> Name:
+    def add_variable(self, symbol: str, type: str, source_refs: List) -> Name:
         cast_name = Name(source_refs=source_refs)
         cast_name.name = symbol
         cast_name.id = self.variable_id
@@ -48,7 +49,7 @@ class VariableContext(object):
     def is_variable(self, symbol: str) -> bool:
         return symbol in self.all_symbols
 
-    def get_node(self, symbol: str) -> dict:
+    def get_node(self, symbol: str) -> Dict:
         return self.all_symbols[symbol]["node"]
 
     def get_type(self, symbol: str) -> str:

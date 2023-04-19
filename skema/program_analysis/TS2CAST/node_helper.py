@@ -1,3 +1,4 @@
+from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
 
@@ -6,7 +7,7 @@ class NodeHelper(object):
         self.source_file_name = source_file_name
         self.source = source
 
-    def parse_tree_to_dict(self, node) -> dict:
+    def parse_tree_to_dict(self, node) -> Dict:
         node_dict = {
             "type": self.get_node_type(node),
             "source_refs": [self.get_node_source_ref(node)],
@@ -86,12 +87,12 @@ class NodeHelper(object):
     def get_node_type(self, node) -> str:
         return node.type
 
-    def get_first_child_by_type(self, node: dict, node_type: str) -> dict:
+    def get_first_child_by_type(self, node: Dict, node_type: str) -> Dict:
         children = self.get_children_by_type(node, node_type)
         if len(children) >= 1:
             return children[0]
 
-    def get_children_by_type(self, node: dict, node_type: str) -> list:
+    def get_children_by_type(self, node: Dict, node_type: str) -> List:
         children = []
 
         for child in node["children"]:

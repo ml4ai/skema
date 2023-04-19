@@ -1,5 +1,5 @@
 import json
-from typing import Any
+from typing import Any, Dict, List
 
 from tree_sitter import Language, Parser
 
@@ -69,54 +69,58 @@ class TS2CAST(object):
         #            )
         #        )
 
-    def run(self, root: dict):
+    def run(self, root: Dict):
         self.module.source_refs = root["source_refs"]
         self.module.body = []
         for child in root["children"]:
             child_cast = self.visit(child)
-            if isinstance(child_cast, list):
+            if isinstance(child_cast, List):
                 self.module.body.extend(child_cast)
             else:
                 self.module.body.append(child_cast)
 
-    def visit(self, node: dict):
-        match node["type"]:
-            case "program":
-                return self.visit_program_statement(node)
-            case "subroutine" | "function":
-                return self.visit_function_def(node)
-            case "subroutine_call" | "call_expression":
-                return self.visit_function_call(node)
-            case "use_statement":
-                return self.visit_use_statement(node)
-            case "variable_declaration":
-                return self.visit_variable_declaration(node)
-            case "assignment_statement":
-                return self.visit_assignment_statement(node)
-            case "identifier":
-                return self.visit_identifier(node)
-            case "name":
-                return self.visit_name(node)
-            case "math_expression" | "relational_expression":
-                return self.visit_math_expression(node)
-            case "number_literal" | "array_literal" | "string_literal" | "boolean_literal":
-                return self.visit_literal(node)
-            case "keyword_statement":
-                return self.visit_keyword_statement(node)
-            case "extent_specifier":
-                return self.visit_extent_specifier(node)
-            case "do_loop_statement":
-                return self.visit_do_loop_statement(node)
-            case "if_statement":
-                return self.visit_if_statement(node)
-            case _:
-                return self._visit_passthrough(node)
+    def visit(self, node: Dict):
+        if node["type"] == "program":
+            return self.visit_program_statement(node)
+        elif node["type"] in ["subroutine", "function"]:
+            return self.visit_function_def(node)
+        elif node["type"] in ["subroutine_call", "call_expression"]:
+            return self.visit_function_call(node)
+        elif node["type"] == "use_statement":
+            return self.visit_use_statement(node)
+        elif node["type"] == "variable_declaration":
+            return self.visit_variable_declaration(node)
+        elif node["type"] == "assignment_statement":
+            return self.visit_assignment_statement(node)
+        elif node["type"] == "identifier":
+            return self.visit_identifier(node)
+        elif node["type"] == "name":
+            return self.visit_name(node)
+        elif node["type"] in ["math_expression", "relational_expression"]:
+            return self.visit_math_expression(node)
+        elif node["type"] in [
+            "number_literal",
+            "array_literal",
+            "string_literal",
+            "boolean_literal",
+        ]:
+            return self.visit_literal(node)
+        elif node["type"] == "keyword_statement":
+            return self.visit_keyword_statement(node)
+        elif node["type"] == "extent_specifier":
+            return self.visit_extent_specifier(node)
+        elif node["type"] == "do_loop_statement":
+            return self.visit_do_loop_statement(node)
+        elif node["type"] == "if_statement":
+            return self.visit_if_statement(node)
+        else:
+            return self._visit_passthrough(node)
 
     def visit_program_statement(self, node):
         program_body = []
         for child in node["children"][1:]:
             child_cast = self.visit(child)
-            if isinstance(child_cast, list):
+            if isinstance(child_cast, List):
                 program_body.extend(child_cast)
             else:
                 program_body.append(child_cast)
@@ -234,13 +238,12 @@ class TS2CAST(object):
 
     def visit_function_call(self, node):
         # Pull relevent nodes
-        match (node["type"]):
-            case "subroutine_call":
-                function_node = node["children"][1]
-                arguments_node = node["children"][2]
-            case "call_expression":
-                function_node = node["children"][0]
-                arguments_node = node["children"][1]
+        if node["type"] == "subroutine_call":
+            function_node = node["children"][1]
+            arguments_node = node["children"][2]
+        elif node["type"] == "call_expression":
+            function_node = node["children"][0]
+            arguments_node = node["children"][1]
 
         function_identifier = function_node["identifier"]
 
@@ -799,12 +802,12 @@ class TS2CAST(object):
         return cast_name
 
     @staticmethod
-    def update_field(field: Any, element: Any) -> list:
+    def update_field(field: Any, element: Any) -> List:
         if not field:
             field = []
 
         if element:
-            if isinstance(element, list):
+            if isinstance(element, List):
                 field.extend(element)
             else:
                 field.append(element)
