@@ -82,7 +82,7 @@ def process_file_system(
             os_module_path = os.path.join(source_directory, f)
             python_module_path = os_module_path.replace("/", ".").replace(
                 ".py", ""
-            )
+            ).strip()
             module_collection.module_index.append(python_module_path)
 
             # Done: Determine how we know a gromet goes in the 'executable' field
