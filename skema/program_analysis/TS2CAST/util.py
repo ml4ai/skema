@@ -2,6 +2,7 @@ from skema.program_analysis.CAST2FN.model.cast import AstNode, LiteralValue, Sou
 
 
 def generate_dummy_source_refs(node: AstNode) -> None:
+    """ Walks a tree of AstNodes replacing any null SourceRefs with a dummy value"""
     if isinstance(node, LiteralValue) and not node.source_code_data_type:
         node.source_code_data_type = ["Fortran", "Fotran95", "None"]
     if not node.source_refs:
@@ -18,10 +19,15 @@ def generate_dummy_source_refs(node: AstNode) -> None:
 
 
 def preprocess(source_code: str) -> str:
-    """Replace the first occurrence of '|' with '&' if it is the first non-whitespace character in the line."""
+    """
+    Preprocesses Fortran source code:
+    1. Replaces the first occurrence of '|' with '&' if it is the first non-whitespace character in the line.
+    2. Adds an additional '&' to the previous line
+    """
     processed_lines = []
-    for line in source_code.splitlines(keepends=True):
+    for i, line in enumerate(source_code.splitlines()):
         if line.lstrip().startswith("|"):
             line = line.replace("|", "&", 1)
+            processed_lines[-1] += "&"
         processed_lines.append(line)
-    return "".join(processed_lines)
+    return "\n".join(processed_lines)
