@@ -1,5 +1,6 @@
 from copy import deepcopy
 import sys
+import os.path
 import pprint
 
 from skema.utils.misc import uuid
@@ -3825,7 +3826,7 @@ class ToGrometPass:
         self.gromet_module.fn = new_gromet
 
         # Set the name of the outer Gromet module to be the source file name
-        self.gromet_module.name = file_name.replace(".py", "")
+        self.gromet_module.name = os.path.basename(file_name).replace(".py", "")
 
         self.build_function_arguments_table(node.body)
 

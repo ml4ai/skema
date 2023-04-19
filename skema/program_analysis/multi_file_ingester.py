@@ -80,9 +80,11 @@ def process_file_system(
                 os.path.normpath(root_dir)
             )  # We just need the last directory of the path, not the complete path
             os_module_path = os.path.join(source_directory, f)
-            python_module_path = os_module_path.replace("/", ".").replace(
-                ".py", ""
-            ).strip()
+                       
+            # Normalize the path across os and then convert to module dot notation
+            python_module_path = ".".join(os.path.normpath(os_module_path).split(os.path.sep))
+            python_module_path = python_module_path.replace(".py", "").strip()
+            
             module_collection.module_index.append(python_module_path)
 
             # Done: Determine how we know a gromet goes in the 'executable' field
