@@ -30,16 +30,8 @@ from skema.program_analysis.TS2CAST.util import generate_dummy_source_refs, prep
 
 
 class TS2CAST(object):
-    def __init__(self, source_file_path: str, tree_sitter_fortran_path: str):
+    def __init__(self, source_file_path: str):
         # Initialize tree-sitter
-        self.tree_sitter_fortran = None
-        self.tree_sitter_fortran_path = tree_sitter_fortran_path
-        Language.build_library(
-            # Store the library in the `build` directory
-            "build/my-languages.so",
-            # Include one or more languages
-            [self.tree_sitter_fortran_path],
-        )
         self.tree_sitter_fortran = Language("build/my-languages.so", "fortran")
 
         # We load the source code from a file

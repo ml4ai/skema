@@ -61,7 +61,7 @@ def fortran_to_cast(
     """
     
 
-    out_cast = TS2CAST(path, "/home/vraymond/tree-sitter-fortran").out_cast
+    out_cast = TS2CAST(path).out_cast
 
     file_name = os.path.basename(path)
     if agraph:
