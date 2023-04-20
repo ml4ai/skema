@@ -24,6 +24,7 @@ def drawPIF(bf, c, data):
             if str(pif["box"]) == str(index[-1]):
                 c.attr("node", shape="box")
                 pif["node"] = f"pif-{bf.get('box')}-{i}"
+                # print("pif node created")
                 c.node(name=f"pif-{bf.get('box')}-{i}", fontcolor="white", label="", width='0.5', penwidth='2')
                 i += 1
 
@@ -117,14 +118,16 @@ def drawWFF(data, g):
     if data.get("wff") != None:
         for wff in data["wff"]:
             # print(wff)
-            if data.get("pif") != None:
-                for pif in data["pif"]:
-                    if data.get("pof") != None:
-                        for pof in data["pof"]:
-                            # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
-                            if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
-                                # print(pif.get("node"), pof.get("node"), "\n",pif, '\n', pof)
-                                g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+            if wff.get('drawn') == False:
+                if data.get("pif") != None:
+                    for pif in data["pif"]:
+                        if data.get("pof") != None:
+                            for pof in data["pof"]:
+                                # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
+                                if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
+                                    # print(pif.get("node"), pof.get("node"), "\n",pif, '\n', pof)
+                                    g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+                                    wff['drawn'] = True
 
 
 def drawWFC(data, g):
@@ -153,11 +156,8 @@ def drawWFOPO(data, g):
             if data.get("opo") != None:
                 for opo in data.get("opo"):
                     for pof in data.get("pof"):
-                        if (
-                            wfopo["src"] == opo["id"]
-                            and wfopo["tgt"] == pof["id"]
-                        ):
-                            # print(opo.get('node'), pof.get('node'))
+                        if (wfopo["src"] == opo["id"] and wfopo["tgt"] == pof["id"]):
+                            print("wfopo: ",opo.get('node'), pof.get('node'))
                             g.edge(opo.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
 
 
@@ -202,6 +202,7 @@ def drawWOPIO(data, g):
 
 
 def drawBF(data, a, bf):
+    primitives = {'ast.Add':'+', 'ast.Subtract':'-'}
     i=0
     # print(bf)
     if bf.get('node') == None:
@@ -234,11 +235,6 @@ def drawBF(data, a, bf):
                     drawPOF(bf, c, data, None)                 
             if bf.get('value').get('value_type') == 'List':
                 literal = bf.get('value').get('value')
-                # for value in bf.get('value').get('value'):
-                #     # print(value)
-                #     literal = str(value)
-                #     # print('vals: ',literal)
-                    
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
                     # print(bf.get('box'))
                     label = f"{literal}"+"\n id: "+bf.get('box')
@@ -250,7 +246,7 @@ def drawBF(data, a, bf):
                     bf["node"] = f"cluster_lit_{literal}_{bf['box']}"
                     drawPIF(bf, c, data)
                     drawPOF(bf, c, data, None) 
-        if bf["function_type"] == "PRIMITIVE":
+        if bf["function_type"] == "LANGUAGE_PRIMITIVE":
             primitive = str(bf["name"])
             with a.subgraph(name=f"cluster_prim_{primitive}_{bf['box']}") as d:
                 d.attr("node",shape = 'point')
@@ -258,8 +254,9 @@ def drawBF(data, a, bf):
                 bf['invisNode'] = f"cluster_prim_{primitive}_{bf['box']}_{i}"
                 i+=1
                 if primitive != None:
-                    bf["node"] = f"cluster_prim_{primitive}_{bf['box']}"
-                label = primitive+"\n id: "+bf.get('box')
+                    # print("primitive:",primitives.get(primitive))
+                    bf["node"] = f"cluster_prim_{primitives.get(primitive)}_{bf['box']}"
+                label = primitives.get(primitive)+"\n id: "+bf.get('box')
                 d.attr(label=label)
                 d.attr(color='black', shape='box', penwidth='3')
                 d.attr("node", shape="box")
@@ -329,7 +326,7 @@ def drawBL(data, a):
             drawBF(data, a, data.get("bf")[k - 1])
 
 def drawB(g, attribute, b, b_type, color,i):
-    # print(i)
+    # print(b)
     with g.subgraph(name=f"cluster_{b_type}_{b.get('box')}") as a:
         a.attr(color=color, style='rounded', penwidth='3', label=f"id: {b.get('box')}")
         a.attr("node",shape = 'point')
@@ -340,30 +337,29 @@ def drawB(g, attribute, b, b_type, color,i):
         if b.get("name") != None:
             a.attr(label=str(b.get("name")))
         b["node"] = f"cluster_{b_type}_{b.get('box')}"
-        drawOPO(b, a, attribute.get("value"))
-        drawOPI(b, a, attribute.get("value"))
-        if attribute.get("value").get("bf") != None:
+        drawOPO(b, a, attribute)
+        drawOPI(b, a, attribute)
+        if attribute.get("bf") != None:
             # print("attribute")
-            for bf in attribute.get("value").get("bf"):
-                drawBF(attribute.get("value"), a, bf)
+            for bf in attribute.get("bf"):
+                drawBF(attribute, a, bf)
     return i
 
 def setExpandValue(data, id):
-    print(id)
-    for attribute in data.get("attributes"):
-        if attribute.get("type") == "FN":
-            if attribute.get("value").get("b") != None:
-                for b in attribute.get("value").get("b"):    
-                    if id == b.get("box"):
-                        print("found id")
-                        attribute['expand'] = True
-                    else:
-                        if attribute.get('expand') == None or attribute.get('expand') == False:
-                            attribute['expand'] = False
-            if attribute.get("value").get("bf") != None:
-                for bf in attribute.get("value").get("bf"): 
-                    if id == bf.get("box"):
-                        attribute['expand'] = True 
-                    else:
-                        if attribute.get('expand') == None or attribute.get('expand') == False:
-                            attribute['expand'] = False
+    # print("in expand",id)
+    for attribute in data.get("fn_array"):
+        if attribute.get("b") != None:
+            for b in attribute.get("b"):    
+                if id == b.get("box"):
+                    # print("found id")
+                    attribute['expand'] = True
+                else:
+                    if attribute.get('expand') == None or attribute.get('expand') == False:
+                        attribute['expand'] = False
+        if attribute.get("bf") != None:
+            for bf in attribute.get("bf"): 
+                if id == bf.get("box"):
+                    attribute['expand'] = True 
+                else:
+                    if attribute.get('expand') == None or attribute.get('expand') == False:
+                        attribute['expand'] = False

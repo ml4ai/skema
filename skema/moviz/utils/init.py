@@ -26,9 +26,9 @@ def init(data):
             i += 1
 
     i = 1
-    for attribute in data["attributes"]:
-        if attribute.get("value").get("b") != None:
-            b_list = attribute.get("value").get("b")
+    for attribute in data["fn_array"]:
+        if attribute.get("b") != None:
+            b_list = attribute.get("b")
             j = 1
 
             for b_dict in b_list:
@@ -37,27 +37,27 @@ def init(data):
             i += 1
 
     i = 1
-    for attribute in data["attributes"]:
-        if attribute.get("value").get("bf") != None:
-            bf_list = attribute.get("value").get("bf")
+    for attribute in data["fn_array"]:
+        if attribute.get("bf") != None:
+            bf_list = attribute.get("bf")
             j = 1
             for bf_dict in bf_list:
                 bf_dict["box"] = "attr-bf-" + str(i) + "-" + str(j)
                 j += 1
             i += 1
 
-    for attribute in data["attributes"]:
+    for attribute in data["fn_array"]:
         j = 1
-        if attribute.get("value").get("pof") != None:
-            pof_list = attribute.get("value").get("pof")
+        if attribute.get("pof") != None:
+            pof_list = attribute.get("pof")
             for pof_dict in pof_list:
                 pof_dict["id"] = j
                 j += 1
 
-    for attribute in data["attributes"]:
+    for attribute in data["fn_array"]:
         j = 1
-        if attribute.get("value").get("pif") != None:
-            pif_list = attribute.get("value").get("pif")
+        if attribute.get("pif") != None:
+            pif_list = attribute.get("pif")
             for pif_dict in pif_list:
                 pif_dict["id"] = j
                 j += 1
@@ -75,3 +75,6 @@ def init(data):
     if data.get("fn").get("wfc") != None:
         for wfc in data.get("fn").get("wfc"):
             wfc["src"] = 1
+
+    # for attribute in data["fn_array"]:
+        

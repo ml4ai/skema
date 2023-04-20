@@ -31,10 +31,10 @@ def draw_graph(gromet, program_name: str):
     data = gromet.to_dict()
     init(data)
 
-    ####remove this before commit
+    ###remove this before commit
     # with open(f"{program_name}--Gromet-FN-auto.json", "w") as f:
     #     f.write(dictionary_to_gromet_json(del_nulls(data)))
-    ####
+    ###
 
     cwd = Path(__file__).parents[0]
     filepath = cwd / "../../../data/gromet/config/config.json"
@@ -54,7 +54,7 @@ def draw_graph(gromet, program_name: str):
     # print(type(g))
     if config['start_collapsed'] == 'false':
         lhs= drawLHS(data, g)
-        rhs = drawRHS(data, g, False,)
+        rhs = drawRHS(data, g)
         output = drawArrows(data, g, False)
         return output
     elif config['start_collapsed'] == 'true':
@@ -65,7 +65,7 @@ def draw_graph(gromet, program_name: str):
             lhs = drawLHS(data, g)
             for item in config['uncollapse_list']:
                 setExpandValue(data, item)
-                rhs = drawRHS(data, g, item)
+                rhs = drawRHS(data, g)
                 # print(rhs)
             # print(rhs)
             output = drawArrows(data, rhs, True)
@@ -100,68 +100,72 @@ def drawLHS(data, g):
     drawWFF(data["fn"], g)
     return g
 
-def drawRHS(data, g, item_id):
+def drawRHS(data, g):
+    print("RHS")
     i=0
-    for attribute in data.get("attributes"):
-        if attribute.get("type") == "FN":
-            if attribute.get("value").get("b") != None:
-                for b in attribute.get("value").get("b"):    
-                    if attribute.get('expand') == True:
-                        if b.get("function_type") == "EXPRESSION":
-                            i = drawB(g, attribute, b, "expr", "purple", i)
-                        if b.get("function_type") == "FUNCTION":
-                            i = drawB(g, b, attribute, "func", "green", i)
-                        if b.get("function_type") == "PREDICATE":
-                            i = drawB(g, b, attribute, "pred", "pink", i)
-                        drawWFF(attribute.get("value"), g)
-                        drawWFOPO(attribute.get("value"), g)
-                        drawWFOPI(attribute.get("value"), g)
-                        drawWOPIO(attribute.get("value"), g)
-                    elif attribute.get('expand') == None:
-                        if b.get("function_type") == "EXPRESSION":
-                            i = drawB(g, attribute, b, "expr", "purple", i)
-                        if b.get("function_type") == "FUNCTION":
-                            i = drawB(g, b, attribute, "func", "green", i)
-                        if b.get("function_type") == "PREDICATE":
-                            i = drawB(g, b, attribute, "pred", "pink", i)
-                        drawWFF(attribute.get("value"), g)
-                        drawWFOPO(attribute.get("value"), g)
-                        drawWFOPI(attribute.get("value"), g)
-                        drawWOPIO(attribute.get("value"), g)
-        if attribute.get("value").get("type") == "IMPORT":
-            with g.subgraph(name=f"cluster_import_{attribute.index()}") as b:
-                b.attr(label=str(attribute))
+    for attribute in data.get("fn_array"):
+        # if attribute.get("type") == "FN":
+        if attribute.get("b") != None:
+            for b in attribute.get("b"):    
+                if attribute.get('expand') == True:
+                    if b.get("function_type") == "EXPRESSION":
+                        i = drawB(g, attribute, b, "expr", "purple", i)
+                    if b.get("function_type") == "FUNCTION":
+                        i = drawB(g, b, attribute, "func", "green", i)
+                    if b.get("function_type") == "PREDICATE":
+                        i = drawB(g, b, attribute, "pred", "pink", i)
+                    drawWFF(attribute, g)
+                    drawWFOPO(attribute, g)
+                    drawWFOPI(attribute, g)
+                    drawWOPIO(attribute, g)
+                elif attribute.get('expand') == None:
+                    if b.get("function_type") == "EXPRESSION":
+                        i = drawB(g, attribute, b, "expr", "purple", i)
+                    if b.get("function_type") == "FUNCTION":
+                        i = drawB(g, b, attribute, "func", "green", i)
+                    if b.get("function_type") == "PREDICATE":
+                        i = drawB(g, b, attribute, "pred", "pink", i)
+                    drawWFF(attribute, g)
+                    drawWFOPO(attribute, g)
+                    drawWFOPI(attribute, g)
+                    drawWOPIO(attribute, g)
+        # if attribute.get("type") == "IMPORT":
+            # with g.subgraph(name=f"cluster_import_{attribute.index()}") as b:
+            #     b.attr(label=str(attribute))
     return g
 
 # connecting LHS and RHS
 def drawArrows(data, g, expand):
     # g.attr(rankdir="LR")
+    
     if data.get("fn").get("bf") != None:
         for bf in data.get("fn").get("bf"):
             # for attribute in data.get('attributes'):
-            if bf.get("contents") != None:
-                attribute = data.get("attributes")[bf.get("contents") - 1]
+            if bf.get("body") != None:
+                attribute = data.get("fn_array")[bf.get("body") - 1]
                 # print(attribute)
-                if attribute.get("value").get("b") != None:
-                    for b in attribute.get("value").get("b"):
-                        # for b in attribute.get("value").get("b"):
+                if attribute.get("b") != None:
+                    b = attribute.get("b")
+                    for b in attribute.get("b"):
+                        # for b in attribute.get("b"):
                         print(b, expand, attribute.get("expand"))
                         if expand == True and attribute.get("expand") == True:
                             print("hi",bf.get("node"), b.get("node"))
                             print(bf.get("invisNode"), b.get("invisNode"))
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3")
                         elif expand == False:
+                            print("in draw arrows")
                             print(bf.get("invisNode"), b.get("invisNode"))
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3")
 
     # edges between the different attributes in RHS 
-    for attribute in data.get("attributes"):
-        if attribute.get("value").get("bf") != None:
-            for bf in attribute.get("value").get("bf"):
+    for attribute in data.get("fn_array"):
+        if attribute.get("bf") != None:
+            for bf in attribute.get("bf"):
                 if bf.get("contents") != None:
                     attr = data.get("attributes")[bf.get("contents") - 1]
-                    if attr.get("value").get("b") != None:
-                        for b in attr.get("value").get("b"):
+                    if attr.get("b") != None:
+                        for b in attr.get("b"):
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="5")
 
     return g
