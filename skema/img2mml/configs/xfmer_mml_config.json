@@ -2,7 +2,7 @@
 "model_type":"resnet_xfmer",
 
 "_comment_":"general params ",
-"device":"cpu",
+"device":"cuda",
 "use_single_gpu":true,
 "gpu_id":1,
 "DDP":false,
@@ -11,7 +11,7 @@
 "DataParallel":false,
 "DataParallel_ids":"0,1,2,3",
 "num_cpus":100,
-"epochs":1,
+"epochs":100,
 "seed":42,
 "load_trained_model_for_testing":false,
 "continue_training_from_last_saved_model":false,

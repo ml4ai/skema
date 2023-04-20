@@ -17,7 +17,7 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
-from skema.img2mml.preprocessing.preprocess import preprocess_mml
+from skema.img2mml.preprocessing.preprocess import preprocess_dataset
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
 from skema.img2mml.models.encoders.resnet_encoder import ResNet18_Encoder, ResNetBlock
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
@@ -257,7 +257,7 @@ def train_model(rank=None,):
                 test_dataloader,
                 val_dataloader,
                 vocab,
-            ) = preprocess_mml(config)
+            ) = preprocess_dataset(config)
             model = define_model(config, vocab, device).to(device)
 
         elif dataparallel:
@@ -268,7 +268,7 @@ def train_model(rank=None,):
                 test_dataloader,
                 val_dataloader,
                 vocab,
-            ) = preprocess_mml(config)
+            ) = preprocess_dataset(config)
             model = define_model(config, vocab, device)
             model = nn.DataParallel(
                 model.cuda(),
@@ -286,7 +286,7 @@ def train_model(rank=None,):
                 test_dataloader,
                 val_dataloader,
                 vocab,
-            ) = preprocess_mml(config)
+            ) = preprocess_dataset(config)
             model = define_model(config, vocab, rank)
             model = DDP(
                 model.to(f"cuda:{rank}"),
@@ -305,7 +305,7 @@ def train_model(rank=None,):
             test_dataloader,
             val_dataloader,
             vocab,
-        ) = preprocess_mml(config)
+        ) = preprocess_dataset(config)
         model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")

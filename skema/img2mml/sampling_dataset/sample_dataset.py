@@ -101,7 +101,7 @@ def main():
     print("collecting all the MathML paths...")
 
     if config["sample_entire_year"]:
-        years = config[years].split(",")
+        years = config["years"].split(",")
 
         for yr in years:
             yr = yr.strip()
