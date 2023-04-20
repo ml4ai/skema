@@ -8,8 +8,6 @@ from skema.moviz.utils.helper_functions import drawB, setExpandValue
 from utils.helper_functions import (
     drawBC,
     drawBL,
-    drawOPO,
-    drawOPI,
     drawWFC,
     drawWFF,
     drawBF,
