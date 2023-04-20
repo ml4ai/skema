@@ -15,10 +15,10 @@ object GrounderFactory {
     // Grounding parameters
     engine.toLowerCase match {
         case "miraembeddings" =>
-          val ontologyFilePath = config.getString("ontologyPath")
-          val embeddingsModelPath = config.getString("embeddingsModelPath")
-          val lambda = config.getInt("lambda")
-          val alpha = config.getDouble("alpha").toFloat
+          val ontologyFilePath = domainConfig.getString("ontologyPath")
+          val embeddingsModelPath = domainConfig.getString("embeddingsModelPath")
+          val lambda = domainConfig.getInt("lambda")
+          val alpha = domainConfig.getDouble("alpha").toFloat
           val namespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
           val grounder = MiraEmbeddingsGrounder(ontologyFilePath, embeddingsModelPath, lambda, alpha, namespaces)
           if(prependManualGrounder)
