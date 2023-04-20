@@ -27,7 +27,7 @@ cd skema/img2mml ; python3 -m pip install -r requirements.txt
 
 To install Pytorch
 ```
-conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6 -c pytorch -c conda-forge
+conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6 -c pytorch -c conda-forge -y
 ```
 
 To install Torchtext
@@ -67,6 +67,17 @@ cd skema/img2mml; mkdir training_data
 ```
 
 To prepare the dataset for training, we will first preprocess it. The first step will be the image preprocessing where all the empty and corrupted images will be removed. The second step will be preprocessing the target MathML equations where again all the equations corresponding to rejected images will be removed from the dataset and all equations which have less than 2 tokens will be rejected as well since a MathML equations can't be defined in just 2 tokens. An example can be seen as `<math> </math>` which doesn't represent anything.
+
+### Preparing config file:
+The config file can be found under `configs/`. Based on the dataset, select the respective config file. Parameters that need to set before training are as follows:
+
+`model_type`: resnet_xfmer, cnn_xfmer, opennmt (a local replica of OpenNMT).
+
+`device`:cpu or cuda. If using Cuda, please modify the GPU related parameters in the config file.
+
+Please ensure that `data_path` and `dataset_type` are properly set under `params for preprocessing`.
+
+If only want to test the pre-trained model, change the `load_trained_model_for_testing` to true.
 
 #### To preprocess images:
 ```
