@@ -99,6 +99,7 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
+        LEN_DIM=930
 
         ENC = {
             "CNN": CNN_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE),
@@ -111,7 +112,7 @@ def define_model(config, VOCAB, DEVICE):
                 MAX_LEN,
                 N_XFMER_ENCODER_LAYERS,
                 DIM_FEEDFWD,
-                LEN_DIM=930
+                LEN_DIM
             ),
         }
         DEC = Transformer_Decoder(
@@ -134,6 +135,7 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
+        LEN_DIM=32
 
         ENC = {
             "CNN": ResNet18_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE, ResNetBlock),
@@ -146,7 +148,7 @@ def define_model(config, VOCAB, DEVICE):
                 MAX_LEN,
                 N_XFMER_ENCODER_LAYERS,
                 DIM_FEEDFWD,
-                LEN_DIM=32
+                LEN_DIM
             ),
         }
         DEC = Transformer_Decoder(
