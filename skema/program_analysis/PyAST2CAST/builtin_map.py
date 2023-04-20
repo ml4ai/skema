@@ -8,13 +8,13 @@ from yaml.loader import SafeLoader
 import os
 from pathlib import Path
 
-filename = "python_builtins.yaml"
+BUILTINS_FILENAME = "python_builtins.yaml"
 BUILTINS = None
 
 def build_map():
     global BUILTINS
     if BUILTINS == None: 
-        f_path = os.path.join(os.path.dirname(__file__),filename)
+        f_path = os.path.join(os.path.dirname(__file__), BUILTINS_FILENAME)
         with open(f_path) as f:
             BUILTINS = yaml.load(f, Loader=SafeLoader)
         return True
