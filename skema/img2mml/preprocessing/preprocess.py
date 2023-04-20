@@ -87,7 +87,7 @@ def preprocess_mml(config):
     IMGTnsrPath = (
         f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     )
-    mml_txt = open(MMLPath).read().split("\n")[:-1]
+    mml_txt = open(MMLPath).read().split("\n")[:-1][:90]
     image_num = range(0, len(mml_txt))
 
     # split the image_num into train, test, validate

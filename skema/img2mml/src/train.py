@@ -47,7 +47,7 @@ def train(
         mml = mml[:, 1:].contiguous().view(-1)
         if model_type == "opennmt":
             outputs = outputs[:, 1:, :].contiguous().view(-1, output_dim)
-        elif model_type == "cnn_xfmer":
+        elif model_type == "cnn_xfmer" or model_type == "resnet_xfmer":
             outputs = outputs.contiguous().view(-1, output_dim)
 
         # print("outputs mml devices are: ", outputs.get_device(), mml.get_device())

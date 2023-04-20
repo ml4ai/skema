@@ -1,7 +1,8 @@
 {
-"model_type":"cnn_xfmer",
+"model_type":"resnet_xfmer",
 
 "_comment_":"general params ",
+"device":"cpu",
 "use_single_gpu":true,
 "gpu_id":1,
 "DDP":false,
@@ -9,7 +10,6 @@
 "DDP gpus":"0,1",
 "DataParallel":false,
 "DataParallel_ids":"0,1,2,3",
-"device":"cuda",
 "num_cpus":100,
 "epochs":1,
 "seed":42,
@@ -48,7 +48,6 @@
 "_comment_":"encoder params",
 "encoder_dim":512,
 "input_channels":3,
-"encoding_type":"row_encoding",
 "n_xfmer_heads":4,
 "n_xfmer_encoder_layers":8,
 "dim_feedforward_for_xfmer":1024,

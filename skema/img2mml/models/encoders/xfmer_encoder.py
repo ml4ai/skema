@@ -17,12 +17,13 @@ class Transformer_Encoder(nn.Module):
         max_len,
         n_xfmer_encoder_layers,
         dim_feedfwd,
+        len_dim
     ):
 
         super(Transformer_Encoder, self).__init__()
         self.dec_hid_dim = dec_hid_dim
         self.device = device
-        self.change_length = nn.Linear(930, max_len)
+        self.change_length = nn.Linear(len_dim, max_len)
         self.pos = PositionalEncoding(dec_hid_dim, dropout, max_len)
 
         """

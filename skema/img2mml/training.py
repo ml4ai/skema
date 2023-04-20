@@ -19,6 +19,7 @@ from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
 from skema.img2mml.preprocessing.preprocess import preprocess_mml
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
+from skema.img2mml.models.encoders.resnet_encoder import ResNet18_Encoder, ResNetBlock
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.lstm_decoder import LSTM_Decoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
@@ -65,7 +66,7 @@ def define_model(config, VOCAB, DEVICE):
     OUTPUT_DIM = len(VOCAB)
     EMB_DIM = config["embedding_dim"]
     ENC_DIM = config["encoder_dim"]
-    ENCODING_TYPE = config["encoding_type"]
+    # ENCODING_TYPE = config["encoding_type"]
     DEC_HID_DIM = config["decoder_hid_dim"]
     DROPOUT = config["dropout"]
     MAX_LEN = config["max_len"]
@@ -73,6 +74,7 @@ def define_model(config, VOCAB, DEVICE):
     print(f"building {MODEL_TYPE} model...")
 
     if MODEL_TYPE == "opennmt":
+        ENCODING_TYPE = "row_encoding"
         N_LAYERS = config["lstm_layers"]
         TFR = config["teacher_force_ratio"]
         ENC = CNN_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE)
@@ -92,6 +94,7 @@ def define_model(config, VOCAB, DEVICE):
 
     elif MODEL_TYPE == "cnn_xfmer":
         # transformers params
+        # ENCODING_TYPE will be PositionalEncoding
         DIM_FEEDFWD = config["dim_feedforward_for_xfmer"]
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
@@ -108,6 +111,42 @@ def define_model(config, VOCAB, DEVICE):
                 MAX_LEN,
                 N_XFMER_ENCODER_LAYERS,
                 DIM_FEEDFWD,
+                LEN_DIM=930
+            ),
+        }
+        DEC = Transformer_Decoder(
+            EMB_DIM,
+            N_HEADS,
+            DEC_HID_DIM,
+            OUTPUT_DIM,
+            DROPOUT,
+            MAX_LEN,
+            N_XFMER_DECODER_LAYERS,
+            DIM_FEEDFWD,
+            DEVICE,
+        )
+
+        model = Image2MathML_Xfmer(ENC, DEC, VOCAB, DEVICE)
+
+    elif MODEL_TYPE == "resnet_xfmer":
+        # transformers params
+        DIM_FEEDFWD = config["dim_feedforward_for_xfmer"]
+        N_HEADS = config["n_xfmer_heads"]
+        N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
+        N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
+
+        ENC = {
+            "CNN": ResNet18_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE, ResNetBlock),
+            "XFMER": Transformer_Encoder(
+                EMB_DIM,
+                DEC_HID_DIM,
+                N_HEADS,
+                DROPOUT,
+                DEVICE,
+                MAX_LEN,
+                N_XFMER_ENCODER_LAYERS,
+                DIM_FEEDFWD,
+                LEN_DIM=32
             ),
         }
         DEC = Transformer_Decoder(
@@ -207,58 +246,59 @@ def train_model(rank=None,):
     json.dump(config, config_log)
 
     # defining model using DataParallel
-    if use_single_gpu:
-        print(f"using single gpu:{config['gpu_id']}...")
+    if torch.cuda.is_available():
+        if use_single_gpu:
+            print(f"using single gpu:{config['gpu_id']}...")
 
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
-        device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
-        (
-            train_dataloader,
-            test_dataloader,
-            val_dataloader,
-            vocab,
-        ) = preprocess_mml(config)
-        model = define_model(config, vocab, device).to(device)
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
+            device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
+            (
+                train_dataloader,
+                test_dataloader,
+                val_dataloader,
+                vocab,
+            ) = preprocess_mml(config)
+            model = define_model(config, vocab, device).to(device)
 
-    elif dataparallel:
-        os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        (
-            train_dataloader,
-            test_dataloader,
-            val_dataloader,
-            vocab,
-        ) = preprocess_mml(config)
-        model = define_model(config, vocab, device)
-        model = nn.DataParallel(
-            model.cuda(),
-            device_ids=[int(i) for i in config["DataParallel_ids"].split(",")],
-        )
+        elif dataparallel:
+            os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            (
+                train_dataloader,
+                test_dataloader,
+                val_dataloader,
+                vocab,
+            ) = preprocess_mml(config)
+            model = define_model(config, vocab, device)
+            model = nn.DataParallel(
+                model.cuda(),
+                device_ids=[int(i) for i in config["DataParallel_ids"].split(",")],
+            )
 
-    elif ddp:
-        # create default process group
-        dist.init_process_group("gloo", rank=rank, world_size=world_size)
-        # add rank to config
-        config["rank"] = rank
-        device = f"cuda:{rank}"
-        (
-            train_dataloader,
-            test_dataloader,
-            val_dataloader,
-            vocab,
-        ) = preprocess_mml(config)
-        model = define_model(config, vocab, rank)
-        model = DDP(
-            model.to(f"cuda:{rank}"),
-            device_ids=[rank],
-            output_device=rank,
-            find_unused_parameters=True,
-        )
+        elif ddp:
+            # create default process group
+            dist.init_process_group("gloo", rank=rank, world_size=world_size)
+            # add rank to config
+            config["rank"] = rank
+            device = f"cuda:{rank}"
+            (
+                train_dataloader,
+                test_dataloader,
+                val_dataloader,
+                vocab,
+            ) = preprocess_mml(config)
+            model = define_model(config, vocab, rank)
+            model = DDP(
+                model.to(f"cuda:{rank}"),
+                device_ids=[rank],
+                output_device=rank,
+                find_unused_parameters=True,
+            )
 
     else:
         import warnings
 
-        warnings.warn("No GPU input has provided. Using CPU!!! ")
+        warnings.warn("No GPU input has provided. Falling back to CPU. ")
         device = torch.device("cpu")
         (
             train_dataloader,
@@ -266,7 +306,7 @@ def train_model(rank=None,):
             val_dataloader,
             vocab,
         ) = preprocess_mml(config)
-        model = define_model(config, vocab, device)
+        model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")
     # print(model.apply(init_weights))

@@ -55,7 +55,7 @@ def evaluate(
                     outputs_reshaped = (
                         outputs[:, 1:, :].contiguous().view(-1, output_dim)
                     )  # (B * max_len-1, output_dim)
-                elif model_type == "cnn_xfmer":
+                elif model_type == "cnn_xfmer" or model_type == "resnet_xfmer":
                     outputs_reshaped = outputs.contiguous().view(
                         -1, output_dim
                     )  # (B * max_len-1, output_dim)
@@ -69,7 +69,7 @@ def evaluate(
                     outputs_reshaped = (
                         outputs[:, 1:, :].contiguous().view(-1, output_dim)
                     )  # (B * max_len-1, output_dim)
-                elif model_type == "cnn_xfmer":
+                elif model_type == "cnn_xfmer" or model_type == "resnet_xfmer":
                     outputs_reshaped = outputs.contiguous().view(
                         -1, output_dim
                     )  # (B * max_len-1, output_dim)
