@@ -75,6 +75,19 @@ def init(data):
     if data.get("fn").get("wfc") != None:
         for wfc in data.get("fn").get("wfc"):
             wfc["src"] = 1
-
-    # for attribute in data["fn_array"]:
+    
+    for attribute in data["fn_array"]:
+        if attribute.get('wfopo') != None:
+            for wfopo in attribute.get('wfopo'):
+                wfopo['drawn'] = False
+        if attribute.get('wfopi') != None:
+            for wfopi in attribute.get('wfopi'):
+                wfopi['drawn'] = False
+        if attribute.get('wff') != None:
+            for wff in attribute.get('wff'):
+                wff['drawn'] = False
         
+
+    if data.get("fn").get("wff") != None:
+        for wff in data.get("fn").get('wff'):
+            wff['drawn'] = False

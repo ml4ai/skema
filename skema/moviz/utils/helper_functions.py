@@ -117,17 +117,17 @@ def drawPOL(data, bl, c):
 def drawWFF(data, g):
     if data.get("wff") != None:
         for wff in data["wff"]:
-            # print(wff)
-            if wff.get('drawn') == False:
-                if data.get("pif") != None:
-                    for pif in data["pif"]:
-                        if data.get("pof") != None:
-                            for pof in data["pof"]:
-                                # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
-                                if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
-                                    # print(pif.get("node"), pof.get("node"), "\n",pif, '\n', pof)
-                                    g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
-                                    wff['drawn'] = True
+            if(wff['drawn'] == False):
+                if wff.get('drawn') == False:
+                    if data.get("pif") != None:
+                        for pif in data["pif"]:
+                            if data.get("pof") != None:
+                                for pof in data["pof"]:
+                                    # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
+                                    if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
+                                        # print(pif.get("node"), pof.get("node"), "\n",pif, '\n', pof)
+                                        g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+                                        wff['drawn'] = True
 
 
 def drawWFC(data, g):
@@ -153,25 +153,26 @@ def drawWFL(data, g):
 def drawWFOPO(data, g):
     if data.get("wfopo") != None:
         for wfopo in data.get("wfopo"):
-            if data.get("opo") != None:
-                for opo in data.get("opo"):
-                    for pof in data.get("pof"):
-                        if (wfopo["src"] == opo["id"] and wfopo["tgt"] == pof["id"]):
-                            print("wfopo: ",opo.get('node'), pof.get('node'))
-                            g.edge(opo.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+            if(wfopo['drawn'] == False):
+                if data.get("opo") != None:
+                    for opo in data.get("opo"):
+                        for pof in data.get("pof"):
+                            if (wfopo["src"] == opo["id"] and wfopo["tgt"] == pof["id"]):
+                                print("wfopo: ",opo.get('node'), pof.get('node'))
+                                g.edge(opo.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+                                wfopo['drawn'] = True
 
 
 def drawWFOPI(data, g):
     if data.get("wfopi") != None:
         for wfopi in data.get("wfopi"):
-            if data.get("opi") != None:
-                for opi in data.get("opi"):
-                    for pif in data.get("pif"):
-                        if (
-                            wfopi["src"] == opi["id"]
-                            and wfopi["tgt"] == pif["id"]
-                        ):
-                            g.edge( pif["node"], opi["node"], dir='forward', arrowhead='normal', color="brown")
+            if(wfopi['drawn'] == False):
+                if data.get("opi") != None:
+                    for opi in data.get("opi"):
+                        for pif in data.get("pif"):
+                            if (wfopi["src"] == opi["id"] and wfopi["tgt"] == pif["id"]):
+                                g.edge( pif["node"], opi["node"], dir='forward', arrowhead='normal', color="brown")
+                                wfopi['drawn'] = True
 
 
 def drawWOPIO(data, g):
