@@ -46,7 +46,7 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args[1]);
 
-    let module_id = 1525;
+    let module_id = 1755;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
     if args[1] == "auto".to_string() {
@@ -69,31 +69,91 @@ fn main() {
         }
         // get a sense of the number of expressions in each function
         let mut func_counter = 0;
-        let mut core_func = 0;
+        let mut core_func = Vec::<usize>::new();
         for func in functions.clone() {
             let mut expression_counter = 0;
+            let mut primitive_counter = 0;
             for node in func.node_indices() {
                 if func[node].labels == ["Expression"] {
                     expression_counter += 1;
                 }
+                if func[node].labels == ["Primitive"] {
+                    if func[node].properties["name"].to_string() == "'*'".to_string() {
+                        primitive_counter += 1;
+                    } else if func[node].properties["name"].to_string() == "'+'".to_string() {
+                        primitive_counter += 1;
+                    } else if func[node].properties["name"].to_string() == "'-'".to_string() {
+                        primitive_counter += 1;
+                    } else if func[node].properties["name"].to_string() == "'USub'".to_string() {
+                        primitive_counter += 1;
+                    }
+                }
             }
-            if expression_counter >= 4 {
-                core_func = func_counter;
+            if expression_counter >= 3 && primitive_counter >= 12 {
+                core_func.push(func_counter);
             }
             func_counter += 1;
         }
-        // 4. get the id of the core dynamics function
-        let mut core_id = module_id;
-        for node in functions[core_func].clone().node_indices() {
-            if functions[core_func][node].labels == ["Function"] {
-                core_id = functions[core_func][node].id.clone();
+        // 4. get the id of functions with enough expressions
+        let mut core_id = Vec::<i64>::new();
+        for c_func in core_func.iter() {
+            for node in functions[c_func.clone()].clone().node_indices() {
+                if functions[c_func.clone()][node].labels == ["Function"] {
+                    core_id.push(functions[c_func.clone()][node].id.clone());
+                }
             }
         }
 
-        // 5. pass id to subgrapg2_core_dyn to get core dynamics
-        let (core_dynamics, metadata_map) = subgraph2_core_dyn_exp(core_id).unwrap();
+        // extract line numbers of function which contains the dynamics
+        let mut line_nums = Vec::<i64>::new();
+        for node in graph.node_indices() {
+            if graph[node].id == core_id[0].clone() {
+                for n_node in graph.neighbors_directed(node.clone(), Outgoing) {
+                    if graph[n_node.clone()].labels == ["Metadata"] {
+                        match &graph[n_node].clone().properties["line_begin"] {
+                            Value::List(x) => match x[0] {
+                                Value::Int(y) => {
+                                    println!("line_begin: {:?}", y);
+                                    line_nums.push(y.clone());
+                                }
+                                _ => println!("error metadata type"),
+                            },
+                            _ => println!("error metadata type"),
+                        }
+                        match &graph[n_node].clone().properties["line_end"] {
+                            Value::List(x) => match x[0] {
+                                Value::Int(y) => {
+                                    println!("line_end: {:?}", y);
+                                    line_nums.push(y.clone());
+                                }
+                                _ => println!("error metadata type"),
+                            },
+                            _ => println!("error metadata type"),
+                        }
+                    }
+                }
+            }
+        }
 
-        println!("{:?}", core_dynamics[0].clone());
+        println!(
+            "Lines for core dynamics function: {:?} -> {:?}",
+            line_nums[0].clone(),
+            line_nums[1].clone()
+        );
+
+        println!("core_id: {:?}", core_id[0].clone());
+        println!("module_id: {:?}", module_id.clone());
+        // 4.5 now to check if of those expressions, if they are arithmetric in nature
+
+        // 5. pass id to subgrapg2_core_dyn to get core dynamics
+        let (mut core_dynamics_ast, metadata_map_ast) =
+            subgraph2_core_dyn_ast(core_id[0].clone()).unwrap();
+
+        println!("{:?}", core_dynamics_ast.clone());
+
+        /*let (core_dynamics, metadata_map) = subgraph2_core_dyn_exp(core_id).unwrap();
+
+        println!("{:?}", core_dynamics[0].clone());*/
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
     else if args[1] == "manual".to_string() {
@@ -121,6 +181,9 @@ fn main() {
             };
             named_core_dynamics.push(test_pre_exp.clone());
         }
+
+        // expressions that are working: 5 (T), 6 (H)
+        // 7 (E) should be fixable, the USub is not being subsituted and is at the end of the RHS instead of the start
 
         println!("Exp:\n {:?}", named_core_dynamics[5].clone());
         println!("\n Ast:\n {:?}", core_dynamics_ast[5].clone());
@@ -342,7 +405,7 @@ fn subgraph2_core_dyn_ast(
 
     // now we convert the following into a Expr to get converted into a petri net
     // first we have to get the parent node index to pass into the function
-    let mut root_node = Vec::<NodeIndex>::new();
+    /*let mut root_node = Vec::<NodeIndex>::new();
     for node_index in trimmed_expressions_wiring[0].clone().node_indices() {
         if trimmed_expressions_wiring[0].clone()[node_index].labels == ["Opo"] {
             root_node.push(node_index);
@@ -350,7 +413,7 @@ fn subgraph2_core_dyn_ast(
     }
     if root_node.len() >= 2 {
         panic!("More than one Opo!");
-    }
+    }*/
 
     // this is the actual convertion
     let mut core_dynamics = Vec::<Vec<MathExpression>>::new();
@@ -363,10 +426,10 @@ fn subgraph2_core_dyn_ast(
             }
         }
         if root_node.len() >= 2 {
-            panic!("More than one Opo!");
+            println!("More than one Opo! Skipping Expression!");
+        } else {
+            core_dynamics.push(tree_2_ast(expr.clone(), root_node[0].clone()).unwrap());
         }
-
-        core_dynamics.push(tree_2_ast(expr.clone(), root_node[0].clone()).unwrap());
     }
 
     return Ok((core_dynamics, metadata_map));
@@ -582,9 +645,10 @@ fn distribute_args(
 
     arg2_term_ind = terms_indicies(arg2.clone());
 
-    // check if need to swap operato signs
+    // check if need to swap operator signs
     if arg1[0] == Mo(Operator::Other("USub".to_string())) {
-        // operator starts at begining of arg2
+        println!("USub dist happens"); // This is never running
+                                       // operator starts at begining of arg2
         if arg2_term_ind[0] == 0 {
             for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
                 if arg2[(*ind as usize)].clone() == Mo(Operator::Add) {
@@ -765,6 +829,7 @@ fn get_args(
             && graph.clone()[node].properties["name"].to_string() == "'USub'".to_string()
         {
             op.push(get_operator(graph.clone(), node.clone()));
+            println!("get_args USub node operator: {:?}", op[0].clone());
             for node1 in graph.neighbors_directed(node.clone(), Outgoing) {
                 let temp_mi =
                     MathExpression::Mi(graph.clone()[node1].properties["name"].to_string());
