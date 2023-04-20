@@ -5,10 +5,10 @@ from skema.program_analysis import astpp
 import json
 import argparse
 from skema.program_analysis.PyAST2CAST import py_ast_to_cast
-from skema.program_analysis.CAST2GrFN import cast
-from skema.program_analysis.CAST2GrFN.model.cast import SourceRef
-from skema.program_analysis.CAST2GrFN.cast import CAST
-from skema.program_analysis.CAST2GrFN.visitors.cast_to_agraph_visitor import (
+from skema.program_analysis.CAST2FN import cast
+from skema.program_analysis.CAST2FN.model.cast import SourceRef
+from skema.program_analysis.CAST2FN.cast import CAST
+from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
 from typing import Optional
