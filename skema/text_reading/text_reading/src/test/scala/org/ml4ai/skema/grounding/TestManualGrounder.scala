@@ -13,7 +13,8 @@ class TestManualGrounder extends Test {
 
   val manualGrounder: ManualGrounder = {
     val config = ConfigFactory.load().getConfig("Grounding")
-    val manualEntries = config.getString("manualGroundings")
+    val domainConfig = config.getConfig(config.getString("domain"))
+    val manualEntries = domainConfig.getString("manualGroundings")
 
     // Set alpha to 1.0 to bypass the edit distance algo for now
     ManualGrounder.fromFileOrResource(manualEntries, new FastNLPProcessor(withChunks = false, internStrings = false))
