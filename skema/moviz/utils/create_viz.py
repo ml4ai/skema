@@ -3,7 +3,7 @@ import graphviz
 from skema.moviz.utils.helper_functions import drawB, setExpandValue
 
 #remove this before commit
-# from skema.utils.fold import del_nulls, dictionary_to_gromet_json
+from skema.utils.fold import del_nulls, dictionary_to_gromet_json
 
 from utils.helper_functions import (
     drawBC,
@@ -30,8 +30,8 @@ def draw_graph(gromet, program_name: str):
     init(data)
 
     ###remove this before commit
-    # with open(f"{program_name}--Gromet-FN-auto.json", "w") as f:
-    #     f.write(dictionary_to_gromet_json(del_nulls(data)))
+    with open(f"{program_name}--Gromet-FN-auto.json", "w") as f:
+        f.write(dictionary_to_gromet_json(del_nulls(data)))
     ###
 
     cwd = Path(__file__).parents[0]
@@ -72,6 +72,7 @@ def draw_graph(gromet, program_name: str):
 #LHS
 def drawLHS(data, g):
     i=0
+    j=0
     # print(data.get('fn'))
     for b in data.get("fn").get("b"):
         # print(b)
@@ -82,15 +83,16 @@ def drawLHS(data, g):
                 a.node(name=f"clusterA_{i}", style = 'invis')
                 i+=1
                 if data.get("fn").get("bc") != None:
-                    drawBC(data.get("fn"), a)
+                    print("drawBC")
+                    j = drawBC(data.get("fn"), a, j)
+                    
                 if data.get("fn").get("bl") != None:
                     # print("here")
                     drawBL(data.get("fn"), a)
-                else:
-                    if data.get("fn").get("bf") != None:
-                        # print(data.get("fn").get("bf"))
-                        for bf in data.get("fn").get("bf"):
-                            drawBF(data.get("fn"), a, bf)
+                if data.get("fn").get("bf") != None:
+                    # print(data.get("fn").get("bf"))
+                    for bf in data.get("fn").get("bf"):
+                        drawBF(data.get("fn"), a, bf)
                             # print("bf: ", bf)
     # print(data.get('fn').get('pof'))
     drawWFC(data["fn"], g)
@@ -99,7 +101,6 @@ def drawLHS(data, g):
     return g
 
 def drawRHS(data, g):
-    print("RHS")
     i=0
     for attribute in data.get("fn_array"):
         # if attribute.get("type") == "FN":
@@ -109,9 +110,10 @@ def drawRHS(data, g):
                     if b.get("function_type") == "EXPRESSION":
                         i = drawB(g, attribute, b, "expr", "purple", i)
                     if b.get("function_type") == "FUNCTION":
-                        i = drawB(g, b, attribute, "func", "green", i)
+                        # print(b)
+                        i = drawB(g, attribute, b, "func", "green", i)
                     if b.get("function_type") == "PREDICATE":
-                        i = drawB(g, b, attribute, "pred", "pink", i)
+                        i = drawB(g, attribute, b, "pred", "pink", i)
                     drawWFF(attribute, g)
                     drawWFOPO(attribute, g)
                     drawWFOPI(attribute, g)
@@ -120,9 +122,9 @@ def drawRHS(data, g):
                     if b.get("function_type") == "EXPRESSION":
                         i = drawB(g, attribute, b, "expr", "purple", i)
                     if b.get("function_type") == "FUNCTION":
-                        i = drawB(g, b, attribute, "func", "green", i)
+                        i = drawB(g, attribute, b, "func", "green", i)
                     if b.get("function_type") == "PREDICATE":
-                        i = drawB(g, b, attribute, "pred", "pink", i)
+                        i = drawB(g, attribute, b, "pred", "pink", i)
                     drawWFF(attribute, g)
                     drawWFOPO(attribute, g)
                     drawWFOPI(attribute, g)
@@ -135,7 +137,6 @@ def drawRHS(data, g):
 # connecting LHS and RHS
 def drawArrows(data, g, expand):
     # g.attr(rankdir="LR")
-    
     if data.get("fn").get("bf") != None:
         for bf in data.get("fn").get("bf"):
             # for attribute in data.get('attributes'):
@@ -146,23 +147,57 @@ def drawArrows(data, g, expand):
                     b = attribute.get("b")
                     for b in attribute.get("b"):
                         # for b in attribute.get("b"):
-                        print(b, expand, attribute.get("expand"))
+                        # print(b, expand, attribute.get("expand"))
                         if expand == True and attribute.get("expand") == True:
-                            print("hi",bf.get("node"), b.get("node"))
-                            print(bf.get("invisNode"), b.get("invisNode"))
+                            # print("hi",bf.get("node"), b.get("node"))
+                            # print(bf.get("invisNode"), b.get("invisNode"))
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3")
                         elif expand == False:
-                            print("in draw arrows")
-                            print(bf.get("invisNode"), b.get("invisNode"))
+                            # print("in draw arrows")
+                            # print(bf.get("invisNode"), b.get("invisNode"))
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3")
+    
+    if data.get('fn').get('bc') != None:
+        for bc in data.get("fn").get("bc"):
+            condition = data.get("fn_array")[bc.get('condition')-1]
+            body_if = data.get("fn_array")[bc.get('body_if')-1]
+            body_else = data.get("fn_array")[bc.get('body_else')-1]
+            if condition.get('b') != None:
+                b = condition.get('b')
+                for b in condition.get("b"):
+                    if expand == True and condition.get("expand") == True:
+                        g.edge(bc.get("invisNode"), b.get("invisNode"), ltail=bc.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3", label="condition")
+                    elif expand == False:
+                        g.edge(bc.get("invisNode"), b.get("invisNode"), ltail=bc.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3", label="condition")
+            if body_if.get('b') != None:
+                b = body_if.get('b')
+                for b in body_if.get("b"):
+                    print(b)
+                    if expand == True and body_if.get("expand") == True:
+                        print(bc.get("invisNode"), b.get("invisNode"))
+                        g.edge(bc.get("invisNode"), b.get("invisNode"), ltail=bc.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3", label="body_if")
+                    elif expand == False:
+                        g.edge(bc.get("invisNode"), b.get("invisNode"), ltail=bc.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3", label="body_if")
+            if body_else.get('b') != None:
+                b = body_else.get('b')
+                for b in body_else.get("b"):
+                    if expand == True and body_else.get("expand") == True:
+                        g.edge(bc.get("invisNode"), b.get("invisNode"), ltail=bc.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3", label="body_else")
+                    elif expand == False:
+                        g.edge(bc.get("invisNode"), b.get("invisNode"), ltail=bc.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="3", label="body_else")
 
     # edges between the different attributes in RHS 
     for attribute in data.get("fn_array"):
         if attribute.get("bf") != None:
             for bf in attribute.get("bf"):
-                if bf.get("contents") != None:
-                    attr = data.get("attributes")[bf.get("contents") - 1]
-                    if attr.get("b") != None:
+                if bf.get("body") != None:
+                    attr = data.get("fn_array")[bf.get("body") - 1]
+                    if expand == True:
+                        if attribute.get('expand') == True and attr.get('expand') == True:
+                            if attr.get("b") != None:
+                                for b in attr.get("b"):
+                                    g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="5")
+                    elif expand == False:
                         for b in attr.get("b"):
                             g.edge(bf.get("invisNode"), b.get("invisNode"), ltail=bf.get('node'), lhead=b.get('node'), dir='forward', arrowhead='normal', color="brown", style="dashed", minlen="5")
 

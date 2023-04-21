@@ -47,7 +47,7 @@ def visualize_single_file(filepath) -> str:
 @app.route("/index")
 def execute():
     cwd = Path(__file__).parents[0]
-    filepath = cwd / "../../data/gromet/examples/exp2/exp2.py"
+    filepath = cwd / "../../data/gromet/examples/for1/for1.py"
     output = visualize_single_file(filepath)
     return render_template("index.html", output_image=output)
 
