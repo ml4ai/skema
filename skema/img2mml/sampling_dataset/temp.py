@@ -5,7 +5,6 @@ import functools
 import multiprocessing as mp
 import shutil
 import threading
-
 import subprocess, shlex
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
