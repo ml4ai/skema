@@ -267,7 +267,7 @@ def drawBF(data, a, bf):
                 if primitive != None:
                     # print("primitive:",primitives.get(primitive))
                     bf["node"] = f"cluster_prim_{primitives.get(primitive)}_{bf['box']}"
-                print(primitive)
+                # print(primitive)
                 label = primitives.get(primitive)+"\n id: "+bf.get('box')
                 d.attr(label=label)
                 d.attr(color='black', shape='box', penwidth='3')
@@ -367,10 +367,12 @@ def drawB(g, attribute, b, b_type, color,i):
 
 def setExpandValue(data, id):
     # print("in expand",id)
+    i=1
     for attribute in data.get("fn_array"):
         if attribute.get("b") != None:
             for b in attribute.get("b"):    
                 if id == b.get("box"):
+                    findConnectedElements(i, data)
                     # print("found id")
                     attribute['expand'] = True
                 else:
@@ -379,7 +381,17 @@ def setExpandValue(data, id):
         if attribute.get("bf") != None:
             for bf in attribute.get("bf"): 
                 if id == bf.get("box"):
+                    findConnectedElements(i, data)
                     attribute['expand'] = True 
                 else:
                     if attribute.get('expand') == None or attribute.get('expand') == False:
                         attribute['expand'] = False
+        i+=1
+
+def findConnectedElements(i, data):
+    print(i)
+    for attribute in data.get("fn_array"):
+        if attribute.get("bf") != None:
+            for bf in attribute.get("bf"): 
+                if bf.get('body') == i:
+                    attribute['expand'] = True 
