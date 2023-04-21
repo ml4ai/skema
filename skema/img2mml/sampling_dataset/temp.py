@@ -62,7 +62,8 @@ class TimeoutError(Exception):
 def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
     def decorator(func):
         def _handle_timeout(signum, frame):
-            raise TimeoutError(error_message)
+            pass
+            # raise TimeoutError(error_message)
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -106,7 +107,7 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
-@timeout(5)
+@timeout(10)
 def simp(mml):
     return simplification(mml)
 
