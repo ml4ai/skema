@@ -107,6 +107,9 @@ def copy_image(img_src, img_dst):
         return False
 
 @timeout(5)
+def simp(mml):
+    return simplification(mml)
+
 def main():
 
     """
@@ -169,7 +172,7 @@ def main():
             )
 
             mml = open(mml_path).readlines()[0]
-            simp_mml = simplification(mml)
+            simp_mml = simp(mml)
             length_mml = len(simp_mml.split())
 
             # finding the bin
