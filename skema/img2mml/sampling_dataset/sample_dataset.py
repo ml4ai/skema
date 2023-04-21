@@ -164,7 +164,7 @@ def main():
             thread.start()
             thread.join(timeout)
             if thread.is_alive():
-                print("taking too long time. skipping this equation...")
+                print(f"taking too long time. skipping {ap} equation...")
                 pass
             else:
                 simp_mml = _temp[0]
