@@ -1,5 +1,6 @@
 from copy import deepcopy
 import sys
+import os.path
 import pprint
 
 from skema.utils.misc import uuid
@@ -117,12 +118,12 @@ def retrieve_name_id_pair(node):
     if isinstance(node, AnnCastName):
         return (node.name, node.id)
     if isinstance(node, AnnCastAttribute):
-        if isinstance(node.value, (AnnCastAttribute, AnnCastName)):
+        if isinstance(node.value, (AnnCastAttribute, AnnCastName, AnnCastCall)):
             return retrieve_name_id_pair(node.value)
         return (node.value, node.value.id)
     if isinstance(node, AnnCastCall):
         return retrieve_name_id_pair(node.func)
-
+    return ("",-1)
 
 def comp_name_nodes(n1, n2):
     """Given two AnnCast nodes we compare their name
@@ -1056,22 +1057,39 @@ class ToGrometPass:
             else:
                 # if isinstance(node.left, AnnCastTuple):
                 if is_tuple(node.left):
-                    if node.right.func.name == "next":
+                    if isinstance(node.right.func, AnnCastName) and node.right.func.name == "next":
                         tuple_values = node.left.value
                         i = 2
                         pof_length = len(parent_gromet_fn.pof) - 1
                         for elem in tuple_values:
-                            parent_gromet_fn.pof[pof_length - i].name = elem.val.name
+                            if isinstance(elem, AnnCastVar):
+                                name = elem.val.name
+                                parent_gromet_fn.pof[pof_length - i].name = name
 
-                            self.add_var_to_env(
-                                elem.val.name,
-                                elem,
-                                parent_gromet_fn.pof[pof_length - i],
-                                pof_length - i,
-                                parent_cast_node,
-                            )
+                                self.add_var_to_env(
+                                    name,
+                                    elem,
+                                    parent_gromet_fn.pof[pof_length - i],
+                                    pof_length - i,
+                                    parent_cast_node,
+                                )
+                                i -= 1
+                            elif isinstance(elem, AnnCastLiteralValue):
+                                name = elem.value[0].val.name
+                                parent_gromet_fn.pof[pof_length - i].name = name
 
-                            i -= 1
+                                self.add_var_to_env(
+                                    name,
+                                    elem,
+                                    parent_gromet_fn.pof[pof_length - i],
+                                    pof_length - i,
+                                    parent_cast_node,
+                                )
+                                i -= 1
+
+                                # self.create_implicit_unpack(
+                                #    node.left.value, parent_gromet_fn, parent_cast_node
+                                #)
 
                         # self.create_implicit_unpack(
                         #    node.left.value, parent_gromet_fn, parent_cast_node
@@ -2828,7 +2846,7 @@ class ToGrometPass:
                         GrometPort(
                             box=len(new_gromet.b),
                             name=arg.val.name,
-                            default_value=arg.default_value.values,
+                            default_value=arg.default_value.value,
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
                             ),
@@ -3342,12 +3360,15 @@ class ToGrometPass:
             )
             
         # Create wopios
-        i = 1
-        while i < len(gromet_predicate_fn.opi) and i < len(gromet_predicate_fn.opo):
-            gromet_predicate_fn.wopio = insert_gromet_object(
-                gromet_predicate_fn.wopio, GrometWire(src=i, tgt=i)
-            )
-            i += 1
+        if gromet_predicate_fn.opi != None and gromet_predicate_fn.opo != None:
+            i = 1
+            while i < len(gromet_predicate_fn.opi) and i < len(gromet_predicate_fn.opo):
+                gromet_predicate_fn.wopio = insert_gromet_object(
+                    gromet_predicate_fn.wopio, GrometWire(src=i, tgt=i)
+                )
+                i += 1
+
+
 
         self.visit(node.expr, gromet_predicate_fn, node)
 
@@ -3649,7 +3670,7 @@ class ToGrometPass:
         parent_gromet_fn.bf = insert_gromet_object(
             parent_gromet_fn.bf,
             GrometBoxFunction(
-                function_type=FunctionType.EXPRESSION, body=-1
+                function_type=FunctionType.EXPRESSION, name=symbol, body=None
             ),
         )
 
@@ -3693,9 +3714,9 @@ class ToGrometPass:
                     )
                 self.import_collection[name][1].append(symbol)
                 # We also maintain the symbol as a 'variable' of sorts in the global environment
-                # self.add_import_symbol_to_env(
-                #    symbol, parent_gromet_fn, parent_cast_node
-                #)
+                self.add_import_symbol_to_env(
+                    symbol, parent_gromet_fn, parent_cast_node
+                )
 
             self.import_collection[name] = (
                 self.import_collection[name][0],
@@ -3709,9 +3730,9 @@ class ToGrometPass:
             else:
                 self.import_collection[name] = (alias, [symbol], all)
                 # We also maintain the symbol as a 'variable' of sorts in the global environment
-                # self.add_import_symbol_to_env(
-                #    symbol, parent_gromet_fn, parent_cast_node
-                #)
+                self.add_import_symbol_to_env(
+                    symbol, parent_gromet_fn, parent_cast_node
+                )
 
     @_visit.register
     def visit_model_return(
@@ -3805,7 +3826,7 @@ class ToGrometPass:
         self.gromet_module.fn = new_gromet
 
         # Set the name of the outer Gromet module to be the source file name
-        self.gromet_module.name = file_name.replace(".py", "")
+        self.gromet_module.name = os.path.basename(file_name).replace(".py", "")
 
         self.build_function_arguments_table(node.body)
 
@@ -4168,12 +4189,20 @@ class ToGrometPass:
                         AnnCastFunctionDef(None, None, None, None),
                     )
 
-                new_gromet.wfopo = insert_gromet_object(
-                    new_gromet.wfopo,
-                    GrometWire(
-                        src=len(new_gromet.opo), tgt=len(new_gromet.pof)
-                    ),
-                )
+                if new_gromet.pof != None:
+                    new_gromet.wfopo = insert_gromet_object(
+                        new_gromet.wfopo,
+                        GrometWire(
+                            src=len(new_gromet.opo), tgt=len(new_gromet.pof)
+                        ),
+                    )
+                else:
+                    new_gromet.wfopo = insert_gromet_object(
+                        new_gromet.wfopo,
+                        GrometWire(
+                            src=len(new_gromet.opo), tgt=-1
+                        ),
+                    )
 
                 var_environment["args"] = deepcopy(arg_env_copy)
                 var_environment["local"] = deepcopy(local_env_copy)
