@@ -35,7 +35,11 @@ WORKDIR /skema
 # Install the skema package
 RUN pip install wheel
 RUN pip install fastapi uvicorn
+RUN pip install six
 RUN pip install -e .
+
+# Build tree-sitter-fortran grammer required by Fortran code2fn
+RUN python /skema/skema/program_analysis/TS2CAST/build_tree-sitter-fortran.py  
 
 # Switch to the skema_py directory
 WORKDIR /skema/skema/skema_py/
