@@ -4,6 +4,8 @@ import signal
 import functools
 import multiprocessing as mp
 import shutil
+import threading
+
 import subprocess, shlex
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
@@ -56,29 +58,28 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
-class TimeoutError(Exception):
-    pass
-
-def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
-    def decorator(func):
-        def _handle_timeout(signum, frame):
-            print(error_message)
-            continue
-            # raise TimeoutError(error_message)
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            signal.signal(signal.SIGALRM, _handle_timeout)
-            signal.alarm(seconds)
-            try:
-                result = func(*args, **kwargs)
-            finally:
-                signal.alarm(0)
-            return result
-
-        return wrapper
-
-    return decorator
+#
+# def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+#     def decorator(func):
+#         def _handle_timeout(signum, frame):
+#             if error_message:
+#                 print(error_message)
+#                 continue
+#             # raise TimeoutError(error_message)
+#
+#         @functools.wraps(func)
+#         def wrapper(*args, **kwargs):
+#             signal.signal(signal.SIGALRM, _handle_timeout)
+#             signal.alarm(seconds)
+#             try:
+#                 result = func(*args, **kwargs)
+#             finally:
+#                 signal.alarm(0)
+#             return result
+#
+#         return wrapper
+#
+#     return decorator
 
 
 def get_paths(yr, yr_path, month):
@@ -108,9 +109,19 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
-@timeout(10)
+# @timeout(10)
+
+class TimeoutError(Exception):
+    pass
+
 def simp(mml):
     return simplification(mml)
+
+def thread_function(mml):
+    try:
+        # Call the function
+        simp(mml)
+    except Exception as e:
 
 def main():
 
@@ -175,7 +186,18 @@ def main():
             )
 
             mml = open(mml_path).readlines()[0]
-            simp_mml = simp(mml)
+            # simp_mml = simp(mml)
+            thread = threading.Thread(target=thread_function, args=(mml))
+            timeout = 5
+            thread.start()
+            thread.join(timeout)
+            if thread.is_alive():
+                thread.terminate()
+                thread.join(timeout)
+                thread_event.clear()
+            else:
+                pass
+
             length_mml = len(simp_mml.split())
 
             # finding the bin
