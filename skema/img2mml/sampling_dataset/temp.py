@@ -117,10 +117,11 @@ class TimeoutError(Exception):
 def simp(mml):
     return simplification(mml)
 
-def thread_function(mml):
+def thread_function(mml, _temp):
     try:
         # Call the function
-        simp(mml)
+        _temp.append(simp(mml))
+
     except Exception as e:
         print("error...")
 
@@ -188,7 +189,8 @@ def main():
 
             mml = open(mml_path).readlines()[0]
             # simp_mml = simp(mml)
-            thread = threading.Thread(target=thread_function, args=(mml))
+            _temp = list()
+            thread = threading.Thread(target=thread_function, args=(mml, _temp))
             timeout = 5
             thread.start()
             thread.join(timeout)
@@ -197,6 +199,8 @@ def main():
                 thread.join(timeout)
                 thread_event.clear()
             else:
+                simp_mml = _temp[0]
+                print(simp_mml)
                 pass
 
             length_mml = len(simp_mml.split())
