@@ -1,4 +1,7 @@
 import os, json, random
+import errno
+import signal
+import functools
 import multiprocessing as mp
 import shutil
 import subprocess, shlex
@@ -53,6 +56,28 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
+class TimeoutError(Exception):
+    pass
+
+def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
+    def decorator(func):
+        def _handle_timeout(signum, frame):
+            raise TimeoutError(error_message)
+
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            signal.signal(signal.SIGALRM, _handle_timeout)
+            signal.alarm(seconds)
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                signal.alarm(0)
+            return result
+
+        return wrapper
+
+    return decorator
+
 
 def get_paths(yr, yr_path, month):
 
@@ -81,6 +106,7 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
+@timeout(5)
 def main():
 
     """
