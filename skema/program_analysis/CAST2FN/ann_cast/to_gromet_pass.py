@@ -224,6 +224,9 @@ class ToGrometPass:
             metadata_collection=[],
         )
 
+        # build the built-in map
+        build_map()
+
         # Everytime we see an AnnCastRecordDef we can store information for it
         # for example the name of the class and indices to its functions
         self.record = {}
