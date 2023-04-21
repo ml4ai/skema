@@ -160,7 +160,7 @@ def main():
             # simp_mml = simplification(mml)
             _temp = list()
             thread = threading.Thread(target=thread_function, args=(mml, _temp))
-            timeout = 5
+            timeout = 10
             thread.start()
             thread.join(timeout)
             if thread.is_alive():
