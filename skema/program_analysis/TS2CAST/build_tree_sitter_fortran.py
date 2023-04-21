@@ -19,7 +19,7 @@ subprocess.run(["git", "clone", FORTRAN_CLONE_URL])
 
 Language.build_library(
     # Store the library in the `build` directory
-    "build/my-languages.so",
+    LANGUAGE_LIBRARY_REL_PATH,
     # Include one or more languages
     ["tree-sitter-fortran"],
 )

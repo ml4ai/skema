@@ -29,11 +29,12 @@ from skema.program_analysis.TS2CAST.variable_context import VariableContext
 from skema.program_analysis.TS2CAST.node_helper import NodeHelper
 from skema.program_analysis.TS2CAST.util import generate_dummy_source_refs, preprocess
 
+from skema.program_analysis.TS2CAST.build_tree_sitter_fortran import LANGUAGE_LIBRARY_REL_PATH
 
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Initialize tree-sitter
-        tree_sitter_fortran_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build/my-languages.so")
+        tree_sitter_fortran_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), LANGUAGE_LIBRARY_REL_PATH)
         self.tree_sitter_fortran = Language(tree_sitter_fortran_path, "fortran")
 
         # We load the source code from a file
