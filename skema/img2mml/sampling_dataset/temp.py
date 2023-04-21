@@ -122,6 +122,7 @@ def thread_function(mml):
         # Call the function
         simp(mml)
     except Exception as e:
+        print("error...")
 
 def main():
 
