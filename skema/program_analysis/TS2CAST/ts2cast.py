@@ -1,4 +1,5 @@
 import json
+import os.path
 from typing import Any, Dict, List
 
 from tree_sitter import Language, Parser
@@ -32,7 +33,8 @@ from skema.program_analysis.TS2CAST.util import generate_dummy_source_refs, prep
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Initialize tree-sitter
-        self.tree_sitter_fortran = Language("build/my-languages.so", "fortran")
+        tree_sitter_fortran_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "build/my-languages.so")
+        self.tree_sitter_fortran = Language(tree_sitter_fortran_path, "fortran")
 
         # We load the source code from a file
         self.source = None
