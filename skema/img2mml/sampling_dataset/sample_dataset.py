@@ -108,7 +108,7 @@ def main():
             yr_path = os.path.join(root, yr)
 
             for m in range(1, 13, 1):
-                month = yr[0:2] + f"{m:02}"  # yr=2018, month=1801,..
+                month = yr[2:] + f"{m:02}"  # yr=2018, month=1801,..
                 temp_paths = get_paths(yr, yr_path, month)
                 for p in temp_paths:
                     all_paths.append(p)
