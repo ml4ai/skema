@@ -1,5 +1,6 @@
 from copy import deepcopy
 import sys
+import os.path
 import pprint
 
 from skema.utils.misc import uuid
@@ -222,6 +223,9 @@ class ToGrometPass:
             fn_array=[],
             metadata_collection=[],
         )
+
+        # build the built-in map
+        build_map()
 
         # Everytime we see an AnnCastRecordDef we can store information for it
         # for example the name of the class and indices to its functions
@@ -3825,7 +3829,7 @@ class ToGrometPass:
         self.gromet_module.fn = new_gromet
 
         # Set the name of the outer Gromet module to be the source file name
-        self.gromet_module.name = file_name.replace(".py", "")
+        self.gromet_module.name = os.path.basename(file_name).replace(".py", "")
 
         self.build_function_arguments_table(node.body)
 
