@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"Main script to train the model. "
+"Main script to train the model."
 
 import os, random
 import subprocess
@@ -438,7 +438,7 @@ def train_model(rank=None,):
                 break
 
         print(
-            "final model saved as:  ",
+            "best model saved as:  ",
             f"trained_models/{model_type}_{dataset_type}_best.pt",
         )
 
@@ -451,7 +451,7 @@ def train_model(rank=None,):
     #     dist.barrier()
 
     print(
-        "loading final saved model: ",
+        "loading best saved model: ",
         f"trained_models/{model_type}_{dataset_type}_best.pt",
     )
     try:
