@@ -1,6 +1,6 @@
 import os, json, random
-import multiprocessing as mp
 import shutil
+import threading
 import subprocess, shlex
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
@@ -81,6 +81,20 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
+class TimeoutError(Exception):
+    pass
+
+def simp(mml):
+    return simplification(mml)
+
+def thread_function(mml, _temp):
+    try:
+        # Call the function
+        _temp.append(simp(mml))
+
+    except Exception as e:
+        print("error...")
+
 def main():
 
     """
@@ -143,7 +157,19 @@ def main():
             )
 
             mml = open(mml_path).readlines()[0]
-            simp_mml = simplification(mml)
+            # simp_mml = simplification(mml)
+            _temp = list()
+            thread = threading.Thread(target=thread_function, args=(mml, _temp))
+            timeout = 5
+            thread.start()
+            thread.join(timeout)
+            if thread.is_alive():
+                print("taking too long time. skipping this equation...")
+                pass
+            else:
+                simp_mml = _temp[0]
+                pass
+
             length_mml = len(simp_mml.split())
 
             # finding the bin

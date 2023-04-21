@@ -58,29 +58,6 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
-#
-# def timeout(seconds=10, error_message=os.strerror(errno.ETIME)):
-#     def decorator(func):
-#         def _handle_timeout(signum, frame):
-#             if error_message:
-#                 print(error_message)
-#                 continue
-#             # raise TimeoutError(error_message)
-#
-#         @functools.wraps(func)
-#         def wrapper(*args, **kwargs):
-#             signal.signal(signal.SIGALRM, _handle_timeout)
-#             signal.alarm(seconds)
-#             try:
-#                 result = func(*args, **kwargs)
-#             finally:
-#                 signal.alarm(0)
-#             return result
-#
-#         return wrapper
-#
-#     return decorator
-
 
 def get_paths(yr, yr_path, month):
 
@@ -108,8 +85,6 @@ def copy_image(img_src, img_dst):
         return True
     except:
         return False
-
-# @timeout(10)
 
 class TimeoutError(Exception):
     pass
@@ -179,7 +154,6 @@ def main():
     final_paths = list()
     count = 0
     for apidx, ap in enumerate(all_paths):
-        print(ap)
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
             mml_path = os.path.join(
@@ -195,12 +169,10 @@ def main():
             thread.start()
             thread.join(timeout)
             if thread.is_alive():
-                thread.terminate()
-                thread.join(timeout)
-                thread_event.clear()
+                print("taking too long time. skipping this equation...")
+                pass
             else:
                 simp_mml = _temp[0]
-                print(simp_mml)
                 pass
 
             length_mml = len(simp_mml.split())
@@ -228,6 +200,8 @@ def main():
     # random shuffle twice
     random.shuffle(final_paths)
     random.shuffle(final_paths)
+
+    print("writing the final dataset...")
 
     reject = 0
     c_idx = 0
