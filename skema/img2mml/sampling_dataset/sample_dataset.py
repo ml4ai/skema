@@ -150,8 +150,10 @@ def main():
     count = 0
     for apidx, ap in enumerate(all_paths):
 
-        if count%10000==0: print("current status...")
-        print(counter_dist_dict)
+        print(ap)
+        if count%10000==0:
+            print("current status...")
+            print(counter_dist_dict)
 
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
