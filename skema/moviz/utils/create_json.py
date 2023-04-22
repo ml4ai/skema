@@ -1,29 +1,29 @@
 
 
 
-from skema.program_analysis.CAST2GrFN.ann_cast.cast_to_annotated_cast import (
+from skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast import (
     CastToAnnotatedCastVisitor,
 )
 
-from skema.program_analysis.CAST2GrFN.ann_cast.id_collapse_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass import (
     IdCollapsePass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.container_scope_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.container_scope_pass import (
     ContainerScopePass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.variable_version_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.variable_version_pass import (
     VariableVersionPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.grfn_var_creation_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.grfn_var_creation_pass import (
     GrfnVarCreationPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.grfn_assignment_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass import (
     GrfnAssignmentPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.lambda_expression_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.lambda_expression_pass import (
     LambdaExpressionPass,
 )
-from skema.program_analysis.CAST2GrFN.ann_cast.to_gromet_pass import (
+from skema.program_analysis.CAST2FN.ann_cast.to_gromet_pass import (
     ToGrometPass,
 )
 
