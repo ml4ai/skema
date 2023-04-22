@@ -150,7 +150,7 @@ def main():
     count = 0
     for apidx, ap in enumerate(all_paths):
 
-        print(ap)
+        # print(ap)
         if count%10000==0:
             print("current status...")
             print(counter_dist_dict)
@@ -202,7 +202,7 @@ def main():
     random.shuffle(final_paths)
     random.shuffle(final_paths)
 
-    print("writing the final datasets...")
+    print("writing the final dataset files and copying images...")
 
     reject = 0
     c_idx = 0
