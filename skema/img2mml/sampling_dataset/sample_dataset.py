@@ -149,6 +149,10 @@ def main():
     final_paths = list()
     count = 0
     for apidx, ap in enumerate(all_paths):
+
+        if count%10000==0: print("current status...")
+        print(counter_dist_dict)
+
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
             mml_path = os.path.join(
@@ -195,6 +199,8 @@ def main():
     # random shuffle twice
     random.shuffle(final_paths)
     random.shuffle(final_paths)
+
+    print("writing the final datasets...")
 
     reject = 0
     c_idx = 0
