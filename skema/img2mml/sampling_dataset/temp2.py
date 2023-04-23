@@ -151,7 +151,7 @@ def main():
     count = 0
     for apidx, ap in enumerate(all_paths):
 
-        # print(ap)
+        print(ap)
         if count%10000==0:
             # lock.acquire()
             print("current status...")
@@ -174,7 +174,8 @@ def main():
             #os.chdir("sampling_dataset/")
             print(os.getcwd())
             results = sb.run(cmd, timeout=5)
-            print(results)
+            if results.returncode != 0:
+                print(f"taking too long time. skipping {ap} equation...")
             #os.chdir("/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/")
 
 
