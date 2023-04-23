@@ -215,7 +215,7 @@ def main():
 
     final_paths = list()
     count = 0
-    n = 500
+    n = 1000000
 
     paths_batch = list(batching_paths(all_paths, n))
     for _pb in paths_batch:
@@ -225,7 +225,7 @@ def main():
             #     result = pool.map(prepare_dataset, _pb)
         for apidx, ap in enumerate(_pb):
             # print(ap)
-            if count%100==0:
+            if count%100000==0:
                 print("current status...")
                 print(counter_dist_dict)
 
