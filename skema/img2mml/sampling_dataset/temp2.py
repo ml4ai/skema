@@ -170,9 +170,9 @@ def main():
 
             cwd = os.getcwd()
             cmd = ["python", f"{cwd}/sampling_dataset/simp.py"]
-            print(os.path.exists("sampling_dataset/simp.py"))
+            # print(os.path.exists("sampling_dataset/simp.py"))
             #os.chdir("sampling_dataset/")
-            print(os.getcwd())
+            # print(os.getcwd())
             results = sb.run(cmd, timeout=5)
             if results.returncode != 0:
                 print(f"taking too long time. skipping {ap} equation...")
