@@ -54,10 +54,10 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
-final_paths = list()
-count = 0
-n = 5000000
-dist_achieved = False
+global final_paths = list()
+global count = 0
+global n = 5000000
+global dist_achieved = False
 
 def get_paths(yr, yr_path, month):
 
@@ -106,6 +106,8 @@ def thread_function(mml, _temp):
         print("error...")
 
 def prepare_dataset(pb):
+
+    global count, n, final_paths, dist_achieved
 
     for apidx, ap in enumerate(pb):
         # print(ap)
