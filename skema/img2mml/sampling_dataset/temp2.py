@@ -151,7 +151,7 @@ def main():
     count = 0
     for apidx, ap in enumerate(all_paths):
 
-        print(ap)
+        # print(ap)
         if count%10000==0:
             # lock.acquire()
             print("current status...")
