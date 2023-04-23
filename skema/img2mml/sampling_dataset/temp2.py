@@ -1,7 +1,7 @@
 import os, json, random
 import shutil
 import threading
-import subprocess as sb
+import subprocess
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
 
