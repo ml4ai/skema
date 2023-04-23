@@ -168,8 +168,8 @@ def main():
             mml = open(mml_path).readlines()[0]
             open("smr.txt", "w").write(mml)
 
-            cmd = "python skema/img2mml/sampling_dataset/simp.py"
-            print(os.path.exists("skema/img2mml/sampling_dataset/simp.py"))
+            cmd = "python sampling_dataset/simp.py"
+            print(os.path.exists("sampling_dataset/simp.py"))
             results = sb.run(cmd, timeout=5)
 
 
