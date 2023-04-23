@@ -4,6 +4,7 @@ import threading
 import subprocess
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
+import multiprocessing as mp
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -53,6 +54,10 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
+final_paths = list()
+count = 0
+n = 5000000
+dist_achieved = False
 
 def get_paths(yr, yr_path, month):
 
@@ -99,6 +104,59 @@ def thread_function(mml, _temp):
 
     except Exception as e:
         print("error...")
+
+def prepare_dataset(pb):
+
+    for apidx, ap in enumerate(pb):
+        # print(ap)
+        if count%10000==0:
+            print("current status...")
+            print(counter_dist_dict)
+
+        if count <= total_eqns:
+            yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
+            mml_path = os.path.join(
+                root,
+                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+            )
+
+            mml = open(mml_path).readlines()[0]
+            # simp_mml = simplification(mml)
+            _temp = list()
+            thread = threading.Thread(target=thread_function, args=(mml, _temp))
+            timeout = 10
+            thread.start()
+            thread.join(timeout)
+            if thread.is_alive():
+                print(f"taking too long time. skipping {ap} equation...")
+                pass
+            else:
+                simp_mml = _temp[0]
+                pass
+
+            length_mml = len(simp_mml.split())
+
+            # finding the bin
+            temp_dict = {}
+            for i in range(50, 400, 50):
+                if length_mml / i < 1:
+                    temp_dict[i] = length_mml / i
+
+            # get the bin
+            if len(temp_dict) >= 1:
+                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+            else:
+                tgt_bin = "350+"
+
+            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                counter_dist_dict[tgt_bin] += 1
+                final_paths.append(ap)
+                count+=1
+
+        else:
+            dist_achieved=True
+            break
 
 def main():
 
@@ -151,61 +209,12 @@ def main():
     ######## and grab the corresponding PNG and latex ############
     print("preparing dataset...")
 
-    n = 5000000
     paths_batch = list(batching_paths(all_paths, n))
-    final_paths = list()
-    _pcount = 0
-    count = 0
-
     for _pb in paths_batch:
-        for apidx, ap in enumerate(_pb):
-            # print(ap)
-            if count%10000==0:
-                print("current status...")
-                print(counter_dist_dict)
+        if not dist_achieved:
+            with mp.Pool(config["num_cpus"]) as pool:
+                result = pool.map(prepare_dataset, _pb)
 
-            if count <= total_eqns:
-                yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-                mml_path = os.path.join(
-                    root,
-                    f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-                )
-
-                mml = open(mml_path).readlines()[0]
-                # simp_mml = simplification(mml)
-                _temp = list()
-                thread = threading.Thread(target=thread_function, args=(mml, _temp))
-                timeout = 10
-                thread.start()
-                thread.join(timeout)
-                if thread.is_alive():
-                    print(f"taking too long time. skipping {ap} equation...")
-                    pass
-                else:
-                    simp_mml = _temp[0]
-                    pass
-
-                length_mml = len(simp_mml.split())
-
-                # finding the bin
-                temp_dict = {}
-                for i in range(50, 400, 50):
-                    if length_mml / i < 1:
-                        temp_dict[i] = length_mml / i
-
-                # get the bin
-                if len(temp_dict) >= 1:
-                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                else:
-                    tgt_bin = "350+"
-
-                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                    counter_dist_dict[tgt_bin] += 1
-                    final_paths.append(ap)
-                    count+=1
-            else:
-                break
 
     # random shuffle twice
     random.shuffle(final_paths)
