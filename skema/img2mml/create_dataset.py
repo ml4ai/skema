@@ -1,4 +1,4 @@
-from skema.img2mml.sampling_dataset.temp import main
+from skema.img2mml.sampling_dataset.temp2 import main
 import sys
 
 if __name__ == "__main__":
