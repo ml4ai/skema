@@ -168,7 +168,7 @@ def main():
             mml = open(mml_path).readlines()[0]
             open("smr.txt", "w").write(mml)
 
-            cmd = "python sampling_dataset/simp.py"
+            cmd = "python skema/img2mml/sampling_dataset/simp.py"
             results = sb.run(cmd, timeout=5)
 
 
