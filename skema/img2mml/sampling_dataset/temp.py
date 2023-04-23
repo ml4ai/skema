@@ -54,12 +54,12 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
-global count, n, final_paths, dist_achieved
+# global count, n, final_paths, dist_achieved
 
-final_paths = list()
-count = 0
-n = 500
-dist_achieved = False
+# final_paths = list()
+# count = 0
+# n = 500
+# dist_achieved = False
 
 def get_paths(yr, yr_path, month):
 
@@ -213,6 +213,10 @@ def main():
     ######## and grab the corresponding PNG and latex ############
     print("preparing dataset...")
 
+    final_paths = list()
+    count = 0
+    n = 500
+    
     paths_batch = list(batching_paths(all_paths, n))
     for _pb in paths_batch:
         # if not dist_achieved:
