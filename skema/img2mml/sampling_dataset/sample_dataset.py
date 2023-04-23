@@ -153,10 +153,10 @@ def main():
 
         # print(ap)
         if count%10000==0:
-            lock.acquire()
+            # lock.acquire()
             print("current status...")
             print(counter_dist_dict)
-            lock.release()
+            # lock.release()
 
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
