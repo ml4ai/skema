@@ -53,6 +53,7 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
+lock = mp.Lock()
 
 def get_paths(yr, yr_path, month):
 
@@ -152,8 +153,10 @@ def main():
 
         # print(ap)
         if count%10000==0:
+            lock.acquire()
             print("current status...")
             print(counter_dist_dict)
+            lock.release()
 
         if count <= total_eqns:
             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
