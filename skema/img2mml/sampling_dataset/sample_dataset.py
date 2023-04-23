@@ -53,7 +53,7 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
-lock = mp.Lock()
+# lock = mp.Lock()
 
 def get_paths(yr, yr_path, month):
 
@@ -149,7 +149,7 @@ def main():
 
     final_paths = list()
     count = 0
-    for apidx, ap in enumerate(paths_batch):
+    for apidx, ap in enumerate(all_paths):
 
         # print(ap)
         if count%10000==0:
