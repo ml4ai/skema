@@ -215,7 +215,6 @@ def main():
             with mp.Pool(config["num_cpus"]) as pool:
                 result = pool.map(prepare_dataset, _pb)
 
-
     # random shuffle twice
     random.shuffle(final_paths)
     random.shuffle(final_paths)
