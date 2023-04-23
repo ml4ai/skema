@@ -168,9 +168,14 @@ def main():
             mml = open(mml_path).readlines()[0]
             open("smr.txt", "w").write(mml)
 
-            cmd = "python sampling_dataset/simp.py"
+            cwd = os.getcwd()
+            cmd = ["python", f"{cwd}/sampling_dataset/simp.py"]
             print(os.path.exists("sampling_dataset/simp.py"))
+            #os.chdir("sampling_dataset/")
+            print(os.getcwd())
             results = sb.run(cmd, timeout=5)
+            print(results)
+            #os.chdir("/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/")
 
 
             # simp_mml = simplification(mml)
@@ -186,6 +191,7 @@ def main():
             #     simp_mml = _temp[0]
             #     pass
 
+            simp_mml = open("sm.txt").readlines()[0]
             length_mml = len(simp_mml.split())
 
             # finding the bin
