@@ -58,7 +58,7 @@ global count, n, final_paths, dist_achieved
 
 final_paths = list()
 count = 0
-n = 5000000
+n = 500
 dist_achieved = False
 
 def get_paths(yr, yr_path, month):
