@@ -96,6 +96,10 @@ def thread_function(mml, _temp):
     except Exception as e:
         print("error...")
 
+# Function to kill process if TimeoutError occurs
+kill = lambda process: process.kill()
+
+
 def main():
 
     """
@@ -173,11 +177,20 @@ def main():
             # print(os.path.exists("sampling_dataset/simp.py"))
             #os.chdir("sampling_dataset/")
             # print(os.getcwd())
-            results = sb.run(cmd, timeout=5)
-            if results.returncode != 0:
-                print(f"taking too long time. skipping {ap} equation...")
+            # results = sb.run(cmd, timeout=5)
+            # if results.returncode != 0:
+            #     print(f"taking too long time. skipping {ap} equation...")
             #os.chdir("/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/")
+            output = subprocess.Popen(
+                cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+            )
+            my_timer = Timer(5, kill, [output])
 
+            try:
+                my_timer.start()
+                stdout, stderr = output.communicate()
+            finally:
+                my_timer.cancel()
 
             # simp_mml = simplification(mml)
             # _temp = list()
