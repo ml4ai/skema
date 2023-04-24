@@ -108,7 +108,7 @@ def prepare_dataset(args):
         open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(mml)
 
         cwd = os.getcwd()
-        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", "--idx", str(i)]
+        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
         output = subprocess.Popen(
             cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
         )
