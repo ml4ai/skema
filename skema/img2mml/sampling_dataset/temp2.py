@@ -155,7 +155,6 @@ def main():
     count = 0
     for apidx, ap in enumerate(all_paths):
 
-        # print(ap)
         if count%10000==0:
             # lock.acquire()
             print("current status...")
@@ -174,13 +173,6 @@ def main():
 
             cwd = os.getcwd()
             cmd = ["python", f"{cwd}/sampling_dataset/simp.py"]
-            # print(os.path.exists("sampling_dataset/simp.py"))
-            #os.chdir("sampling_dataset/")
-            # print(os.getcwd())
-            # results = sb.run(cmd, timeout=5)
-            # if results.returncode != 0:
-            #     print(f"taking too long time. skipping {ap} equation...")
-            #os.chdir("/home/gauravs/github/img2mml/active_models/skema/skema/img2mml/")
             output = subprocess.Popen(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
             )
@@ -214,20 +206,6 @@ def main():
 
             finally:
                 my_timer.cancel()
-
-            # simp_mml = simplification(mml)
-            # _temp = list()
-            # thread = threading.Thread(target=thread_function, args=(mml, _temp))
-            # timeout = 10
-            # thread.start()
-            # thread.join(timeout)
-            # if thread.is_alive():
-            #     print(f"taking too long time. skipping {ap} equation...")
-            #     pass
-            # else:
-            #     simp_mml = _temp[0]
-            #     pass
-
         else:
             break
 

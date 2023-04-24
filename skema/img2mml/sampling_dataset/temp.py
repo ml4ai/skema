@@ -2,6 +2,7 @@ import os, json, random
 import shutil
 import threading
 import subprocess
+from threading import Timer
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
 import multiprocessing as mp
@@ -10,6 +11,8 @@ import multiprocessing as mp
 config_path = "sampling_dataset/sampling_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
+
+global final_paths, count, lock, total_eqns, distribution_achieved, counter_dist_dict, dist_dict
 
 # src path
 root = config["src_path"]
@@ -54,12 +57,10 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
-# global count, n, final_paths, dist_achieved
-
-# final_paths = list()
-# count = 0
-# n = 500
-# dist_achieved = False
+final_paths = list()
+count = 0
+distribution_achieved = False
+lock = mp.Lock()
 
 def get_paths(yr, yr_path, month):
 
@@ -80,7 +81,6 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
-
 def copy_image(img_src, img_dst):
     try:
         CP(img_src, img_dst)
@@ -88,79 +88,67 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
-def batching_paths(all_paths, n):
-    for i in range(0, len(all_paths), n):
-        yield all_paths[i:i + n]
+def prepare_dataset(args):
+
+    global count, total_eqns, distribution_achieved, final_paths, lock, counter_dist_dict, dist_dict
+
+    i, ap = args
+
+    if (count <= total_eqns) and (not distribution_achieved):
+
+        yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
+        mml_path = os.path.join(
+            root,
+            f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+        )
+
+        mml = open(mml_path).readlines()[0]
+        open(f"smr_{i}.txt", "w").write(mml)
+
+        cwd = os.getcwd()
+        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", "--idx", i]
+        output = subprocess.Popen(
+            cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+        )
+        my_timer = Timer(5, kill, [output])
+
+        try:
+            my_timer.start()
+            stdout, stderr = output.communicate()
+            simp_mml = open(f"sm_{i}.txt").readlines()[0]
+            length_mml = len(simp_mml.split())
+            # finding the bin
+            temp_dict = {}
+            for i in range(50, 400, 50):
+                if length_mml / i < 1:
+                    temp_dict[i] = length_mml / i
+
+            # get the bin
+            if len(temp_dict) >= 1:
+                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+            else:
+                tgt_bin = "350+"
+
+            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                counter_dist_dict[tgt_bin] += 1
+                final_paths.append(ap)
+                count+=1
+
+        except:
+            lock.acquire()
+            print(f"taking too long time. skipping {ap} equation...")
+            lock.release()
+
+        finally:
+            my_timer.cancel()
+    else:
+        distribution_achieved = True
 
 
-class TimeoutError(Exception):
-    pass
+# Function to kill process if TimeoutError occurs
+kill = lambda process: process.kill()
 
-def simp(mml):
-    return simplification(mml)
-
-def thread_function(mml, _temp):
-    try:
-        # Call the function
-        _temp.append(simp(mml))
-
-    except Exception as e:
-        print("error...")
-
-# def prepare_dataset(pb):
-#
-#     global count, n, final_paths, dist_achieved
-#
-#     for apidx, ap in enumerate(pb):
-#         print(ap)
-#         if count%10000==0:
-#             print("current status...")
-#             print(counter_dist_dict)
-#
-#         if count <= total_eqns and dist_achieved == False:
-#             yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-#             mml_path = os.path.join(
-#                 root,
-#                 f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-#             )
-#
-#             mml = open(mml_path).readlines()[0]
-#             # simp_mml = simplification(mml)
-#             _temp = list()
-#             thread = threading.Thread(target=thread_function, args=(mml, _temp))
-#             timeout = 10
-#             thread.start()
-#             thread.join(timeout)
-#             if thread.is_alive():
-#                 print(f"taking too long time. skipping {ap} equation...")
-#                 pass
-#             else:
-#                 simp_mml = _temp[0]
-#                 pass
-#
-#             length_mml = len(simp_mml.split())
-#
-#             # finding the bin
-#             temp_dict = {}
-#             for i in range(50, 400, 50):
-#                 if length_mml / i < 1:
-#                     temp_dict[i] = length_mml / i
-#
-#             # get the bin
-#             if len(temp_dict) >= 1:
-#                 max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-#                 tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-#             else:
-#                 tgt_bin = "350+"
-#
-#             if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-#                 counter_dist_dict[tgt_bin] += 1
-#                 final_paths.append(ap)
-#                 count+=1
-#
-#         else:
-#             dist_achieved=True
-            # break
 
 def main():
 
@@ -183,7 +171,6 @@ def main():
 
     if config["sample_entire_year"]:
         years = config["years"].split(",")
-
         for yr in years:
             yr = yr.strip()
             yr_path = os.path.join(root, yr)
@@ -209,70 +196,28 @@ def main():
     random.shuffle(all_paths)
     random.shuffle(all_paths)
 
-    ######## step 3 and 4: simplify MML and and find length  #####
+    ######## step 3: simplify MML and and find length  #####
     ######## and grab the corresponding PNG and latex ############
     print("preparing dataset...")
 
-    final_paths = list()
-    count = 0
-    n = 1000000
+    # opening a temporary folder to store temp files
+    # this folder will be deleted at the end of the run.
+    # It is created to help expediting the process by avoiding
+    # Lock functionality.
+    temp_folder = f"{os.getcwd()}/sampling_dataset/temp_folder"
+    if not os.path.exists(temp_folder):
+        os.mkdir(temp_folder)
 
-    paths_batch = list(batching_paths(all_paths, n))
-    for _pb in paths_batch:
-        # if not dist_achieved:
-            # prepare_dataset(_pb)
-            # with mp.Pool(config["num_cpus"]) as pool:
-            #     result = pool.map(prepare_dataset, _pb)
-        for apidx, ap in enumerate(_pb):
-            # print(ap)
-            if count%100000==0:
-                print("current status...")
-                print(counter_dist_dict)
+    all_files = [[i, ap] for i, ap in enumerate(all_paths)]
+    with mp.Pool(config["num_cpus"]) as pool:
+        result = pool.map(prepare_dataset, all_files)
 
-            if count <= total_eqns:# and dist_achieved == False:
-                yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-                mml_path = os.path.join(
-                    root,
-                    f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-                )
+    # remove temp_folder
+    shutil.rmtree(temp_folder)
 
-                mml = open(mml_path).readlines()[0]
-                # simp_mml = simplification(mml)
-                _temp = list()
-                thread = threading.Thread(target=thread_function, args=(mml, _temp))
-                timeout = 10
-                thread.start()
-                thread.join(timeout)
-                if thread.is_alive():
-                    print(f"taking too long time. skipping {ap} equation...")
-                    pass
-                else:
-                    simp_mml = _temp[0]
-                    pass
+    ######## step 4: writing the final dataset ########
 
-                length_mml = len(simp_mml.split())
-
-                # finding the bin
-                temp_dict = {}
-                for i in range(50, 400, 50):
-                    if length_mml / i < 1:
-                        temp_dict[i] = length_mml / i
-
-                # get the bin
-                if len(temp_dict) >= 1:
-                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                else:
-                    tgt_bin = "350+"
-
-                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                    counter_dist_dict[tgt_bin] += 1
-                    final_paths.append(ap)
-                    count+=1
-
-            else:
-                # dist_achieved=True
-                break
+    global final_paths
 
     # random shuffle twice
     random.shuffle(final_paths)

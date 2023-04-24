@@ -1,7 +1,16 @@
 from skema.img2mml.preprocessing.preprocess_mml import simplification
-import os
+import os, argparse
 
-smr = open("smr.txt").readlines()[0]
-sm  = open("sm.txt", "w")
+parser = argparse.ArgumentParser()
+parser.add_argument("--idx")
+args = parser.parse_args()
 
-sm.write(simplification(smr))
+i = args.idx
+
+open(f"sm_{i}.txt", "w").write
+(
+    simplification
+    (
+        open(f"smr_{i}.txt").readlines()[0]
+    )
+)
