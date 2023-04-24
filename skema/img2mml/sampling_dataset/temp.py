@@ -6,10 +6,6 @@ from threading import Timer
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
 import multiprocessing as mp
-import time
-
-
-start_time = time.time()
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -298,6 +294,3 @@ def main():
         except:
             reject += 1
             pass
-
-total_time = (time.time() - start_time) /3600
-print(f"total time taken {total_time} hours.")
