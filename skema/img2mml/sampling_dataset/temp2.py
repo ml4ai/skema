@@ -121,7 +121,7 @@ def main():
     print("collecting all the MathML paths...")
 
     if config["sample_entire_year"]:
-        years = config["years"].split(",")
+        years = config["years"].split(",").strip()
 
         for yr in years:
             yr = yr.strip()
@@ -134,7 +134,7 @@ def main():
                     all_paths.append(p)
 
     elif config["sample_from_months"]:
-        months = config["months"].split(",")
+        months = config["months"].split(",").strip()
         for month in months:
             month = month.strip()
             yr = f"20{month[0:2]}"
@@ -212,7 +212,7 @@ def main():
 
             except:
                 print(f"taking too long time. skipping {ap} equation...")
-                
+
             finally:
                 my_timer.cancel()
 
