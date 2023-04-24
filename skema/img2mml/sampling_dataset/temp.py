@@ -64,6 +64,7 @@ count = 0
 distribution_achieved = False
 lock = mp.Lock()
 
+
 def get_paths(yr, yr_path, month):
 
     temp_files = list()
@@ -83,12 +84,14 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+
 def copy_image(img_src, img_dst):
     try:
         CP(img_src, img_dst)
         return True
     except:
         return False
+
 
 def prepare_dataset(args):
 
@@ -101,7 +104,6 @@ def prepare_dataset(args):
         print("current status: ", counter_dist_dict)
         lock.release()
 
-
     if (count <= total_eqns) and (not distribution_achieved):
 
         yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
@@ -111,7 +113,9 @@ def prepare_dataset(args):
         )
 
         mml = open(mml_path).readlines()[0]
-        open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(mml)
+        open(
+            f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w"
+        ).write(mml)
 
         cwd = os.getcwd()
         cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
@@ -123,7 +127,9 @@ def prepare_dataset(args):
         try:
             my_timer.start()
             stdout, stderr = output.communicate()
-            simp_mml = open(f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt").readlines()[0]
+            simp_mml = open(
+                f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+            ).readlines()[0]
             length_mml = len(simp_mml.split())
 
             # finding the bin
@@ -142,7 +148,7 @@ def prepare_dataset(args):
             if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                 counter_dist_dict[tgt_bin] += 1
                 final_paths.append(ap)
-                count+=1
+                count += 1
 
         except:
             if verbose:
@@ -283,8 +289,8 @@ def main():
                 latex = latex + "\n"
             latex_file.write(latex)
 
-            c_idx+=1
+            c_idx += 1
 
         except:
-            reject +=1
+            reject += 1
             pass

@@ -56,6 +56,7 @@ counter_dist_dict["350+"] = 0
 
 # lock = mp.Lock()
 
+
 def get_paths(yr, yr_path, month):
 
     temp_files = list()
@@ -83,11 +84,14 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
+
 class TimeoutError(Exception):
     pass
 
+
 def simp(mml):
     return simplification(mml)
+
 
 def thread_function(mml, _temp):
     try:
@@ -96,6 +100,7 @@ def thread_function(mml, _temp):
 
     except Exception as e:
         print("error...")
+
 
 # Function to kill process if TimeoutError occurs
 kill = lambda process: process.kill()
@@ -155,7 +160,7 @@ def main():
     count = 0
     for apidx, ap in enumerate(all_paths):
 
-        if count%10000==0:
+        if count % 10000 == 0:
             # lock.acquire()
             print("current status...")
             print(counter_dist_dict)
@@ -199,7 +204,7 @@ def main():
                 if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                     counter_dist_dict[tgt_bin] += 1
                     final_paths.append(ap)
-                    count+=1
+                    count += 1
 
             except:
                 print(f"taking too long time. skipping {ap} equation...")
@@ -261,8 +266,8 @@ def main():
                 latex = latex + "\n"
             latex_file.write(latex)
 
-            c_idx+=1
+            c_idx += 1
 
         except:
-            reject +=1
+            reject += 1
             pass
