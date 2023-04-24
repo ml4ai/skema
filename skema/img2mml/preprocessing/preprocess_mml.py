@@ -1,20 +1,25 @@
 # -*- coding: utf-8 -*-
 
 import re, json, argparse
-import subprocess, os
+import subprocess, os, sys
 
-# opening config file
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--config",
-    help="configuration file for paths and hyperparameters",
-    default="configs/xfmer_mml_config.json",
-)
+def get_config(config):
 
-args = parser.parse_args()
+    # # opening config file
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument(
+    #     "--config",
+    #     help="configuration file for paths and hyperparameters",
+    #     default="configs/xfmer_mml_config.json",
+    # )
+    #
+    # args = parser.parse_args()
 
-with open(args.config, "r") as cfg:
-    config = json.load(cfg)
+    # with open(args.config, "r") as cfg:
+    with open(config, "r") as cfg:
+        config = json.load(cfg)
+
+    return config
 
 
 def simplification(mml_org):
@@ -478,6 +483,9 @@ def tokenize(mml_eqn):
 
 
 if __name__ == "__main__":
+
+    # get the config
+    config = get_config(sys.argv[-1])
 
     # get the rejected images
     data_path = f"{config['data_path']}/{config['dataset_type']}"
