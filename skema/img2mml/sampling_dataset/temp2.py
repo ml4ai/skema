@@ -210,8 +210,10 @@ def main():
                     final_paths.append(ap)
                     count+=1
 
-            finally:
+            except:
                 print(f"taking too long time. skipping {ap} equation...")
+                
+            finally:
                 my_timer.cancel()
 
             # simp_mml = simplification(mml)
@@ -226,7 +228,7 @@ def main():
             # else:
             #     simp_mml = _temp[0]
             #     pass
-            
+
         else:
             break
 
