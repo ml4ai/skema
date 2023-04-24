@@ -6,31 +6,6 @@ info:
   contact:
     email: ghp@lum.ai
 
-paths:
-  /buildinfo:
-    get:
-      tags:
-        - "config"
-      summary: Information about the current version of this app.
-      description: Provides detailed build information about the currently running app.
-      operationId: buildinfo
-      parameters:
-        - name: pretty
-          in: query
-          description: |
-            Whether or not to pretty print the response.
-          required: false
-          schema:
-            type: boolean
-            example: true
-      responses:
-        '200':
-          description: "A JSON object containing build information."
-          content:
-            application/json:
-              schema:
-                type: string
-
 components:
   schemas:
 
