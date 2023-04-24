@@ -94,6 +94,8 @@ def prepare_dataset(args):
 
     i, ap = args
 
+    print(i, ap)
+
     if (count <= total_eqns) and (not distribution_achieved):
 
         yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
