@@ -108,6 +108,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(views.html.api(version))
   }
 
+  def openDocument() = Action { implicit request: Request[AnyContent] =>
+    Ok(views.html.document())
+  }
+
   // -------------------------------------------
   //      API entry points for SVOGrounder
   // -------------------------------------------
