@@ -2,6 +2,7 @@ import os, json, random
 import shutil
 import threading
 import subprocess
+from tqdm import tqdm
 from threading import Timer
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
@@ -94,7 +95,7 @@ def prepare_dataset(args):
 
     i, ap = args
 
-    print(i, ap)
+    # print(i, ap)
 
     if (count <= total_eqns) and (not distribution_achieved):
 
@@ -145,7 +146,7 @@ def prepare_dataset(args):
 
         finally:
             my_timer.cancel()
-            
+
     else:
         distribution_achieved = True
 
@@ -214,7 +215,7 @@ def main():
 
     all_files = [[i, ap] for i, ap in enumerate(all_paths)]
     with mp.Pool(config["num_cpus"]) as pool:
-        result = pool.map(prepare_dataset, all_files)
+        result = tqdm(pool.imap(prepare_dataset, all_files), total=len(all_files))
 
     # remove temp_folder
     shutil.rmtree(temp_folder)
