@@ -10,18 +10,11 @@ import multiprocessing
 from multiprocessing import Pool, Lock, TimeoutError
 
 
-# opening config file
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--config",
-    help="configuration file for paths and hyperparameters",
-    default="configs/xfmer_mml_config.json",
-)
+def get_config(config_path):
+    with open(config_path, "r") as cfg:
+        config = json.load(cfg)
 
-args = parser.parse_args()
-
-with open(args.config, "r") as cfg:
-    config = json.load(cfg)
+    return config
 
 
 def crop_image(image, reject=False):
@@ -176,8 +169,8 @@ def preprocess_images(image):
 
 def main():
 
-    # # get the config
-    # config = get_config(sys.argv[-1])
+    # get config
+    config = get_config(sys.argv[-1])
 
     data_path = f"{config['data_path']}/{config['dataset_type']}"
     images = os.listdir(f"{data_path}/images")

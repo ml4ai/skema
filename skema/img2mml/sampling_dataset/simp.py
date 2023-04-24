@@ -1,5 +1,5 @@
 from skema.img2mml.preprocessing.preprocess_mml import simplification
-import os, argparse, sys
+import os, sys
 
 i = sys.argv[-1]
 
