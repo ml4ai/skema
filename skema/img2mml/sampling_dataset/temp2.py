@@ -190,7 +190,28 @@ def main():
             try:
                 my_timer.start()
                 stdout, stderr = output.communicate()
+                simp_mml = open("sm.txt").readlines()[0]
+                length_mml = len(simp_mml.split())
+                # finding the bin
+                temp_dict = {}
+                for i in range(50, 400, 50):
+                    if length_mml / i < 1:
+                        temp_dict[i] = length_mml / i
+
+                # get the bin
+                if len(temp_dict) >= 1:
+                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+                else:
+                    tgt_bin = "350+"
+
+                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                    counter_dist_dict[tgt_bin] += 1
+                    final_paths.append(ap)
+                    count+=1
+
             finally:
+                print(f"taking too long time. skipping {ap} equation...")
                 my_timer.cancel()
 
             # simp_mml = simplification(mml)
@@ -205,27 +226,7 @@ def main():
             # else:
             #     simp_mml = _temp[0]
             #     pass
-
-            simp_mml = open("sm.txt").readlines()[0]
-            length_mml = len(simp_mml.split())
-
-            # finding the bin
-            temp_dict = {}
-            for i in range(50, 400, 50):
-                if length_mml / i < 1:
-                    temp_dict[i] = length_mml / i
-
-            # get the bin
-            if len(temp_dict) >= 1:
-                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-            else:
-                tgt_bin = "350+"
-
-            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                counter_dist_dict[tgt_bin] += 1
-                final_paths.append(ap)
-                count+=1
+            
         else:
             break
 
