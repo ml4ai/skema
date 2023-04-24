@@ -1,156 +1,569 @@
 openapi: 3.0.0
 info:
-  title: SKEMA API
-  version: "1.0.1"
-  description: RESTful API exposing functionality of the SKEMA project
+  version: "1.0.6"
+  title: SEC Reader API
+  description: RESTful API exposing core functionality of sec reader.
   contact:
-    name: Clayton T. Morrison
-    email: claytonm@arizona.edu
+    email: ghp@lum.ai
 servers:
-  - url: http://localhost:9000
-    description: local host running the webapp with the default port
+ - url: /api/document
 tags:
-  - name: "grounding"
-    description: operations specific to SKEMA grounding
+  - name: "sec"
+    description: |
+      Operations specific to SEC project.
+  - name: "config"
+    description: |
+      Endpoints for inspecting project config.
 
 paths:
-  /groundStringsToMira:
-    post:
+  /buildinfo:
+    get:
       tags:
-        - "grounding"
-      summary: |
-        accept some texts and a k and return the top-k groundings for the texts
-      description: |
-        accept some texts and a k and return the top-k groundings for the texts
+        - "config"
+      summary: Information about the current version of this app.
+      description: Provides detailed build information about the currently running app.
+      operationId: buildinfo
       parameters:
-        - name: k
+        - name: pretty
           in: query
-          description: the k in top-k
+          description: |
+            Whether or not to pretty print the response.
           required: false
           schema:
-            type: integer
-            format: int32
-            default: 5
-      requestBody:
-        description: the texts to ground, one per line
-        required: true
-        content:
-          text/plain:
-            schema:
-              type: string
-              example: |
-                one
-                two
-                three
+            type: boolean
+            example: true
       responses:
         '200':
-          description: the top-k groundings for the texts
+          description: "A JSON object containing build information."
           content:
             application/json:
               schema:
-                type: array
-                description: one element for each line of text
-                items:
-                  type: array
-                  description: one element for each k of the top-k groundings
-                  items:
-                    $ref: "#/components/schemas/GroundingCandidate"
-
-  /runTextReadingPipelineWithContext:
-    post:
-      tags:
-        - "grounding"
-      summary: |
-        run the text reading pipeline with context
-      description: |
-        run the text reading pipeline with context
-      parameters:
-        - name: contextWindowSize
-          in: query
-          description: the window size for the context
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 3
-      requestBody:
-        description: an array of texts, each probably one or more sentences, perhaps entire documents
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              description: one text, probably at least a sentence if not an entire document
-              items:
                 type: string
-              example: |
-                [
-                  "Far out in the uncharted backwaters of the unfashionable end of the western spiral arm of the Galaxy lies a small, unregarded yellow sun.",
-                  "It was a bright cold day in April, and the clocks were striking thirteen.",
-                  "The year 1866 was signalized by a remarkable incident, a mysterious and inexplicable phenomenon, which doubtless no one has yet forgotten."
-                ]
-      responses:
-        '200':
-          description: output for successful run of the text reading pipeline for the input texts
-          content:
-            application/json:
-              schema:
-                type: array
-                description: for each of the input texts, output from the text reading pipeline
-                items:
-                  type: array
-                  description: output from the text reading pipeline for a single text
-                  items:
-                    $ref: "#/components/schemas/Annotation"
 
 components:
   schemas:
-    Annotation:
-      type: string
-    GroundingCandidate:
-        type: object
-        description: a ranked list of k grounding concepts
-        required:
-          - groundingConcept
-          - score
-        properties:
-            groundingConcept:
-                $ref: "#/components/schemas/GroundingConcept"
-            score:
-                type: number
-                description: score given by the grounding algorithm to the concept
-                example: 0.8
 
-    GroundingConcept:
+    Document:
+      type: object
+      required:
+        - id
+        - text
+        - sentences
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: |
+            The equivalence hash for this org.clulab.processors.Document.
+        text:
+          type: string
+          description: |
+            The original text from which this Document was produced.
+        sentences:
+          type: array
+          description: |
+            array of org.clulab.processors.Sentence.
+          items:
+            $ref: "#/components/schemas/Sentence"
+
+    Sentence:
+      type: object
+      required:
+        - words
+        - startOffsets
+        - endOffsets
+  #      - raw
+  #      - tags
+  #      - lemmas
+  #      - entities
+  #      - norms
+  #      - chunks
+        - graphs
+      properties:
+        words:
+          type: array
+          description: |
+            The tokens for this sentence.
+          items:
+            type: string
+        lemmas:
+          type: array
+          description: |
+            The lemma form of each token in this sentence.
+          items:
+            type: string
+        tags:
+          type: array
+          description: |
+            The part of speech tag for each token in this sentence.
+          items:
+            type: string
+        chunks:
+          type: array
+          description: |
+            The BIO-style chunk label designating a coarse XP assignment for each token in this sentence.
+          items:
+            type: string
+        entities:
+          type: array
+          description: |
+            The BIO-style entity label for each token in this sentence.
+          items:
+            type: string
+        startOffsets:
+          type: array
+          description: |
+            The character-based start offset for each token in this sentence.
+          items:
+            type: integer
+            format: int32
+        endOffsets:
+          type: array
+          description: |
+            The character-based end offset for each token in this sentence.
+          items:
+            type: integer
+            format: int32
+        graphs:
+          $ref: "#/components/schemas/GraphMap"
+
+    GraphMap:
+      type: object
+      description: |
+        Map of graph name -> DirectedGraph.
+      additionalProperties:
+        type: string
+        description: |
+          The name of a DirectedGraph.
+
+    DirectedGraph:
+      type: object
+      properties:
+        edges:
+          type: array
+          description: |
+            A edges comprising this graph.
+          items:
+            $ref: "#/components/schemas/Edge"
+        roots:
+          type: array
+          description: |
+            The token indices corresponding to the root nodes for this DirectedGraph.
+          items:
+            type: integer
+            format: int32
+
+    Edge:
+      type: object
+      required:
+        - source
+        - destination
+        - relation
+      properties:
+        source:
+          type: integer
+          format: int32
+          description: |
+            The token index for the source vertex.
+        destination:
+          type: integer
+          format: int32
+          description: |
+            The token index for the destination vertex.
+        relation:
+          type: string
+          description: |
+            The relation to which this Edge corresponds.
+    Interval:
+      type: object
+      required:
+        - start
+        - end
+      properties:
+        start:
+          type: integer
+          format: int32
+          description: |
+            Inclusive start of org.clulab.struct.Interval.
+        end:
+          type: integer
+          format: int32
+          description: |
+            Exclusive end of org.clulab.struct.Interval.
+
+    Argument:
+      type: object
+      required:
+        - role
+        - text
+        - subtype
+        - labels
+      properties:
+        role:
+          type: string
+          description: |
+            The argument's role (ex. theme)
+        text:
+          type: string
+          description: |
+            The text (span) corresponding to this argument
+        subtype:
+          type: string
+          description: |
+            Lowest hyponym in the labels array
+        labels:
+          type: array
+          description: |
+            array of Mention labels
+          items: string
+
+    MentionData:
+      type: object
+      required:
+        - documents
+        - mentions
+      properties:
+        documents:
+          type: object
+          description: |
+            Map from equivalence hash to org.clulab.processors.Document.
+          additionalProperties:
+            type: integer
+            format: int64
+        mentions:
+          type: array
+          description: |
+            array of org.clulab.odin.Mention.
+          items:
+            $ref: "#/components/schemas/Mention"
+
+    Mention:
+      type: object
+      required:
+        - type
+        - id
+        - text
+        - labels
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+
+      properties:
+        type:
+          type: array
+          description: |
+            A code denoting the type of this mention.
+          items:
+            enum: ["TextBoundMention", "EventMention", "RelationMention", "CrossSentenceMention"]
+        id:
+          type: string
+          description: |
+            Equivalence identifier of the form `shortCode:equivalenceHash`.  `shortCode` is expected to be one of the following: ["T", "E", "R", "CS"].
+        text:
+          type: string
+          description: |
+            Enclosing text span corresponding to this Mention.
+        labels:
+          type: array
+          description: |
+            The labels for this Mention.
+          items:
+            type: string
+        tokenInterval:
+          $ref: "#/components/schemas/Interval"
+        characterStartOffset:
+          type: integer
+          format: int32
+        characterEndOffset:
+          type: integer
+          format: int32
+        sentence:
+          type: integer
+          format: int32
+          description: |
+            The sentence index for the org.clulab.processors.Sentence matching the referenced org.clulab.processors.Document.
+        document:
+          type: integer
+          format: int64
+          description: |
+            The ID corresponding to the document referenced in the `documents` property of `MentionData`.
+        keep:
+          type: boolean
+          description: |
+            Whether or not the Mention was intended to be retained.
+        foundBy:
+          type: string
+          description: |
+            The name of the rule responsible for detecting this mention.
+
+    SimpleMentionData:
+      type:
+        type: array
+        description: |
+          A sequence of simplified Odin Mentions
+        items:
+            oneOf:
+              - $ref: '#/components/schemas/SimpleTextBoundMention'
+              - $ref: '#/components/schemas/SimpleRelationMention'
+              - $ref: '#/components/schemas/SimpleEventMention'
+              - $ref: '#/components/schemas/SimpleCrossSentenceMention'
+
+    SimpleTextBoundMention:
+      type: object
+      required:
+        - $type
+        - "doc-id"
+        - sentence
+        - "sentence-index"
+        - labels
+        - span
+        - found-by
+
+      properties:
+        $type:
+          type: string
+          description: |
+            An identifier for this mention type.
+          items:
+            enum: ["textbound"]
+        "doc-id":
+          type: string
+          description: |
+            An identifier for the source document from which this mention originates.
+        text:
+          type: string
+          description: |
+            Enclosing text span corresponding to this mention.
+        labels:
+          type: array
+          description: |
+            The labels for this Mention.
+          items:
+            type: string
+        sentence:
+          type: string
+          description: |
+            The sentence text that encompasses this mention.
+        "sentence-index":
+          type: integer
+          format: int32
+          description: |
+            The index for this sentence (i.e., its order within the document)
+        found-by:
+          type: string
+          description: |
+            The name of the rule responsible for detecting this mention.
+
+    SimpleRelationMention:
+      type: object
+      required:
+        - $type
+        - "doc-id"
+        - sentence
+        - "sentence-index"
+        - labels
+        - span
+        - found-by
+        - arguments
+
+      properties:
+        $type:
+          type: string
+          description: |
+            An identifier for this mention type.
+          items:
+            enum: ["relation"]
+        "doc-id":
+          type: string
+          description: |
+            An identifier for the source document from which this mention originates.
+        text:
+          type: string
+          description: |
+            Enclosing text span corresponding to this mention.
+        labels:
+          type: array
+          description: |
+            The labels for this Mention.
+          items:
+            type: string
+        sentence:
+          type: string
+          description: |
+            The sentence text that encompasses this mention.
+        "sentence-index":
+          type: integer
+          format: int32
+          description: |
+            The index for this sentence (i.e., its order within the document)
+        "found-by":
+          type: string
+          description: |
+            The name of the rule responsible for detecting this mention.
+        arguments:
+          $ref: '#/components/schemas/SimpleArgumentsMap'
+    
+    SimpleEventMention:
+      type: object
+      required:
+        - $type
+        - "doc-id"
+        - sentence
+        - "sentence-index"
+        - labels
+        - span
+        - found-by
+        - arguments
+        - trigger
+
+      properties:
+        $type:
+          type: string
+          description: |
+            An identifier for this mention type.
+          items:
+            enum: ["event"]
+        "doc-id":
+          type: string
+          description: |
+            An identifier for the source document from which this mention originates.
+        text:
+          type: string
+          description: |
+            Enclosing text span corresponding to this mention.
+        labels:
+          type: array
+          description: |
+            The labels for this Mention.
+          items:
+            type: string
+        sentence:
+          type: string
+          description: |
+            The sentence text that encompasses this mention.
+        "sentence-index":
+          type: integer
+          format: int32
+          description: |
+            The index for this sentence (i.e., its order within the document)
+        "found-by":
+          type: string
+          description: |
+            The name of the rule responsible for detecting this mention.
+        arguments:
+          $ref: '#/components/schemas/SimpleArgumentsMap'
+        trigger:
+          type: string
+          description: |
+            A predicate that signals this particular relation.
+
+    SimpleCrossSentenceMention:
+      type: object
+      required:
+        - $type
+        - "doc-id"
+        - sentence
+        - "sentence-index"
+        - labels
+        - span
+        - "found-by"
+        - arguments
+        - anchor
+        - "anchor-sentence"
+        - "anchor-sentence-index"
+        - neighbor
+        - "neighbor-sentence"
+        - "neighbor-sentence-index"
+
+      properties:
+        $type:
+          type: string
+          description: |
+            An identifier for this mention type.
+          items:
+            enum: ["cross-sentence"]
+        "doc-id":
+          type: string
+          description: |
+            An identifier for the source document from which this mention originates.
+        text:
+          type: string
+          description: |
+            Enclosing text span corresponding to this mention.
+        labels:
+          type: array
+          description: |
+            The labels for this Mention.
+          items:
+            type: string
+        sentence:
+          type: string
+          description: |
+            The sentence text that encompasses this mention.
+        "sentence-index":
+          type: integer
+          format: int32
+          description: |
+            The index for this sentence (i.e., its order within the document)
+        "found-by":
+          type: string
+          description: |
+            The name of the rule responsible for detecting this mention.
+        arguments:
+          $ref: '#/components/schemas/SimpleArgumentsMap'
+        anchor:
+          type: string
+          description: |
+            A component mention falling in a different sentence from the neighbor mention.
+        "anchor-sentence":
+          type: string
+          description: |
+            The sentence text that encompasses this anchor mention.
+        "anchor-sentence-index":
+          type: integer
+          format: int32
+          description: |
+            The anchor sentence's index for this sentence (i.e., its order within the document)
+        neighbor:
+          type: string
+          description: |
+            A component mention falling in different sentence from the anchor mention.
+        "neighbor-sentence":
+          type: string
+          description: |
+            The sentence text that encompasses this neighbor mention.
+        "neighbor-sentence-index":
+          type: integer
+          format: int32
+          description: |
+            The index for this sentence (i.e., its order within the document)
+    
+    SimpleArgumentsMap:
         type: object
-        description: ontology concept that serves as grounding element for extractions
+        additionalProperties:
+          type: array
+          description: |
+            array of simplified arguments
+          items:
+            $ref: "#/components/schemas/SimpleArgument"
+
+    SimpleArgument:
+        type: object
         required:
-          - id
-          - name
+          - text
+          - labels
         properties:
-            id:
-                type: string
-                description: unique identifier of the concept
-                example: "ncit:C80485"
-            name:
-                type: string
-                description: name of the concept
-                example: "Health Level Seven"
-            description:
-                type: string
-                description: optional description of the concept
-                example: "A Standards Developing Organization (SDO) operating in the healthcare arena..."
-            synonyms:
-                type: array
-                description: an optional list of synonyms
-                example: ["Health Level 7 (HL7)", "Health Level Seven", "HL7"]
-                items:
-                  type: string
-            embedding:
-                type: array
-                description: an optional array of floats forming the grounding
-                example: [0.034831780940294266, 0.018551819026470184, -0.046141307801008224]
-                minItems: 200
-                maxItems: 200
-                items: 
-                  type: number
+          text:
+            type: string
+            description: |
+              The text of this argument
+          labels:
+            type: array
+            description: |
+              Array of mention labels for this argument
+            items: string
+            
