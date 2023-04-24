@@ -299,4 +299,5 @@ def main():
             reject += 1
             pass
 
-print("--- total time taken %s hours ---" % (float(time.time()) - float(start_time))/3600)
+total_time = (time.time() - start_time) /3600
+print(f"total time taken {total_time} hours.")
