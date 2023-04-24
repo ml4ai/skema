@@ -215,7 +215,8 @@ components:
           type: array
           description: |
             array of Mention labels
-          items: string
+          items:
+            type: string
 
     MentionData:
       type: object
@@ -301,16 +302,15 @@ components:
             The name of the rule responsible for detecting this mention.
 
     SimpleMentionData:
-      type:
-        type: array
-        description: |
-          A sequence of simplified Odin Mentions
-        items:
-            oneOf:
-              - $ref: '#/components/schemas/SimpleTextBoundMention'
-              - $ref: '#/components/schemas/SimpleRelationMention'
-              - $ref: '#/components/schemas/SimpleEventMention'
-              - $ref: '#/components/schemas/SimpleCrossSentenceMention'
+      type: array
+      description: |
+        A sequence of simplified Odin Mentions
+      items:
+          oneOf:
+            - $ref: '#/components/schemas/SimpleTextBoundMention'
+            - $ref: '#/components/schemas/SimpleRelationMention'
+            - $ref: '#/components/schemas/SimpleEventMention'
+            - $ref: '#/components/schemas/SimpleCrossSentenceMention'
 
     SimpleTextBoundMention:
       type: object
@@ -565,5 +565,5 @@ components:
             type: array
             description: |
               Array of mention labels for this argument
-            items: string
-            
+            items:
+              type: string
