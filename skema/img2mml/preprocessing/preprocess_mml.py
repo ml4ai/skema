@@ -14,7 +14,7 @@ parser.add_argument(
 
 args = parser.parse_args()
 
-with open(config, "r") as cfg:
+with open(args.config, "r") as cfg:
     config = json.load(cfg)
 
 
