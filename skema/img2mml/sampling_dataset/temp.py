@@ -94,6 +94,12 @@ def prepare_dataset(args):
 
     i, ap = args
 
+    if count%10000==0:
+        lock.acquire()
+        print("current status...")
+        print(counter_dist_dict)
+        lock.release()
+
     if (count <= total_eqns) and (not distribution_achieved):
 
         yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
