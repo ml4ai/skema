@@ -12,7 +12,9 @@ config_path = "sampling_dataset/sampling_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
 
-global final_paths, count, lock, total_eqns, distribution_achieved, counter_dist_dict, dist_dict
+global final_paths, count, lock, total_eqns, distribution_achieved, counter_dist_dict, dist_dict, verbose
+
+verbose = config["verbose"]
 
 # src path
 root = config["src_path"]
@@ -137,10 +139,11 @@ def prepare_dataset(args):
                 count+=1
 
         except:
-            lock.acquire()
-            print("current status: ", counter_dist_dict)
-            print(f"taking too long time. skipping {ap} equation...")
-            lock.release()
+            if verbose:
+                lock.acquire()
+                print("current status: ", counter_dist_dict)
+                print(f"taking too long time. skipping {ap} equation...")
+                lock.release()
 
         finally:
             my_timer.cancel()
