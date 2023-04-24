@@ -7,10 +7,10 @@ args = parser.parse_args()
 
 i = args.idx
 
-open(f"sm_{i}.txt", "w").write
+open(f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt", "w").write
 (
     simplification
     (
-        open(f"smr_{i}.txt").readlines()[0]
+        open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt").readlines()[0]
     )
 )
