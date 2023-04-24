@@ -94,12 +94,6 @@ def prepare_dataset(args):
 
     i, ap = args
 
-    if count%10000==0:
-        lock.acquire()
-        print("current status...")
-        print(counter_dist_dict)
-        lock.release()
-
     if (count <= total_eqns) and (not distribution_achieved):
 
         yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
@@ -112,7 +106,7 @@ def prepare_dataset(args):
         open(f"smr_{i}.txt", "w").write(mml)
 
         cwd = os.getcwd()
-        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", "--idx", i]
+        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", "--idx", str(i)]
         output = subprocess.Popen(
             cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
         )
@@ -143,6 +137,7 @@ def prepare_dataset(args):
 
         except:
             lock.acquire()
+            print("current status: ", counter_dist_dict)
             print(f"taking too long time. skipping {ap} equation...")
             lock.release()
 
