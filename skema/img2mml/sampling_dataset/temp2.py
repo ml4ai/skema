@@ -121,8 +121,7 @@ def main():
     print("collecting all the MathML paths...")
 
     if config["sample_entire_year"]:
-        years = config["years"].split(",").strip()
-
+        years = config["years"].split(",")
         for yr in years:
             yr = yr.strip()
             yr_path = os.path.join(root, yr)
@@ -134,7 +133,7 @@ def main():
                     all_paths.append(p)
 
     elif config["sample_from_months"]:
-        months = config["months"].split(",").strip()
+        months = config["months"].split(",")
         for month in months:
             month = month.strip()
             yr = f"20{month[0:2]}"
