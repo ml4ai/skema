@@ -12,17 +12,22 @@
 "src_path":"/home/skema/img2mml/data",
 
 "_comment_":"distribution for sampling dataset form the raw datset",
-"0-50":5995,
-"50-100":33774,
-"100-150":27600,
-"150-200":16084,
-"200-250":8471,
-"250-300":4078,
-"300-350":1819,
-"350+":1961,
+"0-50":55,
+"50-100":34,
+"100-150":20,
+"150-200":14,
+"200-250":18,
+"250-300":18,
+"300-350":19,
+"350+":11,
 
 "seed":21,
 "num_cpus":200,
-"verbose":false
+"verbose":false,
+
+"_comment_":"we will divide all_paths into chunks to save memory and expedite process. Chunk_size < len(all_paths)",
+"__":"A good number will be total_eqns you want in the dataset / 10^n , where n={1,2,..}",
+
+"chunk_size":10
 
 }

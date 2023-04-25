@@ -12,9 +12,13 @@ config_path = "sampling_dataset/sampling_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
 
-global final_paths, count, lock, total_eqns, distribution_achieved, counter_dist_dict, dist_dict, verbose
+global final_paths, count, lock, total_eqns, verbose, chunk_size
+global distribution_achieved, counter_dist_dict, dist_dict
 
 verbose = config["verbose"]
+
+# chink_size for multiprocessing
+chunk_size = config["chunk_size"]
 
 # src path
 root = config["src_path"]
@@ -83,6 +87,11 @@ def get_paths(yr, yr_path, month):
                 temp_files.append(mml_eqn_path)
 
     return temp_files
+
+def divide_all_paths_into_chunks(all_paths):
+    global chunk_size
+    for i in range(0, len(all_paths), chunk_size):
+        yield all_paths[i:i + chunk_size]
 
 
 def copy_image(img_src, img_dst):
@@ -165,6 +174,8 @@ kill = lambda process: process.kill()
 
 def main():
 
+    global chunk_size
+
     """
     Sampling Steps:
 
@@ -221,12 +232,21 @@ def main():
     if not os.path.exists(temp_folder):
         os.mkdir(temp_folder)
 
-    all_files = [[i, ap] for i, ap in enumerate(all_paths)]
-    with mp.Pool(config["num_cpus"]) as pool:
-        result = pool.map(prepare_dataset, all_files)
+    for batch_paths in list(divide_chunks(all_paths)):
+        if not distribution_achieved:
+            all_files = [[i,ap] for i,ap in enumerate(batch_paths)]
 
-    # remove temp_folder
-    shutil.rmtree(temp_folder)
+            with mp.Pool(config["num_cpus"]) as pool:
+                result = pool.map(prepare_dataset, all_files)
+
+            # clean the temp_folder after completeing the batch
+            clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
+            subprocess.run(clean_cmd)
+        else:
+            # remove temp_folder
+            shutil.rmtree(temp_folder)
+            break
+
 
     ######## step 4: writing the final dataset ########
 
