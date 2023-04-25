@@ -232,7 +232,7 @@ def main():
     if not os.path.exists(temp_folder):
         os.mkdir(temp_folder)
 
-    for batch_paths in list(divide_chunks(all_paths)):
+    for batch_paths in list(divide_all_paths_into_chunks(all_paths)):
         if not distribution_achieved:
             all_files = [[i,ap] for i,ap in enumerate(batch_paths)]
 
