@@ -272,5 +272,5 @@ def main():
             reject += 1
             pass
 
-# os.remove("sm.txt")
-# os.remove("smr.txt")
+os.remove("sm.txt")
+os.remove("smr.txt")
