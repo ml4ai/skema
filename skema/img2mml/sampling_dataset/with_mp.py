@@ -214,7 +214,7 @@ def main():
             all_files = list()
             for i,ap in enumerate(batch_paths):
                 all_files.append([i, ap])
-            print("all_files length: ", all_files)
+            print("all_files length: ", len(all_files))
 
             with mp.Pool(config["num_cpus"]) as pool:
                 result = pool.map(prepare_dataset, all_files)
