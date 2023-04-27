@@ -258,9 +258,6 @@ def main():
             shutil.rmtree(temp_folder)
             break
 
-    print("final distribution: ", counter_dist_dict)
-    print("total equations: ", len(final_paths))
-
     ######## step 4: writing the final dataset ########
 
     # random shuffle twice
@@ -320,3 +317,6 @@ def main():
         except:
             reject += 1
             pass
+
+print("final distribution: ", counter_dist_dict)
+print("total equations: ", c_idx)
