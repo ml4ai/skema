@@ -211,12 +211,15 @@ def main():
             if count%100==0:
                 print(counter_dist_dict)
 
-            all_files = [[i,ap] for i,ap in enumerate(batch_paths)]
+            all_files = list()
+            for i,ap in enumerate(batch_paths):
+                all_files.append([i, ap])
+
             with mp.Pool(config["num_cpus"]) as pool:
                 result = pool.map(prepare_dataset, all_files)
 
             # update thhe distribution
-            for i in range(chunk_size):
+            for i,ap in enumerate(all_files):
                 simp_mml = open(
                     f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
                 ).readlines()[0]
