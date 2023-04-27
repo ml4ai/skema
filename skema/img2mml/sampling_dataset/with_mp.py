@@ -259,6 +259,7 @@ def main():
 
     print("final distribution: ")
     print(counter_dist_dict)
+    print("final_paths length: ", len(final_paths))
 
     ######## step 4: writing the final dataset ########
 
