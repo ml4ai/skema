@@ -65,7 +65,6 @@ counter_dist_dict["350+"] = 0
 
 final_paths = list()
 count = 0
-distribution_achieved = False
 lock = mp.Lock()
 
 
@@ -104,13 +103,10 @@ def copy_image(img_src, img_dst):
 
 def prepare_dataset(args):
 
-    global total_eqns, distribution_achieved, lock, dist_dict
+    # global total_eqns, distribution_achieved, lock, dist_dict
     # global count, total_eqns, distribution_achieved, final_paths, lock, counter_dist_dict, dist_dict
 
-    i, ap = args
-
-    if (count <= total_eqns) and (not distribution_achieved):
-
+        i, ap = args
         yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
         mml_path = os.path.join(
             root,
@@ -132,28 +128,6 @@ def prepare_dataset(args):
         try:
             my_timer.start()
             stdout, stderr = output.communicate()
-            simp_mml = open(
-                f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
-            ).readlines()[0]
-            length_mml = len(simp_mml.split())
-
-            # finding the bin
-            temp_dict = {}
-            for i in range(50, 400, 50):
-                if length_mml / i < 1:
-                    temp_dict[i] = length_mml / i
-
-            # get the bin
-            if len(temp_dict) >= 1:
-                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-            else:
-                tgt_bin = "350+"
-
-            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                counter_dist_dict[tgt_bin] += 1
-                final_paths.append(ap)
-                count += 1
 
         except:
             if verbose:
@@ -165,17 +139,14 @@ def prepare_dataset(args):
         finally:
             my_timer.cancel()
 
-    else:
-        distribution_achieved = True
-
-
 # Function to kill process if TimeoutError occurs
 kill = lambda process: process.kill()
 
 
 def main():
 
-    global chunk_size
+    global count, total_eqns, final_paths
+    global lock, counter_dist_dict, dist_dict, chunk_size
 
     """
     Sampling Steps:
@@ -234,14 +205,42 @@ def main():
         os.mkdir(temp_folder)
 
     for batch_paths in list(divide_all_paths_into_chunks(all_paths)):
-        if not distribution_achieved:
+
+        if (count <= total_eqns):
+
             all_files = [[i,ap] for i,ap in enumerate(batch_paths)]
             with mp.Pool(config["num_cpus"]) as pool:
                 result = pool.map(prepare_dataset, all_files)
 
+            # update thhe distribution
+            for i in range(chunk_size):
+                simp_mml = open(
+                    f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+                ).readlines()[0]
+                length_mml = len(simp_mml.split())
+
+                # finding the bin
+                temp_dict = {}
+                for i in range(50, 400, 50):
+                    if length_mml / i < 1:
+                        temp_dict[i] = length_mml / i
+
+                # get the bin
+                if len(temp_dict) >= 1:
+                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+                else:
+                    tgt_bin = "350+"
+
+                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                    counter_dist_dict[tgt_bin] += 1
+                    final_paths.append(ap)
+                    count += 1
+
             # clean the temp_folder after completeing the batch
             clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
             subprocess.run(clean_cmd)
+
         else:
             # remove temp_folder
             shutil.rmtree(temp_folder)
