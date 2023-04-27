@@ -256,6 +256,8 @@ def main():
             shutil.rmtree(temp_folder)
             break
 
+    print("final distribution: ")
+    print(counter_dist_dict)
 
     ######## step 4: writing the final dataset ########
 
