@@ -220,6 +220,7 @@ def main():
 
             # update thhe distribution
             for i,ap in enumerate(all_files):
+                print(i)
                 simp_mml = open(
                     f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
                 )
