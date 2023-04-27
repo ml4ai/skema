@@ -243,6 +243,7 @@ def main():
                     if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                         counter_dist_dict[tgt_bin] += 1
                         final_paths.append(ap)
+                        print(ap)
                         count += 1
                 except:
                     pass
