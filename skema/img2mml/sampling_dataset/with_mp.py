@@ -318,5 +318,6 @@ def main():
             reject += 1
             pass
 
-print("final distribution: ", counter_dist_dict)
-print("total equations: ", c_idx)
+
+    print("final distribution: ", counter_dist_dict)
+    print("total equations: ", c_idx)
