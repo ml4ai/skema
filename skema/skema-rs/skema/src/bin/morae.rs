@@ -44,13 +44,14 @@ fn main() {
         - manual -> This assumes the input is the function of the dynamics
     */
     let args: Vec<String> = env::args().collect();
-    println!("{:?}", args[1]);
 
-    let module_id = 1755;
+    let mut module_id = 1755;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
     if args[1] == "auto".to_string() {
-        println!("auto branch");
+        if args.clone().len() > 2 {
+            module_id = args[2].parse::<i64>().unwrap();
+        }
         let graph = subgraph2petgraph(module_id);
         // 1. find each function node
         let mut function_nodes = Vec::<NodeIndex>::new();
@@ -113,7 +114,7 @@ fn main() {
                         match &graph[n_node].clone().properties["line_begin"] {
                             Value::List(x) => match x[0] {
                                 Value::Int(y) => {
-                                    println!("line_begin: {:?}", y);
+                                    //println!("line_begin: {:?}", y);
                                     line_nums.push(y.clone());
                                 }
                                 _ => println!("error metadata type"),
@@ -123,7 +124,7 @@ fn main() {
                         match &graph[n_node].clone().properties["line_end"] {
                             Value::List(x) => match x[0] {
                                 Value::Int(y) => {
-                                    println!("line_end: {:?}", y);
+                                    //println!("line_end: {:?}", y);
                                     line_nums.push(y.clone());
                                 }
                                 _ => println!("error metadata type"),
@@ -136,20 +137,20 @@ fn main() {
         }
 
         println!(
-            "Lines for core dynamics function: {:?} -> {:?}",
+            "\nLines for core dynamics function: {:?} -> {:?}",
             line_nums[0].clone(),
             line_nums[1].clone()
         );
 
-        println!("core_id: {:?}", core_id[0].clone());
-        println!("module_id: {:?}", module_id.clone());
+        println!("function_core_id: {:?}", core_id[0].clone());
+        println!("module_id: {:?}\n", module_id.clone());
         // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
         // 5. pass id to subgrapg2_core_dyn to get core dynamics
         let (mut core_dynamics_ast, metadata_map_ast) =
             subgraph2_core_dyn_ast(core_id[0].clone()).unwrap();
 
-        println!("{:?}", core_dynamics_ast.clone());
+        println!("\n{:?}", core_dynamics_ast[2].clone());
 
         /*let (core_dynamics, metadata_map) = subgraph2_core_dyn_exp(core_id).unwrap();
 
@@ -532,24 +533,49 @@ fn tree_2_ast(
     if graph.clone()[root_node].labels == ["Opo"] {
         // we first construct the derivative of the first node
         let mut deriv_name: &str = &graph.clone()[root_node].properties["name"].to_string();
+        // this will let us know if additional trimming is needed to handle the code implementation of the equations
+        let mut step_impl = false;
         // This is very bespoke right now
-        let deriv = MathExpression::Mfrac(
-            Box::new(Mrow(
-                [
-                    MathExpression::Mi(deriv_name[1..2].to_string().clone()),
-                    MathExpression::Mi(deriv_name[2..3].to_string().clone()),
-                ]
-                .to_vec(),
-            )),
-            Box::new(Mrow(
-                [
-                    MathExpression::Mi(deriv_name[3..4].to_string().clone()),
-                    MathExpression::Mi(deriv_name[4..5].to_string().clone()),
-                ]
-                .to_vec(),
-            )),
-        );
-        math_vec.push(deriv.clone());
+        // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
+        // currently we convert to leibniz form
+        if deriv_name[1..2].to_string().clone() == "d" {
+            let deriv = MathExpression::Mfrac(
+                Box::new(Mrow(
+                    [
+                        MathExpression::Mi(deriv_name[1..2].to_string().clone()),
+                        MathExpression::Mi(deriv_name[2..3].to_string().clone()),
+                    ]
+                    .to_vec(),
+                )),
+                Box::new(Mrow(
+                    [
+                        MathExpression::Mi(deriv_name[3..4].to_string().clone()),
+                        MathExpression::Mi(deriv_name[4..5].to_string().clone()),
+                    ]
+                    .to_vec(),
+                )),
+            );
+            math_vec.push(deriv.clone());
+        } else {
+            step_impl = true;
+            let deriv = MathExpression::Mfrac(
+                Box::new(Mrow(
+                    [
+                        MathExpression::Mi("d".to_string().clone()),
+                        MathExpression::Mi(deriv_name[1..2].to_string().clone()),
+                    ]
+                    .to_vec(),
+                )),
+                Box::new(Mrow(
+                    [
+                        MathExpression::Mi("d".to_string().clone()),
+                        MathExpression::Mi("t".to_string().clone()),
+                    ]
+                    .to_vec(),
+                )),
+            );
+            math_vec.push(deriv.clone());
+        }
         // we also push an Mo('=') here before traversing the tree to parse the rhs
         math_vec.push(MathExpression::Mo(Operator::Equals));
         // now we walk through the tree to parse the rest
@@ -585,13 +611,25 @@ fn tree_2_ast(
                 println!("Not supported or Trivial case");
             }
         }
+
+        // we now need to handle the case where it's step implementation
+        // we find the Mi of the state variable that doesn't have a multiplication next to it (including only one, if at the end of the vec)
+        // we then remove it and the one of the addition operators next to it
+        if step_impl {
+            let ref_name = deriv_name[1..2].to_string().clone();
+            for (idx, obj) in math_vec.clone().iter().enumerate() {
+                if *obj == MathExpression::Mi(ref_name.clone()) {
+                    // find the index of the extra state variable
+                    println!("found idx: {:?}", idx.clone());
+                    println!("obj: {:?}", obj.clone());
+                }
+            }
+        }
     } else {
         println!("Error! Starting node is not Opo!");
     }
 
-    let math_final = Math {
-        content: [MathExpression::Mrow(math_vec.clone())].to_vec(),
-    };
+    println!("Not reversed mathml: {:?}", math_vec.clone());
 
     let mut reversed_final_math = Vec::<MathExpression>::new();
     let vec_len_temp = math_vec.clone().len();
@@ -829,16 +867,27 @@ fn get_args(
             && graph.clone()[node].properties["name"].to_string() == "'USub'".to_string()
         {
             op.push(get_operator(graph.clone(), node.clone()));
-            println!("get_args USub node operator: {:?}", op[0].clone());
             for node1 in graph.neighbors_directed(node.clone(), Outgoing) {
-                let temp_mi =
-                    MathExpression::Mi(graph.clone()[node1].properties["name"].to_string());
+                let temp_mi = MathExpression::Mi(
+                    graph.clone()[node1].properties["name"].to_string()[1..(graph.clone()[node1]
+                        .properties["name"]
+                        .to_string()
+                        .len()
+                        - 1 as usize)]
+                        .to_string()
+                        .clone(),
+                );
                 args[i].push(op[0].clone());
                 args[i].push(temp_mi.clone());
             }
         } else if graph.clone()[node].labels == ["Opi"] || graph.clone()[node].labels == ["Literal"]
         {
-            let temp_mi = MathExpression::Mi(graph.clone()[node].properties["name"].to_string());
+            let temp_mi = MathExpression::Mi(
+                graph.clone()[node].properties["name"].to_string()
+                    [1..(graph.clone()[node].properties["name"].to_string().len() - 1 as usize)]
+                    .to_string()
+                    .clone(),
+            );
             args[i].push(temp_mi.clone());
         } else {
             let n_args = get_args(graph.clone(), node.clone());
