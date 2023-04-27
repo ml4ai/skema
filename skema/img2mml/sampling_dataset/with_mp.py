@@ -249,8 +249,6 @@ def main():
 
     ######## step 4: writing the final dataset ########
 
-    global final_paths
-
     # random shuffle twice
     random.shuffle(final_paths)
     random.shuffle(final_paths)
