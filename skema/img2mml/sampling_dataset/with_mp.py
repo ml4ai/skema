@@ -214,7 +214,6 @@ def main():
             all_files = list()
             for i,ap in enumerate(batch_paths):
                 all_files.append([i, ap])
-            print("all_files length: ", len(all_files))
 
             with mp.Pool(config["num_cpus"]) as pool:
                 result = pool.map(prepare_dataset, all_files)
@@ -223,7 +222,8 @@ def main():
             for i,ap in enumerate(all_files):
                 simp_mml = open(
                     f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
-                ).readlines()[0]
+                )
+                simp_mml = simp_mml.readlines()[0]
                 length_mml = len(simp_mml.split())
 
                 # finding the bin
