@@ -69,7 +69,6 @@ lock = mp.Lock()
 
 
 def get_paths(yr, yr_path, month):
-
     temp_files = list()
 
     month_path = os.path.join(yr_path, month)
@@ -87,10 +86,11 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+
 def divide_all_paths_into_chunks(all_paths):
     global chunk_size
     for i in range(0, len(all_paths), chunk_size):
-        yield all_paths[i:i + chunk_size]
+        yield all_paths[i : i + chunk_size]
 
 
 def copy_image(img_src, img_dst):
@@ -102,7 +102,6 @@ def copy_image(img_src, img_dst):
 
 
 def prepare_dataset(args):
-
     # global total_eqns, distribution_achieved, lock, dist_dict
     # global count, total_eqns, distribution_achieved, final_paths, lock, counter_dist_dict, dist_dict
 
@@ -114,15 +113,11 @@ def prepare_dataset(args):
     )
 
     mml = open(mml_path).readlines()[0]
-    open(
-        f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w"
-    ).write(mml)
+    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(mml)
 
     cwd = os.getcwd()
     cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
-    output = subprocess.Popen(
-        cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-    )
+    output = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
     my_timer = Timer(5, kill, [output])
 
     try:
@@ -139,12 +134,13 @@ def prepare_dataset(args):
     finally:
         my_timer.cancel()
 
+
 # Function to kill process if TimeoutError occurs
 kill = lambda process: process.kill()
 
 
-def main():
-
+def create_dataset(dataset):
+    print("Generating the {} dataset".format(dataset))
     global count, total_eqns, final_paths
     global lock, counter_dist_dict, dist_dict, chunk_size
 
@@ -205,14 +201,12 @@ def main():
         os.mkdir(temp_folder)
 
     for batch_paths in list(divide_all_paths_into_chunks(all_paths)):
-
-        if (count <= total_eqns):
-
-            if count%100==0:
+        if count <= total_eqns:
+            if count % 100 == 0:
                 print(counter_dist_dict)
 
             all_files = list()
-            for i,ap in enumerate(batch_paths):
+            for i, ap in enumerate(batch_paths):
                 all_files.append([i, ap])
 
             with mp.Pool(config["num_cpus"]) as pool:
@@ -220,7 +214,7 @@ def main():
 
             # update thhe distribution
             for af in all_files:
-                i,ap = af
+                i, ap = af
 
                 try:
                     simp_mml = open(
@@ -317,7 +311,6 @@ def main():
         except:
             reject += 1
             pass
-
 
     print("final distribution: ", counter_dist_dict)
     print("total equations: ", c_idx)
