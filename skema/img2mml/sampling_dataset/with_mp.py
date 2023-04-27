@@ -219,7 +219,9 @@ def main():
                 result = pool.map(prepare_dataset, all_files)
 
             # update thhe distribution
-            for i,ap in enumerate(all_files):
+            for af in all_files:
+                i,ap = af
+                
                 try:
                     simp_mml = open(
                         f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
