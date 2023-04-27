@@ -208,6 +208,9 @@ def main():
 
         if (count <= total_eqns):
 
+            if count%100==0:
+                print(counter_dist_dict)
+
             all_files = [[i,ap] for i,ap in enumerate(batch_paths)]
             with mp.Pool(config["num_cpus"]) as pool:
                 result = pool.map(prepare_dataset, all_files)
