@@ -220,33 +220,32 @@ def main():
 
             # update thhe distribution
             for i,ap in enumerate(all_files):
-                print("========="*4)
-                print(i)
-                simp_mml = open(
-                    f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
-                )
-                simp_mml = simp_mml.readlines()[0]
-                print(" ")
-                print(simp_mml)
-                length_mml = len(simp_mml.split())
+                try:
+                    simp_mml = open(
+                        f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+                    )
+                    simp_mml = simp_mml.readlines()[0]
+                    length_mml = len(simp_mml.split())
 
-                # finding the bin
-                temp_dict = {}
-                for i in range(50, 400, 50):
-                    if length_mml / i < 1:
-                        temp_dict[i] = length_mml / i
+                    # finding the bin
+                    temp_dict = {}
+                    for i in range(50, 400, 50):
+                        if length_mml / i < 1:
+                            temp_dict[i] = length_mml / i
 
-                # get the bin
-                if len(temp_dict) >= 1:
-                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                else:
-                    tgt_bin = "350+"
+                    # get the bin
+                    if len(temp_dict) >= 1:
+                        max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                        tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+                    else:
+                        tgt_bin = "350+"
 
-                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                    counter_dist_dict[tgt_bin] += 1
-                    final_paths.append(ap)
-                    count += 1
+                    if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                        counter_dist_dict[tgt_bin] += 1
+                        final_paths.append(ap)
+                        count += 1
+                except:
+                    pass
 
             # clean the temp_folder after completeing the batch
             clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
