@@ -5,11 +5,20 @@ import subprocess
 from threading import Timer
 from shutil import copyfile as CP
 from preprocessing.preprocess_mml import simplification
+import multiprocessing as mp
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
+
+global final_paths, count, lock, total_eqns, verbose, chunk_size
+global distribution_achieved, counter_dist_dict, dist_dict
+
+verbose = config["verbose"]
+
+# chink_size for multiprocessing
+chunk_size = config["chunk_size"]
 
 # src path
 root = config["src_path"]
@@ -54,7 +63,10 @@ dist_dict["350+"] = config["350+"]
 total_eqns += config["350+"]
 counter_dist_dict["350+"] = 0
 
-# lock = mp.Lock()
+final_paths = list()
+count = 0
+distribution_achieved = False
+lock = mp.Lock()
 
 
 def get_paths(yr, yr_path, month):
@@ -76,6 +88,11 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+def divide_all_paths_into_chunks(all_paths):
+    global chunk_size
+    for i in range(0, len(all_paths), chunk_size):
+        yield all_paths[i:i + chunk_size]
+
 
 def copy_image(img_src, img_dst):
     try:
@@ -85,21 +102,71 @@ def copy_image(img_src, img_dst):
         return False
 
 
-class TimeoutError(Exception):
-    pass
+def prepare_dataset(args):
 
+    global total_eqns, distribution_achieved, lock, dist_dict
+    # global count, total_eqns, distribution_achieved, final_paths, lock, counter_dist_dict, dist_dict
 
-def simp(mml):
-    return simplification(mml)
+    i, ap = args
 
+    if (count <= total_eqns) and (not distribution_achieved):
 
-def thread_function(mml, _temp):
-    try:
-        # Call the function
-        _temp.append(simp(mml))
+        yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
+        mml_path = os.path.join(
+            root,
+            f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+        )
 
-    except Exception as e:
-        print("error...")
+        mml = open(mml_path).readlines()[0]
+        open(
+            f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w"
+        ).write(mml)
+
+        cwd = os.getcwd()
+        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
+        output = subprocess.Popen(
+            cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+        )
+        my_timer = Timer(5, kill, [output])
+
+        try:
+            my_timer.start()
+            stdout, stderr = output.communicate()
+            simp_mml = open(
+                f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+            ).readlines()[0]
+            length_mml = len(simp_mml.split())
+
+            # finding the bin
+            temp_dict = {}
+            for i in range(50, 400, 50):
+                if length_mml / i < 1:
+                    temp_dict[i] = length_mml / i
+
+            # get the bin
+            if len(temp_dict) >= 1:
+                max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+            else:
+                tgt_bin = "350+"
+
+            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                counter_dist_dict[tgt_bin] += 1
+                final_paths.append(ap)
+                count += 1
+
+        except:
+            if verbose:
+                lock.acquire()
+                print("current status: ", counter_dist_dict)
+                print(f"taking too long time. skipping {ap} equation...")
+                lock.release()
+
+        finally:
+            my_timer.cancel()
+
+    else:
+        distribution_achieved = True
 
 
 # Function to kill process if TimeoutError occurs
@@ -107,6 +174,8 @@ kill = lambda process: process.kill()
 
 
 def main():
+
+    global chunk_size
 
     """
     Sampling Steps:
@@ -152,67 +221,36 @@ def main():
     random.shuffle(all_paths)
     random.shuffle(all_paths)
 
-    ######## step 3 and 4: simplify MML and and find length  #####
+    ######## step 3: simplify MML and and find length  #####
     ######## and grab the corresponding PNG and latex ############
     print("preparing dataset...")
 
-    final_paths = list()
-    count = 0
-    for apidx, ap in enumerate(all_paths):
+    # opening a temporary folder to store temp files
+    # this folder will be deleted at the end of the run.
+    # It is created to help expediting the process by avoiding
+    # Lock functionality.
+    temp_folder = f"{os.getcwd()}/sampling_dataset/temp_folder"
+    if not os.path.exists(temp_folder):
+        os.mkdir(temp_folder)
 
-        if count % 10000 == 0:
-            # lock.acquire()
-            print("current status...")
-            print(counter_dist_dict)
-            # lock.release()
+    for batch_paths in list(divide_all_paths_into_chunks(all_paths)):
+        if not distribution_achieved:
+            all_files = [[i,ap] for i,ap in enumerate(batch_paths)]
+            with mp.Pool(config["num_cpus"]) as pool:
+                result = pool.map(prepare_dataset, all_files)
 
-        if count <= total_eqns:
-            yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-            mml_path = os.path.join(
-                root,
-                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-            )
-
-            mml = open(mml_path).readlines()[0]
-            open("smr.txt", "w").write(mml)
-
-            cwd = os.getcwd()
-            cmd = ["python", f"{cwd}/sampling_dataset/simp.py"]
-            output = subprocess.Popen(
-                cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-            )
-            my_timer = Timer(5, kill, [output])
-
-            try:
-                my_timer.start()
-                stdout, stderr = output.communicate()
-                simp_mml = open("sm.txt").readlines()[0]
-                length_mml = len(simp_mml.split())
-                # finding the bin
-                temp_dict = {}
-                for i in range(50, 400, 50):
-                    if length_mml / i < 1:
-                        temp_dict[i] = length_mml / i
-
-                # get the bin
-                if len(temp_dict) >= 1:
-                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                else:
-                    tgt_bin = "350+"
-
-                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                    counter_dist_dict[tgt_bin] += 1
-                    final_paths.append(ap)
-                    count += 1
-
-            except:
-                print(f"taking too long time. skipping {ap} equation...")
-
-            finally:
-                my_timer.cancel()
+            # clean the temp_folder after completeing the batch
+            clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
+            subprocess.run(clean_cmd)
         else:
+            # remove temp_folder
+            shutil.rmtree(temp_folder)
             break
+
+
+    ######## step 4: writing the final dataset ########
+
+    global final_paths
 
     # random shuffle twice
     random.shuffle(final_paths)

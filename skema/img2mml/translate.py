@@ -131,6 +131,7 @@ def define_model(
     n_heads = config["n_xfmer_heads"]
     n_xfmer_encoder_layers = config["n_xfmer_encoder_layers"]
     n_xfmer_decoder_layers = config["n_xfmer_decoder_layers"]
+    len_dim = 930
 
     enc = {
         "CNN": CNN_Encoder(input_channels, dec_hid_dim, dropout, device),
@@ -143,6 +144,7 @@ def define_model(
             max_len,
             n_xfmer_encoder_layers,
             dim_feedfwd,
+            len_dim
         ),
     }
     dec = Transformer_Decoder(
