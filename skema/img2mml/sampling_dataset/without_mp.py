@@ -174,10 +174,10 @@ def main():
             )
 
             mml = open(mml_path).readlines()[0]
-            open("smr.txt", "w").write(mml)
+            open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_0.txt", "w").write(mml)
 
             cwd = os.getcwd()
-            cmd = ["python", f"{cwd}/sampling_dataset/simp.py"]
+            cmd = ["python", f"{cwd}/sampling_dataset/simp.py", "0"]
             output = subprocess.Popen(
                 cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
             )
@@ -186,7 +186,7 @@ def main():
             try:
                 my_timer.start()
                 stdout, stderr = output.communicate()
-                simp_mml = open("sm.txt").readlines()[0]
+                simp_mml = open(f"{os.getcwd()}/sampling_dataset/temp_folder/sm_0.txt").readlines()[0]
                 length_mml = len(simp_mml.split())
                 # finding the bin
                 temp_dict = {}
@@ -272,5 +272,5 @@ def main():
             reject += 1
             pass
 
-os.remove("sm.txt")
-os.remove("smr.txt")
+os.remove(f"{os.getcwd()}/sampling_dataset/temp_folder/sm.txt")
+os.remove(f"{os.getcwd()}/sampling_dataset/temp_folder/smr.txt")
