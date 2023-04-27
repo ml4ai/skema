@@ -2,7 +2,10 @@ openapi: 3.0.0
 info:
   title: SKEMA API
   version: "1.0.1"
-  description: RESTful API exposing functionality of the SKEMA project
+  description: |
+    RESTful API exposing functionality of the SKEMA project
+
+    Some supporting components are supplied by [Document](/api/document).
   contact:
     name: Clayton T. Morrison
     email: claytonm@arizona.edu
@@ -98,15 +101,13 @@ paths:
                 type: array
                 description: for each of the input texts, output from the text reading pipeline
                 items:
-                  type: array
-                  description: output from the text reading pipeline for a single text
-                  items:
-                    $ref: "/assets/schema/document.yaml#components/schemas/Document"
+                  $ref: "#/components/schemas/DocumentsAndMentions"
 
 components:
   schemas:
     Annotation:
       type: string
+
     GroundingCandidate:
         type: object
         description: a ranked list of k grounding concepts
@@ -154,3 +155,205 @@ components:
                 maxItems: 200
                 items: 
                   type: number
+
+    DocumentsAndMentions:
+      type: object
+      description: description
+      required:
+        - mentions
+        - documents
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: "/assets/schema/document.yaml#components/schemas/Document"
+        mentions:
+          type: array
+          items:
+            $ref: "#components/schemas/AutomatesMention"
+
+    AutomatesMention:
+      oneOf:
+        - $ref: "#components/schemas/TextBoundMention"
+        - $ref: "#components/schemas/RelationMention"
+        - $ref: "#components/schemas/EventMention"
+        - $ref: "#components/schemas/CrossSentenceEventMention"
+
+    TextBoundMention:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [TextBoundMention]
+        text:
+          type: string
+        labels:
+          type: array
+          items:
+            type: string
+        tokenInterval:
+          $ref: "#/components/schemas/TokenInterval"
+        characterStartOffset:
+          type: integer
+        characterEndOffset:
+          type: integer
+        sentence:
+          $ref: "#/components/schemas/Sentence"
+        document:
+          type: string
+        keep:
+          type: boolean
+        foundBy:
+          type: string
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/AutomatesAttachment"
+
+    AutomatesAttachment:
+      oneOf:
+        - $ref: "#/components/schemas/GroundingAttachment"
+        - $ref: "#/components/schemas/LocationContextAttachment"
+        - $ref: "#/components/schemas/TimeContextAttachment"
+        - $ref: "#/components/schemas/MentionLocationAttachment"
+        - $ref: "#/components/schemas/DiscontinuousCharOffsetAttachment"
+        - $ref: "#/components/schemas/ParamSetAttachment"
+        - $ref: "#/components/schemas/ParamSettingIntAttachment"
+        - $ref: "#/components/schemas/UnitAttachment"
+        - $ref: "#/components/schemas/ContextAttachment"
+        - $ref: "#/components/schemas/FunctionAttachment"
+
+    FunctionAttachment:
+      type: object
+      properties:
+        attType:
+          type: string
+        trigger:
+          type: string
+        foundBy:
+          type: string
+
+    ContextAttachment:
+      type: object
+      properties:
+        contexts:
+          type: string # TODO this starts out as json
+        attType:
+          type: string
+        foundBy:
+          type: string
+
+    UnitAttachment:
+      type: object
+      properties:
+        attachedTo:
+          type: string
+        attType:
+          type: string
+
+    ParamSettingIntAttachment:
+      type: object
+      properties:
+        inclusiveLower:
+          type: boolean
+          nullable: true
+        inclusiveUpper:
+          type: boolean
+          nullable: true
+        attachedTo:
+          type: string
+        attType:
+          type: string
+
+    ParamSetAttachment:
+      type: object
+      properties:
+        attachedTo:
+          type: string
+        attType:
+          type: string
+
+    DiscontinuousCharOffsetAttachment:
+      type: object
+      properties:
+        charOffsets:
+          type: array
+          items:
+            type: array
+            items:
+              type: integer
+            minItems: 2
+            maxItems: 2
+        attType:
+          type: string
+
+    MentionLocationAttachment:
+      type: object
+      properties:
+        filename: 
+          type: string
+        pageNum:
+          type: array
+          items:
+            type: integer
+        blockIdx:
+          type: array
+          items:
+            type: integer
+        attType:
+          type: string
+
+    TimeContextAttachment:
+      type: object
+      properties:
+        scenarioTime:
+          type: array
+          items:
+            type: string
+            uniqueItems: true
+
+    LocationContextAttachment:
+      type: object
+      properties:
+        scenarioLocation:
+          type: array
+          items:
+            type: string
+            uniqueItems: true
+
+    GroundingAttachment:
+      type: array
+      items:
+        $ref: "#/components/schemas/AutomatesGroundingCandidate"
+
+    AutomatesGroundingCandidate:
+      type: object
+      properties:
+        name:
+          type: string
+        id:
+          type: string
+        score:
+          type: number
+
+    TokenInterval:
+      type: object
+      properties:
+        start:
+          type: integer
+        end:
+          type: integer
+
+    RelationMention: # TODO continue here
+      type: object
+
+    EventMention: # TODO
+      type: object
+
+    CrossSentenceEventMention: # TODO
+      type: object
+
+    Sentence: # TODO
+      type: object
