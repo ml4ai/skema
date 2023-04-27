@@ -220,11 +220,14 @@ def main():
 
             # update thhe distribution
             for i,ap in enumerate(all_files):
+                print("========="*4)
                 print(i)
                 simp_mml = open(
                     f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
                 )
                 simp_mml = simp_mml.readlines()[0]
+                print(" ")
+                print(simp_mml)
                 length_mml = len(simp_mml.split())
 
                 # finding the bin
