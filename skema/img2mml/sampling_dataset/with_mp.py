@@ -221,7 +221,7 @@ def main():
             # update thhe distribution
             for af in all_files:
                 i,ap = af
-                
+
                 try:
                     simp_mml = open(
                         f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
@@ -245,7 +245,6 @@ def main():
                     if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                         counter_dist_dict[tgt_bin] += 1
                         final_paths.append(ap)
-                        print(ap)
                         count += 1
                 except:
                     pass
@@ -259,9 +258,8 @@ def main():
             shutil.rmtree(temp_folder)
             break
 
-    print("final distribution: ")
-    print(counter_dist_dict)
-    print("final_paths length: ", len(final_paths))
+    print("final distribution: ", counter_dist_dict)
+    print("total equations: ", len(final_paths))
 
     ######## step 4: writing the final dataset ########
 
@@ -274,51 +272,51 @@ def main():
     reject = 0
     c_idx = 0
     for fpidx, fp in enumerate(final_paths):
-        # try:
-        yr, month, folder, type_of_eqn, eqn_num = fp.split("_")
+        try:
+            yr, month, folder, type_of_eqn, eqn_num = fp.split("_")
 
-        # copying image
-        img_src = os.path.join(
-            root,
-            f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
-        )
-        img_dst = os.path.join(images_path, f"{c_idx}.png")
-        CP(img_src, img_dst)
+            # copying image
+            img_src = os.path.join(
+                root,
+                f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+            )
+            img_dst = os.path.join(images_path, f"{c_idx}.png")
+            CP(img_src, img_dst)
 
-        # wrting path
-        paths_file.write(fp + "\n")
+            # wrting path
+            paths_file.write(fp + "\n")
 
-        # writing MathML
-        mml_path = os.path.join(
-            root,
-            f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-        )
+            # writing MathML
+            mml_path = os.path.join(
+                root,
+                f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+            )
 
-        mml = open(mml_path).readlines()[0]
+            mml = open(mml_path).readlines()[0]
 
-        if "\n" not in mml:
-            mml = mml + "\n"
-        mml_file.write(mml)
+            if "\n" not in mml:
+                mml = mml + "\n"
+            mml_file.write(mml)
 
-        # writing latex
-        latex_path = os.path.join(
-            root,
-            f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-        )
-        latex_arr = open(latex_path).readlines()
-        if len(latex_arr) > 1:
-            latex = " "
-            for l in latex_arr:
-                latex = latex + l.replace("\n", "")
-        else:
-            latex = latex_arr[0]
+            # writing latex
+            latex_path = os.path.join(
+                root,
+                f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+            )
+            latex_arr = open(latex_path).readlines()
+            if len(latex_arr) > 1:
+                latex = " "
+                for l in latex_arr:
+                    latex = latex + l.replace("\n", "")
+            else:
+                latex = latex_arr[0]
 
-        if "\n" not in latex:
-            latex = latex + "\n"
-        latex_file.write(latex)
+            if "\n" not in latex:
+                latex = latex + "\n"
+            latex_file.write(latex)
 
-        c_idx += 1
+            c_idx += 1
 
-        # except:
-        #     reject += 1
-        #     pass
+        except:
+            reject += 1
+            pass
