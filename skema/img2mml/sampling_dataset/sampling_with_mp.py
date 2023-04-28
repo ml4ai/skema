@@ -157,9 +157,11 @@ def create_dataset(dataset_name):
 
     if not os.path.exists(data_path):
         os.mkdir(data_path)
+        os.mkdir(images_path)
     else:
         shutil.rmtree(data_path)
         os.mkdir(data_path)
+        os.mkdir(images_path)
         print(
             "sample_data already exists. Removing old sample_data and replacing it with new one."
         )
@@ -237,7 +239,6 @@ def create_dataset(dataset_name):
             # collect equations without boldface
             if path not in boldface_list_set:
                 final_paths.append(path)
-                print(path)
                 count += 1
         else:
             break
