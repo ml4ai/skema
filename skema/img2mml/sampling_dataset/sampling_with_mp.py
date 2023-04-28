@@ -301,5 +301,5 @@ def create_dataset(dataset_name):
             reject += 1
             pass
 
-    print("final distribution: ", counter_dist_dict)
+    # print("final distribution: ", counter_dist_dict)
     print("total equations: ", c_idx)
