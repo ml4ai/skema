@@ -170,7 +170,7 @@ def preprocess_images(image):
 
 
 def main():
-
+    global config
     # get config
     config = get_config(sys.argv[-1])
 
