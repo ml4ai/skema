@@ -10,6 +10,8 @@ import multiprocessing
 from multiprocessing import Pool, Lock, TimeoutError
 import sys
 
+config = None
+
 def get_config(config_path):
     with open(config_path, "r") as cfg:
         config = json.load(cfg)
