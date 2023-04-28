@@ -26,42 +26,24 @@ root = config["src_path"]
 # setting seed
 random.seed(config["seed"])
 
-# create destination files and directory
-data_path = "training_data/sample_data"
-images_path = os.path.join(data_path, "images")
+# # distribution
+# dist_dict = dict()
+# counter_dist_dict = dict()
+total_eqns = 100000  # Collect 100000 equations
 
-if not os.path.exists(data_path):
-    os.mkdir(data_path)
+# # initialize the dist_dict
+# for i in range(0, 350, 50):
+#     begin = str(i)
+#     end = str(i + 50)
+#     key = f"{begin}-{end}"
+#     dist_dict[key] = config[f"{begin}-{end}"]
+#     total_eqns += config[f"{begin}-{end}"]
+#     counter_dist_dict[key] = 0
+#
+# dist_dict["350+"] = config["350+"]
+# total_eqns += config["350+"]
+# counter_dist_dict["350+"] = 0
 
-if not os.path.exists(images_path):
-    os.mkdir(images_path)
-else:
-    print(
-        "sample_data already exists. Removing old sample_data and replacing it with new one."
-    )
-    shutil.rmtree(images_path)
-    os.mkdir(images_path)
-
-mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
-latex_file = open(os.path.join(data_path, "original_latex.lst"), "w")
-paths_file = open(os.path.join(data_path, "paths.lst"), "w")
-
-# distribution
-dist_dict = dict()
-counter_dist_dict = dict()
-total_eqns = 0
-
-# initialize the dist_dict
-for i in range(0, 350, 50):
-    begin = str(i)
-    end = str(i + 50)
-    key = f"{begin}-{end}"
-    dist_dict[key] = config[f"{begin}-{end}"]
-    total_eqns += config[f"{begin}-{end}"]
-    counter_dist_dict[key] = 0
-dist_dict["350+"] = config["350+"]
-total_eqns += config["350+"]
-counter_dist_dict["350+"] = 0
 
 final_paths = list()
 count = 0
@@ -139,8 +121,55 @@ def prepare_dataset(args):
 kill = lambda process: process.kill()
 
 
-def create_dataset(dataset):
-    print("Generating the {} dataset".format(dataset))
+# Load the boldface list
+def process_boldface_list(filepath):
+    def convert_filename(filepath):
+        split_path = filepath.split("/")
+        year = split_path[5]
+        month = split_path[6]
+        paper = split_path[8]
+        size = split_path[9].split("_")[0]
+        eqn_num = split_path[10].split(".")[0]
+        new_filename = f"{year}_{month}_{paper}_{size}_{eqn_num}"
+
+        return new_filename
+
+    # Read file
+    with open(filepath) as f:
+        lines = f.readlines()
+
+    # Process each line
+    processed_names = []
+    for line in lines:
+        line = line.strip()
+        if line != "":
+            new_name = convert_filename(line)
+            processed_names.append(new_name)
+
+    return processed_names
+
+
+def create_dataset(dataset_name):
+    print("Generating the {} dataset".format(dataset_name))
+    # create destination files and directory
+    data_path = "training_data/{}_sample_data".format(dataset_name)
+    images_path = os.path.join(data_path, "images")
+
+    if not os.path.exists(data_path):
+        os.mkdir(data_path)
+    else:
+        shutil.rmtree(data_path)
+        os.mkdir(data_path)
+        print(
+            "sample_data already exists. Removing old sample_data and replacing it with new one."
+        )
+
+    mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
+    latex_file = open(os.path.join(data_path, "original_latex.lst"), "w")
+    paths_file = open(os.path.join(data_path, "paths.lst"), "w")
+
+    boldface_list = process_boldface_list("data_generation/boldface_list.txt")
+
     global count, total_eqns, final_paths
     global lock, counter_dist_dict, dist_dict, chunk_size
 
@@ -149,9 +178,7 @@ def create_dataset(dataset):
 
     (1) All the MathML eqn paths will be collected in 'all_paths'.
     (2) They will be randomly shuffled twice to ensure proper shuffling.
-    (3) They will sequentially be fetched and will be distributed according to the
-        length as per the distribution. The length of the preprocessed simplified
-        MathML used will be used to final distribution bin.
+    (3) They will sequentially be fetched. In the arvix dateset, we will ensure 50K equations with boldface.
     (4) Corresponding Latex and PNG will fetched and stored.
 
     """
@@ -187,69 +214,31 @@ def create_dataset(dataset):
     print("shuffling all the paths to create randomness...")
     random.shuffle(all_paths)
     random.shuffle(all_paths)
+    random.shuffle(boldface_list)
+    random.shuffle(boldface_list)
 
-    ######## step 3: simplify MML and and find length  #####
-    ######## and grab the corresponding PNG and latex ############
+    ######## step 3: grab the corresponding PNG and latex  #####
     print("preparing dataset...")
 
-    # opening a temporary folder to store temp files
-    # this folder will be deleted at the end of the run.
-    # It is created to help expediting the process by avoiding
-    # Lock functionality.
-    temp_folder = f"{os.getcwd()}/sampling_dataset/temp_folder"
-    if not os.path.exists(temp_folder):
-        os.mkdir(temp_folder)
+    # Add 50000 equations with boldface to the dataset
+    if len(boldface_list) > 50000:
+        final_paths = boldface_list[:50000]
+        count = 50000
+    else:
+        final_paths = boldface_list
+        count = len(boldface_list)
 
-    for batch_paths in list(divide_all_paths_into_chunks(all_paths)):
+    boldface_list_set = set(boldface_list)
+    for path in all_paths:
         if count <= total_eqns:
-            if count % 100 == 0:
-                print(counter_dist_dict)
+            if count % 1000 == 0:
+                print("{} equations collected.".format(count))
 
-            all_files = list()
-            for i, ap in enumerate(batch_paths):
-                all_files.append([i, ap])
-
-            with mp.Pool(config["num_cpus"]) as pool:
-                result = pool.map(prepare_dataset, all_files)
-
-            # update thhe distribution
-            for af in all_files:
-                i, ap = af
-
-                try:
-                    simp_mml = open(
-                        f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
-                    )
-                    simp_mml = simp_mml.readlines()[0]
-                    length_mml = len(simp_mml.split())
-
-                    # finding the bin
-                    temp_dict = {}
-                    for i in range(50, 400, 50):
-                        if length_mml / i < 1:
-                            temp_dict[i] = length_mml / i
-
-                    # get the bin
-                    if len(temp_dict) >= 1:
-                        max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                        tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                    else:
-                        tgt_bin = "350+"
-
-                    if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                        counter_dist_dict[tgt_bin] += 1
-                        final_paths.append(ap)
-                        count += 1
-                except:
-                    pass
-
-            # clean the temp_folder after completeing the batch
-            clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
-            subprocess.run(clean_cmd)
-
+            # collect equations without boldface
+            if path not in boldface_list_set:
+                final_paths.append(path)
+                count += 1
         else:
-            # remove temp_folder
-            shutil.rmtree(temp_folder)
             break
 
     ######## step 4: writing the final dataset ########
