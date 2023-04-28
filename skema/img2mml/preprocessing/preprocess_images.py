@@ -8,7 +8,7 @@ from torchvision import transforms
 from PIL import Image
 import multiprocessing
 from multiprocessing import Pool, Lock, TimeoutError
-
+import sys
 
 def get_config(config_path):
     with open(config_path, "r") as cfg:
