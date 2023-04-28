@@ -237,6 +237,7 @@ def create_dataset(dataset_name):
             # collect equations without boldface
             if path not in boldface_list_set:
                 final_paths.append(path)
+                print(path)
                 count += 1
         else:
             break
