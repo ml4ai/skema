@@ -41,7 +41,7 @@ directories = config["months"].split(",")
 years = config["years"].split(",")
 verbose = config["verbose"]
 num_cpus = config["num_cpus"]
-
+random.seed(config["seed"])
 
 def main(year):
     for month_dir in directories:
