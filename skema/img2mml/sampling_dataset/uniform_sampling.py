@@ -1,24 +1,13 @@
 import os, json, random
 import shutil
-import threading
-import subprocess
-from threading import Timer
 from shutil import copyfile as CP
-from preprocessing.preprocess_mml import simplification
-import multiprocessing as mp
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
 
-global final_paths, count, lock, total_eqns, verbose, chunk_size
-global distribution_achieved, counter_dist_dict, dist_dict
-
 verbose = config["verbose"]
-
-# chink_size for multiprocessing
-chunk_size = config["chunk_size"]
 
 # src path
 root = config["src_path"]
@@ -26,28 +15,9 @@ root = config["src_path"]
 # setting seed
 random.seed(config["seed"])
 
-# # distribution
-# dist_dict = dict()
-# counter_dist_dict = dict()
 total_eqns = 100000  # Collect 100000 equations
-
-# # initialize the dist_dict
-# for i in range(0, 350, 50):
-#     begin = str(i)
-#     end = str(i + 50)
-#     key = f"{begin}-{end}"
-#     dist_dict[key] = config[f"{begin}-{end}"]
-#     total_eqns += config[f"{begin}-{end}"]
-#     counter_dist_dict[key] = 0
-#
-# dist_dict["350+"] = config["350+"]
-# total_eqns += config["350+"]
-# counter_dist_dict["350+"] = 0
-
-
 final_paths = list()
 count = 0
-lock = mp.Lock()
 
 
 def get_paths(yr, yr_path, month):
@@ -69,56 +39,12 @@ def get_paths(yr, yr_path, month):
     return temp_files
 
 
-def divide_all_paths_into_chunks(all_paths):
-    global chunk_size
-    for i in range(0, len(all_paths), chunk_size):
-        yield all_paths[i : i + chunk_size]
-
-
 def copy_image(img_src, img_dst):
     try:
         CP(img_src, img_dst)
         return True
     except:
         return False
-
-
-def prepare_dataset(args):
-    # global total_eqns, distribution_achieved, lock, dist_dict
-    # global count, total_eqns, distribution_achieved, final_paths, lock, counter_dist_dict, dist_dict
-
-    i, ap = args
-    yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-    mml_path = os.path.join(
-        root,
-        f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
-    )
-
-    mml = open(mml_path).readlines()[0]
-    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(mml)
-
-    cwd = os.getcwd()
-    cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
-    output = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    my_timer = Timer(5, kill, [output])
-
-    try:
-        my_timer.start()
-        stdout, stderr = output.communicate()
-
-    except:
-        if verbose:
-            lock.acquire()
-            print("current status: ", counter_dist_dict)
-            print(f"taking too long time. skipping {ap} equation...")
-            lock.release()
-
-    finally:
-        my_timer.cancel()
-
-
-# Function to kill process if TimeoutError occurs
-kill = lambda process: process.kill()
 
 
 # Load the boldface list
@@ -149,10 +75,10 @@ def process_boldface_list(filepath):
     return processed_names
 
 
-def create_dataset(dataset_name):
-    print("Generating the {} dataset".format(dataset_name))
+def create_dataset():
+    print("Generating the arxiv dataset")
     # create destination files and directory
-    data_path = "training_data/{}_sample_data".format(dataset_name)
+    data_path = "training_data/arxiv_sample_data"
     images_path = os.path.join(data_path, "images")
 
     if not os.path.exists(data_path):
@@ -163,7 +89,7 @@ def create_dataset(dataset_name):
         os.mkdir(data_path)
         os.mkdir(images_path)
         print(
-            "sample_data already exists. Removing old sample_data and replacing it with new one."
+            "arxiv_sample_data already exists. Removing old sample_data and replacing it with new one."
         )
 
     mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
@@ -171,9 +97,6 @@ def create_dataset(dataset_name):
     paths_file = open(os.path.join(data_path, "paths.lst"), "w")
 
     boldface_list = process_boldface_list("data_generation/boldface_list.txt")
-
-    global count, total_eqns, final_paths
-    global lock, counter_dist_dict, dist_dict, chunk_size
 
     """
     Sampling Steps:
@@ -303,5 +226,4 @@ def create_dataset(dataset_name):
             reject += 1
             pass
 
-    # print("final distribution: ", counter_dist_dict)
     print("total equations: ", c_idx)
