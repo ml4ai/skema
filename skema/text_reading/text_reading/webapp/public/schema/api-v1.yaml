@@ -158,17 +158,19 @@ components:
 
     DocumentsAndMentions:
       type: object
-      description: description
+      description: todo
       required:
         - mentions
         - documents
       properties:
         documents:
           type: array
+          description: todo
           items:
             $ref: "/assets/schema/document.yaml#components/schemas/Document"
         mentions:
           type: array
+          description: todo
           items:
             $ref: "#components/schemas/AutomatesMention"
 
@@ -181,36 +183,64 @@ components:
 
     TextBoundMention:
       type: object
+      description: todo
+      required:
+        - id
+        - type
+        - text
+        - labels
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+        - attachments
       properties:
         id:
           type: string
+          description: todo
         type:
-          type: string
-          enum: [TextBoundMention]
+          description: an identifier for this mention type
+          enum: 
+            - TextBoundMention
         text:
           type: string
+          description: enclosing text span corresponding to this mention
         labels:
           type: array
+          description: the labels for this mention
           items:
             type: string
         tokenInterval:
-          $ref: "#/components/schemas/TokenInterval"
+          $ref: "#/components/schemas/Interval"
         characterStartOffset:
           type: integer
+          description: todo
+          format: int32
         characterEndOffset:
           type: integer
+          description: todo
+          format: int32
         sentence:
           $ref: "#/components/schemas/Sentence"
+          description: the sentence text that encompasses this mention
         document:
           type: string
+          description: an identifier for the source document from which this mention originates
         keep:
           type: boolean
+          description: todo
         foundBy:
           type: string
+          description: todo
         attachments:
           type: array
+          description: todo
           items:
             $ref: "#/components/schemas/AutomatesAttachment"
+          uniqueItems: true
 
     AutomatesAttachment:
       oneOf:
@@ -226,99 +256,165 @@ components:
         - $ref: "#/components/schemas/FunctionAttachment"
 
     FunctionAttachment:
+      required:
+        - attType
+        - trigger
+        - foundBy
       type: object
+      description: todo
       properties:
         attType:
           type: string
+          description: todo
         trigger:
           type: string
+          description: todo
         foundBy:
           type: string
+          description: todo
 
     ContextAttachment:
       type: object
+      description: todo
+      required:
+        - contexts
+        - attType
+        - foundBy
       properties:
         contexts:
           type: string # TODO this starts out as json
+          description: todo
         attType:
           type: string
+          description: todo
         foundBy:
           type: string
+          description: todo
 
     UnitAttachment:
       type: object
+      description: todo
+      required:
+        - attachedTo
+        - attType
       properties:
         attachedTo:
           type: string
+          description: todo
         attType:
           type: string
+          description: todo
 
     ParamSettingIntAttachment:
       type: object
+      description: todo
+      required:
+      - inclusiveLower
+      - inclusiveUpper
+      - attachedTo
+      - attType
       properties:
         inclusiveLower:
           type: boolean
+          description: todo
           nullable: true
         inclusiveUpper:
           type: boolean
+          description: todo
           nullable: true
         attachedTo:
           type: string
+          description: todo
         attType:
           type: string
+          description: todo
 
     ParamSetAttachment:
       type: object
+      description: todo
+      required:
+        - attachedTo
+        - attType
       properties:
         attachedTo:
           type: string
+          description: todo
         attType:
           type: string
+          description: todo
 
     DiscontinuousCharOffsetAttachment:
       type: object
+      description: todo
+      required:
+        - charOffsets
+        - attType
       properties:
         charOffsets:
           type: array
+          description: todo
           items:
             type: array
+            description: todo
             items:
               type: integer
+              format: int32
             minItems: 2
             maxItems: 2
         attType:
           type: string
+          description: todo
 
     MentionLocationAttachment:
       type: object
+      description: todo
+      required:
+        - filename
+        - pageNum
+        - blockIdx
+        - attType
       properties:
         filename: 
           type: string
+          description: todo
         pageNum:
           type: array
+          description: todo
           items:
             type: integer
+            format: int32
         blockIdx:
           type: array
+          description: todo
           items:
             type: integer
+            format: int32
         attType:
           type: string
+          description: todo
 
     TimeContextAttachment:
       type: object
+      description: todo
+      required:
+        - scenarioTime
       properties:
         scenarioTime:
           type: array
+          description: todo
           items:
             type: string
             uniqueItems: true
 
     LocationContextAttachment:
       type: object
+      description: todo
+      required:
+        - scenarioLocation
       properties:
         scenarioLocation:
           type: array
+          description: todo
           items:
             type: string
             uniqueItems: true
@@ -330,30 +426,373 @@ components:
 
     AutomatesGroundingCandidate:
       type: object
+      description: todo
+      required:
+        - name
+        - id
+        - score
       properties:
         name:
           type: string
+          description: todo
         id:
           type: string
+          description: todo
         score:
           type: number
+          description: todo
 
-    TokenInterval:
+    Interval:
       type: object
+      required:
+        - start
+        - end
       properties:
         start:
           type: integer
+          description: inclusive start of of interval
+          format: int32
         end:
           type: integer
+          description: exclusive end of the interval
+          format: int32
 
-    RelationMention: # TODO continue here
+    RelationMention:
       type: object
+      description: TODO
+      required:
+        - type
+        - id
+        - text
+        - labels
+        - arguments
+        - paths
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+        - attachments
+      properties:
+        type:
+          type: string
+          description: an identifier for this mention type
+          enum:
+            - TextBoundMention
+        id:
+          type: string
+          description: todo
+        text:
+          type: string
+          description: enclosing text span corresponding to this mention
+        labels:
+          type: array
+          description: the labels for this mention
+          items:
+            type: string
+        arguments:
+          $ref: "#/components/schemas/Arguments"
+        paths:
+          $ref: "#/components/schemas/Paths"
+        tokenInterval:
+          $ref: "#/components/schemas/Interval"
+        characterStartOffset:
+          type: integer
+          description: todo
+          format: int32
+        characterEndOffset:
+          type: integer
+          description: todo
+          format: int32
+        sentence:
+          $ref: "#/components/schemas/Sentence"
+          description: the sentence text that encompasses this mention
+        document:
+          description: an identifier for the source document from which this mention originates
+        keep:
+          type: boolean
+          description: todo
+        foundBy:
+          type: string
+          description: the name of the rule responsible for detecting this mention
+        attachments:
+          type: array
+          description: todo
+          items:
+            $ref: "#/components/schemas/AutomatesAttachment"
+          uniqueItems: true
 
-    EventMention: # TODO
+    EventMention:
       type: object
+      description: todo
+      required:
+        - type
+        - id
+        - text
+        - labels
+        - trigger
+        - arguments
+        - paths
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+        - attachments
+      properties:
+        type:
+          type: string
+          description: an identifier for this mention type
+          enum:
+            - EventMention
+        id:
+          type: string
+          description: todo
+        text:
+          type: string
+          description: enclosing text span corresponding to this mention
+        labels:
+          type: array
+          description: the labels for this mention
+          items:
+            type: string
+        trigger:
+            $ref: "#/components/schemas/TextBoundMention"
+            description: a predicate that signals this particular relation
+        arguments:
+          $ref: "#/components/schemas/Arguments"
+        paths:
+          $ref: "#/components/schemas/Paths"
+        tokenInterval:
+          $ref: "#/components/schemas/Interval"
+        characterStartOffset:
+          description: todo
+          type: integer
+          format: int32
+        characterEndOffset:
+          description: todo
+          type: integer
+          format: int32
+        sentence:
+          $ref: "#/components/schemas/Sentence"
+          description: the sentence text that encompasses this mention
+        document:
+          type: string
+          description: an identifier for the source document from which this mention originates
+        keep:
+          type: boolean
+          description: todo
+        foundBy:
+          type: string
+          description: todo
+        attachments:
+          type: array
+          description: todo
+          items:
+            $ref: "#/components/schemas/AutomatesAttachment"
+          uniqueItems: true
 
-    CrossSentenceEventMention: # TODO
+    CrossSentenceEventMention:
       type: object
+      description: todo
+      required:
+        - type
+        - id
+        - text
+        - labels
+        - trigger
+        - arguments
+        - paths
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+        - attachments
+      properties:
+        type:
+          type: string
+          description: an identifier for this mention type
+          enum:
+            - CrossSentenceEventMention
+        id:
+          type: string
+          description: todo
+        text:
+          type: string
+          description: enclosing text span corresponding to this mention
+        labels:
+          type: array
+          description: the labels for this mention
+          items:
+            type: string
+        trigger:
+            $ref: "#/components/schemas/TextBoundMention"
+            description: a predicate that signals this particular relation
+        arguments:
+          $ref: "#/components/schemas/Arguments"
+        paths:
+          $ref: "#/components/schemas/Paths"
+        tokenInterval:
+          $ref: "#/components/schemas/Interval"
+        characterStartOffset:
+          type: integer
+          description: todo
+          format: int32
+        characterEndOffset:
+          type: integer
+          description: todo
+          format: int32
+        sentence:
+          $ref: "#/components/schemas/Sentence"
+          description: the sentence text that encompasses this mention
+        document:
+          type: string
+          description: an identifier for the source document from which this mention originates
+        keep:
+          type: boolean
+          description: todo
+        foundBy:
+          type: string
+          description: the name of the rule responsible for detecting this mention
+        attachments:
+          type: array
+          description: todo
+          items:
+            $ref: "#/components/schemas/AutomatesAttachment"
+          uniqueItems: true
 
-    Sentence: # TODO
+    Arguments:
       type: object
+      description: todo
+      additionalProperties:
+        type: array
+        description: todo
+        items:
+          $ref: "#/components/schemas/AutomatesMention"
+
+    Paths:
+      type: object
+      description: todo
+      nullable: true
+      additionalProperties:
+        type: array
+        description: todo
+        items:
+          $ref: "#/components/schemas/Edge"
+
+    Edge:
+      type: object
+      description: todo
+      required:
+        - source
+        - destination
+        - relation
+      properties:
+        source:
+          type: integer
+          description: the token index for the source vertex
+          format: int32
+        destination:
+          type: integer
+          description: the token index for the destination vertex
+          format: int32
+        relation:
+          type: string
+          description: the relation to which this Edge corresponds
+
+    Sentence:
+      type: object
+      required:
+        - words
+        - startOffsets
+        - endOffsets
+        - raw
+        - tags
+        - lemmas
+        - entities
+        - norms
+        - chunks
+        - graphs
+      properties:
+        words:
+          type: array
+          description: the tokens for this sentence
+          items:
+            type: string
+        startOffsets:
+          type: array
+          description: the character-based start offset for each token in this sentence
+          items:
+            type: integer
+            format: int32
+        endOffsets:
+          type: array
+          description: the character-based end offset for each token in this sentence
+          items:
+            type: integer
+            format: int32
+        raw:
+          type: array
+          description: todo
+          items:
+            type: string
+        tags:
+          type: array
+          description: the part of speech tag for each token in this sentence
+          items:
+            type: string
+        lemmas:
+          type: array
+          description: the lemma form of each token in this sentence
+          items:
+            type: string
+        entities:
+          type: array
+          description: the BIO-style entity label for each token in this sentence
+          items:
+            type: string
+        norms:
+          type: array
+          description: todo
+          items:
+            type: string
+        chunks:
+          type: array
+          description: the BIO-style chunk label designating a coarse XP assignment for each token in this sentence
+          items:
+            type: string
+        graphs:
+          $ref: "#/components/schemas/GraphMap"
+
+    GraphMap:
+      type: object
+      description: map of graph name -> DirectedGraph
+      additionalProperties:
+        $ref: "#/components/schemas/DirectedGraph"
+
+    DirectedGraph:
+      type: object
+      description: todo
+      required:
+        - edges
+        - roots
+      properties:
+        edges:
+          type: array
+          description: the edges comprising this graph
+          items:
+            $ref: "#/components/schemas/Edge"
+        roots:
+          type: array
+          description: the token indices corresponding to the root nodes for this DirectedGraph
+          items:
+            type: integer
+            format: int32
+            uniqueItems: true
