@@ -2,7 +2,7 @@
 inspired by  https://github.com/harvardnlp/im2markup/blob/master/scripts/utils/image_utils.py
 """
 
-import torch, os, json, argparse
+import torch, os, json, argparse, sys
 import numpy as np
 from torchvision import transforms
 from PIL import Image
