@@ -161,9 +161,9 @@ components:
         - documents
       properties:
         documents:
-          type: array
+          type: object
           description: todo
-          items:
+          additionalProperties:
             $ref: "#/components/schemas/Document"
         mentions:
           type: array
