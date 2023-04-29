@@ -2,10 +2,7 @@ openapi: 3.0.0
 info:
   title: SKEMA API
   version: "1.0.1"
-  description: |
-    RESTful API exposing functionality of the SKEMA project
-
-    Some supporting components are supplied by [Document](/api/document).
+  description: RESTful API exposing functionality of the SKEMA project
   contact:
     name: Clayton T. Morrison
     email: claytonm@arizona.edu
@@ -167,12 +164,22 @@ components:
           type: array
           description: todo
           items:
-            $ref: "/assets/schema/document.yaml#components/schemas/Document"
+            $ref: "#/components/schemas/Document"
         mentions:
           type: array
           description: todo
           items:
             $ref: "#components/schemas/AutomatesMention"
+
+    Document:
+      type: object
+      description: todo
+      required:
+        - id
+      properties:
+        id:
+          type: string
+
 
     AutomatesMention:
       oneOf:
