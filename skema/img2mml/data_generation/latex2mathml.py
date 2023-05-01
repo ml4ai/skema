@@ -1,12 +1,15 @@
 # CONVERT LaTeX EQUATION TO MathML CODE USING MathJax
+import time
+
 import requests
 import subprocess, os
 import json
 import multiprocessing
 import logging
 from datetime import datetime
-from multiprocessing import Pool, Lock, TimeoutError
-
+from multiprocessing import Pool, Lock, TimeoutError, Event
+import re
+from pathlib import Path
 
 # Printing starting time
 print(" ")
@@ -16,6 +19,9 @@ print("starting at:  ", start_time)
 # Defining global lock
 lock = Lock()
 
+pause_event = Event()  # suspend and resume processing
+equation_counter = multiprocessing.Value("i", 0)
+time.sleep(3)
 # defining logger
 logger = logging.getLogger()
 
@@ -48,7 +54,6 @@ def main(year):
     )
 
     for month_dir in directories:
-
         month_dir = str(month_dir)
         print(month_dir)
 
@@ -68,7 +73,6 @@ def main(year):
         temp = []
 
         for folder in os.listdir(folder_images):
-
             # if folder not in mml_folder_list:
 
             # Creating macros dictionary
@@ -94,35 +98,38 @@ def main(year):
 
 
 def creating_macro_dmo_dictionaries(root, folder):
-
     macro_file = os.path.join(root, f"latex_equations/{folder}/macros.txt")
     with open(macro_file, "r") as file:
         macro = file.readlines()
         file.close()
     keyword_macro_dict = {}
     for i in macro:
-        ibegin, iend = i.find("{"), i.find("}")
-        keyword_macro_dict[i[ibegin + 1 : iend]] = i
+        command_pattern = r"\\(new|renew)command\{(.*?)\}\{(.*)\}"
+        command_matches = re.findall(command_pattern, i)
+        if len(command_matches) > 0:
+            if len(command_matches[0]) == 3:
+                if command_matches[0][1] != "":
+                    keyword_macro_dict[command_matches[0][1]] = command_matches[0][2]
 
     # Creating dmo dictionary
-    dmo_file = os.path.join(
-        root, f"latex_equations/{folder}/declare_math_operator.txt"
-    )
+    dmo_file = os.path.join(root, f"latex_equations/{folder}/declare_math_operator.txt")
     with open(dmo_file, "r") as file:
         dmo = file.readlines()
         file.close()
     keyword_dict = {}
     for i in dmo:
-        ibegin, iend = i.find("{"), i.find("}")
-        keyword_dict[i[ibegin + 1 : iend]] = i
+        dmo_pattern = r"\\DeclareMathOperator\{(.*?)\}\{(.*)\}"
+        dmo_matches = re.findall(dmo_pattern, i)
+        if len(dmo_matches) > 0:
+            if len(dmo_matches[0]) == 2:
+                if dmo_matches[0][0] != "":
+                    keyword_dict[dmo_matches[0][0]] = dmo_matches[0][1]
 
     return (keyword_macro_dict, keyword_dict)
 
 
 def creating_final_equations(args_list):
-
     global lock
-
     # Unpacking the args_list
     (
         month_dir,
@@ -152,18 +159,13 @@ def creating_final_equations(args_list):
     small_eqns = os.path.join(folder_images, f"{folder}/small_eqns")
 
     for type_of_folder in [large_eqns, small_eqns]:
-
         for index, eqn in enumerate(os.listdir(type_of_folder)):
-
             if ".png" in eqn:
-
                 try:
                     file_name = eqn.split("-")[0].split(".")[0]
 
                     eqnstype = (
-                        "large_eqns"
-                        if type_of_folder == large_eqns
-                        else "small_eqns"
+                        "large_eqns" if type_of_folder == large_eqns else "small_eqns"
                     )
                     file_path = os.path.join(
                         root,
@@ -181,72 +183,18 @@ def creating_final_equations(args_list):
                         else:
                             text_eqn = text_eqns[0]
 
-                    macros_in_eqn = [
-                        kw
-                        for kw in keyword_macro_dict.keys()
-                        if kw in text_eqn
-                    ]
-                    dmos_in_eqn = [
-                        kw for kw in keyword_dict.keys() if kw in text_eqn
-                    ]
+                    for key, value in keyword_macro_dict.items():
+                        text_eqn = text_eqn.replace(key, value)
 
-                    # Writing macros, dmos, and text_eqn as one string
-                    MiE, DiE = "", ""
-                    for macro in macros_in_eqn:
-                        MiE = MiE + keyword_macro_dict[macro] + " "
-                    for dmo in dmos_in_eqn:
-                        DiE = DiE + keyword_dict[dmo] + " "
+                    for key, value in keyword_dict.items():
+                        text_eqn = text_eqn.replace(key, value)
 
-                    string = MiE + DiE + text_eqn
-
-                    # Removing unsupported keywords
-                    for tr in [
-                        "\\ensuremath",
-                        "\\xspace",
-                        "\\aligned",
-                        "\\endaligned",
-                        "\\span",
-                    ]:
-                        string = string.replace(tr, "")
+                    string = text_eqn
 
                     # Correcting keywords written in an incorrect way
                     for sub in string.split(" "):
                         if "cong" in sub:
                             sub = sub.replace("\\cong", "{\\cong}")
-                        if "mathbb" in sub:
-                            if sub[sub.find("\\mathbb") + 7] != "{":
-                                mathbb_parameter = sub[
-                                    sub.find("\\newcommand")
-                                    + 12 : sub.find("}")
-                                ].replace("\\", "")
-                                sub = (
-                                    sub[: sub.find("\\mathbb") + 7]
-                                    + "{"
-                                    + mathbb_parameter
-                                    + "}"
-                                    + sub[
-                                        sub.find("\\mathbb")
-                                        + 7
-                                        + len(mathbb_parameter) :
-                                    ]
-                                )
-                        if "mathbf" in sub:
-                            if sub[sub.find("\\mathbf") + 7] != "{":
-                                mathbf_parameter = sub[
-                                    sub.find("\\newcommand")
-                                    + 12 : sub.find("}")
-                                ].replace("\\", "")
-                                sub = (
-                                    sub[: sub.find("\\mathbf") + 7]
-                                    + "{"
-                                    + mathbf_parameter
-                                    + "}"
-                                    + sub[
-                                        sub.find("\\mathbf")
-                                        + 7
-                                        + len(mathbf_parameter) :
-                                    ]
-                                )
 
                         final_eqn += sub + " "
 
@@ -256,21 +204,16 @@ def creating_final_equations(args_list):
                         print("final equation is  ", final_eqn)
                         lock.release()
 
-                    mml = (
-                        large_mml
-                        if type_of_folder == large_eqns
-                        else small_mml
-                    )
+                    mml = large_mml if type_of_folder == large_eqns else small_mml
 
-                    mjxmml(file_name, folder, final_eqn, type_of_folder, mml)
+                    if not os.path.exists(mml + f"/{file_name}.xml"):
+                        mjxmml(file_name, folder, final_eqn, type_of_folder, mml)
 
                 except:
                     lock.acquire()
                     if verbose:
                         print(" ")
-                        print(
-                            f" {type_of_folder}/{file_name}: can not be converted."
-                        )
+                        print(f" {type_of_folder}/{file_name}: can not be converted.")
                         print(
                             " =============================================================== "
                         )
@@ -281,10 +224,54 @@ def creating_final_equations(args_list):
                     lock.release()
 
 
+def correct_phi(string):
+    pattern = r"(<mi>&#x03C6;<!-- φ --></mi> <mi>&#x03C6;<!-- φ --></mi> <mtext>&#xA0;</mtext> <mi mathvariant=\"normal\">&#x0393;<!-- Γ --></mi> <mo stretchy=\"false\">[</mo> <mi>f</mi> <mo stretchy=\"false\">(</mo> <mi>t</mi> <mo stretchy=\"false\">)</mo> <mi>cos</mi> <mo>&#x2061;<!-- ⁡ --></mo> <mi>&#x03C6;<!-- φ --></mi> )(.+?)( <mo stretchy=\"false\">]</mo>)"
+    replacement_dict = {
+        "\\": "place_holder1",
+        "[": "place_holder2",
+        "]": "place_holder3",
+        ">(<": "place_holder4",
+        ">)<": "place_holder5",
+    }
+    for key, val in replacement_dict.items():
+        pattern = pattern.replace(key, val)
+        string = string.replace(key, val)
+
+    matches = re.findall(pattern, string)
+    for match in matches:
+        placeholder = match[1]
+        string = string.replace(
+            "".join(match), f"{placeholder} <mi>&#x0278;<!-- ɸ --></mi>"
+        )
+
+    for key, val in replacement_dict.items():
+        string = string.replace(val, key)
+    return string
+
+
+def restart_mathjax_server():
+    response = requests.get("http://localhost:8081/restart")
+
+
 def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
+    global lock, pause_event
+    lock.acquire()
+    print(mml_path + f"/{file_name}.xml")
+    # Open the file for reading
+    with open("statistical_results.txt", "r") as f:
+        # Read the first line and split it into a list of strings
+        numbers = f.readline().strip().split(", ")
+        # Convert the strings to integers
+        numbers = [int(num) for num in numbers]
+        # Update the total number by adding 1
+        numbers[0] += 1
 
-    global lock
+    # Open the file for writing
+    with open("statistical_results.txt", "w") as f:
+        # Write the updated numbers to the file
+        f.write(", ".join(str(num) for num in numbers))
 
+    lock.release()
     # Define the webservice address
     webservice = "http://localhost:8081"
     # Load the LaTeX string data
@@ -306,6 +293,22 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
 
     # Capturing the keywords not supported by MathJax
     if "FAILED" in res.content.decode("utf-8"):
+        lock.acquire()
+        # Open the file for reading
+        with open("statistical_results.txt", "r") as f:
+            # Read the first line and split it into a list of strings
+            numbers = f.readline().strip().split(", ")
+            # Convert the strings to integers
+            numbers = [int(num) for num in numbers]
+            # Update the failed number by adding 1
+            numbers[1] += 1
+
+        # Open the file for writing
+        with open("statistical_results.txt", "w") as f:
+            # Write the updated numbers to the file
+            f.write(", ".join(str(num) for num in numbers))
+
+        lock.release()
         # Just to check errors
         tex_parse_error = res.content.decode("utf-8").split("::")[1]
 
@@ -324,16 +327,17 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
             )
             lock.release()
 
-        elif (
-            "TypeError: Cannot read property 'root' of undefined"
-            in tex_parse_error
-        ):
+        elif "TypeError: Cannot read property 'root' of undefined" in tex_parse_error:
             lock.acquire()
             print(folder)
             logger.warning(
                 f"{type_of_folder}/{file_name}:{tex_parse_error} -- Math Processing Error: Maximum call stack size exceeded. Killing the process and server."
             )
             lock.release()
+            pause_event.clear()
+            restart_mathjax_server()
+            time.sleep(3)
+            pause_event.set()
 
         # Logging errors other than unsupported keywords
         else:
@@ -351,21 +355,68 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
     else:
         # Cleaning and Dumping the MathML strings to JSON file
         mml = cleaning_mml(res.text)
+        # Replacing the wrong generation from MathJax
+        mml = re.sub("\s+", " ", mml)
+        mml = mml.replace(
+            r"<msub> <mi>&#x2113;<!-- ℓ --></mi> <mn>1</mn> </msub> <mo>,</mo> <msub> <mi>&#x2113;<!-- ℓ --></mi> <mn>2</mn> </msub>",
+            "",
+        )
+        mml = mml.replace(
+            r"<mi>&#x03C6;<!-- φ --></mi> <mi>&#x03C6;<!-- φ --></mi> <mtext>&#xA0;</mtext> <mi mathvariant=\"normal\">&#x0393;<!-- Γ --></mi> <mo stretchy=\"false\">[</mo> <mi>f</mi> <mo stretchy=\"false\">(</mo> <mi>t</mi> <mo stretchy=\"false\">)</mo> <mi>cos</mi> <mo>&#x2061;<!-- ⁡ --></mo> <mi>&#x03C6;<!-- φ --></mi> <mo stretchy=\"false\">]</mo>",
+            r"<mi>&#x0278;<!-- ɸ --></mi>",
+        )
+        mml = correct_phi(mml)
 
         if verbose:
             lock.acquire()
             print(f"writing {file_name}")
             lock.release()
 
-        with open(
-            os.path.join(mml_path, f"{file_name}.xml"), "w"
-        ) as mml_output:
+        with open(os.path.join(mml_path, f"{file_name}.xml"), "w") as mml_output:
             mml_output.write(mml)
             mml_output.close()
 
+        if "\\boldsymbol" in eqn or "\\mathbf" in eqn or "\\bf" in eqn:
+            lock.acquire()
+            # Open the file for reading
+            with open("statistical_results.txt", "r") as f:
+                # Read the first line and split it into a list of strings
+                numbers = f.readline().strip().split(", ")
+                # Convert the strings to integers
+                numbers = [int(num) for num in numbers]
+                # Update the boldface number by adding 1
+                numbers[2] += 1
+
+            # Open the file for writing
+            with open("statistical_results.txt", "w") as f:
+                # Write the updated numbers to the file
+                f.write(", ".join(str(num) for num in numbers))
+
+            # Open the file for writing
+            with open("boldface_list.txt", "a") as f:
+                # Write the updated numbers to the file
+                f.write(os.path.join(mml_path, f"{file_name}.xml") + "\n")
+
+            lock.release()
+
+    lock.acquire()
+    equation_counter.value += 1
+
+    # To avoid the buffer issue from MathJax, restart the service once processing 1000 equations
+    if equation_counter.value % 1000 == 0:
+        pause_event.clear()
+        restart_mathjax_server()
+        time.sleep(3)
+        pause_event.set()
+        equation_counter.value = 0
+    else:
+        pause_event.set()
+
+    lock.release()
+    pause_event.wait()
+
 
 def cleaning_mml(res):
-
     # Removing "\ and /" at the begining and at the end
     res = res[res.find("<") :]
     res = res[::-1][res[::-1].find(">") :]
@@ -377,13 +428,23 @@ def cleaning_mml(res):
 
 
 if __name__ == "__main__":
+    current_dir = Path(os.getcwd())
+
+    statistical_file = current_dir / "statistical_results.txt"
+    if not statistical_file.exists():
+        with open(statistical_file, "w") as f:
+            f.write("0, 0, 0\n")  # total, failed, boldface
+
+    boldface_files = current_dir / "boldface_list.txt"
+    if not boldface_files.exists():
+        boldface_files.touch()
 
     for year in years:
         year = year.strip()
         print(year)
         main(str(year))
 
-    # Printing stoping time
+    # Printing stopping time
     print(" ")
     stop_time = datetime.now()
     print("stoping at:  ", stop_time)
