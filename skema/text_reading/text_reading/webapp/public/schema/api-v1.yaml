@@ -171,27 +171,6 @@ components:
           additionalProperties:
             $ref: "#/components/schemas/Document"
 
-    Document:
-      type: object
-      description: todo
-      required:
-        - id
-        - text
-        - sentences
-      properties:
-        id:
-          type: string
-          description: the equivalence hash for this org.clulab.processors.Document
-          example: unknownDocument
-        text:
-          type: string
-          description: the original text from which this document was produced
-        sentences:
-          type: array
-          description: array of org.clulab.processors.Sentence
-          items:
-            $ref: "#components/schemas/Sentence"
-
     AutomatesMention:
       oneOf:
         - $ref: "#components/schemas/TextBoundMention"
@@ -260,6 +239,236 @@ components:
           items:
             $ref: "#/components/schemas/AutomatesAttachment"
           uniqueItems: true
+
+    RelationMention:
+      type: object
+      description: todo
+      required:
+        - type
+        - id
+        - text
+        - labels
+        - arguments
+        - paths
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+        - attachments
+      properties:
+        type:
+          type: string
+          description: an identifier for this mention type
+          enum:
+            - RelationMention
+        id:
+          type: string
+          description: todo
+        text:
+          type: string
+          description: enclosing text span corresponding to this mention
+        labels:
+          type: array
+          description: the labels for this mention
+          items:
+            type: string
+        arguments:
+          $ref: "#/components/schemas/Arguments"
+        paths:
+          $ref: "#/components/schemas/Paths"
+          nullable: true
+        tokenInterval:
+          $ref: "#/components/schemas/Interval"
+        characterStartOffset:
+          type: integer
+          description: todo
+          format: int32
+        characterEndOffset:
+          type: integer
+          description: todo
+          format: int32
+        sentence:
+          type: integer
+          description: the index of the sentence in the document that encompasses this mention
+          format: int32
+        document:
+          description: an identifier for the source document from which this mention originates
+        keep:
+          type: boolean
+          description: todo
+        foundBy:
+          type: string
+          description: the name of the rule responsible for detecting this mention
+        attachments:
+          type: array
+          description: todo
+          items:
+            $ref: "#/components/schemas/AutomatesAttachment"
+          uniqueItems: true
+
+    EventMention:
+      type: object
+      description: todo
+      required:
+        - type
+        - id
+        - text
+        - labels
+        - trigger
+        - arguments
+        - paths
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+        - attachments
+      properties:
+        type:
+          type: string
+          description: an identifier for this mention type
+          enum:
+            - EventMention
+        id:
+          type: string
+          description: todo
+        text:
+          type: string
+          description: enclosing text span corresponding to this mention
+        labels:
+          type: array
+          description: the labels for this mention
+          items:
+            type: string
+        trigger:
+            $ref: "#/components/schemas/TextBoundMention"
+            description: a predicate that signals this particular relation
+        arguments:
+          $ref: "#/components/schemas/Arguments"
+        paths:
+          $ref: "#/components/schemas/Paths"
+        tokenInterval:
+          $ref: "#/components/schemas/Interval"
+        characterStartOffset:
+          description: todo
+          type: integer
+          format: int32
+        characterEndOffset:
+          description: todo
+          type: integer
+          format: int32
+        sentence:
+          type: integer
+          description: the index of the sentence in the document that encompasses this mention
+          format: int32
+        document:
+          type: string
+          description: an identifier for the source document from which this mention originates
+        keep:
+          type: boolean
+          description: todo
+        foundBy:
+          type: string
+          description: todo
+        attachments:
+          type: array
+          description: todo
+          items:
+            $ref: "#/components/schemas/AutomatesAttachment"
+          uniqueItems: true
+
+    CrossSentenceEventMention:
+      type: object
+      description: todo
+      required:
+        - type
+        - id
+        - text
+        - labels
+        - trigger
+        - arguments
+        - paths
+        - tokenInterval
+        - characterStartOffset
+        - characterEndOffset
+        - sentence
+        - document
+        - keep
+        - foundBy
+        - attachments
+      properties:
+        type:
+          type: string
+          description: an identifier for this mention type
+          enum:
+            - CrossSentenceEventMention
+        id:
+          type: string
+          description: todo
+        text:
+          type: string
+          description: enclosing text span corresponding to this mention
+        labels:
+          type: array
+          description: the labels for this mention
+          items:
+            type: string
+        trigger:
+            $ref: "#/components/schemas/TextBoundMention"
+            description: a predicate that signals this particular relation
+        arguments:
+          $ref: "#/components/schemas/Arguments"
+        paths:
+          $ref: "#/components/schemas/Paths"
+        tokenInterval:
+          $ref: "#/components/schemas/Interval"
+        characterStartOffset:
+          type: integer
+          description: todo
+          format: int32
+        characterEndOffset:
+          type: integer
+          description: todo
+          format: int32
+        sentence:
+          type: integer
+          description: the index of the sentence in the document that encompasses this mention
+          format: int32
+        document:
+          type: string
+          description: an identifier for the source document from which this mention originates
+        keep:
+          type: boolean
+          description: todo
+        foundBy:
+          type: string
+          description: the name of the rule responsible for detecting this mention
+        attachments:
+          type: array
+          description: todo
+          items:
+            $ref: "#/components/schemas/AutomatesAttachment"
+          uniqueItems: true
+
+    Interval:
+      type: object
+      required:
+        - start
+        - end
+      properties:
+        start:
+          type: integer
+          description: inclusive start of of interval
+          format: int32
+        end:
+          type: integer
+          description: exclusive end of the interval
+          format: int32
 
     AutomatesAttachment:
       oneOf:
@@ -477,236 +686,6 @@ components:
           type: string
           description: todo
 
-    Interval:
-      type: object
-      required:
-        - start
-        - end
-      properties:
-        start:
-          type: integer
-          description: inclusive start of of interval
-          format: int32
-        end:
-          type: integer
-          description: exclusive end of the interval
-          format: int32
-
-    RelationMention:
-      type: object
-      description: todo
-      required:
-        - type
-        - id
-        - text
-        - labels
-        - arguments
-        - paths
-        - tokenInterval
-        - characterStartOffset
-        - characterEndOffset
-        - sentence
-        - document
-        - keep
-        - foundBy
-        - attachments
-      properties:
-        type:
-          type: string
-          description: an identifier for this mention type
-          enum:
-            - TextBoundMention
-        id:
-          type: string
-          description: todo
-        text:
-          type: string
-          description: enclosing text span corresponding to this mention
-        labels:
-          type: array
-          description: the labels for this mention
-          items:
-            type: string
-        arguments:
-          $ref: "#/components/schemas/Arguments"
-        paths:
-          $ref: "#/components/schemas/Paths"
-          nullable: true
-        tokenInterval:
-          $ref: "#/components/schemas/Interval"
-        characterStartOffset:
-          type: integer
-          description: todo
-          format: int32
-        characterEndOffset:
-          type: integer
-          description: todo
-          format: int32
-        sentence:
-          type: integer
-          description: the index of the sentence in the document that encompasses this mention
-          format: int32
-        document:
-          description: an identifier for the source document from which this mention originates
-        keep:
-          type: boolean
-          description: todo
-        foundBy:
-          type: string
-          description: the name of the rule responsible for detecting this mention
-        attachments:
-          type: array
-          description: todo
-          items:
-            $ref: "#/components/schemas/AutomatesAttachment"
-          uniqueItems: true
-
-    EventMention:
-      type: object
-      description: todo
-      required:
-        - type
-        - id
-        - text
-        - labels
-        - trigger
-        - arguments
-        - paths
-        - tokenInterval
-        - characterStartOffset
-        - characterEndOffset
-        - sentence
-        - document
-        - keep
-        - foundBy
-        - attachments
-      properties:
-        type:
-          type: string
-          description: an identifier for this mention type
-          enum:
-            - EventMention
-        id:
-          type: string
-          description: todo
-        text:
-          type: string
-          description: enclosing text span corresponding to this mention
-        labels:
-          type: array
-          description: the labels for this mention
-          items:
-            type: string
-        trigger:
-            $ref: "#/components/schemas/TextBoundMention"
-            description: a predicate that signals this particular relation
-        arguments:
-          $ref: "#/components/schemas/Arguments"
-        paths:
-          $ref: "#/components/schemas/Paths"
-        tokenInterval:
-          $ref: "#/components/schemas/Interval"
-        characterStartOffset:
-          description: todo
-          type: integer
-          format: int32
-        characterEndOffset:
-          description: todo
-          type: integer
-          format: int32
-        sentence:
-          type: integer
-          description: the index of the sentence in the document that encompasses this mention
-          format: int32
-        document:
-          type: string
-          description: an identifier for the source document from which this mention originates
-        keep:
-          type: boolean
-          description: todo
-        foundBy:
-          type: string
-          description: todo
-        attachments:
-          type: array
-          description: todo
-          items:
-            $ref: "#/components/schemas/AutomatesAttachment"
-          uniqueItems: true
-
-    CrossSentenceEventMention:
-      type: object
-      description: todo
-      required:
-        - type
-        - id
-        - text
-        - labels
-        - trigger
-        - arguments
-        - paths
-        - tokenInterval
-        - characterStartOffset
-        - characterEndOffset
-        - sentence
-        - document
-        - keep
-        - foundBy
-        - attachments
-      properties:
-        type:
-          type: string
-          description: an identifier for this mention type
-          enum:
-            - CrossSentenceEventMention
-        id:
-          type: string
-          description: todo
-        text:
-          type: string
-          description: enclosing text span corresponding to this mention
-        labels:
-          type: array
-          description: the labels for this mention
-          items:
-            type: string
-        trigger:
-            $ref: "#/components/schemas/TextBoundMention"
-            description: a predicate that signals this particular relation
-        arguments:
-          $ref: "#/components/schemas/Arguments"
-        paths:
-          $ref: "#/components/schemas/Paths"
-        tokenInterval:
-          $ref: "#/components/schemas/Interval"
-        characterStartOffset:
-          type: integer
-          description: todo
-          format: int32
-        characterEndOffset:
-          type: integer
-          description: todo
-          format: int32
-        sentence:
-          type: integer
-          description: the index of the sentence in the document that encompasses this mention
-          format: int32
-        document:
-          type: string
-          description: an identifier for the source document from which this mention originates
-        keep:
-          type: boolean
-          description: todo
-        foundBy:
-          type: string
-          description: the name of the rule responsible for detecting this mention
-        attachments:
-          type: array
-          description: todo
-          items:
-            $ref: "#/components/schemas/AutomatesAttachment"
-          uniqueItems: true
-
     Arguments:
       type: object
       description: todo
@@ -745,6 +724,27 @@ components:
         relation:
           type: string
           description: the relation to which this Edge corresponds
+
+    Document:
+      type: object
+      description: todo
+      required:
+        - id
+        - text
+        - sentences
+      properties:
+        id:
+          type: string
+          description: the equivalence hash for this org.clulab.processors.Document
+          example: unknownDocument
+        text:
+          type: string
+          description: the original text from which this document was produced
+        sentences:
+          type: array
+          description: array of org.clulab.processors.Sentence
+          items:
+            $ref: "#components/schemas/Sentence"
 
     Sentence:
       type: object
