@@ -98,7 +98,7 @@ paths:
                 type: array
                 description: for each of the input texts, output from the text reading pipeline
                 items:
-                  $ref: "#/components/schemas/DocumentsAndMentions"
+                  $ref: "#/components/schemas/MentionsAndDocuments"
 
 components:
   schemas:
@@ -153,33 +153,44 @@ components:
                 items: 
                   type: number
 
-    DocumentsAndMentions:
+    MentionsAndDocuments:
       type: object
       description: todo
       required:
         - mentions
         - documents
       properties:
-        documents:
-          type: object
-          description: todo
-          additionalProperties:
-            $ref: "#/components/schemas/Document"
         mentions:
           type: array
           description: todo
           items:
             $ref: "#components/schemas/AutomatesMention"
+        documents:
+          type: object
+          description: todo
+          additionalProperties:
+            $ref: "#/components/schemas/Document"
 
     Document:
       type: object
       description: todo
       required:
         - id
+        - text
+        - sentences
       properties:
         id:
           type: string
-
+          description: the equivalence hash for this org.clulab.processors.Document
+          example: unknownDocument
+        text:
+          type: string
+          description: the original text from which this document was produced
+        sentences:
+          type: array
+          description: array of org.clulab.processors.Sentence
+          items:
+            $ref: "#components/schemas/Sentence"
 
     AutomatesMention:
       oneOf:
@@ -231,8 +242,9 @@ components:
           description: todo
           format: int32
         sentence:
-          $ref: "#/components/schemas/Sentence"
-          description: the sentence text that encompasses this mention
+          type: integer
+          description: the index of the sentence in the document that encompasses this mention
+          format: int32
         document:
           type: string
           description: an identifier for the source document from which this mention originates
@@ -262,115 +274,54 @@ components:
         - $ref: "#/components/schemas/ContextAttachment"
         - $ref: "#/components/schemas/FunctionAttachment"
 
-    FunctionAttachment:
-      required:
-        - attType
-        - trigger
-        - foundBy
+    GroundingAttachment:
+      type: array
+      items:
+        $ref: "#/components/schemas/AutomatesGroundingCandidate"
+
+    AutomatesGroundingCandidate:
       type: object
       description: todo
+      required:
+        - name
+        - id
+        - score
       properties:
-        attType:
+        name:
           type: string
           description: todo
-        trigger:
+        id:
           type: string
           description: todo
-        foundBy:
-          type: string
+        score:
+          type: number
           description: todo
 
-    ContextAttachment:
+    LocationContextAttachment:
       type: object
       description: todo
       required:
-        - contexts
-        - attType
-        - foundBy
+        - scenarioLocation
       properties:
-        contexts:
-          type: string # TODO this starts out as json
-          description: todo
-        attType:
-          type: string
-          description: todo
-        foundBy:
-          type: string
-          description: todo
-
-    UnitAttachment:
-      type: object
-      description: todo
-      required:
-        - attachedTo
-        - attType
-      properties:
-        attachedTo:
-          type: string
-          description: todo
-        attType:
-          type: string
-          description: todo
-
-    ParamSettingIntAttachment:
-      type: object
-      description: todo
-      required:
-      - inclusiveLower
-      - inclusiveUpper
-      - attachedTo
-      - attType
-      properties:
-        inclusiveLower:
-          type: boolean
-          description: todo
-          nullable: true
-        inclusiveUpper:
-          type: boolean
-          description: todo
-          nullable: true
-        attachedTo:
-          type: string
-          description: todo
-        attType:
-          type: string
-          description: todo
-
-    ParamSetAttachment:
-      type: object
-      description: todo
-      required:
-        - attachedTo
-        - attType
-      properties:
-        attachedTo:
-          type: string
-          description: todo
-        attType:
-          type: string
-          description: todo
-
-    DiscontinuousCharOffsetAttachment:
-      type: object
-      description: todo
-      required:
-        - charOffsets
-        - attType
-      properties:
-        charOffsets:
+        scenarioLocation:
           type: array
           description: todo
           items:
-            type: array
-            description: todo
-            items:
-              type: integer
-              format: int32
-            minItems: 2
-            maxItems: 2
-        attType:
-          type: string
+            type: string
+            uniqueItems: true
+
+    TimeContextAttachment:
+      type: object
+      description: todo
+      required:
+        - scenarioTime
+      properties:
+        scenarioTime:
+          type: array
           description: todo
+          items:
+            type: string
+            uniqueItems: true
 
     MentionLocationAttachment:
       type: object
@@ -399,54 +350,131 @@ components:
         attType:
           type: string
           description: todo
+          enum:
+            - MentionLocation
 
-    TimeContextAttachment:
+    DiscontinuousCharOffsetAttachment:
       type: object
       description: todo
       required:
-        - scenarioTime
+        - charOffsets
+        - attType
       properties:
-        scenarioTime:
+        charOffsets:
+          type: array
+          description: todo
+          items:
+            type: array
+            description: todo
+            items:
+              type: integer
+              format: int32
+            minItems: 2
+            maxItems: 2
+        attType:
+          type: string
+          description: todo
+          enum:
+            - DiscontinuousCharOffset
+
+    ParamSetAttachment:
+      type: object
+      description: todo
+      required:
+        - attachedTo
+        - attType
+      properties:
+        attachedTo:
+          type: string
+          description: todo
+        attType:
+          type: string
+          description: todo
+          enum:
+            - ParamSetAtt
+
+    ParamSettingIntAttachment:
+      type: object
+      description: todo
+      required:
+      - inclusiveLower
+      - inclusiveUpper
+      - attachedTo
+      - attType
+      properties:
+        inclusiveLower:
+          type: boolean
+          description: todo
+          nullable: true
+        inclusiveUpper:
+          type: boolean
+          description: todo
+          nullable: true
+        attachedTo:
+          type: string
+          description: todo
+        attType:
+          type: string
+          description: todo
+          enum:
+            - ParamSettingIntervalAtt
+
+    UnitAttachment:
+      type: object
+      description: todo
+      required:
+        - attachedTo
+        - attType
+      properties:
+        attachedTo:
+          type: string
+          description: todo
+        attType:
+          type: string
+          description: todo
+          enum:
+            - UnitAtt
+
+    ContextAttachment:
+      type: object
+      description: todo
+      required:
+        - contexts
+        - attType
+        - foundBy
+      properties:
+        contexts:
           type: array
           description: todo
           items:
             type: string
-            uniqueItems: true
-
-    LocationContextAttachment:
-      type: object
-      description: todo
-      required:
-        - scenarioLocation
-      properties:
-        scenarioLocation:
-          type: array
-          description: todo
-          items:
-            type: string
-            uniqueItems: true
-
-    GroundingAttachment:
-      type: array
-      items:
-        $ref: "#/components/schemas/AutomatesGroundingCandidate"
-
-    AutomatesGroundingCandidate:
-      type: object
-      description: todo
-      required:
-        - name
-        - id
-        - score
-      properties:
-        name:
+        attType:
           type: string
           description: todo
-        id:
+          enum:
+            - ContextAtt
+        foundBy:
           type: string
           description: todo
-        score:
-          type: number
+
+    FunctionAttachment:
+      required:
+        - attType
+        - trigger
+        - foundBy
+      type: object
+      description: todo
+      properties:
+        attType:
+          type: string
+          description: todo
+          enum:
+            - FunctionAtt
+        trigger:
+          type: string
+          description: todo
+        foundBy:
+          type: string
           description: todo
 
     Interval:
@@ -466,7 +494,7 @@ components:
 
     RelationMention:
       type: object
-      description: TODO
+      description: todo
       required:
         - type
         - id
@@ -503,6 +531,7 @@ components:
           $ref: "#/components/schemas/Arguments"
         paths:
           $ref: "#/components/schemas/Paths"
+          nullable: true
         tokenInterval:
           $ref: "#/components/schemas/Interval"
         characterStartOffset:
@@ -514,8 +543,9 @@ components:
           description: todo
           format: int32
         sentence:
-          $ref: "#/components/schemas/Sentence"
-          description: the sentence text that encompasses this mention
+          type: integer
+          description: the index of the sentence in the document that encompasses this mention
+          format: int32
         document:
           description: an identifier for the source document from which this mention originates
         keep:
@@ -585,8 +615,9 @@ components:
           type: integer
           format: int32
         sentence:
-          $ref: "#/components/schemas/Sentence"
-          description: the sentence text that encompasses this mention
+          type: integer
+          description: the index of the sentence in the document that encompasses this mention
+          format: int32
         document:
           type: string
           description: an identifier for the source document from which this mention originates
@@ -657,8 +688,9 @@ components:
           description: todo
           format: int32
         sentence:
-          $ref: "#/components/schemas/Sentence"
-          description: the sentence text that encompasses this mention
+          type: integer
+          description: the index of the sentence in the document that encompasses this mention
+          format: int32
         document:
           type: string
           description: an identifier for the source document from which this mention originates
