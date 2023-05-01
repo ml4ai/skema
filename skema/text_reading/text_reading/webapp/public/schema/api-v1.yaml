@@ -155,19 +155,19 @@ components:
 
     MentionsAndDocuments:
       type: object
-      description: todo
+      # description: todo
       required:
         - mentions
         - documents
       properties:
         mentions:
           type: array
-          description: todo
+          # description: todo
           items:
             $ref: "#components/schemas/AutomatesMention"
         documents:
           type: object
-          description: todo
+          # description: todo
           additionalProperties:
             $ref: "#/components/schemas/Document"
 
@@ -180,7 +180,7 @@ components:
 
     TextBoundMention:
       type: object
-      description: todo
+      # description: todo
       required:
         - id
         - type
@@ -197,7 +197,7 @@ components:
       properties:
         id:
           type: string
-          description: todo
+          # description: todo
         type:
           description: an identifier for this mention type
           enum: 
@@ -214,11 +214,11 @@ components:
           $ref: "#/components/schemas/Interval"
         characterStartOffset:
           type: integer
-          description: todo
+          # description: todo
           format: int32
         characterEndOffset:
           type: integer
-          description: todo
+          # description: todo
           format: int32
         sentence:
           type: integer
@@ -229,20 +229,20 @@ components:
           description: an identifier for the source document from which this mention originates
         keep:
           type: boolean
-          description: todo
+          # description: todo
         foundBy:
           type: string
-          description: todo
+          # description: todo
         attachments:
           type: array
-          description: todo
+          # description: todo
           items:
             $ref: "#/components/schemas/AutomatesAttachment"
           uniqueItems: true
 
     RelationMention:
       type: object
-      description: todo
+      # description: todo
       required:
         - type
         - id
@@ -266,7 +266,7 @@ components:
             - RelationMention
         id:
           type: string
-          description: todo
+          # description: todo
         text:
           type: string
           description: enclosing text span corresponding to this mention
@@ -284,11 +284,11 @@ components:
           $ref: "#/components/schemas/Interval"
         characterStartOffset:
           type: integer
-          description: todo
+          # description: todo
           format: int32
         characterEndOffset:
           type: integer
-          description: todo
+          # description: todo
           format: int32
         sentence:
           type: integer
@@ -298,20 +298,20 @@ components:
           description: an identifier for the source document from which this mention originates
         keep:
           type: boolean
-          description: todo
+          # description: todo
         foundBy:
           type: string
           description: the name of the rule responsible for detecting this mention
         attachments:
           type: array
-          description: todo
+          # description: todo
           items:
             $ref: "#/components/schemas/AutomatesAttachment"
           uniqueItems: true
 
     EventMention:
       type: object
-      description: todo
+      # description: todo
       required:
         - type
         - id
@@ -336,7 +336,7 @@ components:
             - EventMention
         id:
           type: string
-          description: todo
+          # description: todo
         text:
           type: string
           description: enclosing text span corresponding to this mention
@@ -355,11 +355,11 @@ components:
         tokenInterval:
           $ref: "#/components/schemas/Interval"
         characterStartOffset:
-          description: todo
+          # description: todo
           type: integer
           format: int32
         characterEndOffset:
-          description: todo
+          # description: todo
           type: integer
           format: int32
         sentence:
@@ -371,20 +371,20 @@ components:
           description: an identifier for the source document from which this mention originates
         keep:
           type: boolean
-          description: todo
+          # description: todo
         foundBy:
           type: string
-          description: todo
+          # description: todo
         attachments:
           type: array
-          description: todo
+          # description: todo
           items:
             $ref: "#/components/schemas/AutomatesAttachment"
           uniqueItems: true
 
     CrossSentenceEventMention:
       type: object
-      description: todo
+      # description: todo
       required:
         - type
         - id
@@ -409,7 +409,7 @@ components:
             - CrossSentenceEventMention
         id:
           type: string
-          description: todo
+          # description: todo
         text:
           type: string
           description: enclosing text span corresponding to this mention
@@ -429,11 +429,11 @@ components:
           $ref: "#/components/schemas/Interval"
         characterStartOffset:
           type: integer
-          description: todo
+          # description: todo
           format: int32
         characterEndOffset:
           type: integer
-          description: todo
+          # description: todo
           format: int32
         sentence:
           type: integer
@@ -444,13 +444,13 @@ components:
           description: an identifier for the source document from which this mention originates
         keep:
           type: boolean
-          description: todo
+          # description: todo
         foundBy:
           type: string
           description: the name of the rule responsible for detecting this mention
         attachments:
           type: array
-          description: todo
+          # description: todo
           items:
             $ref: "#/components/schemas/AutomatesAttachment"
           uniqueItems: true
@@ -490,7 +490,7 @@ components:
 
     AutomatesGroundingCandidate:
       type: object
-      description: todo
+      # description: todo
       required:
         - name
         - id
@@ -498,43 +498,43 @@ components:
       properties:
         name:
           type: string
-          description: todo
+          # description: todo
         id:
           type: string
-          description: todo
+          # description: todo
         score:
           type: number
-          description: todo
+          # description: todo
 
     LocationContextAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
         - scenarioLocation
       properties:
         scenarioLocation:
           type: array
-          description: todo
+          # description: todo
           items:
             type: string
             uniqueItems: true
 
     TimeContextAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
         - scenarioTime
       properties:
         scenarioTime:
           type: array
-          description: todo
+          # description: todo
           items:
             type: string
             uniqueItems: true
 
     MentionLocationAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
         - filename
         - pageNum
@@ -543,38 +543,38 @@ components:
       properties:
         filename: 
           type: string
-          description: todo
+          # description: todo
         pageNum:
           type: array
-          description: todo
+          # description: todo
           items:
             type: integer
             format: int32
         blockIdx:
           type: array
-          description: todo
+          # description: todo
           items:
             type: integer
             format: int32
         attType:
           type: string
-          description: todo
+          # description: todo
           enum:
             - MentionLocation
 
     DiscontinuousCharOffsetAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
         - charOffsets
         - attType
       properties:
         charOffsets:
           type: array
-          description: todo
+          # description: todo
           items:
             type: array
-            description: todo
+            # description: todo
             items:
               type: integer
               format: int32
@@ -582,29 +582,29 @@ components:
             maxItems: 2
         attType:
           type: string
-          description: todo
+          # description: todo
           enum:
             - DiscontinuousCharOffset
 
     ParamSetAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
         - attachedTo
         - attType
       properties:
         attachedTo:
           type: string
-          description: todo
+          # description: todo
         attType:
           type: string
-          description: todo
+          # description: todo
           enum:
             - ParamSetAtt
 
     ParamSettingIntAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
       - inclusiveLower
       - inclusiveUpper
@@ -613,40 +613,40 @@ components:
       properties:
         inclusiveLower:
           type: boolean
-          description: todo
+          # description: todo
           nullable: true
         inclusiveUpper:
           type: boolean
-          description: todo
+          # description: todo
           nullable: true
         attachedTo:
           type: string
-          description: todo
+          # description: todo
         attType:
           type: string
-          description: todo
+          # description: todo
           enum:
             - ParamSettingIntervalAtt
 
     UnitAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
         - attachedTo
         - attType
       properties:
         attachedTo:
           type: string
-          description: todo
+          # description: todo
         attType:
           type: string
-          description: todo
+          # description: todo
           enum:
             - UnitAtt
 
     ContextAttachment:
       type: object
-      description: todo
+      # description: todo
       required:
         - contexts
         - attType
@@ -654,17 +654,17 @@ components:
       properties:
         contexts:
           type: array
-          description: todo
+          # description: todo
           items:
             type: string
         attType:
           type: string
-          description: todo
+          # description: todo
           enum:
             - ContextAtt
         foundBy:
           type: string
-          description: todo
+          # description: todo
 
     FunctionAttachment:
       required:
@@ -672,42 +672,42 @@ components:
         - trigger
         - foundBy
       type: object
-      description: todo
+      # description: todo
       properties:
         attType:
           type: string
-          description: todo
+          # description: todo
           enum:
             - FunctionAtt
         trigger:
           type: string
-          description: todo
+          # description: todo
         foundBy:
           type: string
-          description: todo
+          # description: todo
 
     Arguments:
       type: object
-      description: todo
+      # description: todo
       additionalProperties:
         type: array
-        description: todo
+        # description: todo
         items:
           $ref: "#/components/schemas/AutomatesMention"
 
     Paths:
       type: object
-      description: todo
+      # description: todo
       nullable: true
       additionalProperties:
         type: array
-        description: todo
+        # description: todo
         items:
           $ref: "#/components/schemas/Edge"
 
     Edge:
       type: object
-      description: todo
+      # description: todo
       required:
         - source
         - destination
@@ -727,7 +727,7 @@ components:
 
     Document:
       type: object
-      description: todo
+      # description: todo
       required:
         - id
         - text
@@ -779,7 +779,7 @@ components:
             format: int32
         raw:
           type: array
-          description: todo
+          # description: todo
           items:
             type: string
         tags:
@@ -799,7 +799,7 @@ components:
             type: string
         norms:
           type: array
-          description: todo
+          # description: todo
           items:
             type: string
         chunks:
@@ -818,7 +818,7 @@ components:
 
     DirectedGraph:
       type: object
-      description: todo
+      # description: todo
       required:
         - edges
         - roots
