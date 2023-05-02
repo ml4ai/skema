@@ -73,10 +73,10 @@ pub struct StringType {
     Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema,
 )]
 pub struct ArrayType {
-    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
-    pub r#type: Option<Vec<String>>,
+    #[serde(rename = "type")]
+    pub r#type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub items: Option<StringType>,
+    pub items: Option<Vec<StringType>>,
 }
 
 #[derive(
@@ -124,7 +124,7 @@ pub struct ModelProperties {
 pub struct States {
     #[serde(rename = "type")]
     r#type: String,
-    items: StateItems,
+    items: Vec<StateItems>,
 }
 
 #[derive(
@@ -178,7 +178,7 @@ pub struct StateProperties {
 pub struct Transitions {
     #[serde(rename = "type")]
     r#type: String,
-    items: TransitionItems,
+    items: Vec<TransitionItems>,
 }
 
 #[derive(
@@ -348,4 +348,143 @@ pub struct DistributionProperties {
 pub struct GroundingProperties {
     identifiers: StringType,
     context: StringType,
+}
+
+// -------------------------------------------------------------------------------------------
+// This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
+pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
+
+    // -----------------------------------------------------
+
+    let mut state_items_vec = Vec::<StateItems>::new();
+    let mut transition_items_vec = Vec::<TransitionItems>::new();
+    let mut string_type_vec = Vec::<StringType>::new();
+
+    // -----------------------------------------------------
+
+    for state in pn.S.iter() {
+        let string_type1 = StringType {
+            r#type: Some(state.sname.clone()),
+            format: None,
+        };
+        let string_type2 = StringType {
+            r#type: Some(state.sname.clone()),
+            format: None,
+        };
+        let state_properties = StateProperties {
+            id: string_type1.clone(),
+            name: string_type2.clone(),
+            grounding: None,
+            initial: None,
+        };
+        let state_items = StateItems {
+            r#type: "object".to_string(),
+            properties: state_properties.clone(),
+            required: None,
+        };
+        state_items_vec.push(state_items.clone());
+    }
+
+    for (i, trans) in pn.T.clone().iter().enumerate() {
+
+        // convert transition index to base 1
+        let transition = i.clone() + 1; 
+
+        let string_type1 = StringType {
+            r#type: Some(trans.tname.clone()),
+            format: None,
+        };
+        // construct array of incoming states
+        let mut string_type_vec1 = Vec::<StringType>::new();
+        for incoming in pn.I.clone().iter() {
+            if incoming.it.clone() == transition {
+                let state_idx = incoming.is.clone() - 1; // 0 based to index the rust vec
+                let state_name = pn.S[state_idx as usize].sname.clone();
+                let string_type_temp = StringType {
+                    r#type: Some(state_name.clone()),
+                    format: None,
+                };
+                string_type_vec1.push(string_type_temp.clone());
+            }
+        }
+        let array_type1 = ArrayType {
+            pub r#type: "array".to_string(),
+            pub items: Some(string_type_vec.clone()),
+        };
+        // construct array of outgoing states
+        let mut string_type_vec2 = Vec::<StringType>::new();
+        for outgoing in pn.O.clone().iter() {
+            if outgoing.ot.clone() == transition {
+                let state_idx = outgoing.os.clone() - 1; // 0 based to index the rust vec
+                let state_name = pn.S[state_idx as usize].sname.clone();
+                let string_type_temp = StringType {
+                    r#type: Some(state_name.clone()),
+                    format: None,
+                };
+                string_type_vec2.push(string_type_temp.clone());
+            }
+        }
+        let array_type2 = ArrayType {
+            pub r#type: "array".to_string(),
+            pub items: Some(string_type_vec2.clone()),
+        };
+        let transition_properties = TransitionProperties {
+            id: string_type1,
+            input: Some(array_type1),
+            output: Some(array_type2),
+            grounding: None,
+            properties: None,
+        };
+        let transition_items = TransitionItems {
+            r#type: "object".to_string(),
+            properties: transition_properties,
+            required: None,
+        };
+        transition_items_vec.push(transition_items.clone());
+    }
+
+    // -----------------------------------------------------------
+
+    let states = States {
+        r#type: "array".to_string(),
+        items: state_items_vec,
+    };
+
+    let transtitions = Transitions {
+        r#type: "array".to_string(),
+        items: transition_items_vec,
+    };
+
+    let model_properties = ModelProperties {
+        states: Some(states),
+        transitions: Some(transitions),
+        parameters: None,
+    };
+
+    let model = Model {
+        r#type: "object".to_string(),
+        properties: model_properties,
+        required: None,
+        additionalproperties: None,
+    };
+
+    let properties = Properties {
+        name: "PetriNet".to_string(),
+        schema: "PertriNet".to_string(),
+        description: None,
+        model_version: "PetriNet".to_string(),
+        properties: None,
+        model: model,
+    }; 
+
+    let mrp =  ModelRepPn {
+        schema: "PetriNet".to_string(),
+        r#type: "PetriNet".to_string(),
+        properties: properties,
+        defs: None,
+        additionalproperties: false,
+        required: None,
+    };
+
+    return mrp;
 }
