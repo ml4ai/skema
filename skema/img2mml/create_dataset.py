@@ -22,10 +22,6 @@ parser.add_argument("--seed", type=int, default=20, help="The random seed.")
 
 args = parser.parse_args()
 
-data_path = "training_data/sample_data/"
-data_path = data_path + str(args.mode) + "_with_fonts" if args.with_fonts else ""
-random.seed(args.seed)
-
 
 def merge_sample_data(with_fonts=True):
     # Set up paths
@@ -156,4 +152,7 @@ def main():
 
 
 if __name__ == "__main__":
+    data_path = "training_data/sample_data/"
+    data_path = data_path + str(args.mode) + "_with_fonts" if args.with_fonts else ""
+    random.seed(args.seed)
     main()
