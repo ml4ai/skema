@@ -165,7 +165,7 @@ def get_bin(af):
         return (tgt_bin, ap)
 
     except:
-        print("probalem: ", ap)
+        pass
 
 
 # Function to kill process if TimeoutError occurs
@@ -236,35 +236,37 @@ def main():
     print("diving all_paths into batches of 10K to work efficiently...")
     for bidx, batch_paths in enumerate(list(divide_all_paths_into_chunks(all_paths))):
 
-        print("running batch: ", bidx)
-        print("current status: ", counter_dist_dict)
+        if count <= total_eqns:
+            print("running batch: ", bidx)
+            print("current status: ", counter_dist_dict)
 
-        all_files = list()
-        for i,ap in enumerate(batch_paths):
-            all_files.append([i, ap])
+            all_files = list()
+            for i,ap in enumerate(batch_paths):
+                all_files.append([i, ap])
 
-        with mp.Pool(config["num_cpus"]) as pool:
-            result = pool.map(prepare_dataset, all_files)
+            with mp.Pool(config["num_cpus"]) as pool:
+                result = pool.map(prepare_dataset, all_files)
 
-        with mp.Pool(config["num_cpus"]) as pool:
-            results = [pool.apply_async(get_bin, args=(i,)).get() for i in all_files]
-        pool.close()
+            with mp.Pool(config["num_cpus"]) as pool:
+                results = [pool.apply_async(get_bin, args=(i,)).get() for i in all_files]
+            pool.close()
 
-        for r in results:
-            if r != None:
-                tgt_bin, ap = r
-                # print(tgt_bin, ap)
-                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                    counter_dist_dict[tgt_bin] += 1
-                    final_paths.append(ap)
-                    count += 1
+            for r in results:
+                if r != None:
+                    tgt_bin, ap = r
+                    # print(tgt_bin, ap)
+                    if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                        counter_dist_dict[tgt_bin] += 1
+                        final_paths.append(ap)
+                        count += 1
 
-        clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
-        subprocess.run(clean_cmd)
+            clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
+            subprocess.run(clean_cmd)
 
-    # remove temp_folder
-    shutil.rmtree(temp_folder)
-    # break
+        else:
+            # remove temp_folder
+            shutil.rmtree(temp_folder)
+            break
 
         # update thhe distribution
         # for af in all_files:
