@@ -81,41 +81,41 @@ def merge_sample_data(with_fonts=True):
                 sample_mml_file.write("\n")
                 sample_mml_file.writelines(im2mml_mml_file.readlines())
 
-    # Randomize image files
-    img_files = os.listdir(sample_images_path)
-    random.shuffle(img_files)
-    for i, img_file in enumerate(img_files):
-        src_file = os.path.join(sample_images_path, img_file)
-        dst_file = os.path.join(sample_images_path, f"{i}.png")
-        os.rename(src_file, dst_file)
-
-    # Update original_latex.lst and original_mml.lst
-    shutil.copyfile(
-        os.path.join(data_path, "original_latex.lst"),
-        os.path.join(data_path, "original_latex_copy.lst"),
-    )
-    with open(os.path.join(data_path, "original_latex_copy.lst"), "r") as in_file:
-        latex_lines = in_file.readlines()
-    with open(os.path.join(data_path, "original_latex.lst"), "w") as f:
-        f.write("")
-
-    shutil.copyfile(
-        os.path.join(data_path, "original_mml.lst"),
-        os.path.join(data_path, "original_mml_copy.lst"),
-    )
-    with open(os.path.join(data_path, "original_mml_copy.lst"), "r") as in_file:
-        mml_lines = in_file.readlines()
-    with open(os.path.join(data_path, "original_mml.lst"), "w") as f:
-        f.write("")
-
-    with open(os.path.join(data_path, "original_latex.lst"), "a") as out_file:
-        with open(os.path.join(data_path, "original_mml.lst"), "a") as out_file2:
-            for i, img_file in enumerate(img_files):
-                out_file.write(latex_lines[int(img_file.split(".")[0])].strip() + "\n")
-                out_file2.write(mml_lines[int(img_file.split(".")[0])].strip() + "\n")
-
-    os.remove(os.path.join(data_path, "original_latex_copy.lst"))
-    os.remove(os.path.join(data_path, "original_mml_copy.lst"))
+    # # Randomize image files
+    # img_files = os.listdir(sample_images_path)
+    # random.shuffle(img_files)
+    # for i, img_file in enumerate(img_files):
+    #     src_file = os.path.join(sample_images_path, img_file)
+    #     dst_file = os.path.join(sample_images_path, f"{i}.png")
+    #     os.rename(src_file, dst_file)
+    #
+    # # Update original_latex.lst and original_mml.lst
+    # shutil.copyfile(
+    #     os.path.join(data_path, "original_latex.lst"),
+    #     os.path.join(data_path, "original_latex_copy.lst"),
+    # )
+    # with open(os.path.join(data_path, "original_latex_copy.lst"), "r") as in_file:
+    #     latex_lines = in_file.readlines()
+    # with open(os.path.join(data_path, "original_latex.lst"), "w") as f:
+    #     f.write("")
+    #
+    # shutil.copyfile(
+    #     os.path.join(data_path, "original_mml.lst"),
+    #     os.path.join(data_path, "original_mml_copy.lst"),
+    # )
+    # with open(os.path.join(data_path, "original_mml_copy.lst"), "r") as in_file:
+    #     mml_lines = in_file.readlines()
+    # with open(os.path.join(data_path, "original_mml.lst"), "w") as f:
+    #     f.write("")
+    #
+    # with open(os.path.join(data_path, "original_latex.lst"), "a") as out_file:
+    #     with open(os.path.join(data_path, "original_mml.lst"), "a") as out_file2:
+    #         for i, img_file in enumerate(img_files):
+    #             out_file.write(latex_lines[int(img_file.split(".")[0])].strip() + "\n")
+    #             out_file2.write(mml_lines[int(img_file.split(".")[0])].strip() + "\n")
+    #
+    # os.remove(os.path.join(data_path, "original_latex_copy.lst"))
+    # os.remove(os.path.join(data_path, "original_mml_copy.lst"))
 
 
 def main():
