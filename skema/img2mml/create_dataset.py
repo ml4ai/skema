@@ -114,8 +114,8 @@ def merge_sample_data(with_fonts=True):
                 out_file.write(latex_lines[int(img_file.split(".")[0])].strip() + "\n")
                 out_file2.write(mml_lines[int(img_file.split(".")[0])].strip() + "\n")
 
-    shutil.rmtree(os.path.join(data_path, "original_latex_copy.lst"))
-    shutil.rmtree(os.path.join(data_path, "original_mml_copy.lst"))
+    os.remove(os.path.join(data_path, "original_latex_copy.lst"))
+    os.remove(os.path.join(data_path, "original_mml_copy.lst"))
 
 
 def main():
