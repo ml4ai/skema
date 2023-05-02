@@ -251,12 +251,13 @@ def main():
         pool.close()
 
         for r in results:
-            tgt_bin, ap = r
-            print(tgt_bin, ap)
-            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                counter_dist_dict[tgt_bin] += 1
-                final_paths.append(ap)
-                count += 1
+            if r != None:
+                tgt_bin, ap = r
+                # print(tgt_bin, ap)
+                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                    counter_dist_dict[tgt_bin] += 1
+                    final_paths.append(ap)
+                    count += 1
 
         clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
         subprocess.run(clean_cmd)
