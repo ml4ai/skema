@@ -251,7 +251,7 @@ def main():
         pool.close()
 
         for r in results:
-            tgt_bin, ap = r.split()
+            tgt_bin, ap = r
             print(tgt_bin, ap)
             if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                 counter_dist_dict[tgt_bin] += 1
