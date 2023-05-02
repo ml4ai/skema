@@ -246,8 +246,9 @@ def main():
         with mp.Pool(config["num_cpus"]) as pool:
             result = pool.map(prepare_dataset, all_files)
 
-        results = [pool.apply_async(get_bin, args=(i,)).get() for i in all_files]
-        pool.close()
+        with mp.Pool(config["num_cpus"]) as pool:
+            results = [pool.apply_async(get_bin, args=(i,)).get() for i in all_files]
+            pool.close()
 
         for r in results:
             tgt_bin, ap = r
