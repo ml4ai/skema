@@ -219,6 +219,7 @@ def main():
 
         # update thhe distribution
         for af in all_files:
+            print(af)
             i,ap = af
 
             try:
