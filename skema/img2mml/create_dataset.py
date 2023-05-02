@@ -70,7 +70,6 @@ def merge_sample_data(with_fonts=True):
         with open(im2mml_latex_path, "r") as im2mml_latex_file:
             with open(sample_latex_path, "a") as sample_latex_file:
                 sample_latex_file.writelines(arxiv_latex_file.readlines())
-                sample_latex_file.write("\n")
                 sample_latex_file.writelines(im2mml_latex_file.readlines())
 
     # Merge original_mml.lst and original_mml.lst
@@ -78,7 +77,6 @@ def merge_sample_data(with_fonts=True):
         with open(im2mml_mml_path, "r") as im2mml_mml_file:
             with open(sample_mml_path, "a") as sample_mml_file:
                 sample_mml_file.writelines(arxiv_mml_file.readlines())
-                sample_mml_file.write("\n")
                 sample_mml_file.writelines(im2mml_mml_file.readlines())
 
     # # Randomize image files
