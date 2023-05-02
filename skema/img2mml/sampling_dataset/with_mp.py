@@ -208,7 +208,7 @@ def main():
 
         if (count <= total_eqns):
 
-            if count%10000==0:
+            if count%1000==0:
                 print("current status: ", counter_dist_dict)
 
             all_files = list()
