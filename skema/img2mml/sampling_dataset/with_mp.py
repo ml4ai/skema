@@ -204,8 +204,10 @@ def main():
     if not os.path.exists(temp_folder):
         os.mkdir(temp_folder)
 
-    for batch_paths in list(divide_all_paths_into_chunks(all_paths)):
+    print("diving all_paths into batches of 10K to work efficiently...")
+    for bidx, batch_paths in enumerate(list(divide_all_paths_into_chunks(all_paths))):
 
+        print("running batch: ", bidx)
         print("current status: ", counter_dist_dict)
 
         all_files = list()
