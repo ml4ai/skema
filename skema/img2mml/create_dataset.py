@@ -22,7 +22,7 @@ parser.add_argument("--seed", type=int, default=20, help="The random seed.")
 
 args = parser.parse_args()
 
-data_path = "training_data/sample_data"
+data_path = "training_data/sample_data/"
 data_path = data_path + str(args.mode) + "_with_fonts" if args.with_fonts else ""
 random.seed(args.seed)
 
