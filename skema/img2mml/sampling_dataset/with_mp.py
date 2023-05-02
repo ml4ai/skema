@@ -234,6 +234,7 @@ def main():
         os.mkdir(temp_folder)
 
     print("diving all_paths into batches of 10K to work efficiently...")
+    reject_count = 0
     for bidx, batch_paths in enumerate(list(divide_all_paths_into_chunks(all_paths))):
 
         if count <= total_eqns:
@@ -259,6 +260,8 @@ def main():
                         counter_dist_dict[tgt_bin] += 1
                         final_paths.append(ap)
                         count += 1
+                else:
+                    reject_count += 1
 
             clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
             subprocess.run(clean_cmd)
