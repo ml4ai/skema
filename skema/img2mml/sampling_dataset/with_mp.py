@@ -248,10 +248,10 @@ def main():
 
         with mp.Pool(config["num_cpus"]) as pool:
             results = [pool.apply_async(get_bin, args=(i,)).get() for i in all_files]
-            pool.close()
+        pool.close()
 
         for r in results:
-            tgt_bin, ap = r
+            tgt_bin, ap = r.split()
             print(tgt_bin, ap)
             if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                 counter_dist_dict[tgt_bin] += 1
