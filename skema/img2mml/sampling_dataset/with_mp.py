@@ -261,7 +261,7 @@ def main():
 
     # remove temp_folder
     shutil.rmtree(temp_folder)
-    break
+    # break
 
         # update thhe distribution
         # for af in all_files:
