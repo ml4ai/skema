@@ -8,5 +8,5 @@ if __name__ == "__main__":
     main()
     print("sampled_data is ready.")
 
-    total_time = (time.time() - start_time) / 3600
-    print(f"total time taken {total_time} hours.")
+    total_time = (time.time() - start_time) / 60
+    print(f"total time taken {total_time} minutes.")
