@@ -139,6 +139,35 @@ def prepare_dataset(args):
     finally:
         my_timer.cancel()
 
+def get_bin(af):
+
+    try:
+        i,ap = af
+        simp_mml = open(
+            f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+        )
+        simp_mml = simp_mml.readlines()[0]
+        length_mml = len(simp_mml.split())
+
+        # finding the bin
+        temp_dict = {}
+        for i in range(50, 400, 50):
+            if length_mml / i < 1:
+                temp_dict[i] = length_mml / i
+
+        # get the bin
+        if len(temp_dict) >= 1:
+            max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+            tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+        else:
+            tgt_bin = "350+"
+
+        return (tgt_bin, ap)
+
+    except:
+        print("probalem: ", ap)
+
+
 # Function to kill process if TimeoutError occurs
 kill = lambda process: process.kill()
 
@@ -217,45 +246,62 @@ def main():
         with mp.Pool(config["num_cpus"]) as pool:
             result = pool.map(prepare_dataset, all_files)
 
+        results = [pool.apply_async(get_bin, args=(i,)).get() for i in all_files]
+        pool.close()
+
+        for r in results:
+            tgt_bin, ap = r
+            if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                counter_dist_dict[tgt_bin] += 1
+                final_paths.append(ap)
+                count += 1
+
+        clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
+        subprocess.run(clean_cmd)
+
+    # remove temp_folder
+    shutil.rmtree(temp_folder)
+    break
+
         # update thhe distribution
-        for af in all_files:
-            i,ap = af
+        # for af in all_files:
+            # i,ap = af
 
-            try:
-                simp_mml = open(
-                    f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
-                )
-                simp_mml = simp_mml.readlines()[0]
-                length_mml = len(simp_mml.split())
+            # try:
+                # simp_mml = open(
+                #     f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+                # )
+                # simp_mml = simp_mml.readlines()[0]
+                # length_mml = len(simp_mml.split())
+                #
+                # # finding the bin
+                # temp_dict = {}
+                # for i in range(50, 400, 50):
+                #     if length_mml / i < 1:
+                #         temp_dict[i] = length_mml / i
+                #
+                # # get the bin
+                # if len(temp_dict) >= 1:
+                #     max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
+                #     tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
+                # else:
+                #     tgt_bin = "350+"
 
-                # finding the bin
-                temp_dict = {}
-                for i in range(50, 400, 50):
-                    if length_mml / i < 1:
-                        temp_dict[i] = length_mml / i
-
-                # get the bin
-                if len(temp_dict) >= 1:
-                    max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                    tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                else:
-                    tgt_bin = "350+"
-
-                if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                    counter_dist_dict[tgt_bin] += 1
-                    final_paths.append(ap)
-                    count += 1
-            except:
-                    pass
+                # if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                #     counter_dist_dict[tgt_bin] += 1
+                #     final_paths.append(ap)
+                #     count += 1
+            # except:
+            #         pass
 
             # clean the temp_folder after completeing the batch
-            clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
-            subprocess.run(clean_cmd)
+            # clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
+            # subprocess.run(clean_cmd)
 
-        else:
-            # remove temp_folder
-            shutil.rmtree(temp_folder)
-            break
+        # else:
+        #     # remove temp_folder
+        #     shutil.rmtree(temp_folder)
+        #     break
 
     ######## step 4: writing the final dataset ########
 
