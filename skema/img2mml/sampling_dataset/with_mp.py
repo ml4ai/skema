@@ -208,8 +208,8 @@ def main():
 
         if (count <= total_eqns):
 
-            if count%100==0:
-                print(counter_dist_dict)
+            if count%10000==0:
+                print("current status: ", counter_dist_dict)
 
             all_files = list()
             for i,ap in enumerate(batch_paths):
