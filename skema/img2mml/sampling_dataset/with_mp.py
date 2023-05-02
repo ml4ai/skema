@@ -269,7 +269,9 @@ def main():
         else:
             # remove temp_folder
             shutil.rmtree(temp_folder)
+            print("rejected: ", reject_count)
             break
+
 
         # update thhe distribution
         # for af in all_files:
