@@ -80,14 +80,17 @@ def create_dataset():
     # create destination files and directory
     data_path = "training_data/arxiv_sample_data"
     images_path = os.path.join(data_path, "images")
+    images_path_fonts = os.path.join(data_path, "images_fonts")
 
     if not os.path.exists(data_path):
         os.mkdir(data_path)
         os.mkdir(images_path)
+        os.mkdir(images_path_fonts)
     else:
         shutil.rmtree(data_path)
         os.mkdir(data_path)
         os.mkdir(images_path)
+        os.mkdir(images_path_fonts)
         print(
             "arxiv_sample_data already exists. Removing old sample_data and replacing it with new one."
         )
@@ -187,6 +190,14 @@ def create_dataset():
             )
             img_dst = os.path.join(images_path, f"{c_idx}.png")
             CP(img_src, img_dst)
+
+            # copying image with diverse fonts
+            img_src_fonts = os.path.join(
+                root,
+                f"{yr}/{month}/latex_images_fonts/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
+            )
+            img_dst_fonts = os.path.join(img_src_fonts, f"{c_idx}.png")
+            CP(img_src_fonts, img_dst_fonts)
 
             # wrting path
             paths_file.write(fp + "\n")
