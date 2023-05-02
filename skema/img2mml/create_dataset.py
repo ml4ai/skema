@@ -15,7 +15,7 @@ parser.add_argument(
 parser.add_argument(
     "--with_fonts",
     action="store_true",
-    default=True,
+    default=False,
     help="Whether using the dataset with diverse fonts",
 )
 parser.add_argument("--seed", type=int, default=20, help="The random seed.")
