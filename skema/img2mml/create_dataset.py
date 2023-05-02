@@ -129,31 +129,31 @@ def main():
     if args.mode == "arxiv":
         if args.with_fonts:
             image_path = "training_data/arxiv_sample_data/images_fonts"
-            shutil.copytree(image_path, data_path)
-            os.rename(data_path + "/images_fonts", data_path + "/images")
+            shutil.copytree(image_path, data_path + "/images")
+            # os.rename(data_path + "/images_fonts", data_path + "/images")
         else:
             image_path = "training_data/arxiv_sample_data/images"
-            shutil.copytree(image_path, data_path)
+            shutil.copytree(image_path, data_path + "/images")
 
         latex_path = "training_data/arxiv_sample_data/original_latex.lst"
-        shutil.copytree(latex_path, data_path)
+        shutil.copy(latex_path, data_path)
         mml_path = "training_data/arxiv_sample_data/original_mml.lst"
-        shutil.copytree(mml_path, data_path)
+        shutil.copy(mml_path, data_path)
         path_path = "training_data/arxiv_sample_data/paths.lst"
-        shutil.copytree(mml_path, path_path)
+        shutil.copy(mml_path, path_path)
 
     elif args.mode == "im2mml":
         if args.with_fonts:
             image_path = "training_data/im2mml-100K/images_fonts"
-            shutil.copytree(image_path, data_path)
-            os.rename(data_path + "/images_fonts", data_path + "/images")
+            shutil.copytree(image_path, data_path + "/images")
+            # os.rename(data_path + "/images_fonts", data_path + "/images")
         else:
             image_path = "training_data/im2mml-100K/images"
-            shutil.copytree(image_path, data_path)
+            shutil.copytree(image_path, data_path + "/images")
         latex_path = "training_data/im2mml-100K/latex.lst"
-        shutil.copytree(latex_path, data_path)
+        shutil.copy(latex_path, data_path)
         mml_path = "training_data/im2mml-100K/original_mml.lst"
-        shutil.copytree(mml_path, data_path)
+        shutil.copy(mml_path, data_path)
     else:
         merge_sample_data(with_fonts=args.with_fonts)
 
