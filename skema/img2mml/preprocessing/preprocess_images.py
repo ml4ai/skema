@@ -9,13 +9,10 @@ from PIL import Image
 import multiprocessing
 from multiprocessing import Pool, Lock, TimeoutError
 
-
-def get_config(config_path):
-    with open(config_path, "r") as cfg:
-        config = json.load(cfg)
-
-    return config
-
+# read config file
+config_path = sys.argv[-1]
+with open(config_path, "r") as cfg:
+    config = json.load(cfg)
 
 def crop_image(image, reject=False):
     # converting to np array
@@ -168,9 +165,6 @@ def preprocess_images(image):
 
 
 def main():
-
-    # get config
-    config = get_config(sys.argv[-1])
 
     data_path = f"{config['data_path']}/{config['dataset_type']}"
     images = os.listdir(f"{data_path}/images")
