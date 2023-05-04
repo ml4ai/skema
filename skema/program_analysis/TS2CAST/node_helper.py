@@ -1,46 +1,15 @@
 from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
+from tree_sitter import Node
 
-class NodeHelper(object):
-    def __init__(self, source_file_name: str, source: str):
-        self.source_file_name = source_file_name
-        self.source = source
-
-    def parse_tree_to_dict(self, node) -> Dict:
-        node_dict = {
-            "type": self.get_node_type(node),
-            "source_refs": [self.get_node_source_ref(node)],
-            "identifier": self.get_node_identifier(node),
-            "original_children_order": [],
-            "children": [],
-            "comments": [],
-            "control": [],
-        }
-
-        for child in node.children:
-            child_dict = self.parse_tree_to_dict(child)
-            node_dict["original_children_order"].append(child_dict)
-            if self.is_comment_node(child):
-                node_dict["comments"].append(child_dict)
-            elif self.is_control_character_node(child):
-                node_dict["control"].append(child_dict)
-            else:
-                node_dict["children"].append(child_dict)
-
-        return node_dict
-
-    def is_comment_node(self, node):
-        if node.type == "comment":
-            return True
-        return False
-
-    def is_control_character_node(self, node):
-        control_characters = [
+CONTROL_CHARACTERS = [
             ",",
             "=",
             "(",
             ")",
+            "(/",
+            "/)",
             ":",
             "::",
             "+",
@@ -52,51 +21,77 @@ class NodeHelper(object):
             "<",
             "<=",
             ">=",
-        ]
-        return node.type in control_characters
+            "only"
+]
 
-    def get_node_source_ref(self, node) -> SourceRef:
-        row_start, col_start = node.start_point
-        row_end, col_end = node.end_point
-        return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)
+def fix_continuation_lines(source: str) -> str:
+    '''
+    Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
+    1. Replaces the first occurrence of '|' with '&' if it is the first non-whitespace character in the line.
+    2. Adds an additional '&' to the previous line
+    '''
+    processed_lines = []
+    for i, line in enumerate(source.splitlines()):
+        if line.lstrip().startswith("|"):
+            line = line.replace("|", "&", 1)
+            processed_lines[-1] += "&"
+        processed_lines.append(line)
+    return "\n".join(processed_lines)
+    
+def remove_comment_nodes(node:Node) -> Node:
+    '''
+    Recursivley walk through tree, removing and Comment nodes
+    '''
+    [remove_comment_nodes(child) for child in node.children if child.type != "comment"]
 
-    def get_node_identifier(self, node) -> str:
-        source_ref = self.get_node_source_ref(node)
+def get_source_ref(node: Node, file_name: str) -> SourceRef:
+    '''Given a node and file name, return a CAST SourceRef object.'''
+    row_start, col_start = node.start_point
+    row_end, col_end = node.end_point
+    return SourceRef(file_name, col_start, col_end, row_start, row_end)
 
-        line_num = 0
-        column_num = 0
-        in_identifier = False
-        identifier = ""
-        for i, char in enumerate(self.source):
-            if line_num == source_ref.row_start and column_num == source_ref.col_start:
-                in_identifier = True
-            elif line_num == source_ref.row_end and column_num == source_ref.col_end:
-                break
+def get_identifier(node: Node, source: str) -> str:
+    '''Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point'''
+    line_num = 0
+    column_num = 0
+    in_identifier = False
+    identifier = ""
+    for i, char in enumerate(source):
+        if line_num == node.start_point[0] and column_num == node.start_point[1]:
+            in_identifier = True
+        elif line_num == node.end_point[0] and column_num == node.end_point[1]:
+            break
 
-            if char == "\n":
-                line_num += 1
-                column_num = 0
-            else:
-                column_num += 1
+        if char == "\n":
+            line_num += 1
+            column_num = 0
+        else:
+            column_num += 1
 
-            if in_identifier:
-                identifier += char
+        if in_identifier:
+            identifier += char
 
-        return identifier
+    
+    return identifier
 
-    def get_node_type(self, node) -> str:
-        return node.type
+def get_first_child_by_type(node: Node, type: str):
+    '''Takes in a node and a type string as inputs and returns the first child matching that type. Otherwise, return None'''
+    for child in node.children:
+        if child.type == type:
+            return child
+    return None
 
-    def get_first_child_by_type(self, node: Dict, node_type: str) -> Dict:
-        children = self.get_children_by_type(node, node_type)
-        if len(children) >= 1:
-            return children[0]
+def get_children_by_types(node: Node, types: List):
+    '''Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list'''
+    return [child for child in node.children if child.type in types]
 
-    def get_children_by_type(self, node: Dict, node_type: str) -> List:
-        children = []
+def get_control_children(node: Node): 
+    return get_children_by_types(node, CONTROL_CHARACTERS)
 
-        for child in node["children"]:
-            if child["type"] == node_type:
-                children.append(child)
+def get_non_control_children(node: Node):
+    children = []
+    for child in node.children:
+        if child.type not in CONTROL_CHARACTERS:
+            children.append(child)
 
-        return children
+    return children
