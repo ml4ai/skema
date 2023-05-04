@@ -90,7 +90,7 @@ def merge_sample_data(with_fonts=True):
         shutil.copy(src_file, dst_file)
 
     shutil.rmtree(sample_images_path)
-    os.rename('images_copy', 'images')
+    os.rename(data_path + '/images_copy', data_path + '/images')
     # Update original_latex.lst and original_mml.lst
     shutil.copyfile(
         os.path.join(data_path, "original_latex.lst"),
