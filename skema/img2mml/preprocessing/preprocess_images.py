@@ -10,7 +10,27 @@ import multiprocessing
 from multiprocessing import Pool, Lock, TimeoutError
 import sys
 
+parser = argparse.ArgumentParser(
+    description="Preprocess the images in the dataset for training and evaluation."
+)
+parser.add_argument(
+    "--mode",
+    choices=["arxiv", "im2mml", "arxiv_im2mml"],
+    default="arxiv",
+    help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
+)
+parser.add_argument(
+    "--with_fonts",
+    action="store_true",
+    default=False,
+    help="Whether using the dataset with diverse fonts",
+)
+parser.add_argument("--seed", type=int, default=20, help="The random seed.")
+
+args = parser.parse_args()
+
 config = None
+
 
 def get_config(config_path):
     with open(config_path, "r") as cfg:
@@ -122,7 +142,6 @@ def downsampling(image):
 
 
 def preprocess_images(image):
-
     """
     RuntimeError: only Tensors of floating point dtype can require gradients
     Crop, padding, and downsample the image.
@@ -131,9 +150,12 @@ def preprocess_images(image):
     :params img_batch: batch of images
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
+    data_path = f"training_data/sample_data/{args.mode}"
+    if args.with_fonts:
+        data_path += "_with_fonts"
 
     IMAGE = Image.open(
-        f"{config['data_path']}/{config['dataset_type']}/images/{image}"
+        f"{data_path}/images/{image}"
     ).convert("L")
 
     # checking the size of the image
@@ -161,7 +183,7 @@ def preprocess_images(image):
         # saving the image
         torch.save(
             IMAGE,
-            f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
+            f"{data_path}/image_tensors/{image.split('.')[0]}.txt",
         )
         return None
 
@@ -171,10 +193,12 @@ def preprocess_images(image):
 
 def main():
     global config
-    # get config
     config = get_config(sys.argv[-1])
 
-    data_path = f"{config['data_path']}/{config['dataset_type']}"
+    data_path = f"training_data/sample_data/{args.mode}"
+    if args.with_fonts:
+        data_path += "_with_fonts"
+
     images = os.listdir(f"{data_path}/images")
 
     # create an image_tensors folder
@@ -191,10 +215,7 @@ def main():
 
     # renaming the final image_tensors to make sequential
     tnsrs = sorted(
-        [
-            int(i.split(".")[0])
-            for i in os.listdir(f"{data_path}/image_tensors")
-        ]
+        [int(i.split(".")[0]) for i in os.listdir(f"{data_path}/image_tensors")]
     )
     os.chdir(f"{data_path}/image_tensors")
     for t in range(len(tnsrs)):
