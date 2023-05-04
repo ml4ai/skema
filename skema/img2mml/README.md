@@ -1,4 +1,4 @@
-[#](#) img2mml
+# img2mml
 
 This directory contains the code for the img2mml service, which processes images
 of equations and returns presentation MathML corresponding to those equations.
