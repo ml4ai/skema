@@ -213,7 +213,11 @@ def main():
 
     blank_images = [i for i in result if i != None]
 
-    with open("logs/blank_images.lst", "w") as out:
+    mode_name = args.mode
+    if args.with_fonts:
+        mode_name += "_with_fonts"
+
+    with open(f"logs/{mode_name}_blank_images.lst", "w") as out:
         out.write("\n".join(str(item) for item in blank_images))
 
     # renaming the final image_tensors to make sequential
