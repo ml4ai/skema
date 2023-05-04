@@ -3,6 +3,38 @@
 import re, json, argparse
 import subprocess, os, sys
 
+
+parser = argparse.ArgumentParser(
+    description="Preprocess the MathMLs in the dataset for training and evaluation."
+)
+parser.add_argument(
+    "--mode",
+    choices=["arxiv", "im2mml", "arxiv_im2mml"],
+    default="arxiv",
+    help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
+)
+parser.add_argument(
+    "--with_fonts",
+    action="store_true",
+    default=False,
+    help="Whether using the dataset with diverse fonts",
+)
+parser.add_argument(
+    "--with_boldface",
+    action="store_true",
+    default=False,
+    help="Whether having boldface in labels",
+)
+parser.add_argument(
+    "--config",
+    type=str,
+    default="configs/xfmer_mml_config.json",
+    help="The configuration file.",
+)
+
+args = parser.parse_args()
+
+
 def get_config(config_path):
     # # opening config file
     # parser = argparse.ArgumentParser()
@@ -19,8 +51,8 @@ def get_config(config_path):
 
     return config
 
-def simplification(mml_org):
 
+def simplification(mml_org):
     """
     simplify the mathml by removing unnecessary information.
     """
@@ -123,9 +155,7 @@ def simplification(mml_org):
     return mml_mod
 
 
-def attribute_definition(
-    mml_code, elements, attr_tobe_removed, attr_tobe_checked
-):
+def attribute_definition(mml_code, elements, attr_tobe_removed, attr_tobe_checked):
     """
     Removing unnecessary information or attributes having default values.
     """
@@ -134,14 +164,10 @@ def attribute_definition(
     definition_array = []
 
     for ele in elements:
-
         # Getting indices of the position of the element in the MML code
-        position = [
-            i for i in re.finditer(r"\b%s\b" % re.escape(ele), mml_code)
-        ]
+        position = [i for i in re.finditer(r"\b%s\b" % re.escape(ele), mml_code)]
 
         for p in position:
-
             # Attribute begining and ending indices
             (attr_begin, attr_end) = p.span()
 
@@ -149,7 +175,6 @@ def attribute_definition(
             length = mml_code[attr_end:].find(">")
 
             if length > 0:
-
                 # Grabbing definition
                 definition = mml_code[attr_end : attr_end + length].split()
 
@@ -228,7 +253,6 @@ def remove_unecc_tokens(eqn):
     eliminate = [
         "mspace",
         "mtable",
-        "mathvariant",
         "class",
         "mpadded",
         "symmetric",
@@ -244,7 +268,14 @@ def remove_unecc_tokens(eqn):
         "minsize",
         "linethickness",
         "mstyle",
+        "mathvariant",
     ]
+    if args.with_boldface:
+        eqn = eqn.replace(r"mathvariant=\"bold-italic\"", r"placeholder")
+        eqn = eqn.replace(r"mathvariant=\"bold-fraktur\"", r"placeholder")
+        eqn = eqn.replace(r"mathvariant=\"bold-script\"", r"placeholder")
+        eqn = eqn.replace(r"mathvariant=\"bold-sans-serif\"", r"placeholder")
+        eqn = eqn.replace(r"mathvariant=\"bold-italic\"", r"placeholder")
 
     keep = ["mo", "mi", "mfrac", "mn", "mrow"]
 
@@ -258,18 +289,12 @@ def remove_unecc_tokens(eqn):
                 temp1 = eqn[: idx + 1]
                 temp2 = eqn[idx + 1 :]
                 open_angle = [
-                    idx_open
-                    for idx_open, angle in enumerate(temp1)
-                    if angle == "<"
+                    idx_open for idx_open, angle in enumerate(temp1) if angle == "<"
                 ]
                 close_angle = [
-                    idx_close
-                    for idx_close, angle in enumerate(temp2)
-                    if angle == ">"
+                    idx_close for idx_close, angle in enumerate(temp2) if angle == ">"
                 ]
-                filtered = (
-                    temp1[open_angle[-1] :] + temp2[: close_angle[0] + 1]
-                )
+                filtered = temp1[open_angle[-1] :] + temp2[: close_angle[0] + 1]
                 flag = False
                 for k in keep:
                     if ("<" + k) in filtered:
@@ -279,9 +304,7 @@ def remove_unecc_tokens(eqn):
                             "mi",
                         ]:
                             true_k = [
-                                k
-                                for f in filtered.split()
-                                if k in f and e not in f
+                                k for f in filtered.split() if k in f and e not in f
                             ]
                             if len(true_k) > 0:
                                 keep_token = true_k[0]
@@ -295,6 +318,9 @@ def remove_unecc_tokens(eqn):
                     )
                 else:
                     eqn = temp1[: open_angle[-1]] + temp2[close_angle[0] + 1 :]
+
+    if args.with_boldface:
+        eqn = eqn.replace(r"placeholder", r"mathvariant=\"bold\"")
 
     return eqn
 
@@ -340,9 +366,7 @@ def remove_additional_tokens(eqn):
                 begin_idx = _eqn_arr.index("<mrow>")
                 end_idx = _eqn_arr.index("</mrow>")
                 if begin_idx + 2 == end_idx:
-                    temp_eqn += _eqn_arr[:begin_idx] + [
-                        _eqn_arr[begin_idx + 1]
-                    ]
+                    temp_eqn += _eqn_arr[:begin_idx] + [_eqn_arr[begin_idx + 1]]
                 else:
                     temp_eqn += eqn_arr[c_begin : c_end + 1]
 
@@ -408,9 +432,7 @@ def extract_inbetween_tokens(mml_eqn):
     extract inbetween token like <mo>/token/<\mo>, etc.
     """
     mmls = [m for m in mml_eqn.split(" ") if m != ""]
-    mmlss = [
-        m for m in mmls if "<" in m and len([t for t in m if t == "<"]) == 2
-    ]
+    mmlss = [m for m in mmls if "<" in m and len([t for t in m if t == "<"]) == 2]
     mmls3 = []
     for i in mmlss:
         if "&#x" not in i:
@@ -440,9 +462,7 @@ def tokenize(mml_eqn):
             if "&#x" in token or len(token) == 1:
                 tokenized_mml += token
 
-            elif (
-                token.isdigit()
-            ):  # entire number is made up integers e.g. 12345
+            elif token.isdigit():  # entire number is made up integers e.g. 12345
                 for intgr in list(map(int, token)):
                     tokenized_mml += f" {intgr} "
 
@@ -480,16 +500,25 @@ def tokenize(mml_eqn):
 
 
 if __name__ == "__main__":
-
     # get config
-    config = get_config(sys.argv[-1])
+    config = get_config(args.config)
+
+    data_path = f"training_data/sample_data/{args.mode}"
+    if args.with_fonts:
+        data_path += "_with_fonts"
 
     # get the rejected images
-    data_path = f"{config['data_path']}/{config['dataset_type']}"
     org_mml = open(f"{data_path}/original_{config['markup']}.lst", "r").readlines()
-    modified_mml_file = open(f"{data_path}/{config['markup']}.lst", "w")
+    if args.with_boldface:
+        modified_mml_file = open(f"{data_path}/{config['markup']}_boldface.lst", "w")
+    else:
+        modified_mml_file = open(f"{data_path}/{config['markup']}.lst", "w")
 
-    blank_images = open("logs/blank_images.lst").readlines()
+    mode_name = args.mode
+    if args.with_fonts:
+        mode_name += "_with_fonts"
+
+    blank_images = open(f"logs/{mode_name}_blank_images.lst").readlines()
     idx_to_be_ignored = [int(i.split(".")[0]) for i in blank_images]
 
     for eqn_idx in range(len(org_mml)):
