@@ -25,7 +25,12 @@ parser.add_argument(
     default=False,
     help="Whether using the dataset with diverse fonts",
 )
-parser.add_argument("--seed", type=int, default=20, help="The random seed.")
+parser.add_argument(
+    "--config",
+    type=str,
+    default="configs/xfmer_mml_config.json",
+    help="The configuration file.",
+)
 
 args = parser.parse_args()
 
@@ -191,7 +196,7 @@ def preprocess_images(image):
 
 def main():
     global config
-    config = get_config(sys.argv[-1])
+    config = get_config(args.config)
 
     data_path = f"training_data/sample_data/{args.mode}"
     if args.with_fonts:
