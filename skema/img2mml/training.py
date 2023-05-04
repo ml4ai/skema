@@ -33,14 +33,41 @@ from skema.img2mml.src.test import evaluate
 # opening config file
 parser = argparse.ArgumentParser()
 parser.add_argument(
+    "--mode",
+    choices=["arxiv", "im2mml", "arxiv_im2mml"],
+    default="arxiv",
+    help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
+)
+parser.add_argument(
+    "--with_fonts",
+    action="store_true",
+    default=False,
+    help="Whether using the dataset with diverse fonts",
+)
+parser.add_argument(
+    "--with_boldface",
+    action="store_true",
+    default=False,
+    help="Whether having boldface in labels",
+)
+parser.add_argument(
     "--config",
     help="configuration file for paths and hyperparameters",
     default="configs/xfmer_mml_config.json",
 )
 args = parser.parse_args()
 
+data_model = args.mode
+if args.with_fonts:
+    data_model += "_with_fonts"
+
 with open(args.config, "r") as cfg:
     config = json.load(cfg)
+    config["data_model"] = data_model
+    if args.with_boldface:
+        config["with_boldface"] = "True"
+    else:
+        config["with_boldface"] = "False"
 
 torch.backends.cudnn.enabled = False
 
@@ -88,9 +115,7 @@ def define_model(config, VOCAB, DEVICE):
             DROPOUT,
             TFR,
         )
-        model = Image2MathML_LSTM(
-            ENC, DEC, DEVICE, ENCODING_TYPE, MAX_LEN, VOCAB
-        )
+        model = Image2MathML_LSTM(ENC, DEC, DEVICE, ENCODING_TYPE, MAX_LEN, VOCAB)
 
     elif MODEL_TYPE == "cnn_xfmer":
         # transformers params
@@ -99,7 +124,7 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
-        LEN_DIM=930
+        LEN_DIM = 930
 
         ENC = {
             "CNN": CNN_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE),
@@ -112,7 +137,7 @@ def define_model(config, VOCAB, DEVICE):
                 MAX_LEN,
                 N_XFMER_ENCODER_LAYERS,
                 DIM_FEEDFWD,
-                LEN_DIM
+                LEN_DIM,
             ),
         }
         DEC = Transformer_Decoder(
@@ -135,10 +160,12 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
-        LEN_DIM=32
+        LEN_DIM = 32
 
         ENC = {
-            "CNN": ResNet18_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE, ResNetBlock),
+            "CNN": ResNet18_Encoder(
+                INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE, ResNetBlock
+            ),
             "XFMER": Transformer_Encoder(
                 EMB_DIM,
                 DEC_HID_DIM,
@@ -148,7 +175,7 @@ def define_model(config, VOCAB, DEVICE):
                 MAX_LEN,
                 N_XFMER_ENCODER_LAYERS,
                 DIM_FEEDFWD,
-                LEN_DIM
+                LEN_DIM,
             ),
         }
         DEC = Transformer_Decoder(
@@ -198,8 +225,9 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(rank=None,):
-
+def train_model(
+    rank=None,
+):
     # parameters
     EPOCHS = config["epochs"]
     batch_size = config["batch_size"]
@@ -241,10 +269,16 @@ def train_model(rank=None,):
         if not os.path.exists(f):
             os.mkdir(f)
 
-    # to log losses
-    loss_file = open("logs/loss_file.txt", "w")
-    # to log config(to keep track while running multiple experiments)
-    config_log = open("logs/config_log.txt", "w")
+    if args.with_boldface:
+        # to log losses
+        loss_file = open(f"logs/{data_model}_boldface_loss_file.txt", "w")
+        # to log config(to keep track while running multiple experiments)
+        config_log = open(f"logs/{data_model}_boldface_config_log.txt", "w")
+    else:
+        # to log losses
+        loss_file = open(f"logs/{data_model}_loss_file.txt", "w")
+        # to log config(to keep track while running multiple experiments)
+        config_log = open(f"logs/{data_model}_config_log.txt", "w")
     json.dump(config, config_log)
 
     # defining model using DataParallel
@@ -344,11 +378,16 @@ def train_model(rank=None,):
         # if continue_training_from_last_saved_model
         # model will be lastest saved model
         if cont_training:
-            model.load_state_dict(
-                torch.load(
-                    f"trained_models/{model_type}_{dataset_type}_latest.pt"
+            if args.with_boldface:
+                model.load_state_dict(
+                    torch.load(
+                        f"trained_models/{model_type}_{data_model}_boldface_latest.pt"
+                    )
                 )
-            )
+            else:
+                model.load_state_dict(
+                    torch.load(f"trained_models/{model_type}_{data_model}_latest.pt")
+                )
             print("continuing training from lastest saved model...")
 
         for epoch in range(EPOCHS):
@@ -356,7 +395,6 @@ def train_model(rank=None,):
             #     print(f"Epoch: {epoch + 1} / {EPOCHS}")
 
             if count_es <= early_stopping_counts:
-
                 start_time = time.time()
 
                 # training and validation
@@ -409,9 +447,7 @@ def train_model(rank=None,):
 
                 # logging
                 if (not ddp) or (ddp and rank == 0):
-                    print(
-                        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s"
-                    )
+                    print(f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s")
                     print(
                         f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
                     )
@@ -469,8 +505,7 @@ def train_model(rank=None,):
         except:
             # adding "module." in keys
             pretrained_dict = {
-                f"module.{key}": value
-                for key, value in model.state_dict().items()
+                f"module.{key}": value for key, value in model.state_dict().items()
             }
 
         model.load_state_dict(pretrained_dict)
@@ -496,9 +531,7 @@ def train_model(rank=None,):
     )
 
     if (not ddp) or (ddp and rank == 0):
-        print(
-            f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-        )
+        print(f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |")
         loss_file.write(
             f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
         )
@@ -507,8 +540,8 @@ def train_model(rank=None,):
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
     # if ddp:
-        # dist.barrier()
-        # dist.destroy_process_group()
+    # dist.barrier()
+    # dist.destroy_process_group()
 
 
 # for DDP
@@ -519,7 +552,6 @@ def ddp_main():
 
 
 if __name__ == "__main__":
-
     if config["DDP"]:
         os.environ["MASTER_ADDR"] = "localhost"
         os.environ["MASTER_PORT"] = "29500"
