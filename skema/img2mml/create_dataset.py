@@ -154,6 +154,7 @@ def main():
             shutil.copytree(image_path, data_path + "/images")
         latex_path = "training_data/im2mml-100K/latex.lst"
         shutil.copy(latex_path, data_path)
+        os.rename(data_path + "/latex.lst", data_path + "/original_latex.lst")
         mml_path = "training_data/im2mml-100K/original_mml.lst"
         shutil.copy(mml_path, data_path)
     else:
