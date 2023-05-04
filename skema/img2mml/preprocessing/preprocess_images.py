@@ -154,9 +154,7 @@ def preprocess_images(image):
     if args.with_fonts:
         data_path += "_with_fonts"
 
-    IMAGE = Image.open(
-        f"{data_path}/images/{image}"
-    ).convert("L")
+    IMAGE = Image.open(f"{data_path}/images/{image}").convert("L")
 
     # checking the size of the image
     w, h = IMAGE.size
