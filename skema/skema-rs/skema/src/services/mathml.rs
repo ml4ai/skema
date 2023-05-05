@@ -68,5 +68,5 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 #[put("/mathml/acset")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
     let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
-    HttpResponse::Ok().json(web::Json(PN_to_ModelRepPN(ACSet::from(asts))))
+    HttpResponse::Ok().json(web::Json(ModelRepPn::from(ACSet::from(asts))))
 }
