@@ -20,15 +20,13 @@ There being a second function call of the same function which contains an expres
 */
 
 /* 3/20/23
-    - '+' at the top level main are getting duplicate wires to the top level literals
- */
+   - '+' at the top level main are getting duplicate wires to the top level literals
+*/
 
-use rsmgclient::{ConnectParams, Connection, MgError};
 use crate::FunctionType;
 use crate::{Attribute, FnType::Import, FunctionNet, GrometBox};
-use crate::{
-    Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta, FnType
-};
+use crate::{Files, FnType, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
+use rsmgclient::{ConnectParams, Connection, MgError};
 
 #[derive(Debug, Clone)]
 pub struct MetadataNode {
@@ -766,7 +764,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             eboxf.clone(),
             nodes.clone(),
             edges,
-            idx.clone() ,
+            idx.clone(),
             bf_counter.clone(),
         );
         // perform cross attributal wiring of function
@@ -774,7 +772,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             eboxf.clone(),
             nodes.clone(),
             edges,
-            idx.clone() ,
+            idx.clone(),
             bf_counter.clone(),
         );
     }
@@ -1587,7 +1585,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
 // this method creates an import type function
 #[allow(unused_assignments)]
 pub fn create_import(
-    gromet: &ModuleCollection, // needed still for metadata unfortunately
+    gromet: &ModuleCollection,  // needed still for metadata unfortunately
     _function_net: FunctionNet, // This is gromet but is more generalizable based on scope
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -1804,7 +1802,6 @@ pub fn create_function(
             for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
                 match sboxf.function_type {
                     FunctionType::Function => {
-                        println!("nested function triggered");
                         (nodes, edges, start, meta_nodes) = create_function(
                             &gromet.clone(),                 // gromet for metadata
                             eboxf.value.clone(),             // function net for attribute
@@ -4809,7 +4806,7 @@ pub fn wff_cross_att_wiring(
             let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
             let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
                                                  // make sure its a cross attributal wiring and not an internal wire
-            // initialize the tgt_att for case of opo or primitive/literal source
+                                                 // initialize the tgt_att for case of opo or primitive/literal source
             let mut tgt_att = idx;
             // next expression for if we are wiring to an expression or function
             if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
@@ -4828,58 +4825,56 @@ pub fn wff_cross_att_wiring(
                 // perhaps add a conditional on if the tgt and src att's are the same no wiring is done?
                 // making sure the wiring is cross attributal and therefore won't get double wired from
                 // internal wiring module as well?
-                    for node in nodes.iter() {
-                        // make sure in correct box
-                        if src_nbox == node.nbox {
-                            // make sure only looking in current attribute nodes for srcs and tgts
-                            if src_att == node.contents {
-                                if (src_box as u32) == node.att_bf_idx {
-                                    // only opo's
-                                    if node.n_type == "Opi" {
-                                        // iterate through port to check for tgt
-                                        for p in node.in_indx.as_ref().unwrap().iter() {
-                                            // push the src first, being pif
-                                            if (src_opi_idx as u32) == *p {
-                                                wff_src_tgt.push(node.node_id.clone());
-                                            }
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if src_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if src_att == node.contents {
+                            if (src_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Opi" {
+                                    // iterate through port to check for tgt
+                                    for p in node.in_indx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (src_opi_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    for node in nodes.iter() {
-                        // make sure in correct box
-                        if tgt_nbox == node.nbox {
-                            // make sure only looking in current attribute nodes for srcs and tgts
-                            if tgt_att == node.contents {
-                                if (tgt_box as u32) == node.att_bf_idx {
-                                    // only opo's
-                                    if node.n_type == "Opo" {
-                                        // iterate through port to check for tgt
-                                        for p in node.out_idx.as_ref().unwrap().iter() {
-                                            // push the src first, being pif
-                                            if (tgt_opo_idx as u32) == *p {
-                                                wff_src_tgt.push(node.node_id.clone());
-                                            }
+                }
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if tgt_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if tgt_att == node.contents {
+                            if (tgt_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Opo" {
+                                    // iterate through port to check for tgt
+                                    for p in node.out_idx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (tgt_opo_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    if wff_src_tgt.len() == 2 {
-                        let e8 = Edge {
-                            src: wff_src_tgt[0].clone(),
-                            tgt: wff_src_tgt[1].clone(),
-                            e_type: String::from("Wire"),
-                            prop: None,
-                        };
-                        edges.push(e8);
-                    }
-            }
-            else 
-            {
+                }
+                if wff_src_tgt.len() == 2 {
+                    let e8 = Edge {
+                        src: wff_src_tgt[0].clone(),
+                        tgt: wff_src_tgt[1].clone(),
+                        e_type: String::from("Wire"),
+                        prop: None,
+                    };
+                    edges.push(e8);
+                }
+            } else {
                 let tgt_nbox = bf_counter; // nbox value of tgt opo
                                            // now to construct the wire
                 let mut wff_src_tgt: Vec<String> = vec![];
@@ -4925,13 +4920,19 @@ pub fn wff_cross_att_wiring(
                     }
                 }
                 if wff_src_tgt.len() == 2 {
-                    // now we perform a conditional for naming the opi's based on 
+                    // now we perform a conditional for naming the opi's based on
                     // the primitives pof names, we have the primitive, the opi node id
                     // and the tgt_opo_idx which is the pof idx for the name
                     for i in 0..nodes.clone().len() {
                         if nodes[i].node_id.clone() == wff_src_tgt[0].clone() {
-                            if !eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].name.is_none() {
-                                nodes[i].name = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].name.clone();
+                            if !eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize]
+                                .name
+                                .is_none()
+                            {
+                                nodes[i].name = eboxf.value.pof.as_ref().unwrap()
+                                    [(tgt_idx - 1) as usize]
+                                    .name
+                                    .clone();
                             }
                         }
                     }
@@ -4945,78 +4946,78 @@ pub fn wff_cross_att_wiring(
                 }
             }
         } else {
-                let src_nbox = bf_counter; // nbox value of src opi
-                                           // collect info to identify the opo tgt node
-                let tgt_idx = wire.tgt; // port index
-                let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
-                let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
-                let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
-                                                     // make sure its a cross attributal wiring and not an internal wire
-                // initialize the tgt_att for case of opo or primitive/literal source
-                let mut tgt_att = idx;
-                if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+            let src_nbox = bf_counter; // nbox value of src opi
+                                       // collect info to identify the opo tgt node
+            let tgt_idx = wire.tgt; // port index
+            let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+            let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
+            let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
+                                                 // make sure its a cross attributal wiring and not an internal wire
+                                                 // initialize the tgt_att for case of opo or primitive/literal source
+            let mut tgt_att = idx;
+            if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                .contents
+                .clone()
+                .is_none()
+            {
+                tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                     .contents
-                    .clone()
-                    .is_none()
-                {
-                    tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
-                        .contents
-                        .unwrap()
-                        .clone(); // attribute index of submodule (also opo contents value)
-                    let tgt_nbox = bf_counter; // nbox value of tgt opo
-                                               // now to construct the wire
-                    let mut wff_src_tgt: Vec<String> = vec![];
-                    // find the src node
-                    for node in nodes.iter() {
-                        // make sure in correct box
-                        if src_nbox == node.nbox {
-                            // make sure only looking in current attribute nodes for srcs and tgts
-                            if src_att == node.contents {
-                                if (src_box as u32) == node.att_bf_idx {
-                                    // only opo's
-                                    if node.n_type == "Primitive" {
-                                        // iterate through port to check for tgt
-                                        for p in node.in_indx.as_ref().unwrap().iter() {
-                                            // push the src first, being pif
-                                            if (src_opi_idx as u32) == *p {
-                                                wff_src_tgt.push(node.node_id.clone());
-                                            }
+                    .unwrap()
+                    .clone(); // attribute index of submodule (also opo contents value)
+                let tgt_nbox = bf_counter; // nbox value of tgt opo
+                                           // now to construct the wire
+                let mut wff_src_tgt: Vec<String> = vec![];
+                // find the src node
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if src_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if src_att == node.contents {
+                            if (src_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Primitive" {
+                                    // iterate through port to check for tgt
+                                    for p in node.in_indx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (src_opi_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
                                         }
                                     }
                                 }
                             }
                         }
-                    }
-                    for node in nodes.iter() {
-                        // make sure in correct box
-                        if tgt_nbox == node.nbox {
-                            // make sure only looking in current attribute nodes for srcs and tgts
-                            if tgt_att == node.contents {
-                                if (tgt_box as u32) == node.att_bf_idx {
-                                    // only opo's
-                                    if node.n_type == "Opo" {
-                                        // iterate through port to check for tgt
-                                        for p in node.out_idx.as_ref().unwrap().iter() {
-                                            // push the src first, being pif
-                                            if (tgt_opo_idx as u32) == *p {
-                                                wff_src_tgt.push(node.node_id.clone());
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if wff_src_tgt.len() == 2 {
-                        let e8 = Edge {
-                            src: wff_src_tgt[0].clone(),
-                            tgt: wff_src_tgt[1].clone(),
-                            e_type: String::from("Wire"),
-                            prop: None,
-                        };
-                        edges.push(e8);
                     }
                 }
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if tgt_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if tgt_att == node.contents {
+                            if (tgt_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Opo" {
+                                    // iterate through port to check for tgt
+                                    for p in node.out_idx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (tgt_opo_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if wff_src_tgt.len() == 2 {
+                    let e8 = Edge {
+                        src: wff_src_tgt[0].clone(),
+                        tgt: wff_src_tgt[1].clone(),
+                        e_type: String::from("Wire"),
+                        prop: None,
+                    };
+                    edges.push(e8);
+                }
+            }
         }
     }
     return (edges, nodes);
