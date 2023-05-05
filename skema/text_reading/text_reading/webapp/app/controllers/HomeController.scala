@@ -19,7 +19,7 @@ import org.clulab.serialization.json.stringify
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
 import org.json4s.{JArray, JValue}
-import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine}
+import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine, TextReadingPipelineWithContext}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
@@ -27,7 +27,7 @@ import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
 import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, SVOGrounder, WikidataGrounder}
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
-import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
 import org.slf4j.{Logger, LoggerFactory}
 import ujson.json4s.Json4sJson
@@ -63,6 +63,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
   val groundingConfig = generalConfig.getConfig("Grounding")
   val miraEmbeddingsGrounder = GrounderFactory.getInstance(groundingConfig, chosenEngine = Some("miraembeddings"))
+  val textReadingPipelineWithContext = new TextReadingPipelineWithContext()
   val ieSystem = OdinEngine.fromConfig(config)
   var proc = ieSystem.proc
   val serializer = JSONSerializer
@@ -84,7 +85,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
 
 
-  private val cosmosPipeline = new CosmosTextReadingPipeline
+  private val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
 
 
   logger.info("Completed Initialization ...")
@@ -146,7 +147,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val mentionsFile = new File(mentionsPath)
 
     val ujsonOfMenFile = ujson.read(mentionsFile)
-    val defMentions = AutomatesJSONSerializer.toMentions(ujsonOfMenFile).filter(m => m.label contains "Description")
+    val defMentions = SkemaJSONSerializer.toMentions(ujsonOfMenFile).filter(m => m.label contains "Description")
     val glVars = WikidataGrounder.mentionsToGlobalVarsWithWikidataGroundings(defMentions)
 
     Ok(glVars).as(JSON)
@@ -167,6 +168,13 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     playJson
   }
 
+  def ujsonToPlayJson(value: ujson.Value): JsValue = {
+    val json = ujson.write(value)
+    val playJson = Json.parse(json)
+
+    playJson
+  }
+
   def groundStringsToMira(k: Int): Action[AnyContent] = Action { request =>
     val text = request.body.asText.get
     val texts = Source.fromString(text).getLines.map(_.trim).filter(_.nonEmpty).toVector
@@ -174,6 +182,20 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val jGroundingCandidates = groundingCandidates.map(_.map(_.toJValue).toList).toList
     val json4sResult = JArray(jGroundingCandidates.map(JArray(_)))
     val playJsonResult = json4sToPlayJson(json4sResult)
+
+    Ok(playJsonResult)
+  }
+
+  def runTextReadingPipelineWithContext(contextWindowSize: Int = 3) = Action { request =>
+    val texts = request.body.asJson.get.as[Array[String]]
+    val ujsonResults = texts.map { text =>
+      val mentions = textReadingPipelineWithContext.extractMentionsWithContext(text, contextWindowSize)
+      val ujsonResult = SkemaJSONSerializer.serializeMentions(mentions)
+
+      ujsonResult
+    }
+    val ujsonResult = ujson.Arr.from(ujsonResults)
+    val playJsonResult = ujsonToPlayJson(ujsonResult)
 
     Ok(playJsonResult)
   }

@@ -1,41 +1,22 @@
 package org.ml4ai.skema.text_reading.apps
 
-import org.clulab.utils.Logging
+import org.clulab.utils.{FileUtils, Logging}
 import org.ml4ai.skema.text_reading.CosmosTextReadingPipeline
+import org.ml4ai.skema.text_reading.utils.{ArgsConfig, CommandLineArgumentParser}
+
 import scala.util.Using
 import scopt.OParser
 
 import java.io.{File, FileOutputStream, PrintWriter}
-case class ArgsConfig(
-                   outDir: File = new File("."),
-                   inputFiles: Seq[File] = Seq(),
-)
+
 
 object AnnotateCosmosJsonFiles extends App with Logging{
 
-  val builder = OParser.builder[ArgsConfig]
-
-  val parser = {
-    import builder._
-    OParser.sequence(
-      programName("AnnotateCosmosJsonFiles"),
-      head("AnnotateCosmosJsonFiles", "1.0"),
-      // option -f, --foo
-      opt[File]('o', "output_dir")
-        .required()
-        .action((x, c) => c.copy(outDir = x)).withFallback( () => new File("."))
-        .text("directory to write the output files to"),
-      // more options here...
-      arg[Seq[File]]("<input file 1>...")
-        .unbounded()
-        .action((x, c) => c.copy(inputFiles = x))
-        .text("files to annotate"),
-    )
-  }
+  val parser = CommandLineArgumentParser.buildParser(getClass.getSimpleName.dropRight(1))
 
   OParser.parse(parser, args, ArgsConfig()) match {
     case Some(config) =>
-      val textReadingPipeline = new CosmosTextReadingPipeline
+      val textReadingPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
 
       logger.info(s"Starting process with ${config.inputFiles} arguments")
 
@@ -60,11 +41,9 @@ object AnnotateCosmosJsonFiles extends App with Logging{
             val outputFile = new File(config.outDir, "extractions_" + inputFile.getName)
             logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
             val jsonContents = textReadingPipeline.extractMentionsFromJsonAndSerialize(inputFile.getAbsolutePath)
-            Using(new PrintWriter(new FileOutputStream(outputFile))) {
-              writer =>
-                writer.write(jsonContents)
-                writer.close()
-                logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
+            Using(FileUtils.printWriterFromFile(outputFile)) { printWriter =>
+              printWriter.println(jsonContents)
+              logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
             }
           }
           else
@@ -80,9 +59,4 @@ object AnnotateCosmosJsonFiles extends App with Logging{
     case _ =>
       // arguments are bad, error message will have been displayed
   }
-
-
-
-
-
 }
