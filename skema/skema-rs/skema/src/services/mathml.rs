@@ -1,6 +1,6 @@
 use actix_web::{get, put, web, HttpResponse};
 use mathml::{
-    acset::{ACSet, PN_to_ModelRepPN},
+    acset::{ACSet, ModelRepPn},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsing::parse,

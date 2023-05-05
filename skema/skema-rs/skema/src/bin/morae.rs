@@ -1,4 +1,4 @@
-use mathml::acset::{InputArc, OutputArc, PN_to_ModelRepPN, Specie, Transition};
+use mathml::acset::{InputArc, ModelRepPn, OutputArc, Specie, Transition};
 use mathml::ast::{Math, Operator};
 use mathml::expression::wrap_math;
 use mathml::expression::Atom;
@@ -80,7 +80,7 @@ fn main() {
 
         println!("Pertri-Net rep: {:?}", test_pn.clone());
 
-        let new_model = PN_to_ModelRepPN(test_pn.clone());
+        let new_model = ModelRepPn::from(test_pn.clone());
 
         println!("New Model Rep: {:?}", new_model.clone());
 

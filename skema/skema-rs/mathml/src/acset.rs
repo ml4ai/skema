@@ -161,65 +161,65 @@ pub struct Metadatas {
 // -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
 // -------------------------------------------------------------------------------------------
-
-    let mut states_vec = Vec::<States>::new();
-    let mut transitions_vec = Vec::<Transitions>::new();
+impl ModelRepPn {
+    pub fn from(pn: ACSet) -> ModelRepPn {
+        let mut states_vec = Vec::<States>::new();
+        let mut transitions_vec = Vec::<Transitions>::new();
 
         // -----------------------------------------------------------
 
-    for state in pn.S.iter() {
-        let states = States {
-            id: state.sname.clone(),
-            name: state.sname.clone(),
-            grounding: None,
-            initial: None,
-        };
-        states_vec.push(states.clone());
-    }
-
-    for (i, trans) in pn.T.clone().iter().enumerate() {
-        // convert transition index to base 1
-        let transition = i.clone() + 1;
-
-        // construct array of incoming states
-        let mut string_vec1 = Vec::<String>::new();
-        for incoming in pn.I.clone().iter() {
-            if incoming.it.clone() == transition {
-                let state_idx = incoming.is.clone() - 1; // 0 based to index the rust vec
-                let state_name = pn.S[state_idx as usize].sname.clone();
-                string_vec1.push(state_name.clone());
-            }
-        }
-        // construct array of outgoing states
-        let mut string_vec2 = Vec::<String>::new();
-        for outgoing in pn.O.clone().iter() {
-            if outgoing.ot.clone() == transition {
-                let state_idx = outgoing.os.clone() - 1; // 0 based to index the rust vec
-                let state_name = pn.S[state_idx as usize].sname.clone();
-                string_vec2.push(state_name.clone());
-            }
+        for state in pn.S.iter() {
+            let states = States {
+                id: state.sname.clone(),
+                name: state.sname.clone(),
+                grounding: None,
+                initial: None,
+            };
+            states_vec.push(states.clone());
         }
 
-        let transitions = Transitions {
-            id: trans.tname.clone(),
-            input: Some(string_vec1.clone()),
-            output: Some(string_vec2.clone()),
-            properties: None,
-            model,
+        for (i, trans) in pn.T.clone().iter().enumerate() {
+            // convert transition index to base 1
+            let transition = i.clone() + 1;
+
+            // construct array of incoming states
+            let mut string_vec1 = Vec::<String>::new();
+            for incoming in pn.I.clone().iter() {
+                if incoming.it.clone() == transition {
+                    let state_idx = incoming.is.clone() - 1; // 0 based to index the rust vec
+                    let state_name = pn.S[state_idx as usize].sname.clone();
+                    string_vec1.push(state_name.clone());
+                }
+            }
+            // construct array of outgoing states
+            let mut string_vec2 = Vec::<String>::new();
+            for outgoing in pn.O.clone().iter() {
+                if outgoing.ot.clone() == transition {
+                    let state_idx = outgoing.os.clone() - 1; // 0 based to index the rust vec
+                    let state_name = pn.S[state_idx as usize].sname.clone();
+                    string_vec2.push(state_name.clone());
+                }
+            }
+
+            let transitions = Transitions {
+                id: trans.tname.clone(),
+                input: Some(string_vec1.clone()),
+                output: Some(string_vec2.clone()),
+                properties: None,
+            };
+
+            transitions_vec.push(transitions.clone());
+        }
+
+        // -----------------------------------------------------------
+
+        let model = Model {
+            states: states_vec,
+            transitions: transitions_vec,
+            parameters: None,
         };
 
-        transitions_vec.push(transitions.clone());
-    }
-
-    // -----------------------------------------------------------
-
-    let model = Model {
-        states: states_vec,
-        transitions: transitions_vec,
-        parameters: None,
-    };
-
-    let mrp = ModelRepPn {
+        let mrp = ModelRepPn {
         name: "mathml model".to_string(),
         schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
         description: "This is a model from mathml equations".to_string(),
@@ -228,5 +228,6 @@ pub struct Metadatas {
         metadata: None,
     };
 
-    return mrp;
+        return mrp;
+    }
 }
