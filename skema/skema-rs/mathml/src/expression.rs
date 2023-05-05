@@ -23,6 +23,13 @@ pub enum Atom {
 }
 
 #[derive(Debug, PartialEq, Clone)]
+pub struct Expression {
+    pub ops: Vec<Operator>,
+    pub args: Vec<Expr>,
+    pub name: String,
+}
+
+#[derive(Debug, PartialEq, Clone)]
 pub enum Expr {
     Atom(Atom),
     Expression {
@@ -35,9 +42,9 @@ pub enum Expr {
 /// Intermediate data structure to support the generation of graphs of mathematical expressions
 #[derive(Debug, Default, PartialEq, Clone)]
 pub struct PreExp {
-    ops: Vec<Operator>,
-    args: Vec<Expr>,
-    name: String,
+    pub ops: Vec<Operator>,
+    pub args: Vec<Expr>,
+    pub name: String,
 }
 
 /// Check if the fraction is a derivative expressed in Leibniz notation. If yes, mutate it to
@@ -216,7 +223,7 @@ impl MathExpression {
 
 impl Expr {
     /// Group expression by multiplication and division operations.
-    fn group_expr(&mut self) {
+    pub fn group_expr(&mut self) {
         if let Expr::Expression { ops, args, .. } = self {
             let mut indices_to_remove = Vec::new();
             let ops_copy = ops.clone();
@@ -474,7 +481,7 @@ impl Expr {
     }
 
     /// Construct a string representation of the Expression and store it under its 'name' property.
-    fn set_name(&mut self) -> String {
+    pub fn set_name(&mut self) -> String {
         let mut add_paren = false;
         match self {
             Expr::Atom(_) => "".to_string(),
@@ -537,7 +544,7 @@ impl Expr {
         }
     }
 
-    fn to_graph(&mut self, graph: &mut MathExpressionGraph) {
+    pub fn to_graph(&mut self, graph: &mut MathExpressionGraph) {
         if let Expr::Expression { ops, args, name } = self {
             if name == "place_holder" {
                 return;
@@ -1000,7 +1007,7 @@ pub fn need_to_distribute(ops: Vec<Operator>) -> bool {
 }
 
 impl PreExp {
-    fn group_expr(&mut self) {
+    pub fn group_expr(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
                 arg.group_expr();
@@ -1008,7 +1015,7 @@ impl PreExp {
         }
     }
 
-    fn collapse_expr(&mut self) {
+    pub fn collapse_expr(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
                 arg.collapse_expr();
@@ -1024,7 +1031,7 @@ impl PreExp {
         }
     }
 
-    fn set_name(&mut self) {
+    pub fn set_name(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
                 arg.set_name();
@@ -1032,7 +1039,7 @@ impl PreExp {
         }
     }
 
-    fn to_graph(&mut self) -> MathExpressionGraph {
+    pub fn to_graph(&mut self) -> MathExpressionGraph {
         let mut g = MathExpressionGraph::new();
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {

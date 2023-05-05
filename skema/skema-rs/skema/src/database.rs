@@ -3,6 +3,11 @@
 
 //!! Currently the literals in the opening main function are getting double wired into the + primitive, guessing some external wiring bug...
 
+// wfopi: pif -> opi
+// wff: pif -> pof
+// wfopo: opo -> pof
+// wopio: opo -> opi
+
 /* TODO (1/8/23):
 -- Update to newest GroMEt spec
 -- Refactor repeated function call implementation to be more robust and in line with other methods
@@ -14,13 +19,14 @@ There being a second function call of the same function which contains an expres
     I believe the wiring will be messed up going into the expression from the second function
 */
 
-use rsmgclient::{ConnectParams, Connection, MgError};
+/* 3/20/23
+   - '+' at the top level main are getting duplicate wires to the top level literals
+*/
 
 use crate::FunctionType;
 use crate::{Attribute, FnType::Import, FunctionNet, GrometBox};
-use crate::{
-    Files, Gromet, Grounding, Metadata, ModuleCollection, Provenance, TextExtraction, ValueMeta,
-};
+use crate::{Files, FnType, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
+use rsmgclient::{ConnectParams, Connection, MgError};
 
 #[derive(Debug, Clone)]
 pub struct MetadataNode {
@@ -87,7 +93,7 @@ pub fn execute_query(query: &str, host: &str) -> Result<(), MgError> {
 // this will create a deserialized metadata node
 fn create_metadata_node(gromet: &ModuleCollection, metadata_idx: u32) -> Vec<MetadataNode> {
     // grabs the deserialized metadata
-    let metadata = gromet.modules[0].metadata_collection.as_ref().unwrap()
+    let _metadata = gromet.modules[0].metadata_collection.as_ref().unwrap()
         [(metadata_idx.clone() - 1) as usize][0]
         .clone();
     let mut metas: Vec<MetadataNode> = vec![];
@@ -370,6 +376,7 @@ fn create_graph_queries(gromet: &ModuleCollection, start: u32) -> Vec<String> {
 // This creates the graph queries from a function network if the code is not executable
 // currently only supports creating the first attribute (a function) and all its dependencies
 // need to add support to find next function and create network as well and repeat
+#[allow(unused_assignments)]
 fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<String> {
     let mut queries: Vec<String> = vec![];
     let mut nodes: Vec<Node> = vec![];
@@ -381,7 +388,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     let mut bf_counter: u8 = 1;
     let mut function_call_repeat = false;
     let mut original_bf = bf_counter.clone();
-    let boxf = gromet.modules[0].attributes[0].value.clone();
+    let _boxf = gromet.modules[0].attributes[0].value.clone();
     for node in nodes.clone() {
         if (1 == node.contents) && (node.n_type == "Function") {
             function_call_repeat = true;
@@ -600,6 +607,9 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             }
         }
     } else {
+        /////////////////////////
+        // This is for no function repeat in a library representation
+        /////////////////////////
         let eboxf = gromet.modules[0].attributes[0 as usize].clone();
         let n1 = Node {
             n_type: String::from("Function"),
@@ -657,8 +667,8 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         // so contents=1 => attribute[0])
         // create nodes and edges for this entry, include opo's and opi's
         start += 1;
-        let idx = 0;
-        let eboxf = gromet.modules[0].attributes[idx as usize].clone();
+        let idx = 1;
+        let eboxf = gromet.modules[0].attributes[(idx - 1) as usize].clone();
         // create the ports
         (nodes, edges, meta_nodes, start) = create_opo(
             nodes.clone(),
@@ -758,7 +768,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             bf_counter.clone(),
         );
         // perform cross attributal wiring of function
-        edges = cross_att_wiring(
+        (edges, nodes) = cross_att_wiring(
             eboxf.clone(),
             nodes.clone(),
             edges,
@@ -878,6 +888,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     return queries;
 }
 
+#[allow(unused_assignments)]
 fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String> {
     // intialize the vectors
     let mut queries: Vec<String> = vec![];
@@ -1424,6 +1435,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                         }
                     }
                 } else {
+                    // mark
                     // get attribute function net to pass into function
                     let pfn = gromet.modules[0].attributes[(boxf.contents.unwrap() - 1) as usize]
                         .value
@@ -1571,9 +1583,10 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     return queries;
 }
 // this method creates an import type function
+#[allow(unused_assignments)]
 pub fn create_import(
-    gromet: &ModuleCollection, // needed still for metadata unfortunately
-    function_net: FunctionNet, // This is gromet but is more generalizable based on scope
+    gromet: &ModuleCollection,  // needed still for metadata unfortunately
+    _function_net: FunctionNet, // This is gromet but is more generalizable based on scope
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     parent_node: Node, // used for contains construction
@@ -1659,6 +1672,7 @@ pub fn create_import(
 }
 
 // this creates a function node including all the contents included in it, including additional functions
+#[allow(unused_assignments)]
 pub fn create_function(
     gromet: &ModuleCollection, // needed still for metadata unfortunately
     function_net: FunctionNet, // This is gromet but is more generalizable based on scope
@@ -1703,7 +1717,7 @@ pub fn create_function(
 
             return (nodes, edges, start, meta_nodes);
         }
-        Fn => {
+        FnType::Fn => {
             let n1 = Node {
                 n_type: String::from("Function"),
                 value: None,
@@ -1878,7 +1892,7 @@ pub fn create_function(
                 bf_counter.clone(),
             );
             // perform cross attributal wiring of function
-            edges = cross_att_wiring(
+            (edges, nodes) = cross_att_wiring(
                 eboxf.clone(),
                 nodes.clone(),
                 edges,
@@ -1898,7 +1912,7 @@ pub fn create_function(
                         nodes.clone(),
                         edges.clone(),
                         n1.clone(),
-                        (att_idx.clone() - 1), // because top level
+                        att_idx.clone() - 1, // because top level
                         cond_counter, // This indexes the conditional in the list of conditionals (bc)
                         bf_counter,   // because top level
                         start.clone(),
@@ -1919,7 +1933,7 @@ pub fn create_function(
                         nodes.clone(),
                         edges.clone(),
                         n1.clone(),
-                        (att_idx.clone() - 1), // because top level
+                        att_idx.clone() - 1, // because top level
                         while_counter, // This indexes the conditional in the list of conditionals (bc)
                         bf_counter,    // because top level
                         start.clone(),
@@ -1936,6 +1950,7 @@ pub fn create_function(
 
 // this creates the framework for conditionals, including the conditional node, the pic and poc nodes and the cond, body_if and body_else edges
 // The iterator through the conditionals will need to be outside this funtion
+#[allow(unused_assignments)]
 pub fn create_conditional(
     gromet: &ModuleCollection,
     function_net: FunctionNet, // This is gromet but is more generalizable based on scope
@@ -2281,7 +2296,7 @@ pub fn create_conditional(
         let src_nbox = src_box;
 
         let tgt_idx = wire.tgt; // port index
-        let tgt_pic = function_net.pic.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+        let _tgt_pic = function_net.pic.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
         let tgt_box = bf_counter; // tgt sub module box number
 
         let tgt_att = idx_in + 1; // attribute index of submodule (also opo contents value)
@@ -2341,7 +2356,7 @@ pub fn create_conditional(
     // now to make the implicit wires that go from pics -> pifs/opis and pofs/opos -> pocs.
     // first we will iterate through the pics
     let mut pic_counter = 1;
-    for pic in function_net.pic.as_ref().unwrap().iter() {
+    for _pic in function_net.pic.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         // Each pic is the target there will then be 2 srcs one for each wire, one going to "if" and one to "else"
 
@@ -2467,7 +2482,7 @@ pub fn create_conditional(
 
     // now we construct the output wires for the bodies
     let mut poc_counter = 1;
-    for poc in function_net.poc.as_ref().unwrap().iter() {
+    for _poc in function_net.poc.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         // Each pic is the target there will then be 2 srcs one for each wire, one going to "if" and one to "else"
 
@@ -2594,7 +2609,7 @@ pub fn create_conditional(
 
     return (nodes, edges, start, meta_nodes);
 }
-
+#[allow(unused_assignments)]
 pub fn create_while_loop(
     gromet: &ModuleCollection,
     function_net: FunctionNet, // This is gromet but is more generalizable based on scope
@@ -2913,7 +2928,7 @@ pub fn create_while_loop(
         let src_nbox = src_box;
 
         let tgt_idx = wire.tgt; // port index
-        let tgt_pil = function_net.pil.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+        let _tgt_pil = function_net.pil.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
         let tgt_box = bf_counter; // tgt sub module box number
 
         let tgt_att = idx_in + 1; // attribute index of submodule (also opo contents value)
@@ -3136,14 +3151,15 @@ pub fn create_while_loop(
 }
 
 // This needs to be updated to handle the new node structure and remove the overloaded contents field which will mess with the wiring alot
+#[allow(unused_assignments)]
 pub fn create_att_expression(
     gromet: &ModuleCollection,
-    eeboxf: Attribute,
+    _eeboxf: Attribute,
     ssboxf: GrometBox,
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     parent_node: Node,
-    idx_in: u32,
+    _idx_in: u32,
     box_counter: u8,
     bf_counter: u8,
     mut start: u32,
@@ -3394,18 +3410,31 @@ pub fn create_att_expression(
         idx.clone(),
         bf_counter.clone(),
     );
+
+    // Now we also perform wopio wiring in case there is an empty expression
+    if !eboxf.value.wopio.is_none() {
+        edges = wopio_wiring(
+            eboxf.clone(),
+            nodes.clone(),
+            edges,
+            idx.clone() - 1,
+            bf_counter.clone(),
+        );
+    }
+
     return (nodes, edges, start, meta_nodes);
 }
 
 // This needs to be updated to handle the new node structure and remove the overloaded contents field which will mess with the wiring alot
+#[allow(unused_assignments)]
 pub fn create_att_predicate(
     gromet: &ModuleCollection,
-    eeboxf: Attribute,
+    _eeboxf: Attribute,
     ssboxf: GrometBox,
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     parent_node: Node,
-    idx_in: u32,
+    _idx_in: u32,
     box_counter: u8,
     bf_counter: u8,
     mut start: u32,
@@ -3654,7 +3683,7 @@ pub fn create_att_predicate(
     );
     return (nodes, edges, start, meta_nodes);
 }
-
+#[allow(unused_assignments)]
 pub fn create_att_literal(
     gromet: &ModuleCollection,
     eboxf: Attribute,
@@ -3726,7 +3755,7 @@ pub fn create_att_literal(
     }
     return (nodes, edges, meta_nodes);
 }
-
+#[allow(unused_assignments)]
 pub fn create_att_primitive(
     gromet: &ModuleCollection,
     eboxf: Attribute,
@@ -3809,6 +3838,7 @@ pub fn create_att_primitive(
     return (nodes, edges, meta_nodes);
 }
 // This is for the construction of Opo's
+#[allow(unused_assignments)]
 pub fn create_opo(
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -3899,6 +3929,7 @@ pub fn create_opo(
 }
 
 // This is for the construction of Opi's
+#[allow(unused_assignments)]
 pub fn create_opi(
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -3909,7 +3940,7 @@ pub fn create_opi(
     box_counter: u8,
 ) -> (Vec<Node>, Vec<Edge>, Vec<MetadataNode>, u32) {
     let eboxf = gromet.modules[0].attributes[(parent_node.contents - 1) as usize].clone();
-    // construct opo nodes, if not none
+    // construct opi nodes, if not none
     if !eboxf.value.opi.clone().is_none() {
         // grab name which is one level up and based on indexing
         let mut opi_name = "un-named";
@@ -3988,6 +4019,7 @@ pub fn create_opi(
     return (nodes, edges, meta_nodes, start);
 }
 // having issues with deeply nested structure, it is breaking in the internal wiring of the function level.
+// wfopi: pif -> opi
 pub fn wfopi_wiring(
     eboxf: Attribute,
     nodes: Vec<Node>,
@@ -4338,7 +4370,7 @@ pub fn internal_wiring(
 // needs to handle top level and function level wiring that uses the function net at the call of the import.
 pub fn import_wiring(
     gromet: &ModuleCollection,
-    mut eboxf: Attribute,
+    _eboxf: Attribute,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
@@ -4520,11 +4552,11 @@ pub fn import_wiring(
 
 pub fn cross_att_wiring(
     eboxf: Attribute, // This is the current attribute
-    nodes: Vec<Node>,
+    mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,       // this +1 is the current attribute index
     bf_counter: u8, // this is the current box
-) -> Vec<Edge> {
+) -> (Vec<Edge>, Vec<Node>) {
     // wire id corresponds to subport index in list so ex: wff src.id="1" means the first opi in the list of the src.box, this is the in_idx in the opi or out_indx in opo.
     // This will have to run wfopo wfopi and wff all in order to get the cross attribual wiring that can exist in all of them, refactoring won't do much in code saving space though.
     // for cross attributal wiring they will construct the following types of wires
@@ -4556,7 +4588,7 @@ pub fn cross_att_wiring(
 
     // check if wire exists, wff
     if !eboxf.value.wff.is_none() {
-        edges = wff_cross_att_wiring(
+        (edges, nodes) = wff_cross_att_wiring(
             eboxf.clone(),
             nodes.clone(),
             edges,
@@ -4564,7 +4596,7 @@ pub fn cross_att_wiring(
             bf_counter.clone(),
         );
     }
-    return edges;
+    return (edges, nodes);
 }
 // this will construct connections from the function opi's to the sub module opi's, tracing inputs through the function
 // opi(sub)->opi(fun)
@@ -4741,13 +4773,14 @@ pub fn wfopo_cross_att_wiring(
 }
 // this will construct connections from the sub function modules opi's to another sub module opo's, tracing data inside the function
 // opi(sub)->opo(sub)
+#[allow(unused_assignments)]
 pub fn wff_cross_att_wiring(
     eboxf: Attribute, // This is the current attribute, should be the function if in a function
-    nodes: Vec<Node>,
+    mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,       // this +1 is the current attribute index
     bf_counter: u8, // this is the current box
-) -> Vec<Edge> {
+) -> (Vec<Edge>, Vec<Node>) {
     for wire in eboxf.value.wff.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         let src_idx = wire.src; // port index
@@ -4755,12 +4788,14 @@ pub fn wff_cross_att_wiring(
         let src_opi_idx = src_pif.id.unwrap().clone(); // index of opi port in opi list in src sub module (also opi node in_indx value)
         let src_box = src_pif.r#box.clone(); // src sub module box number
                                              // make sure its a cross attributal wiring and not an internal wire
+        let mut src_att = idx;
+        // first conditional for if we are wiring from expression or function
         if !eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
             .contents
             .clone()
             .is_none()
         {
-            let src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+            src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
                 .contents
                 .unwrap()
                 .clone(); // attribute index of submodule (also opi contents value)
@@ -4771,12 +4806,15 @@ pub fn wff_cross_att_wiring(
             let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
             let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
                                                  // make sure its a cross attributal wiring and not an internal wire
+                                                 // initialize the tgt_att for case of opo or primitive/literal source
+            let mut tgt_att = idx;
+            // next expression for if we are wiring to an expression or function
             if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                 .contents
                 .clone()
                 .is_none()
             {
-                let tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                     .contents
                     .unwrap()
                     .clone(); // attribute index of submodule (also opo contents value)
@@ -4784,6 +4822,9 @@ pub fn wff_cross_att_wiring(
                                            // now to construct the wire
                 let mut wff_src_tgt: Vec<String> = vec![];
                 // find the src node
+                // perhaps add a conditional on if the tgt and src att's are the same no wiring is done?
+                // making sure the wiring is cross attributal and therefore won't get double wired from
+                // internal wiring module as well?
                 for node in nodes.iter() {
                     // make sure in correct box
                     if src_nbox == node.nbox {
@@ -4833,10 +4874,153 @@ pub fn wff_cross_att_wiring(
                     };
                     edges.push(e8);
                 }
+            } else {
+                let tgt_nbox = bf_counter; // nbox value of tgt opo
+                                           // now to construct the wire
+                let mut wff_src_tgt: Vec<String> = vec![];
+                // find the src node
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if src_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if src_att == node.contents {
+                            if (src_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Opi" {
+                                    // iterate through port to check for tgt
+                                    for p in node.in_indx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (src_opi_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if tgt_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if tgt_att == node.contents {
+                            if (tgt_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Primitive" || node.n_type == "Literal" {
+                                    // iterate through port to check for tgt
+                                    for p in node.out_idx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (tgt_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if wff_src_tgt.len() == 2 {
+                    // now we perform a conditional for naming the opi's based on
+                    // the primitives pof names, we have the primitive, the opi node id
+                    // and the tgt_opo_idx which is the pof idx for the name
+                    for i in 0..nodes.clone().len() {
+                        if nodes[i].node_id.clone() == wff_src_tgt[0].clone() {
+                            if !eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize]
+                                .name
+                                .is_none()
+                            {
+                                nodes[i].name = eboxf.value.pof.as_ref().unwrap()
+                                    [(tgt_idx - 1) as usize]
+                                    .name
+                                    .clone();
+                            }
+                        }
+                    }
+                    let e8 = Edge {
+                        src: wff_src_tgt[0].clone(),
+                        tgt: wff_src_tgt[1].clone(),
+                        e_type: String::from("Wire"),
+                        prop: None,
+                    };
+                    edges.push(e8);
+                }
+            }
+        } else {
+            let src_nbox = bf_counter; // nbox value of src opi
+                                       // collect info to identify the opo tgt node
+            let tgt_idx = wire.tgt; // port index
+            let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+            let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
+            let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
+                                                 // make sure its a cross attributal wiring and not an internal wire
+                                                 // initialize the tgt_att for case of opo or primitive/literal source
+            let mut tgt_att = idx;
+            if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                .contents
+                .clone()
+                .is_none()
+            {
+                tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                    .contents
+                    .unwrap()
+                    .clone(); // attribute index of submodule (also opo contents value)
+                let tgt_nbox = bf_counter; // nbox value of tgt opo
+                                           // now to construct the wire
+                let mut wff_src_tgt: Vec<String> = vec![];
+                // find the src node
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if src_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if src_att == node.contents {
+                            if (src_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Primitive" {
+                                    // iterate through port to check for tgt
+                                    for p in node.in_indx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (src_opi_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                for node in nodes.iter() {
+                    // make sure in correct box
+                    if tgt_nbox == node.nbox {
+                        // make sure only looking in current attribute nodes for srcs and tgts
+                        if tgt_att == node.contents {
+                            if (tgt_box as u32) == node.att_bf_idx {
+                                // only opo's
+                                if node.n_type == "Opo" {
+                                    // iterate through port to check for tgt
+                                    for p in node.out_idx.as_ref().unwrap().iter() {
+                                        // push the src first, being pif
+                                        if (tgt_opo_idx as u32) == *p {
+                                            wff_src_tgt.push(node.node_id.clone());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                if wff_src_tgt.len() == 2 {
+                    let e8 = Edge {
+                        src: wff_src_tgt[0].clone(),
+                        tgt: wff_src_tgt[1].clone(),
+                        e_type: String::from("Wire"),
+                        prop: None,
+                    };
+                    edges.push(e8);
+                }
             }
         }
     }
-    return edges;
+    return (edges, nodes);
 }
 // external wiring is the wiring between boxes at the module level
 pub fn external_wiring(
