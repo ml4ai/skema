@@ -1,4 +1,4 @@
-use mathml::acset::{InputArc, ModelRepPn, OutputArc, Specie, Transition};
+use mathml::acset::{ACSetTransition, InputArc, ModelRepPn, OutputArc, Specie};
 use mathml::ast::{Math, Operator};
 use mathml::expression::wrap_math;
 use mathml::expression::Atom;
@@ -384,7 +384,7 @@ fn ast2exp(mathml_ast: Vec<Math>) -> Vec<PreExp> {
 fn exp2pn(named_core_dynamics: Vec<PreExp>) -> ACSet {
     let ascet = ACSet {
         S: Vec::<Specie>::new(),
-        T: Vec::<Transition>::new(),
+        T: Vec::<ACSetTransition>::new(),
         I: Vec::<InputArc>::new(),
         O: Vec::<OutputArc>::new(),
     };

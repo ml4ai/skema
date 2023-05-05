@@ -180,7 +180,7 @@ struct Exponents(BTreeMap<Specie, BTreeMap<Monomial, Exponent>>);
 #[derive(Debug, Clone)]
 pub enum PetriNetElement {
     Specie(acset::Specie),
-    Transition(acset::Transition),
+    Transition(acset::ACSetTransition),
 }
 
 impl From<Vec<Math>> for acset::ACSet {
@@ -255,7 +255,7 @@ impl From<Vec<Math>> for acset::ACSet {
         let mut exponents = Exponents::default();
 
         for (i, monomial) in monomials.0.iter().enumerate() {
-            acset.T.push(acset::Transition {
+            acset.T.push(acset::ACSetTransition {
                 tname: monomial.0 .0.to_string(),
             });
             for (specie, exponent) in monomial.0 .1.clone() {
