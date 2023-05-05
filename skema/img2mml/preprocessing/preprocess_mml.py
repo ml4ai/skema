@@ -2,6 +2,8 @@
 
 import re, json, argparse
 import subprocess, os, sys
+import signal
+import time
 
 
 parser = argparse.ArgumentParser(
@@ -33,6 +35,14 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+
+
+class TimeoutError(Exception):
+    pass
+
+
+def handle_timeout(signum, frame):
+    raise TimeoutError("simplification function timed out")
 
 
 def get_config(config_path):
@@ -526,7 +536,14 @@ if __name__ == "__main__":
         if eqn_idx not in idx_to_be_ignored:
             eqn = org_mml[eqn_idx]
             if len(eqn) > 2:
-                mml = simplification(eqn)
-                # writing
-                if "\n" not in mml:
-                    modified_mml_file.write(mml + "\n")
+                signal.signal(signal.SIGALRM, handle_timeout)
+                signal.alarm(10)
+                try:
+                    mml = simplification(eqn)
+                except TimeoutError as e:
+                    print("Error: ", e)
+                    continue
+                else:
+                    # writing
+                    if "\n" not in mml:
+                        modified_mml_file.write(mml + "\n")
