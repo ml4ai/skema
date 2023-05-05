@@ -17,17 +17,20 @@ def evaluate(
     ddp=False,
     rank=None,
     g2p=False,
+    config=None,
 ):
-
     model.eval()
     epoch_loss = 0
 
     if is_test:
-        mml_seqs = open("logs/test_targets_100K.txt", "w")
-        pred_seqs = open(f"logs/test_predicted_100K.txt", "w")
+        if config["with_boldface"] == "True":
+            dataset = config["dataset"] + "_boldface"
+        else:
+            dataset = config["dataset"]
+        mml_seqs = open(f"logs/test_{dataset}_targets_100K.txt", "w")
+        pred_seqs = open(f"logs/test_{dataset}_predicted_100K.txt", "w")
 
     with torch.no_grad():
-
         torch.set_printoptions(profile="full")
 
         for i, (img, mml) in enumerate(test_dataloader):
@@ -101,9 +104,7 @@ def evaluate(
                         )  # list of all eqns and score
                         pred = predicted_seq[0][0]
 
-                    pred_arr = [
-                        vocab.itos[ipred] for ipred in preds.int()[idx, :]
-                    ]
+                    pred_arr = [vocab.itos[ipred] for ipred in preds.int()[idx, :]]
                     pred_seq = " ".join(pred_arr)
                     pred_seqs.write(pred_seq + "\n")
 
