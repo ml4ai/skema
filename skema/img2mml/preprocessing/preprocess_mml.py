@@ -522,6 +522,7 @@ if __name__ == "__main__":
     idx_to_be_ignored = [int(i.split(".")[0]) for i in blank_images]
 
     for eqn_idx in range(len(org_mml)):
+        print(eqn_idx)
         if eqn_idx not in idx_to_be_ignored:
             eqn = org_mml[eqn_idx]
             if len(eqn) > 2:
