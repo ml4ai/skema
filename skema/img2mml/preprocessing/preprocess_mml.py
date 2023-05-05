@@ -253,7 +253,7 @@ def remove_unecc_tokens(eqn):
     eliminate = [
         "mathvariant",
         "mspace",
-        "mtable",
+        # "mtable",
         "class",
         "mpadded",
         "symmetric",
@@ -439,10 +439,15 @@ def remove_hexComments(eqn):
     return final
 
 
+def remove_mtable_attributes(mtable_string):
+    return re.sub(r"<mtable[^>]*>", "<mtable>", mtable_string)
+
+
 def cleaning_mml(eqn):
     """
     clean the equation.
     """
+    eqn = remove_mtable_attributes(eqn)
     eqn = remove_unecc_tokens(eqn)
     eqn = remove_additional_tokens(eqn)
     if "&#x" in eqn:
