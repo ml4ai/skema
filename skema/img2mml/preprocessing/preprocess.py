@@ -26,7 +26,6 @@ class Img2MML_dataset(Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, index):
-
         eqn = self.dataframe.iloc[index, 1]
         indexed_eqn = []
         for token in eqn.split():
@@ -60,8 +59,7 @@ class My_pad_collate(object):
 
         batch_size = len(_mml)
         padded_mml_tensors = (
-            torch.ones([batch_size, self.max_len], dtype=torch.long)
-            * self.pad_idx
+            torch.ones([batch_size, self.max_len], dtype=torch.long) * self.pad_idx
         )
         for b in range(batch_size):
             if len(_mml[b]) <= self.max_len:
@@ -79,14 +77,15 @@ class My_pad_collate(object):
 
 
 def preprocess_dataset(config):
-
     print("preprocessing data...")
 
     # reading raw text files
-    MMLPath = f"{config['data_path']}/{config['dataset_type']}/{config['markup']}.lst"
-    IMGTnsrPath = (
-        f"{config['data_path']}/{config['dataset_type']}/image_tensors"
-    )
+    if config["with_boldface"] == "True":
+        MMLPath = f"{config['data_path']}/sample_data/{config['dataset']}/{config['markup']}_boldface.lst"
+    else:
+        MMLPath = f"{config['data_path']}/sample_data/{config['dataset']}/{config['markup']}.lst"
+
+    IMGTnsrPath = f"{config['data_path']}/sample_data/{config['dataset']}/image_tensors"
     mml_txt = open(MMLPath).read().split("\n")[:-1]
     image_num = range(0, len(mml_txt))
 
@@ -101,12 +100,8 @@ def preprocess_dataset(config):
 
     for t_idx, t_images in enumerate([train_images, test_images, val_images]):
         raw_mml_data = {
-            "IMG": [
-                torch.load(f"{IMGTnsrPath}/{num}.txt") for num in t_images
-            ],
-            "EQUATION": [
-                ("<sos> " + mml_txt[num] + " <eos>") for num in t_images
-            ],
+            "IMG": [torch.load(f"{IMGTnsrPath}/{num}.txt") for num in t_images],
+            "EQUATION": [("<sos> " + mml_txt[num] + " <eos>") for num in t_images],
         }
 
         if t_idx == 0:
@@ -115,7 +110,6 @@ def preprocess_dataset(config):
             test = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
         else:
             val = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
-
 
     # build vocab
     print("building vocab...")
@@ -136,7 +130,11 @@ def preprocess_dataset(config):
     # print("vocab size: ", vocab.__len__())
 
     # writing vocab file...
-    vfile = open("vocab.txt", "w")
+    dataset = config["dataset"]
+    if config["with_boldface"] == "True":
+        vfile = open(f"{dataset}_with_boldface_vocab.txt", "w")
+    else:
+        vfile = open(f"{dataset}_vocab.txt", "w")
     for vidx, vstr in vocab.stoi.items():
         vfile.write(f"{vidx} \t {vstr} \n")
 
@@ -145,16 +143,32 @@ def preprocess_dataset(config):
 
     print("saving dataset files to data/ folder...")
 
-    train.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/train.csv",
-        index=False,
-    )
-    test.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/test.csv", index=False
-    )
-    val.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/val.csv", index=False
-    )
+    if config["with_boldface"] == "True":
+        train.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/train_bold.csv",
+            index=False,
+        )
+        test.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/test_bold.csv",
+            index=False,
+        )
+        val.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/val_bold.csv",
+            index=False,
+        )
+    else:
+        train.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/train.csv",
+            index=False,
+        )
+        test.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/test.csv",
+            index=False,
+        )
+        val.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/val.csv",
+            index=False,
+        )
 
     print("building dataloaders...")
 

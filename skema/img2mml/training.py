@@ -57,13 +57,13 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-data_model = args.mode
+dataset = args.mode
 if args.with_fonts:
-    data_model += "_with_fonts"
+    dataset += "_with_fonts"
 
 with open(args.config, "r") as cfg:
     config = json.load(cfg)
-    config["data_model"] = data_model
+    config["dataset"] = dataset
     if args.with_boldface:
         config["with_boldface"] = "True"
     else:
@@ -271,14 +271,14 @@ def train_model(
 
     if args.with_boldface:
         # to log losses
-        loss_file = open(f"logs/{data_model}_boldface_loss_file.txt", "w")
+        loss_file = open(f"logs/{dataset}_boldface_loss_file.txt", "w")
         # to log config(to keep track while running multiple experiments)
-        config_log = open(f"logs/{data_model}_boldface_config_log.txt", "w")
+        config_log = open(f"logs/{dataset}_boldface_config_log.txt", "w")
     else:
         # to log losses
-        loss_file = open(f"logs/{data_model}_loss_file.txt", "w")
+        loss_file = open(f"logs/{dataset}_loss_file.txt", "w")
         # to log config(to keep track while running multiple experiments)
-        config_log = open(f"logs/{data_model}_config_log.txt", "w")
+        config_log = open(f"logs/{dataset}_config_log.txt", "w")
     json.dump(config, config_log)
 
     # defining model using DataParallel
@@ -381,12 +381,12 @@ def train_model(
             if args.with_boldface:
                 model.load_state_dict(
                     torch.load(
-                        f"trained_models/{model_type}_{data_model}_boldface_latest.pt"
+                        f"trained_models/{model_type}_{dataset}_boldface_latest.pt"
                     )
                 )
             else:
                 model.load_state_dict(
-                    torch.load(f"trained_models/{model_type}_{data_model}_latest.pt")
+                    torch.load(f"trained_models/{model_type}_{dataset}_latest.pt")
                 )
             print("continuing training from lastest saved model...")
 
@@ -436,10 +436,16 @@ def train_model(
                 if val_loss < best_valid_loss:
                     best_valid_loss = val_loss
                     if (not ddp) or (ddp and rank == 0):
-                        torch.save(
-                            model.state_dict(),
-                            f"trained_models/{model_type}_{dataset_type}_best.pt",
-                        )
+                        if args.with_boldface:
+                            torch.save(
+                                model.state_dict(),
+                                f"trained_models/{model_type}_{dataset}_boldface_best.pt",
+                            )
+                        else:
+                            torch.save(
+                                model.state_dict(),
+                                f"trained_models/{model_type}_{dataset}_best.pt",
+                            )
                         count_es = 0
 
                 elif early_stopping:
@@ -472,11 +478,16 @@ def train_model(
                     f"Terminating the training process as the validation loss hasn't been reduced from last {early_stopping_counts} epochs."
                 )
                 break
-
-        print(
-            "best model saved as:  ",
-            f"trained_models/{model_type}_{dataset_type}_best.pt",
-        )
+        if args.with_boldface:
+            print(
+                "best model saved as:  ",
+                f"trained_models/{model_type}_{dataset}_boldface_best.pt",
+            )
+        else:
+            print(
+                "best model saved as:  ",
+                f"trained_models/{model_type}_{dataset}_best.pt",
+            )
 
     if ddp:
         dist.destroy_process_group()
@@ -485,16 +496,26 @@ def train_model(
     # if (not ddp) or (ddp and rank==0):
     # if ddp:
     #     dist.barrier()
-
-    print(
-        "loading best saved model: ",
-        f"trained_models/{model_type}_{dataset_type}_best.pt",
-    )
+    if args.with_boldface:
+        print(
+            "loading best saved model: ",
+            f"trained_models/{model_type}_{dataset}_boldface_best.pt",
+        )
+    else:
+        print(
+            "loading best saved model: ",
+            f"trained_models/{model_type}_{dataset}_best.pt",
+        )
     try:
         # loading pre_tained_model
-        model.load_state_dict(
-            torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
-        )
+        if args.with_boldface:
+            model.load_state_dict(
+                torch.load(f"trained_models/{model_type}_{dataset}_boldface_best.pt")
+            )
+        else:
+            model.load_state_dict(
+                torch.load(f"trained_models/{model_type}_{dataset}_best.pt")
+            )
     except:
         try:
             # removing "module." from keys
