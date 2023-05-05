@@ -257,7 +257,6 @@ impl From<Vec<Math>> for acset::ACSet {
         for (i, monomial) in monomials.0.iter().enumerate() {
             acset.T.push(acset::Transition {
                 tname: monomial.0 .0.to_string(),
-                uid: i,
             });
             for (specie, exponent) in monomial.0 .1.clone() {
                 let n_arrows = exponent.0;
