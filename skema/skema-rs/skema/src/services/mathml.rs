@@ -61,7 +61,7 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     responses(
         (
             status = 200,
-            body = ACSet
+            body = ModelRepPn
         )
     )
 )]

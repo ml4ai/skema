@@ -50,7 +50,7 @@ pub struct ModelRepPn {
     pub name: String,
     pub schema: String,
     pub description: String,
-    pub model_verison: String,
+    pub model_version: String,
     pub model: Model,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Map<String, Value>>,
@@ -211,7 +211,7 @@ impl ModelRepPn {
         name: "mathml model".to_string(),
         schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
         description: "This is a model from mathml equations".to_string(),
-        model_verison: "0.1".to_string(),
+        model_version: "0.1".to_string(),
         model: model.clone(),
         ..Default::default()
     };
