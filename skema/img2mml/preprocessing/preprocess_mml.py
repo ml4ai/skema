@@ -2,8 +2,6 @@
 
 import re, json, argparse
 import subprocess, os, sys
-import signal
-import time
 
 
 parser = argparse.ArgumentParser(
@@ -35,14 +33,6 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-
-
-class TimeoutError(Exception):
-    pass
-
-
-def handle_timeout(signum, frame):
-    raise TimeoutError("simplification function timed out")
 
 
 def get_config(config_path):
@@ -208,9 +198,9 @@ def attribute_definition(mml_code, elements, attr_tobe_removed, attr_tobe_checke
                         attribute_value.replace("\\", "").replace('"', "")
                         == attr_tobe_checked[attribute_parameter]
                     ):
-                        mml_code = mml_code.replace(darr, "")
+                        mml_code = mml_code.replace(" " + darr, "")
             else:
-                mml_code = mml_code.replace(darr, "")
+                mml_code = mml_code.replace(" " + darr, "")
 
     return mml_code
 
@@ -261,6 +251,7 @@ def remove_unecc_tokens(eqn):
     One can add or remove the token that needs to be removed.
     """
     eliminate = [
+        "mathvariant",
         "mspace",
         "mtable",
         "class",
@@ -278,16 +269,48 @@ def remove_unecc_tokens(eqn):
         "minsize",
         "linethickness",
         "mstyle",
-        "mathvariant",
     ]
     if args.with_boldface:
-        eqn = eqn.replace(r"mathvariant=\"bold-italic\"", r"placeholder")
-        eqn = eqn.replace(r"mathvariant=\"bold-fraktur\"", r"placeholder")
-        eqn = eqn.replace(r"mathvariant=\"bold-script\"", r"placeholder")
-        eqn = eqn.replace(r"mathvariant=\"bold-sans-serif\"", r"placeholder")
-        eqn = eqn.replace(r"mathvariant=\"bold-italic\"", r"placeholder")
+        eqn = eqn.replace('mathvariant="bold"', "boldface_placeholder")
+        eqn = eqn.replace('mathvariant="bold-italicr"', "boldface_placeholder")
+        eqn = eqn.replace('mathvariant="bold-fraktur"', "boldface_placeholder")
+        eqn = eqn.replace('mathvariant="bold-script"', "boldface_placeholder")
+        eqn = eqn.replace('mathvariant="bold-sans-serif"', "boldface_placeholder")
 
-    keep = ["mo", "mi", "mfrac", "mn", "mrow"]
+    keep = [
+        "mi",
+        "mo",
+        "mn",
+        "mtext",
+        "mspace",
+        "ms",
+        "mfrac",
+        "msqrt",
+        "mroot",
+        "mstyle",
+        "mpadded",
+        "mphantom",
+        "mfenced",
+        "menclose",
+        "munder",
+        "mover",
+        "munderover",
+        "mtable",
+        "mtr",
+        "mtd",
+        "mlabeledtr",
+        "mmultiscripts",
+        "maligngroup",
+        "malignmark",
+        "msub",
+        "msup",
+        "msubsup",
+        "mover",
+        "munder",
+        "munderover",
+        "mmultiscripts",
+        "mprescripts",
+    ]
 
     for e in eliminate:
         if e in eqn:
@@ -330,9 +353,23 @@ def remove_unecc_tokens(eqn):
                     eqn = temp1[: open_angle[-1]] + temp2[close_angle[0] + 1 :]
 
     if args.with_boldface:
-        eqn = eqn.replace(r"placeholder", r"mathvariant=\"bold\"")
+        eqn = eqn.replace("boldface_placeholder", 'mathvariant="bold"')
 
     return eqn
+
+
+def remove_single_mrow_pairs(lst):
+    stack = []
+    for i, elem in enumerate(lst):
+        if "<mrow" in elem:
+            stack.append(i)
+        elif elem == "</mrow>":
+            start = stack.pop()
+            if i - start == 2:
+                lst.pop(i)
+                lst.pop(start)
+                return remove_single_mrow_pairs(lst)
+    return lst
 
 
 def remove_additional_tokens(eqn):
@@ -342,48 +379,24 @@ def remove_additional_tokens(eqn):
     row. In case of more than one row, <mrow> will be
     considered and not be removed.
     """
-    if "mtext" in eqn:
-        try:
-            c = count(eqn, "mtext")
-            for _ in range(c):
-                e1, e2 = eqn.find("<mtext>"), eqn.find("</mtext>")
-                eqn = eqn[:e1] + eqn[e2 + len("</mtext>") :]
-        except:
-            pass
+    # if "mtext" in eqn:
+    #     try:
+    #         c = count(eqn, "mtext")
+    #         for _ in range(c):
+    #             e1, e2 = eqn.find("<mtext>"), eqn.find("</mtext>")
+    #             eqn = eqn[:e1] + eqn[e2 + len("</mtext>") :]
+    #     except:
+    #         pass
 
     if "mrow" in eqn:
         try:
+            eqn = eqn.replace("><", "> <")
             eqn_arr = eqn.split()
-            temp_eqn = list()
-
-            idxs_close = []
-            idxs_open = []
-            for ind, i in enumerate(eqn_arr):
-                if i == "<mrow>":
-                    idxs_open.append(ind)
-                if i == "</mrow>":
-                    idxs_close.append(ind)
-
-            if len(idxs_open) != len(idxs_close):
-                if len(idxs_close) > len(idxs_open):
-                    idxs_close = idxs_close[: len(idxs_open)]
-                else:
-                    idxs_open = idxs_open[: len(idxs_close)]
-
-            c_begin = 0
-            for c_end in idxs_close:
-                _eqn_arr = eqn_arr[c_begin : c_end + 1]
-                begin_idx = _eqn_arr.index("<mrow>")
-                end_idx = _eqn_arr.index("</mrow>")
-                if begin_idx + 2 == end_idx:
-                    temp_eqn += _eqn_arr[:begin_idx] + [_eqn_arr[begin_idx + 1]]
-                else:
-                    temp_eqn += eqn_arr[c_begin : c_end + 1]
-
-                c_begin = c_end + 1
-            temp_eqn += eqn_arr[c_begin:]
-            return " ".join(temp_eqn)
-
+            eqn_arr = remove_single_mrow_pairs(eqn_arr)
+            f = ""
+            for F in eqn_arr:
+                f = f + F + " "
+            return f
         except:
             f = ""
             for F in eqn.split():
@@ -536,14 +549,7 @@ if __name__ == "__main__":
         if eqn_idx not in idx_to_be_ignored:
             eqn = org_mml[eqn_idx]
             if len(eqn) > 2:
-                signal.signal(signal.SIGALRM, handle_timeout)
-                signal.alarm(10)
-                try:
-                    mml = simplification(eqn)
-                except TimeoutError as e:
-                    print("Error: ", e)
-                    continue
-                else:
-                    # writing
-                    if "\n" not in mml:
-                        modified_mml_file.write(mml + "\n")
+                mml = simplification(eqn)
+                # writing
+                if "\n" not in mml:
+                    modified_mml_file.write(mml + "\n")
