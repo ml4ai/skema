@@ -352,8 +352,8 @@ pub struct GroundingProperties {
 
 // -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
+// -------------------------------------------------------------------------------------------
 pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
-
     // -----------------------------------------------------
 
     let mut state_items_vec = Vec::<StateItems>::new();
@@ -386,9 +386,8 @@ pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
     }
 
     for (i, trans) in pn.T.clone().iter().enumerate() {
-
         // convert transition index to base 1
-        let transition = i.clone() + 1; 
+        let transition = i.clone() + 1;
 
         let string_type1 = StringType {
             r#type: Some(trans.tname.clone()),
@@ -408,8 +407,8 @@ pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
             }
         }
         let array_type1 = ArrayType {
-            pub r#type: "array".to_string(),
-            pub items: Some(string_type_vec.clone()),
+            r#type: "array".to_string(),
+            items: Some(string_type_vec1.clone()),
         };
         // construct array of outgoing states
         let mut string_type_vec2 = Vec::<StringType>::new();
@@ -425,8 +424,8 @@ pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
             }
         }
         let array_type2 = ArrayType {
-            pub r#type: "array".to_string(),
-            pub items: Some(string_type_vec2.clone()),
+            r#type: "array".to_string(),
+            items: Some(string_type_vec2.clone()),
         };
         let transition_properties = TransitionProperties {
             id: string_type1,
@@ -450,7 +449,7 @@ pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
         items: state_items_vec,
     };
 
-    let transtitions = Transitions {
+    let transitions = Transitions {
         r#type: "array".to_string(),
         items: transition_items_vec,
     };
@@ -468,16 +467,31 @@ pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
         additionalproperties: None,
     };
 
+    let string_name = StringType {
+        r#type: Some("PetriNet".to_string()),
+        format: None,
+    };
+
+    let string_schema = StringType {
+        r#type: Some("PetriNet".to_string()),
+        format: None,
+    };
+
+    let string_model_version = StringType {
+        r#type: Some("PetriNet".to_string()),
+        format: None,
+    };
+
     let properties = Properties {
-        name: "PetriNet".to_string(),
-        schema: "PertriNet".to_string(),
+        name: string_name,
+        schema: string_schema,
         description: None,
-        model_version: "PetriNet".to_string(),
+        model_version: string_model_version,
         properties: None,
         model: model,
-    }; 
+    };
 
-    let mrp =  ModelRepPn {
+    let mrp = ModelRepPn {
         schema: "PetriNet".to_string(),
         r#type: "PetriNet".to_string(),
         properties: properties,

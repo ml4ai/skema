@@ -1,4 +1,4 @@
-use mathml::acset::{InputArc, OutputArc, Specie, Transition};
+use mathml::acset::{InputArc, OutputArc, PN_to_ModelRepPN, Specie, Transition};
 use mathml::ast::{Math, Operator};
 use mathml::expression::wrap_math;
 use mathml::expression::Atom;
@@ -151,6 +151,22 @@ fn main() {
             subgraph2_core_dyn_ast(core_id[0].clone()).unwrap();
 
         println!("\n{:?}", core_dynamics_ast[2].clone());
+
+        println!("Testing of convseriton to new data rep");
+
+        let mathml_ast =
+            get_mathml_asts_from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+        let test_pn = ACSet::from(mathml_ast);
+
+        println!("Pertri-Net rep: {:?}", test_pn.clone());
+
+        let new_model = PN_to_ModelRepPN(test_pn.clone());
+
+        println!("New Model Rep: {:?}", new_model.clone());
+
+        let mod_serialized = serde_json::to_string(&new_model).unwrap();
+
+        println!("Serialized Model Rep: {}", mod_serialized.clone());
 
         /*let (core_dynamics, metadata_map) = subgraph2_core_dyn_exp(core_id).unwrap();
 
