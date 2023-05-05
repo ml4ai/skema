@@ -151,7 +151,7 @@ def simplification(mml_org):
 
     mml_mod = cleaning_mml(mml_mod)
     mml_mod = tokenize(mml_mod)
-
+    mml_mod = mml_mod.replace("  ", " ")
     return mml_mod
 
 
