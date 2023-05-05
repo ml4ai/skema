@@ -161,13 +161,11 @@ pub struct Metadatas {
 // -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
 // -------------------------------------------------------------------------------------------
-pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
-    // -----------------------------------------------------
 
     let mut states_vec = Vec::<States>::new();
     let mut transitions_vec = Vec::<Transitions>::new();
 
-    // -----------------------------------------------------
+        // -----------------------------------------------------------
 
     for state in pn.S.iter() {
         let states = States {
@@ -207,6 +205,7 @@ pub fn PN_to_ModelRepPN(pn: ACSet) -> ModelRepPn {
             input: Some(string_vec1.clone()),
             output: Some(string_vec2.clone()),
             properties: None,
+            model,
         };
 
         transitions_vec.push(transitions.clone());
