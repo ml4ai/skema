@@ -10,6 +10,7 @@ use petgraph::matrix_graph::IndexType;
 use petgraph::prelude::*;
 use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::env;
@@ -52,95 +53,14 @@ fn main() {
         if args.clone().len() > 2 {
             module_id = args[2].parse::<i64>().unwrap();
         }
-        let graph = subgraph2petgraph(module_id);
-        // 1. find each function node
-        let mut function_nodes = Vec::<NodeIndex>::new();
-        for node in graph.node_indices() {
-            if graph[node].labels == ["Function"] {
-                function_nodes.push(node.clone());
-            }
-        }
-        // 2. check and make sure only expressions in function
-        // 3. check number of expressions and decide off that
-        let mut functions =
-            Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-        for i in 0..function_nodes.len() {
-            // grab the subgraph of the given expression
-            functions.push(subgraph2petgraph(graph[function_nodes[i]].id.clone()));
-        }
-        // get a sense of the number of expressions in each function
-        let mut func_counter = 0;
-        let mut core_func = Vec::<usize>::new();
-        for func in functions.clone() {
-            let mut expression_counter = 0;
-            let mut primitive_counter = 0;
-            for node in func.node_indices() {
-                if func[node].labels == ["Expression"] {
-                    expression_counter += 1;
-                }
-                if func[node].labels == ["Primitive"] {
-                    if func[node].properties["name"].to_string() == "'*'".to_string() {
-                        primitive_counter += 1;
-                    } else if func[node].properties["name"].to_string() == "'+'".to_string() {
-                        primitive_counter += 1;
-                    } else if func[node].properties["name"].to_string() == "'-'".to_string() {
-                        primitive_counter += 1;
-                    } else if func[node].properties["name"].to_string() == "'USub'".to_string() {
-                        primitive_counter += 1;
-                    }
-                }
-            }
-            if expression_counter >= 3 && primitive_counter >= 12 {
-                core_func.push(func_counter);
-            }
-            func_counter += 1;
-        }
-        // 4. get the id of functions with enough expressions
-        let mut core_id = Vec::<i64>::new();
-        for c_func in core_func.iter() {
-            for node in functions[c_func.clone()].clone().node_indices() {
-                if functions[c_func.clone()][node].labels == ["Function"] {
-                    core_id.push(functions[c_func.clone()][node].id.clone());
-                }
-            }
-        }
 
-        // extract line numbers of function which contains the dynamics
-        let mut line_nums = Vec::<i64>::new();
-        for node in graph.node_indices() {
-            if graph[node].id == core_id[0].clone() {
-                for n_node in graph.neighbors_directed(node.clone(), Outgoing) {
-                    if graph[n_node.clone()].labels == ["Metadata"] {
-                        match &graph[n_node].clone().properties["line_begin"] {
-                            Value::List(x) => match x[0] {
-                                Value::Int(y) => {
-                                    //println!("line_begin: {:?}", y);
-                                    line_nums.push(y.clone());
-                                }
-                                _ => println!("error metadata type"),
-                            },
-                            _ => println!("error metadata type"),
-                        }
-                        match &graph[n_node].clone().properties["line_end"] {
-                            Value::List(x) => match x[0] {
-                                Value::Int(y) => {
-                                    //println!("line_end: {:?}", y);
-                                    line_nums.push(y.clone());
-                                }
-                                _ => println!("error metadata type"),
-                            },
-                            _ => println!("error metadata type"),
-                        }
-                    }
-                }
-            }
-        }
+        let graph = subgraph2petgraph(module_id); // makes petgraph of graph
 
-        println!(
-            "\nLines for core dynamics function: {:?} -> {:?}",
-            line_nums[0].clone(),
-            line_nums[1].clone()
-        );
+        let core_id = find_pn_dynamics(module_id); // gives back list of function nodes that might contain the dynamics
+
+        let line_span = get_line_span(core_id[0].clone(), graph.clone()); // get's the line span of function id
+
+        println!("\n{:?}", line_span);
 
         println!("function_core_id: {:?}", core_id[0].clone());
         println!("module_id: {:?}\n", module_id.clone());
@@ -305,6 +225,114 @@ fn main() {
         "{:?}",
         Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
     );*/
+}
+
+// struct for returning line spans
+#[derive(Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize)]
+pub struct LineSpan {
+    line_begin: i64,
+    line_end: i64,
+}
+
+// this function returns the line numbers of the function node id provided
+pub fn get_line_span(
+    node_id: i64,
+    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+) -> LineSpan {
+    // extract line numbers of function which contains the dynamics
+    let mut line_nums = Vec::<i64>::new();
+    for node in graph.node_indices() {
+        if graph[node].id == node_id.clone() {
+            for n_node in graph.neighbors_directed(node.clone(), Outgoing) {
+                if graph[n_node.clone()].labels == ["Metadata"] {
+                    match &graph[n_node].clone().properties["line_begin"] {
+                        Value::List(x) => match x[0] {
+                            Value::Int(y) => {
+                                //println!("line_begin: {:?}", y);
+                                line_nums.push(y.clone());
+                            }
+                            _ => println!("error metadata type"),
+                        },
+                        _ => println!("error metadata type"),
+                    }
+                    match &graph[n_node].clone().properties["line_end"] {
+                        Value::List(x) => match x[0] {
+                            Value::Int(y) => {
+                                //println!("line_end: {:?}", y);
+                                line_nums.push(y.clone());
+                            }
+                            _ => println!("error metadata type"),
+                        },
+                        _ => println!("error metadata type"),
+                    }
+                }
+            }
+        }
+    }
+    let line_span = LineSpan {
+        line_begin: line_nums[0].clone(),
+        line_end: line_nums[1].clone(),
+    };
+
+    return line_span;
+}
+
+// this function finds the core dynamics and returns a vector of
+// node id's that meet the criteria for identification
+pub fn find_pn_dynamics(module_id: i64) -> Vec<i64> {
+    let graph = subgraph2petgraph(module_id);
+    // 1. find each function node
+    let mut function_nodes = Vec::<NodeIndex>::new();
+    for node in graph.node_indices() {
+        if graph[node].labels == ["Function"] {
+            function_nodes.push(node.clone());
+        }
+    }
+    // 2. check and make sure only expressions in function
+    // 3. check number of expressions and decide off that
+    let mut functions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+    for i in 0..function_nodes.len() {
+        // grab the subgraph of the given expression
+        functions.push(subgraph2petgraph(graph[function_nodes[i]].id.clone()));
+    }
+    // get a sense of the number of expressions in each function
+    let mut func_counter = 0;
+    let mut core_func = Vec::<usize>::new();
+    for func in functions.clone() {
+        let mut expression_counter = 0;
+        let mut primitive_counter = 0;
+        for node in func.node_indices() {
+            if func[node].labels == ["Expression"] {
+                expression_counter += 1;
+            }
+            if func[node].labels == ["Primitive"] {
+                if func[node].properties["name"].to_string() == "'*'".to_string() {
+                    primitive_counter += 1;
+                } else if func[node].properties["name"].to_string() == "'+'".to_string() {
+                    primitive_counter += 1;
+                } else if func[node].properties["name"].to_string() == "'-'".to_string() {
+                    primitive_counter += 1;
+                } else if func[node].properties["name"].to_string() == "'USub'".to_string() {
+                    primitive_counter += 1;
+                }
+            }
+        }
+        if expression_counter >= 3 && primitive_counter >= 12 {
+            core_func.push(func_counter);
+        }
+        func_counter += 1;
+    }
+    // 4. get the id of functions with enough expressions
+    let mut core_id = Vec::<i64>::new();
+    for c_func in core_func.iter() {
+        for node in functions[c_func.clone()].clone().node_indices() {
+            if functions[c_func.clone()][node].labels == ["Function"] {
+                core_id.push(functions[c_func.clone()][node].id.clone());
+            }
+        }
+    }
+
+    return core_id;
 }
 
 // This will parse the mathml based on a '=' anchor

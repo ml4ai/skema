@@ -55,7 +55,7 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     dot_representation.to_string()
 }
 
-/// Return a JSON representation of an ACSet constructed from an array of MathML strings.
+/// Return a JSON representation of a ModelRep constructed from an array of MathML strings.
 #[utoipa::path(
     request_body = Vec<String>,
     responses(
