@@ -282,8 +282,8 @@ def remove_unecc_tokens(eqn):
         "mo",
         "mn",
         "mtext",
-        "mspace",
-        "ms",
+        # "mspace",
+        # "ms",
         "mfrac",
         "msqrt",
         "mroot",
@@ -313,6 +313,8 @@ def remove_unecc_tokens(eqn):
     ]
 
     for e in eliminate:
+        if e == "mspace":
+            print()
         if e in eqn:
             c = count(eqn, e)
             for _ in range(c):
