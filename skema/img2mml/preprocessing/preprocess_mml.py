@@ -451,12 +451,24 @@ def remove_mstyle(text):
     return text
 
 
+def remove_nbsp_in_mtext(mml_string):
+    pattern = r'<mtext[^>]*>(.*?)</mtext>'
+    mml_match = re.search(pattern, mml_string)
+    if not mml_match:
+        return mml_string
+
+    mtext_content = mml_match.group(1)
+    cleaned_content = re.sub(r'&#xA0;', '', mtext_content)
+
+    return mml_string.replace(mtext_content, cleaned_content)
+
 def cleaning_mml(eqn):
     """
     clean the equation.
     """
     eqn = remove_mstyle(eqn)  # remove mstyle
     eqn = eqn.replace("<mtext>&#xA0;</mtext>", "")  # remove non-breaking spaces
+    eqn = remove_nbsp_in_mtext(eqn)
     eqn = remove_mtable_attributes(eqn)
     eqn = remove_unecc_tokens(eqn)
     eqn = remove_additional_tokens(eqn)
