@@ -270,9 +270,9 @@ def remove_unecc_tokens(eqn):
         "linethickness",
         "mstyle",
     ]
-    if args.with_boldface:
+    if True:
         eqn = eqn.replace('mathvariant="bold"', "boldface_placeholder")
-        eqn = eqn.replace('mathvariant="bold-italicr"', "boldface_placeholder")
+        eqn = eqn.replace('mathvariant="bold-italic"', "boldface_placeholder")
         eqn = eqn.replace('mathvariant="bold-fraktur"', "boldface_placeholder")
         eqn = eqn.replace('mathvariant="bold-script"', "boldface_placeholder")
         eqn = eqn.replace('mathvariant="bold-sans-serif"', "boldface_placeholder")
@@ -352,7 +352,7 @@ def remove_unecc_tokens(eqn):
                 else:
                     eqn = temp1[: open_angle[-1]] + temp2[close_angle[0] + 1 :]
 
-    if args.with_boldface:
+    if True:
         eqn = eqn.replace("boldface_placeholder", 'mathvariant="bold"')
 
     return eqn
@@ -454,22 +454,56 @@ def cleaning_mml(eqn):
         eqn = remove_hexComments(eqn)
     return eqn
 
-
-def extract_inbetween_tokens(mml_eqn):
+def remove_attributes(mathml_str):
     """
-    extract inbetween token like <mo>/token/<\mo>, etc.
-    """
-    mmls = [m for m in mml_eqn.split(" ") if m != ""]
-    mmlss = [m for m in mmls if "<" in m and len([t for t in m if t == "<"]) == 2]
-    mmls3 = []
-    for i in mmlss:
-        if "&#x" not in i:
-            imml = [im for im in re.split(">|<", i) if im != ""]
-            if len(imml) == 3 and imml[-1] != "/math":
-                if len(imml[1]) > 1:
-                    mmls3.append(imml[1])
+    Remove all attributes from MathML string tokens.
 
-    return mmls3
+    Args:
+        mathml_str (str): A string containing MathML tokens with attributes.
+
+    Returns:
+        str: The MathML string with all attributes removed.
+    """
+    # Define a regular expression pattern that matches attributes
+    attribute_pattern = r'\s+\w+="[^"]*"'
+
+    # Use regular expressions to replace all attribute matches with an empty string
+    result = re.sub(attribute_pattern, '', mathml_str)
+
+    return result
+
+
+# def extract_inbetween_tokens(mml_eqn):
+#     """
+#     extract inbetween token like <mo>/token/<\mo>, etc.
+#     """
+#     clean_mml_eqn = remove_attributes(mml_eqn)
+#     mmls = [m for m in clean_mml_eqn.split(" ") if m != ""]
+#     mmlss = [m for m in mmls if "<" in m and len([t for t in m if t == "<"]) == 2]
+#     mmls3 = []
+#     for i in mmlss:
+#         if "&#x" not in i:
+#             imml = [im for im in re.split(">|<", i) if im != ""]
+#             if len(imml) == 3 and imml[-1] != "/math":
+#                 if len(imml[1]) >= 1:
+#                     mmls3.append(imml[1])
+#
+#     return mmls3
+
+def extract_inbetween_tokens(text):
+    clean_mml_eqn = remove_attributes(text)
+    # Use regular expression to extract all tokens from the MathML string
+    tokens = re.findall(r'<[^>]+>|[^<]+', clean_mml_eqn)
+    # Use a list to save the contents of all token pairs
+    contents = []
+    for token in tokens:
+        # If the token is a MathML tag, skip it
+        if token.startswith('<'):
+            continue
+        # Add the content of the token to the contents list
+        if len(token) > 0 and not token.isspace():
+            contents.append(token)
+    return contents
 
 
 def tokenize(mml_eqn):
@@ -519,7 +553,7 @@ def tokenize(mml_eqn):
                 tokenized_mml += token
 
             # to grab l o g, s i n, c o s, etc. as single token
-            elif len(token.replace(" ", "")) < len(token):
+            elif len(token.replace(" ", "")) < len(token) and "=\"" not in token:
                 tokenized_mml += token
             else:
                 tokenized_mml += " <" + token + "> "
