@@ -4,15 +4,6 @@ import re, json, argparse
 import subprocess, os, sys
 
 def get_config(config_path):
-    # # opening config file
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument(
-    #     "--config",
-    #     help="configuration file for paths and hyperparameters",
-    #     default="configs/xfmer_mml_config.json",
-    # )
-    #
-    # args = parser.parse_args()
 
     with open(config_path, "r") as cfg:
         config = json.load(cfg)
@@ -299,6 +290,85 @@ def remove_unecc_tokens(eqn):
     return eqn
 
 
+# def remove_additional_tokens(eqn):
+#     """
+#     remove redundant tokens like mtext and mrow.
+#     <mrow> will not consoidered if it has only one
+#     row. In case of more than one row, <mrow> will be
+#     considered and not be removed.
+#     """
+#     if "mtext" in eqn:
+#         try:
+#             c = count(eqn, "mtext")
+#             for _ in range(c):
+#                 e1, e2 = eqn.find("<mtext>"), eqn.find("</mtext>")
+#                 eqn = eqn[:e1] + eqn[e2 + len("</mtext>") :]
+#         except:
+#             pass
+#
+#     if "mrow" in eqn:
+#         try:
+#             eqn_arr = eqn.split()
+#             temp_eqn = list()
+#
+#             idxs_close = []
+#             idxs_open = []
+#             for ind, i in enumerate(eqn_arr):
+#                 if i == "<mrow>":
+#                     idxs_open.append(ind)
+#                 if i == "</mrow>":
+#                     idxs_close.append(ind)
+#
+#             if len(idxs_open) != len(idxs_close):
+#                 if len(idxs_close) > len(idxs_open):
+#                     idxs_close = idxs_close[: len(idxs_open)]
+#                 else:
+#                     idxs_open = idxs_open[: len(idxs_close)]
+#
+#             c_begin = 0
+#             for c_end in idxs_close:
+#                 _eqn_arr = eqn_arr[c_begin : c_end + 1]
+#                 begin_idx = _eqn_arr.index("<mrow>")
+#                 end_idx = _eqn_arr.index("</mrow>")
+#                 if begin_idx + 2 == end_idx:
+#                     temp_eqn += _eqn_arr[:begin_idx] + [
+#                         _eqn_arr[begin_idx + 1]
+#                     ]
+#                 else:
+#                     temp_eqn += eqn_arr[c_begin : c_end + 1]
+#
+#                 c_begin = c_end + 1
+#             temp_eqn += eqn_arr[c_begin:]
+#             return " ".join(temp_eqn)
+#
+#         except:
+#             f = ""
+#             for F in eqn.split():
+#                 f = f + F + " "
+#             return f
+#
+#     else:
+#         f = ""
+#         for F in eqn.split():
+#             f = f + F + " "
+#
+#         return f
+
+
+def remove_single_mrow_pairs(lst):
+    stack = []
+    for i, elem in enumerate(lst):
+        if "<mrow" in elem:
+            stack.append(i)
+        elif elem == "</mrow>":
+            start = stack.pop()
+            if i - start == 2:
+                lst.pop(i)
+                lst.pop(start)
+                return remove_single_mrow_pairs(lst)
+    return lst
+
+
 def remove_additional_tokens(eqn):
     """
     remove redundant tokens like mtext and mrow.
@@ -317,39 +387,13 @@ def remove_additional_tokens(eqn):
 
     if "mrow" in eqn:
         try:
+            eqn = eqn.replace("><", "> <")
             eqn_arr = eqn.split()
-            temp_eqn = list()
-
-            idxs_close = []
-            idxs_open = []
-            for ind, i in enumerate(eqn_arr):
-                if i == "<mrow>":
-                    idxs_open.append(ind)
-                if i == "</mrow>":
-                    idxs_close.append(ind)
-
-            if len(idxs_open) != len(idxs_close):
-                if len(idxs_close) > len(idxs_open):
-                    idxs_close = idxs_close[: len(idxs_open)]
-                else:
-                    idxs_open = idxs_open[: len(idxs_close)]
-
-            c_begin = 0
-            for c_end in idxs_close:
-                _eqn_arr = eqn_arr[c_begin : c_end + 1]
-                begin_idx = _eqn_arr.index("<mrow>")
-                end_idx = _eqn_arr.index("</mrow>")
-                if begin_idx + 2 == end_idx:
-                    temp_eqn += _eqn_arr[:begin_idx] + [
-                        _eqn_arr[begin_idx + 1]
-                    ]
-                else:
-                    temp_eqn += eqn_arr[c_begin : c_end + 1]
-
-                c_begin = c_end + 1
-            temp_eqn += eqn_arr[c_begin:]
-            return " ".join(temp_eqn)
-
+            eqn_arr = remove_single_mrow_pairs(eqn_arr)
+            f = ""
+            for F in eqn_arr:
+                f = f + F + " "
+            return f
         except:
             f = ""
             for F in eqn.split():

@@ -91,7 +91,6 @@ def preprocess_dataset(config):
     image_num = range(0, len(mml_txt))
 
     # split the image_num into train, test, validate
-    # df = image_num  # pd.DataFrame(image_num, columns=["IMG"])
     train_val_images, test_images = train_test_split(
         image_num, test_size=0.1, random_state=42
     )
