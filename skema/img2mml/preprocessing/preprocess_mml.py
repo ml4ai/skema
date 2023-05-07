@@ -270,7 +270,7 @@ def remove_unecc_tokens(eqn):
         "linethickness",
         "mstyle",
     ]
-    if True:
+    if args.with_boldface:
         eqn = eqn.replace('mathvariant="bold"', "boldface_placeholder")
         eqn = eqn.replace('mathvariant="bold-italic"', "boldface_placeholder")
         eqn = eqn.replace('mathvariant="bold-fraktur"', "boldface_placeholder")
@@ -352,7 +352,7 @@ def remove_unecc_tokens(eqn):
                 else:
                     eqn = temp1[: open_angle[-1]] + temp2[close_angle[0] + 1 :]
 
-    if True:
+    if args.with_boldface:
         eqn = eqn.replace("boldface_placeholder", 'mathvariant="bold"')
 
     return eqn
@@ -443,16 +443,27 @@ def remove_mtable_attributes(mtable_string):
     return re.sub(r"<mtable[^>]*>", "<mtable>", mtable_string)
 
 
+def remove_mstyle(text):
+    # remove <mstyle> and </mstyle> pairs
+    text = re.sub(r"<mstyle[^>]*>", "<mstyle>", text)
+    text = text.replace("<mstyle>", "")
+    text = text.replace("</mstyle>", "")
+    return text
+
+
 def cleaning_mml(eqn):
     """
     clean the equation.
     """
+    eqn = remove_mstyle(eqn)  # remove mstyle
+    eqn = eqn.replace("<mtext>&#xA0;</mtext>", "")  # remove non-breaking spaces
     eqn = remove_mtable_attributes(eqn)
     eqn = remove_unecc_tokens(eqn)
     eqn = remove_additional_tokens(eqn)
     if "&#x" in eqn:
         eqn = remove_hexComments(eqn)
     return eqn
+
 
 def remove_attributes(mathml_str):
     """
@@ -468,7 +479,7 @@ def remove_attributes(mathml_str):
     attribute_pattern = r'\s+\w+="[^"]*"'
 
     # Use regular expressions to replace all attribute matches with an empty string
-    result = re.sub(attribute_pattern, '', mathml_str)
+    result = re.sub(attribute_pattern, "", mathml_str)
 
     return result
 
@@ -490,15 +501,16 @@ def remove_attributes(mathml_str):
 #
 #     return mmls3
 
+
 def extract_inbetween_tokens(text):
     clean_mml_eqn = remove_attributes(text)
     # Use regular expression to extract all tokens from the MathML string
-    tokens = re.findall(r'<[^>]+>|[^<]+', clean_mml_eqn)
+    tokens = re.findall(r"<[^>]+>|[^<]+", clean_mml_eqn)
     # Use a list to save the contents of all token pairs
     contents = []
     for token in tokens:
         # If the token is a MathML tag, skip it
-        if token.startswith('<'):
+        if token.startswith("<"):
             continue
         # Add the content of the token to the contents list
         if len(token) > 0 and not token.isspace():
@@ -553,7 +565,7 @@ def tokenize(mml_eqn):
                 tokenized_mml += token
 
             # to grab l o g, s i n, c o s, etc. as single token
-            elif len(token.replace(" ", "")) < len(token) and "=\"" not in token:
+            elif len(token.replace(" ", "")) < len(token) and '="' not in token:
                 tokenized_mml += token
             else:
                 tokenized_mml += " <" + token + "> "
