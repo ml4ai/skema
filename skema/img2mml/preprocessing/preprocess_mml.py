@@ -287,8 +287,8 @@ def remove_unecc_tokens(eqn):
         "mfrac",
         "msqrt",
         "mroot",
-        "mstyle",
-        "mpadded",
+        # "mstyle",
+        # "mpadded",
         "mphantom",
         "mfenced",
         "menclose",
@@ -425,6 +425,8 @@ def remove_hexComments(eqn):
         if _idx != skip_idx:
             if "&#x" in _o:
                 temp_arr.append(_o.split(";")[0].strip())
+                if "</" in _o.split(";")[1]:
+                    temp_arr.append(_o.split(";")[1].strip())
                 if _idx + 1 != len(eqn_split) - 1:
                     skip_idx = _idx + 1
 
