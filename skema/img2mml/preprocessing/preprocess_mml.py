@@ -365,7 +365,7 @@ def remove_single_mrow_pairs(lst):
             stack.append(i)
         elif elem == "</mrow>":
             start = stack.pop()
-            if i - start == 2:
+            if i - start <= 2:
                 lst.pop(i)
                 lst.pop(start)
                 return remove_single_mrow_pairs(lst)
