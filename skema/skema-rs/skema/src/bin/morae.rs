@@ -644,9 +644,41 @@ fn tree_2_ast(
             let ref_name = deriv_name[1..2].to_string().clone();
             for (idx, obj) in math_vec.clone().iter().enumerate() {
                 if *obj == MathExpression::Mi(ref_name.clone()) {
-                    // find the index of the extra state variable
+                    // find each index of the state variable on the rhs
                     println!("found idx: {:?}", idx.clone());
                     println!("obj: {:?}", obj.clone());
+                    // check if there is a multiplication to the right or left
+                    // if no multiplication then delete entry and all neighboring addition operators
+                    // this should complete the transformation to a leibniz diff eq from a euler method
+                    if math_vec[idx.clone() - 1 as usize].clone()
+                        == MathExpression::Mo(Operator::Add)
+                        || math_vec[idx.clone() - 1 as usize].clone()
+                            == MathExpression::Mo(Operator::Equals)
+                    {
+                        // check right side of operator, but need to be wary of vec end
+                        let mut idx_last = false;
+                        if idx.clone() == math_vec.clone().len() - 1 {
+                            idx_last = true;
+                        }
+                        if !idx_last.clone()
+                            && math_vec[idx.clone() + 1 as usize].clone()
+                                == MathExpression::Mo(Operator::Add)
+                        {
+                            // delete idx and neighboring Add's (left side might be equals, which is kept)
+                            math_vec.remove(idx.clone() + 1 as usize);
+                            math_vec.remove(idx.clone() as usize);
+                            if math_vec[idx.clone() - 1 as usize].clone()
+                                != MathExpression::Mo(Operator::Equals)
+                            {
+                                math_vec.remove(idx.clone() - 1 as usize);
+                            }
+                        } else if idx_last.clone() {
+                            // delete idx and neighboring Add to the left
+                            // need to delete from the largest index to the smallest as to not mess up the indexing
+                            math_vec.remove(idx.clone() as usize);
+                            math_vec.remove(idx.clone() - 1 as usize);
+                        }
+                    }
                 }
             }
         }
