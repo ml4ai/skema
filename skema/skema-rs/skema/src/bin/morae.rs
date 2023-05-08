@@ -70,27 +70,7 @@ fn main() {
         let (mut core_dynamics_ast, metadata_map_ast) =
             subgraph2_core_dyn_ast(core_id[0].clone()).unwrap();
 
-        println!("\n{:?}", core_dynamics_ast[2].clone());
-
-        println!("Testing of convseriton to new data rep");
-
-        let mathml_ast =
-            get_mathml_asts_from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
-        let test_pn = ACSet::from(mathml_ast);
-
-        println!("Pertri-Net rep: {:?}", test_pn.clone());
-
-        let new_model = ModelRepPn::from(test_pn.clone());
-
-        println!("New Model Rep: {:?}", new_model.clone());
-
-        let mod_serialized = serde_json::to_string(&new_model).unwrap();
-
-        println!("Serialized Model Rep: {}", mod_serialized.clone());
-
-        /*let (core_dynamics, metadata_map) = subgraph2_core_dyn_exp(core_id).unwrap();
-
-        println!("{:?}", core_dynamics[0].clone());*/
+        println!("\n{:?}", core_dynamics_ast[0].clone());
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
     else if args[1] == "manual".to_string() {
@@ -420,6 +400,7 @@ fn subgraph2_core_dyn_ast(
     for node in graph.node_indices() {
         if graph[node].labels == ["Expression"] {
             expression_nodes.push(node);
+            println!("Expression Nodes: {:?}", graph[node].clone().id);
         }
     }
 
@@ -1112,6 +1093,7 @@ fn trim_un_named(
             for node2 in graph.neighbors_directed(node_index, Outgoing) {
                 bypass.push(node2);
             }
+            // one incoming one outgoing
             if bypass.len() == 2 {
                 bypass_graph.add_edge(
                     bypass[0].clone(),
@@ -1121,6 +1103,27 @@ fn trim_un_named(
                         .unwrap()
                         .clone(),
                 );
+            } else if bypass.len() > 2 {
+                // this operates on the assumption that there maybe multiple references to the port
+                // (incoming arrows) but only one outgoing arrow, this seems to be the case based on
+                // data too.
+
+                let end_node_idx = bypass.len().clone() - 1;
+                for (i, _ent) in bypass[0..(end_node_idx as usize)].iter().enumerate() {
+                    // this iterates over all but the last entry in the bypass vec
+                    bypass_graph.add_edge(
+                        bypass[i.clone() as usize].clone(),
+                        bypass[end_node_idx.clone() as usize].clone(),
+                        graph
+                            .edge_weight(
+                                graph
+                                    .find_edge(node_index, bypass[end_node_idx.clone() as usize])
+                                    .unwrap(),
+                            )
+                            .unwrap()
+                            .clone(),
+                    );
+                }
             }
         }
     }
