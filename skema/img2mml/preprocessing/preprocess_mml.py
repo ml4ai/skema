@@ -454,28 +454,58 @@ def remove_mstyle(text):
 
 
 def remove_nbsp_in_mtext(mml_string):
-    pattern = r'<mtext[^>]*>(.*?)</mtext>'
+    pattern = r"<mtext[^>]*>(.*?)</mtext>"
     mml_match = re.search(pattern, mml_string)
     if not mml_match:
         return mml_string
 
     mtext_content = mml_match.group(1)
-    cleaned_content = re.sub(r'&#xA0;', '', mtext_content)
+    cleaned_content = re.sub(r"&#xA0;", "", mtext_content)
 
     return mml_string.replace(mtext_content, cleaned_content)
+
+
+def extract_mtext_tags(mathml_str):
+    pattern = r"<mtext[^>]*>(.*?)<\/mtext>"
+    mtext_tags = []
+    for m in re.finditer(pattern, mathml_str):
+        mtext_tags.append(m.group())
+    return mtext_tags
+
+
+def process_mtext(eqn):
+    #  remove non-breaking spaces
+    eqn = eqn.replace("<mtext>&#xA0;</mtext>", "")
+    eqn = eqn.replace("&#xA0;", "")
+    eqn = eqn.replace("<mtext></mtext>", "")
+    mtexts = extract_mtext_tags(eqn)
+    if len(mtexts) > 0:
+        for mt in mtexts:
+            #  if containing ???
+            if "???" in mt:
+                eqn = eqn.replace(mt, "")
+            #  if containing latex
+            if "\\" in mt.replace('\\"', ""):
+                eqn = eqn.replace(mt, "")
+            #  remove empty mtext pairs
+            if mt.strip() == "<mtext></mtext>":
+                eqn = eqn.replace(mt, "")
+    return eqn
+
 
 def cleaning_mml(eqn):
     """
     clean the equation.
     """
     eqn = remove_mstyle(eqn)  # remove mstyle
-    eqn = eqn.replace("<mtext>&#xA0;</mtext>", "")  # remove non-breaking spaces
-    eqn = remove_nbsp_in_mtext(eqn)
+    eqn = process_mtext(eqn)
+    # eqn = remove_nbsp_in_mtext(eqn)
     eqn = remove_mtable_attributes(eqn)
     eqn = remove_unecc_tokens(eqn)
     eqn = remove_additional_tokens(eqn)
     if "&#x" in eqn:
         eqn = remove_hexComments(eqn)
+
     return eqn
 
 
