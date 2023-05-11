@@ -196,7 +196,7 @@ def create_dataset():
                 root,
                 f"{yr}/{month}/latex_images_fonts/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
             )
-            img_dst_fonts = os.path.join(img_src_fonts, f"{c_idx}.png")
+            img_dst_fonts = os.path.join(images_path_fonts, f"{c_idx}.png")
             CP(img_src_fonts, img_dst_fonts)
 
             # wrting path
