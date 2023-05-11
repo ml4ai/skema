@@ -164,9 +164,9 @@ def attribute_definition(
                         attribute_value.replace("\\", "").replace('"', "")
                         == attr_tobe_checked[attribute_parameter]
                     ):
-                        mml_code = mml_code.replace(" " + darr, "")
+                        mml_code = mml_code.replace(darr, "")
             else:
-                mml_code = mml_code.replace(" " + darr, "")
+                mml_code = mml_code.replace(darr, "")
 
     return mml_code
 
@@ -362,7 +362,7 @@ def remove_single_mrow_pairs(lst):
             stack.append(i)
         elif elem == "</mrow>":
             start = stack.pop()
-            if i - start <= 2:
+            if i - start == 2:
                 lst.pop(i)
                 lst.pop(start)
                 return remove_single_mrow_pairs(lst)
@@ -447,39 +447,29 @@ def cleaning_mml(eqn):
     return eqn
 
 
-# def extract_inbetween_tokens(mml_eqn):
-#     """
-#     extract inbetween token like <mo>/token/<\mo>, etc.
-#     """
-#     mmls = [m for m in mml_eqn.split(" ") if m != ""]
-#     mmlss = [
-#         m for m in mmls if "<" in m and len([t for t in m if t == "<"]) == 2
-#     ]
-#     mmls3 = []
-#     for i in mmlss:
-#         if "&#x" not in i:
-#             imml = [im for im in re.split(">|<", i) if im != ""]
-#             if len(imml) == 3 and imml[-1] != "/math":
-#                 if len(imml[1]) > 1:
-#                     mmls3.append(imml[1])
-#
-#     return mmls3
+def extract_inbetween_tokens(mml_eqn):
+    """
+    extract inbetween token like <mo>/token/<\mo>, etc.
+    """
+    mmls = [m for m in mml_eqn.split(" ") if m != ""]
+    # print(mmls)
+    mmlss = [
+        m for m in mmls if "<" in m and len([t for t in m if t == "<"]) == 2
+    ]
+    print(mmlss)
+    mmls3 = []
+    for i in mmlss:
+        if "&#x" not in i:
+            print(i)
+            imml = [im for im in re.split(">|<", i) if im != ""]
+            print(imml)
+            if len(imml) == 3 and imml[-1] != "/math":
+                print(imml)
+                if len(imml[1]) >= 1:
+                    print(".... ", imml[1])
+                    mmls3.append(imml[1])
 
-
-def extract_inbetween_tokens(text):
-    clean_mml_eqn = remove_attributes(text)
-    # Use regular expression to extract all tokens from the MathML string
-    tokens = re.findall(r"<[^>]+>|[^<]+", clean_mml_eqn)
-    # Use a list to save the contents of all token pairs
-    contents = []
-    for token in tokens:
-        # If the token is a MathML tag, skip it
-        if token.startswith("<"):
-            continue
-        # Add the content of the token to the contents list
-        if len(token) > 0 and not token.isspace():
-            contents.append(token)
-    return contents
+    return mmls3
 
 
 def tokenize(mml_eqn):
@@ -531,10 +521,8 @@ def tokenize(mml_eqn):
                 tokenized_mml += token
 
             # to grab l o g, s i n, c o s, etc. as single token
-            # elif len(token.replace(" ", "")) < len(token):
-            elif len(token.replace(" ", "")) < len(token) and '="' not in token:
+            elif len(token.replace(" ", "")) < len(token):
                 tokenized_mml += token
-
             else:
                 tokenized_mml += " <" + token + "> "
 
@@ -543,22 +531,5 @@ def tokenize(mml_eqn):
 
 if __name__ == "__main__":
 
-    # get config
-    config = get_config(sys.argv[-1])
-
-    # get the rejected images
-    data_path = f"{config['data_path']}/{config['dataset_type']}"
-    org_mml = open(f"{data_path}/original_{config['markup']}.lst", "r").readlines()
-    modified_mml_file = open(f"{data_path}/{config['markup']}.lst", "w")
-
-    blank_images = open("logs/blank_images.lst").readlines()
-    idx_to_be_ignored = [int(i.split(".")[0]) for i in blank_images]
-
-    for eqn_idx in range(len(org_mml)):
-        if eqn_idx not in idx_to_be_ignored:
-            eqn = org_mml[eqn_idx]
-            if len(eqn) > 2:
-                mml = simplification(eqn)
-                # writing
-                if "\n" not in mml:
-                    modified_mml_file.write(mml + "\n")
+    eqn = '<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\" alttext=\"\\nabla H({\\bf r})=\\left(q\\sinh r_1/2,\\pm q\\sinh\\!\\left(\\mathrm{arcosh}\\!\\left(2\\nu q^{-1}+2-\\cosh r_1\\right)\\!\\right)\\!/2\\right)\\;\\mbox{and}\\;{\\bf z}({\\bf r}) \"> <mi mathvariant=\"normal\">&#x2207;<!-- ∇ --></mi> <mi>H</mi> <mo stretchy=\"false\">(</mo> <mrow class=\"MJX-TeXAtom-ORD\"> <mi mathvariant=\"bold\">r</mi> </mrow> <mo stretchy=\"false\">)</mo> <mo>=</mo> <mrow> <mo>(</mo> <mi>q</mi> <mi>sinh</mi> <mo>&#x2061;<!-- ⁡ --></mo> <msub> <mi>r</mi> <mn>1</mn> </msub> <mrow class=\"MJX-TeXAtom-ORD\"> <mo>/</mo> </mrow> <mn>2</mn> <mo>,</mo> <mo>&#x00B1;<!-- ± --></mo> <mi>q</mi> <mi>sinh</mi> <mspace width=\"negativethinmathspace\" /> <mrow> <mo>(</mo> <mrow class=\"MJX-TeXAtom-ORD\"> <mi mathvariant=\"normal\">a</mi> <mi mathvariant=\"normal\">r</mi> <mi mathvariant=\"normal\">c</mi> <mi mathvariant=\"normal\">o</mi> <mi mathvariant=\"normal\">s</mi> <mi mathvariant=\"normal\">h</mi> </mrow> <mspace width=\"negativethinmathspace\" /> <mrow> <mo>(</mo> <mn>2</mn> <mi>&#x03BD;<!-- ν --></mi> <msup> <mi>q</mi> <mrow class=\"MJX-TeXAtom-ORD\"> <mo>&#x2212;<!-- − --></mo> <mn>1</mn> </mrow> </msup> <mo>+</mo> <mn>2</mn> <mo>&#x2212;<!-- − --></mo> <mi>cosh</mi> <mo>&#x2061;<!-- ⁡ --></mo> <msub> <mi>r</mi> <mn>1</mn> </msub> <mo>)</mo> </mrow> <mspace width=\"negativethinmathspace\" /> <mo>)</mo> </mrow> <mspace width=\"negativethinmathspace\" /> <mrow class=\"MJX-TeXAtom-ORD\"> <mo>/</mo> </mrow> <mn>2</mn> <mo>)</mo> </mrow> <mspace width=\"thickmathspace\" /> <mstyle displaystyle=\"false\" scriptlevel=\"0\"> <mtext>and</mtext> </mstyle> <mspace width=\"thickmathspace\" /> <mrow class=\"MJX-TeXAtom-ORD\"> <mi mathvariant=\"bold\">z</mi> </mrow> <mo stretchy=\"false\">(</mo> <mrow class=\"MJX-TeXAtom-ORD\"> <mi mathvariant=\"bold\">r</mi> </mrow> <mo stretchy=\"false\">)</mo></math>'
+    print(simplification(eqn))
