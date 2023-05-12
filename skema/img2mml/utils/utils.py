@@ -1,6 +1,8 @@
 import torch, math
 from collections import Counter
 
+# intializing loss function
+criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
 class CreateVocab(object):
     """
@@ -113,7 +115,6 @@ def calculate_loss(output, mml, vocab):
     """
     calculate Cross Entropy loss
     """
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
     loss = criterion(output, mml)
     return loss
 

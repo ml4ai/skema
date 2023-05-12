@@ -465,7 +465,24 @@ def cleaning_mml(eqn):
 #
 #     return mmls3
 
+def remove_attributes(mathml_str):
+    """
+    Remove all attributes from MathML string tokens.
 
+    Args:
+        mathml_str (str): A string containing MathML tokens with attributes.
+
+    Returns:
+        str: The MathML string with all attributes removed.
+    """
+    # Define a regular expression pattern that matches attributes
+    attribute_pattern = r'\s+\w+="[^"]*"'
+
+    # Use regular expressions to replace all attribute matches with an empty string
+    result = re.sub(attribute_pattern, "", mathml_str)
+
+    return result
+    
 def extract_inbetween_tokens(text):
     clean_mml_eqn = remove_attributes(text)
     # Use regular expression to extract all tokens from the MathML string
