@@ -25,9 +25,11 @@ def simplification(mml_org):
         i = mml_org.find("\\\\")
 
     # Removing initial information about URL, display, and equation itself
+    # keeping display="block"
     begin = mml_org.find("<math") + len("<math")
     end = mml_org.find(">")
-    mml_org = mml_org.replace(mml_org[begin:end], "")
+    # mml_org = mml_org.replace(mml_org[begin:end], "")
+    mml_org = mml_org.replace(mml_org[begin:end], ' display="block"')
 
     # ATTRIBUTES
 
@@ -90,7 +92,7 @@ def simplification(mml_org):
         "lquote": "&quot;",
         "rquote": "&quot;",
         "overflow": "linebreak",
-        "display": "block",
+        # "display": "block",
         "denomalign": "center",
         "numalign": "center",
         "align": "axis",
@@ -482,7 +484,7 @@ def remove_attributes(mathml_str):
     result = re.sub(attribute_pattern, "", mathml_str)
 
     return result
-    
+
 def extract_inbetween_tokens(text):
     clean_mml_eqn = remove_attributes(text)
     # Use regular expression to extract all tokens from the MathML string
@@ -545,12 +547,15 @@ def tokenize(mml_eqn):
                         tokenized_mml += f" {intgr} "
 
             elif token in inbetween_tokens:
-                tokenized_mml += token
+                if len(token.replace(" ", "")) < len(token):
+                    tokenized_mml += token.replace(" ", "")
+                else: tokenized_mml += token
+
 
             # to grab l o g, s i n, c o s, etc. as single token
             # elif len(token.replace(" ", "")) < len(token):
-            elif len(token.replace(" ", "")) < len(token) and '="' not in token:
-                tokenized_mml += token
+            # elif len(token.replace(" ", "")) < len(token):# and '="' not in token:
+            #     tokenized_mml += token
 
             else:
                 tokenized_mml += " <" + token + "> "
