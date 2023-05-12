@@ -1434,7 +1434,7 @@ class PyASTToCAST:
                     unique_name = construct_unique_name(
                         self.filenames[-1], node.func.id
                     )
-            if unique_name not in prev_scope_id_dict.keys():
+            if unique_name not in prev_scope_id_dict.keys(): # and unique_name not in curr_scope_id_dict.keys():
 
                 # If a built-in is called, then it gets added to the global dictionary if
                 # it hasn't been called before. This is to maintain one consistent ID per built-in
@@ -2441,12 +2441,14 @@ class PyASTToCAST:
             for piece in node.body:
                 # We defer visiting function defs until we've cleared the rest of the code in the function
                 if isinstance(piece, ast.FunctionDef):
-                    self.insert_next_id(curr_scope_id_dict, piece.name)
-                    prev_scope_id_dict[piece.name] = curr_scope_id_dict[
-                        piece.name
-                    ]
+                    unique_name = construct_unique_name(self.filenames[-1], piece.name)
+                    self.insert_next_id(curr_scope_id_dict, unique_name)
+                    prev_scope_id_dict[unique_name] = curr_scope_id_dict[unique_name]
                     # functions_to_visit.append(piece)
                     #continue
+
+                    print(curr_scope_id_dict)
+                    print(prev_scope_id_dict)
 
                 # Have to figure out name IDs for imports (i.e. other modules)
                 # These asserts will keep us from visiting them from now
