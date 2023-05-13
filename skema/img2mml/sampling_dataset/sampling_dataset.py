@@ -330,7 +330,7 @@ def main():
                 root,
                 f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
             )
-            img_dst = os.path.join(images_path, f"{c_idx}.png")
+            img_dst = os.path.join(os.path.join(data_path, "images"), f"{c_idx}.png")
             CP(img_src, img_dst)
 
             # wrting path
