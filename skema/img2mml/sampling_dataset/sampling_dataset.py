@@ -28,19 +28,17 @@ random.seed(config["seed"])
 
 # create destination files and directory
 data_path = "training_data/sample_data"
-images_path = os.path.join(data_path, "images")
 
 if not os.path.exists(data_path):
     os.mkdir(data_path)
-
-if not os.path.exists(images_path):
-    os.mkdir(images_path)
 else:
     print(
         "sample_data already exists. Removing old sample_data and replacing it with new one."
     )
-    shutil.rmtree(images_path)
-    os.mkdir(images_path)
+    shutil.rmtree(data_path)
+    os.mkdir(data_path)
+    os.mkdir(os.path.join(data_path, "images"))
+
 
 mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
 latex_file = open(os.path.join(data_path, "original_latex.lst"), "w")
