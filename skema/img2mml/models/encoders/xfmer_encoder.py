@@ -47,7 +47,6 @@ class Transformer_Encoder(nn.Module):
         # src_from_cnn: (B, L, dec_hid_dim)
         # change the L=H*W to max_len
         src_from_cnn = src_from_cnn.permute(0, 2, 1)  # (B, dec_hid_dim, L)
-        # print("src_from_cnn shape: ", src_from_cnn.shape)
         src_from_cnn = self.change_length(
             src_from_cnn
         )  # (B, dec_hid_dim, max_len)

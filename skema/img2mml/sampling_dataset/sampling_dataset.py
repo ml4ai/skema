@@ -101,9 +101,6 @@ def copy_image(img_src, img_dst):
 
 def prepare_dataset(args):
 
-    # global total_eqns, distribution_achieved, lock, dist_dict
-    # global count, total_eqns, distribution_achieved, final_paths, lock, counter_dist_dict, dist_dict
-
     i, ap = args
     yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
     mml_path = os.path.join(
@@ -253,7 +250,6 @@ def main():
             for r in results:
                 if r != None:
                     tgt_bin, ap = r
-                    # print(tgt_bin, ap)
                     if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                         counter_dist_dict[tgt_bin] += 1
                         final_paths.append(ap)
@@ -269,47 +265,6 @@ def main():
             shutil.rmtree(temp_folder)
             print("rejected: ", reject_count)
             break
-
-
-        # update thhe distribution
-        # for af in all_files:
-            # i,ap = af
-
-            # try:
-                # simp_mml = open(
-                #     f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
-                # )
-                # simp_mml = simp_mml.readlines()[0]
-                # length_mml = len(simp_mml.split())
-                #
-                # # finding the bin
-                # temp_dict = {}
-                # for i in range(50, 400, 50):
-                #     if length_mml / i < 1:
-                #         temp_dict[i] = length_mml / i
-                #
-                # # get the bin
-                # if len(temp_dict) >= 1:
-                #     max_bin_size = max(temp_dict, key=lambda k: temp_dict[k])
-                #     tgt_bin = f"{max_bin_size-50}-{max_bin_size}"
-                # else:
-                #     tgt_bin = "350+"
-
-                # if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
-                #     counter_dist_dict[tgt_bin] += 1
-                #     final_paths.append(ap)
-                #     count += 1
-            # except:
-            #         pass
-
-            # clean the temp_folder after completeing the batch
-            # clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
-            # subprocess.run(clean_cmd)
-
-        # else:
-        #     # remove temp_folder
-        #     shutil.rmtree(temp_folder)
-        #     break
 
     ######## step 4: writing the final dataset ########
 

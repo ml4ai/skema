@@ -28,7 +28,6 @@ def simplification(mml_org):
     # keeping display="block"
     begin = mml_org.find("<math") + len("<math")
     end = mml_org.find(">")
-    # mml_org = mml_org.replace(mml_org[begin:end], "")
     mml_org = mml_org.replace(mml_org[begin:end], ' display="block"')
 
     # ATTRIBUTES
