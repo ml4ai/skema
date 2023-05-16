@@ -75,7 +75,7 @@ class My_pad_collate(object):
         """ _img = torch.Tensor(_img) """
 
         return (
-            torch.stack(_img).to(self.device),   """ _img.to(...)"""
+            torch.stack(_img).to(self.device),   #""" _img.to(...)"""
             padded_mml_tensors.to(self.device),
         )
 
