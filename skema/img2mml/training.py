@@ -37,13 +37,13 @@ parser.add_argument(
     help="configuration file for paths and hyperparameters",
     default="configs/xfmer_mml_config.json",
 )
+
 args = parser.parse_args()
 
 with open(args.config, "r") as cfg:
     config = json.load(cfg)
 
 torch.backends.cudnn.enabled = False
-
 
 def set_random_seed(SEED):
     # set up seed
@@ -445,10 +445,7 @@ def train_model(rank=None,):
     if ddp:
         dist.destroy_process_group()
 
-    # testing
-    # if (not ddp) or (ddp and rank==0):
-    # if ddp:
-    #     dist.barrier()
+    time.sleep(3)
 
     print(
         "loading best saved model: ",
@@ -505,11 +502,6 @@ def train_model(rank=None,):
 
     # stopping time
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
-
-    # if ddp:
-        # dist.barrier()
-        # dist.destroy_process_group()
-
 
 # for DDP
 def ddp_main():

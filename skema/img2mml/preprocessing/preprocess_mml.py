@@ -291,72 +291,6 @@ def remove_unecc_tokens(eqn):
 
     return eqn
 
-
-# def remove_additional_tokens(eqn):
-#     """
-#     remove redundant tokens like mtext and mrow.
-#     <mrow> will not consoidered if it has only one
-#     row. In case of more than one row, <mrow> will be
-#     considered and not be removed.
-#     """
-#     if "mtext" in eqn:
-#         try:
-#             c = count(eqn, "mtext")
-#             for _ in range(c):
-#                 e1, e2 = eqn.find("<mtext>"), eqn.find("</mtext>")
-#                 eqn = eqn[:e1] + eqn[e2 + len("</mtext>") :]
-#         except:
-#             pass
-#
-#     if "mrow" in eqn:
-#         try:
-#             eqn_arr = eqn.split()
-#             temp_eqn = list()
-#
-#             idxs_close = []
-#             idxs_open = []
-#             for ind, i in enumerate(eqn_arr):
-#                 if i == "<mrow>":
-#                     idxs_open.append(ind)
-#                 if i == "</mrow>":
-#                     idxs_close.append(ind)
-#
-#             if len(idxs_open) != len(idxs_close):
-#                 if len(idxs_close) > len(idxs_open):
-#                     idxs_close = idxs_close[: len(idxs_open)]
-#                 else:
-#                     idxs_open = idxs_open[: len(idxs_close)]
-#
-#             c_begin = 0
-#             for c_end in idxs_close:
-#                 _eqn_arr = eqn_arr[c_begin : c_end + 1]
-#                 begin_idx = _eqn_arr.index("<mrow>")
-#                 end_idx = _eqn_arr.index("</mrow>")
-#                 if begin_idx + 2 == end_idx:
-#                     temp_eqn += _eqn_arr[:begin_idx] + [
-#                         _eqn_arr[begin_idx + 1]
-#                     ]
-#                 else:
-#                     temp_eqn += eqn_arr[c_begin : c_end + 1]
-#
-#                 c_begin = c_end + 1
-#             temp_eqn += eqn_arr[c_begin:]
-#             return " ".join(temp_eqn)
-#
-#         except:
-#             f = ""
-#             for F in eqn.split():
-#                 f = f + F + " "
-#             return f
-#
-#     else:
-#         f = ""
-#         for F in eqn.split():
-#             f = f + F + " "
-#
-#         return f
-
-
 def remove_single_mrow_pairs(lst):
     stack = []
     for i, elem in enumerate(lst):
@@ -448,25 +382,6 @@ def cleaning_mml(eqn):
         eqn = remove_hexComments(eqn)
     return eqn
 
-
-# def extract_inbetween_tokens(mml_eqn):
-#     """
-#     extract inbetween token like <mo>/token/<\mo>, etc.
-#     """
-#     mmls = [m for m in mml_eqn.split(" ") if m != ""]
-#     mmlss = [
-#         m for m in mmls if "<" in m and len([t for t in m if t == "<"]) == 2
-#     ]
-#     mmls3 = []
-#     for i in mmlss:
-#         if "&#x" not in i:
-#             imml = [im for im in re.split(">|<", i) if im != ""]
-#             if len(imml) == 3 and imml[-1] != "/math":
-#                 if len(imml[1]) > 1:
-#                     mmls3.append(imml[1])
-#
-#     return mmls3
-
 def remove_attributes(mathml_str):
     """
     Remove all attributes from MathML string tokens.
@@ -550,12 +465,6 @@ def tokenize(mml_eqn):
                 if len(token.replace(" ", "")) < len(token):
                     tokenized_mml += token.replace(" ", "")
                 else: tokenized_mml += token
-
-
-            # to grab l o g, s i n, c o s, etc. as single token
-            # elif len(token.replace(" ", "")) < len(token):
-            # elif len(token.replace(" ", "")) < len(token):# and '="' not in token:
-            #     tokenized_mml += token
 
             else:
                 tokenized_mml += " <" + token + "> "

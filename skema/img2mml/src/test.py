@@ -32,10 +32,6 @@ def evaluate(
 
         for i, (img, mml) in enumerate(test_dataloader):
             batch_size = mml.shape[0]
-            # if ddp:
-            #     mml = mml.to(f"cuda:{rank}", dtype=torch.long)
-            #     img = img.to(f"cuda:{rank}")
-            # else:
             mml = mml.to(device, dtype=torch.long)
             img = img.to(device)
 
@@ -59,9 +55,6 @@ def evaluate(
                     outputs_reshaped = outputs.contiguous().view(
                         -1, output_dim
                     )  # (B * max_len-1, output_dim)
-
-            # elif masking:
-            #     outputs_reshaped, mml_reshaped = masking_pad_token(outputs, mml)
 
             else:
                 output_dim = outputs.shape[-1]

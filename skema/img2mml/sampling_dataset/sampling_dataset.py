@@ -322,7 +322,7 @@ def main():
     reject = 0
     c_idx = 0
     for fpidx, fp in enumerate(final_paths):
-        # try:
+        try:
             yr, month, folder, type_of_eqn, eqn_num = fp.split("_")
 
             # copying image
@@ -367,9 +367,9 @@ def main():
 
             c_idx += 1
 
-        # except:
-        #     reject += 1
-        #     pass
+        except:
+            reject += 1
+            pass
 
 
     print("final distribution: ", counter_dist_dict)

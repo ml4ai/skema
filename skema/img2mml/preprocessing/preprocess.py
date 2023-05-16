@@ -72,8 +72,10 @@ class My_pad_collate(object):
         # images tensors
         _img = [i for i in _img]
 
+        """ _img = torch.Tensor(_img) """
+
         return (
-            torch.stack(_img).to(self.device),
+            torch.stack(_img).to(self.device),   """ _img.to(...)"""
             padded_mml_tensors.to(self.device),
         )
 
@@ -189,10 +191,6 @@ def preprocess_dataset(config):
     imml_test = Img2MML_dataset(test, vocab, tokenizer)
 
     if config["DDP"]:
-        # test_sampler = DistributedSampler(dataset=imml_test,
-        #                                 num_replicas=config["world_size"],
-        #                                 rank=config["rank"],
-        #                                 shuffle=True)
         test_sampler = SequentialSampler(imml_test)
         sampler = test_sampler
         shuffle = False
@@ -214,10 +212,6 @@ def preprocess_dataset(config):
     imml_val = Img2MML_dataset(val, vocab, tokenizer)
 
     if config["DDP"]:
-        # val_sampler = DistributedSampler(dataset=imml_val,
-        #                                 num_replicas=config["world_size"],
-        #                                 rank=config["rank"],
-        #                                 shuffle=True)
         val_sampler = SequentialSampler(imml_val)
         sampler = val_sampler
         shuffle = False

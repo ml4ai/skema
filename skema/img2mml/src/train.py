@@ -24,11 +24,14 @@ def train(
     for i, (img, mml) in enumerate(train_dataloader):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
+        """
+        imgs = list()
+        for im in img:
+            imgs.append(torch.load(f".../{int(im.item)}.txt"))
+        img = torch.stack(imgs)
+        """
+
         batch_size = mml.shape[0]
-        # if ddp:
-        #     mml = mml.to(f"cuda:{rank}", dtype=torch.long)
-        #     img = img.to(f"cuda:{rank}")
-        # else:
         mml = mml.to(device, dtype=torch.long)
         img = img.to(device)
 
@@ -36,13 +39,8 @@ def train(
         optimizer.zero_grad()
 
         outputs, _ = model(img, mml)  # (B, max_len, output_dim)
-        # print("shape:", (mml.shape, outputs.shape))
-
-        # if masking:
-        #     # output: (l*B, output_dim); mml: (l*B)
-        #     outputs, mml = masking_pad_token(outputs, mml)
-        # else:
         output_dim = outputs.shape[-1]
+
         # avoiding <sos> token while Calculating loss
         mml = mml[:, 1:].contiguous().view(-1)
         if model_type == "opennmt":
@@ -50,10 +48,7 @@ def train(
         elif model_type == "cnn_xfmer" or model_type == "resnet_xfmer":
             outputs = outputs.contiguous().view(-1, output_dim)
 
-        # print("outputs mml devices are: ", outputs.get_device(), mml.get_device())
-        # print("shape:", (mml.shape, outputs.shape))
         loss = calculate_loss(outputs, mml, vocab)
-        # print("loss devices are: ", loss.get_device())
         loss.backward()
 
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
