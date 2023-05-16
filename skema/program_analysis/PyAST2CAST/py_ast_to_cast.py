@@ -1435,7 +1435,6 @@ class PyASTToCAST:
                         self.filenames[-1], node.func.id
                     )
             if unique_name not in prev_scope_id_dict.keys(): # and unique_name not in curr_scope_id_dict.keys():
-
                 # If a built-in is called, then it gets added to the global dictionary if
                 # it hasn't been called before. This is to maintain one consistent ID per built-in
                 # function
@@ -1507,7 +1506,7 @@ class PyASTToCAST:
                         Call(
                             func=Name(
                                 node.func.id,
-                                id=prev_scope_id_dict[unique_name],
+                                id=curr_scope_id_dict[unique_name] if unique_name in curr_scope_id_dict else prev_scope_id_dict[unique_name], # NOTE: do this everywhere?
                                 source_refs=ref,
                             ),
                             arguments=args,
@@ -2439,7 +2438,7 @@ class PyASTToCAST:
             # merge_dicts(prev_scope_id_dict, curr_scope_id_dict)
             merge_dicts(curr_scope_id_dict, prev_scope_id_dict)
             for piece in node.body:
-                # We defer visiting function defs until we've cleared the rest of the code in the function
+
                 if isinstance(piece, ast.FunctionDef):
                     unique_name = construct_unique_name(self.filenames[-1], piece.name)
                     self.insert_next_id(curr_scope_id_dict, unique_name)
