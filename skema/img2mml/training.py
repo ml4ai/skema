@@ -486,7 +486,7 @@ def train_model(rank=None,):
         criterion,
         device,
         beam_params,
-        voacb=vocab,
+        vocab=vocab,
         is_test=True,
         ddp=ddp,
         rank=rank,
