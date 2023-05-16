@@ -10,6 +10,7 @@ def train(
     train_dataloader,
     vocab,
     optimizer,
+    criterion,
     clip,
     device,
     ddp=False,
@@ -48,7 +49,7 @@ def train(
         elif model_type == "cnn_xfmer" or model_type == "resnet_xfmer":
             outputs = outputs.contiguous().view(-1, output_dim)
 
-        loss = calculate_loss(outputs, mml, vocab)
+        loss = criterion(output, mml) #calculate_loss(outputs, mml, vocab)
         loss.backward()
 
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)

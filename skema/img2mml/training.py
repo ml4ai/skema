@@ -314,6 +314,9 @@ def train_model(rank=None,):
     # print(model.apply(init_weights))
     print(f"The model has {count_parameters(model):,} trainable parameters")
 
+    # intializing loss function
+    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
+
     # optimizer
     _lr = starting_lr if use_scheduler else learning_rate
 
@@ -369,6 +372,7 @@ def train_model(rank=None,):
                     train_dataloader,
                     vocab,
                     optimizer,
+                    criterion,
                     CLIP,
                     device,
                     ddp=ddp,

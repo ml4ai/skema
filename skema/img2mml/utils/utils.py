@@ -1,8 +1,7 @@
 import torch, math
 from collections import Counter
 
-# intializing loss function
-criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
+
 
 class CreateVocab(object):
     """
@@ -49,33 +48,6 @@ class CreateVocab(object):
         return len(self.tok2ind)
 
 
-# def masking_pad_token(output, mml):
-#     """
-#     mask will be created using target sequences
-#     which then be applied on the model's output seq
-#
-#     params:
-#     output: model's output of shape (seq_len/max_len, B, output_dim)
-#     mml: target eqns (seq_len/max_len, B)
-#
-#     return:
-#     output: masked output (len*B, output_dim)
-#     mml: masked_mml (len*B)
-#     """
-#     # masking
-#     padding = torch.ones_like(mml) * 0  # 0 is pad_token index
-#     mask = (mml != padding)             # [B, l]
-#     mml = mml.masked_select(mask)       # [B * (l - len(tok!=<pad>))]
-#
-#     output_dim = output.shape[-1]
-#     output = output.masked_select(mask.unsqueeze(2).expand(-1, -1, output_dim))
-#     output = output.contiguous().view(-1, output_dim)
-#
-#     assert output.shape[0] == mml.shape[0], "output and target shapes are diffrent."
-#
-#     return output, mml
-
-
 def garbage2pad(preds, vocab, is_test=False):
     """
     all garbage tokens will be converted to <pad> token
@@ -115,6 +87,8 @@ def calculate_loss(output, mml, vocab):
     """
     calculate Cross Entropy loss
     """
+    # intializing loss function
+    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
     loss = criterion(output, mml)
     return loss
 
