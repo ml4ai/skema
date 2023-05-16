@@ -363,9 +363,6 @@ def train_model(rank=None,):
                 start_time = time.time()
 
                 # training and validation
-                # with tqdm(train_dataloader, unit="batch", desc="training") as tepoch:
-                # train_loss = train(model, model_type, tepoch, vocab,
-                #                  optimizer, CLIP, ddp=ddp, rank=rank)
                 train_loss = train(
                     model,
                     model_type,
@@ -382,7 +379,7 @@ def train_model(rank=None,):
                 # if rank==0:
                 val_loss = evaluate(
                     model,
-                    model_type,    
+                    model_type,
                     batch_size,
                     val_dataloader,
                     criterion,
@@ -484,7 +481,6 @@ def train_model(rank=None,):
     test_loss = evaluate(
         model,
         model_type,
-        vocab,
         batch_size,
         test_dataloader,
         criterion,
