@@ -27,7 +27,7 @@ def train(
 
         imgs = list()
         for im in img:
-            imgs.append(torch.load(f"training_data/sample_data/image_tensors/{int(im.item)}.txt"))
+            imgs.append(torch.load(f"training_data/sample_data/image_tensors/{int(im.item())}.txt"))
         img = torch.stack(imgs)
 
         batch_size = mml.shape[0]
