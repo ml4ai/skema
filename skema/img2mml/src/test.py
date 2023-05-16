@@ -12,7 +12,7 @@ def evaluate(
     test_dataloader,
     criterion,
     device,
-    vocab=None,
+    vocab,
     beam_params=None,
     is_test=False,
     ddp=False,
