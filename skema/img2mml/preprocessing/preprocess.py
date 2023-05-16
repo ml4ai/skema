@@ -72,17 +72,19 @@ class My_pad_collate(object):
         # images tensors
         _img = [i for i in _img]
 
-        # _img = torch.Tensor(_img)
+        return (
+            torch.stack(_img).to(self.device),
+            padded_mml_tensors.to(self.device),
+        )
 
+        # _img = torch.Tensor(_img)
+        #
         # return (
         #     _img.to(self.device),
         #     padded_mml_tensors.to(self.device),
         # )
 
-        return (
-            torch.stack(_img).to(self.device),
-            padded_mml_tensors.to(self.device),
-        )
+
 
 
 def preprocess_dataset(config):

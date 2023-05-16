@@ -11,6 +11,7 @@ def evaluate(
     vocab,
     batch_size,
     test_dataloader,
+    criterion,
     device,
     beam_params=None,
     is_test=False,
@@ -68,7 +69,7 @@ def evaluate(
                     )  # (B * max_len-1, output_dim)
                 mml_reshaped = mml[:, 1:].contiguous().view(-1)
 
-            loss = calculate_loss(outputs_reshaped, mml_reshaped, vocab)
+            loss = criterion(outputs_reshaped, mml_reshaped)
 
             epoch_loss += loss.item()
 

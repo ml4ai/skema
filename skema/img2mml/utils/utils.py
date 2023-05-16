@@ -82,17 +82,6 @@ def generate_square_subsequent_mask(sz: int) -> torch.Tensor:
     )
     return mask
 
-
-def calculate_loss(output, mml, vocab):
-    """
-    calculate Cross Entropy loss
-    """
-    # intializing loss function
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
-    loss = criterion(output, mml)
-    return loss
-
-
 def calculating_accuracy(pred, mml):
     """
     calculate accuracy
