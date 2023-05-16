@@ -607,6 +607,7 @@ fn tree_2_ast(
         let mut rhs_eq = Vec::<MathExpression>::new();
         let mut first_op = Vec::<MathExpression>::new();
 
+        // this only distributing if the multiplication is
         for node in graph.neighbors_directed(root_node, Outgoing) {
             if graph.clone()[node].labels == ["Primitive"]
                 && !(graph.clone()[node].properties["name"].to_string() == "'USub'".to_string())
@@ -628,9 +629,54 @@ fn tree_2_ast(
                         math_vec.extend_from_slice(&arg1[1].clone());
                     }
                 } else {
-                    math_vec.extend_from_slice(&arg1[0].clone());
-                    math_vec.push(first_op[0].clone());
-                    math_vec.extend_from_slice(&arg1[1].clone());
+                    // need to test for when we have USub next to mults in a term that might be needed
+                    // these args should all be multiplications of each other, aka an individual term
+                    // there for we just check for a usub and if it exists, we remove it and swap the operator + -> - or - -> +
+                    let mut new_arg = Vec::<MathExpression>::new();
+                    let mut usub_exist0 = false;
+                    let mut usub_exist1 = false;
+                    let mut usub_idx = Vec::<i32>::new();
+                    for (i, ent) in arg1[0].clone().iter().enumerate() {
+                        if *ent == MathExpression::Mo(Operator::Other("'USub'".to_string())) {
+                            usub_exist0 = true;
+                            usub_idx.push(i.clone().try_into().unwrap());
+                        }
+                    }
+                    for (i, ent) in arg1[1].clone().iter().enumerate() {
+                        if *ent == MathExpression::Mo(Operator::Other("'USub'".to_string())) {
+                            usub_exist1 = true;
+                            usub_idx.push(i.clone().try_into().unwrap());
+                        }
+                    }
+                    if usub_exist0 {
+                        for id in usub_idx.clone().iter().rev() {
+                            arg1[0].remove(id.clone() as usize);
+                        }
+                        if first_op.clone()[0] == MathExpression::Mo(Operator::Add) {
+                            first_op[0] = MathExpression::Mo(Operator::Subtract);
+                        } else {
+                            first_op[0] = MathExpression::Mo(Operator::Add);
+                        }
+                        math_vec.extend_from_slice(&arg1[0].clone());
+                        math_vec.push(first_op[0].clone());
+                        math_vec.extend_from_slice(&arg1[1].clone());
+                    } else if usub_exist1 {
+                        for id in usub_idx.clone().iter().rev() {
+                            arg1[1].remove(id.clone() as usize);
+                        }
+                        if first_op.clone()[0] == MathExpression::Mo(Operator::Add) {
+                            first_op[0] = MathExpression::Mo(Operator::Subtract);
+                        } else {
+                            first_op[0] = MathExpression::Mo(Operator::Add);
+                        }
+                        math_vec.extend_from_slice(&arg1[0].clone());
+                        math_vec.push(first_op[0].clone());
+                        math_vec.extend_from_slice(&arg1[1].clone());
+                    } else {
+                        math_vec.extend_from_slice(&arg1[0].clone());
+                        math_vec.push(first_op[0].clone());
+                        math_vec.extend_from_slice(&arg1[1].clone());
+                    }
                 }
             } else {
                 println!("Not supported or Trivial case");
@@ -645,8 +691,6 @@ fn tree_2_ast(
             for (idx, obj) in math_vec.clone().iter().enumerate() {
                 if *obj == MathExpression::Mi(ref_name.clone()) {
                     // find each index of the state variable on the rhs
-                    println!("found idx: {:?}", idx.clone());
-                    println!("obj: {:?}", obj.clone());
                     // check if there is a multiplication to the right or left
                     // if no multiplication then delete entry and all neighboring addition operators
                     // this should complete the transformation to a leibniz diff eq from a euler method
@@ -671,6 +715,21 @@ fn tree_2_ast(
                                 != MathExpression::Mo(Operator::Equals)
                             {
                                 math_vec.remove(idx.clone() - 1 as usize);
+                            }
+                        } else if !idx_last.clone()
+                            && math_vec[idx.clone() + 1 as usize].clone()
+                                == MathExpression::Mo(Operator::Subtract)
+                        {
+                            // delete idx and neighboring Add's (left side might be equals, which is kept)
+                            math_vec.remove(idx.clone() + 1 as usize);
+                            math_vec.remove(idx.clone() as usize);
+                            if math_vec[idx.clone() - 1 as usize].clone()
+                                != MathExpression::Mo(Operator::Equals)
+                            {
+                                math_vec.remove(idx.clone() - 1 as usize);
+                            } else {
+                                // this puts the deleted subtract back but on the end, which will be correct once flipped
+                                math_vec.push(MathExpression::Mo(Operator::Subtract));
                             }
                         } else if idx_last.clone() {
                             // delete idx and neighboring Add to the left
@@ -698,6 +757,8 @@ fn tree_2_ast(
             reversed_final_math.push(j.clone());
         }
     }
+
+    println!("reversed mathml: {:?}", reversed_final_math.clone());
 
     return Ok(reversed_final_math);
 }
@@ -741,9 +802,10 @@ fn distribute_args(
     arg2_term_ind = terms_indicies(arg2.clone());
 
     // check if need to swap operator signs
-    if arg1[0] == Mo(Operator::Other("USub".to_string())) {
+    /* Is this running properly, not removing Mo(Other("'USub'")) in I equation in SIR */
+    if arg1[0] == Mo(Operator::Other("'USub'".to_string())) {
         println!("USub dist happens"); // This is never running
-                                       // operator starts at begining of arg2
+        println!("Entry 1"); // operator starts at begining of arg2
         if arg2_term_ind[0] == 0 {
             for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
                 if arg2[(*ind as usize)].clone() == Mo(Operator::Add) {
@@ -784,6 +846,7 @@ fn distribute_args(
                 }
             }
         } else {
+            println!("Entry 2");
             // operator doesn't start at beginning so have to add it manually
             arg_dist.push(Mo(Operator::Subtract));
             arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind.clone()[0] - 1) as usize]);
@@ -831,6 +894,7 @@ fn distribute_args(
     } else {
         // don't have to swap operators
         if arg2_term_ind[0] == 0 {
+            println!("Entry 3");
             for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
                 if arg2[(*ind as usize)].clone() == Mo(Operator::Add) {
                     if (i + 1) != arg2_term_ind.clone().len() {
@@ -865,6 +929,7 @@ fn distribute_args(
                 }
             }
         } else {
+            println!("Entry 4");
             // don't swap operators manual beginning push
             arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind.clone()[0] - 1) as usize]);
             //arg_dist.push(Mo(Operator::Multiply));
