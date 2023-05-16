@@ -370,7 +370,6 @@ def train_model(rank=None,):
                     model,
                     model_type,
                     train_dataloader,
-                    # vocab,
                     optimizer,
                     criterion,
                     CLIP,
@@ -383,8 +382,7 @@ def train_model(rank=None,):
                 # if rank==0:
                 val_loss = evaluate(
                     model,
-                    model_type,
-                    # vocab,
+                    model_type,    
                     batch_size,
                     val_dataloader,
                     criterion,

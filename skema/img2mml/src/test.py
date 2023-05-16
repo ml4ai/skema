@@ -8,7 +8,6 @@ from skema.img2mml.utils.utils import *
 def evaluate(
     model,
     model_type,
-    # vocab,
     batch_size,
     test_dataloader,
     criterion,
