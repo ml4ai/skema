@@ -33,7 +33,11 @@ def evaluate(
         for i, (img, mml) in enumerate(test_dataloader):
             batch_size = mml.shape[0]
             mml = mml.to(device, dtype=torch.long)
-            img = img.to(device)
+            # img = img.to(device)
+            imgs = list()
+            for im in img:
+                imgs.append(torch.load(f"training_data/sample_data/image_tensors/{int(im.item())}.txt"))
+            img = torch.stack(imgs)
 
             """
             we will pass "mml" just to provide initial <sos> token.
