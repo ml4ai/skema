@@ -109,10 +109,14 @@ def creating_macro_dmo_dictionaries(root, folder):
         if len(command_matches) > 0:
             if len(command_matches[0]) == 3:
                 if command_matches[0][1] != "":
-                    keyword_macro_dict[command_matches[0][1]] = command_matches[0][2]
+                    keyword_macro_dict[
+                        command_matches[0][1]
+                    ] = command_matches[0][2]
 
     # Creating dmo dictionary
-    dmo_file = os.path.join(root, f"latex_equations/{folder}/declare_math_operator.txt")
+    dmo_file = os.path.join(
+        root, f"latex_equations/{folder}/declare_math_operator.txt"
+    )
     with open(dmo_file, "r") as file:
         dmo = file.readlines()
         file.close()
@@ -165,7 +169,9 @@ def creating_final_equations(args_list):
                     file_name = eqn.split("-")[0].split(".")[0]
 
                     eqnstype = (
-                        "large_eqns" if type_of_folder == large_eqns else "small_eqns"
+                        "large_eqns"
+                        if type_of_folder == large_eqns
+                        else "small_eqns"
                     )
                     file_path = os.path.join(
                         root,
@@ -204,16 +210,24 @@ def creating_final_equations(args_list):
                         print("final equation is  ", final_eqn)
                         lock.release()
 
-                    mml = large_mml if type_of_folder == large_eqns else small_mml
+                    mml = (
+                        large_mml
+                        if type_of_folder == large_eqns
+                        else small_mml
+                    )
 
                     if not os.path.exists(mml + f"/{file_name}.xml"):
-                        mjxmml(file_name, folder, final_eqn, type_of_folder, mml)
+                        mjxmml(
+                            file_name, folder, final_eqn, type_of_folder, mml
+                        )
 
                 except:
                     lock.acquire()
                     if verbose:
                         print(" ")
-                        print(f" {type_of_folder}/{file_name}: can not be converted.")
+                        print(
+                            f" {type_of_folder}/{file_name}: can not be converted."
+                        )
                         print(
                             " =============================================================== "
                         )
@@ -327,7 +341,10 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
             )
             lock.release()
 
-        elif "TypeError: Cannot read property 'root' of undefined" in tex_parse_error:
+        elif (
+            "TypeError: Cannot read property 'root' of undefined"
+            in tex_parse_error
+        ):
             lock.acquire()
             print(folder)
             logger.warning(
@@ -372,7 +389,9 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
             print(f"writing {file_name}")
             lock.release()
 
-        with open(os.path.join(mml_path, f"{file_name}.xml"), "w") as mml_output:
+        with open(
+            os.path.join(mml_path, f"{file_name}.xml"), "w"
+        ) as mml_output:
             mml_output.write(mml)
             mml_output.close()
 

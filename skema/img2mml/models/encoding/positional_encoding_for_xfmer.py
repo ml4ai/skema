@@ -27,7 +27,5 @@ class PositionalEncoding(nn.Module):
 
     def forward(self, x: torch.tensor) -> torch.tensor:
         # x: (max_len, B, embed_dim)
-        # print("x shape:", x.shape)
-        # print("x_ shape:", self.pe[:x.size(0), :].shape)
         x = x + self.pe[: x.size(0), :]
         return self.dropout(x)

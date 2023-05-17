@@ -17,9 +17,8 @@ class Transformer_Encoder(nn.Module):
         max_len,
         n_xfmer_encoder_layers,
         dim_feedfwd,
-        len_dim
+        len_dim,
     ):
-
         super(Transformer_Encoder, self).__init__()
         self.dec_hid_dim = dec_hid_dim
         self.device = device
@@ -43,7 +42,6 @@ class Transformer_Encoder(nn.Module):
         )
 
     def forward(self, src_from_cnn):
-
         # src_from_cnn: (B, L, dec_hid_dim)
         # change the L=H*W to max_len
         src_from_cnn = src_from_cnn.permute(0, 2, 1)  # (B, dec_hid_dim, L)

@@ -32,7 +32,6 @@ num_cpus = config["num_cpus"]
 
 
 def main(year):
-
     src_path = config["source_directory"]
     destination = config["destination_directory"]
     directories = config["months"].split(",")
@@ -61,14 +60,12 @@ def main(year):
 
 
 def pool_path(path, logger):
-
     global lock
 
     # Folder path to TeX files
     tex_folder_path = os.path.join(path, "tex_files")
 
     for folder in os.listdir(tex_folder_path):
-
         # make results PNG directories
         pdf_dst_root = os.path.join(path, f"latex_images/{folder}")
         pdf_large = os.path.join(pdf_dst_root, "large_eqns")
@@ -97,7 +94,6 @@ def pool_path(path, logger):
 
 # This function will run pdflatex
 def run_pdflatex(run_pdflatex_list):
-
     global lock
 
     (folder, type_of_folder, texfile, pdf_dst, logger) = run_pdflatex_list
@@ -135,13 +131,11 @@ def run_pdflatex(run_pdflatex_list):
 
 # Function to convert PDFs to PNGs
 def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder, logger):
-
     global lock
 
     os.chdir(png_dst)
 
     try:
-
         command_args = [
             "convert",
             "-background",
@@ -168,7 +162,6 @@ def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder, logger):
         try:
             os.remove(f'{pdf_file.split(".")[0]}.aux')
         except:
-
             if verbose:
                 lock.acquire()
                 print(f'{pdf_file.split(".")[0]}.aux doesn\'t exists.')
@@ -181,7 +174,6 @@ def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder, logger):
             lock.release()
 
     except:
-
         if verbose:
             lock.acquire()
             print(
@@ -201,7 +193,6 @@ kill = lambda process: process.kill()
 
 
 if __name__ == "__main__":
-
     for year in years:
         main(str(year))
 

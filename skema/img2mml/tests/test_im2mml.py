@@ -12,5 +12,6 @@ def test_get_mathml():
     print("target mml: ", output)
     assert mathml == output
     print("test pass!")
-    
+
+
 test_get_mathml()

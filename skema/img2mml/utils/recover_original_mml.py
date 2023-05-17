@@ -27,7 +27,7 @@ if __name__ == "__main__":
     tgt_new = open("logs/test_targets_100K_recovered.txt", "w")
     pred_new = open("logs/test_predicted_100K_recovered.txt", "w")
 
-    for (t, p) in zip(tgt_file, pred_file):
+    for t, p in zip(tgt_file, pred_file):
         _t, _p = map(recover_mml, (t, p))
         tgt_new.write(_t)
         pred_new.write(_p)

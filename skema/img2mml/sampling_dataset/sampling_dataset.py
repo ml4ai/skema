@@ -67,7 +67,6 @@ lock = mp.Lock()
 
 
 def get_paths(yr, yr_path, month):
-
     temp_files = list()
 
     month_path = os.path.join(yr_path, month)
@@ -85,10 +84,11 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+
 def divide_all_paths_into_chunks(all_paths):
     global chunk_size
     for i in range(0, len(all_paths), chunk_size):
-        yield all_paths[i:i + chunk_size]
+        yield all_paths[i : i + chunk_size]
 
 
 def copy_image(img_src, img_dst):
@@ -100,7 +100,6 @@ def copy_image(img_src, img_dst):
 
 
 def prepare_dataset(args):
-
     i, ap = args
     yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
     mml_path = os.path.join(
@@ -109,9 +108,9 @@ def prepare_dataset(args):
     )
 
     mml = open(mml_path).readlines()[0]
-    open(
-        f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w"
-    ).write(mml)
+    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
+        mml
+    )
 
     cwd = os.getcwd()
     cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
@@ -134,10 +133,10 @@ def prepare_dataset(args):
     finally:
         my_timer.cancel()
 
-def get_bin(af):
 
+def get_bin(af):
     try:
-        i,ap = af
+        i, ap = af
         simp_mml = open(
             f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
         )
@@ -168,7 +167,6 @@ kill = lambda process: process.kill()
 
 
 def main():
-
     global count, total_eqns, final_paths
     global lock, counter_dist_dict, dist_dict, chunk_size
 
@@ -230,21 +228,25 @@ def main():
 
     print("diving all_paths into batches of 10K to work efficiently...")
     reject_count = 0
-    for bidx, batch_paths in enumerate(list(divide_all_paths_into_chunks(all_paths))):
-
+    for bidx, batch_paths in enumerate(
+        list(divide_all_paths_into_chunks(all_paths))
+    ):
         if count <= total_eqns:
             print("running batch: ", bidx)
             print("current status: ", counter_dist_dict)
 
             all_files = list()
-            for i,ap in enumerate(batch_paths):
+            for i, ap in enumerate(batch_paths):
                 all_files.append([i, ap])
 
             with mp.Pool(config["num_cpus"]) as pool:
                 result = pool.map(prepare_dataset, all_files)
 
             with mp.Pool(config["num_cpus"]) as pool:
-                results = [pool.apply_async(get_bin, args=(i,)).get() for i in all_files]
+                results = [
+                    pool.apply_async(get_bin, args=(i,)).get()
+                    for i in all_files
+                ]
             pool.close()
 
             for r in results:
@@ -257,7 +259,11 @@ def main():
                 else:
                     reject_count += 1
 
-            clean_cmd = ["rm", "-rf", f"{os.getcwd()}/sampling_dataset/temp_folder/*"]
+            clean_cmd = [
+                "rm",
+                "-rf",
+                f"{os.getcwd()}/sampling_dataset/temp_folder/*",
+            ]
             subprocess.run(clean_cmd)
 
         else:
@@ -285,7 +291,9 @@ def main():
                 root,
                 f"{yr}/{month}/latex_images/{folder}/{type_of_eqn}_eqns/{eqn_num}.png",
             )
-            img_dst = os.path.join(os.path.join(data_path, "images"), f"{c_idx}.png")
+            img_dst = os.path.join(
+                os.path.join(data_path, "images"), f"{c_idx}.png"
+            )
             CP(img_src, img_dst)
 
             # wrting path
@@ -325,7 +333,6 @@ def main():
         except:
             reject += 1
             pass
-
 
     print("final distribution: ", counter_dist_dict)
     print("total equations: ", c_idx)

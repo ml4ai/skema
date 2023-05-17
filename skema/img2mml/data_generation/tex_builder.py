@@ -28,7 +28,6 @@ num_cpus = config["num_cpus"]
 
 
 def main(year):
-
     for month_dir in directories:
         month_dir = str(month_dir).strip()
         base_dir = os.path.join(destination, f"{year}/{month_dir}")
@@ -46,7 +45,6 @@ def main(year):
 
 
 def tex_builder(args_list):
-
     # Unpacking argments list
     (folder, tex_files, latex_equations) = args_list
 
@@ -90,7 +88,6 @@ def tex_builder(args_list):
     # eqn_path to the folder containing Large and Small equations
     for eqn_path in [large_eqn_path, small_eqn_path]:
         for eqn_file in os.listdir(eqn_path):
-
             main_file = os.path.join(eqn_path, eqn_file)
 
             eqns = open(main_file).readlines()
@@ -128,7 +125,6 @@ def tex_builder(args_list):
 def create_tex_doc(
     eqn, keyword_dict, keyword_macro_dict, tex_folder, tex_name
 ):
-
     # checking \DeclareMathOperator and Macros
     declare_math_operator_in_eqn = [
         kw for kw in keyword_dict.keys() if kw in eqn
@@ -149,7 +145,6 @@ def create_tex_doc(
 
 # Template for the TeX files
 def template(eqn, preamble_dmo, preamble_macro):
-
     # writing tex document for respective eqn
     temp1 = (
         "\\documentclass{standalone}\n"

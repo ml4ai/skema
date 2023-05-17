@@ -16,7 +16,6 @@ class BahdanauAttention(nn.Module):
         self.n_layers = n_layers
 
     def forward(self, encoder_outputs, hidden):
-
         # hidden = [1, batch size, dec hid dim]
         # encoder_outputs = [batch size, src_len, dec_hid_dim]
         batch_size = encoder_outputs.shape[0]
@@ -38,7 +37,6 @@ class BahdanauAttention(nn.Module):
                 1, self.n_layers, 1
             )  # (B, n*L, dec_hid_dim)
 
-        # print("enc hidden shape: ", encoder_outputs.shape, hidden.shape)
         energy = self.attn(torch.cat((hidden, encoder_outputs), dim=2))
         energy = torch.tanh(energy)  # [batch size, src len, dec hid dim]
         attention = self.v(energy).squeeze(2)  # [batch size, src len]

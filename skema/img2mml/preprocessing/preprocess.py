@@ -24,7 +24,6 @@ class Img2MML_dataset(Dataset):
         return len(self.dataframe)
 
     def __getitem__(self, index):
-
         eqn = self.dataframe.iloc[index, 1]
         indexed_eqn = []
         for token in eqn.split():
@@ -77,7 +76,6 @@ class My_pad_collate(object):
 
 
 def preprocess_dataset(config):
-
     print("preprocessing data...")
 
     # reading raw text files
@@ -97,7 +95,6 @@ def preprocess_dataset(config):
     )
 
     for t_idx, t_images in enumerate([train_images, test_images, val_images]):
-
         raw_mml_data = {
             "IMG": [num for num in t_images],
             "EQUATION": [
@@ -111,7 +108,6 @@ def preprocess_dataset(config):
             test = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
         else:
             val = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
-
 
     # build vocab
     print("building vocab...")

@@ -22,7 +22,6 @@ class Image2MathML_LSTM(nn.Module):
         self.vocab = vocab
 
     def forward(self, src, trg, is_train=False, is_test=False):
-
         enc_output = self.encoder(
             src, self.encoding_type
         )  # Output: (B, L, dec_hid_dim)

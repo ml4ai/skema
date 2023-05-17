@@ -27,7 +27,6 @@ class Image2MathML_Xfmer(nn.Module):
         EOS_token=None,
         PAD_token=None,
     ):
-
         # run the encoder --> get flattened FV of images
         # for inference Batch(B)=1
         cnn_enc_output = self.cnn_encoder(src)  # (B, L, dec_hid_dim)
@@ -44,7 +43,11 @@ class Image2MathML_Xfmer(nn.Module):
             PAD_token = self.vocab.stoi["<pad>"]
 
             xfmer_dec_outputs, preds = self.xfmer_decoder(
-                trg, xfmer_enc_output, SOS_token, PAD_token, is_test=is_test,
+                trg,
+                xfmer_enc_output,
+                SOS_token,
+                PAD_token,
+                is_test=is_test,
             )
 
             return xfmer_dec_outputs, preds

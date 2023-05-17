@@ -19,7 +19,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
-    """ preprocessing image - cropping, resizing, and padding """
+    """preprocessing image - cropping, resizing, and padding"""
 
     # checking if the image lies wihin permissible boundary
     w, h = image.size
@@ -144,7 +144,7 @@ def define_model(
             max_len,
             n_xfmer_encoder_layers,
             dim_feedfwd,
-            len_dim
+            len_dim,
         ),
     }
     dec = Transformer_Decoder(
@@ -170,7 +170,6 @@ def evaluate(
     img: torch.Tensor,
     device: torch.device,
 ) -> str:
-
     """
     It predicts the sequence for the image to translate it into MathML contents
     """
@@ -197,7 +196,6 @@ def evaluate(
 
 
 def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
-
     """
     It allows us to obtain mathML for an image
     """

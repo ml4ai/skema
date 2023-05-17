@@ -14,6 +14,7 @@ config_path = sys.argv[-1]
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
 
+
 def crop_image(image, reject=False):
     # converting to np array
     image_arr = np.asarray(image, dtype=np.uint8)
@@ -117,7 +118,6 @@ def downsampling(image):
 
 
 def preprocess_images(image):
-
     """
     RuntimeError: only Tensors of floating point dtype can require gradients
     Crop, padding, and downsample the image.
@@ -165,7 +165,6 @@ def preprocess_images(image):
 
 
 def main():
-
     data_path = f"{config['data_path']}/{config['dataset_type']}"
     images = os.listdir(f"{data_path}/images")
 

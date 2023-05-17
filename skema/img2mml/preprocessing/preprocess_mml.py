@@ -3,15 +3,15 @@
 import re, json, argparse
 import subprocess, os, sys
 
-def get_config(config_path):
 
+def get_config(config_path):
     with open(config_path, "r") as cfg:
         config = json.load(cfg)
 
     return config
 
-def simplification(mml_org):
 
+def simplification(mml_org):
     """
     simplify the mathml by removing unnecessary information.
     """
@@ -126,14 +126,12 @@ def attribute_definition(
     definition_array = []
 
     for ele in elements:
-
         # Getting indices of the position of the element in the MML code
         position = [
             i for i in re.finditer(r"\b%s\b" % re.escape(ele), mml_code)
         ]
 
         for p in position:
-
             # Attribute begining and ending indices
             (attr_begin, attr_end) = p.span()
 
@@ -141,7 +139,6 @@ def attribute_definition(
             length = mml_code[attr_end:].find(">")
 
             if length > 0:
-
                 # Grabbing definition
                 definition = mml_code[attr_end : attr_end + length].split()
 
@@ -290,6 +287,7 @@ def remove_unecc_tokens(eqn):
 
     return eqn
 
+
 def remove_single_mrow_pairs(lst):
     stack = []
     for i, elem in enumerate(lst):
@@ -381,6 +379,7 @@ def cleaning_mml(eqn):
         eqn = remove_hexComments(eqn)
     return eqn
 
+
 def remove_attributes(mathml_str):
     """
     Remove all attributes from MathML string tokens.
@@ -398,6 +397,7 @@ def remove_attributes(mathml_str):
     result = re.sub(attribute_pattern, "", mathml_str)
 
     return result
+
 
 def extract_inbetween_tokens(text):
     clean_mml_eqn = remove_attributes(text)
@@ -463,7 +463,8 @@ def tokenize(mml_eqn):
             elif token in inbetween_tokens:
                 if len(token.replace(" ", "")) < len(token):
                     tokenized_mml += token.replace(" ", "")
-                else: tokenized_mml += token
+                else:
+                    tokenized_mml += token
 
             else:
                 tokenized_mml += " <" + token + "> "
@@ -472,13 +473,14 @@ def tokenize(mml_eqn):
 
 
 if __name__ == "__main__":
-
     # get config
     config = get_config(sys.argv[-1])
 
     # get the rejected images
     data_path = f"{config['data_path']}/{config['dataset_type']}"
-    org_mml = open(f"{data_path}/original_{config['markup']}.lst", "r").readlines()
+    org_mml = open(
+        f"{data_path}/original_{config['markup']}.lst", "r"
+    ).readlines()
     modified_mml_file = open(f"{data_path}/{config['markup']}.lst", "w")
 
     blank_images = open("logs/blank_images.lst").readlines()

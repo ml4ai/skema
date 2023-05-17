@@ -2,7 +2,6 @@ import torch, math
 from collections import Counter
 
 
-
 class CreateVocab(object):
     """
     building vocab for the dataset
@@ -81,6 +80,7 @@ def generate_square_subsequent_mask(sz: int) -> torch.Tensor:
         .masked_fill(mask == 1, float(0.0))
     )
     return mask
+
 
 def calculating_accuracy(pred, mml):
     """

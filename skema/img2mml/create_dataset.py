@@ -2,7 +2,6 @@ from skema.img2mml.sampling_dataset.sampling_dataset import main
 import sys, time
 
 if __name__ == "__main__":
-
     start_time = time.time()
 
     main()

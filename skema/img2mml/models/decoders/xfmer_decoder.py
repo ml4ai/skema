@@ -19,7 +19,6 @@ class Transformer_Decoder(nn.Module):
         dim_feedfwd,
         device,
     ):
-
         super(Transformer_Decoder, self).__init__()
         self.device = device
         self.output_dim = output_dim
@@ -57,7 +56,6 @@ class Transformer_Decoder(nn.Module):
     def create_pad_mask(
         self, matrix: torch.tensor, pad_token: int
     ) -> torch.tensor:
-
         # If matrix = [1,2,3,0,0,0] where pad_token=0, the result mask is
         # [False, False, False, True, True, True]
         return matrix == pad_token
@@ -71,7 +69,6 @@ class Transformer_Decoder(nn.Module):
         is_test=False,
         is_inference=False,
     ):
-
         # xfmer_enc_output: (max_len, B, dec_hid_dim)
         # trg: (B, max_len)
         """

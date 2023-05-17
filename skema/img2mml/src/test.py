@@ -19,7 +19,6 @@ def evaluate(
     rank=None,
     g2p=False,
 ):
-
     model.eval()
     epoch_loss = 0
 
@@ -28,7 +27,6 @@ def evaluate(
         pred_seqs = open(f"logs/test_predicted_100K.txt", "w")
 
     with torch.no_grad():
-
         torch.set_printoptions(profile="full")
 
         for i, (img, mml) in enumerate(test_dataloader):
@@ -36,7 +34,11 @@ def evaluate(
             mml = mml.to(device, dtype=torch.long)
             imgs = list()
             for im in img:
-                imgs.append(torch.load(f"training_data/sample_data/image_tensors/{int(im.item())}.txt"))
+                imgs.append(
+                    torch.load(
+                        f"training_data/sample_data/image_tensors/{int(im.item())}.txt"
+                    )
+                )
             img = torch.stack(imgs)
 
             """

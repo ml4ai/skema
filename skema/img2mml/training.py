@@ -19,7 +19,10 @@ from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
 from skema.img2mml.preprocessing.preprocess import preprocess_dataset
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.img2mml.models.encoders.resnet_encoder import ResNet18_Encoder, ResNetBlock
+from skema.img2mml.models.encoders.resnet_encoder import (
+    ResNet18_Encoder,
+    ResNetBlock,
+)
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.lstm_decoder import LSTM_Decoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
@@ -27,8 +30,6 @@ from skema.img2mml.models.image2mml_lstm import Image2MathML_LSTM
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
-
-# from utils.bleu_score import calculate_bleu_score
 
 # opening config file
 parser = argparse.ArgumentParser()
@@ -44,6 +45,7 @@ with open(args.config, "r") as cfg:
     config = json.load(cfg)
 
 torch.backends.cudnn.enabled = False
+
 
 def set_random_seed(SEED):
     # set up seed
@@ -66,7 +68,6 @@ def define_model(config, VOCAB, DEVICE):
     OUTPUT_DIM = len(VOCAB)
     EMB_DIM = config["embedding_dim"]
     ENC_DIM = config["encoder_dim"]
-    # ENCODING_TYPE = config["encoding_type"]
     DEC_HID_DIM = config["decoder_hid_dim"]
     DROPOUT = config["dropout"]
     MAX_LEN = config["max_len"]
@@ -99,7 +100,7 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
-        LEN_DIM=930
+        LEN_DIM = 930
 
         ENC = {
             "CNN": CNN_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE),
@@ -112,7 +113,7 @@ def define_model(config, VOCAB, DEVICE):
                 MAX_LEN,
                 N_XFMER_ENCODER_LAYERS,
                 DIM_FEEDFWD,
-                LEN_DIM
+                LEN_DIM,
             ),
         }
         DEC = Transformer_Decoder(
@@ -135,10 +136,12 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
-        LEN_DIM=32
+        LEN_DIM = 32
 
         ENC = {
-            "CNN": ResNet18_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE, ResNetBlock),
+            "CNN": ResNet18_Encoder(
+                INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE, ResNetBlock
+            ),
             "XFMER": Transformer_Encoder(
                 EMB_DIM,
                 DEC_HID_DIM,
@@ -148,7 +151,7 @@ def define_model(config, VOCAB, DEVICE):
                 MAX_LEN,
                 N_XFMER_ENCODER_LAYERS,
                 DIM_FEEDFWD,
-                LEN_DIM
+                LEN_DIM,
             ),
         }
         DEC = Transformer_Decoder(
@@ -198,8 +201,9 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(rank=None,):
-
+def train_model(
+    rank=None,
+):
     # parameters
     EPOCHS = config["epochs"]
     batch_size = config["batch_size"]
@@ -253,7 +257,9 @@ def train_model(rank=None,):
             print(f"using single gpu:{config['gpu_id']}...")
 
             os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
-            device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
+            device = torch.device(
+                f"cuda" if torch.cuda.is_available() else "cpu"
+            )
             (
                 train_dataloader,
                 test_dataloader,
@@ -264,7 +270,9 @@ def train_model(rank=None,):
 
         elif dataparallel:
             os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            device = torch.device(
+                "cuda" if torch.cuda.is_available() else "cpu"
+            )
             (
                 train_dataloader,
                 test_dataloader,
@@ -274,7 +282,9 @@ def train_model(rank=None,):
             model = define_model(config, vocab, device)
             model = nn.DataParallel(
                 model.cuda(),
-                device_ids=[int(i) for i in config["DataParallel_ids"].split(",")],
+                device_ids=[
+                    int(i) for i in config["DataParallel_ids"].split(",")
+                ],
             )
 
         elif ddp:
@@ -311,7 +321,6 @@ def train_model(rank=None,):
         model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")
-    # print(model.apply(init_weights))
     print(f"The model has {count_parameters(model):,} trainable parameters")
 
     # intializing loss function
@@ -355,11 +364,7 @@ def train_model(rank=None,):
             print("continuing training from lastest saved model...")
 
         for epoch in range(EPOCHS):
-            # if (not ddp) or (ddp and rank == 0):
-            #     print(f"Epoch: {epoch + 1} / {EPOCHS}")
-
             if count_es <= early_stopping_counts:
-
                 start_time = time.time()
 
                 # training and validation
@@ -375,8 +380,6 @@ def train_model(rank=None,):
                     rank=rank,
                 )
 
-                # dist.barrier()  # using single gpu
-                # if rank==0:
                 val_loss = evaluate(
                     model,
                     model_type,
@@ -393,8 +396,6 @@ def train_model(rank=None,):
                 end_time = time.time()
                 # total time spent on training an epoch
                 epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-                # if (not ddp) or (ddp and rank==0):
-                #     torch.save(model.state_dict(), f'trained_models/{model_type}_{dataset_type}_latest.pt')
 
                 if val_loss < best_valid_loss:
                     best_valid_loss = val_loss
@@ -429,8 +430,6 @@ def train_model(rank=None,):
                     loss_file.write(
                         f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
                     )
-
-                # dist.barrier()
 
             else:
                 print(
@@ -505,6 +504,7 @@ def train_model(rank=None,):
     # stopping time
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
+
 # for DDP
 def ddp_main():
     world_size = config["world_size"]
@@ -513,7 +513,6 @@ def ddp_main():
 
 
 if __name__ == "__main__":
-
     if config["DDP"]:
         os.environ["MASTER_ADDR"] = "localhost"
         os.environ["MASTER_PORT"] = "29500"

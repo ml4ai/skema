@@ -38,7 +38,6 @@ num_cpus = config["num_cpus"]
 
 
 def main(year):
-
     # possible matrix and equation keyword that can be used in LaTeX source codes
     matrix_cmds = [
         "{matrix}",
@@ -114,7 +113,6 @@ def main(year):
         temp = []
 
         for tex_folder in os.listdir(dir_path):
-
             temp.append(
                 [
                     latex_equations,
@@ -134,7 +132,6 @@ def main(year):
 
 
 def parse_equation(args_list):
-
     global lock
 
     # Unpacking args_list
@@ -163,7 +160,6 @@ def parse_equation(args_list):
 
     # considering folders/papers with only single tex file
     if len(tex_file) == 1:
-
         tex_doc = os.path.join(tex_folder_path, tex_file[0])
         file = open(tex_doc, "rb")
         lines = file.readlines()
@@ -177,7 +173,6 @@ def parse_equation(args_list):
         # Finding the type of encoding i.e. utf-8, ISO8859-1, ASCII, etc.
         if encoding is not None:
             if encoding not in unknown_iconv:
-
                 # initializing the arrays and variables
                 total_macros = []
                 declare_math_operator = []
@@ -581,7 +576,6 @@ def cleaning_writing_eqn(
     matrix_cmds,
     large_flag,
 ):
-
     global lock
 
     src_latex, eq_dict = [], {}
@@ -626,7 +620,6 @@ def cleaning_writing_eqn(
 
 # cleaning eqn - part 1 --> removing label, text, intertext
 def clean_eqn_1(eqn_1):
-
     keywords_tobeCleaned = ["\\label", "\\text", "\\intertext"]
     for KC in keywords_tobeCleaned:
         try:
@@ -701,7 +694,6 @@ def clean_eqn_2(eqn_2, matrix_cmds):
 
 
 if __name__ == "__main__":
-
     for year in years:
         main(str(year))
 
