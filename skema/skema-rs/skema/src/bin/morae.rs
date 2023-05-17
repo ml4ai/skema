@@ -71,6 +71,24 @@ fn main() {
             subgraph2_core_dyn_ast(core_id[0].clone()).unwrap();
 
         println!("\n{:?}", core_dynamics_ast[0].clone());
+
+        // need to convert core_synamics_ast to a Math object to then run the PN converter on it
+        let mut math_content = Vec::<Math>::new();
+        for eq in core_dynamics_ast.clone().iter() {
+            let math_ast = Math {
+                content: [Mrow(eq.clone())].to_vec(),
+            };
+            math_content.push(math_ast.clone());
+        }
+
+        let mathml_ast =
+            get_mathml_asts_from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+
+        println!("\nmath_content: {:?}", math_content.clone());
+        println!("\nmathml_ast: {:?}", mathml_ast.clone());
+
+        println!("\nPN from code: {:?}", ACSet::from(math_content.clone()));
+        println!("\nPN from mathml: {:?}\n", ACSet::from(mathml_ast.clone()));
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
     else if args[1] == "manual".to_string() {
@@ -429,18 +447,6 @@ fn subgraph2_core_dyn_ast(
         }
     }
 
-    // now we convert the following into a Expr to get converted into a petri net
-    // first we have to get the parent node index to pass into the function
-    /*let mut root_node = Vec::<NodeIndex>::new();
-    for node_index in trimmed_expressions_wiring[0].clone().node_indices() {
-        if trimmed_expressions_wiring[0].clone()[node_index].labels == ["Opo"] {
-            root_node.push(node_index);
-        }
-    }
-    if root_node.len() >= 2 {
-        panic!("More than one Opo!");
-    }*/
-
     // this is the actual convertion
     let mut core_dynamics = Vec::<Vec<MathExpression>>::new();
 
@@ -607,7 +613,7 @@ fn tree_2_ast(
         let mut rhs_eq = Vec::<MathExpression>::new();
         let mut first_op = Vec::<MathExpression>::new();
 
-        // this only distributing if the multiplication is
+        // this only distributing if the multiplication is the first operator
         for node in graph.neighbors_directed(root_node, Outgoing) {
             if graph.clone()[node].labels == ["Primitive"]
                 && !(graph.clone()[node].properties["name"].to_string() == "'USub'".to_string())
@@ -747,6 +753,7 @@ fn tree_2_ast(
 
     println!("Not reversed mathml: {:?}", math_vec.clone());
 
+    // do to how the expression tree in generated we need to reverse the order
     let mut reversed_final_math = Vec::<MathExpression>::new();
     let vec_len_temp = math_vec.clone().len();
 
@@ -759,6 +766,15 @@ fn tree_2_ast(
     }
 
     println!("reversed mathml: {:?}", reversed_final_math.clone());
+
+    // we now need to remove all the multiplications since the PN converter uses adjacency to
+    // determine multiplications
+
+    for (i, term) in reversed_final_math.clone().iter().enumerate().rev() {
+        if *term == MathExpression::Mo(Operator::Multiply) {
+            reversed_final_math.remove(i as usize);
+        }
+    }
 
     return Ok(reversed_final_math);
 }
