@@ -108,8 +108,7 @@ def preprocess_dataset(config):
     for t_idx, t_images in enumerate([train_images, test_images, val_images]):
         #[num for num in t_images],
         raw_mml_data = {
-            "IMG": torch.load(f"{IMGTnsrPath}/{num}.txt") for num in t_images],
-
+            "IMG": [torch.load(f"{IMGTnsrPath}/{num}.txt") for num in t_images],
             "EQUATION": [
                 ("<sos> " + mml_txt[num] + " <eos>") for num in t_images
             ],
