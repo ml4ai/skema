@@ -8,8 +8,6 @@ import os
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 from collections import Counter
-
-# from torchtext.legacy.vocab import Vocab
 from torchtext.vocab import Vocab
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import SequentialSampler
@@ -70,19 +68,12 @@ class My_pad_collate(object):
                 padded_mml_tensors[b][: self.max_len] = _mml[b][: self.max_len]
 
         # images tensors
-        _img = [i for i in _img]
+        _img = torch.Tensor(_img)
 
         return (
-            torch.stack(_img).to(self.device),
+            _img.to(self.device),
             padded_mml_tensors.to(self.device),
         )
-        #
-        # _img = torch.Tensor(_img)
-        #
-        # return (
-        #     _img.to(self.device),
-        #     padded_mml_tensors.to(self.device),
-        # )
 
 
 def preprocess_dataset(config):
@@ -106,9 +97,9 @@ def preprocess_dataset(config):
     )
 
     for t_idx, t_images in enumerate([train_images, test_images, val_images]):
-        #[num for num in t_images],
+
         raw_mml_data = {
-            "IMG": [torch.load(f"{IMGTnsrPath}/{num}.txt") for num in t_images],
+            "IMG": [num for num in t_images],
             "EQUATION": [
                 ("<sos> " + mml_txt[num] + " <eos>") for num in t_images
             ],
@@ -135,10 +126,6 @@ def preprocess_dataset(config):
         min_freq=config["vocab_freq"],
         specials=["<pad>", "<unk>", "<sos>", "<eos>"],
     )
-
-    # special_tokens = ["<pad>", "<unk>", "<sos>", "<eos>"]
-    # vocab = CreateVocab(train, special_tokens, min_freq=10)
-    # print("vocab size: ", vocab.__len__())
 
     # writing vocab file...
     vfile = open("vocab.txt", "w")
