@@ -25,14 +25,14 @@ def train(
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
 
-        imgs = list()
-        for im in img:
-            imgs.append(torch.load(f"training_data/sample_data/image_tensors/{int(im.item())}.txt"))
-        img = torch.stack(imgs)
+        # imgs = list()
+        # for im in img:
+        #     imgs.append(torch.load(f"training_data/sample_data/image_tensors/{int(im.item())}.txt"))
+        # img = torch.stack(imgs)
 
         batch_size = mml.shape[0]
         mml = mml.to(device, dtype=torch.long)
-        # img = img.to(device)
+        img = img.to(device)
 
         # setting gradients to zero
         optimizer.zero_grad()
