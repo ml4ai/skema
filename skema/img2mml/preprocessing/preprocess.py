@@ -69,7 +69,7 @@ class My_pad_collate(object):
             else:
                 padded_mml_tensors[b][: self.max_len] = _mml[b][: self.max_len]
 
-        images tensors
+        # images tensors
         _img = [i for i in _img]
 
         return (
