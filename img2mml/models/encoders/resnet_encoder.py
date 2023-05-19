@@ -4,7 +4,7 @@ ResNet18 with row encoding
 
 import torch
 import torch.nn as nn
-from skema.img2mml.models.encoding.row_encoding import RowEncoding
+from img2mml.models.encoding.row_encoding import RowEncoding
 
 
 class ResNetBlock(nn.Module):  # res_block

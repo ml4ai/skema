@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from fastapi import FastAPI, File
-from skema.img2mml.api import get_mathml_from_bytes
+from img2mml.api import get_mathml_from_bytes
 
 
 # Create a web app using FastAPI

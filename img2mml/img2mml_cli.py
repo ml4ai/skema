@@ -3,7 +3,7 @@
 """Command-line program to exercise the img2mml pipeline."""
 
 import argparse
-from skema.img2mml.api import get_mathml_from_file
+from img2mml.api import get_mathml_from_file
 
 
 def get_mml(image_path) -> None:

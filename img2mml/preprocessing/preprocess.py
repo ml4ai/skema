@@ -12,7 +12,7 @@ from torchtext.vocab import Vocab
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import SequentialSampler
 from functools import partial
-from skema.img2mml.utils.utils import CreateVocab
+from img2mml.utils.utils import CreateVocab
 
 
 class Img2MML_dataset(Dataset):

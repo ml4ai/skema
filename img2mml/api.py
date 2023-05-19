@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from skema.img2mml.translate import convert_to_torch_tensor, render_mml
+from img2mml.translate import convert_to_torch_tensor, render_mml
 
 
 def get_mathml_from_bytes(data: bytes):

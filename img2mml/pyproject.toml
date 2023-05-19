@@ -1,0 +1,37 @@
+[project]
+name="img2mml"
+authors=[
+    {name = "Gaurav Sharma", email="gauravs@arizona.edu"},
+    {name = "Adarsh Pyarelal", email="adarsh@arizona.edu"},
+    {name="Clayton Morrison", email="claytonm@lum.ai"},
+    {name="Liang Zhang", email="liangzh@arizona.edu"},
+]
+description="Image to MathML"
+version="0.1.0"
+dependencies=[
+    "fastapi",
+    "requests",
+    "uvicorn",
+    "torch==1.12.*",
+    "torchvision",
+    "torchtext",
+    "python-multipart",
+    "tqdm",
+    "scikit-learn"
+]
+
+license={text="MIT"}
+
+[project.optional-dependencies]
+# Dev dependencies.
+# - pytest: for running tests
+# - black: Autoformatting
+dev = ["pytest", "black"]
+
+[tool.setuptools.packages]
+find = {}  # Scan the project directory with the default parameters
+
+# Minimum requirements for the build system to execute.
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"

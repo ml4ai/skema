@@ -1,5 +1,5 @@
 from pathlib import Path
-from skema.img2mml.api import get_mathml_from_file
+from img2mml.api import get_mathml_from_file
 
 
 def test_get_mathml():

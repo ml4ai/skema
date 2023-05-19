@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
-from skema.img2mml.utils.utils import *
+from img2mml.utils.utils import *
 
 
 def train(
