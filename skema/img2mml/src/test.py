@@ -39,7 +39,7 @@ def evaluate(
                         f"training_data/sample_data/image_tensors/{int(im.item())}.txt"
                     )
                 )
-            img = torch.stack(imgs)
+            img = torch.stack(imgs).to(device)
 
             """
             we will pass "mml" just to provide initial <sos> token.

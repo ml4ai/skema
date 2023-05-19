@@ -32,7 +32,7 @@ def train(
                     f"training_data/sample_data/image_tensors/{int(im.item())}.txt"
                 )
             )
-        img = torch.stack(imgs)
+        img = torch.stack(imgs).to(device)
 
         # setting gradients to zero
         optimizer.zero_grad()
