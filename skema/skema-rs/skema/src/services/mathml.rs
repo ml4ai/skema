@@ -1,6 +1,6 @@
 use actix_web::{get, put, web, HttpResponse};
 use mathml::{
-    acset::ACSet,
+    acset::{ACSet, ModelRepPn},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsing::parse,
@@ -55,18 +55,18 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     dot_representation.to_string()
 }
 
-/// Return a JSON representation of an ACSet constructed from an array of MathML strings.
+/// Return a JSON representation of a ModelRep constructed from an array of MathML strings.
 #[utoipa::path(
     request_body = Vec<String>,
     responses(
         (
             status = 200,
-            body = ACSet
+            body = ModelRepPn
         )
     )
 )]
 #[put("/mathml/acset")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
     let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
-    HttpResponse::Ok().json(web::Json(ACSet::from(asts)))
+    HttpResponse::Ok().json(web::Json(ModelRepPn::from(ACSet::from(asts))))
 }

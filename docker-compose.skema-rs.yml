@@ -3,7 +3,9 @@ version: "3"
 services:
   # The skema-rs web service exposing functionality implemented in Rust.
   skema-rs:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.skema-rs
     entrypoint: cargo run --release --bin skema_service -- --host 0.0.0.0 --db-host database
     ports:
       - "8080:8080"

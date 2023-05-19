@@ -71,7 +71,7 @@ impl fmt::Display for MathExpression {
 
 /// The Math struct represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_math)
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Math {
     pub content: Vec<MathExpression>,
 }
