@@ -72,6 +72,10 @@ pub struct State {
     pub id: String,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub rate_constant: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sign: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub grounding: Option<Grounding>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub initial: Option<Initial>,
@@ -112,6 +116,9 @@ pub struct Transition {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub output: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sign: Option<bool>,
+
     pub grounding: Option<Grounding>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -123,6 +130,7 @@ pub struct Properties {
     pub name: String,
     pub grounding: Option<Grounding>,
     pub rate: Rate,
+    pub rate_constant: Option<String>,
 }
 
 #[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]

@@ -3,7 +3,7 @@ use mathml::ast::{Math, Operator};
 use mathml::expression::wrap_math;
 use mathml::expression::Atom;
 use mathml::expression::{Expr, PreExp};
-use mathml::mml2pn::get_mathml_asts_from_file;
+use mathml::mml2pn::{get_mathml_asts_from_file, group_by_operators};
 pub use mathml::mml2pn::{ACSet, Term};
 use petgraph::dot::{Config, Dot};
 use petgraph::matrix_graph::IndexType;
@@ -16,9 +16,13 @@ use std::collections::HashSet;
 use std::env;
 
 // new imports
+use mathml::acset::Model;
+use mathml::acset::Properties;
+use mathml::acset::State;
+use mathml::acset::Transition;
 use mathml::ast::MathExpression;
-use mathml::ast::MathExpression::Mo;
 use mathml::ast::MathExpression::Mrow;
+use mathml::ast::MathExpression::{Mi, Mo};
 use mathml::expression::preprocess_content;
 use mathml::expression::Expression;
 use mathml::parsing::parse;
@@ -183,6 +187,188 @@ fn main() {
         pre_exp.collapse_expr();
         pre_exp.set_name();
         println!("\nLiang exp: {:?}", pre_exp.clone());
+    } else if args[1] == "test_regnet".to_string() {
+        // this is just for testing the added functionality to convert mathml to a regnet
+        // this will need to be added to another location and an end point constructed after the testing is done
+
+        // notes: targets are the current state variable and src is the other in the coupling, negative polarity is false sign, state's rate_constants are the parameters coupled to current state in equation
+
+        let mathml_asts =
+            get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
+
+        println!("ast for lotka: {:?}", mathml_asts.clone());
+
+        // this algorithm to follow should be refactored into a seperate function once it is functional
+
+        let mut specie_vars = HashSet::<Var>::new();
+        let mut vars = HashSet::<Var>::new();
+        let mut eqns = HashMap::<Var, Vec<Term>>::new();
+
+        for ast in mathml_asts.into_iter() {
+            group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
+        }
+
+        for obj in specie_vars.clone().into_iter() {
+            println!("\nobj: {:?}", obj.clone());
+            println!("\nmaping into eqns: {:?}", eqns[&obj.clone()]);
+        }
+
+        // Get the rate variables
+        let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
+
+        println!("\neqns: {:?}", eqns.clone());
+
+        // -----------------------------------------------------------
+        // -----------------------------------------------------------
+
+        let mut states_vec = Vec::<State>::new();
+        let mut transitions_vec = Vec::<Transition>::new();
+
+        for state in specie_vars.clone().into_iter() {
+            // state bits
+            let mut rate_const = "temp".to_string();
+            let mut state_name = "temp".to_string();
+            let mut term_idx = 0;
+            let mut rate_sign = false;
+
+            //transition bits
+            let mut trans_name = "temp".to_string();
+            let mut trans_sign = false;
+            let mut trans_tgt = "temp".to_string();
+            let mut trans_src = "temp".to_string();
+
+            for (i, term) in eqns[&state.clone()].iter().enumerate() {
+                for variable in term.vars.clone().iter() {
+                    if state == variable.clone() && term.vars.len() == 2 {
+                        term_idx = i.clone();
+                    }
+                }
+            }
+
+            if eqns[&state.clone()][term_idx.clone() as usize].polarity == Polarity::Positive {
+                rate_sign = true;
+            }
+
+            for variable in eqns[&state.clone()][term_idx.clone() as usize]
+                .vars
+                .clone()
+                .iter()
+            {
+                if state.clone() != variable.clone() {
+                    match variable.clone() {
+                        Var(Mi(x)) => {
+                            rate_const = x.clone();
+                        }
+                        _ => {
+                            println!("Error in rate extraction");
+                        }
+                    };
+                } else {
+                    match variable.clone() {
+                        Var(Mi(x)) => {
+                            state_name = x.clone();
+                        }
+                        _ => {
+                            println!("Error in rate extraction");
+                        }
+                    };
+                }
+            }
+
+            let states = State {
+                id: state_name.clone(),
+                name: state_name.clone(),
+                sign: Some(rate_sign.clone()),
+                rate_constant: Some(rate_const.clone()),
+                ..Default::default()
+            };
+            states_vec.push(states.clone());
+
+            // now to make the transition part ----------------------------------
+
+            for (i, term) in eqns[&state.clone()].iter().enumerate() {
+                if i != term_idx {
+                    if term.polarity == Polarity::Positive {
+                        trans_sign = true;
+                    }
+                    let mut state_indx = 0;
+                    let mut other_state_indx = 0;
+                    for (j, var) in term.vars.clone().iter().enumerate() {
+                        if state.clone() == var.clone() {
+                            state_indx = j.clone();
+                        }
+                        for other_states in specie_vars.clone().into_iter() {
+                            if *var != state && *var == other_states {
+                                // this means it is not the state, but is another state
+                                other_state_indx = j.clone();
+                            }
+                        }
+                    }
+                    for (j, var) in term.vars.clone().iter().enumerate() {
+                        if j == other_state_indx {
+                            match var.clone() {
+                                Var(Mi(x)) => {
+                                    trans_src = x.clone();
+                                }
+                                _ => {
+                                    println!("error in trans src extraction");
+                                }
+                            };
+                        } else if j != other_state_indx && j != state_indx {
+                            match var.clone() {
+                                Var(Mi(x)) => {
+                                    trans_name = x.clone();
+                                }
+                                _ => {
+                                    println!("error in trans name extraction");
+                                }
+                            };
+                        }
+                    }
+                }
+            }
+
+            let prop = Properties {
+                name: trans_name.clone(),
+                rate_constant: Some(trans_name.clone()),
+                ..Default::default()
+            };
+
+            let transitions = Transition {
+                id: trans_name.clone(),
+                input: Some([state_name.clone()].to_vec()), // tgt
+                output: Some([trans_src.clone()].to_vec()), // src
+                sign: Some(trans_sign.clone()),
+                properties: Some(prop.clone()),
+                ..Default::default()
+            };
+
+            transitions_vec.push(transitions.clone());
+        }
+
+        println!("\nstates_vec: {:?}", states_vec.clone());
+
+        // -----------------------------------------------------------
+
+        let model = Model {
+            states: states_vec,
+            transitions: transitions_vec,
+            ..Default::default()
+        };
+
+        let mrp = ModelRepPn {
+        name: "Regnet mathml model".to_string(),
+        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
+        description: "This is a Regnet model from mathml equations".to_string(),
+        model_version: "0.1".to_string(),
+        model: model.clone(),
+        ..Default::default()
+        };
+
+        // -----------------------------------------------------------
+        // -----------------------------------------------------------
+
+        println!("\nRegNet: \n{:?}", mrp.clone());
     } else {
         println!("Unknown Command!");
     }
