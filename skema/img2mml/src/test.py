@@ -8,6 +8,7 @@ from skema.img2mml.utils.utils import *
 def evaluate(
     model,
     model_type,
+    img_tnsr_path,
     batch_size,
     test_dataloader,
     criterion,
@@ -36,7 +37,7 @@ def evaluate(
             for im in img:
                 imgs.append(
                     torch.load(
-                        f"training_data/sample_data/image_tensors/{int(im.item())}.txt"
+                        f"{img_tnsr_path}/{int(im.item())}.txt"
                     )
                 )
             img = torch.stack(imgs).to(device)

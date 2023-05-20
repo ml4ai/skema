@@ -349,7 +349,10 @@ def train_model(
         )
 
     best_valid_loss = float("inf")
-    TRG_PAD_IDX = vocab.stoi["<pad>"]
+    trg_pad_idx = vocab.stoi["<pad>"]
+
+    # raw data paths
+    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
 
     if not load_trained_model:
         count_es = 0
@@ -371,6 +374,7 @@ def train_model(
                 train_loss = train(
                     model,
                     model_type,
+                    img_tnsr_path,
                     train_dataloader,
                     optimizer,
                     criterion,
@@ -383,6 +387,7 @@ def train_model(
                 val_loss = evaluate(
                     model,
                     model_type,
+                    img_tnsr_path,
                     batch_size,
                     val_dataloader,
                     criterion,
@@ -481,6 +486,7 @@ def train_model(
     test_loss = evaluate(
         model,
         model_type,
+        img_tnsr_path,
         batch_size,
         test_dataloader,
         criterion,

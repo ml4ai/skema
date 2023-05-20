@@ -79,11 +79,11 @@ def preprocess_dataset(config):
     print("preprocessing data...")
 
     # reading raw text files
-    MMLPath = f"{config['data_path']}/{config['dataset_type']}/{config['markup']}.lst"
-    IMGTnsrPath = (
+    mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['markup']}.lst"
+    img_tnsr_path = (
         f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     )
-    mml_txt = open(MMLPath).read().split("\n")[:-1]
+    mml_txt = open(mml_path).read().split("\n")[:-1]
     image_num = range(0, len(mml_txt))
 
     # split the image_num into train, test, validate
