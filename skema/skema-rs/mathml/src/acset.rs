@@ -125,12 +125,12 @@ pub struct Rate {
 pub struct RegTransition {
     pub id: String,
 
-    /// Note: input is a required field in the schema, but we make it optional since we want to
+    /// Note: source is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<Vec<String>>,
 
-    /// Note: output is a required field in the schema, but we make it optional since we want to
+    /// Note: target is a required field in the schema, but we make it optional since we want to
     /// reuse this schema for partial extractions as well.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub target: Option<Vec<String>>,
