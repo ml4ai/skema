@@ -18,8 +18,8 @@ use std::env;
 // new imports
 use mathml::acset::Model;
 use mathml::acset::Properties;
-use mathml::acset::State;
 use mathml::acset::Transition;
+use mathml::acset::{RegState, RegTransition, State};
 use mathml::ast::MathExpression;
 use mathml::ast::MathExpression::Mrow;
 use mathml::ast::MathExpression::{Mi, Mo};
@@ -196,8 +196,6 @@ fn main() {
         let mathml_asts =
             get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
 
-        println!("ast for lotka: {:?}", mathml_asts.clone());
-
         // this algorithm to follow should be refactored into a seperate function once it is functional
 
         let mut specie_vars = HashSet::<Var>::new();
@@ -208,21 +206,14 @@ fn main() {
             group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
         }
 
-        for obj in specie_vars.clone().into_iter() {
-            println!("\nobj: {:?}", obj.clone());
-            println!("\nmaping into eqns: {:?}", eqns[&obj.clone()]);
-        }
-
         // Get the rate variables
         let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
 
-        println!("\neqns: {:?}", eqns.clone());
-
         // -----------------------------------------------------------
         // -----------------------------------------------------------
 
-        let mut states_vec = Vec::<State>::new();
-        let mut transitions_vec = Vec::<Transition>::new();
+        let mut states_vec = Vec::<RegState>::new();
+        let mut transitions_vec = Vec::<RegTransition>::new();
 
         for state in specie_vars.clone().into_iter() {
             // state bits
@@ -237,7 +228,7 @@ fn main() {
             let mut trans_tgt = "temp".to_string();
             let mut trans_src = "temp".to_string();
 
-            for (i, term) in eqns[&state.clone()].iter().enumerate() {
+            for (i, term) in eqns[&state].iter().enumerate() {
                 for variable in term.vars.clone().iter() {
                     if state == variable.clone() && term.vars.len() == 2 {
                         term_idx = i.clone();
@@ -249,11 +240,7 @@ fn main() {
                 rate_sign = true;
             }
 
-            for variable in eqns[&state.clone()][term_idx.clone() as usize]
-                .vars
-                .clone()
-                .iter()
-            {
+            for variable in eqns[&state][term_idx as usize].vars.iter() {
                 if state.clone() != variable.clone() {
                     match variable.clone() {
                         Var(Mi(x)) => {
@@ -275,7 +262,7 @@ fn main() {
                 }
             }
 
-            let states = State {
+            let states = RegState {
                 id: state_name.clone(),
                 name: state_name.clone(),
                 sign: Some(rate_sign.clone()),
@@ -286,14 +273,14 @@ fn main() {
 
             // now to make the transition part ----------------------------------
 
-            for (i, term) in eqns[&state.clone()].iter().enumerate() {
+            for (i, term) in eqns[&state].iter().enumerate() {
                 if i != term_idx {
                     if term.polarity == Polarity::Positive {
                         trans_sign = true;
                     }
                     let mut state_indx = 0;
                     let mut other_state_indx = 0;
-                    for (j, var) in term.vars.clone().iter().enumerate() {
+                    for (j, var) in term.vars.iter().enumerate() {
                         if state.clone() == var.clone() {
                             state_indx = j.clone();
                         }
@@ -304,7 +291,7 @@ fn main() {
                             }
                         }
                     }
-                    for (j, var) in term.vars.clone().iter().enumerate() {
+                    for (j, var) in term.vars.iter().enumerate() {
                         if j == other_state_indx {
                             match var.clone() {
                                 Var(Mi(x)) => {
@@ -334,10 +321,10 @@ fn main() {
                 ..Default::default()
             };
 
-            let transitions = Transition {
+            let transitions = RegTransition {
                 id: trans_name.clone(),
-                input: Some([state_name.clone()].to_vec()), // tgt
-                output: Some([trans_src.clone()].to_vec()), // src
+                target: Some([state_name.clone()].to_vec()), // tgt
+                source: Some([trans_src.clone()].to_vec()),  // src
                 sign: Some(trans_sign.clone()),
                 properties: Some(prop.clone()),
                 ..Default::default()
@@ -346,29 +333,22 @@ fn main() {
             transitions_vec.push(transitions.clone());
         }
 
-        println!("\nstates_vec: {:?}", states_vec.clone());
-
         // -----------------------------------------------------------
 
-        let model = Model {
-            states: states_vec,
-            transitions: transitions_vec,
-            ..Default::default()
+        let model = Model::RegNet {
+            vertices: states_vec,
+            edges: transitions_vec,
+            parameters: None,
         };
 
         let mrp = ModelRepPn {
         name: "Regnet mathml model".to_string(),
-        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
+        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
         description: "This is a Regnet model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model: model.clone(),
-        ..Default::default()
+        model: model,
+        metadata: None,
         };
-
-        // -----------------------------------------------------------
-        // -----------------------------------------------------------
-
-        println!("\nRegNet: \n{:?}", mrp.clone());
     } else {
         println!("Unknown Command!");
     }

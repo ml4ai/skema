@@ -45,7 +45,7 @@ pub struct ACSet {
 // -------------------------------------------------------------------------------------------
 // The following data structs are those requested by TA-4 as an exchange format for the models.
 // the spec in json format can be found here: https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ModelRepPn {
     pub name: String,
     pub schema: String,
@@ -56,25 +56,44 @@ pub struct ModelRepPn {
     pub metadata: Option<serde_json::Map<String, Value>>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
-pub struct Model {
-    pub states: Vec<State>,
-    pub transitions: Vec<Transition>,
-
-    /// Note: parameters is a required field in the schema, but we make it optional since we want
-    /// to reuse this schema for partial extractions as well.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parameters: Option<Vec<Parameter>>,
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+pub enum Model {
+    RegNet {
+        vertices: Vec<RegState>,
+        edges: Vec<RegTransition>,
+        /// Note: parameters is a required field in the schema, but we make it optional since we want
+        /// to reuse this schema for partial extractions as well.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        parameters: Option<Vec<Parameter>>,
+    },
+    PetriNet {
+        states: Vec<State>,
+        transitions: Vec<Transition>,
+        /// Note: parameters is a required field in the schema, but we make it optional since we want
+        /// to reuse this schema for partial extractions as well.
+        #[serde(skip_serializing_if = "Option::is_none")]
+        parameters: Option<Vec<Parameter>>,
+    },
 }
 
 #[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
-pub struct State {
+pub struct RegState {
     pub id: String,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub rate_constant: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sign: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub grounding: Option<Grounding>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub initial: Option<Initial>,
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+pub struct State {
+    pub id: String,
+    pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grounding: Option<Grounding>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -100,6 +119,29 @@ pub struct Initial {
 pub struct Rate {
     pub expression: String,
     pub expression_mathml: String,
+}
+
+#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+pub struct RegTransition {
+    pub id: String,
+
+    /// Note: input is a required field in the schema, but we make it optional since we want to
+    /// reuse this schema for partial extractions as well.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<Vec<String>>,
+
+    /// Note: output is a required field in the schema, but we make it optional since we want to
+    /// reuse this schema for partial extractions as well.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sign: Option<bool>,
+
+    pub grounding: Option<Grounding>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub properties: Option<Properties>,
 }
 
 #[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
@@ -209,10 +251,10 @@ impl ModelRepPn {
 
         // -----------------------------------------------------------
 
-        let model = Model {
+        let model = Model::PetriNet {
             states: states_vec,
             transitions: transitions_vec,
-            ..Default::default()
+            parameters: None,
         };
 
         let mrp = ModelRepPn {
@@ -221,7 +263,7 @@ impl ModelRepPn {
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
         model: model.clone(),
-        ..Default::default()
+        metadata: None,
     };
 
         return mrp;
