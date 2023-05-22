@@ -1,13 +1,14 @@
+use crate::acset;
 pub use crate::acset::ACSet;
 use crate::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
     Polarity, Rate, Specie, Var,
 };
 use crate::{
-    acset,
+    acset::{Model, ModelRepPn, Properties, RegState, RegTransition},
     ast::{
         Math,
-        MathExpression::{Mn, Mo, Mrow},
+        MathExpression::{Mi, Mn, Mo, Mrow},
         Operator,
     },
     parsing::parse,
@@ -394,6 +395,165 @@ impl acset::ACSet {
         dot.push('}');
         dot
     }
+}
+
+// This function takes in a mathml string and returns a Regnet
+pub fn mathml2regnet(mathml_asts: Vec<Math>) -> ModelRepPn {
+    // this algorithm to follow should be refactored into a seperate function once it is functional
+
+    let mut specie_vars = HashSet::<Var>::new();
+    let mut vars = HashSet::<Var>::new();
+    let mut eqns = HashMap::<Var, Vec<Term>>::new();
+
+    for ast in mathml_asts.into_iter() {
+        group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
+    }
+
+    // Get the rate variables
+    let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
+
+    // -----------------------------------------------------------
+    // -----------------------------------------------------------
+
+    let mut states_vec = Vec::<RegState>::new();
+    let mut transitions_vec = Vec::<RegTransition>::new();
+
+    for state in specie_vars.clone().into_iter() {
+        // state bits
+        let mut rate_const = "temp".to_string();
+        let mut state_name = "temp".to_string();
+        let mut term_idx = 0;
+        let mut rate_sign = false;
+
+        //transition bits
+        let mut trans_name = "temp".to_string();
+        let mut trans_sign = false;
+        let mut trans_tgt = "temp".to_string();
+        let mut trans_src = "temp".to_string();
+
+        for (i, term) in eqns[&state].iter().enumerate() {
+            for variable in term.vars.clone().iter() {
+                if state == variable.clone() && term.vars.len() == 2 {
+                    term_idx = i.clone();
+                }
+            }
+        }
+
+        if eqns[&state.clone()][term_idx.clone() as usize].polarity == Polarity::Positive {
+            rate_sign = true;
+        }
+
+        for variable in eqns[&state][term_idx as usize].vars.iter() {
+            if state.clone() != variable.clone() {
+                match variable.clone() {
+                    Var(Mi(x)) => {
+                        rate_const = x.clone();
+                    }
+                    _ => {
+                        println!("Error in rate extraction");
+                    }
+                };
+            } else {
+                match variable.clone() {
+                    Var(Mi(x)) => {
+                        state_name = x.clone();
+                    }
+                    _ => {
+                        println!("Error in rate extraction");
+                    }
+                };
+            }
+        }
+
+        let states = RegState {
+            id: state_name.clone(),
+            name: state_name.clone(),
+            sign: Some(rate_sign.clone()),
+            rate_constant: Some(rate_const.clone()),
+            ..Default::default()
+        };
+        states_vec.push(states.clone());
+
+        // now to make the transition part ----------------------------------
+
+        for (i, term) in eqns[&state].iter().enumerate() {
+            if i != term_idx {
+                if term.polarity == Polarity::Positive {
+                    trans_sign = true;
+                }
+                let mut state_indx = 0;
+                let mut other_state_indx = 0;
+                for (j, var) in term.vars.iter().enumerate() {
+                    if state.clone() == var.clone() {
+                        state_indx = j.clone();
+                    }
+                    for other_states in specie_vars.clone().into_iter() {
+                        if *var != state && *var == other_states {
+                            // this means it is not the state, but is another state
+                            other_state_indx = j.clone();
+                        }
+                    }
+                }
+                for (j, var) in term.vars.iter().enumerate() {
+                    if j == other_state_indx {
+                        match var.clone() {
+                            Var(Mi(x)) => {
+                                trans_src = x.clone();
+                            }
+                            _ => {
+                                println!("error in trans src extraction");
+                            }
+                        };
+                    } else if j != other_state_indx && j != state_indx {
+                        match var.clone() {
+                            Var(Mi(x)) => {
+                                trans_name = x.clone();
+                            }
+                            _ => {
+                                println!("error in trans name extraction");
+                            }
+                        };
+                    }
+                }
+            }
+        }
+
+        let prop = Properties {
+            name: trans_name.clone(),
+            rate_constant: Some(trans_name.clone()),
+            ..Default::default()
+        };
+
+        let transitions = RegTransition {
+            id: trans_name.clone(),
+            target: Some([state_name.clone()].to_vec()), // tgt
+            source: Some([trans_src.clone()].to_vec()),  // src
+            sign: Some(trans_sign.clone()),
+            properties: Some(prop.clone()),
+            ..Default::default()
+        };
+
+        transitions_vec.push(transitions.clone());
+    }
+
+    // -----------------------------------------------------------
+
+    let model = Model::RegNet {
+        vertices: states_vec,
+        edges: transitions_vec,
+        parameters: None,
+    };
+
+    let mrp = ModelRepPn {
+        name: "Regnet mathml model".to_string(),
+        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
+        description: "This is a Regnet model from mathml equations".to_string(),
+        model_version: "0.1".to_string(),
+        model: model,
+        metadata: None,
+        };
+
+    return mrp;
 }
 
 /// Helper function for testing equality of ACSets, since the order of the edges is not guaranteed

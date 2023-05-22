@@ -41,6 +41,7 @@ async fn main() -> std::io::Result<()> {
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
+            skema::services::mathml::get_regnet,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -107,6 +108,7 @@ async fn main() -> std::io::Result<()> {
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
             .service(skema::services::mathml::get_acset)
+            .service(skema::services::mathml::get_regnet)
             .service(ping)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })
