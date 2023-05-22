@@ -10,14 +10,15 @@ description="Image to MathML"
 version="0.1.0"
 dependencies=[
     "fastapi",
+    "pandas",
     "requests",
-    "uvicorn",
-    "torch==1.12.*",
+    "scikit-learn",
+    "python-multipart",
+    "torch",
     "torchvision",
     "torchtext",
-    "python-multipart",
     "tqdm",
-    "scikit-learn"
+    "uvicorn",
 ]
 
 license={text="MIT"}
@@ -28,8 +29,8 @@ license={text="MIT"}
 # - black: Autoformatting
 dev = ["pytest", "black"]
 
-[tool.setuptools.packages]
-find = {}  # Scan the project directory with the default parameters
+#[tool.setuptools.packages]
+#find = {}  # Scan the project directory with the default parameters
 
 # Minimum requirements for the build system to execute.
 [build-system]

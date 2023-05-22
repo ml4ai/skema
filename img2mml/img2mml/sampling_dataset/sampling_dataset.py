@@ -4,11 +4,11 @@ import threading
 import subprocess
 from threading import Timer
 from shutil import copyfile as CP
-from preprocessing.preprocess_mml import simplification
+from img2mml.preprocessing.preprocess_mml import simplification
 import multiprocessing as mp
 
 # read config file and define paths
-config_path = "sampling_dataset/sampling_config.json"
+config_path = "configs/sampling_config.json"
 with open(config_path, "r") as cfg:
     config = json.load(cfg)
 
@@ -30,7 +30,7 @@ random.seed(config["seed"])
 data_path = "training_data/sample_data"
 
 if not os.path.exists(data_path):
-    os.mkdir(data_path)
+    os.makedirs(data_path)
 else:
     print(
         "sample_data already exists. Removing old sample_data and replacing it with new one."
