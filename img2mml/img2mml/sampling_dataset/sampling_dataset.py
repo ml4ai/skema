@@ -6,6 +6,7 @@ from threading import Timer
 from shutil import copyfile as CP
 from img2mml.preprocessing.preprocess_mml import simplification
 import multiprocessing as mp
+from tqdm import tqdm, trange
 
 # read config file and define paths
 config_path = "configs/sampling_config.json"
@@ -108,7 +109,7 @@ def prepare_dataset(args):
     )
 
     mml = open(mml_path).readlines()[0]
-    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
+    open(f"{os.getcwd()}/temp_folder/smr_{i}.txt", "w").write(
         mml
     )
 
@@ -138,7 +139,7 @@ def get_bin(af):
     try:
         i, ap = af
         simp_mml = open(
-            f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+            f"{os.getcwd()}/temp_folder/sm_{i}.txt"
         )
         simp_mml = simp_mml.readlines()[0]
         length_mml = len(simp_mml.split())
@@ -188,20 +189,19 @@ def main():
     print("collecting all the MathML paths...")
 
     if config["sample_entire_year"]:
-        years = config["years"].split(",")
-        for yr in years:
+        years = config["years"]
+        for yr in tqdm(years):
             yr = yr.strip()
             yr_path = os.path.join(root, yr)
 
-            for m in range(1, 13, 1):
+            for m in trange(1, 13, 1):
                 month = yr[2:] + f"{m:02}"  # yr=2018, month=1801,..
                 temp_paths = get_paths(yr, yr_path, month)
                 for p in temp_paths:
                     all_paths.append(p)
 
     elif config["sample_from_months"]:
-        months = config["months"].split(",")
-        for month in months:
+        for month in config["months"]:
             month = month.strip()
             yr = f"20{month[0:2]}"
             yr_path = os.path.join(root, yr)
@@ -210,8 +210,7 @@ def main():
                 all_paths.append(p)
 
     ######## step 2: shuffle it twice ########
-    print("shuffling all the paths to create randomness...")
-    random.shuffle(all_paths)
+    print("Shuffling all the paths to create randomness...")
     random.shuffle(all_paths)
 
     ######## step 3: simplify MML and and find length  #####
@@ -222,21 +221,22 @@ def main():
     # this folder will be deleted at the end of the run.
     # It is created to help expediting the process by avoiding
     # Lock functionality.
-    temp_folder = f"{os.getcwd()}/sampling_dataset/temp_folder"
+    temp_folder = f"{os.getcwd()}/temp_folder"
     if not os.path.exists(temp_folder):
         os.mkdir(temp_folder)
 
-    print("diving all_paths into batches of 10K to work efficiently...")
+    print("Dividing all_paths into batches of 10K to work efficiently...")
     reject_count = 0
-    for bidx, batch_paths in enumerate(
+    for bidx, batch_paths in tqdm(enumerate(
         list(divide_all_paths_into_chunks(all_paths))
-    ):
+    )):
         if count <= total_eqns:
-            print("running batch: ", bidx)
-            print("current status: ", counter_dist_dict)
+            print("Running batch: ", bidx)
+            print("Current status: ", counter_dist_dict)
 
             all_files = list()
             for i, ap in enumerate(batch_paths):
+                print(i, ap)
                 all_files.append([i, ap])
 
             with mp.Pool(config["num_cpus"]) as pool:
@@ -262,7 +262,7 @@ def main():
             clean_cmd = [
                 "rm",
                 "-rf",
-                f"{os.getcwd()}/sampling_dataset/temp_folder/*",
+                f"{os.getcwd()}/temp_folder/*",
             ]
             subprocess.run(clean_cmd)
 

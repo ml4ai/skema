@@ -32,13 +32,13 @@ pip install torchtext==0.6.0
 ```
 
 ## Generating raw dataset
-Please check out the `data_generation/README.md` file.
+Please check out the `img2mml/data_generation/README.md` file.
 
 ## Creating dataset for training
 
 We need to create dataset for training purpose from the raw dataset that has
 been generated from the arxiv source files. For further details about data
-generation, check out `data_generation/README.md`.
+generation, check out `img2mml/data_generation/README.md`.
 
 #### Distribution
 
@@ -46,10 +46,10 @@ We need to provide the distribution which we want to follow while sampling our
 dataset for training purpose. To do this, update the
 `sampling_dataset/sampling_config.json`.
 
-The dataset distribution is largely divided into a few bin based on the length of the MathML equations. These bins are:
-[0,50], [50,100], [100,150], [150,200], [200,250], [250,300], [300,350],
-[350,1000]. In every bin represents range of the number of tokens a MathML
-equation can have.
+The dataset distribution is largely divided into a few bin based on the length
+of the MathML equations. These bins are: [0,50], [50,100], [100,150],
+[150,200], [200,250], [250,300], [300,350], [350,1000]. In every bin represents
+range of the number of tokens a MathML equation can have.
 
 After updating the `sampling_config.json` file,
 ```
