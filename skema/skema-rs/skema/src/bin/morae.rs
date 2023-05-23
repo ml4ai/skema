@@ -1,41 +1,17 @@
-use mathml::acset::{ACSetTransition, InputArc, ModelRepPn, OutputArc, Specie};
 use mathml::ast::{Math, Operator};
-use mathml::expression::wrap_math;
-use mathml::expression::Atom;
-use mathml::expression::{Expr, PreExp};
-use mathml::mml2pn::{get_mathml_asts_from_file, group_by_operators};
+use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
-use petgraph::dot::{Config, Dot};
-use petgraph::matrix_graph::IndexType;
 use petgraph::prelude::*;
-use petgraph::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::collections::HashSet;
 use std::env;
 
 // new imports
-use mathml::acset::Model;
-use mathml::acset::Properties;
-use mathml::acset::Transition;
-use mathml::acset::{RegState, RegTransition, State};
 use mathml::ast::MathExpression;
+use mathml::ast::MathExpression::Mo;
 use mathml::ast::MathExpression::Mrow;
-use mathml::ast::MathExpression::{Mi, Mo};
-use mathml::expression::preprocess_content;
-use mathml::expression::Expression;
-use mathml::parsing::parse;
-use mathml::petri_net::recognizers::get_polarity;
-use mathml::petri_net::recognizers::get_specie_var;
 use mathml::petri_net::recognizers::is_add_or_subtract_operator;
-use mathml::petri_net::recognizers::is_var_candidate;
-use mathml::petri_net::{Polarity, Var};
-
-// just for making schema's
-use schemars::schema_for; // for printing
-use serde_json; // need for printing
-use skema::Metadata; // struct to make schema from
 
 // overall this will be a function that takes in a module id and weather it is manually or auto extraction to use
 
@@ -98,297 +74,16 @@ fn main() {
     else if args[1] == "manual".to_string() {
         // still need to grab the module id
 
-        let (mut core_dynamics, metadata_map) = subgraph2_core_dyn_exp(module_id.clone()).unwrap();
-
         let (mut core_dynamics_ast, metadata_map_ast) =
             subgraph2_core_dyn_ast(module_id.clone()).unwrap();
-
-        let mut named_core_dynamics = Vec::<PreExp>::new();
-
-        for (i, expression) in core_dynamics.clone().iter().enumerate() {
-            let test_pre_exp = match &expression {
-                Expr::Expression { ops, args, name } => PreExp {
-                    ops: (*ops.clone()).to_vec(),
-                    args: (*args.clone()).to_vec(),
-                    name: expression.clone().set_name(),
-                },
-                &Expr::Atom(_) => PreExp {
-                    ops: Vec::<Operator>::new(),
-                    args: Vec::<Expr>::new(),
-                    name: "".to_string(),
-                },
-            };
-            named_core_dynamics.push(test_pre_exp.clone());
-        }
 
         // expressions that are working: 5 (T), 6 (H)
         // 7 (E) should be fixable, the USub is not being subsituted and is at the end of the RHS instead of the start
 
-        println!("Exp:\n {:?}", named_core_dynamics[5].clone());
         println!("\n Ast:\n {:?}", core_dynamics_ast[5].clone());
-    }
-    // This is for testing the converter and it will import from the test files since we should be able to make sure things are
-    // parsing correctly
-    else if args[1] == "test".to_string() {
-        // load up the parsed file
-        let mathml_ast =
-            get_mathml_asts_from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
-
-        // make my own converter to PreExp with an '=' as the anchor as I don't understand Liang's converter
-        let mut core_dynamics_exp = ast2exp(mathml_ast.clone());
-
-        // convert the parsed file into pre_exp
-        let mut named_core_dynamics = Vec::<PreExp>::new();
-        for equation in mathml_ast.iter() {
-            println!("\nast: {:?}", equation.content[0].clone());
-            // this next bit is for Liang's converter to expressions
-            let mut pre_exp = PreExp {
-                ops: Vec::<Operator>::new(),
-                args: Vec::<Expr>::new(),
-                name: "".to_string(),
-            };
-            let new_math = wrap_math(equation.clone());
-            new_math.clone().to_expr(&mut pre_exp);
-            pre_exp.group_expr();
-            pre_exp.collapse_expr();
-            //pre_exp.to_graph();
-            pre_exp.set_name();
-            // pre_exp.distribute_expr();
-            println!("\nLiang exp: {:?}", pre_exp.clone());
-        }
-
-        let acset_dyn = exp2pn(named_core_dynamics);
-
-        // printing the ACSet for future comparison
-        println!("\nACSet: {:?}", ACSet::from(mathml_ast));
-        println!("\n exp ACSet: {:?}", acset_dyn);
-
-        // printing json schema's for Ben
-        /*let schema = schema_for!(Metadata);
-        println!("{}", serde_json::to_string_pretty(&schema).unwrap());*/
-    } else if args[1] == "test_liang".to_string() {
-        let input = "../../../skema/skema-rs/mathml/tests/seir_eq1.xml";
-        let mut contents = std::fs::read_to_string(input)
-            .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
-        contents = preprocess_content(contents);
-        let (_, mut math) =
-            parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
-        math.normalize();
-        let new_math = wrap_math(math);
-        let mut pre_exp = PreExp {
-            ops: Vec::<Operator>::new(),
-            args: Vec::<Expr>::new(),
-            name: "".to_string(),
-        };
-        new_math.clone().to_expr(&mut pre_exp);
-        pre_exp.group_expr();
-        pre_exp.collapse_expr();
-        pre_exp.group_expr();
-        pre_exp.collapse_expr();
-        pre_exp.set_name();
-        println!("\nLiang exp: {:?}", pre_exp.clone());
-    } else if args[1] == "test_regnet".to_string() {
-        // this is just for testing the added functionality to convert mathml to a regnet
-        // this will need to be added to another location and an end point constructed after the testing is done
-
-        // notes: targets are the current state variable and src is the other in the coupling, negative polarity is false sign, state's rate_constants are the parameters coupled to current state in equation
-
-        let mathml_asts =
-            get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
-
-        // this algorithm to follow should be refactored into a seperate function once it is functional
-
-        let mut specie_vars = HashSet::<Var>::new();
-        let mut vars = HashSet::<Var>::new();
-        let mut eqns = HashMap::<Var, Vec<Term>>::new();
-
-        for ast in mathml_asts.into_iter() {
-            group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
-        }
-
-        // Get the rate variables
-        let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
-
-        // -----------------------------------------------------------
-        // -----------------------------------------------------------
-
-        let mut states_vec = Vec::<RegState>::new();
-        let mut transitions_vec = Vec::<RegTransition>::new();
-
-        for state in specie_vars.clone().into_iter() {
-            // state bits
-            let mut rate_const = "temp".to_string();
-            let mut state_name = "temp".to_string();
-            let mut term_idx = 0;
-            let mut rate_sign = false;
-
-            //transition bits
-            let mut trans_name = "temp".to_string();
-            let mut trans_sign = false;
-            let mut trans_tgt = "temp".to_string();
-            let mut trans_src = "temp".to_string();
-
-            for (i, term) in eqns[&state].iter().enumerate() {
-                for variable in term.vars.clone().iter() {
-                    if state == variable.clone() && term.vars.len() == 2 {
-                        term_idx = i.clone();
-                    }
-                }
-            }
-
-            if eqns[&state.clone()][term_idx.clone() as usize].polarity == Polarity::Positive {
-                rate_sign = true;
-            }
-
-            for variable in eqns[&state][term_idx as usize].vars.iter() {
-                if state.clone() != variable.clone() {
-                    match variable.clone() {
-                        Var(Mi(x)) => {
-                            rate_const = x.clone();
-                        }
-                        _ => {
-                            println!("Error in rate extraction");
-                        }
-                    };
-                } else {
-                    match variable.clone() {
-                        Var(Mi(x)) => {
-                            state_name = x.clone();
-                        }
-                        _ => {
-                            println!("Error in rate extraction");
-                        }
-                    };
-                }
-            }
-
-            let states = RegState {
-                id: state_name.clone(),
-                name: state_name.clone(),
-                sign: Some(rate_sign.clone()),
-                rate_constant: Some(rate_const.clone()),
-                ..Default::default()
-            };
-            states_vec.push(states.clone());
-
-            // now to make the transition part ----------------------------------
-
-            for (i, term) in eqns[&state].iter().enumerate() {
-                if i != term_idx {
-                    if term.polarity == Polarity::Positive {
-                        trans_sign = true;
-                    }
-                    let mut state_indx = 0;
-                    let mut other_state_indx = 0;
-                    for (j, var) in term.vars.iter().enumerate() {
-                        if state.clone() == var.clone() {
-                            state_indx = j.clone();
-                        }
-                        for other_states in specie_vars.clone().into_iter() {
-                            if *var != state && *var == other_states {
-                                // this means it is not the state, but is another state
-                                other_state_indx = j.clone();
-                            }
-                        }
-                    }
-                    for (j, var) in term.vars.iter().enumerate() {
-                        if j == other_state_indx {
-                            match var.clone() {
-                                Var(Mi(x)) => {
-                                    trans_src = x.clone();
-                                }
-                                _ => {
-                                    println!("error in trans src extraction");
-                                }
-                            };
-                        } else if j != other_state_indx && j != state_indx {
-                            match var.clone() {
-                                Var(Mi(x)) => {
-                                    trans_name = x.clone();
-                                }
-                                _ => {
-                                    println!("error in trans name extraction");
-                                }
-                            };
-                        }
-                    }
-                }
-            }
-
-            let prop = Properties {
-                name: trans_name.clone(),
-                rate_constant: Some(trans_name.clone()),
-                ..Default::default()
-            };
-
-            let transitions = RegTransition {
-                id: trans_name.clone(),
-                target: Some([state_name.clone()].to_vec()), // tgt
-                source: Some([trans_src.clone()].to_vec()),  // src
-                sign: Some(trans_sign.clone()),
-                properties: Some(prop.clone()),
-                ..Default::default()
-            };
-
-            transitions_vec.push(transitions.clone());
-        }
-
-        // -----------------------------------------------------------
-
-        let model = Model::RegNet {
-            vertices: states_vec,
-            edges: transitions_vec,
-            parameters: None,
-        };
-
-        let mrp = ModelRepPn {
-        name: "Regnet mathml model".to_string(),
-        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
-        description: "This is a Regnet model from mathml equations".to_string(),
-        model_version: "0.1".to_string(),
-        model: model,
-        metadata: None,
-        };
     } else {
         println!("Unknown Command!");
     }
-
-    // FOR DEBUGGING
-    /*for node_idx in expressions_wiring[1].clone().node_indices() {
-        if expressions_wiring[1].clone()[node_idx].properties["name"].to_string()
-            == "'un-named'".to_string()
-        {
-            println!("{:?}", node_idx);
-        }
-    }*/
-    /*for i in 0..trimmed_expressions_wiring.len() {
-        println!("{:?}", graph[expression_nodes[i]].id);
-        println!(
-            "Nodes in wiring subgraph: {}",
-            trimmed_expressions_wiring[i].node_count()
-        );
-        println!(
-            "Edges in wiring subgraph: {}",
-            trimmed_expressions_wiring[i].edge_count()
-        );
-    }*/
-    //let (nodes1, edges1) = expressions_wiring[1].clone().into_nodes_edges();
-    /*for edge in edges1 {
-        let source = edge.source();
-        let target = edge.target();
-        let edge_weight = edge.weight;
-        println!(
-            "Edge from {:?} to {:?} with weight {:?}",
-            source, target, edge_weight
-        );
-    }*/
-    /*for node in nodes1 {
-        println!("{:?}", node);
-    }*/
-    /*println!(
-        "{:?}",
-        Dot::with_config(&expressions_wiring[1], &[Config::EdgeNoLabel])
-    );*/
 }
 
 // struct for returning line spans
@@ -499,63 +194,6 @@ pub fn find_pn_dynamics(module_id: i64) -> Vec<i64> {
     return core_id;
 }
 
-// This will parse the mathml based on a '=' anchor
-fn ast2exp(mathml_ast: Vec<Math>) -> Vec<PreExp> {
-    let mut named_core_dynamics = Vec::<PreExp>::new();
-
-    // This is a lot of adarsh's code on somehow iteratoring over an enum
-    let mut equals_index = 0;
-    for equation in mathml_ast {
-        let mut pre_exp = PreExp {
-            ops: Vec::<Operator>::new(),
-            args: Vec::<Expr>::new(),
-            name: "".to_string(),
-        };
-        if let Mrow(expr_1) = &equation.content[0] {
-            // Get the index of the equals term
-            for (i, expr_2) in (*expr_1).iter().enumerate() {
-                if let Mo(Operator::Equals) = expr_2 {
-                    equals_index = i;
-                    println!("{:?}", expr_1.clone());
-                    let lhs = &expr_1[0]; // does this not imply equals_index is always 1?
-                    println!("lhs: {:?}", lhs);
-                    pre_exp.ops.push(Operator::Other("".to_string()));
-                    pre_exp.ops.push(Operator::Equals);
-                    let mut pre_exp_args = Vec::<Expression>::new();
-                    let lhs_string = String::new();
-                    let lhs_expr = Expression {
-                        ops: [Operator::Other("Derivative".to_string())].to_vec(),
-                        args: [Expr::Atom(Atom::Identifier("S".to_string()))].to_vec(),
-                        name: "".to_string(),
-                    };
-                    let mut rhs_math = expr_1[2..].to_vec();
-                    pre_exp_args.push(lhs_expr.clone());
-
-                    pre_exp.args.push(Expr::Expression {
-                        ops: pre_exp_args[0].ops.clone(),
-                        args: pre_exp_args[0].args.clone(),
-                        name: "".to_string(),
-                    });
-                    println!("\nContrstucted pre_exp: {:?}", pre_exp.clone());
-                }
-            }
-        }
-    }
-
-    return named_core_dynamics;
-}
-
-fn exp2pn(named_core_dynamics: Vec<PreExp>) -> ACSet {
-    let ascet = ACSet {
-        S: Vec::<Specie>::new(),
-        T: Vec::<ACSetTransition>::new(),
-        I: Vec::<InputArc>::new(),
-        O: Vec::<OutputArc>::new(),
-    };
-
-    return ascet;
-}
-
 fn subgraph2_core_dyn_ast(
     root_node_id: i64,
 ) -> Result<(Vec<Vec<MathExpression>>, HashMap<String, rsmgclient::Node>), MgError> {
@@ -633,94 +271,6 @@ fn subgraph2_core_dyn_ast(
     return Ok((core_dynamics, metadata_map));
 }
 
-fn subgraph2_core_dyn_exp(
-    root_node_id: i64,
-) -> Result<(Vec<Expr>, HashMap<String, rsmgclient::Node>), MgError> {
-    // get the petgraph of the subgraph
-    let graph = subgraph2petgraph(root_node_id);
-
-    /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
-    // create the metadata rust rep
-    // this will be a map of the name of the node and the metadata node it's attached to with the mapping to our standard metadata struct
-    // grab metadata nodes
-    let mut metadata_map = HashMap::new();
-    for node in graph.node_indices() {
-        if graph[node].labels == ["Metadata"] {
-            for neighbor_node in graph.neighbors_directed(node, Incoming) {
-                // NOTE: these names have slightly off formating, the key is: "'name'"
-                metadata_map.insert(
-                    graph[neighbor_node].properties["name"].to_string().clone(),
-                    graph[node].clone(),
-                );
-            }
-        }
-    }
-
-    // find all the expressions
-    let mut expression_nodes = Vec::<NodeIndex>::new();
-    for node in graph.node_indices() {
-        if graph[node].labels == ["Expression"] {
-            expression_nodes.push(node);
-        }
-    }
-
-    // initialize vector to collect all expressions
-    let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expression_nodes.len() {
-        // grab the subgraph of the given expression
-        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id.clone()));
-    }
-
-    // initialize vector to collect all expression wiring graphs
-    let mut expressions_wiring =
-        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expression_nodes.len() {
-        // grab the wiring subgraph of the given expression
-        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id.clone()).unwrap());
-    }
-
-    // now to trim off the un-named filler nodes and filler expressions
-    let mut trimmed_expressions_wiring =
-        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
-    for i in 0..expressions_wiring.clone().len() {
-        let (nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
-        if nodes1.len() > 3 {
-            trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
-        }
-    }
-
-    // now we convert the following into a Expr to get converted into a petri net
-    // first we have to get the parent node index to pass into the function
-    let mut root_node = Vec::<NodeIndex>::new();
-    for node_index in trimmed_expressions_wiring[0].clone().node_indices() {
-        if trimmed_expressions_wiring[0].clone()[node_index].labels == ["Opo"] {
-            root_node.push(node_index);
-        }
-    }
-    if root_node.len() >= 2 {
-        panic!("More than one Opo!");
-    }
-
-    // this is the actual convertion
-    let mut core_dynamics = Vec::<Expr>::new();
-
-    for expr in trimmed_expressions_wiring.clone() {
-        let mut root_node = Vec::<NodeIndex>::new();
-        for node_index in expr.clone().node_indices() {
-            if expr.clone()[node_index].labels == ["Opo"] {
-                root_node.push(node_index);
-            }
-        }
-        if root_node.len() >= 2 {
-            panic!("More than one Opo!");
-        }
-
-        core_dynamics.push(tree_2_expr(expr.clone(), root_node[0].clone()).unwrap());
-    }
-
-    return Ok((core_dynamics, metadata_map));
-}
-
 fn tree_2_ast(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
@@ -735,7 +285,7 @@ fn tree_2_ast(
         // This is very bespoke right now
         // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
         // currently we convert to leibniz form
-        if deriv_name[1..2].to_string().clone() == "d" {
+        if deriv_name[1..2].to_string() == "d" {
             let deriv = MathExpression::Mfrac(
                 Box::new(Mrow(
                     [
@@ -781,12 +331,12 @@ fn tree_2_ast(
 
         // this only distributing if the multiplication is the first operator
         for node in graph.neighbors_directed(root_node, Outgoing) {
-            if graph.clone()[node].labels == ["Primitive"]
-                && !(graph.clone()[node].properties["name"].to_string() == "'USub'".to_string())
+            if graph[node].labels == ["Primitive"]
+                && !(graph[node].properties["name"].to_string() == "'USub'".to_string())
             {
                 first_op.push(get_operator(graph.clone(), node.clone()));
                 let mut arg1 = get_args(graph.clone(), node.clone());
-                if graph.clone()[node].properties["name"].to_string() == "'*'".to_string() {
+                if graph[node].properties["name"].to_string() == "'*'".to_string() {
                     let arg1_mult = is_multiple_terms(arg1[0].clone());
                     let arg2_mult = is_multiple_terms(arg1[1].clone());
                     if arg1_mult {
@@ -824,7 +374,7 @@ fn tree_2_ast(
                         for id in usub_idx.clone().iter().rev() {
                             arg1[0].remove(id.clone() as usize);
                         }
-                        if first_op.clone()[0] == MathExpression::Mo(Operator::Add) {
+                        if first_op[0] == MathExpression::Mo(Operator::Add) {
                             first_op[0] = MathExpression::Mo(Operator::Subtract);
                         } else {
                             first_op[0] = MathExpression::Mo(Operator::Add);
@@ -836,7 +386,7 @@ fn tree_2_ast(
                         for id in usub_idx.clone().iter().rev() {
                             arg1[1].remove(id.clone() as usize);
                         }
-                        if first_op.clone()[0] == MathExpression::Mo(Operator::Add) {
+                        if first_op[0] == MathExpression::Mo(Operator::Add) {
                             first_op[0] = MathExpression::Mo(Operator::Subtract);
                         } else {
                             first_op[0] = MathExpression::Mo(Operator::Add);
@@ -949,7 +499,7 @@ fn tree_2_ast(
 fn is_multiple_terms(arg: Vec<MathExpression>) -> bool {
     let mut add_sub_index = 0;
 
-    for (i, expression) in arg.clone().iter().enumerate() {
+    for (i, expression) in arg.iter().enumerate() {
         if is_add_or_subtract_operator(expression) {
             add_sub_index = i.clone();
         }
@@ -965,7 +515,7 @@ fn is_multiple_terms(arg: Vec<MathExpression>) -> bool {
 fn terms_indicies(arg: Vec<MathExpression>) -> Vec<i32> {
     let mut add_sub_index_vec = Vec::<i32>::new();
 
-    for (i, expression) in arg.clone().iter().enumerate() {
+    for (i, expression) in arg.iter().enumerate() {
         if is_add_or_subtract_operator(expression) {
             add_sub_index_vec.push(i.clone().try_into().unwrap());
         }
@@ -990,9 +540,9 @@ fn distribute_args(
         println!("Entry 1"); // operator starts at begining of arg2
         if arg2_term_ind[0] == 0 {
             for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
-                if arg2[(*ind as usize)].clone() == Mo(Operator::Add) {
+                if arg2[(*ind as usize)] == Mo(Operator::Add) {
                     arg2[(*ind as usize)] = Mo(Operator::Subtract);
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1010,7 +560,7 @@ fn distribute_args(
                     }
                 } else {
                     arg2[(*ind as usize)] = Mo(Operator::Add);
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1036,9 +586,9 @@ fn distribute_args(
             let vec_len1 = (arg1.clone().len() - 1) as usize;
             arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
             for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
-                if arg2[(*ind as usize)].clone() == Mo(Operator::Add) {
+                if arg2[(*ind as usize)] == Mo(Operator::Add) {
                     arg2[(*ind as usize)] = Mo(Operator::Subtract);
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1055,7 +605,7 @@ fn distribute_args(
                     }
                 } else {
                     arg2[(*ind as usize)] = Mo(Operator::Add);
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1078,8 +628,8 @@ fn distribute_args(
         if arg2_term_ind[0] == 0 {
             println!("Entry 3");
             for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
-                if arg2[(*ind as usize)].clone() == Mo(Operator::Add) {
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                if arg2[(*ind as usize)] == Mo(Operator::Add) {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1094,7 +644,7 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()); // check
                     }
                 } else {
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1118,8 +668,8 @@ fn distribute_args(
             let vec_len1 = (arg1.clone().len() - 1) as usize;
             arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
             for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
-                if arg2[*ind as usize].clone() == Mo(Operator::Add) {
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                if arg2[*ind as usize] == Mo(Operator::Add) {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1134,7 +684,7 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()); // check
                     }
                 } else {
-                    if (i + 1) != arg2_term_ind.clone().len() {
+                    if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
@@ -1167,8 +717,8 @@ fn get_args(
     let mut args = vec![temp_op.clone(); 2];
 
     for (i, node) in graph.neighbors_directed(root_node, Outgoing).enumerate() {
-        if graph.clone()[node].labels == ["Primitive"]
-            && graph.clone()[node].properties["name"].to_string() == "'USub'".to_string()
+        if graph[node].labels == ["Primitive"]
+            && graph[node].properties["name"].to_string() == "'USub'".to_string()
         {
             op.push(get_operator(graph.clone(), node.clone()));
             for node1 in graph.neighbors_directed(node.clone(), Outgoing) {
@@ -1184,8 +734,7 @@ fn get_args(
                 args[i].push(op[0].clone());
                 args[i].push(temp_mi.clone());
             }
-        } else if graph.clone()[node].labels == ["Opi"] || graph.clone()[node].labels == ["Literal"]
-        {
+        } else if graph[node].labels == ["Opi"] || graph[node].labels == ["Literal"] {
             let temp_mi = MathExpression::Mi(
                 graph.clone()[node].properties["name"].to_string()
                     [1..(graph.clone()[node].properties["name"].to_string().len() - 1 as usize)]
@@ -1212,147 +761,20 @@ fn get_operator(
     root_node: NodeIndex,
 ) -> MathExpression {
     let mut op = Vec::<MathExpression>::new();
-    if graph.clone()[root_node].properties["name"].to_string() == "'*'".to_string() {
+    if graph[root_node].properties["name"].to_string() == "'*'".to_string() {
         op.push(Mo(Operator::Multiply));
-    } else if graph.clone()[root_node].properties["name"].to_string() == "'+'".to_string() {
+    } else if graph[root_node].properties["name"].to_string() == "'+'".to_string() {
         op.push(Mo(Operator::Add));
-    } else if graph.clone()[root_node].properties["name"].to_string() == "'-'".to_string() {
+    } else if graph[root_node].properties["name"].to_string() == "'-'".to_string() {
         op.push(Mo(Operator::Subtract));
-    } else if graph.clone()[root_node].properties["name"].to_string() == "'/'".to_string() {
+    } else if graph[root_node].properties["name"].to_string() == "'/'".to_string() {
         op.push(Mo(Operator::Divide));
     } else {
         op.push(Mo(Operator::Other(
-            graph.clone()[root_node].properties["name"].to_string(),
+            graph[root_node].properties["name"].to_string(),
         )));
     }
     return op[0].clone();
-}
-
-fn tree_2_expr(
-    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
-    root_node: NodeIndex,
-) -> Result<Expr, MgError> {
-    // initialize struct properties
-    let mut op_vec = Vec::<Operator>::new();
-    op_vec.push(Operator::Other("".to_string())); // empty first element to initialize
-    let mut args_vec = Vec::<Expr>::new();
-    let mut expr_name = String::from("");
-
-    if graph.clone()[root_node].labels == ["Opo"] {
-        // starting node in expression tree, traverse down one node and then start parse
-        for node in graph.neighbors_directed(root_node, Outgoing) {
-            if graph.clone()[node].labels == ["Primitive"]
-                && !(graph.clone()[node].properties["name"].to_string() == "'unpack'".to_string())
-            {
-                // make an operator type based on operation
-                if graph.clone()[node].properties["name"].to_string() == "'+'".to_string() {
-                    op_vec.push(Operator::Add);
-                } else if graph.clone()[node].properties["name"].to_string() == "'-'".to_string() {
-                    op_vec.push(Operator::Subtract);
-                } else if graph.clone()[node].properties["name"].to_string() == "'*'".to_string() {
-                    op_vec.push(Operator::Multiply);
-                } else if graph.clone()[node].properties["name"].to_string() == "'/'".to_string() {
-                    op_vec.push(Operator::Divide);
-                } else {
-                    panic!("Unknown Primitive!");
-                }
-                // name expression
-                expr_name = graph.clone()[root_node].properties["name"].to_string();
-
-                // now for the more complicated part, getting the arguments
-                for node1 in graph.neighbors_directed(node, Outgoing) {
-                    if graph.clone()[node1].properties["name"].to_string() == "'USub'".to_string() {
-                        // this means there is a '-' outside one of the arguments and we need to traverse
-                        // a node deeper to get the argument
-                        for node2 in graph.neighbors_directed(node1, Outgoing) {
-                            if graph.clone()[node2].labels == ["Opi"] {
-                                let arg_string = format!(
-                                    "{}",
-                                    graph.clone()[node2].properties["name"].to_string()
-                                );
-                                args_vec.push(Expr::Atom(Atom::Identifier(arg_string)));
-                            } else {
-                                panic!("Unsupported edge case where 'USub' preceeds something besides an 'Opi'!");
-                            }
-                        }
-                        op_vec[0] = Operator::Subtract;
-                    // add this as a new unary operator to the expression
-                    } else if graph.clone()[node1].labels == ["Primitive"] {
-                        // this is the case where there are more operators and will likely require a recursive call.
-                        let expr1 = tree_2_expr(graph.clone(), node1).unwrap();
-                        args_vec.push(expr1);
-                    } else if graph.clone()[node1].labels == ["Opi"] {
-                        // nice and straight to an argument
-                        args_vec.push(Expr::Atom(Atom::Identifier(
-                            graph.clone()[node1].properties["name"].to_string(),
-                        )));
-                    } else {
-                        panic!("Encoutered node that is not an 'Opi' or 'Primitive'!");
-                    }
-                }
-            }
-        }
-    } else {
-        if graph.clone()[root_node].labels == ["Primitive"]
-            && !(graph.clone()[root_node].properties["name"].to_string() == "'unpack'".to_string())
-        {
-            // make an operator type based on operation
-            if graph.clone()[root_node].properties["name"].to_string() == "'+'".to_string() {
-                op_vec.push(Operator::Add);
-            } else if graph.clone()[root_node].properties["name"].to_string() == "'-'".to_string() {
-                op_vec.push(Operator::Subtract);
-            } else if graph.clone()[root_node].properties["name"].to_string() == "'*'".to_string() {
-                op_vec.push(Operator::Multiply);
-            } else if graph.clone()[root_node].properties["name"].to_string() == "'/'".to_string() {
-                op_vec.push(Operator::Divide);
-            } else {
-                panic!("Unknown Primitive!");
-            }
-            // name expression
-            expr_name = graph.clone()[root_node].properties["name"].to_string();
-
-            // now for the more complicated part, getting the arguments
-            for node1 in graph.neighbors_directed(root_node, Outgoing) {
-                if graph.clone()[node1].properties["name"].to_string() == "'USub'".to_string() {
-                    // this means there is a '-' outside one of the arguments and we need to traverse
-                    // a node deeper to get the argument
-                    for node2 in graph.neighbors_directed(node1, Outgoing) {
-                        if graph.clone()[node2].labels == ["Opi"] {
-                            let arg_string =
-                                format!("{}", graph.clone()[node2].properties["name"].to_string());
-                            args_vec.push(Expr::Atom(Atom::Identifier(arg_string)));
-                        } else {
-                            panic!("Unsupported edge case where 'USub' preceeds something besides an 'Opi'!");
-                        }
-                    }
-                    op_vec[0] = Operator::Subtract; // add this as a new unary operator to the expression
-                } else if graph.clone()[node1].labels == ["Primitive"] {
-                    // this is the case where there are more operators and will likely require a recursive call.
-                    let expr1 = tree_2_expr(graph.clone(), node1).unwrap();
-                    args_vec.push(expr1);
-                } else if (graph.clone()[node1].labels == ["Opi"]
-                    || graph.clone()[node1].labels == ["Literal"])
-                {
-                    // nice and straight to an argument
-                    args_vec.push(Expr::Atom(Atom::Identifier(
-                        graph.clone()[node1].properties["name"].to_string(),
-                    )));
-                } else {
-                    println!("{:?}", graph.clone()[node1].labels);
-                    panic!("Encoutered node that is not an 'Opi' or 'Primitive'!");
-                }
-            }
-        }
-    }
-
-    // now to construct the Expr
-    let temp_expr = Expr::Expression {
-        ops: op_vec.clone(),
-        args: args_vec.clone(),
-        name: expr_name,
-    };
-
-    return Ok(temp_expr);
 }
 
 // this currently only works for un-named nodes that are not chained or have multiple incoming/outgoing edges
@@ -1364,7 +786,7 @@ fn trim_un_named(
 
     // iterate over the graph and add a new edge to bypass the un-named nodes
     for node_index in graph.clone().node_indices() {
-        if graph.clone()[node_index].properties["name"].to_string() == "'un-named'".to_string() {
+        if graph[node_index].properties["name"].to_string() == "'un-named'".to_string() {
             let mut bypass = Vec::<NodeIndex>::new();
             for node1 in graph.neighbors_directed(node_index, Incoming) {
                 bypass.push(node1);
@@ -1411,9 +833,9 @@ fn trim_un_named(
     // we also remove the unpack node if it is present here as well
     let trimmed_graph = bypass_graph.filter_map(
         |node_index, _edge_index| {
-            if !(bypass_graph.clone()[node_index].properties["name"].to_string()
+            if !(bypass_graph[node_index].properties["name"].to_string()
                 == "'un-named'".to_string()
-                || bypass_graph.clone()[node_index].properties["name"].to_string()
+                || bypass_graph[node_index].properties["name"].to_string()
                     == "'unpack'".to_string())
             {
                 Some(graph[node_index].clone())

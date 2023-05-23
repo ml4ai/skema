@@ -1,10 +1,9 @@
 use actix_web::{get, put, web, HttpResponse};
 use mathml::{
-    acset::{ACSet, ModelRepPn},
+    acset::{ACSet, RegNet, PetriNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsing::parse,
-    mml2pn::mathml2regnet,
 };
 use petgraph::dot::{Config, Dot};
 use serde::{Deserialize, Serialize};
@@ -62,14 +61,14 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     responses(
         (
             status = 200,
-            body = ModelRepPn
+            body = PetriNet
         )
     )
 )]
 #[put("/mathml/acset")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
     let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
-    HttpResponse::Ok().json(web::Json(ModelRepPn::from(ACSet::from(asts))))
+    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
 }
 
 /// Return a JSON representation of a RegNet ModelRep constructed from an array of MathML strings.
@@ -78,13 +77,13 @@ pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
     responses(
         (
             status = 200,
-            body = ModelRepPn
+            body = RegNet
         )
     )
 )]
 #[put("/mathml/regnet")]
 pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
     let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
-    HttpResponse::Ok().json(web::Json(mathml2regnet(asts)))
+    HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
 }
 

@@ -1,7 +1,12 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
+use crate::ast::Math;
+use crate::ast::MathExpression::{Mi, Mo};
+use crate::mml2pn::{group_by_operators, Term};
+use crate::petri_net::{Polarity, Var};
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
+use std::collections::{HashMap, HashSet};
 use utoipa;
 use utoipa::ToSchema;
 
@@ -46,7 +51,17 @@ pub struct ACSet {
 // The following data structs are those requested by TA-4 as an exchange format for the models.
 // the spec in json format can be found here: https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
-pub struct ModelRepPn {
+pub struct PetriNet {
+    pub name: String,
+    pub schema: String,
+    pub description: String,
+    pub model_version: String,
+    pub model: Model,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<serde_json::Map<String, Value>>,
+}
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+pub struct RegNet {
     pub name: String,
     pub schema: String,
     pub description: String,
@@ -200,8 +215,8 @@ pub struct Distribution {
 // -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
 // -------------------------------------------------------------------------------------------
-impl ModelRepPn {
-    pub fn from(pn: ACSet) -> ModelRepPn {
+impl PetriNet {
+    pub fn from(pn: ACSet) -> PetriNet {
         let mut states_vec = Vec::<State>::new();
         let mut transitions_vec = Vec::<Transition>::new();
 
@@ -218,7 +233,7 @@ impl ModelRepPn {
 
         for (i, trans) in pn.T.clone().iter().enumerate() {
             // convert transition index to base 1
-            let transition = i.clone() + 1;
+            let transition = i + 1;
 
             // construct array of incoming states
             let mut string_vec1 = Vec::<String>::new();
@@ -257,14 +272,174 @@ impl ModelRepPn {
             parameters: None,
         };
 
-        let mrp = ModelRepPn {
+        let mrp = PetriNet {
         name: "mathml model".to_string(),
         schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model: model.clone(),
+        model: model,
         metadata: None,
     };
+
+        return mrp;
+    }
+}
+// This function takes in a mathml string and returns a Regnet
+impl RegNet {
+    pub fn from(mathml_asts: Vec<Math>) -> RegNet {
+        // this algorithm to follow should be refactored into a seperate function once it is functional
+
+        let mut specie_vars = HashSet::<Var>::new();
+        let mut vars = HashSet::<Var>::new();
+        let mut eqns = HashMap::<Var, Vec<Term>>::new();
+
+        for ast in mathml_asts.into_iter() {
+            group_by_operators(ast, &mut specie_vars, &mut vars, &mut eqns);
+        }
+
+        // Get the rate variables
+        let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
+
+        // -----------------------------------------------------------
+        // -----------------------------------------------------------
+
+        let mut states_vec = Vec::<RegState>::new();
+        let mut transitions_vec = Vec::<RegTransition>::new();
+
+        for state in specie_vars.clone().into_iter() {
+            // state bits
+            let mut rate_const = "temp".to_string();
+            let mut state_name = "temp".to_string();
+            let mut term_idx = 0;
+            let mut rate_sign = false;
+
+            //transition bits
+            let mut trans_name = "temp".to_string();
+            let mut trans_sign = false;
+            let mut trans_tgt = "temp".to_string();
+            let mut trans_src = "temp".to_string();
+
+            for (i, term) in eqns[&state].iter().enumerate() {
+                for variable in term.vars.clone().iter() {
+                    if state == variable.clone() && term.vars.len() == 2 {
+                        term_idx = i.clone();
+                    }
+                }
+            }
+
+            if eqns[&state.clone()][term_idx.clone() as usize].polarity == Polarity::Positive {
+                rate_sign = true;
+            }
+
+            for variable in eqns[&state][term_idx as usize].vars.iter() {
+                if state.clone() != variable.clone() {
+                    match variable.clone() {
+                        Var(Mi(x)) => {
+                            rate_const = x.clone();
+                        }
+                        _ => {
+                            println!("Error in rate extraction");
+                        }
+                    };
+                } else {
+                    match variable.clone() {
+                        Var(Mi(x)) => {
+                            state_name = x.clone();
+                        }
+                        _ => {
+                            println!("Error in rate extraction");
+                        }
+                    };
+                }
+            }
+
+            let states = RegState {
+                id: state_name.clone(),
+                name: state_name.clone(),
+                sign: Some(rate_sign.clone()),
+                rate_constant: Some(rate_const.clone()),
+                ..Default::default()
+            };
+            states_vec.push(states.clone());
+
+            // now to make the transition part ----------------------------------
+
+            for (i, term) in eqns[&state].iter().enumerate() {
+                if i != term_idx {
+                    if term.polarity == Polarity::Positive {
+                        trans_sign = true;
+                    }
+                    let mut state_indx = 0;
+                    let mut other_state_indx = 0;
+                    for (j, var) in term.vars.iter().enumerate() {
+                        if state.clone() == var.clone() {
+                            state_indx = j.clone();
+                        }
+                        for other_states in specie_vars.clone().into_iter() {
+                            if *var != state && *var == other_states {
+                                // this means it is not the state, but is another state
+                                other_state_indx = j.clone();
+                            }
+                        }
+                    }
+                    for (j, var) in term.vars.iter().enumerate() {
+                        if j == other_state_indx {
+                            match var.clone() {
+                                Var(Mi(x)) => {
+                                    trans_src = x.clone();
+                                }
+                                _ => {
+                                    println!("error in trans src extraction");
+                                }
+                            };
+                        } else if j != other_state_indx && j != state_indx {
+                            match var.clone() {
+                                Var(Mi(x)) => {
+                                    trans_name = x.clone();
+                                }
+                                _ => {
+                                    println!("error in trans name extraction");
+                                }
+                            };
+                        }
+                    }
+                }
+            }
+
+            let prop = Properties {
+                name: trans_name.clone(),
+                rate_constant: Some(trans_name.clone()),
+                ..Default::default()
+            };
+
+            let transitions = RegTransition {
+                id: trans_name.clone(),
+                target: Some([state_name.clone()].to_vec()), // tgt
+                source: Some([trans_src.clone()].to_vec()),  // src
+                sign: Some(trans_sign.clone()),
+                properties: Some(prop.clone()),
+                ..Default::default()
+            };
+
+            transitions_vec.push(transitions.clone());
+        }
+
+        // -----------------------------------------------------------
+
+        let model = Model::RegNet {
+            vertices: states_vec,
+            edges: transitions_vec,
+            parameters: None,
+        };
+
+        let mrp = RegNet {
+        name: "Regnet mathml model".to_string(),
+        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
+        description: "This is a Regnet model from mathml equations".to_string(),
+        model_version: "0.1".to_string(),
+        model: model,
+        metadata: None,
+        };
 
         return mrp;
     }

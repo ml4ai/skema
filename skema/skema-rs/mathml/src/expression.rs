@@ -436,8 +436,7 @@ impl Expr {
                 }
             }
 
-            if need_to_distribute_divs(ops.to_vec().clone(), args.to_vec().clone()) && ops.len() > 1
-            {
+            if need_to_distribute_divs(ops.to_vec(), args.to_vec()) && ops.len() > 1 {
                 let mut new_expr = Expr::Expression {
                     ops: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
