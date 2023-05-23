@@ -225,7 +225,7 @@ def train_model(
     beam_k = config["beam_k"]
     model_type = config["model_type"]
     dataset_type = config["dataset_type"]
-    load_trained_model = config["load_trained_model_for_testing"]
+    load_trained_model_for_testing = config["load_trained_model_for_testing"]
     cont_training = config["continue_training_from_last_saved_model"]
     g2p = config["garbage2pad"]
     use_single_gpu = config["use_single_gpu"]
@@ -354,7 +354,7 @@ def train_model(
     # raw data paths
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
 
-    if not load_trained_model:
+    if not load_trained_model_for_testing:
         count_es = 0
         # if continue_training_from_last_saved_model
         # model will be lastest saved model
@@ -401,6 +401,13 @@ def train_model(
                 end_time = time.time()
                 # total time spent on training an epoch
                 epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+
+                # saving the current model for transfer learning
+                if (not ddp) or (ddp and rank == 0):
+                    torch.save(
+                        model.state_dict(),
+                        f"trained_models/{model_type}_{dataset_type}_latest.pt",
+                    )
 
                 if val_loss < best_valid_loss:
                     best_valid_loss = val_loss
