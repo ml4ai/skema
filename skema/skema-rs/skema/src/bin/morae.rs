@@ -1,3 +1,4 @@
+use clap::Parser;
 use mathml::ast::{Math, Operator};
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
@@ -13,9 +14,15 @@ use mathml::ast::MathExpression::Mo;
 use mathml::ast::MathExpression::Mrow;
 use mathml::petri_net::recognizers::is_add_or_subtract_operator;
 
-// overall this will be a function that takes in a module id and weather it is manually or auto extraction to use
+#[derive(Parser, Debug)]
+struct Cli {
+    /// the commandline arg
+    #[arg(short, long, default_value_t = String::from("auto"))]
+    arg: String,
 
-// for now we will deal with manual module ids
+    #[arg(short, long)]
+    model_id: Option<i64>,
+}
 
 fn main() {
     // setup command line argument on if the core dynamics has been found manually or needs to be found automatically
@@ -24,14 +31,14 @@ fn main() {
         - auto -> This will attempt an automated search for the dynamics
         - manual -> This assumes the input is the function of the dynamics
     */
-    let args: Vec<String> = env::args().collect();
+    let new_args = Cli::parse();
 
     let mut module_id = 1755;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
-    if args[1] == "auto".to_string() {
-        if args.clone().len() > 2 {
-            module_id = args[2].parse::<i64>().unwrap();
+    if new_args.arg == "auto".to_string() {
+        if !new_args.model_id.is_none() {
+            module_id = new_args.model_id.unwrap();
         }
 
         let graph = subgraph2petgraph(module_id); // makes petgraph of graph
@@ -71,7 +78,7 @@ fn main() {
         println!("\nPN from mathml: {:?}\n", ACSet::from(mathml_ast.clone()));
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
-    else if args[1] == "manual".to_string() {
+    else if new_args.arg == "manual".to_string() {
         // still need to grab the module id
 
         let (mut core_dynamics_ast, metadata_map_ast) =
