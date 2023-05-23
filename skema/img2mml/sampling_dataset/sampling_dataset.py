@@ -37,9 +37,8 @@ else:
     )
     shutil.rmtree(data_path)
     os.mkdir(data_path)
-    os.mkdir(os.path.join(data_path, "images"))
 
-
+os.mkdir(os.path.join(data_path, "images"))
 mml_file = open(os.path.join(data_path, "original_mml.lst"), "w")
 latex_file = open(os.path.join(data_path, "original_latex.lst"), "w")
 paths_file = open(os.path.join(data_path, "paths.lst"), "w")
