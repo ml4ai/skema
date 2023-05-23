@@ -215,8 +215,8 @@ pub struct Distribution {
 // -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
 // -------------------------------------------------------------------------------------------
-impl PetriNet {
-    pub fn from(pn: ACSet) -> PetriNet {
+impl From<ACSet> for PetriNet {
+    fn from(pn: ACSet) -> PetriNet {
         let mut states_vec = Vec::<State>::new();
         let mut transitions_vec = Vec::<Transition>::new();
 
@@ -285,8 +285,8 @@ impl PetriNet {
     }
 }
 // This function takes in a mathml string and returns a Regnet
-impl RegNet {
-    pub fn from(mathml_asts: Vec<Math>) -> RegNet {
+impl From<Vec<Math>> for RegNet {
+    fn from(mathml_asts: Vec<Math>) -> RegNet {
         // this algorithm to follow should be refactored into a seperate function once it is functional
 
         let mut specie_vars = HashSet::<Var>::new();
