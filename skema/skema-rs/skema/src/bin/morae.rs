@@ -108,10 +108,10 @@ pub fn get_line_span(
     // extract line numbers of function which contains the dynamics
     let mut line_nums = Vec::<i64>::new();
     for node in graph.node_indices() {
-        if graph[node].id == node_id.clone() {
+        if graph[node].id == node_id {
             for n_node in graph.neighbors_directed(node.clone(), Outgoing) {
                 if graph[n_node.clone()].labels == ["Metadata"] {
-                    match &graph[n_node].clone().properties["line_begin"] {
+                    match &graph[n_node].properties["line_begin"] {
                         Value::List(x) => match x[0] {
                             Value::Int(y) => {
                                 //println!("line_begin: {:?}", y);
@@ -264,7 +264,7 @@ fn subgraph2_core_dyn_ast(
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
         for node_index in expr.clone().node_indices() {
-            if expr.clone()[node_index].labels == ["Opo"] {
+            if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
             }
         }
@@ -286,7 +286,7 @@ fn tree_2_ast(
 
     if graph.clone()[root_node].labels == ["Opo"] {
         // we first construct the derivative of the first node
-        let mut deriv_name: &str = &graph.clone()[root_node].properties["name"].to_string();
+        let mut deriv_name: &str = &graph[root_node].properties["name"].to_string().clone();
         // this will let us know if additional trimming is needed to handle the code implementation of the equations
         let mut step_impl = false;
         // This is very bespoke right now
@@ -423,48 +423,47 @@ fn tree_2_ast(
                     // check if there is a multiplication to the right or left
                     // if no multiplication then delete entry and all neighboring addition operators
                     // this should complete the transformation to a leibniz diff eq from a euler method
-                    if math_vec[idx.clone() - 1 as usize].clone()
-                        == MathExpression::Mo(Operator::Add)
-                        || math_vec[idx.clone() - 1 as usize].clone()
+                    if math_vec[idx - 1 as usize].clone() == MathExpression::Mo(Operator::Add)
+                        || math_vec[idx - 1 as usize].clone()
                             == MathExpression::Mo(Operator::Equals)
                     {
                         // check right side of operator, but need to be wary of vec end
                         let mut idx_last = false;
-                        if idx.clone() == math_vec.clone().len() - 1 {
+                        if idx == math_vec.clone().len() - 1 {
                             idx_last = true;
                         }
-                        if !idx_last.clone()
-                            && math_vec[idx.clone() + 1 as usize].clone()
+                        if !idx_last
+                            && math_vec[idx + 1 as usize].clone()
                                 == MathExpression::Mo(Operator::Add)
                         {
                             // delete idx and neighboring Add's (left side might be equals, which is kept)
-                            math_vec.remove(idx.clone() + 1 as usize);
-                            math_vec.remove(idx.clone() as usize);
-                            if math_vec[idx.clone() - 1 as usize].clone()
+                            math_vec.remove(idx + 1 as usize);
+                            math_vec.remove(idx as usize);
+                            if math_vec[idx - 1 as usize].clone()
                                 != MathExpression::Mo(Operator::Equals)
                             {
-                                math_vec.remove(idx.clone() - 1 as usize);
+                                math_vec.remove(idx - 1 as usize);
                             }
-                        } else if !idx_last.clone()
-                            && math_vec[idx.clone() + 1 as usize].clone()
+                        } else if !idx_last
+                            && math_vec[idx + 1 as usize].clone()
                                 == MathExpression::Mo(Operator::Subtract)
                         {
                             // delete idx and neighboring Add's (left side might be equals, which is kept)
-                            math_vec.remove(idx.clone() + 1 as usize);
-                            math_vec.remove(idx.clone() as usize);
-                            if math_vec[idx.clone() - 1 as usize].clone()
+                            math_vec.remove(idx + 1 as usize);
+                            math_vec.remove(idx as usize);
+                            if math_vec[idx - 1 as usize].clone()
                                 != MathExpression::Mo(Operator::Equals)
                             {
-                                math_vec.remove(idx.clone() - 1 as usize);
+                                math_vec.remove(idx - 1 as usize);
                             } else {
                                 // this puts the deleted subtract back but on the end, which will be correct once flipped
                                 math_vec.push(MathExpression::Mo(Operator::Subtract));
                             }
-                        } else if idx_last.clone() {
+                        } else if idx_last {
                             // delete idx and neighboring Add to the left
                             // need to delete from the largest index to the smallest as to not mess up the indexing
-                            math_vec.remove(idx.clone() as usize);
-                            math_vec.remove(idx.clone() - 1 as usize);
+                            math_vec.remove(idx as usize);
+                            math_vec.remove(idx - 1 as usize);
                         }
                     }
                 }
@@ -511,7 +510,7 @@ fn is_multiple_terms(arg: Vec<MathExpression>) -> bool {
             add_sub_index = i.clone();
         }
     }
-    if add_sub_index.clone() != 0 {
+    if add_sub_index != 0 {
         return true;
     } else {
         return false;
@@ -524,7 +523,7 @@ fn terms_indicies(arg: Vec<MathExpression>) -> Vec<i32> {
 
     for (i, expression) in arg.iter().enumerate() {
         if is_add_or_subtract_operator(expression) {
-            add_sub_index_vec.push(i.clone().try_into().unwrap());
+            add_sub_index_vec.push(i.try_into().unwrap());
         }
     }
     return add_sub_index_vec;
@@ -820,12 +819,12 @@ fn trim_un_named(
                 for (i, _ent) in bypass[0..(end_node_idx as usize)].iter().enumerate() {
                     // this iterates over all but the last entry in the bypass vec
                     bypass_graph.add_edge(
-                        bypass[i.clone() as usize].clone(),
-                        bypass[end_node_idx.clone() as usize].clone(),
+                        bypass[i as usize].clone(),
+                        bypass[end_node_idx as usize].clone(),
                         graph
                             .edge_weight(
                                 graph
-                                    .find_edge(node_index, bypass[end_node_idx.clone() as usize])
+                                    .find_edge(node_index, bypass[end_node_idx as usize])
                                     .unwrap(),
                             )
                             .unwrap()
