@@ -36,9 +36,6 @@ else:
         "sample_data already exists. Removing old sample_data and replacing it with new one."
     )
     shutil.rmtree(data_path)
-    os.remove(os.path.join(data_path, "original_mml.lst"))
-    os.remove(os.path.join(data_path, "original_latex.lst"))
-    os.remove(os.path.join(data_path, "paths.lst"))
     os.mkdir(data_path)
     os.mkdir(os.path.join(data_path, "images"))
 
