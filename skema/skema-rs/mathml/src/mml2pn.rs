@@ -5,7 +5,7 @@ use crate::petri_net::{
     Polarity, Rate, Specie, Var,
 };
 use crate::{
-    acset::{Model, Properties, RegState, RegTransition},
+    acset::{ModelRegNet, Properties, RegState, RegTransition},
     ast::{
         Math,
         MathExpression::{Mi, Mn, Mo, Mrow},

@@ -6,9 +6,11 @@ use petgraph::prelude::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::env;
+use std::string::ToString;
+use std::{env, fs};
 
 // new imports
+use mathml::acset::{ModelRegNet, RegNet};
 use mathml::ast::MathExpression;
 use mathml::ast::MathExpression::Mo;
 use mathml::ast::MathExpression::Mrow;
@@ -1045,4 +1047,20 @@ pub fn get_subgraph(module_id: i64) -> Result<(Vec<Node>, Vec<Relationship>), Mg
     connection.commit()?;
 
     return Ok((node_list, edge_list));
+}
+
+#[test]
+fn test_lotka_voltera_RegNet() {
+    let mathml_asts =
+        get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
+    let mut regnet = RegNet::from(mathml_asts);
+    regnet.model.vertices.sort();
+    regnet.model.edges.sort();
+    let regnet_serial = serde_json::to_string(&regnet).unwrap();
+
+    let mut file_contents =
+        fs::read_to_string("../../../skema/skema-rs/mathml/tests/lotka_voltera_regnet.json")
+            .expect("Unable to read file");
+
+    assert_eq!(file_contents, regnet_serial);
 }

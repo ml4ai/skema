@@ -56,7 +56,7 @@ pub struct PetriNet {
     pub schema: String,
     pub description: String,
     pub model_version: String,
-    pub model: Model,
+    pub model: ModelPetriNet,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Map<String, Value>>,
 }
@@ -66,32 +66,33 @@ pub struct RegNet {
     pub schema: String,
     pub description: String,
     pub model_version: String,
-    pub model: Model,
+    pub model: ModelRegNet,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<serde_json::Map<String, Value>>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
-pub enum Model {
-    RegNet {
-        vertices: Vec<RegState>,
-        edges: Vec<RegTransition>,
-        /// Note: parameters is a required field in the schema, but we make it optional since we want
-        /// to reuse this schema for partial extractions as well.
-        #[serde(skip_serializing_if = "Option::is_none")]
-        parameters: Option<Vec<Parameter>>,
-    },
-    PetriNet {
-        states: Vec<State>,
-        transitions: Vec<Transition>,
-        /// Note: parameters is a required field in the schema, but we make it optional since we want
-        /// to reuse this schema for partial extractions as well.
-        #[serde(skip_serializing_if = "Option::is_none")]
-        parameters: Option<Vec<Parameter>>,
-    },
+pub struct ModelRegNet {
+    pub vertices: Vec<RegState>,
+    pub edges: Vec<RegTransition>,
+    /// Note: parameters is a required field in the schema, but we make it optional since we want
+    /// to reuse this schema for partial extractions as well.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<Parameter>>,
+}
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ModelPetriNet {
+    pub states: Vec<State>,
+    pub transitions: Vec<Transition>,
+    /// Note: parameters is a required field in the schema, but we make it optional since we want
+    /// to reuse this schema for partial extractions as well.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parameters: Option<Vec<Parameter>>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct RegState {
     pub id: String,
     pub name: String,
@@ -105,7 +106,9 @@ pub struct RegState {
     pub initial: Option<Initial>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct State {
     pub id: String,
     pub name: String,
@@ -115,9 +118,11 @@ pub struct State {
     pub initial: Option<Initial>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct Grounding {
-    pub identifiers: serde_json::Map<String, Value>,
+    pub identifiers: String,
 }
 
 #[derive(
@@ -136,7 +141,9 @@ pub struct Rate {
     pub expression_mathml: String,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct RegTransition {
     pub id: String,
 
@@ -159,7 +166,9 @@ pub struct RegTransition {
     pub properties: Option<Properties>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct Transition {
     pub id: String,
 
@@ -182,7 +191,9 @@ pub struct Transition {
     pub properties: Option<Properties>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct Properties {
     pub name: String,
     pub grounding: Option<Grounding>,
@@ -190,7 +201,9 @@ pub struct Properties {
     pub rate_constant: Option<String>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct Parameter {
     pub id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -205,11 +218,13 @@ pub struct Parameter {
     pub distribution: Option<Distribution>,
 }
 
-#[derive(Debug, Default, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
 pub struct Distribution {
     #[serde(rename = "type")]
     pub r#type: String,
-    pub parameters: serde_json::Map<String, Value>,
+    pub parameters: String,
 }
 
 // -------------------------------------------------------------------------------------------
@@ -266,7 +281,7 @@ impl From<ACSet> for PetriNet {
 
         // -----------------------------------------------------------
 
-        let model = Model::PetriNet {
+        let model = ModelPetriNet {
             states: states_vec,
             transitions: transitions_vec,
             parameters: None,
@@ -426,7 +441,7 @@ impl From<Vec<Math>> for RegNet {
 
         // -----------------------------------------------------------
 
-        let model = Model::RegNet {
+        let model = ModelRegNet {
             vertices: states_vec,
             edges: transitions_vec,
             parameters: None,
