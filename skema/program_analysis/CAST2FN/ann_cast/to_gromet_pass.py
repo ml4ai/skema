@@ -270,7 +270,11 @@ class ToGrometPass:
 
     def wire_from_var_env(self, name, gromet_fn):
         var_environment = self.symtab_variables()
+        # print(var_environment)
 
+        print(name)
+        print(name in var_environment["local"])
+        print(name in var_environment["args"])
         if name in var_environment["local"]:
             local_env = var_environment["local"]
             entry = local_env[name]
@@ -571,6 +575,7 @@ class ToGrometPass:
             gromet_fn = attribute
             if gromet_fn.b != None:
                 gromet_fn_b = gromet_fn.b[0]
+                # print(f"{gromet_fn_b.name} == {func_name}")
                 if gromet_fn_b.name == func_name:
                     found_func = True
                     break
@@ -2213,13 +2218,15 @@ class ToGrometPass:
             return func_call_idx
 
         func_name = node.func.name
-        in_module = self.func_in_module(node.func.name)
-        # print(in_module)
+        # identified_func_name = ".".join(node.func.con_scope)
+        identified_func_name = f"{func_name}_id{node.func.id}"
+        in_module = self.func_in_module(func_name)
+        print(f"Calling {identified_func_name}")
+        print("---")
         # NOTE: This allows us to wire arguments that aren't originally in the CAST but are necessary
         # For the functional GroMEt structure.  This will probably change
-        if (
-            parent_gromet_fn.pof != None and parent_gromet_fn.pif != None
-        ):  # NOTE: this is a good guard probably don't need to remove
+        if (parent_gromet_fn.pof != None and parent_gromet_fn.pif != None):  
+            # NOTE: this is a good guard probably don't need to remove
             for i, pof in enumerate(parent_gromet_fn.pof, 1):
                 if pof.name != None:
                     for j, pif in enumerate(parent_gromet_fn.pif, 1):
@@ -2237,7 +2244,7 @@ class ToGrometPass:
         # considered function calls but rather they're considered expressions, so we
         # call a special handler to handle these
         if is_primitive(node.func.name, "CAST") and not in_module[0]:
-            # print(node.func.name)
+            # print(f"PRIMITIVE {node.func.name}")
             self.handle_primitive_function(
                 node, parent_gromet_fn, parent_cast_node, from_assignment
             )
@@ -2349,7 +2356,7 @@ class ToGrometPass:
             parent_gromet_fn.bf = insert_gromet_object(
                 parent_gromet_fn.bf,
                 GrometBoxFunction(
-                    name=f"{in_module[1]}.{func_name}",
+                    name=f"{in_module[1]}.{func_name}_id{node.func.id}",
                     function_type=func_info[0],
                     import_type=func_info[1],
                     import_version=func_info[2],
@@ -2368,7 +2375,8 @@ class ToGrometPass:
             # that a GroMEt FN isn't guaranteed to exist before a Call
             # to it is made. So we either find the GroMEt in the collection of
             # FNs or we create a 'temporary' one that will be filled out later
-            qualified_func_name = f"{'.'.join(node.func.con_scope)}.{node.func.name}_{node.invocation_index}"
+            # qualified_func_name = f"{'.'.join(node.func.con_scope)}.{node.func.name}_{node.invocation_index}"
+            qualified_func_name = f"{node.func.name}_id{node.func.id}"
             func_name = node.func.name
 
             # print(func_name in BUILTINS)
@@ -2393,7 +2401,11 @@ class ToGrometPass:
                     ),
                 )
             else:
-                idx, found = self.find_gromet(func_name)
+                # idx, found = self.find_gromet(func_name)
+                #print(identified_func_name)
+                #print(qualified_func_name)
+                #print("---")
+                idx, found = self.find_gromet(identified_func_name)
                 if not found and func_name not in self.record.keys():
                     temp_gromet_fn = GrometFN()
                     temp_gromet_fn.b = insert_gromet_object(
@@ -2790,8 +2802,9 @@ class ToGrometPass:
         self, node: AnnCastFunctionDef, parent_gromet_fn, parent_cast_node
     ):
         # print(f"-----{node.name.name}------")
-        func_name = node.name.name
+        func_name = f"{node.name.name}_id{node.name.id}"
         identified_func_name = ".".join(node.con_scope)
+        print(f"Adding {func_name}")
         idx, found = self.find_gromet(func_name)
 
         ref = node.source_refs[0]
@@ -2807,6 +2820,7 @@ class ToGrometPass:
                 new_gromet.b,
                 GrometBoxFunction(
                     name=func_name, function_type=FunctionType.FUNCTION
+                    # name=func_name, function_type=FunctionType.FUNCTION
                 ),
             )
         else:
