@@ -1,3 +1,4 @@
+import argparse
 import re
 import os
 import shutil
@@ -215,3 +216,57 @@ def tree_sitter_parse(source: str) -> Tree:
     )
 
     return parser.parse(bytes(source, "utf8"))
+
+
+def main():
+    """Run the preprocessor as a script"""
+    parser = argparse.ArgumentParser(description="Fortran preprocessing script")
+    parser.add_argument("source_path", type=str, help="Path to the source file")
+    parser.add_argument("out_path", type=str, help="Output directory path")
+    parser.add_argument(
+        "-o",
+        "--overwrite",
+        action="store_true",
+        help="Overwrite existing output directory",
+    )
+    parser.add_argument(
+        "--out_missing_includes",
+        action="store_true",
+        help="Output missing includes log",
+    )
+    parser.add_argument(
+        "--out_gcc",
+        action="store_true",
+        help="Output source after running the GCC preprocessor",
+    )
+    parser.add_argument(
+        "--out_unsupported",
+        action="store_true",
+        help="Output unsupported idioms log",
+    )
+    parser.add_argument(
+        "--out_corrected",
+        action="store_true",
+        help="Output source after fixing unsupported idioms",
+    )
+    parser.add_argument(
+        "--out_parse",
+        action="store_true",
+        help="Output tree-sitter parse tree",
+    )
+    args = parser.parse_args()
+
+    preprocess(
+        args.source_path,
+        args.out_path,
+        args.overwrite,
+        args.out_missing_includes,
+        args.out_gcc,
+        args.out_unsupported,
+        args.out_corrected,
+        args.out_parse,
+    )
+
+
+if __name__ == "__main__":
+    main()
