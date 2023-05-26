@@ -60,7 +60,6 @@ async fn main() -> std::io::Result<()> {
                 comment_extraction::CommentExtractionResponse,
                 mathml::acset::RegNet,
                 mathml::acset::PetriNet,
-                mathml::acset::Model,
                 mathml::acset::State,
                 mathml::acset::Transition,
                 mathml::acset::Grounding,
