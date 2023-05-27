@@ -26,7 +26,7 @@ from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
 import re
 import pickle
-from preprocessing.preprocess_dataset import Img2MML_dataset
+from preprocessing.preprocess_dataset import *
 
 # opening config file
 parser = argparse.ArgumentParser()
