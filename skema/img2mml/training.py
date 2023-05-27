@@ -289,7 +289,7 @@ def train_model(
 
         elif ddp:
             # create default process group
-            dist.init_process_group("gloo", rank=rank, world_size=world_size)
+            dist.init_process_group("nccl", rank=rank, world_size=world_size)
             # add rank to config
             config["rank"] = rank
             device = f"cuda:{rank}"

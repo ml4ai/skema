@@ -41,7 +41,7 @@ def simplification(mml_org):
         "ms",
         "mtext",
         "math",
-        "mtable",
+        # "mtable",
         "mspace",
         "maction",
         "menclose",
@@ -60,8 +60,8 @@ def simplification(mml_org):
         "msub",
         "msubsup",
         "msup",
-        "mtd",
-        "mtr",
+        # "mtd",
+        # "mtr",
         "munder",
         "munderover",
         "semantics",
@@ -216,7 +216,7 @@ def remove_unecc_tokens(eqn):
     """
     eliminate = [
         "mspace",
-        "mtable",
+        # "mtable",
         "mathvariant",
         "class",
         "mpadded",
