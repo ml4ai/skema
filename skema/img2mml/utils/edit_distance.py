@@ -25,9 +25,9 @@ args = parser.parse_args()
 def calculate_edit_distance():
     dataset = args.dataset
     if args.with_fonts:
-        dataset = args.mode + "_with_fonts"
+        dataset += "_with_fonts"
     if args.with_boldface:
-        dataset = args.mode + "_boldface"
+        dataset += "_boldface"
     tgt = open(f"logs/{dataset}_final_targets.txt").readlines()
     pred = open(f"logs/{dataset}_final_preds.txt").readlines()
 

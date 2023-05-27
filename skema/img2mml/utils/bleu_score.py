@@ -27,9 +27,9 @@ args = parser.parse_args()
 def calculate_bleu_score():
     dataset = args.dataset
     if args.with_fonts:
-        dataset = args.mode + "_with_fonts"
+        dataset += "_with_fonts"
     if args.with_boldface:
-        dataset = args.mode + "_boldface"
+        dataset += "_boldface"
 
     tt = open(f"logs/test_{dataset}_targets_100K.txt").readlines()
     tp = open(f"logs/test_{dataset}_predicted_100K.txt").readlines()
