@@ -15,47 +15,6 @@ from functools import partial
 from skema.img2mml.utils.utils import CreateVocab
 import argparse
 import json
-import pickle
-
-# opening config file
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--dataset",
-    choices=["arxiv", "im2mml", "arxiv_im2mml"],
-    default="arxiv_im2mml",
-    help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
-)
-parser.add_argument(
-    "--with_fonts",
-    action="store_true",
-    default=False,
-    help="Whether using the dataset with diverse fonts",
-)
-parser.add_argument(
-    "--with_boldface",
-    action="store_true",
-    default=False,
-    help="Whether having boldface in labels",
-)
-parser.add_argument(
-    "--config",
-    help="configuration file for paths and hyperparameters",
-    default="configs/xfmer_mml_config.json",
-)
-
-args = parser.parse_args()
-
-dataset = args.dataset
-if args.with_fonts:
-    dataset += "_with_fonts"
-
-with open(args.config, "r") as cfg:
-    config = json.load(cfg)
-    config["dataset"] = dataset
-    if args.with_boldface:
-        config["with_boldface"] = "True"
-    else:
-        config["with_boldface"] = "False"
 
 
 class Img2MML_dataset(Dataset):
@@ -117,7 +76,7 @@ class My_pad_collate(object):
         )
 
 
-def main():
+def preprocess_dataset(config):
     print("preprocessing data...")
 
     # reading raw text files
@@ -220,7 +179,6 @@ def main():
     # initailizing class Img2MML_dataset: train dataloader
     imml_train = Img2MML_dataset(train, vocab, tokenizer)
     # creating dataloader
-    config["rank"] = None
     if config["DDP"]:
         train_sampler = DistributedSampler(
             dataset=imml_train,
@@ -243,12 +201,6 @@ def main():
         collate_fn=mypadcollate,
         pin_memory=config["pin_memory"],
     )
-    if config["with_boldface"] == "True":
-        train_dl = f"{config['data_path']}/sample_data/{config['dataset']}/train_bold_dataloader.pkl"
-    else:
-        train_dl = f"{config['data_path']}/sample_data/{config['dataset']}/train_dataloader.pkl"
-    with open(train_dl, "wb") as file:
-        pickle.dump(train_dataloader, file)
 
     # initailizing class Img2MML_dataset: test dataloader
     imml_test = Img2MML_dataset(test, vocab, tokenizer)
@@ -270,14 +222,6 @@ def main():
         collate_fn=mypadcollate,
         pin_memory=config["pin_memory"],
     )
-    if config["with_boldface"] == "True":
-        test_dl = f"{config['data_path']}/sample_data/{config['dataset']}/test_bold_dataloader.pkl"
-    else:
-        test_dl = (
-            f"{config['data_path']}/sample_data/{config['dataset']}/test_dataloader.pkl"
-        )
-    with open(test_dl, "wb") as file:
-        pickle.dump(test_dataloader, file)
 
     # initailizing class Img2MML_dataset: val dataloader
     imml_val = Img2MML_dataset(val, vocab, tokenizer)
@@ -299,27 +243,7 @@ def main():
         collate_fn=mypadcollate,
         pin_memory=config["pin_memory"],
     )
-    if config["with_boldface"] == "True":
-        val_dl = f"{config['data_path']}/sample_data/{config['dataset']}/val_bold_dataloader.pkl"
-    else:
-        val_dl = (
-            f"{config['data_path']}/sample_data/{config['dataset']}/val_dataloader.pkl"
-        )
-    with open(val_dl, "wb") as file:
-        pickle.dump(val_dataloader, file)
-
-    if config["with_boldface"] == "True":
-        voc_data = (
-            f"{config['data_path']}/sample_data/{config['dataset']}/voc_bold_data.pkl"
-        )
-    else:
-        voc_data = f"{config['data_path']}/sample_data/{config['dataset']}/voc_data.pkl"
-
-    with open(voc_data, "wb") as file:
-        pickle.dump(vocab, file)
 
     print("Dataset is ready to train.")
 
-
-if __name__ == "__main__":
-    main()
+    return train_dataloader, test_dataloader, val_dataloader, vocab

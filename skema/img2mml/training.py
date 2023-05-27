@@ -12,6 +12,7 @@ import torch.nn as nn
 import torch.distributed as dist
 import torch.multiprocessing as mp
 from torch.nn.parallel import DistributedDataParallel as DDP
+from skema.img2mml.preprocessing.preprocess_dataset import preprocess_dataset
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
 from skema.img2mml.models.encoders.resnet_encoder import (
     ResNet18_Encoder,
@@ -25,8 +26,6 @@ from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
 import re
-import pickle
-from preprocessing.preprocess_dataset import *
 
 # opening config file
 parser = argparse.ArgumentParser()
@@ -237,41 +236,6 @@ def get_last_epoch(file_path):
     return 0
 
 
-def load_dataloader_and_vocab():
-    """
-    Load the training data, test data, validation data and vocabulary
-    """
-    if config["with_boldface"] == "True":
-        train_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/train_bold_dataloader.pkl"
-        test_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/test_bold_dataloader.pkl"
-        val_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/val_bold_dataloader.pkl"
-        voc_data_path = (
-            f"{config['data_path']}/sample_data/{config['dataset']}/voc_bold_data.pkl"
-        )
-    else:
-        train_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/train_dataloader.pkl"
-        test_dl_path = (
-            f"{config['data_path']}/sample_data/{config['dataset']}/test_dataloader.pkl"
-        )
-        val_dl_path = (
-            f"{config['data_path']}/sample_data/{config['dataset']}/val_dataloader.pkl"
-        )
-        voc_data_path = (
-            f"{config['data_path']}/sample_data/{config['dataset']}/voc_data.pkl"
-        )
-
-    with open(train_dl_path, "rb") as file:
-        train_dl = pickle.load(file)
-    with open(test_dl_path, "rb") as file:
-        test_dl = pickle.load(file)
-    with open(val_dl_path, "rb") as file:
-        val_dl = pickle.load(file)
-    with open(voc_data_path, "rb") as file:
-        vocab = pickle.load(file)
-
-    return train_dl, test_dl, val_dl, vocab
-
-
 def train_model(
     rank=None,
 ):
@@ -339,14 +303,6 @@ def train_model(
 
     json.dump(config, config_log)
 
-    # load dataset
-    (
-        train_dataloader,
-        test_dataloader,
-        val_dataloader,
-        vocab,
-    ) = load_dataloader_and_vocab()
-
     # defining model using DataParallel
     if torch.cuda.is_available():
         if use_single_gpu:
@@ -354,11 +310,23 @@ def train_model(
 
             os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
             device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
+            (
+                train_dataloader,
+                test_dataloader,
+                val_dataloader,
+                vocab,
+            ) = preprocess_dataset(config)
             model = define_model(config, vocab, device).to(device)
 
         elif dataparallel:
             os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            (
+                train_dataloader,
+                test_dataloader,
+                val_dataloader,
+                vocab,
+            ) = preprocess_dataset(config)
             model = define_model(config, vocab, device)
             model = nn.DataParallel(
                 model.cuda(),
@@ -371,6 +339,12 @@ def train_model(
             # add rank to config
             config["rank"] = rank
             device = f"cuda:{rank}"
+            (
+                train_dataloader,
+                test_dataloader,
+                val_dataloader,
+                vocab,
+            ) = preprocess_dataset(config)
             model = define_model(config, vocab, rank)
             model = DDP(
                 model.to(f"cuda:{rank}"),
@@ -384,6 +358,12 @@ def train_model(
 
         warnings.warn("No GPU input has provided. Falling back to CPU. ")
         device = torch.device("cpu")
+        (
+            train_dataloader,
+            test_dataloader,
+            val_dataloader,
+            vocab,
+        ) = preprocess_dataset(config)
         model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")
