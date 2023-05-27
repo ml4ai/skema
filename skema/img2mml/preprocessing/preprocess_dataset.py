@@ -220,6 +220,7 @@ def main():
     # initailizing class Img2MML_dataset: train dataloader
     imml_train = Img2MML_dataset(train, vocab, tokenizer)
     # creating dataloader
+    config["rank"] = None
     if config["DDP"]:
         train_sampler = DistributedSampler(
             dataset=imml_train,
