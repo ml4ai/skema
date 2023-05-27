@@ -308,7 +308,7 @@ def train_model(
     use_single_gpu = config["use_single_gpu"]
     ddp = config["DDP"]
     dataparallel = config["DataParallel"]
-    dataParallel_ids = config["DataParallel_ids"]
+    dataParallel_ids = config["DataParallel_gpu_ids"]
     num_DDP_gpus = config["num_DDP_gpus"]
     early_stopping = config["early_stopping"]
     early_stopping_counts = config["early_stopping_counts"]
