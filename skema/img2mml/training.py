@@ -581,6 +581,7 @@ def train_model(
         ddp=ddp,
         rank=rank,
         g2p=g2p,
+        config=config
     )
 
     if (not ddp) or (ddp and rank == 0):

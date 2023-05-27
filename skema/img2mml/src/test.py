@@ -19,13 +19,18 @@ def evaluate(
     ddp=False,
     rank=None,
     g2p=False,
+    config=None
 ):
     model.eval()
     epoch_loss = 0
 
     if is_test:
-        mml_seqs = open("logs/test_targets_100K.txt", "w")
-        pred_seqs = open(f"logs/test_predicted_100K.txt", "w")
+        dataset = config["dataset"]
+        if config["with_boldface"] == "True":
+            dataset += "_boldface"
+
+        mml_seqs = open(f"logs/test_{dataset}_targets_200K.txt", "w")
+        pred_seqs = open(f"logs/test_{dataset}_predicted_200K.txt", "w")
 
     with torch.no_grad():
         torch.set_printoptions(profile="full")

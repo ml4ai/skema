@@ -31,8 +31,8 @@ def calculate_bleu_score():
     if args.with_boldface:
         dataset += "_boldface"
 
-    tt = open(f"logs/test_{dataset}_targets_100K.txt").readlines()
-    tp = open(f"logs/test_{dataset}_predicted_100K.txt").readlines()
+    tt = open(f"logs/test_{dataset}_targets_200K.txt").readlines()
+    tp = open(f"logs/test_{dataset}_predicted_200K.txt").readlines()
     _tt = open(f"logs/{dataset}_final_targets.txt", "w")
     _tp = open(f"logs/{dataset}_final_preds.txt", "w")
 
