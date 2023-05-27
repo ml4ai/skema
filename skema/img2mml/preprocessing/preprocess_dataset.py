@@ -317,6 +317,8 @@ def main():
     with open(voc_data, "wb") as file:
         pickle.dump(vocab, file)
 
+    print("Dataset is ready to train.")
+
 
 if __name__ == "__main__":
     main()
