@@ -122,9 +122,9 @@ def main():
 
     # reading raw text files
     if config["with_boldface"] == "True":
-        mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/{config['markup']}.lst"
-    else:
         mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/{config['markup']}_boldface.lst"
+    else:
+        mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/{config['markup']}.lst"
 
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/image_tensors"
     mml_txt = open(mml_path).read().split("\n")[:-1]
