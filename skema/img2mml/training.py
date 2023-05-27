@@ -354,23 +354,11 @@ def train_model(
 
             os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
             device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
-            # (
-            #     train_dataloader,
-            #     test_dataloader,
-            #     val_dataloader,
-            #     vocab,
-            # ) = preprocess_dataset(config)
             model = define_model(config, vocab, device).to(device)
 
         elif dataparallel:
             os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            # (
-            #     train_dataloader,
-            #     test_dataloader,
-            #     val_dataloader,
-            #     vocab,
-            # ) = preprocess_dataset(config)
             model = define_model(config, vocab, device)
             model = nn.DataParallel(
                 model.cuda(),
@@ -383,12 +371,6 @@ def train_model(
             # add rank to config
             config["rank"] = rank
             device = f"cuda:{rank}"
-            # (
-            #     train_dataloader,
-            #     test_dataloader,
-            #     val_dataloader,
-            #     vocab,
-            # ) = preprocess_dataset(config)
             model = define_model(config, vocab, rank)
             model = DDP(
                 model.to(f"cuda:{rank}"),
@@ -402,12 +384,6 @@ def train_model(
 
         warnings.warn("No GPU input has provided. Falling back to CPU. ")
         device = torch.device("cpu")
-        # (
-        #     train_dataloader,
-        #     test_dataloader,
-        #     val_dataloader,
-        #     vocab,
-        # ) = preprocess_dataset(config)
         model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")
@@ -581,7 +557,7 @@ def train_model(
             f"trained_models/{model_type}_{dataset}_best.pt",
         )
     try:
-        # loading pre_tained_model
+        # loading pre_trained_model
         if args.with_boldface:
             model.load_state_dict(
                 torch.load(f"trained_models/{model_type}_{dataset}_boldface_best.pt")
