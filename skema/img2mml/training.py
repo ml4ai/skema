@@ -2,23 +2,16 @@
 "Main script to train the model."
 
 import os, random
-import subprocess
 import numpy as np
 import time
 import json
 import math
 import argparse
-import logging
-import itertools
 import torch
-import torchvision
 import torch.nn as nn
 import torch.distributed as dist
 import torch.multiprocessing as mp
-from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
-
-# from skema.img2mml.preprocessing.preprocess import preprocess_dataset
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
 from skema.img2mml.models.encoders.resnet_encoder import (
     ResNet18_Encoder,
@@ -33,6 +26,7 @@ from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
 import re
 import pickle
+from preprocessing.preprocess_dataset import Img2MML_dataset
 
 # opening config file
 parser = argparse.ArgumentParser()
