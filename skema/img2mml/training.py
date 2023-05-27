@@ -411,12 +411,13 @@ def train_model(
 
                 if val_loss < best_valid_loss:
                     best_valid_loss = val_loss
+                    count_es = 0
                     if (not ddp) or (ddp and rank == 0):
                         torch.save(
                             model.state_dict(),
                             f"trained_models/{model_type}_{dataset_type}_best.pt",
                         )
-                        count_es = 0
+
 
                 elif early_stopping:
                     count_es += 1
