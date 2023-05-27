@@ -28,11 +28,7 @@ def train(
         mml = mml.to(device, dtype=torch.long)
         imgs = list()
         for im in img:
-            imgs.append(
-                torch.load(
-                    f"{img_tnsr_path}/{int(im.item())}.txt"
-                )
-            )
+            imgs.append(torch.load(f"{img_tnsr_path}/{int(im.item())}.txt"))
         img = torch.stack(imgs).to(device)
 
         # setting gradients to zero

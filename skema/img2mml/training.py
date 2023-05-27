@@ -17,7 +17,8 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
-from skema.img2mml.preprocessing.preprocess import preprocess_dataset
+
+# from skema.img2mml.preprocessing.preprocess import preprocess_dataset
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
 from skema.img2mml.models.encoders.resnet_encoder import (
     ResNet18_Encoder,
@@ -30,9 +31,29 @@ from skema.img2mml.models.image2mml_lstm import Image2MathML_LSTM
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
+import re
+import pickle
 
 # opening config file
 parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--dataset",
+    choices=["arxiv", "im2mml", "arxiv_im2mml"],
+    default="arxiv_im2mml",
+    help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
+)
+parser.add_argument(
+    "--with_fonts",
+    action="store_true",
+    default=False,
+    help="Whether using the dataset with diverse fonts",
+)
+parser.add_argument(
+    "--with_boldface",
+    action="store_true",
+    default=False,
+    help="Whether having boldface in labels",
+)
 parser.add_argument(
     "--config",
     help="configuration file for paths and hyperparameters",
@@ -41,8 +62,17 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+dataset = args.dataset
+if args.with_fonts:
+    dataset += "_with_fonts"
+
 with open(args.config, "r") as cfg:
     config = json.load(cfg)
+    config["dataset"] = dataset
+    if args.with_boldface:
+        config["with_boldface"] = "True"
+    else:
+        config["with_boldface"] = "False"
 
 torch.backends.cudnn.enabled = False
 
@@ -89,9 +119,7 @@ def define_model(config, VOCAB, DEVICE):
             DROPOUT,
             TFR,
         )
-        model = Image2MathML_LSTM(
-            ENC, DEC, DEVICE, ENCODING_TYPE, MAX_LEN, VOCAB
-        )
+        model = Image2MathML_LSTM(ENC, DEC, DEVICE, ENCODING_TYPE, MAX_LEN, VOCAB)
 
     elif MODEL_TYPE == "cnn_xfmer":
         # transformers params
@@ -173,7 +201,7 @@ def define_model(config, VOCAB, DEVICE):
 
 def init_weights(m):
     """
-    initializing the model wghts with values
+    initializing the model weights with values
     drawn from normal distribution.
     else initialize them with 0.
     """
@@ -199,6 +227,55 @@ def epoch_time(start_time, end_time):
     elapsed_mins = int(elapsed_time / 60)
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
+
+
+def get_last_epoch(file_path):
+    with open(file_path, "r") as file:
+        content = file.read()
+
+    pattern = r"Epoch: (\d+) \| Time:"
+    matches = re.findall(pattern, content)
+
+    if matches:
+        last_epoch = int(matches[-1])
+        return last_epoch
+
+    return 0
+
+
+def load_dataloader_and_vocab():
+    """
+    Load the training data, test data, validation data and vocabulary
+    """
+    if config["with_boldface"] == "True":
+        train_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/train_bold_dataloader.pkl"
+        test_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/test_bold_dataloader.pkl"
+        val_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/val_bold_dataloader.pkl"
+        voc_data_path = (
+            f"{config['data_path']}/sample_data/{config['dataset']}/voc_bold_data.pkl"
+        )
+    else:
+        train_dl_path = f"{config['data_path']}/sample_data/{config['dataset']}/train_dataloader.pkl"
+        test_dl_path = (
+            f"{config['data_path']}/sample_data/{config['dataset']}/test_dataloader.pkl"
+        )
+        val_dl_path = (
+            f"{config['data_path']}/sample_data/{config['dataset']}/val_dataloader.pkl"
+        )
+        voc_data_path = (
+            f"{config['data_path']}/sample_data/{config['dataset']}/voc_data.pkl"
+        )
+
+    with open(train_dl_path, "rb") as file:
+        train_dl = pickle.load(file)
+    with open(test_dl_path, "rb") as file:
+        test_dl = pickle.load(file)
+    with open(val_dl_path, "rb") as file:
+        val_dl = pickle.load(file)
+    with open(voc_data_path, "rb") as file:
+        vocab = pickle.load(file)
+
+    return train_dl, test_dl, val_dl, vocab
 
 
 def train_model(
@@ -232,9 +309,10 @@ def train_model(
     ddp = config["DDP"]
     dataparallel = config["DataParallel"]
     dataParallel_ids = config["DataParallel_ids"]
-    world_size = config["world_size"]
+    num_DDP_gpus = config["num_DDP_gpus"]
     early_stopping = config["early_stopping"]
     early_stopping_counts = config["early_stopping_counts"]
+    minimum_training_epochs = config["minimum_training_epochs"]
 
     # set_random_seed
     set_random_seed(SEED)
@@ -245,11 +323,35 @@ def train_model(
         if not os.path.exists(f):
             os.mkdir(f)
 
-    # to log losses
-    loss_file = open("logs/loss_file.txt", "w")
-    # to log config(to keep track while running multiple experiments)
-    config_log = open("logs/config_log.txt", "w")
+    current_epoch = 0
+    if args.with_boldface:
+        # to log losses
+        if cont_training:
+            loss_file = open(f"logs/{dataset}_boldface_loss_file.txt", "a")
+            current_epoch = get_last_epoch(f"logs/{dataset}_boldface_loss_file.txt")
+        else:
+            loss_file = open(f"logs/{dataset}_boldface_loss_file.txt", "w")
+        # to log config(to keep track while running multiple experiments)
+        config_log = open(f"logs/{dataset}_boldface_config_log.txt", "w")
+    else:
+        # to log losses
+        if cont_training:
+            loss_file = open(f"logs/{dataset}_loss_file.txt", "a")
+            current_epoch = get_last_epoch(f"logs/{dataset}_loss_file.txt")
+        else:
+            loss_file = open(f"logs/{dataset}_loss_file.txt", "w")
+        # to log config(to keep track while running multiple experiments)
+        config_log = open(f"logs/{dataset}_config_log.txt", "w")
+
     json.dump(config, config_log)
+
+    # load dataset
+    (
+        train_dataloader,
+        test_dataloader,
+        val_dataloader,
+        vocab,
+    ) = load_dataloader_and_vocab()
 
     # defining model using DataParallel
     if torch.cuda.is_available():
@@ -257,48 +359,42 @@ def train_model(
             print(f"using single gpu:{config['gpu_id']}...")
 
             os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
-            device = torch.device(
-                f"cuda" if torch.cuda.is_available() else "cpu"
-            )
-            (
-                train_dataloader,
-                test_dataloader,
-                val_dataloader,
-                vocab,
-            ) = preprocess_dataset(config)
+            device = torch.device(f"cuda" if torch.cuda.is_available() else "cpu")
+            # (
+            #     train_dataloader,
+            #     test_dataloader,
+            #     val_dataloader,
+            #     vocab,
+            # ) = preprocess_dataset(config)
             model = define_model(config, vocab, device).to(device)
 
         elif dataparallel:
             os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
-            device = torch.device(
-                "cuda" if torch.cuda.is_available() else "cpu"
-            )
-            (
-                train_dataloader,
-                test_dataloader,
-                val_dataloader,
-                vocab,
-            ) = preprocess_dataset(config)
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            # (
+            #     train_dataloader,
+            #     test_dataloader,
+            #     val_dataloader,
+            #     vocab,
+            # ) = preprocess_dataset(config)
             model = define_model(config, vocab, device)
             model = nn.DataParallel(
                 model.cuda(),
-                device_ids=[
-                    int(i) for i in config["DataParallel_ids"].split(",")
-                ],
+                device_ids=[int(i) for i in config["DataParallel_ids"].split(",")],
             )
 
         elif ddp:
             # create default process group
-            dist.init_process_group("gloo", rank=rank, world_size=world_size)
+            dist.init_process_group("nccl", rank=rank, world_size=num_DDP_gpus)
             # add rank to config
             config["rank"] = rank
             device = f"cuda:{rank}"
-            (
-                train_dataloader,
-                test_dataloader,
-                val_dataloader,
-                vocab,
-            ) = preprocess_dataset(config)
+            # (
+            #     train_dataloader,
+            #     test_dataloader,
+            #     val_dataloader,
+            #     vocab,
+            # ) = preprocess_dataset(config)
             model = define_model(config, vocab, rank)
             model = DDP(
                 model.to(f"cuda:{rank}"),
@@ -312,18 +408,18 @@ def train_model(
 
         warnings.warn("No GPU input has provided. Falling back to CPU. ")
         device = torch.device("cpu")
-        (
-            train_dataloader,
-            test_dataloader,
-            val_dataloader,
-            vocab,
-        ) = preprocess_dataset(config)
+        # (
+        #     train_dataloader,
+        #     test_dataloader,
+        #     val_dataloader,
+        #     vocab,
+        # ) = preprocess_dataset(config)
         model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")
     print(f"The model has {count_parameters(model):,} trainable parameters")
 
-    # intializing loss function
+    # initializing loss function
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
@@ -352,22 +448,28 @@ def train_model(
     trg_pad_idx = vocab.stoi["<pad>"]
 
     # raw data paths
-    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
+    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/image_tensors"
 
     if not load_trained_model_for_testing:
         count_es = 0
         # if continue_training_from_last_saved_model
-        # model will be lastest saved model
+        # model will be latest saved model
         if cont_training:
-            model.load_state_dict(
-                torch.load(
-                    f"trained_models/{model_type}_{dataset_type}_latest.pt"
+            if args.with_boldface:
+                model.load_state_dict(
+                    torch.load(
+                        f"trained_models/{model_type}_{dataset}_boldface_latest.pt"
+                    )
                 )
-            )
-            print("continuing training from lastest saved model...")
+            else:
+                model.load_state_dict(
+                    torch.load(f"trained_models/{model_type}_{dataset}_latest.pt")
+                )
 
-        for epoch in range(EPOCHS):
-            if count_es <= early_stopping_counts:
+            print("continuing training from latest saved model...")
+
+        for epoch in range(current_epoch, EPOCHS):
+            if count_es <= early_stopping_counts or epoch < minimum_training_epochs:
                 start_time = time.time()
 
                 # training and validation
@@ -404,28 +506,37 @@ def train_model(
 
                 # saving the current model for transfer learning
                 if (not ddp) or (ddp and rank == 0):
-                    torch.save(
-                        model.state_dict(),
-                        f"trained_models/{model_type}_{dataset_type}_latest.pt",
-                    )
+                    if args.with_boldface:
+                        torch.save(
+                            model.state_dict(),
+                            f"trained_models/{model_type}_{dataset}_boldface_latest.pt",
+                        )
+                    else:
+                        torch.save(
+                            model.state_dict(),
+                            f"trained_models/{model_type}_{dataset}_latest.pt",
+                        )
 
                 if val_loss < best_valid_loss:
                     best_valid_loss = val_loss
-                    if (not ddp) or (ddp and rank == 0):
+                    if args.with_boldface:
                         torch.save(
                             model.state_dict(),
-                            f"trained_models/{model_type}_{dataset_type}_best.pt",
+                            f"trained_models/{model_type}_{dataset}_boldface_best.pt",
                         )
-                        count_es = 0
+                    else:
+                        torch.save(
+                            model.state_dict(),
+                            f"trained_models/{model_type}_{dataset}_best.pt",
+                        )
+                    count_es = 0
 
                 elif early_stopping:
                     count_es += 1
 
                 # logging
                 if (not ddp) or (ddp and rank == 0):
-                    print(
-                        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s"
-                    )
+                    print(f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s")
                     print(
                         f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
                     )
@@ -449,25 +560,42 @@ def train_model(
                 )
                 break
 
-        print(
-            "best model saved as:  ",
-            f"trained_models/{model_type}_{dataset_type}_best.pt",
-        )
+        if args.with_boldface:
+            print(
+                "best model saved as:  ",
+                f"trained_models/{model_type}_{dataset}_boldface_best.pt",
+            )
+        else:
+            print(
+                "best model saved as:  ",
+                f"trained_models/{model_type}_{dataset}_best.pt",
+            )
 
     if ddp:
         dist.destroy_process_group()
 
     time.sleep(3)
 
-    print(
-        "loading best saved model: ",
-        f"trained_models/{model_type}_{dataset_type}_best.pt",
-    )
+    if args.with_boldface:
+        print(
+            "loading best saved model: ",
+            f"trained_models/{model_type}_{dataset}_boldface_best.pt",
+        )
+    else:
+        print(
+            "loading best saved model: ",
+            f"trained_models/{model_type}_{dataset}_best.pt",
+        )
     try:
         # loading pre_tained_model
-        model.load_state_dict(
-            torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
-        )
+        if args.with_boldface:
+            model.load_state_dict(
+                torch.load(f"trained_models/{model_type}_{dataset}_boldface_best.pt")
+            )
+        else:
+            model.load_state_dict(
+                torch.load(f"trained_models/{model_type}_{dataset}_best.pt")
+            )
     except:
         try:
             # removing "module." from keys
@@ -478,8 +606,7 @@ def train_model(
         except:
             # adding "module." in keys
             pretrained_dict = {
-                f"module.{key}": value
-                for key, value in model.state_dict().items()
+                f"module.{key}": value for key, value in model.state_dict().items()
             }
 
         model.load_state_dict(pretrained_dict)
@@ -507,9 +634,7 @@ def train_model(
     )
 
     if (not ddp) or (ddp and rank == 0):
-        print(
-            f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-        )
+        print(f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |")
         loss_file.write(
             f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
         )
@@ -520,15 +645,15 @@ def train_model(
 
 # for DDP
 def ddp_main():
-    world_size = config["world_size"]
-    os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
-    mp.spawn(train_model, args=(), nprocs=world_size, join=True)
+    num_DDP_gpus = config["num_DDP_gpus"]
+    os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP_gpu_ids"]
+    mp.spawn(train_model, args=(), nprocs=num_DDP_gpus, join=True)
 
 
 if __name__ == "__main__":
     if config["DDP"]:
         os.environ["MASTER_ADDR"] = "localhost"
-        os.environ["MASTER_PORT"] = "29500"
+        os.environ["MASTER_PORT"] = "29501"
         ddp_main()
     else:
         train_model()

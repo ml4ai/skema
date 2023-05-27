@@ -13,6 +13,49 @@ from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import SequentialSampler
 from functools import partial
 from skema.img2mml.utils.utils import CreateVocab
+import argparse
+import json
+import pickle
+
+# opening config file
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--dataset",
+    choices=["arxiv", "im2mml", "arxiv_im2mml"],
+    default="arxiv_im2mml",
+    help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
+)
+parser.add_argument(
+    "--with_fonts",
+    action="store_true",
+    default=False,
+    help="Whether using the dataset with diverse fonts",
+)
+parser.add_argument(
+    "--with_boldface",
+    action="store_true",
+    default=False,
+    help="Whether having boldface in labels",
+)
+parser.add_argument(
+    "--config",
+    help="configuration file for paths and hyperparameters",
+    default="configs/xfmer_mml_config.json",
+)
+
+args = parser.parse_args()
+
+dataset = args.dataset
+if args.with_fonts:
+    dataset += "_with_fonts"
+
+with open(args.config, "r") as cfg:
+    config = json.load(cfg)
+    config["dataset"] = dataset
+    if args.with_boldface:
+        config["with_boldface"] = "True"
+    else:
+        config["with_boldface"] = "False"
 
 
 class Img2MML_dataset(Dataset):
@@ -57,8 +100,7 @@ class My_pad_collate(object):
 
         batch_size = len(_mml)
         padded_mml_tensors = (
-            torch.ones([batch_size, self.max_len], dtype=torch.long)
-            * self.pad_idx
+            torch.ones([batch_size, self.max_len], dtype=torch.long) * self.pad_idx
         )
         for b in range(batch_size):
             if len(_mml[b]) <= self.max_len:
@@ -75,14 +117,16 @@ class My_pad_collate(object):
         )
 
 
-def preprocess_dataset(config):
+def main():
     print("preprocessing data...")
 
     # reading raw text files
-    mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['markup']}.lst"
-    img_tnsr_path = (
-        f"{config['data_path']}/{config['dataset_type']}/image_tensors"
-    )
+    if config["with_boldface"] == "True":
+        mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/{config['markup']}.lst"
+    else:
+        mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/{config['markup']}_boldface.lst"
+
+    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/{config['dataset']}/image_tensors"
     mml_txt = open(mml_path).read().split("\n")[:-1]
     image_num = range(0, len(mml_txt))
 
@@ -97,9 +141,7 @@ def preprocess_dataset(config):
     for t_idx, t_images in enumerate([train_images, test_images, val_images]):
         raw_mml_data = {
             "IMG": [num for num in t_images],
-            "EQUATION": [
-                ("<sos> " + mml_txt[num] + " <eos>") for num in t_images
-            ],
+            "EQUATION": [("<sos> " + mml_txt[num] + " <eos>") for num in t_images],
         }
 
         if t_idx == 0:
@@ -124,7 +166,17 @@ def preprocess_dataset(config):
     )
 
     # writing vocab file...
-    vfile = open("vocab.txt", "w")
+    dataset = config["dataset"]
+    if config["with_boldface"] == "True":
+        vfile = open(
+            f"{config['data_path']}/sample_data/{config['dataset']}/{dataset}_with_boldface_vocab.txt",
+            "w",
+        )
+    else:
+        vfile = open(
+            f"{config['data_path']}/sample_data/{config['dataset']}/{dataset}_vocab.txt",
+            "w",
+        )
     for vidx, vstr in vocab.stoi.items():
         vfile.write(f"{vidx} \t {vstr} \n")
 
@@ -133,16 +185,32 @@ def preprocess_dataset(config):
 
     print("saving dataset files to data/ folder...")
 
-    train.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/train.csv",
-        index=False,
-    )
-    test.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/test.csv", index=False
-    )
-    val.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/val.csv", index=False
-    )
+    if config["with_boldface"] == "True":
+        train.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/train_bold.csv",
+            index=False,
+        )
+        test.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/test_bold.csv",
+            index=False,
+        )
+        val.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/val_bold.csv",
+            index=False,
+        )
+    else:
+        train.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/train.csv",
+            index=False,
+        )
+        test.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/test.csv",
+            index=False,
+        )
+        val.to_csv(
+            f"{config['data_path']}/sample_data/{config['dataset']}/val.csv",
+            index=False,
+        )
 
     print("building dataloaders...")
 
@@ -155,7 +223,7 @@ def preprocess_dataset(config):
     if config["DDP"]:
         train_sampler = DistributedSampler(
             dataset=imml_train,
-            num_replicas=config["world_size"],
+            num_replicas=config["num_DDP_gpus"],
             rank=config["rank"],
             shuffle=True,
         )
@@ -164,6 +232,7 @@ def preprocess_dataset(config):
     else:
         sampler = None
         shuffle = config["shuffle"]
+
     train_dataloader = DataLoader(
         imml_train,
         batch_size=config["batch_size"],
@@ -173,6 +242,12 @@ def preprocess_dataset(config):
         collate_fn=mypadcollate,
         pin_memory=config["pin_memory"],
     )
+    if config["with_boldface"] == "True":
+        train_dl = f"{config['data_path']}/sample_data/{config['dataset']}/train_bold_dataloader.pkl"
+    else:
+        train_dl = f"{config['data_path']}/sample_data/{config['dataset']}/train_dataloader.pkl"
+    with open(train_dl, "wb") as file:
+        pickle.dump(train_dataloader, file)
 
     # initailizing class Img2MML_dataset: test dataloader
     imml_test = Img2MML_dataset(test, vocab, tokenizer)
@@ -194,6 +269,14 @@ def preprocess_dataset(config):
         collate_fn=mypadcollate,
         pin_memory=config["pin_memory"],
     )
+    if config["with_boldface"] == "True":
+        test_dl = f"{config['data_path']}/sample_data/{config['dataset']}/test_bold_dataloader.pkl"
+    else:
+        test_dl = (
+            f"{config['data_path']}/sample_data/{config['dataset']}/test_dataloader.pkl"
+        )
+    with open(test_dl, "wb") as file:
+        pickle.dump(test_dataloader, file)
 
     # initailizing class Img2MML_dataset: val dataloader
     imml_val = Img2MML_dataset(val, vocab, tokenizer)
@@ -215,5 +298,25 @@ def preprocess_dataset(config):
         collate_fn=mypadcollate,
         pin_memory=config["pin_memory"],
     )
+    if config["with_boldface"] == "True":
+        val_dl = f"{config['data_path']}/sample_data/{config['dataset']}/val_bold_dataloader.pkl"
+    else:
+        val_dl = (
+            f"{config['data_path']}/sample_data/{config['dataset']}/val_dataloader.pkl"
+        )
+    with open(val_dl, "wb") as file:
+        pickle.dump(val_dataloader, file)
 
-    return train_dataloader, test_dataloader, val_dataloader, vocab
+    if config["with_boldface"] == "True":
+        voc_data = (
+            f"{config['data_path']}/sample_data/{config['dataset']}/voc_bold_data.pkl"
+        )
+    else:
+        voc_data = f"{config['data_path']}/sample_data/{config['dataset']}/voc_data.pkl"
+
+    with open(voc_data, "wb") as file:
+        pickle.dump(vocab, file)
+
+
+if __name__ == "__main__":
+    main()
