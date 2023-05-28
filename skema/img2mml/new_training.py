@@ -541,13 +541,10 @@ def train_model(
             g2p=g2p,
         )
 
-        if (not ddp) or (ddp and rank == 0):
-            print(
-                f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-            )
-            loss_file.write(
-                f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-            )
+        print(
+            f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
+        )
+
 
         # stopping time
         print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
