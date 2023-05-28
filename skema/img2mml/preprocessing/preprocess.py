@@ -131,89 +131,96 @@ def preprocess_dataset(config):
     # define tokenizer function
     tokenizer = lambda x: x.split()
 
-    print("saving dataset files to data/ folder...")
+    if not config["load_trained_model_for_testing"]:
 
-    train.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/train.csv",
-        index=False,
-    )
-    test.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/test.csv", index=False
-    )
-    val.to_csv(
-        f"{config['data_path']}/{config['dataset_type']}/val.csv", index=False
-    )
+        print("saving dataset files to data/ folder...")
 
-    print("building dataloaders...")
-
-    # initializing pad collate class
-    mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])
-
-    # initailizing class Img2MML_dataset: train dataloader
-    imml_train = Img2MML_dataset(train, vocab, tokenizer)
-    # creating dataloader
-    if config["DDP"]:
-        train_sampler = DistributedSampler(
-            dataset=imml_train,
-            num_replicas=config["world_size"],
-            rank=config["rank"],
-            shuffle=True,
+        train.to_csv(
+            f"{config['data_path']}/{config['dataset_type']}/train.csv",
+            index=False,
         )
-        sampler = train_sampler
-        shuffle = False
+        test.to_csv(
+            f"{config['data_path']}/{config['dataset_type']}/test.csv", index=False
+        )
+        val.to_csv(
+            f"{config['data_path']}/{config['dataset_type']}/val.csv", index=False
+        )
+
+        print("building dataloaders...")
+
+        # initializing pad collate class
+        mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])
+
+
+        # initailizing class Img2MML_dataset: train dataloader
+        imml_train = Img2MML_dataset(train, vocab, tokenizer)
+        # creating dataloader
+        if config["DDP"]:
+            train_sampler = DistributedSampler(
+                dataset=imml_train,
+                num_replicas=config["world_size"],
+                rank=config["rank"],
+                shuffle=True,
+            )
+            sampler = train_sampler
+            shuffle = False
+        else:
+            sampler = None
+            shuffle = config["shuffle"]
+        train_dataloader = DataLoader(
+            imml_train,
+            batch_size=config["batch_size"],
+            num_workers=config["num_workers"],
+            shuffle=shuffle,
+            sampler=sampler,
+            collate_fn=mypadcollate,
+            pin_memory=config["pin_memory"],
+        )
+
+        # initailizing class Img2MML_dataset: val dataloader
+        imml_val = Img2MML_dataset(val, vocab, tokenizer)
+
+        if config["DDP"]:
+            val_sampler = SequentialSampler(imml_val)
+            sampler = val_sampler
+            shuffle = False
+        else:
+            sampler = None
+            shuffle = config["shuffle"]
+
+        val_dataloader = DataLoader(
+            imml_val,
+            batch_size=config["batch_size"],
+            num_workers=config["num_workers"],
+            shuffle=shuffle,
+            sampler=sampler,
+            collate_fn=mypadcollate,
+            pin_memory=config["pin_memory"],
+        )
+
+        return train_dataloader, val_dataloader, vocab
+
     else:
-        sampler = None
-        shuffle = config["shuffle"]
-    train_dataloader = DataLoader(
-        imml_train,
-        batch_size=config["batch_size"],
-        num_workers=config["num_workers"],
-        shuffle=shuffle,
-        sampler=sampler,
-        collate_fn=mypadcollate,
-        pin_memory=config["pin_memory"],
-    )
+        # initailizing class Img2MML_dataset: test dataloader
+        test = pd.read_csv(f"{config['data_path']}/{config['dataset_type']}/test.csv")
+        imml_test = Img2MML_dataset(test, vocab, tokenizer)
 
-    # initailizing class Img2MML_dataset: test dataloader
-    imml_test = Img2MML_dataset(test, vocab, tokenizer)
+        # if config["DDP"]:
+        #     test_sampler = SequentialSampler(imml_test)
+        #     sampler = test_sampler
+        #     shuffle = False
+        # else:
+        # sampler = None
+        # shuffle = config["shuffle"]
 
-    if config["DDP"]:
-        test_sampler = SequentialSampler(imml_test)
-        sampler = test_sampler
-        shuffle = False
-    else:
-        sampler = None
-        shuffle = config["shuffle"]
+        test_dataloader = DataLoader(
+            imml_test,
+            batch_size=config["batch_size"],
+            num_workers=config["num_workers"],
+            shuffle=config["shuffle"],
+            sampler=None,
+            collate_fn=mypadcollate,
+            pin_memory=config["pin_memory"],
+        )
 
-    test_dataloader = DataLoader(
-        imml_test,
-        batch_size=config["batch_size"],
-        num_workers=config["num_workers"],
-        shuffle=shuffle,
-        sampler=sampler,
-        collate_fn=mypadcollate,
-        pin_memory=config["pin_memory"],
-    )
-
-    # initailizing class Img2MML_dataset: val dataloader
-    imml_val = Img2MML_dataset(val, vocab, tokenizer)
-
-    if config["DDP"]:
-        val_sampler = SequentialSampler(imml_val)
-        sampler = val_sampler
-        shuffle = False
-    else:
-        sampler = None
-        shuffle = config["shuffle"]
-
-    val_dataloader = DataLoader(
-        imml_val,
-        batch_size=config["batch_size"],
-        num_workers=config["num_workers"],
-        shuffle=shuffle,
-        sampler=sampler,
-        collate_fn=mypadcollate,
-        pin_memory=config["pin_memory"],
-    )
-
-    return train_dataloader, test_dataloader, val_dataloader, vocab
+        return test_dataloader, vocab
