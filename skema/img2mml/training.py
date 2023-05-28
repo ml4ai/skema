@@ -225,7 +225,7 @@ def train_model(
     beam_k = config["beam_k"]
     model_type = config["model_type"]
     dataset_type = config["dataset_type"]
-    load_trained_model_for_testing = config["load_trained_model_for_testing"]
+    testing = config["testing"]
     cont_training = config["continue_training_from_last_saved_model"]
     g2p = config["garbage2pad"]
     use_single_gpu = config["use_single_gpu"]
@@ -251,110 +251,107 @@ def train_model(
     config_log = open("logs/config_log.txt", "w")
     json.dump(config, config_log)
 
-    # defining model using DataParallel
-    if torch.cuda.is_available():
-        if use_single_gpu:
-            print(f"using single gpu:{config['gpu_id']}...")
+    # raw data paths
+    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
 
-            os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
-            device = torch.device(
-                f"cuda" if torch.cuda.is_available() else "cpu"
-            )
+    if not testing:
+        # defining model using DataParallel
+        if torch.cuda.is_available():
+            if use_single_gpu:
+                print(f"using single gpu:{config['gpu_id']}...")
+
+                os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
+                device = torch.device(
+                    f"cuda" if torch.cuda.is_available() else "cpu"
+                )
+                (
+                    train_dataloader,
+                    val_dataloader,
+                    vocab,
+                ) = preprocess_dataset(config)
+                model = define_model(config, vocab, device).to(device)
+
+            elif dataparallel:
+                os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
+                device = torch.device(
+                    "cuda" if torch.cuda.is_available() else "cpu"
+                )
+                (
+                    train_dataloader,
+                    val_dataloader,
+                    vocab,
+                ) = preprocess_dataset(config)
+                model = define_model(config, vocab, device)
+                model = nn.DataParallel(
+                    model.cuda(),
+                    device_ids=[
+                        int(i) for i in config["DataParallel_ids"].split(",")
+                    ],
+                )
+
+            elif ddp:
+                # create default process group
+                dist.init_process_group("nccl", rank=rank, world_size=world_size)
+                # add rank to config
+                config["rank"] = rank
+                device = f"cuda:{rank}"
+                (
+                    train_dataloader,
+                    val_dataloader,
+                    vocab,
+                ) = preprocess_dataset(config)
+                model = define_model(config, vocab, rank)
+                model = DDP(
+                    model.to(f"cuda:{rank}"),
+                    device_ids=[rank],
+                    output_device=rank,
+                    find_unused_parameters=True,
+                )
+
+        else:
+            import warnings
+
+            warnings.warn("No GPU input has provided. Falling back to CPU. ")
+            device = torch.device("cpu")
             (
                 train_dataloader,
-                test_dataloader,
                 val_dataloader,
                 vocab,
             ) = preprocess_dataset(config)
             model = define_model(config, vocab, device).to(device)
 
-        elif dataparallel:
-            os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
-            device = torch.device(
-                "cuda" if torch.cuda.is_available() else "cpu"
-            )
-            (
-                train_dataloader,
-                test_dataloader,
-                val_dataloader,
-                vocab,
-            ) = preprocess_dataset(config)
-            model = define_model(config, vocab, device)
-            model = nn.DataParallel(
-                model.cuda(),
-                device_ids=[
-                    int(i) for i in config["DataParallel_ids"].split(",")
-                ],
-            )
+        print("MODEL: ")
+        print(f"The model has {count_parameters(model):,} trainable parameters")
 
-        elif ddp:
-            # create default process group
-            dist.init_process_group("nccl", rank=rank, world_size=world_size)
-            # add rank to config
-            config["rank"] = rank
-            device = f"cuda:{rank}"
-            (
-                train_dataloader,
-                test_dataloader,
-                val_dataloader,
-                vocab,
-            ) = preprocess_dataset(config)
-            model = define_model(config, vocab, rank)
-            model = DDP(
-                model.to(f"cuda:{rank}"),
-                device_ids=[rank],
-                output_device=rank,
-                find_unused_parameters=True,
+        # intializing loss function
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
+
+        # optimizer
+        _lr = starting_lr if use_scheduler else learning_rate
+
+        if optimizer_type == "Adam":
+            optimizer = torch.optim.Adam(
+                params=model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                betas=(beta_1, beta_2),
+            )
+        elif optimizer_type == "SGD":
+            optimizer = torch.optim.SGD(
+                model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                momentum=momentum,
+            )
+        if use_scheduler:
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer, step_size=step_size, gamma=gamma
             )
 
-    else:
-        import warnings
+        best_valid_loss = float("inf")
 
-        warnings.warn("No GPU input has provided. Falling back to CPU. ")
-        device = torch.device("cpu")
-        (
-            train_dataloader,
-            test_dataloader,
-            val_dataloader,
-            vocab,
-        ) = preprocess_dataset(config)
-        model = define_model(config, vocab, device).to(device)
+        trg_pad_idx = vocab.stoi["<pad>"]
 
-    print("MODEL: ")
-    print(f"The model has {count_parameters(model):,} trainable parameters")
-
-    # intializing loss function
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
-
-    # optimizer
-    _lr = starting_lr if use_scheduler else learning_rate
-
-    if optimizer_type == "Adam":
-        optimizer = torch.optim.Adam(
-            params=model.parameters(),
-            lr=_lr,
-            weight_decay=weight_decay,
-            betas=(beta_1, beta_2),
-        )
-    elif optimizer_type == "SGD":
-        optimizer = torch.optim.SGD(
-            model.parameters(),
-            lr=_lr,
-            weight_decay=weight_decay,
-            momentum=momentum,
-        )
-    if use_scheduler:
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=step_size, gamma=gamma
-        )
-
-    best_valid_loss = float("inf")
-    trg_pad_idx = vocab.stoi["<pad>"]
-
-    # raw data paths
-    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
-
-    if not load_trained_model_for_testing:
         count_es = 0
         # if continue_training_from_last_saved_model
         # model will be lastest saved model
@@ -455,68 +452,102 @@ def train_model(
             f"trained_models/{model_type}_{dataset_type}_best.pt",
         )
 
-    if ddp:
-        dist.destroy_process_group()
+        if ddp:
+            dist.destroy_process_group()
 
-    time.sleep(3)
+        time.sleep(3)
 
-    print(
-        "loading best saved model: ",
-        f"trained_models/{model_type}_{dataset_type}_best.pt",
-    )
-    try:
-        # loading pre_tained_model
-        model.load_state_dict(
-            torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
-        )
-    except:
-        try:
-            # removing "module." from keys
-            pretrained_dict = {
-                key.replace("module.", ""): value
-                for key, value in model.state_dict().items()
-            }
-        except:
-            # adding "module." in keys
-            pretrained_dict = {
-                f"module.{key}": value
-                for key, value in model.state_dict().items()
-            }
-
-        model.load_state_dict(pretrained_dict)
-
-    epoch = "test_0"
-    if config["beam_search"]:
-        beam_params = [beam_k, alpha, min_length_bean_search_normalization]
     else:
-        beam_params = None
+        # testing
+        os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
+        device = torch.device(
+            f"cuda" if torch.cuda.is_available() else "cpu"
+        )
 
-    test_loss = evaluate(
-        model,
-        model_type,
-        img_tnsr_path,
-        batch_size,
-        test_dataloader,
-        criterion,
-        device,
-        vocab,
-        beam_params=beam_params,
-        is_test=True,
-        ddp=ddp,
-        rank=rank,
-        g2p=g2p,
-    )
+        (test_dataloader, vocab) = preprocess_dataset(config)
+        model = define_model(config, vocab, device).to(device)
 
-    if (not ddp) or (ddp and rank == 0):
+        # intializing loss function
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
+
+        # optimizer
+        _lr = starting_lr if use_scheduler else learning_rate
+
+        if optimizer_type == "Adam":
+            optimizer = torch.optim.Adam(
+                params=model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                betas=(beta_1, beta_2),
+            )
+        elif optimizer_type == "SGD":
+            optimizer = torch.optim.SGD(
+                model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                momentum=momentum,
+            )
+        if use_scheduler:
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer, step_size=step_size, gamma=gamma
+            )
+
+        best_valid_loss = float("inf")
+
+        print(
+            "loading best saved model: ",
+            f"trained_models/{model_type}_{dataset_type}_best.pt",
+        )
+        try:
+            # loading pre_tained_model
+            model.load_state_dict(
+                torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
+            )
+        except:
+            try:
+                # removing "module." from keys
+                pretrained_dict = {
+                    key.replace("module.", ""): value
+                    for key, value in model.state_dict().items()
+                }
+            except:
+                # adding "module." in keys
+                pretrained_dict = {
+                    f"module.{key}": value
+                    for key, value in model.state_dict().items()
+                }
+
+            model.load_state_dict(pretrained_dict)
+
+        epoch = "test_0"
+        if config["beam_search"]:
+            beam_params = [beam_k, alpha, min_length_bean_search_normalization]
+        else:
+            beam_params = None
+
+        test_loss = evaluate(
+            model,
+            model_type,
+            img_tnsr_path,
+            batch_size,
+            test_dataloader,
+            criterion,
+            device,
+            vocab,
+            beam_params=beam_params,
+            is_test=True,
+            ddp=ddp,
+            rank=rank,
+            g2p=g2p,
+        )
+
         print(
             f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
         )
-        loss_file.write(
-            f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-        )
 
-    # stopping time
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
+
+        # stopping time
+        print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
 
 
 # for DDP
@@ -527,7 +558,8 @@ def ddp_main():
 
 
 if __name__ == "__main__":
-    if config["DDP"]:
+    # No need to use DDP for testing.
+    if (not config["testing"]) and (config["DDP"]):
         os.environ["MASTER_ADDR"] = "localhost"
         os.environ["MASTER_PORT"] = "29500"
         ddp_main()

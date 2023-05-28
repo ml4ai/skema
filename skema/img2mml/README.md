@@ -89,7 +89,9 @@ python preprocessing/preprocess_images.py --config configs/xfmer_mml_config.json
 python preprocessing/preprocess_mml.py --config configs/xfmer_mml_config.json
 ```
 
-#### To train the model:
+#### To train and test the model:
+
+To train, set `testing=false` while to test set it to `true`.
 ```
 python training.py --config configs/xfmer_mml_config.json
 ```
