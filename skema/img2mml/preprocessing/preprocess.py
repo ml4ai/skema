@@ -131,6 +131,9 @@ def preprocess_dataset(config):
     # define tokenizer function
     tokenizer = lambda x: x.split()
 
+    # initializing pad collate class
+    mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])
+
     if not config["load_trained_model_for_testing"]:
 
         print("saving dataset files to data/ folder...")
@@ -147,10 +150,6 @@ def preprocess_dataset(config):
         )
 
         print("building dataloaders...")
-
-        # initializing pad collate class
-        mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])
-
 
         # initailizing class Img2MML_dataset: train dataloader
         imml_train = Img2MML_dataset(train, vocab, tokenizer)
