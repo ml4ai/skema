@@ -225,7 +225,7 @@ def train_model(
     beam_k = config["beam_k"]
     model_type = config["model_type"]
     dataset_type = config["dataset_type"]
-    load_trained_model_for_testing = config["load_trained_model_for_testing"]
+    testing = config["testing"]
     cont_training = config["continue_training_from_last_saved_model"]
     g2p = config["garbage2pad"]
     use_single_gpu = config["use_single_gpu"]
@@ -254,7 +254,7 @@ def train_model(
     # raw data paths
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
 
-    if not load_trained_model_for_testing:
+    if not testing:
         # defining model using DataParallel
         if torch.cuda.is_available():
             if use_single_gpu:
@@ -562,7 +562,7 @@ def ddp_main():
 
 if __name__ == "__main__":
     # No need to use DDP for testing.
-    if (not config["load_trained_model_for_testing"]) and (config["DDP"]):
+    if (not config["testing"]) and (config["DDP"]):
         os.environ["MASTER_ADDR"] = "localhost"
         os.environ["MASTER_PORT"] = "29500"
         ddp_main()

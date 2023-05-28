@@ -134,7 +134,7 @@ def preprocess_dataset(config):
     # initializing pad collate class
     mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])
 
-    if not config["load_trained_model_for_testing"]:
+    if not config["testing"]:
 
         print("saving dataset files to data/ folder...")
 
