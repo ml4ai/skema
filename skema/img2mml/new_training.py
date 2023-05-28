@@ -251,9 +251,6 @@ def train_model(
     config_log = open("logs/config_log.txt", "w")
     json.dump(config, config_log)
 
-    # intializing loss function
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
-
     # optimizer
     _lr = starting_lr if use_scheduler else learning_rate
 
@@ -280,7 +277,6 @@ def train_model(
 
     # raw data paths
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
-
 
     if not load_trained_model_for_testing:
         # defining model using DataParallel
@@ -351,6 +347,8 @@ def train_model(
         print("MODEL: ")
         print(f"The model has {count_parameters(model):,} trainable parameters")
 
+        # intializing loss function
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
         trg_pad_idx = vocab.stoi["<pad>"]
 
@@ -469,6 +467,9 @@ def train_model(
         (test_dataloader, vocab) = preprocess_dataset(config)
         model = define_model(config, vocab, device).to(device)
 
+        # intializing loss function
+        criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
+        
         print(
             "loading best saved model: ",
             f"trained_models/{model_type}_{dataset_type}_best.pt",
