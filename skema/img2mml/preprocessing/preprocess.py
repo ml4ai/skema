@@ -201,6 +201,7 @@ def preprocess_dataset(config):
         return train_dataloader, val_dataloader, vocab
 
     else:
+        # testing
         # initailizing class Img2MML_dataset: test dataloader
         test = pd.read_csv(f"{config['data_path']}/{config['dataset_type']}/test.csv")
         imml_test = Img2MML_dataset(test, vocab, tokenizer)
