@@ -251,30 +251,6 @@ def train_model(
     config_log = open("logs/config_log.txt", "w")
     json.dump(config, config_log)
 
-    # optimizer
-    _lr = starting_lr if use_scheduler else learning_rate
-
-    if optimizer_type == "Adam":
-        optimizer = torch.optim.Adam(
-            params=model.parameters(),
-            lr=_lr,
-            weight_decay=weight_decay,
-            betas=(beta_1, beta_2),
-        )
-    elif optimizer_type == "SGD":
-        optimizer = torch.optim.SGD(
-            model.parameters(),
-            lr=_lr,
-            weight_decay=weight_decay,
-            momentum=momentum,
-        )
-    if use_scheduler:
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=step_size, gamma=gamma
-        )
-
-    best_valid_loss = float("inf")
-
     # raw data paths
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
 
@@ -349,6 +325,30 @@ def train_model(
 
         # intializing loss function
         criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
+
+        # optimizer
+        _lr = starting_lr if use_scheduler else learning_rate
+
+        if optimizer_type == "Adam":
+            optimizer = torch.optim.Adam(
+                params=model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                betas=(beta_1, beta_2),
+            )
+        elif optimizer_type == "SGD":
+            optimizer = torch.optim.SGD(
+                model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                momentum=momentum,
+            )
+        if use_scheduler:
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer, step_size=step_size, gamma=gamma
+            )
+
+        best_valid_loss = float("inf")
 
         trg_pad_idx = vocab.stoi["<pad>"]
 
@@ -469,7 +469,31 @@ def train_model(
 
         # intializing loss function
         criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
-        
+
+        # optimizer
+        _lr = starting_lr if use_scheduler else learning_rate
+
+        if optimizer_type == "Adam":
+            optimizer = torch.optim.Adam(
+                params=model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                betas=(beta_1, beta_2),
+            )
+        elif optimizer_type == "SGD":
+            optimizer = torch.optim.SGD(
+                model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                momentum=momentum,
+            )
+        if use_scheduler:
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer, step_size=step_size, gamma=gamma
+            )
+
+        best_valid_loss = float("inf")
+
         print(
             "loading best saved model: ",
             f"trained_models/{model_type}_{dataset_type}_best.pt",
