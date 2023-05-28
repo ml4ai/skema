@@ -460,6 +460,7 @@ def train_model(
         time.sleep(3)
 
     else:
+        # testing
         os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
         device = torch.device(
             f"cuda" if torch.cuda.is_available() else "cpu"
