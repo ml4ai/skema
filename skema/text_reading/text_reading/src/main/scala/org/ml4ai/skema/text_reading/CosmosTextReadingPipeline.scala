@@ -96,5 +96,5 @@ class CosmosTextReadingPipeline(contextWindowSize:Int) extends TextReadingPipeli
     * @param jsonPath Path to the json file to annotate
     * @return string with the json representation of the extractions and the document annotations
     */
-  def extractMentionsFromJsonAndSerialize(jsonPath: String): String = ujson.write(SkemaJSONSerializer.serializeMentions(this.extractMentionsFromCosmosJson(jsonPath)))
+  def extractMentionsFromJsonAndSerialize(jsonPath: String): String = this.serializeExtractions(this.extractMentionsFromCosmosJson(jsonPath))
 }
