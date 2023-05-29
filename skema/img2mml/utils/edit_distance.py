@@ -5,7 +5,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--dataset",
     choices=["arxiv", "im2mml", "arxiv_im2mml"],
-    default="arxiv",
+    default="arxiv_im2mml",
     help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
 )
 parser.add_argument(
