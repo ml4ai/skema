@@ -260,9 +260,9 @@ def train_model(
             if use_single_gpu:
                 print(f"using single gpu:{config['gpu_id']}...")
 
-                os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
+                # os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
                 device = torch.device(
-                    f"cuda" if torch.cuda.is_available() else "cpu"
+                    f"cuda:{config["gpu_id"]}" if torch.cuda.is_available() else "cpu"
                 )
                 (
                     train_dataloader,
