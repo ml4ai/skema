@@ -61,7 +61,7 @@ class TextReadingPipeline extends Logging {
     val candidatesToGround = fetchNestedArguments(mentions).filter(isGroundable).distinct
 
     // Do batch grounding
-    val mentionsGroundings = grounder.groundingCandidates(candidatesToGround.map(_.text), k=5).map{
+    val mentionsGroundings = grounder.groundingCandidates(candidatesToGround.map(_.text), k=15).map{
       gs => gs.filter(_.score >= groundingAssignmentThreshold)
     }
 

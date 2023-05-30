@@ -48,14 +48,15 @@ object AnnotateCosmosJsonFiles extends App with Logging{
             }
 
             // Output the grounding annotation files
-            val groundingAnnotations = textReadingPipeline.serializeExtractionsForGrounding(extractions)
-            val groundingOutputFile = textReadingPipeline.generateGroundingOutputFilename(outputFile)
-            Using(FileUtils.printWriterFromFile(groundingOutputFile.getAbsolutePath)) {
-              printWriter =>
-                groundingAnnotations.foreach(printWriter.println)
-                logger.info(s"Wrote annotation file to ${groundingOutputFile.getAbsolutePath}")
+            if(config.annotateGrounding){
+              val groundingAnnotations = textReadingPipeline.serializeExtractionsForGrounding(extractions)
+              val groundingOutputFile = textReadingPipeline.generateGroundingOutputFilename(outputFile)
+              Using(FileUtils.printWriterFromFile(groundingOutputFile.getAbsolutePath)) {
+                printWriter =>
+                  groundingAnnotations.foreach(printWriter.println)
+                  logger.info(s"Wrote annotation file to ${groundingOutputFile.getAbsolutePath}")
+              }
             }
-
           }
           else
             logger.error(s"Didn't find ${inputFile.getAbsolutePath}")
