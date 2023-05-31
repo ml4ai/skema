@@ -239,22 +239,22 @@ def train_model(
     # set_random_seed
     set_random_seed(SEED)
 
-    # to save trained model and logs
-    FOLDER = ["trained_models", "logs"]
-    for f in FOLDER:
-        if not os.path.exists(f):
-            os.mkdir(f)
-
-    # to log losses
-    loss_file = open("logs/loss_file.txt", "w")
-    # to log config(to keep track while running multiple experiments)
-    config_log = open("logs/config_log.txt", "w")
-    json.dump(config, config_log)
-
     # raw data paths
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
 
     if not testing:
+        # to save trained model and logs
+        FOLDER = ["trained_models", "logs"]
+        for f in FOLDER:
+            if not os.path.exists(f):
+                os.mkdir(f)
+
+        # to log losses
+        loss_file = open("logs/loss_file.txt", "w")
+        # to log config(to keep track while running multiple experiments)
+        config_log = open("logs/config_log.txt", "w")
+        json.dump(config, config_log)
+
         # defining model using DataParallel
         if torch.cuda.is_available():
             if use_single_gpu:
@@ -358,7 +358,7 @@ def train_model(
         if cont_training:
             model.load_state_dict(
                 torch.load(
-                    f"trained_models/{model_type}_{dataset_type}_latest.pt"
+                    f"trained_models/{model_type}_{dataset_type}_{config['markup']}_latest.pt"
                 )
             )
             print("continuing training from lastest saved model...")
@@ -403,7 +403,7 @@ def train_model(
                 if (not ddp) or (ddp and rank == 0):
                     torch.save(
                         model.state_dict(),
-                        f"trained_models/{model_type}_{dataset_type}_latest.pt",
+                        f"trained_models/{model_type}_{dataset_type}_{config['markup']}_latest.pt",
                     )
 
                 if val_loss < best_valid_loss:
@@ -412,7 +412,7 @@ def train_model(
                     if (not ddp) or (ddp and rank == 0):
                         torch.save(
                             model.state_dict(),
-                            f"trained_models/{model_type}_{dataset_type}_best.pt",
+                            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
                         )
 
 
@@ -449,7 +449,7 @@ def train_model(
 
         print(
             "best model saved as:  ",
-            f"trained_models/{model_type}_{dataset_type}_best.pt",
+            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
         )
 
         if ddp:
@@ -496,12 +496,12 @@ def train_model(
 
         print(
             "loading best saved model: ",
-            f"trained_models/{model_type}_{dataset_type}_best.pt",
+            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
         )
         try:
             # loading pre_tained_model
             model.load_state_dict(
-                torch.load(f"trained_models/{model_type}_{dataset_type}_best.pt")
+                torch.load(f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt")
             )
         except:
             try:
@@ -553,7 +553,7 @@ def train_model(
 # for DDP
 def ddp_main():
     world_size = config["world_size"]
-    os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+    # os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
     mp.spawn(train_model, args=(), nprocs=world_size, join=True)
 
 
