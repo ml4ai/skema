@@ -160,7 +160,7 @@ class TextReadingPipeline extends Logging {
     val chunks =
       relevant.flatMap{
         event => {
-          val context = event.text
+          val context = event.sentenceObj.getSentenceText // Updated this to contain the whole sentence instead of just the event
           getArgs(event) match {
             case Some(args) =>
               args.flatMap {
