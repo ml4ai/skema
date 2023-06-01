@@ -39,12 +39,15 @@ libraryDependencies ++= {
 
 lazy val root = project in file(".")
 
- lazy val webapp = project
-   .enablePlugins(PlayScala)
-   .aggregate(root)
-   .dependsOn(root)
+lazy val webapp = project
+    .enablePlugins(PlayScala)
+    .aggregate(root)
+    .dependsOn(root)
 
 //EclipseKeys.withSource := true
 
 ThisBuild / Test / fork := true // also forces sequential operation
 ThisBuild / Test / parallelExecution := false // keeps groups in their order
+
+addCommandAlias("dockerizeWebapp", "webapp/docker:publishLocal")
+
