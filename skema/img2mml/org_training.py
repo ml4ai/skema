@@ -225,7 +225,7 @@ def train_model(
     beam_k = config["beam_k"]
     model_type = config["model_type"]
     dataset_type = config["dataset_type"]
-    load_trained_model_for_testing = config["load_trained_model_for_testing"]
+    load_trained_model_for_testing = config["testing"]
     cont_training = config["continue_training_from_last_saved_model"]
     g2p = config["garbage2pad"]
     use_single_gpu = config["use_single_gpu"]
