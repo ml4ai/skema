@@ -210,8 +210,8 @@ def preprocess_dataset(config):
         sampler = test_sampler
         shuffle = False
     else:
-    sampler = None
-    shuffle = config["shuffle"]
+        sampler = None
+        shuffle = config["shuffle"]
 
     test_dataloader = DataLoader(
         imml_test,
