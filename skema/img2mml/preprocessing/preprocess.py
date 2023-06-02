@@ -193,9 +193,7 @@ def preprocess_dataset(config):
     )
 
     # initailizing class Img2MML_dataset: test dataloader
-    test = pd.read_csv(f"{config['data_path']}/{config['dataset_type']}/test.csv")
     imml_test = Img2MML_dataset(test, vocab, tokenizer)
-
     if config["DDP"]:
         test_sampler = SequentialSampler(imml_test)
         sampler = test_sampler
