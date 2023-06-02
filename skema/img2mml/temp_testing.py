@@ -342,7 +342,7 @@ def test_model():
     # set_random_seed
     set_random_seed(SEED)
     device = "cuda:5"
-    test_dataloader, vocab = preprocess_dataset(device,max_len)
+    test_dataloader, vocab = preprocess_dataset(device,config["max_len"])
 
     model = define_model(config, vocab, device).to(device)
 
