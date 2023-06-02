@@ -16,7 +16,9 @@ this step if have python installed.
 ```
 pip install pyenv
 
-pyenv virtualenv 3.8.16 image2math_venv
+pyenv virtualenv 3.8.16 image2math_venv ; pyenv activate image2math_venv
+
+pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
 
 python3 -m pip install -r requirements.txt
 ````
