@@ -273,8 +273,7 @@ class ToGrometPass:
         # print(var_environment)
 
         print(name)
-        print(name in var_environment["local"])
-        print(name in var_environment["args"])
+        # print(var_environment["args"])
         if name in var_environment["local"]:
             local_env = var_environment["local"]
             entry = local_env[name]
@@ -389,6 +388,7 @@ class ToGrometPass:
         else:
             func_name = node.func.name
 
+        print(f"PRIMITIVE {func_name}")
         # primitives that come from something other than an assignment or functions designated to be inlined at all times have
         # special semantics in that they're inlined as opposed to creating their own GroMEt FNs
         if (not from_assignment) or is_inline(func_name):
@@ -406,6 +406,7 @@ class ToGrometPass:
                     parent_gromet_fn.pif, GrometPort(box=inline_bf_loc)
                 )
                 if isinstance(arg, AnnCastName):
+                    print("yeah")
                     self.wire_from_var_env(arg.name, parent_gromet_fn)
                 elif isinstance(arg, AnnCastVar):
                     self.wire_from_var_env(arg.val.name, parent_gromet_fn)
@@ -2743,13 +2744,11 @@ class ToGrometPass:
         # function definition
         var_environment = self.symtab_variables()
         
+        prev_local_env = {}
         if isinstance(parent_cast_node, AnnCastFunctionDef):
             prev_local_env = deepcopy(var_environment["local"])
-        else:
-            # Initialize the function argument variable environment and populate it as we
-            # visit the function arguments
-            prev_local_env = {}
-            var_environment["local"] = {}
+
+        var_environment["local"] = {}
 
         for n in func_body:
             self.visit(n, new_gromet_fn, node)
@@ -2846,7 +2845,19 @@ class ToGrometPass:
             # visit the function arguments
             prev_arg_env = {}
             var_environment["args"] = {}
-        arg_env = var_environment["args"]
+        # arg_env = var_environment["args"]
+
+        # Copy the previous local and argument environments
+        # If we're a function within a function this effectively lets us
+        # see all the local and arguments from the outer scope and use them
+        # within here
+        # If we have an argument or a local variable that share a name
+        # With a variable or argument in the outer scope, then they get
+        # overwritten (to simulate scope shadowing)
+        # The use of {**var_env_args, **var_env_local} here creates new dictionaries,
+        # so the old environments are left unchanged
+        arg_env = {**var_environment["args"], **var_environment["local"]}
+        var_environment["args"] = arg_env
 
         for arg in node.func_args:
             # print("VISITING ARG ----")
@@ -2855,6 +2866,8 @@ class ToGrometPass:
 
             # for each argument we want to have a corresponding port (OPI) here
             arg_ref = arg.source_refs[0]
+            arg_name = arg.val.name
+
             if arg.default_value != None:
                 # if isinstance(arg.default_value, AnnCastTuple):
                 if is_tuple(arg.default_value):
@@ -2862,7 +2875,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=arg.default_value.value,
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2874,7 +2887,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=None,  # TODO: What's the actual default value?
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2886,7 +2899,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=None,  # TODO: M7 placeholder
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2898,7 +2911,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=arg.default_value.value,
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2910,7 +2923,7 @@ class ToGrometPass:
                     new_gromet.opi,
                     GrometPort(
                         box=len(new_gromet.b),
-                        name=arg.val.name,
+                        name=arg_name,
                         metadata=self.insert_metadata(
                             self.create_source_code_reference(arg_ref)
                         ),
@@ -2920,11 +2933,30 @@ class ToGrometPass:
             # Store each argument, its opi, and where it is in the opi table
             # For use when creating wfopi wires
             # Have to add 1 to the third value if we want to use it as an index reference
-            arg_env[arg.val.name] = (
+            arg_env[arg_name] = (
                 arg,
                 new_gromet.opi[-1],
                 len(new_gromet.opi),
             )
+
+        for var in var_environment["args"]:
+            if not var in [opi.name for opi in new_gromet.opi]:
+                new_gromet.opi = insert_gromet_object(
+                    new_gromet.opi,
+                    GrometPort(
+                        box=len(new_gromet.b),
+                        name=var,
+                        metadata=self.insert_metadata(
+                            self.create_source_code_reference(arg_ref)
+                        ),
+                    ),
+                )
+                arg_env[var] = (
+                    var_environment["args"][var][0],
+                    new_gromet.opi[-1],
+                    len(new_gromet.opi)
+                )
+
 
         # handle_function_def() will visit the body of the function and take care of
         # wiring any GroMEt FNs in its body
