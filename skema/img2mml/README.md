@@ -18,6 +18,8 @@ pip install pyenv
 
 pyenv virtualenv 3.8.16 image2math_venv ; pyenv activate image2math_venv
 
+pip install -e .[img2mml]
+
 pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
 
 python3 -m pip install -r requirements.txt
@@ -27,6 +29,8 @@ python3 -m pip install -r requirements.txt
 ```
 conda create -n image2mathml_venv python=3.8 -y ; conda activate image2mathml_venv
 
+pip install -e .[img2mml]  (to ensure proper working of skema module)
+
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6 -c pytorch -c conda-forge -y
 
 conda install --file requirements.txt
@@ -35,6 +39,11 @@ conda install --file requirements.txt
 To deactivate (if used pyenv to create virtual environment)
 ```
 pyenv deactivate
+```
+
+Moving to working directory
+```
+cd skema/img2mml
 ```
 
 ## Generating raw dataset
