@@ -70,7 +70,7 @@ class My_pad_collate(object):
         )
 
 
-def preprocess_dataset(device, start, end, max_len):
+def preprocess_dataset(device, start=None, end=None, max_len):
 
     # reading raw text files
     img_tnsr_path = "/home/gauravs/data/odata/im2data/image_tensors"
