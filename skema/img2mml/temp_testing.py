@@ -70,7 +70,7 @@ class My_pad_collate(object):
         )
 
 
-def preprocess_dataset(device, start=None, end=None, max_len):
+def preprocess_dataset(device, max_len, start=None, end=None, ):
 
     # reading raw text files
     img_tnsr_path = "/home/gauravs/data/odata/im2data/image_tensors"
@@ -118,4 +118,4 @@ if __name__ == "__main__":
     device = "cuda:5"
     # start, end = sys.argv[-2], sys.argv[-1]
     max_len = sys.argv[-1]
-    preprocess_dataset(device, start, end, max_len)
+    preprocess_dataset(device,max_len, start, end, max_len)
