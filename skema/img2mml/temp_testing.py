@@ -402,7 +402,7 @@ def test_model():
         beam_params=None,
         is_test=True,
         ddp=ddp,
-        rank=rank,
+        rank=None,
         g2p=g2p,
     )
 
