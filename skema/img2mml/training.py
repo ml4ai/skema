@@ -491,6 +491,13 @@ def train_model(
     else:
         beam_params = None
 
+    """
+    bin comparison
+    """
+    if config["bin_comparison"]:
+        from bin_testing import bin_test_dataloader
+        test_dataloader = bin_test_dataloader(config, vocab)
+
     test_loss = evaluate(
         model,
         model_type,
