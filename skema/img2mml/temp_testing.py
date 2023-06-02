@@ -118,4 +118,4 @@ if __name__ == "__main__":
     device = "cuda:5"
     # start, end = sys.argv[-2], sys.argv[-1]
     max_len = sys.argv[-1]
-    preprocess_dataset(device,max_len, start, end, max_len)
+    preprocess_dataset(device,max_len)
