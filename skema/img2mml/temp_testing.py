@@ -273,11 +273,11 @@ def preprocess_dataset(device, max_len, start=None, end=None, ):
         eqns_arr.append(e)
         imgs_arr.append(i)
 
-    test = {
+    raw_mml_data = {
         "IMG": imgs_arr,
         "EQUATION": eqns_arr,
     }
-
+    test = pd.DataFrame(raw_mml_data, columns=["IMG", "EQUATION"])
     vocab_file = open("vocab.txt").readlines()
     counter = dict()
     for line in vocab_file:
