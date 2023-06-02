@@ -1,6 +1,3 @@
-# creating tab dataset having image_num and mml
-# split train, test, val
-# dataloader to load data
 import pandas as pd
 import random
 import torch
@@ -134,8 +131,6 @@ def preprocess_dataset(config):
     # initializing pad collate class
     mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])
 
-    # if not config["testing"]:
-
     print("saving dataset files to data/ folder...")
 
     train.to_csv(
@@ -197,10 +192,6 @@ def preprocess_dataset(config):
         pin_memory=config["pin_memory"],
     )
 
-    # return train_dataloader, val_dataloader, vocab
-
-    # else:
-    # testing
     # initailizing class Img2MML_dataset: test dataloader
     test = pd.read_csv(f"{config['data_path']}/{config['dataset_type']}/test.csv")
     imml_test = Img2MML_dataset(test, vocab, tokenizer)
