@@ -86,6 +86,11 @@ def preprocess_dataset(device, max_len, start=None, end=None, ):
         eqns_arr.append(e)
         imgs_arr.append(i)
 
+    test = {
+        "IMG": imgs_arr,
+        "EQUATION": eqns_arr,
+    }
+
     vocab_file = open("vocab.txt").readlines()
     counter = dict()
     for line in vocab_file:
