@@ -355,7 +355,7 @@ def test_model(rank=None,):
             output_device=rank,
             find_unused_parameters=True,
         )
-        
+
     else:
         device = "cuda:5"
         test_dataloader, vocab = preprocess_dataset(device,config["max_len"])
@@ -427,9 +427,16 @@ def test_model(rank=None,):
     )
 
 # for DDP
-os.environ["MASTER_ADDR"] = "localhost"
-os.environ["MASTER_PORT"] = "29500"
-world_size = config["world_size"]
-mp.spawn(test_model, args=(), nprocs=world_size, join=True)
+def ddp_main():
+    world_size = config["world_size"]
+    # os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+    mp.spawn(test_model, args=(), nprocs=world_size, join=True)
+
+
+if __name__ == "__main__":
+    if config["DDP"]:
+        os.environ["MASTER_ADDR"] = "localhost"
+        os.environ["MASTER_PORT"] = "29500"
+        ddp_main()
 
 # test_model()
