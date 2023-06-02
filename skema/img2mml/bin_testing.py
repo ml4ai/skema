@@ -70,7 +70,7 @@ class My_pad_collate(object):
         )
 
 
-def bin_test_dataloader(config, vocab, start=None, end=None):
+def bin_test_dataloader(config, vocab, device, start=None, end=None):
 
     # reading raw text files
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
@@ -99,16 +99,23 @@ def bin_test_dataloader(config, vocab, start=None, end=None):
     tokenizer = lambda x: x.split()
 
     # initializing pad collate class
-    mypadcollate = My_pad_collate(device, vocab, max_len)
+    mypadcollate = My_pad_collate(device, vocab, config["max_len"])
 
     # initailizing class Img2MML_dataset: test dataloader
     imml_test = Img2MML_dataset(test, vocab, tokenizer)
+    if config["DDP"]:
+        test_sampler = SequentialSampler(imml_test)
+        sampler = test_sampler
+        shuffle = False
+    else:
+        sampler = None
+        shuffle = config["shuffle"]
     test_dataloader = DataLoader(
         imml_test,
-        batch_size=64,
+        batch_size=config["batch_size"],
         num_workers=0,
-        shuffle=True,
-        sampler=None,
+        shuffle=shuffle,
+        sampler=sampler,
         collate_fn=mypadcollate,
         pin_memory=False,
     )

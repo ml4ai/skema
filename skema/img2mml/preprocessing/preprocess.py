@@ -206,7 +206,7 @@ def preprocess_dataset(config):
         imml_test,
         batch_size=config["batch_size"],
         num_workers=config["num_workers"],
-        shuffle=config["shuffle"],
+        shuffle=shuffle,
         sampler=None,
         collate_fn=mypadcollate,
         pin_memory=config["pin_memory"],
