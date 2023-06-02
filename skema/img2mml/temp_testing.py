@@ -305,7 +305,7 @@ def preprocess_dataset(device, max_len, start=None, end=None, ):
 
     return test_dataloader, vocab
 
-def test_model():
+def test_model(rank=None,):
 
     # parameters
     EPOCHS = config["epochs"]
@@ -341,10 +341,25 @@ def test_model():
 
     # set_random_seed
     set_random_seed(SEED)
-    device = "cuda:5"
-    test_dataloader, vocab = preprocess_dataset(device,config["max_len"])
-
-    model = define_model(config, vocab, device).to(device)
+    if ddp:
+        # create default process group
+        dist.init_process_group("nccl", rank=rank, world_size=world_size)
+        # add rank to config
+        config["rank"] = rank
+        device = f"cuda:{rank}"
+        test_dataloader, vocab = preprocess_dataset(device,config["max_len"])
+        model = define_model(config, vocab, rank)
+        model = DDP(
+            model.to(f"cuda:{rank}"),
+            device_ids=[rank],
+            output_device=rank,
+            find_unused_parameters=True,
+        )
+        
+    else:
+        device = "cuda:5"
+        test_dataloader, vocab = preprocess_dataset(device,config["max_len"])
+        model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")
     print(f"The model has {count_parameters(model)} trainable parameters")
@@ -411,4 +426,10 @@ def test_model():
         f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
     )
 
-test_model()
+# for DDP
+os.environ["MASTER_ADDR"] = "localhost"
+os.environ["MASTER_PORT"] = "29500"
+world_size = config["world_size"]
+mp.spawn(test_model, args=(), nprocs=world_size, join=True)
+
+# test_model()
