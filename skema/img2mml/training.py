@@ -256,9 +256,9 @@ def train_model(
         if use_single_gpu:
             print(f"using single gpu:{config['gpu_id']}...")
 
-            os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
+            # os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
             device = torch.device(
-                f"cuda" if torch.cuda.is_available() else "cpu"
+                f"cuda:{config['gpu_id']}" if torch.cuda.is_available() else "cpu"
             )
             (
                 train_dataloader,
@@ -269,9 +269,9 @@ def train_model(
             model = define_model(config, vocab, device).to(device)
 
         elif dataparallel:
-            os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
+            # os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
             device = torch.device(
-                "cuda" if torch.cuda.is_available() else "cpu"
+                f"cuda:{config["gpu_id"]}" if torch.cuda.is_available() else "cpu"
             )
             (
                 train_dataloader,
@@ -522,7 +522,7 @@ def train_model(
 # for DDP
 def ddp_main():
     world_size = config["world_size"]
-    os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+    # os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
     mp.spawn(train_model, args=(), nprocs=world_size, join=True)
 
 
