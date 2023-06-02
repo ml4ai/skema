@@ -116,6 +116,6 @@ def preprocess_dataset(device, start, end, max_len):
 if __name__ == "__main__":
 
     device = "cuda:5"
-    start, end = sys.argv[-2], sys.argv[-1]
-    max_len = sys.argv[-3]
+    # start, end = sys.argv[-2], sys.argv[-1]
+    max_len = sys.argv[-1]
     preprocess_dataset(device, start, end, max_len)
