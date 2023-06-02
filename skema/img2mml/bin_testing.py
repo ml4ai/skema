@@ -70,7 +70,7 @@ class My_pad_collate(object):
         )
 
 
-def preprocess_dataset(config, vocab, start=None, end=None):
+def bin_test_dataloader(config, vocab, start=None, end=None):
 
     # reading raw text files
     img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
