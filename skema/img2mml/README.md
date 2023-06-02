@@ -13,9 +13,26 @@ service was developed by Deepsana Shahi and Adarsh Pyarelal.
 We are using `pyenv` to create pip virtual environment. Feel free to skip
 this step if have python installed.
 
+To install pyenv:
 ```
-pip install pyenv
+git clone https://github.com/pyenv/pyenv.git ~/.pyenv
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bashrc
 
+pyenv install --list
+
+pyenv install 3.8.16
+
+git clone https://github.com/pyenv/pyenv-virtualenv.git $(pyenv root)/plugins/pyenv-virtualenv
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+exec "$SHELL"   
+
+eval "$(pyenv virtualenv-init -)"
+
+```
+
+```
 pyenv virtualenv 3.8.16 image2math_venv ; pyenv activate image2math_venv
 
 pip install -e .[img2mml]
@@ -101,7 +118,7 @@ python preprocessing/preprocess_mml.py --config configs/xfmer_mml_config.json
 ```
 
 #### To train and test the model:
-Set `testing=true` if only want to test using already trained best model. 
+Set `testing=true` if only want to test using already trained best model.
 ```
 python training.py --config configs/xfmer_mml_config.json
 ```
