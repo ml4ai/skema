@@ -495,6 +495,7 @@ def train_model(
     bin comparison
     """
     if config["bin_comparison"]:
+        print("comparing bin...")
         from bin_testing import bin_test_dataloader
         test_dataloader = bin_test_dataloader(config, vocab)
 
