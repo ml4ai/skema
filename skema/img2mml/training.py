@@ -497,7 +497,7 @@ def train_model(
     if config["bin_comparison"]:
         print("comparing bin...")
         from bin_testing import bin_test_dataloader
-        test_dataloader = bin_test_dataloader(config, vocab, device, start=200, end=250)
+        test_dataloader = bin_test_dataloader(config, vocab, device, start=250, end=300)
 
     test_loss = evaluate(
         model,
