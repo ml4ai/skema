@@ -321,7 +321,7 @@ def train_model(
         model = define_model(config, vocab, device).to(device)
 
     print("MODEL: ")
-    print(f"The model has {count_parameters(model):,} trainable parameters")
+    print(f"The model has {count_parameters(model)} trainable parameters")
 
     # intializing loss function
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
