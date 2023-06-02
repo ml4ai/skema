@@ -399,7 +399,7 @@ def test_model():
         criterion,
         device,
         vocab,
-        beam_params=beam_params,
+        beam_params=None,
         is_test=True,
         ddp=ddp,
         rank=rank,
