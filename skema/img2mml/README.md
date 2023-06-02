@@ -6,33 +6,33 @@ of equations and returns presentation MathML corresponding to those equations.
 The model was developed by Gaurav Sharma and Clay Morrison, and this wrapper
 service was developed by Deepsana Shahi and Adarsh Pyarelal.
 
-## Build conda virtual environment and installling requirements
+## Building virtual environment and installling requirements
 
+### Using pip
+
+We are using `pyenv` to create pip virtual environment. Feel free to skip
+this step if have python installed.
+
+```
+pip install pyenv
+
+pyenv virtualenv 3.8.16 image2math_venv
+
+python3 -m pip install -r requirements.txt
+````
+
+### Using conda virtual environment
 ```
 conda create -n image2mathml_venv python=3.8 -y ; conda activate image2mathml_venv
-```
-Please ensure that the `pwd` is `skema`.
-```
-pip install -e .[img2mml]
-```
-In case of Zsh, run
-```
-pip install -e ."[img2mml]"
-```
 
-To install requirements,
-```
-cd skema/img2mml ; python3 -m pip install -r requirements.txt
-```
-
-To install Pytorch
-```
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6 -c pytorch -c conda-forge -y
+
+conda install --file requirements.txt
 ```
 
-To install Torchtext
+To deactivate (if used pyenv to create virtual environment)
 ```
-pip install torchtext==0.6.0
+pyenv deactivate
 ```
 
 ## Generating raw dataset
@@ -128,8 +128,6 @@ Then to run the invocation below to launch the Dockerized service:
 ```
 docker-compose up --build
 ```
-
-To test the service without Docker (e.g., for development purposes), ensure that you have installed the required packages (run `pip install -e .[img2mml]` in the root of the repository. In case of Zsh, run `pip install -e ."[img2mml]"`). This step can be skipped if you have already built the conda venv and installed the requirements as described under "Build conda virtual environment and installling requirements" section.
 
 Then, run the following command to launch the img2mml server program:
 
