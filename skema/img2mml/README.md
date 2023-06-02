@@ -101,8 +101,7 @@ python preprocessing/preprocess_mml.py --config configs/xfmer_mml_config.json
 ```
 
 #### To train and test the model:
-
-To train, set `testing=false` while to test set it to `true`.
+Set `testing=true` if only want to test using already trained best model. 
 ```
 python training.py --config configs/xfmer_mml_config.json
 ```
