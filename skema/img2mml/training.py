@@ -271,7 +271,7 @@ def train_model(
         elif dataparallel:
             # os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
             device = torch.device(
-                f"cuda:{config["gpu_id"]}" if torch.cuda.is_available() else "cpu"
+                f"cuda:{config['gpu_id']}" if torch.cuda.is_available() else "cpu"
             )
             (
                 train_dataloader,
