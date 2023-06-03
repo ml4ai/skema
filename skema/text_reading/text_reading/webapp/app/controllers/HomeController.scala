@@ -283,18 +283,16 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok("")
   }
 
+  def cosmosJsonToMentions: Action[AnyContent] = Action { request =>
+    val json = request.body.asJson.get.toString()
+    val ujsonArray = ujson.read(json)
+    val ujsonValues = ujsonArray.arr.map { ujsonValue =>
+      cosmosPipeline.extractMentionsFromJsonAndSerialize(ujsonValue)
+    }
+    val ujsonResult = ujson.Arr.from(ujsonValues)
+    val playJsonResult = ujsonToPlayJson(ujsonResult)
 
-  def cosmos_json_to_mentions: Action[AnyContent] = Action { request =>
-    val data = request.body.asJson.get.toString()
-
-    val pathJson = ujson.read(data)
-    val jsonPath = pathJson("pathToCosmosJson").str
-    logger.info(s"Extracting mentions from $jsonPath")
-
-    val exportedData = cosmosPipeline.extractMentionsFromJsonAndSerialize(jsonPath)
-
-    Ok(exportedData)
-
+    Ok(playJsonResult)
   }
   /**
     * Align mentions from text, code, comment. Expected fields in the json obj passed in:

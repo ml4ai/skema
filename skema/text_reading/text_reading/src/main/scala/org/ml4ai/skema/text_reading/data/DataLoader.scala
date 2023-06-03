@@ -69,7 +69,10 @@ class CosmosJsonDataLoader extends DataLoader {
     */
   def loadFile(f: File): Seq[String] = {
     val cosmosDoc = CosmosJsonProcessor.mkDocument(f)
-    cosmosDoc.cosmosOjects.filter(section => (section.cls.getOrElse("") != "Figure" && section.cls.getOrElse("") != "Table" ) && section.cls.getOrElse("") != "Reference text"  && section.cls.getOrElse("") != "Page Footer" && section.detectCls.getOrElse("") != "Equation"  && section.detectCls.getOrElse("") != "Section Header").map(co => co.content.get + "<::>" + co.pdfName.getOrElse("unknown_doc") + "<::>" + co.pageNum.get.mkString(",") + "<::>" + co.blockIdx.get.mkString(",")).map(string => remapSpecialSymbols(string)) // for some papers, also  && section.cls.getOrElse("") != "Equation" and && section.cls.getOrElse("") != "Section Header"
+    cosmosDoc.cosmosOjects
+        .filter(section => (section.cls.getOrElse("") != "Figure" && section.cls.getOrElse("") != "Table" ) && section.cls.getOrElse("") != "Reference text"  && section.cls.getOrElse("") != "Page Footer" && section.detectCls.getOrElse("") != "Equation"  && section.detectCls.getOrElse("") != "Section Header")
+        .map(co => co.content.get + "<::>" + co.pdfName.getOrElse("unknown_doc") + "<::>" + co.pageNum.get.mkString(",") + "<::>" + co.blockIdx.get.mkString(","))
+        .map(string => remapSpecialSymbols(string)) // for some papers, also  && section.cls.getOrElse("") != "Equation" and && section.cls.getOrElse("") != "Section Header"
   }
   override val extension: String = "json"
   val specialCharMap: Map[String, String] = Map("(cid:27)" -> "ff", "(cid:28)" -> "ft", "cid:0" -> " ")
@@ -80,6 +83,34 @@ class CosmosJsonDataLoader extends DataLoader {
     }
     newString
   }
+
+  def loadJson(json: ujson.Js): Seq[String] = {
+    val cosmosDocument = CosmosJsonProcessor.mkDocument(json)
+    val filtered = cosmosDocument.cosmosOjects.filter { section =>
+      !section.cls.exists(CosmosJsonDataLoader.clsToIgnore) &&
+      !section.detectCls.exists(CosmosJsonDataLoader.detectClsToIgnore)
+    }
+    val mapped = filtered.map { cosmosObject =>
+      val parts = Array(
+        cosmosObject.content.get,
+        cosmosObject.pdfName.getOrElse("unknown_doc"),
+        cosmosObject.pageNum.get.mkString(","),
+        cosmosObject.blockIdx.get.mkString(",")
+      )
+
+      parts.mkString(CosmosJsonDataLoader.sep)
+    }
+    val remapped = mapped.map(remapSpecialSymbols)
+    // for some papers, also  && section.cls.getOrElse("") != "Equation" and && section.cls.getOrElse("") != "Section Header"
+
+    remapped
+  }
+}
+
+object CosmosJsonDataLoader {
+  val clsToIgnore: Set[String] = Set("Figure", "Table", "Reference text", "Page Footer")
+  val detectClsToIgnore: Set[String] = Set("Equation", "Section Header")
+  val sep: String = "<::>"
 }
 
 class PDFDataLoader extends DataLoader {
