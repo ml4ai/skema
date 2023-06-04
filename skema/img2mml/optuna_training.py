@@ -438,7 +438,7 @@ def tune(rank=None,):
 def ddp_main():
     world_size = config["world_size"]
     # os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
-    mp.spawn(tunue, args=(), nprocs=world_size, join=True)
+    mp.spawn(tune, args=(), nprocs=world_size, join=True)
 
 
 if __name__ == "__main__":
