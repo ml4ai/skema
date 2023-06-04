@@ -86,9 +86,9 @@ class CosmosJsonDataLoader extends DataLoader {
 
   def loadJson(json: ujson.Js): Seq[String] = {
     val cosmosDocument = CosmosJsonProcessor.mkDocument(json)
-    val filtered = cosmosDocument.cosmosOjects.filter { section =>
-      !section.cls.exists(CosmosJsonDataLoader.clsToIgnore) &&
-      !section.detectCls.exists(CosmosJsonDataLoader.detectClsToIgnore)
+    val filtered = cosmosDocument.cosmosOjects.filterNot { section =>
+      section.cls.exists(CosmosJsonDataLoader.clsToIgnore) ||
+      section.detectCls.exists(CosmosJsonDataLoader.detectClsToIgnore)
     }
     val mapped = filtered.map { cosmosObject =>
       val parts = Array(
