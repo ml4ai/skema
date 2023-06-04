@@ -31,6 +31,8 @@ from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
 from utils.bleu_score import calculate_bleu_score
+import optuna
+from optuna.trial import TrialState
 
 # opening config file
 parser = argparse.ArgumentParser()
