@@ -407,7 +407,7 @@ def tune(rank=None,):
     os.environ["NCCL_DEBUG"] = "INFO"
 
     config["rank"]=rank
-    train_dataloader, test_dataloader, val_dataloader, vocab = preprocess_mml(config)
+    train_dataloader, test_dataloader, val_dataloader, vocab = preprocess_dataset(config)
 
     func = lambda trial: objective(trial, train_dataloader,
                                         test_dataloader,
