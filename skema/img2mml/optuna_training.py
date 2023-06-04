@@ -391,7 +391,7 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
 
         # Handle pruning based on the intermediate value.
         if trial.should_prune():
-        raise optuna.exceptions.TrialPruned()
+            raise optuna.exceptions.TrialPruned()
 
 
 
