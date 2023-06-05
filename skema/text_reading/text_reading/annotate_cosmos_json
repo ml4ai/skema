@@ -30,5 +30,8 @@ cp ${input}/*.json ${json_input}
 # Convert parquet to jsons
 python3 cosmos_integration.py -o ${json_input} ${input}
 
+# Only keep the "--COSMOS-data.json" files, other files are not meant to be read by the pipeline
+find ${json_input} -type f -not -name "*COSMOS-data.json" -exec rm {} \;
+
 # Run the TR pipeline
 java -jar target/scala-2.12/skema_text_reading-assembly-0.1.0-SNAPSHOT.jar org.ml4ai.skema.text_reading.apps.AnnotateCosmosJsonFiles -o ${output} ${json_input}
