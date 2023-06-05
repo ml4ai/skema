@@ -41,7 +41,7 @@ def simplification(mml_org):
         "ms",
         "mtext",
         "math",
-        # "mtable",
+        "mtable",
         "mspace",
         "maction",
         "menclose",
@@ -60,8 +60,8 @@ def simplification(mml_org):
         "msub",
         "msubsup",
         "msup",
-        # "mtd",
-        # "mtr",
+        "mtd",
+        "mtr",
         "munder",
         "munderover",
         "semantics",
@@ -235,7 +235,7 @@ def remove_unecc_tokens(eqn):
         "mstyle",
     ]
 
-    keep = ["mo", "mi", "mfrac", "mn", "mrow"]
+    keep = ["mo", "mi", "mfrac", "mn", "mrow", "mtr","mtd"]
 
     for e in eliminate:
         if e in eqn:

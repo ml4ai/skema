@@ -30,7 +30,6 @@ from skema.img2mml.models.image2mml_lstm import Image2MathML_LSTM
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
-from utils.bleu_score import calculate_bleu_score
 import optuna
 from optuna.trial import TrialState
 
@@ -202,6 +201,31 @@ def epoch_time(start_time, end_time):
     elapsed_mins = int(elapsed_time / 60)
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
+
+def calculate_bleu_score():
+    tt = open("logs/test_targets_100K.txt").readlines()
+    tp = open("logs/test_predicted_100K.txt").readlines()
+    _tt = open("logs/final_targets.txt", "w")
+    _tp = open("logs/final_preds.txt", "w")
+
+    for i, j in zip(tt, tp):
+        eos_i = i.find("<eos>")
+        _tt.write(i[6:eos_i] + "\n")
+
+        eos_j = j.find("<eos>")
+        _tp.write(j[6:eos_j] + "\n")
+
+    test = open("logs/final_targets.txt").readlines()
+    predicted = open("logs/final_preds.txt").readlines()
+
+    candidate_corpus, references_corpus = [], []
+
+    for t, p in zip(test, predicted):
+        candidate_corpus.append(t.split())
+        references_corpus.append([p.split()])
+
+    bleu = bleu_score(candidate_corpus, references_corpus)
+    return bleu
 
 
 def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, rank=None):
@@ -388,8 +412,8 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
 
         # calculate bleu score
         print("epoch: ", epoch)
-        bs = calculate_bleu_score()
-        trial.report(bs, epoch)
+        # bs = calculate_bleu_score()
+        trial.report(val_loss, epoch)
 
         # Handle pruning based on the intermediate value.
         if trial.should_prune():
@@ -402,7 +426,7 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
 
     time.sleep(3)
 
-    return bs
+    return val_loss
 
 def tune(rank=None,):
 
@@ -416,7 +440,7 @@ def tune(rank=None,):
                                         val_dataloader,
                                         vocab, rank)
 
-    study = optuna.create_study(direction="maximize")
+    study = optuna.create_study(direction="minimize")
     study.optimize(func, n_trials=15)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
