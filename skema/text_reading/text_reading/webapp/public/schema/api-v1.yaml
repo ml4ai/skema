@@ -104,6 +104,41 @@ paths:
                 items:
                   $ref: "#/components/schemas/MentionsAndDocuments"
 
+  /cosmosJsonToMentions:
+    post:
+      tags:
+        - "grounding"
+      summary: |
+        TODO
+      description: |
+        TODO
+      requestBody:
+        description: TODO
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              description: TODO
+              items:
+                type: string
+              example: |
+                [
+                  "TODO",
+                  "TODO",
+                  "TODO"
+                ]
+      responses:
+        '200':
+          description: TODO
+          content:
+            application/json:
+              schema:
+                type: array
+                description: TODO
+                items:
+                  $ref: "#/components/schemas/MentionsAndDocuments"
+
 components:
   schemas:
     GroundingCandidate:
