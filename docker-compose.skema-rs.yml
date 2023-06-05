@@ -1,5 +1,11 @@
 # Docker Compose file for the skema-rs web service
 version: "3"
+
+
+networks:
+  skema_net:
+    external: true
+
 services:
   # The skema-rs web service exposing functionality implemented in Rust.
   skema-rs:
@@ -9,6 +15,11 @@ services:
     entrypoint: cargo run --release --bin skema_service -- --host 0.0.0.0 --db-host database
     ports:
       - "8080:8080"
+    networks:
+      skema_net:
+        aliases:
+          - "img2mml"  # use ${AGENT_NAME} before deploying
+
 
   # We currently use Memgraph (in-memory graph database).
   database:

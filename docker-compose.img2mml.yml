@@ -1,5 +1,10 @@
 # Docker Compose file for the img2mml service
 version: "3"
+
+networks:
+  skema_net:
+    external: true
+
 services:
   img2mml:
     image: img2mml:latest
@@ -9,3 +14,9 @@ services:
     entrypoint: uvicorn img2mml:app --host=0.0.0.0
     ports:
       - "8000:8000" # Change port mapping appropriately before deploying.
+    networks:
+      skema_net:
+        aliases:
+          - "img2mml"  # use ${AGENT_NAME} before deploying
+
+

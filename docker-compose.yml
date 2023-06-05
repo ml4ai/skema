@@ -5,6 +5,13 @@
 # HOST_PORT:CONTAINER_PORT.
 version: "3"
 
+
+
+networks:
+  skema_net:
+    external: true
+
+
 services:
   # The skema-py web service exposing functionality implemented in Python.
   skema-py:
@@ -16,6 +23,11 @@ services:
     ports:
     - "8001:8000"
     command: ["uvicorn", "server:app", "--host", "0.0.0.0"]
+    networks:
+      skema_net:
+        aliases:
+          - "skema-py"  # use ${AGENT_NAME} before deploying
+
 
   # The skema-rs web service exposing functionality implemented in Rust.
   skema-rs:
@@ -25,6 +37,12 @@ services:
     entrypoint: cargo run --release --bin skema_service -- --host 0.0.0.0 --db-host database
     ports:
       - "8080:8080"
+    networks:
+      skema_net:
+        aliases:
+          - "skema-rs"  # use ${AGENT_NAME} before deploying
+
+
 
   database:
     image: "memgraph/memgraph-platform"

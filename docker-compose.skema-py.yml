@@ -1,6 +1,11 @@
 # Docker Compose file for the skema-py service
 version: "3.9"
 
+
+networks:
+  skema_net:
+    external: true
+
 services:
   skema-py:
     image: skema-py:latest
@@ -11,3 +16,10 @@ services:
     ports:
     - "8000:8000" # Change port mapping appropriately before deploying.
     command: ["uvicorn", "server:app", "--host", "0.0.0.0"]
+
+    networks:
+      skema_net:
+        aliases:
+          - "skema-py"  # use ${AGENT_NAME} before deploying
+
+
