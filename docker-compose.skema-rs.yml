@@ -3,7 +3,7 @@ version: "3"
 
 
 networks:
-  skema_net:
+  skema_default:
     external: true
 
 services:
@@ -16,7 +16,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      skema_net:
+      skema_default:
         aliases:
           - "img2mml"  # use ${AGENT_NAME} before deploying
 
@@ -35,6 +35,10 @@ services:
     environment:
       - MEMGRAPH="--log-level=TRACE"
     entrypoint: ["/usr/bin/supervisord"]
+    networks:
+      skema_default:
+        aliases:
+          - "memgraph_db"  # use ${AGENT_NAME} before deploying
 
 volumes:
   mg_lib:

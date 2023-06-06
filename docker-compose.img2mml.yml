@@ -2,7 +2,7 @@
 version: "3"
 
 networks:
-  skema_net:
+  skema_default:
     external: true
 
 services:
@@ -15,7 +15,7 @@ services:
     ports:
       - "8000:8000" # Change port mapping appropriately before deploying.
     networks:
-      skema_net:
+      skema_default:
         aliases:
           - "img2mml"  # use ${AGENT_NAME} before deploying
 

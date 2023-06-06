@@ -6,11 +6,9 @@
 version: "3"
 
 
-
 networks:
-  skema_net:
+  skema_default:
     external: true
-
 
 services:
   # The skema-py web service exposing functionality implemented in Python.
@@ -24,7 +22,7 @@ services:
     - "8001:8000"
     command: ["uvicorn", "server:app", "--host", "0.0.0.0"]
     networks:
-      skema_net:
+      skema_default:
         aliases:
           - "skema-py"  # use ${AGENT_NAME} before deploying
 
@@ -38,7 +36,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      skema_net:
+      skema_default:
         aliases:
           - "skema-rs"  # use ${AGENT_NAME} before deploying
 
@@ -57,6 +55,11 @@ services:
     environment:
       - MEMGRAPH="--log-level=TRACE"
     entrypoint: ["/usr/bin/supervisord"]
+    networks:
+      skema_default:
+        aliases:
+          - "memgraph_db"  # use ${AGENT_NAME} before deploying
+
 
 volumes:
   mg_lib:

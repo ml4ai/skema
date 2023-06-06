@@ -1,5 +1,10 @@
 # Docker Compose file to launch the MemgraphDB platform standalone.
 version: "3"
+
+networks:
+  skema_default:
+    external: true
+
 services:
   database:
     image: "memgraph/memgraph-platform"
@@ -14,6 +19,10 @@ services:
     environment:
       - MEMGRAPH="--log-level=TRACE"
     entrypoint: ["/usr/bin/supervisord"]
+    networks:
+      skema_default:
+        aliases:
+          - "memgraph_db" # use ${AGENT_NAME} before deploying
 
 volumes:
   mg_lib:
