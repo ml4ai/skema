@@ -94,6 +94,8 @@ def get_node_name(ast_node):
     elif isinstance(ast_node, ast.Name):
         return [ast_node.id]
     elif isinstance(ast_node, ast.Attribute):
+        return get_node_name(ast_node.value)
+    elif isinstance(ast_node, ast.Tuple):
         return [""]
     elif isinstance(ast_node, Attribute):
         return [ast_node.attr.name]
@@ -101,6 +103,8 @@ def get_node_name(ast_node):
         return [ast_node.val.name]
     elif isinstance(ast_node, Assignment):
         return get_node_name(ast_node.left)
+    elif isinstance(ast_node, ast.Subscript):
+        return get_node_name(ast_node.value)
     elif (
         isinstance(ast_node, LiteralValue)
         and (ast_node.value_type == StructureType.LIST or ast_node.value_type == StructureType.TUPLE)
@@ -651,9 +655,8 @@ class PyASTToCAST:
             len(node.targets) == 1
         ):  # x = 1, or maybe x = y, in general x = {expression}
 
-            if isinstance(
-                node.targets[0], ast.Subscript
-            ):  # List subscript nodes get replaced out by
+            if isinstance(node.targets[0], ast.Subscript):  
+                # List subscript nodes get replaced out by
                 # A function call to a "list_set"
                 sub_node = node.targets[0]
                 if isinstance(node.value, ast.Subscript):
@@ -796,9 +799,7 @@ class PyASTToCAST:
                     )
                 ]
 
-            if isinstance(
-                node.value, ast.BinOp
-            ):  # Checking if we have an assignment of the form
+            if isinstance(node.value, ast.BinOp):  # Checking if we have an assignment of the form
                 # x = LIST * NUM or x = NUM * LIST
                 binop = node.value
                 list_node = None
@@ -2446,8 +2447,8 @@ class PyASTToCAST:
                     # functions_to_visit.append(piece)
                     #continue
 
-                    print(curr_scope_id_dict)
-                    print(prev_scope_id_dict)
+                    # print(curr_scope_id_dict)
+                    # print(prev_scope_id_dict)
 
                 # Have to figure out name IDs for imports (i.e. other modules)
                 # These asserts will keep us from visiting them from now
