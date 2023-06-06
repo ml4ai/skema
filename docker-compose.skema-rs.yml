@@ -3,7 +3,7 @@ version: "3"
 
 
 networks:
-  skema_default:
+  skema_net:
     external: true
 
 services:
@@ -16,7 +16,7 @@ services:
     ports:
       - "8080:8080"
     networks:
-      skema_default:
+      skema_net:
         aliases:
           - "skema-rs"  # use ${AGENT_NAME} before deploying
 
@@ -36,7 +36,7 @@ services:
       - MEMGRAPH="--log-level=TRACE"
     entrypoint: ["/usr/bin/supervisord"]
     networks:
-      skema_default:
+      skema_net:
         aliases:
           - "memgraph_db"  # use ${AGENT_NAME} before deploying
 

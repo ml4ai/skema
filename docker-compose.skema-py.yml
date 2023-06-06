@@ -3,7 +3,7 @@ version: "3.9"
 
 
 networks:
-  skema_default:
+  skema_net:
     external: true
 
 services:
@@ -18,7 +18,7 @@ services:
     command: ["uvicorn", "server:app", "--host", "0.0.0.0"]
 
     networks:
-      skema_default:
+      skema_net:
         aliases:
           - "skema-py"  # use ${AGENT_NAME} before deploying
 

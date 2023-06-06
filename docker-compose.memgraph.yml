@@ -2,7 +2,7 @@
 version: "3"
 
 networks:
-  skema_default:
+  skema_net:
     external: true
 
 services:
@@ -20,7 +20,7 @@ services:
       - MEMGRAPH="--log-level=TRACE"
     entrypoint: ["/usr/bin/supervisord"]
     networks:
-      skema_default:
+      skema_net:
         aliases:
           - "skema_database_1" # use ${AGENT_NAME} before deploying
 

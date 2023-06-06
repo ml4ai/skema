@@ -1,6 +1,6 @@
 version: "3"
 networks:
-  skema_default:
+  skema_net:
     external: true
 
 services:
@@ -9,7 +9,7 @@ services:
         ports:
             - "8080:8080"
         networks:
-            skema_default:
+            skema_net:
                 aliases:
                     - "scienceparse"  # use ${AGENT_NAME} before deploying
 
@@ -19,6 +19,6 @@ services:
         ports:
             - "8060:8060"
         networks:
-            skema_default:
+            skema_net:
                 aliases:
                     - "grobidquantities"  # use ${AGENT_NAME} before deploying
