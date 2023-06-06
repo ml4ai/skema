@@ -22,7 +22,7 @@ services:
     networks:
       skema_default:
         aliases:
-          - "memgraph_db" # use ${AGENT_NAME} before deploying
+          - "skema_database_1" # use ${AGENT_NAME} before deploying
 
 volumes:
   mg_lib:
