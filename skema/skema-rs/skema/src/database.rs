@@ -24,7 +24,7 @@ There being a second function call of the same function which contains an expres
 */
 
 use crate::FunctionType;
-use crate::{Attribute, FnType::Import, FunctionNet, GrometBox};
+use crate::{Attribute, FnType::ImportFn, FunctionNet, GrometBox};
 use crate::{Files, FnType, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
 use rsmgclient::{ConnectParams, Connection, MgError};
 
@@ -388,7 +388,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     let mut bf_counter: u8 = 1;
     let mut function_call_repeat = false;
     let mut original_bf = bf_counter.clone();
-    let _boxf = gromet.modules[0].attributes[0].value.clone();
+    let _boxf = gromet.modules[0].attributes[0].clone();
     for node in nodes.clone() {
         if (1 == node.contents) && (node.n_type == "Function") {
             function_call_repeat = true;
@@ -407,7 +407,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             n_type: String::from("Function"),
             value: None,
             name: Some(
-                eboxf.value.b.as_ref().unwrap()[0]
+                eboxf.b.as_ref().unwrap()[0]
                     .name
                     .clone()
                     .map_or_else(|| format!("Function{}", start), |x| format!("{}", x)),
@@ -427,12 +427,8 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         };
         nodes.push(n1.clone());
         edges.push(e1);
-        if !eboxf.value.b.as_ref().unwrap()[0]
-            .metadata
-            .as_ref()
-            .is_none()
-        {
-            metadata_idx = eboxf.value.b.unwrap()[0].metadata.unwrap().clone();
+        if !eboxf.b.as_ref().unwrap()[0].metadata.as_ref().is_none() {
+            metadata_idx = eboxf.b.unwrap()[0].metadata.unwrap().clone();
             let mut repeat_meta = false;
             for node in meta_nodes.iter() {
                 if node.metadata_idx == metadata_idx {
@@ -500,7 +496,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         // they will have the same contents, being: (idx+1), however the bf_counter will be different, parse bf_counter from first call
         // (smallest of bf_counter of all calls) and use that in wiring, it is original_bf now
         // concerns over wiring into an expression, the expression would be in the correct contents attribute, but the ports are labeled as the expressions contents
-        for wire in eboxf.value.wfopi.unwrap().iter() {
+        for wire in eboxf.wfopi.unwrap().iter() {
             let mut wfopi_src_tgt: Vec<String> = vec![];
             // find the src node
             for node in nodes.iter() {
@@ -553,7 +549,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
                 edges.push(e6);
             }
         }
-        for wire in eboxf.value.wfopo.unwrap().iter() {
+        for wire in eboxf.wfopo.unwrap().iter() {
             let mut wfopo_src_tgt: Vec<String> = vec![];
             // find the src node
             for node in nodes.iter() {
@@ -615,7 +611,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             n_type: String::from("Function"),
             value: None,
             name: Some(
-                eboxf.value.b.as_ref().unwrap()[0]
+                eboxf.b.as_ref().unwrap()[0]
                     .name
                     .clone()
                     .map_or_else(|| format!("Function{}", start), |x| format!("{}", x)),
@@ -636,12 +632,8 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         nodes.push(n1.clone());
         edges.push(e1);
 
-        if !eboxf.value.b.as_ref().unwrap()[0]
-            .metadata
-            .as_ref()
-            .is_none()
-        {
-            metadata_idx = eboxf.value.b.unwrap()[0].metadata.unwrap().clone();
+        if !eboxf.b.as_ref().unwrap()[0].metadata.as_ref().is_none() {
+            metadata_idx = eboxf.b.unwrap()[0].metadata.unwrap().clone();
             let mut repeat_meta = false;
             for node in meta_nodes.iter() {
                 if node.metadata_idx == metadata_idx {
@@ -691,7 +683,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         // now to construct the nodes inside the function, currently supported Literals and Primitives
         // first include an Expression for increased depth
         let mut box_counter: u8 = 1;
-        for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+        for sboxf in eboxf.bf.clone().as_ref().unwrap().iter() {
             match sboxf.function_type {
                 FunctionType::Predicate => {
                     (nodes, edges, start, meta_nodes) = create_att_predicate(
@@ -1026,7 +1018,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 );
                 // now to construct the nodes inside the expression, Literal and Primitives
                 let mut box_counter: u8 = 1;
-                for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+                for sboxf in eboxf.bf.clone().as_ref().unwrap().iter() {
                     match sboxf.function_type {
                         FunctionType::Literal => {
                             (nodes, edges, meta_nodes) = create_att_literal(
@@ -1142,7 +1134,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 );
                 // now to construct the nodes inside the expression, Literal and Primitives
                 let mut box_counter: u8 = 1;
-                for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+                for sboxf in eboxf.bf.clone().as_ref().unwrap().iter() {
                     match sboxf.function_type {
                         FunctionType::Literal => {
                             (nodes, edges, meta_nodes) = create_att_literal(
@@ -1210,22 +1202,21 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                     let idx = boxf.contents.unwrap() - 1;
                     let eboxf = gromet.modules[0].attributes[idx as usize].clone();
 
-                    let n1 = Node {
-                        n_type: String::from("Function"),
-                        value: None,
-                        name: Some(
-                            eboxf.value.b.as_ref().unwrap()[0]
-                                .name
-                                .clone()
-                                .map_or_else(|| format!("Function{}", start), |x| format!("{}", x)),
-                        ),
-                        node_id: format!("n{}", start),
-                        out_idx: None,
-                        in_indx: None,
-                        contents: idx + 1,
-                        nbox: bf_counter,
-                        att_bf_idx: 0,
-                    };
+                    let n1 =
+                        Node {
+                            n_type: String::from("Function"),
+                            value: None,
+                            name: Some(eboxf.b.as_ref().unwrap()[0].name.clone().map_or_else(
+                                || format!("Function{}", start),
+                                |x| format!("{}", x),
+                            )),
+                            node_id: format!("n{}", start),
+                            out_idx: None,
+                            in_indx: None,
+                            contents: idx + 1,
+                            nbox: bf_counter,
+                            att_bf_idx: 0,
+                        };
                     let e1 = Edge {
                         src: String::from("mod"),
                         tgt: format!("n{}", start),
@@ -1258,12 +1249,8 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                         }
                     }
                     // attribute b level metadata reference
-                    if !eboxf.value.b.as_ref().unwrap()[0]
-                        .metadata
-                        .as_ref()
-                        .is_none()
-                    {
-                        metadata_idx = eboxf.value.b.unwrap()[0].metadata.unwrap().clone();
+                    if !eboxf.b.as_ref().unwrap()[0].metadata.as_ref().is_none() {
+                        metadata_idx = eboxf.b.unwrap()[0].metadata.unwrap().clone();
                         let mut repeat_meta = false;
                         for node in meta_nodes.iter() {
                             if node.metadata_idx == metadata_idx {
@@ -1328,7 +1315,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                     // they will have the same contents, being: (idx+1), however the bf_counter will be different, parse bf_counter from first call
                     // (smallest of bf_counter of all calls) and use that in wiring, it is original_bf now
                     // concerns over wiring into an expression, the expression would be in the correct contents attribute, but the ports are labeled as the expressions contents
-                    for wire in eboxf.value.wfopi.unwrap().iter() {
+                    for wire in eboxf.wfopi.unwrap().iter() {
                         let mut wfopi_src_tgt: Vec<String> = vec![];
                         // find the src node
                         for node in nodes.iter() {
@@ -1381,7 +1368,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                             edges.push(e6);
                         }
                     }
-                    for wire in eboxf.value.wfopo.unwrap().iter() {
+                    for wire in eboxf.wfopo.unwrap().iter() {
                         let mut wfopo_src_tgt: Vec<String> = vec![];
                         // find the src node
                         for node in nodes.iter() {
@@ -1437,9 +1424,8 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 } else {
                     // mark
                     // get attribute function net to pass into function
-                    let pfn = gromet.modules[0].attributes[(boxf.contents.unwrap() - 1) as usize]
-                        .value
-                        .clone();
+                    let pfn =
+                        gromet.modules[0].attributes[(boxf.contents.unwrap() - 1) as usize].clone();
 
                     // need a parent node for the module at this level
                     let temp_mod_node = Node {
@@ -1597,9 +1583,7 @@ pub fn create_import(
     mut meta_nodes: Vec<MetadataNode>,
 ) -> (Vec<Node>, Vec<Edge>, u32, Vec<MetadataNode>) {
     let eboxf = gromet.modules[0].clone();
-    let sboxf = gromet.modules[0].attributes[(att_idx - 1) as usize]
-        .value
-        .clone();
+    let sboxf = gromet.modules[0].attributes[(att_idx - 1) as usize].clone();
     let mboxf = eboxf.r#fn.bf.unwrap()[(bf_counter - 1) as usize].clone();
 
     let mut pof: Vec<u32> = vec![];
@@ -1689,8 +1673,8 @@ pub fn create_function(
     let eboxf = gromet.modules[0].attributes[(att_idx - 1) as usize].clone();
 
     // now we add a check for if this is an imported function
-    match eboxf.r#type.clone() {
-        Import => {
+    match eboxf.b.clone().unwrap()[0].function_type.clone() {
+        FunctionType::Import => {
             (nodes, edges, start, meta_nodes) = create_import(
                 &gromet.clone(),
                 function_net.clone(),
@@ -1717,12 +1701,12 @@ pub fn create_function(
 
             return (nodes, edges, start, meta_nodes);
         }
-        FnType::Fn => {
+        _ => {
             let n1 = Node {
                 n_type: String::from("Function"),
                 value: None,
                 name: Some(
-                    eboxf.value.b.as_ref().unwrap()[0]
+                    eboxf.b.as_ref().unwrap()[0]
                         .name
                         .clone()
                         .map_or_else(|| format!("Function{}", start), |x| format!("{}", x)),
@@ -1744,12 +1728,8 @@ pub fn create_function(
             edges.push(e1);
             let mut metadata_idx = 0;
             // attribute b level metadata reference
-            if !eboxf.value.b.as_ref().unwrap()[0]
-                .metadata
-                .as_ref()
-                .is_none()
-            {
-                metadata_idx = eboxf.value.b.as_ref().unwrap()[0].metadata.unwrap().clone();
+            if !eboxf.b.as_ref().unwrap()[0].metadata.as_ref().is_none() {
+                metadata_idx = eboxf.b.as_ref().unwrap()[0].metadata.unwrap().clone();
                 let mut repeat_meta = false;
                 for node in meta_nodes.iter() {
                     if node.metadata_idx == metadata_idx {
@@ -1799,12 +1779,12 @@ pub fn create_function(
             // now to construct the nodes inside the function, currently supported Literals and Primitives
             // first include an Expression for increased depth
             let mut box_counter: u8 = 1;
-            for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+            for sboxf in eboxf.bf.clone().as_ref().unwrap().iter() {
                 match sboxf.function_type {
                     FunctionType::Function => {
                         (nodes, edges, start, meta_nodes) = create_function(
                             &gromet.clone(),                 // gromet for metadata
-                            eboxf.value.clone(),             // function net for attribute
+                            eboxf.clone(),                   // function net for attribute
                             nodes.clone(),                   // nodes
                             edges.clone(),                   // edges
                             n1.clone(),                      // parent node
@@ -1908,7 +1888,7 @@ pub fn create_function(
                     // now lets check for and setup any conditionals at this level
                     (nodes, edges, start, meta_nodes) = create_conditional(
                         &gromet.clone(),
-                        eboxf.value.clone(), // This is gromet but is more generalizable based on scope
+                        eboxf.clone(), // This is gromet but is more generalizable based on scope
                         nodes.clone(),
                         edges.clone(),
                         n1.clone(),
@@ -1929,7 +1909,7 @@ pub fn create_function(
                     // now lets check for and setup any conditionals at this level
                     (nodes, edges, start, meta_nodes) = create_while_loop(
                         &gromet.clone(),
-                        eboxf.value.clone(), // This is gromet but is more generalizable based on scope
+                        eboxf.clone(), // This is gromet but is more generalizable based on scope
                         nodes.clone(),
                         edges.clone(),
                         n1.clone(),
@@ -2371,7 +2351,6 @@ pub fn create_conditional(
             .clone(); // get the attribute this box lives in
         let src_if_nbox = src_if_box;
         let src_if_pif = gromet.modules[0].attributes[(src_if_att - 1) as usize]
-            .value
             .opi
             .as_ref()
             .unwrap()[(pic_counter - 1) as usize]
@@ -2497,7 +2476,6 @@ pub fn create_conditional(
             .clone(); // get the attribute this box lives in
         let tgt_if_nbox = tgt_if_box;
         let tgt_if_pof = gromet.modules[0].attributes[(tgt_if_att - 1) as usize]
-            .value
             .opo
             .as_ref()
             .unwrap()[(poc_counter - 1) as usize]
@@ -3000,7 +2978,6 @@ pub fn create_while_loop(
             .clone(); // get the attribute this box lives in
         let src_if_nbox = src_if_box;
         let src_if_pif = gromet.modules[0].attributes[(src_if_att - 1) as usize]
-            .value
             .opi
             .as_ref()
             .unwrap()[(pic_counter - 1) as usize]
@@ -3080,7 +3057,6 @@ pub fn create_while_loop(
             .clone(); // get the attribute this box lives in
         let tgt_if_nbox = tgt_if_box;
         let tgt_if_pof = gromet.modules[0].attributes[(tgt_if_att - 1) as usize]
-            .value
             .opo
             .as_ref()
             .unwrap()[(poc_counter - 1) as usize]
@@ -3154,7 +3130,7 @@ pub fn create_while_loop(
 #[allow(unused_assignments)]
 pub fn create_att_expression(
     gromet: &ModuleCollection,
-    _eeboxf: Attribute,
+    _eeboxf: FunctionNet,
     ssboxf: GrometBox,
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -3221,12 +3197,12 @@ pub fn create_att_expression(
     // construct opo nodes, if not none
     // not calling the opo port constuctors since they are based on grabbing in the name from top level of the gromet,
     // not a parental attribute
-    if !eboxf.value.opo.clone().is_none() {
+    if !eboxf.opo.clone().is_none() {
         // grab name which is one level up and based on indexing
         // this can be done by the parent nodes contents field should give the index of the attributes
         // this constructs a vec for the names in the pofs, if any.
         let mut opo_name: Vec<String> = vec![];
-        for port in pboxf.value.pof.as_ref().unwrap().iter() {
+        for port in pboxf.pof.as_ref().unwrap().iter() {
             if port.r#box == box_counter {
                 if !port.name.is_none() {
                     opo_name.push(port.name.as_ref().unwrap().clone());
@@ -3237,7 +3213,7 @@ pub fn create_att_expression(
         }
         if opo_name.clone().len() != 0 {
             let mut oport: u32 = 0;
-            for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+            for _op in eboxf.opo.clone().as_ref().unwrap().iter() {
                 let n2 = Node {
                     n_type: String::from("Opo"),
                     value: None,
@@ -3258,13 +3234,13 @@ pub fn create_att_expression(
                     prop: None,
                 };
                 edges.push(e3);
-                if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+                if !eboxf.opo.clone().as_ref().unwrap()[oport as usize]
                     .metadata
                     .clone()
                     .as_ref()
                     .is_none()
                 {
-                    metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                    metadata_idx = eboxf.opo.clone().unwrap()[oport as usize]
                         .metadata
                         .clone()
                         .unwrap();
@@ -3295,10 +3271,10 @@ pub fn create_att_expression(
         }
     }
     // construct opi nodes, in not none
-    if !eboxf.value.opi.clone().is_none() {
+    if !eboxf.opi.clone().is_none() {
         // grab name which is NOT one level up as in opo
         let mut opi_name: Vec<String> = vec![];
-        for port in eboxf.value.opi.as_ref().unwrap().iter() {
+        for port in eboxf.opi.as_ref().unwrap().iter() {
             if !port.name.is_none() {
                 opi_name.push(port.name.as_ref().unwrap().clone());
             } else {
@@ -3306,7 +3282,7 @@ pub fn create_att_expression(
             }
         }
         let mut iport: u32 = 0;
-        for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+        for _op in eboxf.opi.clone().as_ref().unwrap().iter() {
             let n2 = Node {
                 n_type: String::from("Opi"),
                 value: None,
@@ -3327,13 +3303,13 @@ pub fn create_att_expression(
                 prop: None,
             };
             edges.push(e3);
-            if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+            if !eboxf.opi.clone().as_ref().unwrap()[iport as usize]
                 .metadata
                 .clone()
                 .as_ref()
                 .is_none()
             {
-                metadata_idx = eboxf.value.opi.clone().unwrap()[iport as usize]
+                metadata_idx = eboxf.opi.clone().unwrap()[iport as usize]
                     .metadata
                     .clone()
                     .unwrap();
@@ -3363,8 +3339,8 @@ pub fn create_att_expression(
     }
     // now to construct the nodes inside the expression, Literal and Primitives
     let mut box_counter: u8 = 1;
-    if !eboxf.value.bf.is_none() {
-        for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+    if !eboxf.bf.is_none() {
+        for sboxf in eboxf.bf.clone().as_ref().unwrap().iter() {
             match sboxf.function_type {
                 FunctionType::Literal => {
                     (nodes, edges, meta_nodes) = create_att_literal(
@@ -3412,7 +3388,7 @@ pub fn create_att_expression(
     );
 
     // Now we also perform wopio wiring in case there is an empty expression
-    if !eboxf.value.wopio.is_none() {
+    if !eboxf.wopio.is_none() {
         edges = wopio_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -3429,7 +3405,7 @@ pub fn create_att_expression(
 #[allow(unused_assignments)]
 pub fn create_att_predicate(
     gromet: &ModuleCollection,
-    _eeboxf: Attribute,
+    _eeboxf: FunctionNet,
     ssboxf: GrometBox,
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -3496,12 +3472,12 @@ pub fn create_att_predicate(
     // construct opo nodes, if not none
     // not calling the opo port constuctors since they are based on grabbing in the name from top level of the gromet,
     // not a parental attribute
-    if !eboxf.value.opo.clone().is_none() {
+    if !eboxf.opo.clone().is_none() {
         // grab name which is one level up and based on indexing
         // this can be done by the parent nodes contents field should give the index of the attributes
         // this constructs a vec for the names in the pofs, if any.
         let mut opo_name: Vec<String> = vec![];
-        for port in pboxf.value.pof.as_ref().unwrap().iter() {
+        for port in pboxf.pof.as_ref().unwrap().iter() {
             if port.r#box == box_counter {
                 if !port.name.is_none() {
                     opo_name.push(port.name.as_ref().unwrap().clone());
@@ -3511,7 +3487,7 @@ pub fn create_att_predicate(
             }
         }
         let mut oport: u32 = 0;
-        for _op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+        for _op in eboxf.opo.clone().as_ref().unwrap().iter() {
             let n2 = Node {
                 n_type: String::from("Opo"),
                 value: None,
@@ -3532,13 +3508,13 @@ pub fn create_att_predicate(
                 prop: None,
             };
             edges.push(e3);
-            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+            if !eboxf.opo.clone().as_ref().unwrap()[oport as usize]
                 .metadata
                 .clone()
                 .as_ref()
                 .is_none()
             {
-                metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                metadata_idx = eboxf.opo.clone().unwrap()[oport as usize]
                     .metadata
                     .clone()
                     .unwrap();
@@ -3568,10 +3544,10 @@ pub fn create_att_predicate(
         }
     }
     // construct opi nodes, in not none
-    if !eboxf.value.opi.clone().is_none() {
+    if !eboxf.opi.clone().is_none() {
         // grab name which is NOT one level up as in opo
         let mut opi_name: Vec<String> = vec![];
-        for port in eboxf.value.opi.as_ref().unwrap().iter() {
+        for port in eboxf.opi.as_ref().unwrap().iter() {
             if !port.name.is_none() {
                 opi_name.push(port.name.as_ref().unwrap().clone());
             } else {
@@ -3579,7 +3555,7 @@ pub fn create_att_predicate(
             }
         }
         let mut iport: u32 = 0;
-        for _op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+        for _op in eboxf.opi.clone().as_ref().unwrap().iter() {
             let n2 = Node {
                 n_type: String::from("Opi"),
                 value: None,
@@ -3600,13 +3576,13 @@ pub fn create_att_predicate(
                 prop: None,
             };
             edges.push(e3);
-            if !eboxf.value.opi.clone().as_ref().unwrap()[iport as usize]
+            if !eboxf.opi.clone().as_ref().unwrap()[iport as usize]
                 .metadata
                 .clone()
                 .as_ref()
                 .is_none()
             {
-                metadata_idx = eboxf.value.opi.clone().unwrap()[iport as usize]
+                metadata_idx = eboxf.opi.clone().unwrap()[iport as usize]
                     .metadata
                     .clone()
                     .unwrap();
@@ -3636,7 +3612,7 @@ pub fn create_att_predicate(
     }
     // now to construct the nodes inside the expression, Literal and Primitives
     let mut box_counter: u8 = 1;
-    for sboxf in eboxf.value.bf.clone().as_ref().unwrap().iter() {
+    for sboxf in eboxf.bf.clone().as_ref().unwrap().iter() {
         match sboxf.function_type {
             FunctionType::Literal => {
                 (nodes, edges, meta_nodes) = create_att_literal(
@@ -3686,7 +3662,7 @@ pub fn create_att_predicate(
 #[allow(unused_assignments)]
 pub fn create_att_literal(
     gromet: &ModuleCollection,
-    eboxf: Attribute,
+    eboxf: FunctionNet,
     sboxf: GrometBox,
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -3699,9 +3675,9 @@ pub fn create_att_literal(
 ) -> (Vec<Node>, Vec<Edge>, Vec<MetadataNode>) {
     // first find the pof's for box
     let mut pof: Vec<u32> = vec![];
-    if !eboxf.value.pof.clone().is_none() {
+    if !eboxf.pof.clone().is_none() {
         let mut po_idx: u32 = 1;
-        for port in eboxf.value.pof.clone().unwrap().iter() {
+        for port in eboxf.pof.clone().unwrap().iter() {
             if port.r#box == box_counter {
                 pof.push(po_idx);
             } else {
@@ -3758,7 +3734,7 @@ pub fn create_att_literal(
 #[allow(unused_assignments)]
 pub fn create_att_primitive(
     gromet: &ModuleCollection,
-    eboxf: Attribute,
+    eboxf: FunctionNet,
     sboxf: GrometBox,
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
@@ -3771,9 +3747,9 @@ pub fn create_att_primitive(
 ) -> (Vec<Node>, Vec<Edge>, Vec<MetadataNode>) {
     // first find the pof's for box
     let mut pof: Vec<u32> = vec![];
-    if !eboxf.value.pof.clone().is_none() {
+    if !eboxf.pof.clone().is_none() {
         let mut po_idx: u32 = 1;
-        for port in eboxf.value.pof.clone().unwrap().iter() {
+        for port in eboxf.pof.clone().unwrap().iter() {
             if port.r#box == box_counter {
                 pof.push(po_idx);
             }
@@ -3782,9 +3758,9 @@ pub fn create_att_primitive(
     }
     // then find pif's for box
     let mut pif: Vec<u32> = vec![];
-    if !eboxf.value.pif.clone().is_none() {
+    if !eboxf.pif.clone().is_none() {
         let mut pi_idx: u32 = 1;
-        for port in eboxf.value.pif.clone().unwrap().iter() {
+        for port in eboxf.pif.clone().unwrap().iter() {
             if port.r#box == box_counter {
                 pif.push(pi_idx);
             }
@@ -3850,11 +3826,11 @@ pub fn create_opo(
 ) -> (Vec<Node>, Vec<Edge>, Vec<MetadataNode>, u32) {
     let eboxf = gromet.modules[0].attributes[(parent_node.contents - 1) as usize].clone();
     // construct opo nodes, if not none
-    if !eboxf.value.opo.clone().is_none() {
+    if !eboxf.opo.clone().is_none() {
         // grab name which is one level up and based on indexing
         let mut opo_name = "un-named";
         let mut oport: u32 = 0;
-        for op in eboxf.value.opo.clone().as_ref().unwrap().iter() {
+        for op in eboxf.opo.clone().as_ref().unwrap().iter() {
             if op.name.as_ref().is_none() && !gromet.modules[0].r#fn.pof.as_ref().is_none() {
                 for port in gromet.modules[0].r#fn.pof.as_ref().unwrap().iter() {
                     if port.r#box == box_counter {
@@ -3890,13 +3866,13 @@ pub fn create_opo(
             edges.push(e3);
 
             let mut metadata_idx = 0;
-            if !eboxf.value.opo.clone().as_ref().unwrap()[oport as usize]
+            if !eboxf.opo.clone().as_ref().unwrap()[oport as usize]
                 .metadata
                 .clone()
                 .as_ref()
                 .is_none()
             {
-                metadata_idx = eboxf.value.opo.clone().unwrap()[oport as usize]
+                metadata_idx = eboxf.opo.clone().unwrap()[oport as usize]
                     .metadata
                     .clone()
                     .unwrap();
@@ -3941,11 +3917,11 @@ pub fn create_opi(
 ) -> (Vec<Node>, Vec<Edge>, Vec<MetadataNode>, u32) {
     let eboxf = gromet.modules[0].attributes[(parent_node.contents - 1) as usize].clone();
     // construct opi nodes, if not none
-    if !eboxf.value.opi.clone().is_none() {
+    if !eboxf.opi.clone().is_none() {
         // grab name which is one level up and based on indexing
         let mut opi_name = "un-named";
         let mut oport: u32 = 0;
-        for op in eboxf.value.opi.clone().as_ref().unwrap().iter() {
+        for op in eboxf.opi.clone().as_ref().unwrap().iter() {
             if op.name.as_ref().is_none() && !gromet.modules[0].r#fn.pif.as_ref().is_none() {
                 for port in gromet.modules[0].r#fn.pif.as_ref().unwrap().iter() {
                     if port.r#box == box_counter {
@@ -3981,13 +3957,13 @@ pub fn create_opi(
             edges.push(e3);
 
             let mut metadata_idx = 0;
-            if !eboxf.value.opi.clone().as_ref().unwrap()[oport as usize]
+            if !eboxf.opi.clone().as_ref().unwrap()[oport as usize]
                 .metadata
                 .clone()
                 .as_ref()
                 .is_none()
             {
-                metadata_idx = eboxf.value.opi.clone().unwrap()[oport as usize]
+                metadata_idx = eboxf.opi.clone().unwrap()[oport as usize]
                     .metadata
                     .clone()
                     .unwrap();
@@ -4021,14 +3997,14 @@ pub fn create_opi(
 // having issues with deeply nested structure, it is breaking in the internal wiring of the function level.
 // wfopi: pif -> opi
 pub fn wfopi_wiring(
-    eboxf: Attribute,
+    eboxf: FunctionNet,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
     bf_counter: u8,
 ) -> Vec<Edge> {
     // iterate through all wires of type
-    for wire in eboxf.value.wfopi.unwrap().iter() {
+    for wire in eboxf.wfopi.unwrap().iter() {
         let mut wfopi_src_tgt: Vec<String> = vec![];
         // find the src node
         for node in nodes.iter() {
@@ -4085,14 +4061,14 @@ pub fn wfopi_wiring(
 }
 
 pub fn wfopo_wiring(
-    eboxf: Attribute,
+    eboxf: FunctionNet,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
     bf_counter: u8,
 ) -> Vec<Edge> {
     // iterate through all wires of type
-    for wire in eboxf.value.wfopo.unwrap().iter() {
+    for wire in eboxf.wfopo.unwrap().iter() {
         let mut wfopo_src_tgt: Vec<String> = vec![];
         // find the src node
         for node in nodes.iter() {
@@ -4151,19 +4127,19 @@ pub fn wfopo_wiring(
 // shouldn't use bf_counter, should use att_bf_idx since that is variable for functions, need to pull the box from the
 // ports the wires point to.
 pub fn wff_wiring(
-    eboxf: Attribute,
+    eboxf: FunctionNet,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
     bf_counter: u8,
 ) -> Vec<Edge> {
     // iterate through all wires of type
-    for wire in eboxf.value.wff.unwrap().iter() {
+    for wire in eboxf.wff.unwrap().iter() {
         let mut wff_src_tgt: Vec<String> = vec![];
 
         let src_idx = wire.src; // port index
 
-        let src_pif = eboxf.value.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
+        let src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
 
         let src_box = src_pif.r#box.clone(); // src sub module box number
         let src_att = idx; // attribute index of submodule (also opi contents value)
@@ -4171,7 +4147,7 @@ pub fn wff_wiring(
 
         let tgt_idx = wire.tgt; // port index
 
-        let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+        let tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
 
         let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
         let tgt_att = idx; // attribute index of submodule (also opo contents value)
@@ -4241,14 +4217,14 @@ pub fn wff_wiring(
 }
 
 pub fn wopio_wiring(
-    eboxf: Attribute,
+    eboxf: FunctionNet,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
     bf_counter: u8,
 ) -> Vec<Edge> {
     // iterate through all wires of type
-    for wire in eboxf.value.wopio.unwrap().iter() {
+    for wire in eboxf.wopio.unwrap().iter() {
         let mut wopio_src_tgt: Vec<String> = vec![];
         // find the src node
         for node in nodes.iter() {
@@ -4305,7 +4281,7 @@ pub fn wopio_wiring(
 }
 
 pub fn internal_wiring(
-    eboxf: Attribute,
+    eboxf: FunctionNet,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
@@ -4320,7 +4296,7 @@ pub fn internal_wiring(
     // wopio: opo -> opi
 
     // check if wire exists, wfopi
-    if !eboxf.value.wfopi.clone().is_none() {
+    if !eboxf.wfopi.clone().is_none() {
         edges = wfopi_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -4331,7 +4307,7 @@ pub fn internal_wiring(
     }
 
     // check if wire exists, wfopo
-    if !eboxf.value.wfopo.is_none() {
+    if !eboxf.wfopo.is_none() {
         edges = wfopo_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -4342,7 +4318,7 @@ pub fn internal_wiring(
     }
 
     // check if wire exists, wff
-    if !eboxf.value.wff.is_none() {
+    if !eboxf.wff.is_none() {
         edges = wff_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -4353,7 +4329,7 @@ pub fn internal_wiring(
     }
 
     // check if wire exists, wopio
-    if !eboxf.value.wopio.is_none() {
+    if !eboxf.wopio.is_none() {
         edges = wopio_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -4370,7 +4346,7 @@ pub fn internal_wiring(
 // needs to handle top level and function level wiring that uses the function net at the call of the import.
 pub fn import_wiring(
     gromet: &ModuleCollection,
-    _eboxf: Attribute,
+    _eboxf: FunctionNet,
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,
@@ -4467,12 +4443,12 @@ pub fn import_wiring(
         let eboxf = gromet.modules[0].attributes[(parent_node.contents - 1) as usize].clone();
 
         // iterate through all wires of type
-        for wire in eboxf.value.wff.unwrap().iter() {
+        for wire in eboxf.wff.unwrap().iter() {
             let mut wff_src_tgt: Vec<String> = vec![];
 
             let src_idx = wire.src; // port index
 
-            let src_pif = eboxf.value.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
+            let src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
 
             let src_box = src_pif.r#box.clone(); // src sub module box number
             let src_att = idx; // attribute index of submodule (also opi contents value)
@@ -4480,7 +4456,7 @@ pub fn import_wiring(
 
             let tgt_idx = wire.tgt; // port index
 
-            let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+            let tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
 
             let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
             let tgt_att = idx; // attribute index of submodule (also opo contents value)
@@ -4551,7 +4527,7 @@ pub fn import_wiring(
 }
 
 pub fn cross_att_wiring(
-    eboxf: Attribute, // This is the current attribute
+    eboxf: FunctionNet, // This is the current attribute
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,       // this +1 is the current attribute index
@@ -4565,7 +4541,7 @@ pub fn cross_att_wiring(
     // wfopo: opo -> opo
 
     // check if wire exists, wfopi
-    if !eboxf.value.wfopi.clone().is_none() {
+    if !eboxf.wfopi.clone().is_none() {
         edges = wfopi_cross_att_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -4576,7 +4552,7 @@ pub fn cross_att_wiring(
     }
 
     // check if wire exists, wfopo
-    if !eboxf.value.wfopo.is_none() {
+    if !eboxf.wfopo.is_none() {
         edges = wfopo_cross_att_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -4587,7 +4563,7 @@ pub fn cross_att_wiring(
     }
 
     // check if wire exists, wff
-    if !eboxf.value.wff.is_none() {
+    if !eboxf.wff.is_none() {
         (edges, nodes) = wff_cross_att_wiring(
             eboxf.clone(),
             nodes.clone(),
@@ -4601,26 +4577,26 @@ pub fn cross_att_wiring(
 // this will construct connections from the function opi's to the sub module opi's, tracing inputs through the function
 // opi(sub)->opi(fun)
 pub fn wfopi_cross_att_wiring(
-    eboxf: Attribute, // This is the current attribute
+    eboxf: FunctionNet, // This is the current attribute
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,       // this is the current attribute index
     bf_counter: u8, // this is the current box
 ) -> Vec<Edge> {
-    for wire in eboxf.value.wfopi.as_ref().unwrap().iter() {
+    for wire in eboxf.wfopi.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         let src_idx = wire.src; // port index
-        let src_pif = eboxf.value.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
+        let src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
         let src_opi_idx = src_pif.id.unwrap().clone(); // index of opi port in opi list in src sub module (also opi node in_indx value)
         let src_box = src_pif.r#box.clone(); // src sub module box number, should also be the att_bf_idx of the opi
 
         // make sure it's a cross attributal wire and not internal
-        if !eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+        if !eboxf.bf.as_ref().unwrap()[(src_box - 1) as usize]
             .contents
             .clone()
             .is_none()
         {
-            let src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+            let src_att = eboxf.bf.as_ref().unwrap()[(src_box - 1) as usize]
                 .contents
                 .unwrap()
                 .clone(); // attribute index of submodule (also opi contents value)
@@ -4688,26 +4664,26 @@ pub fn wfopi_cross_att_wiring(
 // this will construct connections from the function opo's to the sub module opo's, tracing outputs through the function
 // opo(fun)->opo(sub)
 pub fn wfopo_cross_att_wiring(
-    eboxf: Attribute, // This is the current attribute
+    eboxf: FunctionNet, // This is the current attribute
     nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,       // this +1 is the current attribute index
     bf_counter: u8, // this is the current box
 ) -> Vec<Edge> {
-    for wire in eboxf.value.wfopo.as_ref().unwrap().iter() {
+    for wire in eboxf.wfopo.as_ref().unwrap().iter() {
         // collect info to identify the opo tgt node
         let tgt_idx = wire.tgt; // port index
-        let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+        let tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
         let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
         let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
 
         // make sure its a cross attributal wiring and not an internal one
-        if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+        if !eboxf.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
             .contents
             .clone()
             .is_none()
         {
-            let tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+            let tgt_att = eboxf.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                 .contents
                 .unwrap()
                 .clone(); // attribute index of submodule (also opo contents value)
@@ -4775,46 +4751,46 @@ pub fn wfopo_cross_att_wiring(
 // opi(sub)->opo(sub)
 #[allow(unused_assignments)]
 pub fn wff_cross_att_wiring(
-    eboxf: Attribute, // This is the current attribute, should be the function if in a function
+    eboxf: FunctionNet, // This is the current attribute, should be the function if in a function
     mut nodes: Vec<Node>,
     mut edges: Vec<Edge>,
     idx: u32,       // this +1 is the current attribute index
     bf_counter: u8, // this is the current box
 ) -> (Vec<Edge>, Vec<Node>) {
-    for wire in eboxf.value.wff.as_ref().unwrap().iter() {
+    for wire in eboxf.wff.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         let src_idx = wire.src; // port index
-        let src_pif = eboxf.value.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
+        let src_pif = eboxf.pif.as_ref().unwrap()[(src_idx - 1) as usize].clone(); // src port
         let src_opi_idx = src_pif.id.unwrap().clone(); // index of opi port in opi list in src sub module (also opi node in_indx value)
         let src_box = src_pif.r#box.clone(); // src sub module box number
                                              // make sure its a cross attributal wiring and not an internal wire
         let mut src_att = idx;
         // first conditional for if we are wiring from expression or function
-        if !eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+        if !eboxf.bf.as_ref().unwrap()[(src_box - 1) as usize]
             .contents
             .clone()
             .is_none()
         {
-            src_att = eboxf.value.bf.as_ref().unwrap()[(src_box - 1) as usize]
+            src_att = eboxf.bf.as_ref().unwrap()[(src_box - 1) as usize]
                 .contents
                 .unwrap()
                 .clone(); // attribute index of submodule (also opi contents value)
             let src_nbox = bf_counter; // nbox value of src opi
                                        // collect info to identify the opo tgt node
             let tgt_idx = wire.tgt; // port index
-            let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+            let tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
             let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
             let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
                                                  // make sure its a cross attributal wiring and not an internal wire
                                                  // initialize the tgt_att for case of opo or primitive/literal source
             let mut tgt_att = idx;
             // next expression for if we are wiring to an expression or function
-            if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+            if !eboxf.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                 .contents
                 .clone()
                 .is_none()
             {
-                tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                tgt_att = eboxf.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                     .contents
                     .unwrap()
                     .clone(); // attribute index of submodule (also opo contents value)
@@ -4925,12 +4901,11 @@ pub fn wff_cross_att_wiring(
                     // and the tgt_opo_idx which is the pof idx for the name
                     for i in 0..nodes.clone().len() {
                         if nodes[i].node_id.clone() == wff_src_tgt[0].clone() {
-                            if !eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize]
+                            if !eboxf.pof.as_ref().unwrap()[(tgt_idx - 1) as usize]
                                 .name
                                 .is_none()
                             {
-                                nodes[i].name = eboxf.value.pof.as_ref().unwrap()
-                                    [(tgt_idx - 1) as usize]
+                                nodes[i].name = eboxf.pof.as_ref().unwrap()[(tgt_idx - 1) as usize]
                                     .name
                                     .clone();
                             }
@@ -4949,18 +4924,18 @@ pub fn wff_cross_att_wiring(
             let src_nbox = bf_counter; // nbox value of src opi
                                        // collect info to identify the opo tgt node
             let tgt_idx = wire.tgt; // port index
-            let tgt_pof = eboxf.value.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
+            let tgt_pof = eboxf.pof.as_ref().unwrap()[(tgt_idx - 1) as usize].clone(); // tgt port
             let tgt_opo_idx = tgt_pof.id.unwrap().clone(); // index of tgt port in opo list in tgt sub module (also opo node out_idx value)
             let tgt_box = tgt_pof.r#box.clone(); // tgt sub module box number
                                                  // make sure its a cross attributal wiring and not an internal wire
                                                  // initialize the tgt_att for case of opo or primitive/literal source
             let mut tgt_att = idx;
-            if !eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+            if !eboxf.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                 .contents
                 .clone()
                 .is_none()
             {
-                tgt_att = eboxf.value.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
+                tgt_att = eboxf.bf.as_ref().unwrap()[(tgt_box - 1) as usize]
                     .contents
                     .unwrap()
                     .clone(); // attribute index of submodule (also opo contents value)
