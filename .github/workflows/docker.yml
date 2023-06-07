@@ -1,0 +1,177 @@
+name: SKEMA docker
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# builds and publishes docker images for the default branch.
+# images are tagged with short commit hash and latest.
+jobs:
+  setup:
+    name: setup
+    runs-on: ubuntu-latest
+    outputs:
+      sha_short: ${{ steps.sha.outputs.sha_short }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    # FIXME: this is deprecated
+    - name: generate short commit hash
+      id: sha
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+  docker:
+    name: "docker images"
+    needs: setup
+    env:
+      ORG: "lumai"
+    runs-on: ubuntu-latest
+    steps:
+    # Setup docker
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+    # for multi-arch builds (ex. ARM 64)
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: docker/setup-buildx-action@v2
+    # - name: Prepare buildx builder
+    #   run: |
+    #     docker buildx create --use --name "multiarch-builder" --platform linux/amd64,linux/arm64 --driver "docker-container"
+    - name: Inspect builder
+      run: |
+        echo "Name:      ${{ steps.buildx.outputs.name }}"
+        echo "Endpoint:  ${{ steps.buildx.outputs.endpoint }}"
+        echo "Status:    ${{ steps.buildx.outputs.status }}"
+        echo "Flags:     ${{ steps.buildx.outputs.flags }}"
+        echo "Platforms: ${{ steps.buildx.outputs.platforms }}"
+    # Checkout code
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Login to DockerHub
+      uses: docker/login-action@v2 
+      with:
+        username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
+        password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
+
+    ########################################
+    # lumai/askem-skema-py
+    ########################################
+    # build and tag image
+    - name: "build and tag `lumai/askem-skema-py` image"
+      env:
+        IMAGE_NAME: "lumai/askem-skema-py"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: "Dockerfile.skema-py"
+        platforms: linux/amd64
+        push: false
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+
+    # build, tag, and publish image
+    # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
+    - name: "build, tag, and publish `lumai/askem-skema-py` image"
+      if: github.ref == 'refs/heads/main'
+      env:
+        IMAGE_NAME: "lumai/askem-skema-py"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: "Dockerfile.skema-py"
+        platforms: linux/amd64
+        push: true
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+
+    ########################################
+    # lumai/askem-skema-rs
+    ########################################
+    # build and tag image
+    - name: "build and tag `lumai/askem-skema-rs` image"
+      env:
+        IMAGE_NAME: "lumai/askem-skema-rs"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: "Dockerfile.skema-rs"
+        platforms: linux/amd64
+        push: false
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+
+    # build, tag, and publish image
+    # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
+    - name: "build, tag, and publish `lumai/askem-skema-rs` image"
+      if: github.ref == 'refs/heads/main'
+      env:
+        IMAGE_NAME: "lumai/askem-skema-rs"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: "Dockerfile.skema-rs"
+        platforms: linux/amd64
+        push: true
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+
+    ########################################
+    # lumai/askem-skema-text-reading
+    ########################################
+    # build and tag image
+    - name: "build and tag `lumai/askem-skema-text-reading` image"
+      env:
+        IMAGE_NAME: "lumai/askem-skema-text-reading"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: ./skema/text_reading/text_reading
+        platforms: linux/amd64
+        push: false
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+
+    # build, tag, and publish image
+    # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
+    - name: "build, tag, and publish `lumai/askem-skema-text-reading` image"
+      if: github.ref == 'refs/heads/main'
+      env:
+        IMAGE_NAME: "lumai/askem-skema-text-reading"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: ./skema/text_reading/text_reading
+        platforms: linux/amd64
+        push: true
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+
+    ########################################
+    # lumai/askem-skema-img2mml
+    ########################################
+    # build and tag image
+    - name: "build and tag `lumai/askem-skema-img2mml` image"
+      env:
+        IMAGE_NAME: "lumai/askem-skema-img2mml"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: "Dockerfile.img2mml"
+        platforms: linux/amd64
+        push: false
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+
+    # build, tag, and publish image
+    # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
+    - name: "build, tag, and publish `lumai/askem-skema-img2mml` image"
+      if: github.ref == 'refs/heads/main'
+      env:
+        IMAGE_NAME: "lumai/askem-skema-img2mml"
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: "Dockerfile.img2mml"
+        platforms: linux/amd64
+        push: true
+        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
