@@ -68,7 +68,7 @@ jobs:
         file: "Dockerfile.skema-py"
         platforms: linux/amd64
         push: false
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
 
     # build, tag, and publish image
     # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
@@ -83,7 +83,7 @@ jobs:
         file: "Dockerfile.skema-py"
         platforms: linux/amd64
         push: true
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
 
     ########################################
     # lumai/askem-skema-rs
@@ -99,7 +99,7 @@ jobs:
         file: "Dockerfile.skema-rs"
         platforms: linux/amd64
         push: false
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
 
     # build, tag, and publish image
     # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
@@ -114,7 +114,7 @@ jobs:
         file: "Dockerfile.skema-rs"
         platforms: linux/amd64
         push: true
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
 
     ########################################
     # lumai/askem-skema-text-reading
@@ -129,7 +129,7 @@ jobs:
         context: ./skema/text_reading/text_reading
         platforms: linux/amd64
         push: false
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
 
     # build, tag, and publish image
     # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
@@ -143,7 +143,7 @@ jobs:
         context: ./skema/text_reading/text_reading
         platforms: linux/amd64
         push: true
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
 
     ########################################
     # lumai/askem-skema-img2mml
@@ -159,7 +159,7 @@ jobs:
         file: "Dockerfile.img2mml"
         platforms: linux/amd64
         push: false
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
 
     # build, tag, and publish image
     # NOTE: this will *not* rebuild the image, but rather utilize the cache from the prior step
@@ -174,4 +174,4 @@ jobs:
         file: "Dockerfile.img2mml"
         platforms: linux/amd64
         push: true
-        tags: ${{ env.ORG }}/$IMAGE_NAME:latest,${{ env.ORG }}/$IMAGE_NAME:${{ needs.setup.outputs.sha_short }}
+        tags: ${{ env.ORG }}/${{ env.IMAGE_NAME }}:latest,${{ env.ORG }}/${{ env.IMAGE_NAME }}:${{ needs.setup.outputs.sha_short }}
