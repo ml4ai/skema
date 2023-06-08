@@ -408,25 +408,24 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
             ddp=ddp,
             rank=rank,
             g2p=g2p,
+            is_test=True,
         )
 
         # calculate bleu score
         print("epoch: ", epoch)
-        # bs = calculate_bleu_score()
+        bs = calculate_bleu_score()
         trial.report(val_loss, epoch)
 
         # Handle pruning based on the intermediate value.
         if trial.should_prune():
             raise optuna.exceptions.TrialPruned()
 
-
-
     if ddp:
         dist.destroy_process_group()
 
     time.sleep(3)
 
-    return val_loss
+    return bs
 
 def tune(rank=None,):
 
@@ -440,7 +439,7 @@ def tune(rank=None,):
                                         val_dataloader,
                                         vocab, rank)
 
-    study = optuna.create_study(direction="minimize")
+    study = optuna.create_study(direction="maximize")
     study.optimize(func, n_trials=15)
 
     pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
