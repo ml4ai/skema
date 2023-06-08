@@ -32,6 +32,7 @@ from skema.img2mml.src.train import train
 from skema.img2mml.src.test import evaluate
 import optuna
 from optuna.trial import TrialState
+from utils.bleu_score import calculate_bleu_score
 
 # opening config file
 parser = argparse.ArgumentParser()
@@ -201,32 +202,6 @@ def epoch_time(start_time, end_time):
     elapsed_mins = int(elapsed_time / 60)
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
-
-def calculate_bleu_score():
-    tt = open("logs/test_targets_100K.txt").readlines()
-    tp = open("logs/test_predicted_100K.txt").readlines()
-    _tt = open("logs/final_targets.txt", "w")
-    _tp = open("logs/final_preds.txt", "w")
-
-    for i, j in zip(tt, tp):
-        eos_i = i.find("<eos>")
-        _tt.write(i[6:eos_i] + "\n")
-
-        eos_j = j.find("<eos>")
-        _tp.write(j[6:eos_j] + "\n")
-
-    test = open("logs/final_targets.txt").readlines()
-    predicted = open("logs/final_preds.txt").readlines()
-
-    candidate_corpus, references_corpus = [], []
-
-    for t, p in zip(test, predicted):
-        candidate_corpus.append(t.split())
-        references_corpus.append([p.split()])
-
-    bleu = bleu_score(candidate_corpus, references_corpus)
-    return bleu
-
 
 def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, rank=None):
 
