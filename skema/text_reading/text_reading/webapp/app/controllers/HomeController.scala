@@ -19,7 +19,7 @@ import org.clulab.serialization.json.stringify
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
 import org.json4s.{JArray, JValue}
-import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine, TextReadingPipelineWithContext}
+import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine, PlainTextFileTextReadingPipeline, TextReadingPipelineWithContext}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
@@ -86,6 +86,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
 
   private val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
+  private val plainTextPipeline = new TextReadingPipelineWithContext() // TODO Add the window parameter to the configuration file
 
 
   logger.info("Completed Initialization ...")
@@ -242,52 +243,25 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   }
 
-  /**
-    * Extract mentions from a pdf. Requires Science-Parse running. Expected fields in the json obj passed in:
-    *  'pdf' : path to the pdf file
-    * @return Seq[Mention] (json serialized)
-    */
-  def pdf_to_mentions: Action[AnyContent] = Action { request =>
-    val data = request.body.asJson.get.toString()
-    val json = ujson.read(data)
-    val pdfFile = json("pdf").str
-    logger.info(s"Extracting mentions from $pdfFile")
-    val scienceParseDoc = scienceParse.parsePdf(pdfFile)
-    val texts = if (scienceParseDoc.sections.isDefined)  {
-      scienceParseDoc.sections.get.map(_.headingAndText) ++ scienceParseDoc.abstractText
-    } else scienceParseDoc.abstractText.toSeq
-    logger.info("Finished converting to text")
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile)).mentions)
-    val outFile = json("outfile").str
-    AutomatesExporter(outFile).export(mentions)
-    //    mentions.saveJSON(outFile, pretty=true)
-    Ok("")
-  }
-
-  /**
-    * Extract mentions from a json produced by running Science Parse on a pdf file. Expected fields in the json obj passed in:
-    *  'json' : path to the Science Parse json file, 'outfile' : path to the json file to store extracted mentions. In the curl post request, the data argument will look like this: "--data '{"json": "someDirectory/petpno_Penman.json", "outfile": path/to/output..json}'"
-    * @return Seq[Mention] (json serialized)
-    */
-
-  def json_doc_to_mentions: Action[AnyContent] = Action { request =>
-    val data = request.body.asJson.get.toString()
-    val json = ujson.read(data)
-    val jsonFile = json("json").str
-    logger.info(s"Extracting mentions from $jsonFile")
-    val loader = new ScienceParsedDataLoader
-    val texts = loader.loadFile(jsonFile)
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile)).mentions)
-    val outFile = json("outfile").str
-    AutomatesExporter(outFile).export(mentions)
-    Ok("")
-  }
 
   def cosmosJsonToMentions: Action[AnyContent] = Action { request =>
     val json = request.body.asJson.get.toString()
     val ujsonArray = ujson.read(json)
     val ujsonValues = ujsonArray.arr.map { ujsonValue =>
       cosmosPipeline.extractMentionsFromJsonAndSerialize(ujsonValue)
+    }
+    val ujsonResult = ujson.Arr.from(ujsonValues)
+    val playJsonResult = ujsonToPlayJson(ujsonResult)
+
+    Ok(playJsonResult)
+  }
+
+
+  def textFileToMentions: Action[AnyContent] = Action { request =>
+    val json = request.body.asJson.get.toString()
+    val ujsonArray = ujson.read(json)
+    val ujsonValues = ujsonArray.arr.map { ujsonValue =>
+      SkemaJSONSerializer.serializeMentions(plainTextPipeline.extractMentionsWithContext(ujsonValue.toString(), contextWindowSize = 3))
     }
     val ujsonResult = ujson.Arr.from(ujsonValues)
     val playJsonResult = ujsonToPlayJson(ujsonResult)
