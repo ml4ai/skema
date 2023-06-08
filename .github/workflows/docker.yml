@@ -54,6 +54,13 @@ jobs:
       with:
         username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
+    - name: "Free disk space"
+      run: |
+        sudo apt clean
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
     ########################################
     # lumai/askem-skema-py
@@ -118,6 +125,13 @@ jobs:
       with:
         username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
+    - name: "Free disk space"
+      run: |
+        sudo apt clean
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
     ########################################
     # lumai/askem-skema-rs
@@ -182,6 +196,13 @@ jobs:
       with:
         username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
+    - name: "Free disk space"
+      run: |
+        sudo apt clean
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
     ########################################
     # lumai/askem-skema-text-reading
@@ -245,6 +266,13 @@ jobs:
       with:
         username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
+    - name: "Free disk space"
+      run: |
+        sudo apt clean
+        sudo rm -rf /usr/share/dotnet
+        sudo rm -rf /opt/ghc
+        sudo rm -rf "/usr/local/share/boost"
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
     ########################################
     # lumai/askem-skema-img2mml
