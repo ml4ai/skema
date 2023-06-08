@@ -5,10 +5,7 @@
 # HOST_PORT:CONTAINER_PORT.
 version: "3"
 
-
-networks:
-  skema_net:
-    external: true
+# create the network if it does not yet exist
 
 services:
   # The skema-py web service exposing functionality implemented in Python.
@@ -22,10 +19,9 @@ services:
     - "8001:8000"
     command: ["uvicorn", "server:app", "--host", "0.0.0.0"]
     networks:
-      skema_net:
+      net:
         aliases:
           - "skema-py"  # use ${AGENT_NAME} before deploying
-
 
   # The skema-rs web service exposing functionality implemented in Rust.
   skema-rs:
@@ -36,11 +32,9 @@ services:
     ports:
       - "8080:8080"
     networks:
-      skema_net:
+      net:
         aliases:
           - "skema-rs"  # use ${AGENT_NAME} before deploying
-
-
 
   database:
     image: "memgraph/memgraph-platform"
@@ -56,10 +50,13 @@ services:
       - MEMGRAPH="--log-level=TRACE"
     entrypoint: ["/usr/bin/supervisord"]
     networks:
-      skema_net:
+      net:
         aliases:
           - "skema_database_1"  # use ${AGENT_NAME} before deploying
 
+# when run from directory 'skema' creates 'skema_net' if needed
+networks:
+  net:
 
 volumes:
   mg_lib:
