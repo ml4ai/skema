@@ -61,7 +61,7 @@ jobs:
     # build and tag image
     - name: "build and tag `lumai/askem-skema-py` image"
       env:
-        IMAGE_NAME: "lumai/askem-skema-py"
+        IMAGE_NAME: "askem-skema-py"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
@@ -76,7 +76,7 @@ jobs:
     - name: "build, tag, and publish `lumai/askem-skema-py` image"
       if: github.ref == 'refs/heads/main'
       env:
-        IMAGE_NAME: "lumai/askem-skema-py"
+        IMAGE_NAME: "askem-skema-py"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
@@ -125,7 +125,7 @@ jobs:
     # build and tag image
     - name: "build and tag `lumai/askem-skema-rs` image"
       env:
-        IMAGE_NAME: "lumai/askem-skema-rs"
+        IMAGE_NAME: "askem-skema-rs"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
@@ -140,7 +140,7 @@ jobs:
     - name: "build, tag, and publish `lumai/askem-skema-rs` image"
       if: github.ref == 'refs/heads/main'
       env:
-        IMAGE_NAME: "lumai/askem-skema-rs"
+        IMAGE_NAME: "askem-skema-rs"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
@@ -189,7 +189,7 @@ jobs:
     # build and tag image
     - name: "build and tag `lumai/askem-skema-text-reading` image"
       env:
-        IMAGE_NAME: "lumai/askem-skema-text-reading"
+        IMAGE_NAME: "askem-skema-text-reading"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
@@ -203,7 +203,7 @@ jobs:
     - name: "build, tag, and publish `lumai/askem-skema-text-reading` image"
       if: github.ref == 'refs/heads/main'
       env:
-        IMAGE_NAME: "lumai/askem-skema-text-reading"
+        IMAGE_NAME: "askem-skema-text-reading"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
@@ -252,7 +252,7 @@ jobs:
     # build and tag image
     - name: "build and tag `lumai/askem-skema-img2mml` image"
       env:
-        IMAGE_NAME: "lumai/askem-skema-img2mml"
+        IMAGE_NAME: "askem-skema-img2mml"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
@@ -267,7 +267,7 @@ jobs:
     - name: "build, tag, and publish `lumai/askem-skema-img2mml` image"
       if: github.ref == 'refs/heads/main'
       env:
-        IMAGE_NAME: "lumai/askem-skema-img2mml"
+        IMAGE_NAME: "askem-skema-img2mml"
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
