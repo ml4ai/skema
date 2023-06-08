@@ -230,9 +230,12 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     else:
         if not torch.cuda.is_available():
             info("CUDA is not available, falling back to using the CPU.")
-            model.load_state_dict(
-                torch.load(model_path, map_location=torch.device("cpu"))
-            )
+            new_model = dict()
+            for key, value in torch.load(
+                    model_path, map_location=torch.device("cpu")
+            ).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
         else:
             model.load_state_dict(torch.load(model_path))
 
