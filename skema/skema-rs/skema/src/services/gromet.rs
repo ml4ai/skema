@@ -3,11 +3,25 @@
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
 use crate::{Gromet, ModuleCollection};
+use actix_web::web::ServiceConfig;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use std::collections::HashMap;
 
 use actix_web::{delete, get, post, web, HttpResponse};
 use utoipa;
+
+pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
+    |config: &mut ServiceConfig| {
+        config
+            .service(get_model_ids)
+            .service(post_model)
+            .service(delete_model)
+            .service(get_named_opos)
+            .service(get_named_opis)
+            .service(get_named_ports)
+            .service(get_subgraph);
+    }
+}
 
 pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgError> {
     // parse gromet into vec of queries
@@ -196,7 +210,7 @@ pub async fn get_model_ids(config: web::Data<Config>) -> HttpResponse {
 
 /// Pushes a gromet JSON to the Memgraph database
 #[utoipa::path(
-    request_body = Gromet,
+    request_body = ModuleCollection,
     responses(
         (status = 200, description = "Model successfully pushed")
     )

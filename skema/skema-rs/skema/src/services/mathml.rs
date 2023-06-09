@@ -1,8 +1,15 @@
-use actix_web::put;
-use mathml::parsing::parse;
+use actix_web::{get, put, web, HttpResponse};
+use mathml::{
+    acset::{ACSet, ModelRepPn},
+    ast::Math,
+    expression::{preprocess_content, wrap_math},
+    parsing::parse,
+};
 use petgraph::dot::{Config, Dot};
+use serde::{Deserialize, Serialize};
 use std::string::String;
 use utoipa;
+use utoipa::ToSchema;
 
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 #[utoipa::path(
@@ -38,10 +45,28 @@ pub async fn get_ast_graph(payload: String) -> String {
 )]
 #[put("/mathml/math-exp-graph")]
 pub async fn get_math_exp_graph(payload: String) -> String {
-    let contents = &payload;
+    let mut contents = payload.clone();
+    contents = preprocess_content(contents);
     let (_, mut math) = parse(&contents).expect(format!("Unable to parse payload!").as_str());
     math.normalize();
-    let g = &mut math.content[0].clone().to_graph();
-    let dot_representation = Dot::new(&*g);
+    let mut new_math = wrap_math(math);
+    let g = new_math.clone().to_graph();
+    let dot_representation = Dot::new(&g);
     dot_representation.to_string()
+}
+
+/// Return a JSON representation of a ModelRep constructed from an array of MathML strings.
+#[utoipa::path(
+    request_body = Vec<String>,
+    responses(
+        (
+            status = 200,
+            body = ModelRepPn
+        )
+    )
+)]
+#[put("/mathml/acset")]
+pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
+    let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
+    HttpResponse::Ok().json(web::Json(ModelRepPn::from(ACSet::from(asts))))
 }

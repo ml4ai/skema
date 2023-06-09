@@ -24,8 +24,7 @@ function configureMathJax() {
         });
 
         mjAPI.start();
-    }
-    catch (error) {
+    } catch (error) {
         console.error(`An error occurred while configuring MathJax: ${error.message}`);
         configureMathJax();
     }

@@ -5,7 +5,7 @@ import org.clulab.odin.{Attachment, EventMention, Mention, RelationMention, Text
 import org.ml4ai.skema.test.ExtractionTest
 import org.ml4ai.skema.text_reading.attachments.AutomatesAttachment
 import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
-import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
 
 // first, let's make crossSentenceMentions to export to JSON file
@@ -17,8 +17,8 @@ class TestConjDescrSerialization extends ExtractionTest {
   passingTest should s"successfully serialize and deserialize Description RelationMentions that went through conjunction-related post-processing (t1): ${t1}" taggedAs (Somebody) in {
     val mentions = extractMentions(t1)
     val DescrMentions = mentions.filter(m => m.label =="Description")
-    val uJson = AutomatesJSONSerializer.serializeMentions(DescrMentions)
-    val deserializedMentions = AutomatesJSONSerializer.toMentions(uJson)
+    val uJson = SkemaJSONSerializer.serializeMentions(DescrMentions)
+    val deserializedMentions = SkemaJSONSerializer.toMentions(uJson)
     getAttachmentJsonsFromArgs(deserializedMentions) should equal(getAttachmentJsonsFromArgs(DescrMentions))
     deserializedMentions should have size (DescrMentions.size)
     deserializedMentions.head.document.equivalenceHash should equal (DescrMentions.head.document.equivalenceHash)
@@ -33,14 +33,14 @@ class TestConjDescrSerialization extends ExtractionTest {
   passingTest should s"serialize and deserialize conjunction descriptions successfully from t2: ${t2}" taggedAs (Somebody) in {
     val mentions = extractMentions(t2)
     val conjDefMention = mentions.filter(m => m.labels.contains("ConjDescription"))
-    val uJson = AutomatesJSONSerializer.serializeMentions(conjDefMention)
-    val deserializedMentions = AutomatesJSONSerializer.toMentions(uJson)
+    val uJson = SkemaJSONSerializer.serializeMentions(conjDefMention)
+    val deserializedMentions = SkemaJSONSerializer.toMentions(uJson)
     deserializedMentions should have size (conjDefMention.size)
     deserializedMentions.head.document.equivalenceHash should equal (conjDefMention.head.document.equivalenceHash)
     deserializedMentions.head.text should equal(conjDefMention.head.text)
     deserializedMentions.head.asInstanceOf[EventMention].sentence should equal(conjDefMention.head.asInstanceOf[EventMention].sentence)
-    val hashesDeser = deserializedMentions.map(m => AutomatesJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
-    val hashesOrig = conjDefMention.map(m =>  AutomatesJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
+    val hashesDeser = deserializedMentions.map(m => SkemaJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
+    val hashesOrig = conjDefMention.map(m =>  SkemaJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
     hashesDeser should equal(hashesOrig)
   }
 
@@ -48,8 +48,8 @@ class TestConjDescrSerialization extends ExtractionTest {
   passingTest should s"serialize and deserialize the Description EventMentions successfully from t3: ${t3}" taggedAs (Somebody) in {
     val mentions = extractMentions(t3)
     val DescrMentions = mentions.filter(m => m.label == "Description")
-    val uJson = AutomatesJSONSerializer.serializeMentions(DescrMentions)
-    val deserializedMentions = AutomatesJSONSerializer.toMentions(uJson)
+    val uJson = SkemaJSONSerializer.serializeMentions(DescrMentions)
+    val deserializedMentions = SkemaJSONSerializer.toMentions(uJson)
     getAttachmentJsonsFromArgs(deserializedMentions) should equal(getAttachmentJsonsFromArgs(DescrMentions))
     deserializedMentions should have size (DescrMentions.size)
     deserializedMentions.head.document.equivalenceHash should equal(DescrMentions.head.document.equivalenceHash)
@@ -65,14 +65,14 @@ class TestConjDescrSerialization extends ExtractionTest {
     val mentions = extractMentions(t4)
     val conjDefMention = mentions.filter(m => m.labels.contains("ConjDescription"))
     // TODO: conjDefMention is empty which will cause an exception shortly.
-    val uJson = AutomatesJSONSerializer.serializeMentions(conjDefMention)
-    val deserializedMentions = AutomatesJSONSerializer.toMentions(uJson)
+    val uJson = SkemaJSONSerializer.serializeMentions(conjDefMention)
+    val deserializedMentions = SkemaJSONSerializer.toMentions(uJson)
     deserializedMentions should have size (conjDefMention.size)
     deserializedMentions.head.document.equivalenceHash should equal (conjDefMention.head.document.equivalenceHash)
     deserializedMentions.head.text should equal(conjDefMention.head.text)
     deserializedMentions.head.asInstanceOf[EventMention].sentence should equal(conjDefMention.head.asInstanceOf[EventMention].sentence)
-    val hashesDeser = deserializedMentions.map(m => AutomatesJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
-    val hashesOrig = conjDefMention.map(m =>  AutomatesJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
+    val hashesDeser = deserializedMentions.map(m => SkemaJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
+    val hashesOrig = conjDefMention.map(m =>  SkemaJSONSerializer.AutomatesEventMentionOps(m.asInstanceOf[EventMention]).equivalenceHash).toSet
     hashesDeser should equal(hashesOrig)
   }
 }

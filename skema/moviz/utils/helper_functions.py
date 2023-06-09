@@ -24,18 +24,30 @@ def drawPIF(bf, c, data):
             if str(pif["box"]) == str(index[-1]):
                 c.attr("node", shape="box")
                 pif["node"] = f"pif-{bf.get('box')}-{i}"
+                # print("pif node created")
                 c.node(name=f"pif-{bf.get('box')}-{i}", fontcolor="white", label="", width='0.5', penwidth='2')
                 i += 1
 
 
 def drawOPO(b, c, data):
+    i=0
     if data.get("opo") != None:
         for opo in data["opo"]:
             index = b.get("box").split("-")
             if str(opo.get("box")) == index[-1]:
-                opo["node"] = f"opo-{b.get('box')}"
-                c.attr("node", shape="box")
-                c.node(name=f"opo-{b.get('box')}", fontcolor="white", label="", width='0.5', penwidth='2')
+                # print(opo)
+                if opo.get("name") != None:
+                    opo["node"] = f"opo-{b.get('box')}-{str(opo.get('name'))}"
+                    c.attr("node", shape="box")
+                    c.node(name=opo.get('node'), fontcolor="white", label=opo.get("name"), width='0.5', penwidth='2')
+                else:                   
+                    opo["node"] = f"opo-{b.get('box')}-{i}"
+                    i+=1
+                    c.attr("node", shape="box")
+                    c.node(name=opo.get('node'), fontcolor="white", label="", width='0.5', penwidth='2')
+                
+                print("opo:", data.get("opo"))
+
 
 
 def drawOPI(b, c, data):
@@ -46,19 +58,14 @@ def drawOPI(b, c, data):
                 if opi.get("name") != None:
                     opi["node"] = f"opi-{b.get('box')}-{str(opi.get('name'))}"
                     c.attr("node", shape="box")
-                    c.node(
-                        name=f"opi-{b.get('box')}-{str(opi.get('name'))}",
-                        label=str(opi.get("name")),
-                        width='0.5', 
-                        penwidth='2'
-                    )
+                    c.node(name=f"opi-{b.get('box')}-{str(opi.get('name'))}", label=str(opi.get("name")), width='0.5', penwidth='2')
                 else:
                     opi["node"] = f"opi-{b.get('box')}"
                     c.attr("node", shape="box")
                     c.node(name=f"opi-{b.get('box')}", fontcolor="white", label="", width='0.5', penwidth='2')
 
 
-def drawPIC(data, bc, c):
+def drawPIC(data, bc, c): 
     if data.get("pic") != None:
         for pic in data.get("pic"):
             index = bc["box"].split("-")
@@ -67,10 +74,13 @@ def drawPIC(data, bc, c):
             if str(pic["box"]) == str(index[-1]):
                 if pic.get("name") != None:
                     pic["node"] = f"pic-{bc['box']}"
-                    c.node(name=str(pic.get("name")), width='0.5')
+                    c.node(name=pic.get('node'), width='0.5', penwidth='2', label=str(pic.get("name")))
+                    print("if",pic)
                 else:
+                    print("else",pic)
                     pic["node"] = f"pic-{bc['box']}"
-                    c.node(name=f"pic-{bc['box']}", fontcolor="white", width='0.5')
+                    c.node(name=f"pic-{bc['box']}", fontcolor="white", width='0.5', penwidth='2', label="")
+                    print(pic)
 
 
 def drawPOC(data, bc, c):
@@ -80,9 +90,13 @@ def drawPOC(data, bc, c):
             c.attr("node", shape="box")
             if str(poc["box"]) == str(index[-1]):
                 if poc.get("name") != None:
-                    c.node(name=str(poc.get("name")), width='0.5')
+                    poc["node"] = f"poc-{bc['box']}"
+                    c.node(name=poc.get('node'), width='0.5', penwidth='2', label=str(poc.get("name")))
+                    print("if",poc)
                 else:
-                    c.node(name=f"poc-{bc['box']}", fontcolor="white", width='0.5')
+                    poc["node"] = f"poc-{bc['box']}"
+                    c.node(name=f"poc-{bc['box']}", fontcolor="white", width='0.5', penwidth='2', label="")
+                    print("else",poc)
 
 
 def drawPIL(data, bl, c):
@@ -116,14 +130,17 @@ def drawPOL(data, bl, c):
 def drawWFF(data, g):
     if data.get("wff") != None:
         for wff in data["wff"]:
-            if data.get("pif") != None:
-                for pif in data["pif"]:
-                    if data.get("pof") != None:
-                        for pof in data["pof"]:
-                            # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
-                            if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
-                                # print(pif.get("node"), pof.get("node"))
-                                g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+            if(wff['drawn'] == False):
+                if wff.get('drawn') == False:
+                    if data.get("pif") != None:
+                        for pif in data["pif"]:
+                            if data.get("pof") != None:
+                                for pof in data["pof"]:
+                                    # print(wff["src"], pif["id"], wff["tgt"], pof["id"])
+                                    if wff["src"] == pif["id"] and wff["tgt"] == pof["id"]:
+                                        # print(pif.get("node"), pof.get("node"), "\n",pif, '\n', pof)
+                                        g.edge(pif.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+                                        wff['drawn'] = True
 
 
 def drawWFC(data, g):
@@ -149,28 +166,26 @@ def drawWFL(data, g):
 def drawWFOPO(data, g):
     if data.get("wfopo") != None:
         for wfopo in data.get("wfopo"):
-            if data.get("opo") != None:
-                for opo in data.get("opo"):
-                    for pof in data.get("pof"):
-                        if (
-                            wfopo["src"] == opo["id"]
-                            and wfopo["tgt"] == pof["id"]
-                        ):
-                            # print(opo.get('node'), pof.get('node'))
-                            g.edge(opo.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+            if(wfopo['drawn'] == False):
+                if data.get("opo") != None:
+                    for opo in data.get("opo"):
+                        for pof in data.get("pof"):
+                            if (wfopo["src"] == opo["id"] and wfopo["tgt"] == pof["id"]):
+                                print("wfopo: ",opo.get('node'), pof.get('node'))
+                                g.edge(opo.get("node"), pof.get("node"), dir='forward', arrowhead='normal', color="brown")
+                                wfopo['drawn'] = True
 
 
 def drawWFOPI(data, g):
     if data.get("wfopi") != None:
         for wfopi in data.get("wfopi"):
-            if data.get("opi") != None:
-                for opi in data.get("opi"):
-                    for pif in data.get("pif"):
-                        if (
-                            wfopi["src"] == opi["id"]
-                            and wfopi["tgt"] == pif["id"]
-                        ):
-                            g.edge( pif["node"], opi["node"], dir='forward', arrowhead='normal', color="brown")
+            if(wfopi['drawn'] == False):
+                if data.get("opi") != None:
+                    for opi in data.get("opi"):
+                        for pif in data.get("pif"):
+                            if (wfopi["src"] == opi["id"] and wfopi["tgt"] == pif["id"]):
+                                g.edge( pif["node"], opi["node"], dir='forward', arrowhead='normal', color="brown")
+                                wfopi['drawn'] = True
 
 
 def drawWOPIO(data, g):
@@ -180,10 +195,7 @@ def drawWOPIO(data, g):
                 for opo in data.get("opo"):
                     if data.get("opi") != None:
                         for opi in data.get("opi"):
-                            if (
-                                wopio["src"] == opo["id"]
-                                and wopio["tgt"] == opi["id"]
-                            ):
+                            if (wopio["src"] == opo["id"] and wopio["tgt"] == opi["id"]):
                                 g.edge(opo["node"], opi["node"],dir='forward', arrowhead='normal', color="brown")
 
 
@@ -201,6 +213,7 @@ def drawWOPIO(data, g):
 
 
 def drawBF(data, a, bf):
+    primitives = {'ast.Add':'+', 'ast.Sub':'-', 'ast.Mult':'*', 'ast.Div':'/','ast.Lt': '<', 'ast.Gt': '>', 'ast.USub':'-', 'ast.Eq':'==', 'iter':'_iterator', 'range':'range', 'next':'_next'}
     i=0
     # print(bf)
     if bf.get('node') == None:
@@ -220,8 +233,9 @@ def drawBF(data, a, bf):
             if bf.get("value").get("value_type") == "Integer" or bf.get("value").get("value_type") == "Boolean":
                 literal = str(bf.get("value").get("value"))
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
-                    print(bf.get('box'))
-                    label = f"{literal}"+"\n id: "+bf.get('box')
+                    # print(bf.get('box'))
+                    label = f"{literal}"
+                    #label = f"{literal}"+"\n id: "+bf.get('box')
                     c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
                     c.attr("node", shape = 'point')
                     c.node(name=f"cluster_lit_{literal}_{bf['box']}_{i}", style = 'invis')
@@ -231,13 +245,9 @@ def drawBF(data, a, bf):
                     drawPIF(bf, c, data)
                     drawPOF(bf, c, data, None)                 
             if bf.get('value').get('value_type') == 'List':
-                literal = ""
-                for value in bf.get('value').get('value'):
-                    print(value)
-                    literal = literal+", "+str(value.get('value'))
-                    print('vals: ',literal)
+                literal = bf.get('value').get('value')
                 with a.subgraph(name=f"cluster_lit_{literal}_{bf['box']}") as c:
-                    print(bf.get('box'))
+                    # print(bf.get('box'))
                     label = f"{literal}"+"\n id: "+bf.get('box')
                     c.attr(color='red', shape='box', style='rounded', penwidth='3', label=label)
                     c.attr("node", shape = 'point')
@@ -247,7 +257,7 @@ def drawBF(data, a, bf):
                     bf["node"] = f"cluster_lit_{literal}_{bf['box']}"
                     drawPIF(bf, c, data)
                     drawPOF(bf, c, data, None) 
-        if bf["function_type"] == "PRIMITIVE":
+        if bf["function_type"] == "LANGUAGE_PRIMITIVE":
             primitive = str(bf["name"])
             with a.subgraph(name=f"cluster_prim_{primitive}_{bf['box']}") as d:
                 d.attr("node",shape = 'point')
@@ -255,8 +265,10 @@ def drawBF(data, a, bf):
                 bf['invisNode'] = f"cluster_prim_{primitive}_{bf['box']}_{i}"
                 i+=1
                 if primitive != None:
-                    bf["node"] = f"cluster_prim_{primitive}_{bf['box']}"
-                label = primitive+"\n id: "+bf.get('box')
+                    # print("primitive:",primitives.get(primitive))
+                    bf["node"] = f"cluster_prim_{primitives.get(primitive)}_{bf['box']}"
+                # print(primitive)
+                label = primitives.get(primitive)+"\n id: "+bf.get('box')
                 d.attr(label=label)
                 d.attr(color='black', shape='box', penwidth='3')
                 d.attr("node", shape="box")
@@ -264,7 +276,7 @@ def drawBF(data, a, bf):
                 drawPOF(bf, d, data, None)
         if bf.get("function_type") == "FUNCTION":
             with a.subgraph(name=f"cluster_func_{bf['box']}") as e:  # function
-                e.attr(color='green', style='rounded', penwidth='3', label=f"bf-{bf.get('box')[-1]}")
+                e.attr(color='green', style='rounded', penwidth='3', label=f"{bf.get('box')[-1]}\n id: {bf.get('box')}" )
                 e.attr("node",shape = 'point')
                 e.node(name=f"cluster_func_{bf['box']}_{i}", style = 'invis')
                 bf['invisNode'] = f"cluster_func_{bf['box']}_{i}"
@@ -285,24 +297,31 @@ def drawBF(data, a, bf):
     # print("in bf: ",bf)
 
 
-def drawBC(data, a):
+def drawBC(data, a, i):
     bf_dict = {}
     for bf in data.get("bf"):
         bf_dict[int(bf.get("box").split("-")[-1])] = 0
 
     for bc in data.get("bc"):
-        for key, value in bc.items():
-            if key != "metadata" and key != "box":
-                if value in bf_dict:
-                    with a.subgraph(name=f"cluster_{bc['box']}") as c:
-                        drawBF(data, c, data.get("bf")[value - 1])
-                        bf_dict[value] = 1
-                        drawPIC(data, bc, c)
-                        drawPOC(data, bc, c)
+        # for key, value in bc.items():
+        #     if key != "metadata" and key != "box":
+        #         if value in bf_dict:
+        with a.subgraph(name=f"cluster_{bc['box']}") as c:
+            c.attr(color='orange', style='rounded', penwidth='3', label=f"id: {bc.get('box')}")
+            c.attr("node",shape = 'point')
+            c.node(name=f"cluster_{bc['box']}_{i}", style = 'invis')
+            bc['invisNode'] = f"cluster_{bc['box']}_{i}"
+            bc["node"] = f"cluster_{bc.get('box')}"
+            # drawBF(data, c, data.get("bf")[value - 1])
+            # bf_dict[value] = 1
+            j=1
+            drawPIC(data, bc, c)
+            drawPOC(data, bc, c)
 
     for k in bf_dict.keys():
         if bf_dict.get(k) == 0:
             drawBF(data, a, data.get("bf")[k - 1])
+    return i
 
 
 def drawBL(data, a):
@@ -324,3 +343,55 @@ def drawBL(data, a):
     for k in bf_dict.keys():
         if bf_dict.get(k) == 0:
             drawBF(data, a, data.get("bf")[k - 1])
+
+def drawB(g, attribute, b, b_type, color,i):
+    # print("box:",b)
+    with g.subgraph(name=f"cluster_{b_type}_{b.get('box')}") as a:
+        a.attr(color=color, style='rounded', penwidth='3', label=f"id: {b.get('box')}")
+        a.attr("node",shape = 'point')
+        a.node(name=f"cluster_{b_type}_{b['box']}_{i}", style = 'invis')
+        b['invisNode'] = f"cluster_{b_type}_{b['box']}_{i}"
+        print(b['invisNode'])
+        i+=1
+        if b.get("name") != None:
+            a.attr(label=f"{b.get('name')}\n id: {b.get('box')}" )
+        b["node"] = f"cluster_{b_type}_{b.get('box')}"
+        drawOPO(b, a, attribute)
+        drawOPI(b, a, attribute)
+        if attribute.get("bf") != None:
+            # print("attribute")
+            for bf in attribute.get("bf"):
+                drawBF(attribute, a, bf)
+        # print("box:",b)
+    return i
+
+def setExpandValue(data, id):
+    # print("in expand",id)
+    i=1
+    for attribute in data.get("fn_array"):
+        if attribute.get("b") != None:
+            for b in attribute.get("b"):    
+                if id == b.get("box"):
+                    findConnectedElements(i, data)
+                    # print("found id")
+                    attribute['expand'] = True
+                else:
+                    if attribute.get('expand') == None or attribute.get('expand') == False:
+                        attribute['expand'] = False
+        if attribute.get("bf") != None:
+            for bf in attribute.get("bf"): 
+                if id == bf.get("box"):
+                    findConnectedElements(i, data)
+                    attribute['expand'] = True 
+                else:
+                    if attribute.get('expand') == None or attribute.get('expand') == False:
+                        attribute['expand'] = False
+        i+=1
+
+def findConnectedElements(i, data):
+    print(i)
+    for attribute in data.get("fn_array"):
+        if attribute.get("bf") != None:
+            for bf in attribute.get("bf"): 
+                if bf.get('body') == i:
+                    attribute['expand'] = True 

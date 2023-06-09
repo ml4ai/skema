@@ -1,16 +1,6 @@
 use actix_web::{get, web::Data, App, HttpResponse, HttpServer};
 use skema::config::Config;
-use skema::services::comment_extraction::{
-    get_comments, CommentExtractionRequest, CommentExtractionResponse, Docstring, Language,
-    SingleLineComment,
-};
-use skema::services::{
-    gromet::{
-        delete_model, get_model_ids, get_named_opis, get_named_opos, get_named_ports, get_subgraph,
-        post_model,
-    },
-    mathml::{get_ast_graph, get_math_exp_graph},
-};
+use skema::services::{comment_extraction, gromet};
 
 use clap::Parser;
 use utoipa::OpenApi;
@@ -47,29 +37,58 @@ async fn main() -> std::io::Result<()> {
     #[derive(OpenApi)]
     #[openapi(
         paths(
-            skema::services::comment_extraction::get_comments,
+            comment_extraction::get_comments,
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
-            skema::services::gromet::get_model_ids,
-            skema::services::gromet::post_model,
-            skema::services::gromet::delete_model,
-            skema::services::gromet::get_named_opos,
-            skema::services::gromet::get_named_opis,
-            skema::services::gromet::get_named_ports,
-            skema::services::gromet::get_subgraph,
+            skema::services::mathml::get_acset,
+            gromet::get_model_ids,
+            gromet::post_model,
+            gromet::delete_model,
+            gromet::get_named_opos,
+            gromet::get_named_opis,
+            gromet::get_named_ports,
+            gromet::get_subgraph,
             ping
         ),
         components(
             schemas(
-                Language,
-                CommentExtractionRequest,
-                SingleLineComment,
-                Docstring,
-                CommentExtractionResponse,
+                comment_extraction::Language,
+                comment_extraction::CommentExtractionRequest,
+                comment_extraction::SingleLineComment,
+                comment_extraction::Docstring,
+                comment_extraction::CommentExtractionResponse,
+                mathml::acset::ModelRepPn,
+                mathml::acset::Model,
+                mathml::acset::State,
+                mathml::acset::Transition,
+                mathml::acset::Grounding,
+                mathml::acset::Initial,
+                mathml::acset::Rate,
+                mathml::acset::Properties,
+                mathml::acset::Parameter,
+                mathml::acset::Distribution,
+                skema::Attribute,
+                skema::FunctionNet,
+                skema::FunctionType,
+                skema::FnType,
+                skema::Gromet,
+                skema::GrometBox,
+                skema::GrometBoxConditional,
+                skema::GrometBoxLoop,
+                skema::GrometPort,
+                skema::GrometWire,
+                skema::Grounding,
+                skema::Metadata,
+                skema::ModuleCollection,
+                skema::TextExtraction,
+                skema::Files,
+                skema::Provenance,
+                skema::ValueL,
+                skema::ValueMeta,
             )
         ),
         tags(
-            (name = "SKEMA", description = "SKEMA web services.")
+            (name = "SKEMA", description = "SKEMA web services."),
         ),
     )]
     struct ApiDoc;
@@ -83,18 +102,12 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(Config {
                 db_host: args.db_host.clone(),
             }))
-            .service(get_comments)
+            .configure(gromet::configure())
+            .service(comment_extraction::get_comments)
+            .service(skema::services::mathml::get_ast_graph)
+            .service(skema::services::mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_acset)
             .service(ping)
-            .service(get_model_ids)
-            .service(post_model)
-            .service(delete_model)
-            .service(get_named_opos)
-            .service(get_named_opis)
-            .service(get_named_ports)
-            .service(get_comments)
-            .service(get_ast_graph)
-            .service(get_math_exp_graph)
-            .service(get_subgraph)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })
     .bind((args.host, args.port))?

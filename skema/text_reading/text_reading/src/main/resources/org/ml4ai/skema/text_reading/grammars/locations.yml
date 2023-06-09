@@ -8,7 +8,7 @@ rules:
     type: token
     example: "These crises include the 2015 - 2016 civil war in Burundi and the 2013 - 2016 conflict in the Central African Republic ( CAR )"
     pattern: |
-      [entity = "LOCATION"]+
+      [entity = /${locationContext}/]+
 
 
   - name: entity-location-appos

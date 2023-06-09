@@ -200,6 +200,7 @@ BUILTINS = [
     "stat",
     "statistics",
     "string",
+    "str",
     "stringprep",
     "struct",
     "subprocess",
@@ -316,6 +317,11 @@ def find_func_in_module(module_name, func_name):
     """
     # TODO: Metapath finder, find_spec
     # TODO: cache the module objects to look back so we dont do multiple imports in a map
+    import os
+    import sys
+
+    sys.path.append(os.getcwd())
     module_import = importlib.import_module(module_name)
+
     funcs = list(dir(module_import))
     return func_name in funcs

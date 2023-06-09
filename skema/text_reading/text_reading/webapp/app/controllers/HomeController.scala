@@ -15,17 +15,19 @@ import ujson.json4s.Json4sJson
 import ujson.play.PlayJson
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.processors.{Document, Sentence}
+import org.clulab.serialization.json.stringify
 import org.slf4j.{Logger, LoggerFactory}
 import org.json4s
-import org.ml4ai.grounding.{GroundingCandidate, MiraEmbeddingsGrounder, SVOGrounder, WikidataGrounder, sparqlWikiResult}
-import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine}
+import org.json4s.{JArray, JValue}
+import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, OdinEngine, PlainTextFileTextReadingPipeline, TextReadingPipelineWithContext}
 import org.ml4ai.skema.text_reading.alignment.{Aligner, AlignmentHandler}
 import org.ml4ai.skema.text_reading.apps.{AutomatesExporter, ExtractAndAlign}
 import org.ml4ai.skema.text_reading.attachments.{GroundingAttachment, MentionLocationAttachment}
 import org.ml4ai.skema.text_reading.cosmosjson.CosmosJsonProcessor
 import org.ml4ai.skema.text_reading.data.{CosmosJsonDataLoader, ScienceParsedDataLoader}
+import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, SVOGrounder, WikidataGrounder}
 import org.ml4ai.skema.text_reading.scienceparse.ScienceParseClient
-import org.ml4ai.skema.text_reading.serializer.AutomatesJSONSerializer
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 import org.ml4ai.skema.text_reading.utils.{AlignmentJsonUtils, DisplayUtils}
 import org.slf4j.{Logger, LoggerFactory}
 import ujson.json4s.Json4sJson
@@ -34,6 +36,7 @@ import upickle.default._
 import java.io.File
 import javax.inject._
 import scala.collection.mutable.ArrayBuffer
+import scala.io.Source
 //import org.ml4ai.grounding.MiraEmbeddingsGrounder
 import play.api.libs.json._
 import play.api.mvc._
@@ -59,6 +62,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   val defaultConfig: Config = generalConfig[Config](readerType)
   val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
   val groundingConfig = generalConfig.getConfig("Grounding")
+  val miraEmbeddingsGrounder = GrounderFactory.getInstance(groundingConfig, chosenEngine = Some("miraembeddings"))
+  val textReadingPipelineWithContext = new TextReadingPipelineWithContext()
   val ieSystem = OdinEngine.fromConfig(config)
   var proc = ieSystem.proc
   val serializer = JSONSerializer
@@ -80,7 +85,8 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
 
 
-  private val cosmosPipeline = new CosmosTextReadingPipeline
+  private val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
+  private val plainTextPipeline = new TextReadingPipelineWithContext() // TODO Add the window parameter to the configuration file
 
 
   logger.info("Completed Initialization ...")
@@ -97,6 +103,10 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     */
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
+  }
+
+  def openAPI(version: String) = Action {
+    Ok(views.html.api(version))
   }
 
   // -------------------------------------------
@@ -138,7 +148,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val mentionsFile = new File(mentionsPath)
 
     val ujsonOfMenFile = ujson.read(mentionsFile)
-    val defMentions = AutomatesJSONSerializer.toMentions(ujsonOfMenFile).filter(m => m.label contains "Description")
+    val defMentions = SkemaJSONSerializer.toMentions(ujsonOfMenFile).filter(m => m.label contains "Description")
     val glVars = WikidataGrounder.mentionsToGlobalVarsWithWikidataGroundings(defMentions)
 
     Ok(glVars).as(JSON)
@@ -152,6 +162,44 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     Ok(SVOGrounder.groundString(string)).as(JSON)
   }
 
+  def json4sToPlayJson(jValue: JValue): JsValue = {
+    val json = stringify(jValue, pretty = true)
+    val playJson = Json.parse(json)
+
+    playJson
+  }
+
+  def ujsonToPlayJson(value: ujson.Value): JsValue = {
+    val json = ujson.write(value)
+    val playJson = Json.parse(json)
+
+    playJson
+  }
+
+  def groundStringsToMira(k: Int): Action[AnyContent] = Action { request =>
+    val text = request.body.asText.get
+    val texts = Source.fromString(text).getLines.map(_.trim).filter(_.nonEmpty).toVector
+    val groundingCandidates = miraEmbeddingsGrounder.groundingCandidates(texts, k)
+    val jGroundingCandidates = groundingCandidates.map(_.map(_.toJValue).toList).toList
+    val json4sResult = JArray(jGroundingCandidates.map(JArray(_)))
+    val playJsonResult = json4sToPlayJson(json4sResult)
+
+    Ok(playJsonResult)
+  }
+
+  def runTextReadingPipelineWithContext(contextWindowSize: Int = 3) = Action { request =>
+    val texts = request.body.asJson.get.as[Array[String]]
+    val ujsonResults = texts.map { text =>
+      val mentions = textReadingPipelineWithContext.extractMentionsWithContext(text, contextWindowSize)
+      val ujsonResult = SkemaJSONSerializer.serializeMentions(mentions)
+
+      ujsonResult
+    }
+    val ujsonResult = ujson.Arr.from(ujsonResults)
+    val playJsonResult = ujsonToPlayJson(ujsonResult)
+
+    Ok(playJsonResult)
+  }
 
   // we need documentation on how to use this, or we can remove it
 
@@ -195,59 +243,30 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   }
 
-  /**
-    * Extract mentions from a pdf. Requires Science-Parse running. Expected fields in the json obj passed in:
-    *  'pdf' : path to the pdf file
-    * @return Seq[Mention] (json serialized)
-    */
-  def pdf_to_mentions: Action[AnyContent] = Action { request =>
-    val data = request.body.asJson.get.toString()
-    val json = ujson.read(data)
-    val pdfFile = json("pdf").str
-    logger.info(s"Extracting mentions from $pdfFile")
-    val scienceParseDoc = scienceParse.parsePdf(pdfFile)
-    val texts = if (scienceParseDoc.sections.isDefined)  {
-      scienceParseDoc.sections.get.map(_.headingAndText) ++ scienceParseDoc.abstractText
-    } else scienceParseDoc.abstractText.toSeq
-    logger.info("Finished converting to text")
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(pdfFile)))
-    val outFile = json("outfile").str
-    AutomatesExporter(outFile).export(mentions)
-    //    mentions.saveJSON(outFile, pretty=true)
-    Ok("")
-  }
 
-  /**
-    * Extract mentions from a json produced by running Science Parse on a pdf file. Expected fields in the json obj passed in:
-    *  'json' : path to the Science Parse json file, 'outfile' : path to the json file to store extracted mentions. In the curl post request, the data argument will look like this: "--data '{"json": "someDirectory/petpno_Penman.json", "outfile": path/to/output..json}'"
-    * @return Seq[Mention] (json serialized)
-    */
+  def cosmosJsonToMentions: Action[AnyContent] = Action { request =>
+    val json = request.body.asJson.get.toString()
+    val ujsonArray = ujson.read(json)
+    val ujsonValues = ujsonArray.arr.map { ujsonValue =>
+      cosmosPipeline.extractMentionsFromJsonAndSerialize(ujsonValue)
+    }
+    val ujsonResult = ujson.Arr.from(ujsonValues)
+    val playJsonResult = ujsonToPlayJson(ujsonResult)
 
-  def json_doc_to_mentions: Action[AnyContent] = Action { request =>
-    val data = request.body.asJson.get.toString()
-    val json = ujson.read(data)
-    val jsonFile = json("json").str
-    logger.info(s"Extracting mentions from $jsonFile")
-    val loader = new ScienceParsedDataLoader
-    val texts = loader.loadFile(jsonFile)
-    val mentions = texts.flatMap(t => ieSystem.extractFromText(t, keepText = true, filename = Some(jsonFile)))
-    val outFile = json("outfile").str
-    AutomatesExporter(outFile).export(mentions)
-    Ok("")
+    Ok(playJsonResult)
   }
 
 
-  def cosmos_json_to_mentions: Action[AnyContent] = Action { request =>
-    val data = request.body.asJson.get.toString()
+  def textFileToMentions: Action[AnyContent] = Action { request =>
+    val json = request.body.asJson.get.toString()
+    val ujsonArray = ujson.read(json)
+    val ujsonValues = ujsonArray.arr.map { ujsonValue =>
+      SkemaJSONSerializer.serializeMentions(plainTextPipeline.extractMentionsWithContext(ujsonValue.toString(), contextWindowSize = 3))
+    }
+    val ujsonResult = ujson.Arr.from(ujsonValues)
+    val playJsonResult = ujsonToPlayJson(ujsonResult)
 
-    val pathJson = ujson.read(data)
-    val jsonPath = pathJson("pathToCosmosJson").str
-    logger.info(s"Extracting mentions from $jsonPath")
-
-    val exportedData = cosmosPipeline.serializeToJson(jsonPath)
-
-    Ok(exportedData)
-
+    Ok(playJsonResult)
   }
   /**
     * Align mentions from text, code, comment. Expected fields in the json obj passed in:
@@ -426,15 +445,22 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def processPlayText(ieSystem: OdinEngine, text: String, gazetteer: Option[Seq[String]] = None): (Document, Vector[Mention]) = {
     // preprocessing
     logger.info(s"Processing sentence : ${text}")
-    val doc = ieSystem.cleanAndAnnotate(text, keepText = true, filename = None)
+//    val doc = ieSystem.cleanAndAnnotate(text, keepText = true, filename = None)
+//
+//    logger.info(s"DOC : ${doc}")
+//    // extract mentions from annotated document
+//    val mentions = if (gazetteer.isDefined) {
+//      ieSystem.extractFromDocWithGazetteer(doc, gazetteer = gazetteer.get)
+//    } else {
+//      ieSystem.extractFrom(doc)
+//    }
+//    val sorted = mentions.sortBy(m => (m.sentence, m.getClass.getSimpleName)).toVector
+//
+//    logger.info(s"Done extracting the mentions ... ")
+//    logger.info(s"They are : ${mentions.map(m => m.text).mkString(",\t")}")
 
-    logger.info(s"DOC : ${doc}")
-    // extract mentions from annotated document
-    val mentions = if (gazetteer.isDefined) {
-      ieSystem.extractFromDocWithGazetteer(doc, gazetteer = gazetteer.get)
-    } else {
-      ieSystem.extractFrom(doc)
-    }
+    val (doc, mentions) = cosmosPipeline.extractMentions(text, None)
+
     val sorted = mentions.sortBy(m => (m.sentence, m.getClass.getSimpleName)).toVector
 
     logger.info(s"Done extracting the mentions ... ")
@@ -694,7 +720,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
         case m: RelationMention => new TextBoundMention(m.labels, m.tokenInterval, m.sentence, m.document, m.keep, m.foundBy)
         case m: EventMention => m.trigger
       }
-      mkArgMention(argRole, s"T${tbmToId(arg)}")
+      mkArgMention(argRole, s"T${tbmToId.getOrElse(arg, "X")}")
     }
     args.toSeq
   }
