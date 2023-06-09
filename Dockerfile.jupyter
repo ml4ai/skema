@@ -1,0 +1,24 @@
+# Dockerfile for the Jupyter Notebooks service
+
+FROM  python:3.8-bullseye
+
+# ======================
+# Install prerequisites
+# ======================
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update &&\
+    apt-get -y --no-install-recommends install \
+        build-essential \
+        python3-venv  &&\
+
+    # The two commands below are to reduce the size of the Docker image
+    apt-get clean &&\
+    rm -rf /var/lib/apt/lists/*
+
+
+# Install Jupyter notebooks
+RUN pip install --upgrade jupyterhub
+RUN pip install --upgrade  nbconvert
+
+# Switch to the jupyter directory
+#WORKDIR /skema/skema/jupyter/
