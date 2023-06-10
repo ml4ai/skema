@@ -61,7 +61,7 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     """preprocessing image - cropping, resizing, and padding"""
     # remove equation number if having
     image = remove_eqn_number(image)
-    # checking if the image lies wihin permissible boundary
+    # checking if the image lies within permissible boundary
     w, h = image.size
     max_h = config["max_input_hgt"]
     if h >= max_h:
