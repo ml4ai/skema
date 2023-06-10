@@ -13,14 +13,54 @@ import io
 from typing import List
 import logging
 from logging import info
+import cv2
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
 
+def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -> Image.Image:
+    """
+    Remove equation number from an image of an equation.
+
+    Args:
+        image (Image.Image): The input image.
+        threshold (float, optional): The threshold to determine the size of the equation number.
+            A smaller threshold will consider larger areas as equation numbers.
+            Defaults to 0.1.
+
+    Returns:
+        Image.Image: The modified image with the equation number removed.
+    """
+    image_arr = np.asarray(image, dtype=np.uint8)
+    # Invert the image to make the blank regions black
+    inverted = cv2.bitwise_not(image_arr)
+
+    # Get the width and height of the image
+    height, width = inverted.shape[:2]
+
+    # Start scanning from the right side
+    column_sum = np.sum(inverted, axis=0)
+    rightmost_column = width - 1
+    leftmost_column = rightmost_column
+    while leftmost_column >= 0:
+        if column_sum[leftmost_column] != 0:
+            if rightmost_column - leftmost_column > threshold * width:
+                image_arr = image_arr[:, 0:leftmost_column]
+                return Image.fromarray(image_arr)
+
+            leftmost_column -= 1
+            rightmost_column = leftmost_column
+        else:
+            leftmost_column -= 1
+
+    return Image.fromarray(image_arr)
+
+
 def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     """preprocessing image - cropping, resizing, and padding"""
-
+    # remove equation number if having
+    image = remove_eqn_number(image)
     # checking if the image lies wihin permissible boundary
     w, h = image.size
     max_h = config["max_input_hgt"]
@@ -232,7 +272,7 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
             info("CUDA is not available, falling back to using the CPU.")
             new_model = dict()
             for key, value in torch.load(
-                    model_path, map_location=torch.device("cpu")
+                model_path, map_location=torch.device("cpu")
             ).items():
                 new_model[key[7:]] = value
                 model.load_state_dict(new_model, strict=False)
