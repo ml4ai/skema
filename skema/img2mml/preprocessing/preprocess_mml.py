@@ -254,7 +254,7 @@ def remove_unecc_tokens(eqn):
     eliminate = [
         # "mspace",
         # "mtable",
-        "mathvariant",
+        # "mathvariant",
         "class",
         "mpadded",
         "symmetric",
@@ -271,12 +271,12 @@ def remove_unecc_tokens(eqn):
         "linethickness",
         "mstyle",
     ]
-    if args.with_boldface:
-        eqn = eqn.replace('mathvariant="bold"', "boldface_placeholder")
-        eqn = eqn.replace('mathvariant="bold-italic"', "boldface_placeholder")
-        eqn = eqn.replace('mathvariant="bold-fraktur"', "boldface_placeholder")
-        eqn = eqn.replace('mathvariant="bold-script"', "boldface_placeholder")
-        eqn = eqn.replace('mathvariant="bold-sans-serif"', "boldface_placeholder")
+    # if args.with_boldface:
+    #     eqn = eqn.replace('mathvariant="bold"', "boldface_placeholder")
+    #     eqn = eqn.replace('mathvariant="bold-italic"', "boldface_placeholder")
+    #     eqn = eqn.replace('mathvariant="bold-fraktur"', "boldface_placeholder")
+    #     eqn = eqn.replace('mathvariant="bold-script"', "boldface_placeholder")
+    #     eqn = eqn.replace('mathvariant="bold-sans-serif"', "boldface_placeholder")
 
     keep = [
         "mi",
@@ -353,8 +353,8 @@ def remove_unecc_tokens(eqn):
                 else:
                     eqn = temp1[: open_angle[-1]] + temp2[close_angle[0] + 1 :]
 
-    if args.with_boldface:
-        eqn = eqn.replace("boldface_placeholder", 'mathvariant="bold"')
+    # if args.with_boldface:
+    #     eqn = eqn.replace("boldface_placeholder", 'mathvariant="bold"')
 
     return eqn
 
