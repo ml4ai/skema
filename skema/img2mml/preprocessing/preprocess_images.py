@@ -2,17 +2,54 @@
 inspired by  https://github.com/harvardnlp/im2markup/blob/master/scripts/utils/image_utils.py
 """
 
-import torch, os, json, argparse, sys
+import torch, os, json, argparse
 import numpy as np
+from PIL.Image import Image
 from torchvision import transforms
-from PIL import Image
+from PIL import Image, ImageEnhance
 import multiprocessing
 from multiprocessing import Pool, Lock, TimeoutError
+import sys
+import random
 
-# read config file
-config_path = sys.argv[-1]
-with open(config_path, "r") as cfg:
-    config = json.load(cfg)
+parser = argparse.ArgumentParser(
+    description="Preprocess the images in the dataset for training and evaluation."
+)
+parser.add_argument(
+    "--mode",
+    choices=["arxiv", "im2mml", "arxiv_im2mml"],
+    default="arxiv",
+    help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
+)
+parser.add_argument(
+    "--with_fonts",
+    action="store_true",
+    default=False,
+    help="Whether using the dataset with diverse fonts",
+)
+parser.add_argument(
+    "--enhance_images",
+    action="store_true",
+    default=False,
+    help="Whether enhancing images",
+)
+parser.add_argument(
+    "--config",
+    type=str,
+    default="configs/xfmer_mml_config.json",
+    help="The configuration file.",
+)
+
+args = parser.parse_args()
+
+config = None
+
+
+def get_config(config_path):
+    with open(config_path, "r") as cfg:
+        config = json.load(cfg)
+
+    return config
 
 
 def crop_image(image, reject=False):
@@ -72,10 +109,15 @@ def bucket(image):
     # [width, hgt, resize_factor]
     buckets = [
         [820, 86, 0.6],
+        [703, 74, 0.7],
         [615, 65, 0.8],
+        [547, 58, 0.9],
         [492, 52, 1],
+        [447, 47, 1.1],
         [410, 43, 1.2],
+        [379, 40, 1.3],
         [350, 37, 1.4],
+        [328, 35, 1.5],
     ]
     # current width, hgt
     crop_width, crop_hgt = image.size[0], image.size[1]
@@ -117,6 +159,44 @@ def downsampling(image):
     return image
 
 
+def enhance_image(image: Image) -> Image:
+    """
+    Apply image enhancement techniques to the input image.
+
+    Args:
+        image (Image): The input image.
+
+    Returns:
+        Image: The enhanced image.
+    """
+    # Brightness enhancement
+    brightness_factor = random.uniform(0.8, 1.2)
+    enhancer = ImageEnhance.Brightness(image)
+    image = enhancer.enhance(brightness_factor)
+
+    # Contrast enhancement
+    contrast_factor = random.uniform(0.8, 1.2)
+    enhancer = ImageEnhance.Contrast(image)
+    image = enhancer.enhance(contrast_factor)
+
+    # Sharpness enhancement
+    sharpness_factor = random.uniform(0.8, 1.2)
+    enhancer = ImageEnhance.Sharpness(image)
+    image = enhancer.enhance(sharpness_factor)
+
+    # # Image rotation
+    # rotation_angle = random.randint(-10, 10)
+    # image = image.rotate(rotation_angle)
+    #
+    # # Adding noise
+    # noise_factor = random.uniform(0.01, 0.05)
+    # width, height = image.size
+    # noise = Image.frombytes('L', (width, height), bytes([random.randint(0, 255) for _ in range(width * height)]))
+    # image = Image.blend(image, noise, noise_factor)
+
+    return image
+
+
 def preprocess_images(image):
     """
     RuntimeError: only Tensors of floating point dtype can require gradients
@@ -126,10 +206,11 @@ def preprocess_images(image):
     :params img_batch: batch of images
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
+    data_path = f"training_data/sample_data/{args.mode}"
+    if args.with_fonts:
+        data_path += "_with_fonts"
 
-    IMAGE = Image.open(
-        f"{config['data_path']}/{config['dataset_type']}/images/{image}"
-    ).convert("L")
+    IMAGE = Image.open(f"{data_path}/images/{image}").convert("L")
 
     # checking the size of the image
     w, h = IMAGE.size
@@ -149,6 +230,10 @@ def preprocess_images(image):
         # padding
         IMAGE = pad_image(IMAGE)
 
+        # if enhancing images
+        if args.enhance_images:
+            IMAGE = enhance_image(IMAGE)
+
         # convert to tensor
         convert = transforms.ToTensor()
         IMAGE = convert(IMAGE)
@@ -156,7 +241,7 @@ def preprocess_images(image):
         # saving the image
         torch.save(
             IMAGE,
-            f"{config['data_path']}/{config['dataset_type']}/image_tensors/{image.split('.')[0]}.txt",
+            f"{data_path}/image_tensors/{image.split('.')[0]}.txt",
         )
         return None
 
@@ -165,7 +250,14 @@ def preprocess_images(image):
 
 
 def main():
-    data_path = f"{config['data_path']}/{config['dataset_type']}"
+    global config
+    config = get_config(args.config)
+    random.seed(int(config["seed"]))
+
+    data_path = f"training_data/sample_data/{args.mode}"
+    if args.with_fonts:
+        data_path += "_with_fonts"
+
     images = os.listdir(f"{data_path}/images")
 
     # create an image_tensors folder
@@ -177,15 +269,16 @@ def main():
 
     blank_images = [i for i in result if i != None]
 
-    with open("logs/blank_images.lst", "w") as out:
+    mode_name = args.mode
+    if args.with_fonts:
+        mode_name += "_with_fonts"
+
+    with open(f"logs/{mode_name}_blank_images.lst", "w") as out:
         out.write("\n".join(str(item) for item in blank_images))
 
     # renaming the final image_tensors to make sequential
     tnsrs = sorted(
-        [
-            int(i.split(".")[0])
-            for i in os.listdir(f"{data_path}/image_tensors")
-        ]
+        [int(i.split(".")[0]) for i in os.listdir(f"{data_path}/image_tensors")]
     )
     os.chdir(f"{data_path}/image_tensors")
     for t in range(len(tnsrs)):
