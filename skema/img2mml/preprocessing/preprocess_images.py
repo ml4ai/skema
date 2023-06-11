@@ -16,9 +16,9 @@ parser = argparse.ArgumentParser(
     description="Preprocess the images in the dataset for training and evaluation."
 )
 parser.add_argument(
-    "--mode",
+    "--dataset",
     choices=["arxiv", "im2mml", "arxiv_im2mml"],
-    default="arxiv",
+    default="arxiv_im2mml",
     help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
 )
 parser.add_argument(
@@ -206,7 +206,7 @@ def preprocess_images(image):
     :params img_batch: batch of images
     :return: processed image tensor for enitre batch-[Batch, Channels, W, H]
     """
-    data_path = f"training_data/sample_data/{args.mode}"
+    data_path = f"training_data/sample_data/{args.dataset}"
     if args.with_fonts:
         data_path += "_with_fonts"
 
@@ -254,7 +254,7 @@ def main():
     config = get_config(args.config)
     random.seed(int(config["seed"]))
 
-    data_path = f"training_data/sample_data/{args.mode}"
+    data_path = f"training_data/sample_data/{args.dataset}"
     if args.with_fonts:
         data_path += "_with_fonts"
 
@@ -269,7 +269,7 @@ def main():
 
     blank_images = [i for i in result if i != None]
 
-    mode_name = args.mode
+    mode_name = args.dataset
     if args.with_fonts:
         mode_name += "_with_fonts"
 
