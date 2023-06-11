@@ -271,6 +271,8 @@ def remove_unecc_tokens(eqn):
         "linethickness",
         "mstyle",
     ]
+    if not args.with_boldface:
+        eliminate.append("mathvariant")
     # if args.with_boldface:
     #     eqn = eqn.replace('mathvariant="bold"', "boldface_placeholder")
     #     eqn = eqn.replace('mathvariant="bold-italic"', "boldface_placeholder")
@@ -545,59 +547,98 @@ def extract_inbetween_tokens(text):
     return contents
 
 
-def tokenize(mml_eqn):
+# def tokenize(mml_eqn):
+#     """
+#     tokenize the final cleaned equation based on < >
+#     i.e. <math><mo> ... </mo></math> will be tokenized like
+#     <math> <mo> ... </mo> </math>.
+#     """
+#     mml_split = re.split(">|<", mml_eqn)
+#     tokenized_mml = ""
+#
+#     inbetween_tokens = extract_inbetween_tokens(mml_eqn)
+#
+#     for token in mml_split:
+#         token = token.strip()
+#
+#         if len(token) > 0:
+#             if "&#x" in token or len(token) == 1:
+#                 tokenized_mml += token
+#
+#             elif token.isdigit():  # entire number is made up integers e.g. 12345
+#                 for intgr in list(map(int, token)):
+#                     tokenized_mml += f" {intgr} "
+#
+#             elif isfloat(token):  # eg. 120.456
+#                 try:
+#                     token_arr = token.split(".")
+#                     for tok_idx, tok in enumerate(token_arr):
+#                         if tok_idx == 1:
+#                             tokenized_mml += "."
+#
+#                         for intgr in list(map(int, token_arr[tok_idx])):
+#                             tokenized_mml += f" {intgr} "
+#                 except:
+#                     pass
+#
+#             elif isfrac(token):
+#                 token_arr = token.split("/")
+#
+#                 for tok_idx, tok in enumerate(token_arr):
+#                     if tok_idx == 1:
+#                         tokenized_mml += "/"
+#                     for intgr in list(map(int, token_arr[tok_idx])):
+#                         tokenized_mml += f" {intgr} "
+#
+#             elif token in inbetween_tokens:
+#                 if len(token.replace(" ", "")) < len(token):
+#                     tokenized_mml += token.replace(" ", "")
+#                 else:
+#                     tokenized_mml += token
+#
+#             else:
+#                 tokenized_mml += " <" + token + "> "
+#
+#     return tokenized_mml.strip()
+
+
+def tokenize(mathml: str) -> str:
     """
-    tokenize the final cleaned equation based on < >
-    i.e. <math><mo> ... </mo></math> will be tokenized like
-    <math> <mo> ... </mo> </math>.
+    Tokenizes the content of MathML and returns a string with tokens separated by spaces.
+
+    Args:
+        mathml (str): The MathML content to be tokenized.
+
+    Returns:
+        str: The tokenized MathML content.
     """
-    mml_split = re.split(">|<", mml_eqn)
-    tokenized_mml = ""
+    # Use regular expressions to match tokens in MathML
+    pattern = r"(<.*?>)|([^<>\s]+)|(\s+)"
+    tokens = re.findall(pattern, mathml)
 
-    inbetween_tokens = extract_inbetween_tokens(mml_eqn)
-
-    for token in mml_split:
-        token = token.strip()
-
-        if len(token) > 0:
-            if "&#x" in token or len(token) == 1:
-                tokenized_mml += token
-
-            elif token.isdigit():  # entire number is made up integers e.g. 12345
-                for intgr in list(map(int, token)):
-                    tokenized_mml += f" {intgr} "
-
-            elif isfloat(token):  # eg. 120.456
-                try:
-                    token_arr = token.split(".")
-                    for tok_idx, tok in enumerate(token_arr):
-                        if tok_idx == 1:
-                            tokenized_mml += "."
-
-                        for intgr in list(map(int, token_arr[tok_idx])):
-                            tokenized_mml += f" {intgr} "
-                except:
-                    pass
-
-            elif isfrac(token):
-                token_arr = token.split("/")
-
-                for tok_idx, tok in enumerate(token_arr):
-                    if tok_idx == 1:
-                        tokenized_mml += "/"
-                    for intgr in list(map(int, token_arr[tok_idx])):
-                        tokenized_mml += f" {intgr} "
-
-            elif token in inbetween_tokens:
-                if len(token.replace(" ", "")) < len(token):
-                    tokenized_mml += token.replace(" ", "")
-                else:
-                    tokenized_mml += token
-
+    # Process the token list
+    tokenized_mathml = []
+    for token in tokens:
+        if token[0] != "":
+            # Preserve MathML tags as they are, no processing needed
+            tokenized_mathml.append(token[0])
+        elif token[1] != "":
+            # For non-empty content, split into individual characters as tokens
+            if token[1].startswith("&#x"):
+                # For Unicode characters, treat them as a whole token
+                tokenized_mathml.append(token[1])
             else:
-                tokenized_mml += " <" + token + "> "
+                # Split other cases into individual characters
+                tokenized_mathml.extend(list(token[1]))
+        else:
+            # Preserve whitespace characters
+            tokenized_mathml.append(token[2])
 
-    return tokenized_mml.strip()
+    # Join the token list into a string
+    res = " ".join(tokenized_mathml)
+    # Use regular expression to replace multiple whitespaces with a single whitespace
+    res = re.sub(r"\s+", " ", res)
+    return res
 
 
 if __name__ == "__main__":
