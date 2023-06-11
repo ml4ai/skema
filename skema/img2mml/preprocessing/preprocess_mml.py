@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(
     description="Preprocess the MathMLs in the dataset for training and evaluation."
 )
 parser.add_argument(
-    "--mode",
+    "--dataset",
     choices=["arxiv", "im2mml", "arxiv_im2mml"],
     default="arxiv",
     help="Choose which dataset to be used for training. Choices: arxiv, im2mml, arxiv_im2mml.",
@@ -645,7 +645,7 @@ if __name__ == "__main__":
     # get config
     config = get_config(args.config)
 
-    data_path = f"training_data/sample_data/{args.mode}"
+    data_path = f"training_data/sample_data/{args.dataset}"
     if args.with_fonts:
         data_path += "_with_fonts"
 
@@ -656,7 +656,7 @@ if __name__ == "__main__":
     else:
         modified_mml_file = open(f"{data_path}/{config['markup']}.lst", "w")
 
-    mode_name = args.mode
+    mode_name = args.dataset
     if args.with_fonts:
         mode_name += "_with_fonts"
 
