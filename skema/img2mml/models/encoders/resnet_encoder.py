@@ -5,7 +5,9 @@ ResNet18 with row encoding
 import torch
 import torch.nn as nn
 from skema.img2mml.models.encoding.row_encoding import RowEncoding
-
+from skema.img2mml.models.encoding.positional_features_for_cnn_encoder import (
+    add_positional_features,
+)
 
 class ResNetBlock(nn.Module):  # res_block
     def __init__(self, in_channels, out_channels, stride, downsampling=False):
@@ -87,11 +89,11 @@ class ResNet18_Encoder(nn.Module):
             res_block(128, 128, stride=1),
             res_block(128, 256, stride=2, downsampling=True),
             res_block(256, 256, stride=1),
-            res_block(256, 512, stride=2, downsampling=True),
-            res_block(512, 512, stride=1),
+            # res_block(256, 512, stride=2, downsampling=True),
+            # res_block(512, 512, stride=1),
         )
 
-        self.linear = nn.Linear(512, dec_hid_dim)
+        self.linear = nn.Linear(256, dec_hid_dim)
         self.init_weights()
 
     def init_weights(self):
