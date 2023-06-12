@@ -27,7 +27,7 @@ def regenerate_examples_google_drive(root_dir: str, gromet_version: str, overwri
         exit(1)
 
     for path in root_dir.iterdir():
-        if path.is_dir():
+        if path.isdir():
             output_dir = Path(path, gromet_version)
             gromet_file = Path(output_dir, f"{path.stem}--Gromet-FN-auto.json")
             
@@ -38,6 +38,7 @@ def regenerate_examples_google_drive(root_dir: str, gromet_version: str, overwri
             for file in path.iterdir():
                 if file.suffix in SUPPORTED_FILE_EXTENSIONS:
                     gromet_collection = process_file(str(file))
+                    print(str(gromet_file))
                     with open(gromet_file, "w") as f:
                         f.write(dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict())))
 
@@ -61,6 +62,7 @@ def regenerate_examples_simple(root_dir: str, output_dir=None, overwrite=False) 
 
 
     for path in root_dir.iterdir():
+        print(str(path))
         if path.suffix.lower() in SUPPORTED_FILE_EXTENSIONS:
             
             if output_dir:
@@ -77,3 +79,29 @@ def regenerate_examples_simple(root_dir: str, output_dir=None, overwrite=False) 
                 f.write(dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict())))
         else:
             print(f"WARNING: The file type of {str(path)} is not supported by CODE2FN")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers(title="mode", dest="mode", help="Select mode")
+
+    # Subparser for regenerate_examples_google_drive
+    parser_google_drive = subparsers.add_parser("google_drive", help="Regenerate examples following Google Drive structure")
+    parser_google_drive.add_argument("root_dir", type=str, help="Path to the root directory")
+    parser_google_drive.add_argument("gromet_version", type=str, help="Gromet version number")
+    parser_google_drive.add_argument("--overwrite", action="store_true", help="Overwrite existing Gromet files")
+
+    # Subparser for regenerate_examples_simple
+    parser_simple = subparsers.add_parser("simple", help="Regenerate examples in a single directory")
+    parser_simple.add_argument("root_dir", type=str, help="Path to the root directory")
+    parser_simple.add_argument("--output_dir", type=str, help="Path to the output directory")
+    parser_simple.add_argument("--overwrite", action="store_true", help="Overwrite existing Gromet files")
+
+    args = parser.parse_args()
+
+    if args.mode == "google_drive":
+        regenerate_examples_google_drive(args.root_dir, args.gromet_version, args.overwrite)
+    elif args.mode == "simple":
+        regenerate_examples_simple(args.root_dir, args.output_dir, args.overwrite)
+    else:
+        parser.print_help()
