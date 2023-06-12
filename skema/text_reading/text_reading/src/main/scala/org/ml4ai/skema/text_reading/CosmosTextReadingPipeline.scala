@@ -46,14 +46,12 @@ class CosmosTextReadingPipeline(contextWindowSize:Int) extends TextReadingPipeli
     * @param jsonPath Path to the json file to annotate
     * @return Mentions extracted by the TR textReadingPipeline
     */
-  def extractMentionsFromCosmosJson(jsonPath: String): Seq[Mention] = {
+  def extractMentionsFromTextsAndLocations(textsAndLocations: Seq[String]): Seq[Mention] = {
 
     //TODO: Make this interpretable
-    val textsAndLocations = loader.loadFile(jsonPath)
     val textsAndFilenames = textsAndLocations.map(_.split(jsonSeparator).slice(0, 2).mkString(jsonSeparator))
     val locations = textsAndLocations.map(_.split(jsonSeparator).takeRight(2).mkString(jsonSeparator)) //location = pageNum::blockIdx
 
-    logger.info(s"Started annotation of $jsonPath")
     // extract mentions form each text block
     val mentions = for (tf <- textsAndFilenames) yield {
       val Array(rawText, filename) = tf.split(jsonSeparator)
@@ -87,14 +85,32 @@ class CosmosTextReadingPipeline(contextWindowSize:Int) extends TextReadingPipeli
     val cosmosOrderer = new CosmosOrderer(mentionsWithLocations)
     val scenarioContextEngine = new ContextEngine(windowSize = contextWindowSize, mentionsWithLocations, cosmosOrderer)
     val mentionsWithScenarioContext = mentionsWithLocations map scenarioContextEngine.resolveContext
-    logger.info(s"Finished annotation of $jsonPath")
     mentionsWithScenarioContext
   }
 
-  /**
+  def extractMentionsFromCosmosJson(jsonPath: String): Seq[Mention] = {
+    logger.info(s"Started annotation of $jsonPath")
+
+    val textsAndLocations = loader.loadFile(jsonPath)
+    val result = extractMentionsFromTextsAndLocations(textsAndLocations)
+
+    logger.info(s"Finished annotation of $jsonPath")
+    result
+  }
+
+    /**
     * Extracts the mentions and serializes them into a json string
     * @param jsonPath Path to the json file to annotate
     * @return string with the json representation of the extractions and the document annotations
     */
-  def extractMentionsFromJsonAndSerialize(jsonPath: String): String = ujson.write(SkemaJSONSerializer.serializeMentions(this.extractMentionsFromCosmosJson(jsonPath)))
+  def extractMentionsFromJsonAndSerialize(jsonPath: String): String =
+      ujson.write(SkemaJSONSerializer.serializeMentions(this.extractMentionsFromCosmosJson(jsonPath)))
+
+  def extractMentionsFromJsonAndSerialize(ujsonValue: ujson.Js): ujson.Value = {
+    val textsAndLocations = loader.loadJson(ujsonValue)
+    val mentions = extractMentionsFromTextsAndLocations(textsAndLocations)
+    val result = SkemaJSONSerializer.serializeMentions(mentions)
+
+    result
+  }
 }
