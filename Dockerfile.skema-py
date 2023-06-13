@@ -37,6 +37,7 @@ RUN pip install wheel
 RUN pip install fastapi uvicorn
 RUN pip install six
 RUN pip install -e .
+RUN pip install jupyter
 
 # Build tree-sitter-fortran grammar required by Fortran code2fn
 RUN python /skema/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
