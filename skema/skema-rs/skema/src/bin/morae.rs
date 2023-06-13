@@ -10,7 +10,7 @@ use std::string::ToString;
 use std::{env, fs};
 
 // new imports
-use mathml::acset::{ModelRegNet, RegNet};
+use mathml::acset::{ModelRegNet, PetriNet, RegNet};
 use mathml::ast::MathExpression;
 use mathml::ast::MathExpression::Mo;
 use mathml::ast::MathExpression::Mrow;
@@ -90,6 +90,22 @@ fn main() {
         // 7 (E) should be fixable, the USub is not being subsituted and is at the end of the RHS instead of the start
 
         println!("\n Ast:\n {:?}", core_dynamics_ast[5].clone());
+    } else if new_args.arg == "AMR_test".to_string() {
+        let mathml_asts =
+            get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
+        let mut regnet = RegNet::from(mathml_asts);
+        println!("\nRegnet AMR: {:?}\n", regnet.clone());
+        regnet.model.vertices.sort();
+        regnet.model.edges.sort();
+        let regnet_serial = serde_json::to_string(&regnet).unwrap();
+        println!("For serialization test:\n\n {}", regnet_serial);
+
+        let mathml_pn_asts =
+            get_mathml_asts_from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+        let mut pn = PetriNet::from(ACSet::from(mathml_pn_asts));
+        println!("\nPetriNet AMR: {:?}", pn.clone());
+        let pn_serial = serde_json::to_string(&pn).unwrap();
+        println!("For serialization test:\n\n {}", pn_serial);
     } else {
         println!("Unknown Command!");
     }

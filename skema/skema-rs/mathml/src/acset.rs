@@ -54,6 +54,7 @@ pub struct ACSet {
 pub struct PetriNet {
     pub name: String,
     pub schema: String,
+    pub schema_name: String,
     pub description: String,
     pub model_version: String,
     pub model: ModelPetriNet,
@@ -64,6 +65,7 @@ pub struct PetriNet {
 pub struct RegNet {
     pub name: String,
     pub schema: String,
+    pub schema_name: String,
     pub description: String,
     pub model_version: String,
     pub model: ModelRegNet,
@@ -87,7 +89,54 @@ pub struct ModelPetriNet {
     /// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantics: Option<Semantics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<Metadata>,
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct Metadata {
+    pub placeholder: String, // once we finalize the metadata data struct fill in this data struct
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct Semantics {
+    pub ode: Ode,
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct Ode {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rates: Option<Vec<Rate>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub initials: Option<Vec<Initial>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub parameters: Option<Vec<Parameter>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub observables: Option<Vec<Observable>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub time: Option<Time>,
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct Observable {
+    id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    states: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    expression: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    expression_mathml: Option<String>,
 }
 
 #[derive(
@@ -97,13 +146,13 @@ pub struct RegState {
     pub id: String,
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub grounding: Option<Grounding>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub initial: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rate_constant: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sign: Option<bool>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub grounding: Option<Grounding>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub initial: Option<Initial>,
 }
 
 #[derive(
@@ -115,20 +164,36 @@ pub struct State {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub grounding: Option<Grounding>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub initial: Option<Initial>,
+    pub units: Option<Units>,
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema,
+)]
+pub struct Units {
+    pub expression: String,
+    pub expression_mathml: String,
 }
 
 #[derive(
     Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
 )]
 pub struct Grounding {
-    pub identifiers: String,
+    pub identifiers: Identifier,
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema,
+)]
+pub struct Identifier {
+    pub ido: String,
 }
 
 #[derive(
     Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema,
 )]
 pub struct Initial {
+    pub target: String,
     pub expression: String,
     pub expression_mathml: String,
 }
@@ -137,6 +202,7 @@ pub struct Initial {
     Debug, Default, PartialEq, Eq, PartialOrd, Ord, Clone, Serialize, Deserialize, ToSchema,
 )]
 pub struct Rate {
+    pub target: String,
     pub expression: String,
     pub expression_mathml: String,
 }
@@ -195,10 +261,7 @@ pub struct Transition {
     Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
 )]
 pub struct Properties {
-    pub name: String,
-    pub grounding: Option<Grounding>,
-    pub rate: Rate,
-    pub rate_constant: Option<String>,
+    pub rate_constant: String,
 }
 
 #[derive(
@@ -207,15 +270,26 @@ pub struct Properties {
 pub struct Parameter {
     pub id: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
+    pub name: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub grounding: Option<Grounding>,
-
+    pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub grounding: Option<Grounding>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub distribution: Option<Distribution>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub units: Option<Units>,
+}
+
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct Time {
+    id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    units: Option<Units>,
 }
 
 #[derive(
@@ -284,12 +358,14 @@ impl From<ACSet> for PetriNet {
         let model = ModelPetriNet {
             states: states_vec,
             transitions: transitions_vec,
-            parameters: None,
+            semantics: None,
+            metadata: None,
         };
 
         let mrp = PetriNet {
         name: "mathml model".to_string(),
         schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
+        schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
         model: model,
@@ -422,8 +498,7 @@ impl From<Vec<Math>> for RegNet {
             }
 
             let prop = Properties {
-                name: trans_name.clone(),
-                rate_constant: Some(trans_name.clone()),
+                rate_constant: trans_name.clone(),
                 ..Default::default()
             };
 
@@ -450,6 +525,7 @@ impl From<Vec<Math>> for RegNet {
         let mrp = RegNet {
         name: "Regnet mathml model".to_string(),
         schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
+        schema_name: "regnet".to_string(),
         description: "This is a Regnet model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
         model: model,
