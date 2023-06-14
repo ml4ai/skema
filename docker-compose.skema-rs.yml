@@ -9,7 +9,7 @@ networks:
 services:
   skema-rs:
     image: lumai/askem-skema-rs:latest
-    container_name: skema-rsD
+    container_name: skema-rs
     entrypoint: cargo run --release --bin skema_service -- --host 0.0.0.0 --db-host database
     ports:
       - "8080:8080"
