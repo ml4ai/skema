@@ -7,11 +7,9 @@ networks:
     external: true
 
 services:
-  # The skema-rs web service exposing functionality implemented in Rust.
   skema-rs:
-    build:
-      context: .
-      dockerfile: Dockerfile.skema-rs
+    image: lumai/askem-skema-rs:latest
+    container_name: skema-rsD
     entrypoint: cargo run --release --bin skema_service -- --host 0.0.0.0 --db-host database
     ports:
       - "8080:8080"
@@ -19,28 +17,3 @@ services:
       skema_net:
         aliases:
           - "skema-rs"  # use ${AGENT_NAME} before deploying
-
-
-  # We currently use Memgraph (in-memory graph database).
-  database:
-    image: "memgraph/memgraph-platform"
-    ports:
-      - "7687:7687"
-      - "3000:3000"
-      - "7444:7444"
-    volumes:
-      - mg_lib:/var/lib/memgraph
-      - mg_log:/var/log/memgraph
-      - mg_etc:/etc/memgraph
-    environment:
-      - MEMGRAPH="--log-level=TRACE"
-    entrypoint: ["/usr/bin/supervisord"]
-    networks:
-      skema_net:
-        aliases:
-          - "memgraph_db"  # use ${AGENT_NAME} before deploying
-
-volumes:
-  mg_lib:
-  mg_log:
-  mg_etc:
