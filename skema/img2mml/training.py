@@ -252,7 +252,7 @@ def train_model(
     json.dump(config, config_log)
 
     # defining model using DataParallel
-    if torch.cuda.is_available():
+    if torch.cuda.is_available() and config["device"]=="cuda":
         if use_single_gpu:
             print(f"using single gpu:{config['gpu_id']}...")
 
