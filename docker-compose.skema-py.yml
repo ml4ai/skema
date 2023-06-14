@@ -8,18 +8,13 @@ networks:
 
 services:
   skema-py:
-    image: skema-py:latest
-    build:
-      context: .
-      dockerfile: Dockerfile.skema-py
+    image: lumai/askem-skema-py:latest
     container_name: skema-py
     ports:
-    - "8000:8000" # Change port mapping appropriately before deploying.
-    command: ["uvicorn", "server:app", "--host", "0.0.0.0"]
-
+    - "8010:8010" 
+    command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8010"]
     networks:
       skema_net:
         aliases:
-          - "skema-py"  # use ${AGENT_NAME} before deploying
-
+          - "skema-py" 
 
