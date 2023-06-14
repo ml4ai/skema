@@ -7,16 +7,14 @@ networks:
 
 services:
   img2mml:
-    image: img2mml:latest
-    build:
-      context: .
-      dockerfile: Dockerfile.img2mml
-    entrypoint: uvicorn img2mml:app --host=0.0.0.0
+    image: lumai/askem-skema-img2mml:latest
+    container_name: img2mml
+    entrypoint: uvicorn img2mml:app --host=0.0.0.0 --port=8020
     ports:
-      - "8000:8000" # Change port mapping appropriately before deploying.
+      - "8020:8020"
     networks:
       skema_net:
         aliases:
-          - "img2mml"  # use ${AGENT_NAME} before deploying
+          - "img2mml" 
 
 
