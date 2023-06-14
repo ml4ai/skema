@@ -27,7 +27,7 @@ def regenerate_examples_google_drive(root_dir: str, gromet_version: str, overwri
         exit(1)
 
     for path in root_dir.iterdir():
-        if path.isdir():
+        if path.is_dir():
             output_dir = Path(path, gromet_version)
             gromet_file = Path(output_dir, f"{path.stem}--Gromet-FN-auto.json")
             
@@ -38,9 +38,8 @@ def regenerate_examples_google_drive(root_dir: str, gromet_version: str, overwri
             for file in path.iterdir():
                 if file.suffix in SUPPORTED_FILE_EXTENSIONS:
                     gromet_collection = process_file(str(file))
-                    print(str(gromet_file))
-                    with open(gromet_file, "w") as f:
-                        f.write(dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict())))
+                    gromet_file.parent.mkdir(exist_ok=True, parents=True)
+                    gromet_file.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict())))
 
 def regenerate_examples_simple(root_dir: str, output_dir=None, overwrite=False) -> None:
     '''Script to regenerate Gromet FN JSON for Python/Fortran source examples where are source files are in a single directory.'''
@@ -62,7 +61,6 @@ def regenerate_examples_simple(root_dir: str, output_dir=None, overwrite=False) 
 
 
     for path in root_dir.iterdir():
-        print(str(path))
         if path.suffix.lower() in SUPPORTED_FILE_EXTENSIONS:
             
             if output_dir:
@@ -75,8 +73,7 @@ def regenerate_examples_simple(root_dir: str, output_dir=None, overwrite=False) 
                 continue
 
             gromet_collection = process_file(str(path))
-            with open(gromet_file, "w") as f:
-                f.write(dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict())))
+            gromet_file.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict())))
         else:
             print(f"WARNING: The file type of {str(path)} is not supported by CODE2FN")
 
