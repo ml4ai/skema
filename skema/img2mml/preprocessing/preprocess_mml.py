@@ -362,6 +362,7 @@ def remove_unecc_tokens(eqn):
     if 'mspace' in eqn:
         # Remove existing attributes in mspace
         eqn = re.sub(r'mspace[^>]*', 'mspace width="thinmathspace" /', eqn)
+    eqn = eqn.replace(" MJX-fixedlimits\"", "")
 
     return eqn
 
