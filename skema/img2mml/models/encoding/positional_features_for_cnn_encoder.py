@@ -1,5 +1,4 @@
-import math
-import torch
+import torch, math
 
 
 def get_range_vector(size: int, device) -> torch.Tensor:

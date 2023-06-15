@@ -16,10 +16,9 @@ class BahdanauAttention(nn.Module):
         self.n_layers = n_layers
 
     def forward(self, encoder_outputs, hidden):
-
         # hidden = [1, batch size, dec hid dim]
         # encoder_outputs = [batch size, src_len, dec_hid_dim]
-        encoder_outputs.shape[0]
+        batch_size = encoder_outputs.shape[0]
         src_len = encoder_outputs.shape[1]
         if self.n_layers == 1:
             hidden = hidden.repeat(src_len, 1, 1).permute(
@@ -27,9 +26,7 @@ class BahdanauAttention(nn.Module):
             )  # (B,L,dec_hid_dim)
         else:
             """
-            We need to repeat the hidden to src_len that will result in
-            hid:(n*L, B, dec_hid_dim).
-
+            we need to repeat the hidden to src_len that will result in hid:(n*L, B, dec_hid_dim)
             Hence we need to repeat encoder_outputs too, to match hidden size
             i.e. hid_src_len-src_len
             """
@@ -40,7 +37,6 @@ class BahdanauAttention(nn.Module):
                 1, self.n_layers, 1
             )  # (B, n*L, dec_hid_dim)
 
-        # print("enc hidden shape: ", encoder_outputs.shape, hidden.shape)
         energy = self.attn(torch.cat((hidden, encoder_outputs), dim=2))
         energy = torch.tanh(energy)  # [batch size, src len, dec hid dim]
         attention = self.v(energy).squeeze(2)  # [batch size, src len]

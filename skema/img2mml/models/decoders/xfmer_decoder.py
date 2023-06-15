@@ -1,7 +1,6 @@
-import math
-import torch
+import torch, math
 import torch.nn as nn
-from skema.img2mml.utils import generate_square_subsequent_mask
+from skema.img2mml.utils.utils import generate_square_subsequent_mask
 from skema.img2mml.models.encoding.positional_encoding_for_xfmer import (
     PositionalEncoding,
 )
@@ -61,29 +60,74 @@ class Transformer_Decoder(nn.Module):
         # [False, False, False, True, True, True]
         return matrix == pad_token
 
-    def forward(self, trg, xfmer_enc_output, sos_idx, pad_idx):
+    def forward(
+        self,
+        trg,
+        xfmer_enc_output,
+        sos_idx,
+        pad_idx,
+        is_test=False,
+        is_inference=False,
+    ):
+        # xfmer_enc_output: (max_len, B, dec_hid_dim)
+        # trg: (B, max_len)
         """
+        we provide input: [<sos>, x1, x2, ...]
+        we get output: [x1, x2, ..., <eos>]
+        So we have to add <sos> in  the final preds
+
         for inference
         trg: sequnece containing total number of token that has been predicted.
         xfmer_enc_output: input from encoder
         """
-        # trg = trg.permute(1,0)  # batch_first --> (len, B)
+
+        if not is_inference:
+            (B, max_len) = trg.shape
+            _preds = torch.zeros(max_len, B).to(self.device)  # (max_len, B)
+            trg = trg.permute(1, 0)  # (max_len, B)
+            trg = trg[:-1, :]  # (max_len-1, B)
+
         sequence_length = trg.shape[0]
-        # print("trg:", trg.shape)
         trg_attn_mask = generate_square_subsequent_mask(sequence_length).to(
             self.device
-        )
+        )  # (max_len-1, max_len-1)
 
-        trg = self.embed(trg) * math.sqrt(self.emb_dim)
-        pos_trg = self.pos(trg)
-        pos_trg = self.modify_dimension(pos_trg)
+        # no need of padding for inference
+        if is_inference:
+            trg_padding_mask = None
+        else:
+            trg_padding_mask = self.create_pad_mask(trg, pad_idx).permute(
+                1, 0
+            )  # (B, max_len-1)
+
+        trg = self.embed(trg) * math.sqrt(
+            self.emb_dim
+        )  # (max_len-1, B, emb_dim)
+        pos_trg = self.pos(trg)  # (max_len-1, B, emb_dim)
+        pos_trg = self.modify_dimension(pos_trg)  # (max_len-1, B, dec_hid_dim)
 
         # outputs: (max_len-1,B, dec_hid_dim)
         xfmer_dec_outputs = self.xfmer_decoder(
-            tgt=pos_trg, memory=xfmer_enc_output, tgt_mask=trg_attn_mask
+            tgt=pos_trg,
+            memory=xfmer_enc_output,
+            tgt_mask=trg_attn_mask,
+            tgt_key_padding_mask=trg_padding_mask,
         )
 
         xfmer_dec_outputs = self.final_linear(
             xfmer_dec_outputs
-        )  # (-1,B, output_dim)
-        return xfmer_dec_outputs
+        )  # (max_len-1,B, output_dim)
+
+        if is_inference:
+            return xfmer_dec_outputs  # (-1, B, output_dim)
+        else:
+            # preds
+            _preds[0, :] = torch.full(_preds[0, :].shape, sos_idx)
+            if is_test:
+                for i in range(xfmer_dec_outputs.shape[0]):
+                    top1 = xfmer_dec_outputs[i, :, :].argmax(1)  # (B)
+                    _preds[i + 1, :] = top1
+
+            # xfmer_dec_outputs: (max_len-1, B, output_dim); _preds: (max_len, B)
+            # permute them to make "Batch first"
+            return xfmer_dec_outputs.permute(1, 0, 2), _preds.permute(1, 0)

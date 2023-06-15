@@ -1,3 +1,5 @@
+""" borrowed from OpenNMT-py v1.0.0.rc1 """
+
 import torch
 import torch.nn as nn
 from skema.img2mml.models.encoding.positional_features_for_cnn_encoder import (

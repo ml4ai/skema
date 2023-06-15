@@ -1,4 +1,4 @@
-import torch
+import torch, math
 from collections import Counter
 
 
@@ -46,6 +46,7 @@ class CreateVocab(object):
     def __len__(self):
         return len(self.tok2ind)
 
+
 def garbage2pad(preds, vocab, is_test=False):
     """
     all garbage tokens will be converted to <pad> token
@@ -58,12 +59,15 @@ def garbage2pad(preds, vocab, is_test=False):
     pred: cleaned pred eqn
     """
 
-    vocab.stoi["<pad>"]
+    pad_idx = vocab.stoi["<pad>"]
     eos_idx = vocab.stoi["<eos>"]
     for b in range(preds.shape[0]):
-        # cleaning pred
-        eos_pos = (preds[b, :] == eos_idx).nonzero(as_tuple=False)[0]
-        preds[b, :] = preds[b, : eos_pos + 1]  # pad_idx
+        try:
+            # cleaning pred
+            eos_pos = (preds[b, :] == eos_idx).nonzero(as_tuple=False)[0]
+            preds[b, :] = preds[b, : eos_pos + 1]  # pad_idx
+        except:
+            pass
 
     return preds
 
@@ -76,15 +80,6 @@ def generate_square_subsequent_mask(sz: int) -> torch.Tensor:
         .masked_fill(mask == 1, float(0.0))
     )
     return mask
-
-
-def calculate_loss(output, mml, vocab):
-    """
-    calculate Cross Entropy loss
-    """
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
-    loss = criterion(output, mml)
-    return loss
 
 
 def calculating_accuracy(pred, mml):
