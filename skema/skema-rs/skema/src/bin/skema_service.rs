@@ -42,6 +42,7 @@ async fn main() -> std::io::Result<()> {
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
             skema::services::mathml::get_regnet,
+            skema::services::mathml::get_amr,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -58,6 +59,7 @@ async fn main() -> std::io::Result<()> {
                 comment_extraction::SingleLineComment,
                 comment_extraction::Docstring,
                 comment_extraction::CommentExtractionResponse,
+                mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::PetriNet,
                 mathml::acset::State,
@@ -109,6 +111,7 @@ async fn main() -> std::io::Result<()> {
             .service(skema::services::mathml::get_math_exp_graph)
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
+            .service(skema::services::mathml::get_amr)
             .service(ping)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })

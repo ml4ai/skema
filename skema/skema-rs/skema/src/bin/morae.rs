@@ -92,7 +92,7 @@ fn main() {
         println!("\n Ast:\n {:?}", core_dynamics_ast[5].clone());
     } else if new_args.arg == "AMR_test".to_string() {
         let mathml_asts =
-            get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
+            get_mathml_asts_from_file("../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
         let mut regnet = RegNet::from(mathml_asts);
         println!("\nRegnet AMR: {:?}\n", regnet.clone());
         regnet.model.vertices.sort();
@@ -101,7 +101,7 @@ fn main() {
         println!("For serialization test:\n\n {}", regnet_serial);
 
         let mathml_pn_asts =
-            get_mathml_asts_from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+            get_mathml_asts_from_file("../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
         let mut pn = PetriNet::from(ACSet::from(mathml_pn_asts));
         println!("\nPetriNet AMR: {:?}", pn.clone());
         let pn_serial = serde_json::to_string(&pn).unwrap();

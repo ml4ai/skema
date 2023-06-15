@@ -1,6 +1,6 @@
-use actix_web::{get, put, web, HttpResponse};
+use actix_web::{get, put, web, HttpResponse, body::EitherBody};
 use mathml::{
-    acset::{ACSet, RegNet, PetriNet},
+    acset::{ACSet, RegNet, PetriNet, AMRmathml},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsing::parse,
@@ -65,7 +65,7 @@ pub async fn get_math_exp_graph(payload: String) -> String {
         )
     )
 )]
-#[put("/mathml/acset")]
+#[put("/mathml/petrinet")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
     let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
     HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
@@ -87,3 +87,26 @@ pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
 }
 
+
+/// Return a JSON representation of an AMR constructed from an array of MathML strings and a string for the AMR subtype
+#[utoipa::path(
+    request_body = AMRmathml,
+    responses(
+        (
+            status = 200,
+            body = EitherBody<PetriNet, RegNet>,
+        )
+    )
+)]
+#[put("/mathml/amr")]
+pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
+    let asts: Vec<Math> = payload.mathml.iter().map(|x| parse(&x).unwrap().1).collect();
+    let model_type = payload.model.clone();
+    if model_type == "regnet".to_string() {
+        HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+    } else if model_type == "petrinet".to_string() {
+        HttpResponse::Ok().json(PetriNet::from(ACSet::from(asts)))
+    } else {
+        HttpResponse::BadRequest().into()
+    }
+}

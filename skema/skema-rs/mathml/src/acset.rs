@@ -301,6 +301,15 @@ pub struct Distribution {
     pub parameters: String,
 }
 
+// This is for the routing of mathml for various endpoints to extract the appropriate AMR
+#[derive(
+    Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord, Serialize, Deserialize, ToSchema,
+)]
+pub struct AMRmathml {
+    pub model: String,
+    pub mathml: Vec<String>,
+}
+
 // -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
 // -------------------------------------------------------------------------------------------
