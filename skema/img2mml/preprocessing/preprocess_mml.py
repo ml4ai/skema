@@ -293,7 +293,7 @@ def remove_unecc_tokens(eqn):
         "mroot",
         # "mstyle",
         # "mpadded",
-        "mphantom",
+        # "mphantom",
         "mfenced",
         "menclose",
         "munder",
