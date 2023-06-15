@@ -358,6 +358,11 @@ def remove_unecc_tokens(eqn):
     # if args.with_boldface:
     #     eqn = eqn.replace("boldface_placeholder", 'mathvariant="bold"')
 
+    # unify the space size
+    if 'mspace' in eqn:
+        # Remove existing attributes in mspace
+        eqn = re.sub(r'mspace[^>]*', 'mspace width="thinmathspace" /', eqn)
+
     return eqn
 
 
