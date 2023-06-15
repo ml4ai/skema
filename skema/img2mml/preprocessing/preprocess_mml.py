@@ -270,6 +270,7 @@ def remove_unecc_tokens(eqn):
         "minsize",
         "linethickness",
         "mstyle",
+        "mphantom"
     ]
     if not args.with_boldface:
         eliminate.append("mathvariant")
