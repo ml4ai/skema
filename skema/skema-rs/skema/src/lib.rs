@@ -45,9 +45,7 @@ pub struct ValueL {
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct GrometBox {
     pub function_type: FunctionType,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub body: Option<u32>,
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(skip_serializing_if = "Option::is_none", rename = "body")]
     pub contents: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<ValueL>,
