@@ -434,6 +434,7 @@ def train_model(
                     device,
                     ddp=ddp,
                     rank=rank,
+                    vocab=vocab
                 )
 
                 val_loss = evaluate(
