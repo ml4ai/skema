@@ -4,6 +4,7 @@ import requests
 import re
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
+PORT = 8031
 
 def get_mathml_from_bytes(data: bytes):
     # convert png image to tensor
@@ -41,7 +42,7 @@ def get_mathml_from_latex(eqn) -> str:
     """Read a LaTeX equation string and convert it to presentation MathML"""
 
     # Define the webservice address from the MathJAX service
-    webservice = "http://localhost:8081"
+    webservice = "http://localhost:" + str(PORT)
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
         f"{webservice}/tex2mml",
