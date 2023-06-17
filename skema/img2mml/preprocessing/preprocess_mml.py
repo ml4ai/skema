@@ -631,7 +631,7 @@ def tokenize(mathml: str) -> str:
             tokenized_mathml.append(token[0])
         elif token[1] != "":
             # For non-empty content, split into individual characters as tokens
-            if token[1].startswith("&"):
+            if "&" in token[1]:
                 # For Unicode characters, treat them as a whole token
                 tokenized_mathml.append(token[1])
             else:
