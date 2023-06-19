@@ -60,6 +60,8 @@ jobs:
       with:
         images: lumai/askem-skema-py
         tags: |
+          # latest
+          type=raw,value=latest
           # version
           type=semver,pattern={{version}}
           # other tags
@@ -125,6 +127,8 @@ jobs:
       with:
         images: lumai/askem-skema-rs
         tags: |
+          # latest
+          type=raw,value=latest
           # version
           type=semver,pattern={{version}}
           # other tags
@@ -190,6 +194,8 @@ jobs:
       with:
         images: lumai/askem-skema-text-reading
         tags: |
+          # latest
+          type=raw,value=latest
           # version
           type=semver,pattern={{version}}
           # other tags
@@ -201,7 +207,7 @@ jobs:
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
       with:
-        context: ./skema/text_reading/text_reading
+        context: ./skema/text_reading/scala
         platforms: linux/amd64
         push: ${{ github.event_name != 'pull_request' }}
         # references `tags` step in steps for current job
@@ -254,6 +260,8 @@ jobs:
       with:
         images: lumai/askem-skema-img2mml
         tags: |
+          # latest
+          type=raw,value=latest
           # version
           type=semver,pattern={{version}}
           # other tags

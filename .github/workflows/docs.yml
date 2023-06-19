@@ -72,26 +72,28 @@ jobs:
         mv target/doc/* $GITHUB_WORKSPACE/docs/api/rust/
 
     # generate Scala docs using sbt doc
-    - name: "Create documentation for Scala components (API docs)"
-      working-directory: ./skema/text_reading/scala
-      run: |
-        sbt doc
-        mkdir -p $GITHUB_WORKSPACE/docs/api/scala
-        mv target/doc/* $GITHUB_WORKSPACE/docs/api/scala/
+    # FIXME: downloading project deps is far too slow and too large to cache (3+ GB) to include this step in our CI
+    # - name: "Create documentation for Scala components (API docs)"
+    #   working-directory: ./skema/text_reading/scala
+    #   run: |
+    #     sbt doc
+    #     mkdir -p $GITHUB_WORKSPACE/docs/api/scala
+    #     mv target/doc/* $GITHUB_WORKSPACE/docs/api/scala/
 
     # code coverage (Scala)
-    - name: "Code coverage reports for Scala components"
-      working-directory: ./skema/text_reading/scala
-      run: |
-        sbt clean coverage test
-        sbt coverageReport
-        sbt coverageAggregate
+    # FIXME: downloading project deps is far too slow to include this step
+    # - name: "Code coverage reports for Scala components"
+    #   working-directory: ./skema/text_reading/scala
+    #   run: |
+    #     sbt clean coverage test
+    #     sbt coverageReport
+    #     sbt coverageAggregate
 
     # code coverage (Python)
-    - name: "Code coverage reports for Python components"
-      run: |
-        coverage report -m
-        coverage html
+    # - name: "Code coverage reports for Python components"
+    #   run: |
+    #     coverage report -m
+    #     coverage html
 
     # docs (other)
     - name: "Create documentation (other)"
