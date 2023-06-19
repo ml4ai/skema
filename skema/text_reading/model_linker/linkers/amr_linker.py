@@ -12,9 +12,10 @@ from walkers.json import JsonNode, JsonDictWalker
 
 class AMRLinker(ABC):
 
-    def __init__(self, model_name: str, device: Optional[str] = None):
+    def __init__(self, model_name: str, sim_threshold: float = 0.7, device: Optional[str] = None):
         self.__model_name = model_name
         self.__model = SentenceTransformer(model_name)
+        self.__threshold = sim_threshold
 
         if device:
             self.__model.to(device)
@@ -25,29 +26,27 @@ class AMRLinker(ABC):
     def _build_walker(self, amr_data:Dict[str, Any]) -> JsonDictWalker:
         pass
 
-    @abc.abstractmethod
-    def _generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredExtraction]]:
-        """ Will generate candidate texts to link to model elements """
-        pass
 
-    @staticmethod
-    def __generate_linking_sources(elements: Iterable[JsonNode]) -> Dict[str, List[Any]]:
-        """" Will generate candidate texts to link to text extractions """
+    def __generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredExtraction]]:
+        """ Will generate candidate texts to link to model elements """
         ret = defaultdict(list)
-        for name, val, ix in elements:
-            if name == "states":
-                if "description" in val:
-                    ret[f"{val['name'].strip()}: {val['description']}"] = val
+        for ex in extractions:
+            for name in ex.payload.names:
+                if len(ex.payload.descriptions) > 0:
+                    for desc in ex.payload.descriptions:
+                        ret[f"{name.name.strip()}: {desc.source.strip()}"].append(ex)
+                        ret[desc.source.strip()].append(ex)
                 else:
-                    ret[val['name'].strip()] = val
-            elif name == "transitions":
-                if "description" in val:
-                    ret[f"{val['id'].strip()}: {val['description']}"] = val
-                else:
-                    ret[val['id'].strip()] = val
+                    candidate_text = f"{name.name.strip()}"
+                    ret[candidate_text].append(ex)
         return ret
 
-    def __align_texts(self, sources: List[str], targets: List[str], threshold: float = 0.7) -> List[Tuple[str, str]]:
+    @abc.abstractmethod
+    def _generate_linking_sources(self, elements: Iterable[JsonNode]) -> Dict[str, List[Any]]:
+        """" Will generate candidate texts to link to text extractions """
+        pass
+
+    def __align_texts(self, sources: List[str], targets: List[str], threshold: float) -> List[Tuple[str, str]]:
 
         with torch.no_grad():
             s_embs = self.__model.encode(sources)
@@ -68,15 +67,15 @@ class AMRLinker(ABC):
         # Make a copy of the amr to avoid mutating the original model
         amr_data = {**amr_data}
 
-        targets = self._generate_linking_targets(
+        targets = self.__generate_linking_targets(
             e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
 
         walker = self._build_walker(amr_data)
 
         to_link = list(walker.walk())
-        sources = self.__generate_linking_sources(to_link)
+        sources = self._generate_linking_sources(to_link)
 
-        pairs = self.__align_texts(list(sources.keys()), list(targets.keys()))
+        pairs = self.__align_texts(list(sources.keys()), list(targets.keys()), threshold=self.__threshold)
 
         for s_key, t_key in pairs:
             source = sources[s_key]

@@ -1,27 +1,31 @@
 from collections import defaultdict
-from typing import Iterable, Dict, List
+from typing import Iterable, Dict, List, Any
 
 from askem_extractions.data_model import Attribute, AnchoredExtraction
 
 from linkers.amr_linker import AMRLinker
-from walkers.json import JsonDictWalker
+from walkers.json import JsonDictWalker, JsonNode
 from walkers.petrinet import PetriNetWalker
 
 
 class PetriNetLinker(AMRLinker):
 
+    def _generate_linking_sources(self, elements: Iterable[JsonNode]) -> Dict[str, List[Any]]:
+        ret = defaultdict(list)
+        for name, val, ix in elements:
+            if name == "states":
+                if "description" in val:
+                    ret[f"{val['name'].strip()}: {val['description']}"] = val
+                else:
+                    ret[val['name'].strip()] = val
+            elif name == "transitions":
+                if "description" in val:
+                    ret[f"{val['id'].strip()}: {val['description']}"] = val
+                else:
+                    ret[val['id'].strip()] = val
+        return ret
+
     def _build_walker(self, amr_data) -> JsonDictWalker:
         return PetriNetWalker(amr_data)
 
-    def _generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredExtraction]]:
-        ret = defaultdict(list)
-        for ex in extractions:
-            for name in ex.payload.names:
-                if len(ex.payload.descriptions) > 0:
-                    for desc in ex.payload.descriptions:
-                        ret[f"{name.name.strip()}: {desc.source.strip()}"].append(ex)
-                        ret[desc.source.strip()].append(ex)
-                else:
-                    candidate_text = f"{name.name.strip()}"
-                    ret[candidate_text].append(ex)
-        return ret
+
