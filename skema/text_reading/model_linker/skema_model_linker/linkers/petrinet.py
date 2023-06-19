@@ -1,11 +1,9 @@
 from collections import defaultdict
 from typing import Iterable, Dict, List, Any
 
-from askem_extractions.data_model import Attribute, AnchoredExtraction
-
-from linkers.amr_linker import AMRLinker
-from walkers.json import JsonDictWalker, JsonNode
-from walkers.petrinet import PetriNetWalker
+from . import AMRLinker
+from skema_model_linker.walkers import JsonDictWalker, JsonNode
+from skema_model_linker.walkers import PetriNetWalker
 
 
 class PetriNetLinker(AMRLinker):

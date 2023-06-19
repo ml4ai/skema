@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "skema-model-linker"
+version = "1.0.0"
+authors = [{ name="Enrique Noriega-Atala", email= "enoriega@arizona.edu"}]
+description = "Model linker utiliy"
+dependencies = [
+    "askem-extractions @ git+https://github.com/ml4ai/ASKEM-TA1-DataModel@c595e2492f51cf93cf4ba2615571ed9c905f7c52",
+    "fire==0.5.0",
+    "torch==2.0.1",
+    "transformers==4.30.2",
+    "mock==5.0.2"
+]
+
+[project.scripts]
+link_amr = "skema_model_linker.link_amr:main"
+
+[options]
+packages = ["model_linker"]

@@ -1,6 +1,6 @@
 from typing import NamedTuple, Any, Dict, Optional
 
-from walkers.model_walker import ModelWalker
+from . import ModelWalker
 
 
 class JsonNode(NamedTuple):

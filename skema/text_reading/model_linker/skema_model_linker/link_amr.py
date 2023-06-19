@@ -6,19 +6,18 @@ from typing import Optional
 import fire.fire_test
 from askem_extractions.data_model import AttributeCollection
 
-from linkers.petrinet import PetriNetLinker
-from linkers.regnet import RegNetLinker
+from skema_model_linker.linkers import PetriNetLinker, RegNetLinker
 
 
 def link_amr(
-        amr_path: str,                                                     # Path of the AMR model
-        attribute_collection: str,                                         # Path to the attribute collection
-        amr_type: str,                                                     # AMR model type. I.e. "petrinet" or "regnet"
-        output_path: Optional[str] = None,                                 # Output file path
+        amr_path: str,  # Path of the AMR model
+        attribute_collection: str,  # Path to the attribute collection
+        amr_type: str,  # AMR model type. I.e. "petrinet" or "regnet"
+        output_path: Optional[str] = None,  # Output file path
         similarity_model: str = "sentence-transformers/all-MiniLM-L6-v2",  # Transformer model to compute similarities
-        similarity_threshold: float = 0.7,                                 # Cosine similarity threshold for linking
-        device: Optional[str] = None                                       # PyTorch device to run the model on
-        ):
+        similarity_threshold: float = 0.7,  # Cosine similarity threshold for linking
+        device: Optional[str] = None  # PyTorch device to run the model on
+):
     """ Links and AMR model to an attribute collections from ASKEM text reading pipelines """
 
     if amr_type == "petrinet":
@@ -45,8 +44,10 @@ def link_amr(
         json.dump(linked_model, f, default=str, indent=2)
 
 
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
+def main():
+    """ Module's entry point"""
     fire.Fire(link_amr)
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+
+if __name__ == "__main__":
+    main()

@@ -7,7 +7,7 @@ import torch
 from askem_extractions.data_model import Attribute, AnchoredExtraction, AttributeCollection, AttributeType
 from sentence_transformers import SentenceTransformer, util
 
-from walkers.json import JsonNode, JsonDictWalker
+from skema_model_linker.walkers import JsonNode, JsonDictWalker
 
 
 class AMRLinker(ABC):

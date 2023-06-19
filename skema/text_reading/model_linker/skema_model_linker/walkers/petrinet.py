@@ -1,6 +1,6 @@
 from typing import Optional, Any
 
-from walkers.json import JsonDictWalker
+from . import JsonDictWalker
 
 
 class PetriNetWalker(JsonDictWalker):
