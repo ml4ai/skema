@@ -35,7 +35,7 @@ from skema.gromet.metadata import (
     SourceCodePortKeywordArg,
     ProgramAnalysisRecordBookkeeping,
 )
-from skema.gromet.fn import TypedValue, ImportReference
+from skema.gromet.fn import TypedValue
 
 
 def json_to_gromet(path):
@@ -284,19 +284,6 @@ def parse_metadata(obj):
     import_basic_datatypes(obj, metadata_object)
 
     return metadata_object
-
-
-def parse_import_reference(obj):
-    import_object = ImportReference()
-
-    import_basic_datatypes(obj, import_object)
-
-    if "uri" in obj:
-        import_object.uri = TypedValue()
-        import_basic_datatypes(obj["uri", import_object.uri])
-        # TODO: Potentially fill out uri.value type for typed value
-
-    return import_object
 
 
 def import_basic_datatypes(obj, gromet_obj):

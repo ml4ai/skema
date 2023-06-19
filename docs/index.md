@@ -1,8 +1,3 @@
----
-title: "Home"
-layout: page
----
-
 Computational models are powerful tools for exploring and verifying hypotheses
 about complex systems. However, the scientific knowledge that drives their
 creation and results from their use is largely fractured among a number of
