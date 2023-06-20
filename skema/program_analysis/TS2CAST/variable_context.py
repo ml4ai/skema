@@ -25,11 +25,22 @@ class VariableContext(object):
 
     def push_context(self):
         """Create a new variable context and add it to the stack"""
+        
+        # TODO: Could this add unwanted variables to the context or overwrite existing variables
+        # If the internal flag is set, then all new scopes will use the top-level context
+        if self.internal:
+            return None
+
         self.context.append({})
         self.context_return_values.append(set())
 
     def pop_context(self):
         """Pop the current variable context off of the stack and remove any references to those symbols."""
+        
+        # If the internal flag is set, then all new scopes will use the top-level context
+        if self.internal:
+            return None
+        
         context = self.context.pop()
 
         # Remove symbols from all_symbols variable
