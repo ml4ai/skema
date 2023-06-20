@@ -1,0 +1,88 @@
+site_name: skema
+site_url: https://ml4ai.github.io/skema
+site_description: SKEMA project documentation.
+site_author: University of Arizona &amp; Lum AI
+
+repo_url: https://github.com/ml4ai/skema/
+edit_uri: "blob/main/docs/"
+
+theme:
+  name: readthedocs
+  highlightjs: true
+  hljs_style: github
+  # list additional languages here
+  hljs_languages:
+    - yaml
+  analytics:
+    gtag: null
+  shortcuts:
+    help: 191    # ?
+    next: 78     # n
+    previous: 80 # p
+    search: 83   # s
+  nav_style: dark
+  locale: en
+
+nav:
+    # NOTE: all relative to docs/
+    - Home: index.md
+    - Software: software.md
+    - About:
+        #- Release Notes: about/release-notes.md
+        - Team: team.md
+        # - Contributing: contributing.md
+        - License: "license.md"
+    - Developing:
+        - Configuring your development environment: "dev/env.md"
+        - Building documentation: "dev/docs.md"
+        - Test coverage reports: "coverage/index.md"
+    #- Getting Started: getting-started.md
+    # - User Guide:
+    #     - Installation: install.md
+    #     - Testing: test.md 
+    - API (Python):
+      # NOTE: moviz currently has no API docs
+      #- "skema.moviz": api/python/moviz/index.html
+      - "<code>skema.isa</code>": api/python/skema/isa/index.html
+      - "<code>skema.img2mml</code>": api/python/skema/img2mml/index.html
+      - "<code>skema.skema_py</code>": api/python/skema/skema_py/index.html
+      - "<code>skema.gromet</code>": api/python/skema/gromet/index.html
+      - "<code>skema.utils</code>": api/python/skema/utils/index.html
+    - API (Rust):
+      - "<code>skema.rust</code>": api/rust/index.html
+    - API (Scala):
+      - "<code>skema.scala</code>": api/scala/index.html
+
+        
+
+#api/python/skema/gromet/index.html
+
+extra_css:
+    - css/extra.css
+
+# footnotes
+# pymdownx.emoji
+# pymdownx.caret
+# pymdownx.mark
+# pymdownx.tilde
+# pymdownx.details
+# pymdownx.superfences
+# pymdownx.tabbed
+markdown_extensions:
+    - toc:
+        permalink: 
+    - admonition
+    - attr_list
+    - def_list
+
+copyright: Copyright &copy; 2023 University of Arizona &amp; Lum AI.
+
+plugins:
+    - search
+    # # see https://github.com/mercari/mkdocs-git-snippet
+    - git-snippet
+    # see https://github.com/timvink/mkdocs-git-revision-date-localized-plugin
+    - git-revision-date-localized
+    # see https://github.com/timvink/mkdocs-git-authors-plugin
+    - git-authors
+    # TODO: add https://github.com/fralau/mkdocs-mermaid2-plugin

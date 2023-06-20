@@ -8,6 +8,7 @@ FROM  python:3.8-bullseye
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update &&\
     apt-get -y --no-install-recommends install \
+        tree \
         # Required for pygraphviz
         build-essential \
         graphviz \
@@ -21,25 +22,31 @@ RUN apt-get update &&\
 # =====================
 # Setup the repository
 # =====================
-RUN mkdir -p /skema/skema
+RUN mkdir -p /app
 
 # Copy the necessary files and folders, omitting unnecessary ones.
-COPY pyproject.toml /skema/
-COPY skema/program_analysis /skema/skema/program_analysis
-COPY skema/gromet /skema/skema/gromet
-COPY skema/model_assembly /skema/skema/model_assembly
-COPY skema/skema_py /skema/skema/skema_py
-COPY skema/utils /skema/skema/utils
-WORKDIR /skema
+COPY . /app/
+WORKDIR /app/
+
+# Install rust (needed b/c of ISA's use of graspologic)
+RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install the skema package
 RUN pip install wheel
 RUN pip install fastapi uvicorn
 RUN pip install six
-RUN pip install -e .
+# Download ML model (~150MB)
+# FIXME: consider publishing and retrieving this model from HF Hub
+RUN curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+# FIXME: remove later
+RUN tree /app
+#RUN pip install ".[all]"
+# exclude dependencies for docs
+RUN pip install ".[core,dev]"
 
 # Build tree-sitter-fortran grammar required by Fortran code2fn
-RUN python /skema/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
+#RUN python /app/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
 
-# Switch to the skema_py directory
-WORKDIR /skema/skema/skema_py/
+
+#CMD ["uvicorn", "skema.skema_py.server:app", "--host", "0.0.0.0", "--port", "8000"]

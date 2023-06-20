@@ -1,11 +1,11 @@
 import json
 import graphviz
-from skema.moviz.utils.helper_functions import drawB, setExpandValue
 
 #remove this before commit
 # from skema.utils.fold import del_nulls, dictionary_to_gromet_json
 
-from utils.helper_functions import (
+from skema.moviz.utils.helper_functions import (
+    drawB,
     drawBC,
     drawBL,
     drawWFC,
@@ -15,10 +15,11 @@ from utils.helper_functions import (
     drawWFOPO,
     drawWFOPI,
     drawWOPIO,
+    setExpandValue,
 )
 
 
-from utils.init import init
+from skema.moviz.utils.init import init
 
 from pathlib import Path
 

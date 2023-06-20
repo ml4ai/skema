@@ -31,7 +31,7 @@ in the root of the repository).
 Then, run the following command to launch the img2mml server program:
 
 ```
-uvicorn img2mml:app --reload
+uvicorn skema.img2mml.img2mml:app --reload
 ```
 
 An example test program is provided as well, which you can invoke with:
