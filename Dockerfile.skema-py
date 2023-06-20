@@ -28,7 +28,7 @@ RUN mkdir -p /app
 COPY . /app/
 WORKDIR /app/
 
-# Install rust (needed b/c of ISA's use of graspologic)
+# Install rust (needed b/c of ISA's use of graspologic; no wheels available for ARM64/M1)
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
