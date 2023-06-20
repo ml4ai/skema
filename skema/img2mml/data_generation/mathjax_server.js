@@ -1,6 +1,7 @@
 const express = require('express');
 const mjAPI = require("mathjax-node");
 const _ = require('lodash');
+const PORT = 8031;
 
 // ==== Initialize the express server ==========================================
 var app = express();
@@ -87,7 +88,7 @@ app.get('/restart', function (req, res) {
 
 
 // Start the express application server
-var server = app.listen(8081, function () {
+var server = app.listen(PORT, function () {
     var port = server.address().port
     console.log("MathJax server listening at http://localhost:%s", port)
 });
