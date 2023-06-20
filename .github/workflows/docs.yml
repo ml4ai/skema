@@ -67,7 +67,7 @@ jobs:
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.skema_py
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading
+        #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading
     # generate Rust docs using cargo doc
     - name: "Create documentation for Rust components (API docs)"
       working-directory: ./skema/skema-rs
