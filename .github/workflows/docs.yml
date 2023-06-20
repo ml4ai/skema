@@ -45,6 +45,11 @@ jobs:
       with:
         distribution: temurin
         java-version: 11
+    # Install dependencies
+    - name: System-wide deps
+      run: |
+        sudo apt-get install -y graphviz \
+        libgraphviz-dev
     # Install packages (for API doc gen)
     - name: Install askem-skema-py
       working-directory: .
