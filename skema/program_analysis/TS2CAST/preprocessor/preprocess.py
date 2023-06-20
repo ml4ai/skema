@@ -20,8 +20,7 @@ def preprocess(
     out_gcc=False,
     out_unsupported=False,
     out_corrected=False,
-    out_parse=False,
-) -> Tree:
+) -> str:
     """Run the full preprocessing pipeline for Fortran->Tree-Sitter->CAST
     Takes the original source as input and will return the tree-sitter parse tree as output
     An intermediary directory will also be created containing:
@@ -29,7 +28,6 @@ def preprocess(
     2. The intermediary product from running the c-preprocessor
     3. A log of unsupported idioms
     4. The source code with unsupported idioms corrected
-    5. The tree-sitter parse tree
     """
 
     source = open(source_path, "r").read()
@@ -87,14 +85,7 @@ def preprocess(
         with open(corrected_path, "w") as f:
             f.write(source)
 
-    # Stage 7: Parse with tree-sitter
-    parse_tree = tree_sitter_parse(source)
-    if out_parse:
-        parse_path = os.path.join(out_path, "parse_tree.txt")
-        with open(parse_path, "w") as f:
-            f.write(parse_tree.root_node.sexp())
-
-    return parse_tree
+    return source
 
 
 def check_for_missing_includes(source_path: str):
@@ -204,20 +195,6 @@ def run_c_preprocessor(source: str, include_base_path: str) -> str:
     )
     return result.stdout
 
-
-def tree_sitter_parse(source: str) -> Tree:
-    """Use tree-sitter to parse the source code and output the parse tree"""
-    parser = Parser()
-
-    parser.set_language(
-        Language(
-            os.path.join(os.path.dirname("../"), LANGUAGE_LIBRARY_REL_PATH), "fortran"
-        )
-    )
-
-    return parser.parse(bytes(source, "utf8"))
-
-
 def main():
     """Run the preprocessor as a script"""
     parser = argparse.ArgumentParser(description="Fortran preprocessing script")
@@ -249,11 +226,6 @@ def main():
         action="store_true",
         help="Output source after fixing unsupported idioms",
     )
-    parser.add_argument(
-        "--out_parse",
-        action="store_true",
-        help="Output tree-sitter parse tree",
-    )
     args = parser.parse_args()
 
     preprocess(
@@ -263,8 +235,7 @@ def main():
         args.out_missing_includes,
         args.out_gcc,
         args.out_unsupported,
-        args.out_corrected,
-        args.out_parse,
+        args.out_corrected
     )
 
 

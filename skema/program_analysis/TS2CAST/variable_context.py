@@ -1,9 +1,8 @@
-from typing import List, Dict
+from typing import List, Dict, Set
 from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     Name,
 )
-
 
 class VariableContext(object):
     def __init__(self):
@@ -16,6 +15,9 @@ class VariableContext(object):
         # This gives each symbol a unqique name. For example "a" would become "type_name.a"
         # For nested type definitions (derived type in a module), multiple prefixes can be added.
         self.prefix = []
+
+        # Flag neccessary to declare if a function is internal or external
+        self.internal = False
 
         self.variable_id = 0
         self.iterator_id = 0
@@ -100,3 +102,10 @@ class VariableContext(object):
     def exit_record_definition(self):
         """Exit a record definition. Resets the prefix to the empty string"""
         self.prefix.pop()
+
+    def set_internal(self):
+        '''Set the internal flag, meaning, all '''
+        self.internal = True
+
+    def unset_internal(self):
+        self.internal = False
