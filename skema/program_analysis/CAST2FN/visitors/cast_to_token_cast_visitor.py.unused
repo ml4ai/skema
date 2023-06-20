@@ -10,8 +10,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
     AstNode,
     Assignment,
     Attribute,
-    BinaryOp,
-    BinaryOperator,
     Boolean,
     Call,
     ClassDef,
@@ -27,6 +25,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Module,
     Name,
     Number,
+    Operator,
     Set,
     String,
     SourceRef,
@@ -158,8 +157,8 @@ class CASTToTokenCASTVisitor(CASTVisitor):
         return ""
 
     @visit.register
-    def _(self, node: BinaryOp):
-        """Visits BinaryOp nodes, we visit the left and right nodes, and then
+    def _(self, node: Operator):
+        """Visits Operator nodes, we visit the left and right nodes, and then
         generate the token CAST string."""
         left = self.visit(node.left)
         right = self.visit(node.right)
