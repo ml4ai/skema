@@ -60,12 +60,12 @@ jobs:
     # generate python docs using pdoc
     - name: "Create documentation for Python components (API docs)"
       run: |
-        # once issues with program_analysis resolved, move to top command
+        # FIXME: once issues with submodules resolved, top command will be sufficient
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.img2mml
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.isa
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.skema_py
-        #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading
     # generate Rust docs using cargo doc
@@ -93,12 +93,10 @@ jobs:
     #     sbt clean coverage test
     #     sbt coverageReport
     #     sbt coverageAggregate
-
     # code coverage (Python)
-    # - name: "Code coverage reports for Python components"
-    #   run: |
-    #     coverage report -m
-    #     coverage html
+    - name: "Code coverage reports for Python components"
+      run: |
+        pytest
 
     # docs (other)
     - name: "Create documentation (other)"

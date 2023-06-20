@@ -53,7 +53,7 @@ img2mml = ["fastapi", "uvicorn", "torch", "torchvision", "python-multipart"]
 tr = ["transformers", "gensim", "SPARQLWrapper", "tqdm", "pandas"]
 
 # project documentation generation
-doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-git-revision-date-localized-plugin==0.11.1", "mkdocs-git-authors-plugin==0.6.3", "mkdocs-rtd-dropdown==1.0.2"]
+doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-git-revision-date-localized-plugin==0.11.1", "mkdocs-git-authors-plugin==0.6.3", "mkdocs-rtd-dropdown==1.0.2", "jinja2<3.1.0"]
 
 core = ["skema[moviz]", "skema[img2mml]", "skema[isa]", "skema[tr]"]
 
@@ -90,7 +90,14 @@ skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_
 requires = ["setuptools>=67", "wheel"]
 build-backend = "setuptools.build_meta"
 
-
+# pytest
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "--cov=skema --cov-report html:docs/coverage/python"
+testpaths = [
+    "skema/program_analysis/tests",
+    "skema/img2mml/tests",
+]
 
 # Configuration for Black.
 
