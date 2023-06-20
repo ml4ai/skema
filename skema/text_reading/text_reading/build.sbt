@@ -18,6 +18,7 @@ libraryDependencies ++= {
     "org.scalanlp"               %% "breeze-viz"                          % breezeVer,
     "ai.lum"                     %% "common"                              % "0.0.10",
     "org.clulab"                 %% "epidemiology-embeddings-model-ser"   % "1.0.0",
+    "org.clulab"                  % "spaceweather-model-unigram-ser"      % "1.0.0",
     "org.clulab"                  % "glove-840b-300d"                     % "0.1.0" % Test,
     "org.clulab"                 %% "pdf2txt"                             % "1.1.3",
     "com.typesafe.play"          %% "play-json"                           % "2.9.3",
@@ -38,12 +39,15 @@ libraryDependencies ++= {
 
 lazy val root = project in file(".")
 
- lazy val webapp = project
-   .enablePlugins(PlayScala)
-   .aggregate(root)
-   .dependsOn(root)
+lazy val webapp = project
+    .enablePlugins(PlayScala)
+    .aggregate(root)
+    .dependsOn(root)
 
 //EclipseKeys.withSource := true
 
 ThisBuild / Test / fork := true // also forces sequential operation
 ThisBuild / Test / parallelExecution := false // keeps groups in their order
+
+addCommandAlias("dockerizeWebapp", "webapp/docker:publishLocal")
+

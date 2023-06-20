@@ -4,11 +4,11 @@ pub mod database;
 pub mod services;
 
 // Stub for SKEMA library
+use schemars::JsonSchema;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
-use utoipa::ToSchema;
-
 use serde_json::Value; // for json
 use std::string::ToString;
+use utoipa::ToSchema;
 
 /******** AST for the Gromet Data Structure ********/
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
@@ -196,7 +196,7 @@ pub struct Attribute {
     pub metadata: Option<Vec<Metadata>>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 pub struct Provenance {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub method: Option<String>,
@@ -204,7 +204,7 @@ pub struct Provenance {
     pub timestamp: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 pub struct Files {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub uid: Option<String>,
@@ -214,7 +214,7 @@ pub struct Files {
     pub path: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 pub struct TextExtraction {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub document_reference_uid: Option<String>,
@@ -228,7 +228,7 @@ pub struct TextExtraction {
     pub char_end: Option<u32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 pub struct Grounding {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub argument_name: Option<String>,
@@ -240,13 +240,13 @@ pub struct Grounding {
     pub score: Option<f32>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 pub struct ValueMeta {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<String>,
 }
 
-#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
+#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
 pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata_type: Option<String>,
