@@ -40,7 +40,10 @@ dev = ["fastapi", "requests", "uvicorn", "pytest", "black", "mypy", "coverage", 
 moviz = ["flask", "graphviz"]
 
 # ISA dependencies.
-isa = ["pydot", "graspologic"]
+isa = [
+  "pydot", 
+  "graspologic" # NOTE: this depends on rust
+]
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
@@ -73,10 +76,10 @@ all = ["skema[core]", "skema[dev]", "skema[doc]"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
-
 # runnables
 [project.scripts]
 skema-tr-cosmos-integration = "skema.text_reading.cosmos_integration:main"
+skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
 
 # Minimum requirements for the build system to execute.
 [build-system]
