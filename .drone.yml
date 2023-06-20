@@ -41,7 +41,7 @@ steps:
   commands:
   - apt-get update
   - apt-get -y install build-essential graphviz libgraphviz-dev
-  - pip install -e .[dev]
+  - pip install -e ".[core,dev]"
   - pip install pytest-cov pytest-xdist
   - pytest --cov=skema --ignore=skema/img2mml skema/program_analysis/tests
   when:
