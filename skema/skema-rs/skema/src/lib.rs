@@ -40,6 +40,8 @@ pub struct ValueL {
     #[serde(deserialize_with = "de_value")]
     #[serde(serialize_with = "se_value")]
     pub value: String, // This is the generic problem. floats are exported as ints but rust exports as floats, making full generic isn't feasible since we don't know the number of instances before hand. So we import as a string to capture the data regardless of type.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
@@ -51,6 +53,8 @@ pub struct GrometBox {
     pub value: Option<ValueL>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<u32>,
 }
@@ -64,6 +68,8 @@ pub struct GrometPort {
     #[serde(rename = "box")]
     pub r#box: u8,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<u32>, // pof: 473, 582, b: 685, 702, 719, 736, most b's
 }
 
@@ -73,6 +79,8 @@ pub struct GrometWire {
     pub name: Option<String>,
     pub src: u8,
     pub tgt: u8,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<u32>,
 }
@@ -90,6 +98,8 @@ pub struct GrometBoxLoop {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<u32>,
 }
 // condition, body_if, and body_else don't match online documentation
@@ -106,6 +116,8 @@ pub struct GrometBoxConditional {
     pub body_if: Option<u32>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body_else: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<u32>,
 }
@@ -178,6 +190,8 @@ pub struct FunctionNet {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wc_cargs: Option<Vec<GrometWire>>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
     // these additions are I guess how imports are being handled...
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -197,6 +211,8 @@ pub struct Attribute {
     pub value: FunctionNet,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub index: Option<u8>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Vec<Metadata>>,
 }
@@ -304,6 +320,8 @@ pub struct Gromet {
     pub attributes: Vec<FunctionNet>, // from 0.1.5 this went from Vec<Attribute> -> Vec<FunctionNet>
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata_collection: Option<Vec<Vec<Metadata>>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gromet_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<u32>,
 }
