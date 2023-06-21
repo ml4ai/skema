@@ -1,12 +1,13 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
-
+use crate::model_extraction::module_id2mathml_ast;
+use mathml::mml2pn::ACSet;
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
 use crate::{Gromet, ModuleCollection};
 use actix_web::web::ServiceConfig;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use std::collections::HashMap;
-
+use mathml::acset::{PetriNet, RegNet};
 use actix_web::{delete, get, post, web, HttpResponse};
 use utoipa;
 
@@ -283,4 +284,34 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
 pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let response = get_subgraph_query(path.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
+}
+
+/// This retrieves a PetriNet AMR based on model id.
+#[utoipa::path(
+    responses(
+        (
+            status = 200, description = "Successfully retrieved PN AMR",
+            body = PetriNet
+        )
+    )
+)]
+#[get("/models/{id}/PN")]
+pub async fn get_model_PN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let mathml_ast = module_id2mathml_ast(path.into_inner(), &config.db_host);
+    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(mathml_ast))))
+}
+
+/// This retrieves a RegNet AMR based on model id.
+#[utoipa::path(
+    responses(
+        (
+            status = 200, description = "Successfully retrieved RN AMR",
+            body = RegNet
+        )
+    )
+)]
+#[get("/models/{id}/RN")]
+pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let mathml_ast = module_id2mathml_ast(path.into_inner(), &config.db_host);
+    HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
 }
