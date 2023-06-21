@@ -196,15 +196,22 @@ def get_seeds(
     threshold: float = 0.8,
 ) -> Tuple[List[int], List[int]]:
     """
-    Calculate the seeds in the two equations
-    Input: the name lists of the variables and terms in the equation 1 and the equation 2
-    Method: the method to get seeds.
-        heuristic: based on the variable name identification
-        levenshtein：based on the levenshtein similarity of the variable names
-        jaccard: based on the jaccard similarity of the variable names
-        cosine: based on the cosine similarity of the variable names
-    Threshold: the threshold if using levenshtein, jaccard, cosine
-    Output: the seed indices from the equations 1 and the equation 2
+        Calculate the seeds in the two equations.
+
+        Args:
+            node_labels1: The name lists of the variables and terms in equation 1.
+            node_labels2: The name lists of the variables and terms in equation 2.
+            method: The method to get seeds.
+                - "heuristic": Based on variable name identification.
+                - "levenshtein": Based on Levenshtein similarity of variable names.
+                - "jaccard": Based on Jaccard similarity of variable names.
+                - "cosine": Based on cosine similarity of variable names.
+            threshold: The threshold to use for Levenshtein, Jaccard, and cosine methods.
+
+        Returns:
+            A tuple of two lists:
+            - seed1: The seed indices from equation 1.
+            - seed2: The seed indices from equation 2.
     """
     seed1 = [0, 1]
     seed2 = [0, 1]
