@@ -2,7 +2,7 @@
 """
 All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: April 12, 2023
+Updated date: June 21, 2023
 """
 
 import warnings
@@ -196,22 +196,22 @@ def get_seeds(
     threshold: float = 0.8,
 ) -> Tuple[List[int], List[int]]:
     """
-        Calculate the seeds in the two equations.
+    Calculate the seeds in the two equations.
 
-        Args:
-            node_labels1: The name lists of the variables and terms in equation 1.
-            node_labels2: The name lists of the variables and terms in equation 2.
-            method: The method to get seeds.
-                - "heuristic": Based on variable name identification.
-                - "levenshtein": Based on Levenshtein similarity of variable names.
-                - "jaccard": Based on Jaccard similarity of variable names.
-                - "cosine": Based on cosine similarity of variable names.
-            threshold: The threshold to use for Levenshtein, Jaccard, and cosine methods.
+    Args:
+        node_labels1: The name lists of the variables and terms in equation 1.
+        node_labels2: The name lists of the variables and terms in equation 2.
+        method: The method to get seeds.
+            - "heuristic": Based on variable name identification.
+            - "levenshtein": Based on Levenshtein similarity of variable names.
+            - "jaccard": Based on Jaccard similarity of variable names.
+            - "cosine": Based on cosine similarity of variable names.
+        threshold: The threshold to use for Levenshtein, Jaccard, and cosine methods.
 
-        Returns:
-            A tuple of two lists:
-            - seed1: The seed indices from equation 1.
-            - seed2: The seed indices from equation 2.
+    Returns:
+        A tuple of two lists:
+        - seed1: The seed indices from equation 1.
+        - seed2: The seed indices from equation 2.
     """
     seed1 = [0, 1]
     seed2 = [0, 1]
