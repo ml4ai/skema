@@ -20,6 +20,9 @@ from graspologic.match import graph_match
 from graphviz import Source
 import graphviz
 from copy import deepcopy
+import Levenshtein
+from typing import Tuple
+import re
 
 # Set up the random seed
 np.random.seed(1)
@@ -27,6 +30,63 @@ rng = np.random.default_rng(1)
 
 # The encodings of basic operators when converting adjacency matrix
 op_dict = {"+": 1, "-": 2, "*": 3, "/": 4, "=": 5, "√": 6}
+
+
+def levenshtein_similarity(var1: str, var2: str) -> float:
+    """
+    Compute the Levenshtein similarity between two variable names.
+    The Levenshtein similarity is the ratio of the Levenshtein distance to the maximum length.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The Levenshtein similarity between the two variable names.
+    """
+    distance = Levenshtein.distance(var1, var2)
+    max_length = max(len(var1), len(var2))
+    similarity = 1 - (distance / max_length)
+    return similarity
+
+
+def jaccard_similarity(var1: str, var2: str) -> float:
+    """
+    Compute the Jaccard similarity between two variable names.
+    The Jaccard similarity is the size of the intersection divided by the size of the union of the variable names.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The Jaccard similarity between the two variable names.
+    """
+    set1 = set(var1)
+    set2 = set(var2)
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    similarity = intersection / union
+    return similarity
+
+
+def cosine_similarity(var1: str, var2: str) -> float:
+    """
+    Compute the cosine similarity between two variable names.
+    The cosine similarity is the dot product of the character frequency vectors divided by the product of their norms.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The cosine similarity between the two variable names.
+    """
+    char_freq1 = {char: var1.count(char) for char in var1}
+    char_freq2 = {char: var2.count(char) for char in var2}
+
+    dot_product = sum(
+        char_freq1.get(char, 0) * char_freq2.get(char, 0) for char in set(var1 + var2)
+    )
+    norm1 = sum(freq**2 for freq in char_freq1.values()) ** 0.5
+    norm2 = sum(freq**2 for freq in char_freq2.values()) ** 0.5
+
+    similarity = dot_product / (norm1 * norm2)
+    return similarity
 
 
 def generate_graph(file: str = "", render: bool = False) -> pydot.Dot:
@@ -72,21 +132,100 @@ def generate_amatrix(graph: pydot.Dot) -> Tuple[ndarray, List[str]]:
     return amatrix, node_labels
 
 
+def heuristic_compare_variable_names(var1: str, var2: str) -> bool:
+    """
+    Compare two variable names in a formula, accounting for Unicode representations.
+    Convert the variable names to English letter representations before comparison.
+
+    Args:
+        var1 (str): The first variable name.
+        var2 (str): The second variable name.
+
+    Returns:
+        bool: True if the variable names are the same, False otherwise.
+    """
+    # Mapping of Greek letters to English letter representations
+    greek_letters = {
+        "α": "alpha",
+        "β": "beta",
+        "γ": "gamma",
+        "δ": "delta",
+        "ε": "epsilon",
+        "ζ": "zeta",
+        "η": "eta",
+        "θ": "theta",
+        "ι": "iota",
+        "κ": "kappa",
+        "λ": "lambda",
+        "μ": "mu",
+        "ν": "nu",
+        "ξ": "xi",
+        "ο": "omicron",
+        "π": "pi",
+        "ρ": "rho",
+        "σ": "sigma",
+        "τ": "tau",
+        "υ": "upsilon",
+        "φ": "phi",
+        "χ": "chi",
+        "ψ": "psi",
+        "ω": "omega",
+    }
+
+    # Convert Unicode representations to English letter representations
+    var1 = re.sub(r"&#x(\w+);?", lambda m: chr(int(m.group(1), 16)), var1)
+    var2 = re.sub(r"&#x(\w+);?", lambda m: chr(int(m.group(1), 16)), var2)
+
+    # Convert Greek letter representations to English letter representations
+    for greek_letter, english_letter in greek_letters.items():
+        var1 = var1.replace(greek_letter, english_letter)
+        var2 = var2.replace(greek_letter, english_letter)
+
+    # Remove trailing quotation marks, if present
+    var1 = var1.strip("'\"")
+    var2 = var2.strip("'\"")
+
+    # Compare the variable names
+    return var1.lower() == var2.lower()
+
+
 def get_seeds(
-    node_labels1: List[str], node_labels2: List[str]
+    node_labels1: List[str],
+    node_labels2: List[str],
+    method: str = "heuristic",
+    threshold: float = 0.8,
 ) -> Tuple[List[int], List[int]]:
     """
     Calculate the seeds in the two equations
     Input: the name lists of the variables and terms in the equation 1 and the equation 2
+    Method: the method to get seeds.
+        heuristic: based on the variable name identification
+        levenshtein：based on the levenshtein similarity of the variable names
+        jaccard: based on the jaccard similarity of the variable names
+        cosine: based on the cosine similarity of the variable names
+    Threshold: the threshold if using levenshtein, jaccard, cosine
     Output: the seed indices from the equations 1 and the equation 2
     """
     seed1 = [0, 1]
     seed2 = [0, 1]
     for i in range(2, len(node_labels1)):
         for j in range(2, len(node_labels2)):
-            if node_labels1[i].lower() == node_labels2[j].lower():
-                seed1.append(i)
-                seed2.append(j)
+            if method == "heuristic":
+                if heuristic_compare_variable_names(node_labels1[i], node_labels2[j]):
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == "levenshtein":
+                if levenshtein_similarity(node_labels1[i], node_labels2[j]) > threshold:
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == "jaccard":
+                if jaccard_similarity(node_labels1[i], node_labels2[j]) > threshold:
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == "cosine":
+                if cosine_similarity(node_labels1[i], node_labels2[j]) > threshold:
+                    seed1.append(i)
+                    seed2.append(j)
 
     return seed1, seed2
 
