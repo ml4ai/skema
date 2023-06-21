@@ -1,9 +1,9 @@
 const express = require('express');
 const mjAPI = require("mathjax-node");
 const _ = require('lodash');
-var PORT = process.env.MATHJAX_PORT;
-if(port == undefined) {
-   port = "8031";
+var PORT = process.env.SKEMA_MATHJAX_PORT;
+if(PORT == undefined) {
+   PORT = "8031";
 }
 
 
