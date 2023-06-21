@@ -54,20 +54,25 @@ jobs:
     - name: Install askem-skema-py
       working-directory: .
       run: |
+        # retrieve latest model for img2mml component
+        curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
         pip install ".[all]"
 
     # docs (API)
     # generate python docs using pdoc
     - name: "Create documentation for Python components (API docs)"
       run: |
-        # FIXME: once issues with submodules resolved, top command will be sufficient
+        # FIXME: once issues with text reading submodule resolved, top command will be sufficient
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.img2mml
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.isa
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.skema_py
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
-        #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
-        #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading.python
+        # remove intermediate `python` directory
+        mv docs/api/python/skema/text_reading/python/* docs/api/python/skema/text_reading/
+        rmdir docs/api/python/skema/text_reading/python
     # generate Rust docs using cargo doc
     - name: "Create documentation for Rust components (API docs)"
       working-directory: ./skema/skema-rs
