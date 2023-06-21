@@ -1,7 +1,11 @@
 const express = require('express');
 const mjAPI = require("mathjax-node");
 const _ = require('lodash');
-const PORT = 8031;
+var PORT = process.env.MATHJAX_PORT;
+if(port == undefined) {
+   port = "8031";
+}
+
 
 // ==== Initialize the express server ==========================================
 var app = express();

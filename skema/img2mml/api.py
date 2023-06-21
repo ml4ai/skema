@@ -1,10 +1,11 @@
 import json
+import os
 from pathlib import Path
 import requests
 import re
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
-PORT = 8031
+PORT = os.environ.get('MATHJAX_PORT', 8031)
 
 def get_mathml_from_bytes(data: bytes):
     # convert png image to tensor
