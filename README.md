@@ -14,9 +14,8 @@ coexist peacefully.
 
 At the top level, we have the following files and directories:
 
-- `Dockerfile.skema-py`: Dockerfile for the skema-py service.
+- `Dockerfile.skema-py`: Dockerfile for the skema python library (includes program analysis, img2mml, isa, and MOVIZ components).
 - `Dockerfile.skema-rs`: Dockerfile for the skema-rs service.
-- `Dockerfile.img2mml`: Dockerfile for the img2mml service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
@@ -57,18 +56,22 @@ Running the following command in this directory will install the `skema` Python
 package into your Python virtual environment (we assume you have one active),
 so that it is available for scripts running in that virtual environment.
 
-```
-pip install -e .
+```bash
+pip install -e ".[core]"
 ```
 
 The command above installs the minimum set packages required for the Code2FN
-pipeline. There are a couple of extra features that you can install as well
-with an alternative invocation. For example, the invocation below installs
-packages required for the `moviz` extra.
+pipeline. 
 
+To additionally install dev dependencies:
 
+```bash
+pip install -e ".[core,dev]"
 ```
-pip install -e .[moviz]
+
+To install **all** components (including dev dependencies for documentation generation):
+```bash
+pip install ".[all]"
 ```
 
 For more details on the available extras, see the `pyproject.toml` file.

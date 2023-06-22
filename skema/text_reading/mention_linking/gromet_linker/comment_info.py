@@ -4,7 +4,7 @@ from typing import Any, List, Mapping, NamedTuple, Optional, Tuple, Union
 class CommentInfo(NamedTuple):
     line_range: Optional[range]
     name: Optional[str]
-    line_docstrings: List[tuple[int, str]]
+    line_docstrings: List[Tuple[int, str]]
     comments: List[Union[str, Tuple[int, str]]]
     mentions: Mapping[str, Any]
 

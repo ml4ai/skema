@@ -2,6 +2,8 @@ const express = require('express');
 const mjAPI = require("mathjax-node");
 const _ = require('lodash');
 
+
+
 // ==== Initialize the express server ==========================================
 var app = express();
 app.use(express.json());
@@ -85,9 +87,32 @@ app.get('/restart', function (req, res) {
     res.send("MathJax service restarted");
 });
 
+function port() {
+    try {
+        var port = process.env.SKEMA_MATHJAX_PORT
+        if(port == undefined) {
+            port = "8031";
+        }
+        return port;
+    } catch(err) {
+        return "8031";
+    }
+}
+
+function host() {
+    try {
+        var host = process.env.SKEMA_MATHJAX_HOST
+        if(host == undefined) {
+            return "127.0.0.1";
+        }
+        return host;
+    } catch(err) {
+        return "127.0.0.1";
+    }
+}
 
 // Start the express application server
-var server = app.listen(8081, function () {
-    var port = server.address().port
-    console.log("MathJax server listening at http://localhost:%s", port)
+var server = app.listen(port(), host(), function(){
+    console.log("MathJax server listening at %s:%s", server.address().address, server.address().port);
 });
+

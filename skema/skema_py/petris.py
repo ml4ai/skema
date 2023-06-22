@@ -1,4 +1,4 @@
-from acsets import Ob, Hom, Attr, AttrType, Schema, ACSet
+from skema.skema_py.acsets import Ob, Hom, Attr, AttrType, Schema, ACSet
 
 from typing import Tuple, List
 
