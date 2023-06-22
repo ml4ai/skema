@@ -74,7 +74,7 @@ async fn main() -> std::io::Result<()> {
                 mathml::acset::Properties,
                 mathml::acset::Parameter,
                 mathml::acset::Distribution,
-                mathml::acset::RegState, 
+                mathml::acset::RegState,
                 mathml::acset::RegTransition,
                 mathml::acset::Units,
                 mathml::acset::Metadata,

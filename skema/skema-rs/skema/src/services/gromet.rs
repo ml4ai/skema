@@ -1,14 +1,14 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
-use crate::model_extraction::module_id2mathml_ast;
-use mathml::mml2pn::ACSet;
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
+use crate::model_extraction::module_id2mathml_ast;
 use crate::{Gromet, ModuleCollection};
 use actix_web::web::ServiceConfig;
+use actix_web::{delete, get, post, web, HttpResponse};
+use mathml::acset::{PetriNet, RegNet};
+use mathml::mml2pn::ACSet;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use std::collections::HashMap;
-use mathml::acset::{PetriNet, RegNet};
-use actix_web::{delete, get, post, web, HttpResponse};
 use utoipa;
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
