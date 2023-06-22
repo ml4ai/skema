@@ -28,12 +28,12 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import json
+import os
 from pathlib import Path
 import requests
 import re
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
-PORT = 8031
 
 def get_mathml_from_bytes(data: bytes):
     # convert png image to tensor
@@ -71,8 +71,11 @@ def get_mathml_from_latex(eqn) -&gt; str:
     &#34;&#34;&#34;Read a LaTeX equation string and convert it to presentation MathML&#34;&#34;&#34;
 
     # Define the webservice address from the MathJAX service
-    # FIXME: this should be set using an ENV variable
-    webservice = &#34;http://localhost:&#34; + str(PORT)
+    host = os.environ.get(&#39;SKEMA_MATHJAX_HOST&#39;, &#39;127.0.0.1&#39;)
+    port = os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031)
+    webservice = host + &#39;:&#39; + port
+    print(&#39;Connecting to &#39; + webservice)
+
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
         f&#34;{webservice}/tex2mml&#34;,
@@ -175,8 +178,11 @@ def get_mathml_from_latex(eqn) -&gt; str:
     &#34;&#34;&#34;Read a LaTeX equation string and convert it to presentation MathML&#34;&#34;&#34;
 
     # Define the webservice address from the MathJAX service
-    # FIXME: this should be set using an ENV variable
-    webservice = &#34;http://localhost:&#34; + str(PORT)
+    host = os.environ.get(&#39;SKEMA_MATHJAX_HOST&#39;, &#39;127.0.0.1&#39;)
+    port = os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031)
+    webservice = host + &#39;:&#39; + port
+    print(&#39;Connecting to &#39; + webservice)
+
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
         f&#34;{webservice}/tex2mml&#34;,
