@@ -2,10 +2,11 @@
 version: "3"
 services:
   img2mml:
-    image: img2mml:latest
+    image: lumai/askem-skema-img2mml:local
     build:
       context: .
-      dockerfile: Dockerfile.img2mml
-    entrypoint: uvicorn img2mml:app --host=0.0.0.0
+      dockerfile: Dockerfile.skema-py
+    # open browser to http://localhost:8000/docs
+    entrypoint: uvicorn skema.img2mml.img2mml:app --host=0.0.0.0 --port 8000
     ports:
       - "8000:8000" # Change port mapping appropriately before deploying.

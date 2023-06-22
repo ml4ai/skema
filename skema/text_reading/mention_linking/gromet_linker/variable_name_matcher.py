@@ -1,10 +1,10 @@
 import re
-
+from typing import List, Tuple
 
 class LanguageMatcher:
     def match_line_comment(
-        self, name: str, line_comments: list[tuple[int, str]]
-    ) -> list[tuple[int, str]]:
+        self, name: str, line_comments: List[Tuple[int, str]]
+    ) -> List[Tuple[int, str]]:
         return list()
 
 
@@ -17,8 +17,8 @@ class PythonMatcher(LanguageMatcher):
         self.separator = r"[:,\.\s]"
 
     def match_line_comment(
-        self, name: str, line_comments: list[tuple[int, str]]
-    ) -> list[tuple[int, str]]:
+        self, name: str, line_comments: List[Tuple[int, str]]
+    ) -> List[Tuple[int, str]]:
         # TODO: Use re.escape() after regression testing
         # pattern = self.separator + re.escape(name) + self.separator
         pattern = self.separator + name + self.separator
@@ -40,8 +40,8 @@ class VariableNameMatcher(LanguageMatcher):
             self.matcher = PythonMatcher()  # TODO: raise an exception?
 
     def match_line_comment(
-        self, name: str, line_comments: list[tuple[int, str]]
-    ) -> list[tuple[int, str]]:
+        self, name: str, line_comments: List[Tuple[int, str]]
+    ) -> List[Tuple[int, str]]:
         if name:
             return self.matcher.match_line_comment(name, line_comments)
         else:
