@@ -133,7 +133,7 @@ var sourcesIndex = JSON.parse('{\
 "sha2":["",[["sha256",[],["soft.rs","x86.rs"]],["sha512",[],["soft.rs","x86.rs"]]],["consts.rs","core_api.rs","lib.rs","sha256.rs","sha512.rs"]],\
 "shellexpand":["",[],["lib.rs"]],\
 "signal_hook_registry":["",[],["half_lock.rs","lib.rs"]],\
-"skema":["",[["services",[],["comment_extraction.rs","gromet.rs","mathml.rs"]]],["config.rs","database.rs","lib.rs","services.rs"]],\
+"skema":["",[["services",[],["comment_extraction.rs","gromet.rs","mathml.rs"]]],["config.rs","database.rs","lib.rs","model_extraction.rs","services.rs"]],\
 "skema_service":["",[],["skema_service.rs"]],\
 "slab":["",[],["builder.rs","lib.rs"]],\
 "smallvec":["",[],["lib.rs"]],\

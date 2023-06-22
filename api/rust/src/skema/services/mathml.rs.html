@@ -70,15 +70,56 @@
 <a href="#70" id="70">70</a>
 <a href="#71" id="71">71</a>
 <a href="#72" id="72">72</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, put, web, HttpResponse};
+<a href="#73" id="73">73</a>
+<a href="#74" id="74">74</a>
+<a href="#75" id="75">75</a>
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{put, web, HttpResponse};
 <span class="kw">use </span>mathml::{
-    acset::{ACSet, ModelRepPn},
+    acset::{ACSet, AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsing::parse,
 };
 <span class="kw">use </span>petgraph::dot::{Config, Dot};
-<span class="kw">use </span>serde::{Deserialize, Serialize};
+
 <span class="kw">use </span>std::string::String;
 <span class="kw">use </span>utoipa;
 <span class="kw">use </span>utoipa::ToSchema;
@@ -96,7 +137,8 @@
 #[put(<span class="string">&quot;/mathml/ast-graph&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_ast_graph(payload: String) -&gt; String {
     <span class="kw">let </span>contents = <span class="kw-2">&amp;</span>payload;
-    <span class="kw">let </span>(<span class="kw">_</span>, math) = parse(<span class="kw-2">&amp;</span>contents).expect(<span class="macro">format!</span>(<span class="string">&quot;Unable to parse payload!&quot;</span>).as_str());
+    <span class="kw">let </span>(<span class="kw">_</span>, math) =
+        parse(contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse payload!&quot;</span>.to_string()));
 
     <span class="kw">let </span>g = math.to_graph();
     <span class="kw">let </span>dot_representation = Dot::with_config(<span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>[Config::EdgeNoLabel]);
@@ -117,29 +159,69 @@
 )]
 #[put(<span class="string">&quot;/mathml/math-exp-graph&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_math_exp_graph(payload: String) -&gt; String {
-    <span class="kw">let </span><span class="kw-2">mut </span>contents = payload.clone();
+    <span class="kw">let </span><span class="kw-2">mut </span>contents = payload;
     contents = preprocess_content(contents);
-    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) = parse(<span class="kw-2">&amp;</span>contents).expect(<span class="macro">format!</span>(<span class="string">&quot;Unable to parse payload!&quot;</span>).as_str());
+    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) =
+        parse(<span class="kw-2">&amp;</span>contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse payload!&quot;</span>.to_string()));
     math.normalize();
-    <span class="kw">let </span><span class="kw-2">mut </span>new_math = wrap_math(math);
-    <span class="kw">let </span>g = new_math.clone().to_graph();
+    <span class="kw">let </span>new_math = wrap_math(math);
+    <span class="kw">let </span>g = new_math.to_graph();
     <span class="kw">let </span>dot_representation = Dot::new(<span class="kw-2">&amp;</span>g);
     dot_representation.to_string()
 }
 
-<span class="doccomment">/// Return a JSON representation of a ModelRep constructed from an array of MathML strings.
+<span class="doccomment">/// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.
 </span><span class="attr">#[utoipa::path(
     request_body = Vec&lt;String&gt;,
     responses(
         (
             status = <span class="number">200</span>,
-            body = ModelRepPn
+            body = PetriNet
         )
     )
 )]
-#[put(<span class="string">&quot;/mathml/acset&quot;</span>)]
+#[put(<span class="string">&quot;/mathml/petrinet&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_acset(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| parse(<span class="kw-2">&amp;</span>x).unwrap().<span class="number">1</span>).collect();
-    HttpResponse::Ok().json(web::Json(ModelRepPn::from(ACSet::from(asts))))
+    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| parse(x).unwrap().<span class="number">1</span>).collect();
+    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
+}
+
+<span class="doccomment">/// Return a JSON representation of a RegNet ModelRep constructed from an array of MathML strings.
+</span><span class="attr">#[utoipa::path(
+    request_body = Vec&lt;String&gt;,
+    responses(
+        (
+            status = <span class="number">200</span>,
+            body = RegNet
+        )
+    )
+)]
+#[put(<span class="string">&quot;/mathml/regnet&quot;</span>)]
+</span><span class="kw">pub async fn </span>get_regnet(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
+    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| parse(x).unwrap().<span class="number">1</span>).collect();
+    HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+}
+
+<span class="doccomment">/// Return a JSON representation of an AMR constructed from an array of MathML strings and a string for the AMR subtype
+</span><span class="attr">#[utoipa::path(
+    request_body = AMRmathml,
+    responses(
+        (
+            status = <span class="number">200</span>,
+            body = EitherBody&lt;PetriNet, RegNet&gt;,
+        )
+    )
+)]
+#[put(<span class="string">&quot;/mathml/amr&quot;</span>)]
+</span><span class="kw">pub async fn </span>get_amr(payload: web::Json&lt;AMRmathml&gt;) -&gt; HttpResponse {
+    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.mathml.iter().map(|x| parse(x).unwrap().<span class="number">1</span>).collect();
+    <span class="kw">let </span>model_type = payload.model.clone();
+    <span class="kw">if </span>model_type == <span class="kw-2">*</span><span class="string">&quot;regnet&quot; </span>{
+        HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+    } <span class="kw">else if </span>model_type == <span class="kw-2">*</span><span class="string">&quot;petrinet&quot; </span>{
+        HttpResponse::Ok().json(PetriNet::from(ACSet::from(asts)))
+    } <span class="kw">else </span>{
+        HttpResponse::BadRequest().into()
+    }
 }
 </code></pre></div></section></main></body></html>

@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"constant":["FIELDS"],"enum":["__Field"],"fn":["ast2exp","distribute_args","exp2pn","find_pn_dynamics","get_args","get_line_span","get_operator","get_subgraph","is_multiple_terms","main","subgraph2_core_dyn_ast","subgraph2_core_dyn_exp","subgraph2petgraph","subgraph_wiring","terms_indicies","tree_2_ast","tree_2_expr","trim_un_named"],"struct":["ACSet","LineSpan","Term","__FieldVisitor","__Visitor"]};
+window.SIDEBAR_ITEMS = {"fn":["main"],"static":["DEFAULT_VALUE"],"struct":["ACSet","Cli","Term"]};

@@ -284,16 +284,48 @@
 <a href="#284" id="284">284</a>
 <a href="#285" id="285">285</a>
 <a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
-
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{execute_query, parse_gromet_queries};
-<span class="kw">use crate</span>::{Gromet, ModuleCollection};
+<span class="kw">use </span><span class="kw">crate</span>::model_extraction::module_id2mathml_ast;
+<span class="kw">use </span><span class="kw">crate</span>::ModuleCollection;
 <span class="kw">use </span>actix_web::web::ServiceConfig;
+<span class="kw">use </span>actix_web::{delete, get, post, web, HttpResponse};
+<span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
+<span class="kw">use </span>mathml::mml2pn::ACSet;
 <span class="kw">use </span>rsmgclient::{ConnectParams, Connection, MgError, Value};
 <span class="kw">use </span>std::collections::HashMap;
-
-<span class="kw">use </span>actix_web::{delete, get, post, web, HttpResponse};
 <span class="kw">use </span>utoipa;
 
 <span class="kw">pub fn </span>configure() -&gt; <span class="kw">impl </span>FnOnce(<span class="kw-2">&amp;mut </span>ServiceConfig) {
@@ -316,9 +348,9 @@
     <span class="comment">// need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     </span><span class="kw">let </span><span class="kw-2">mut </span>full_query = queries[<span class="number">0</span>].clone();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..(queries.len()) {
-        full_query.push_str(<span class="string">&quot;\n&quot;</span>);
+        full_query.push(<span class="string">&#39;\n&#39;</span>);
         <span class="kw">let </span>temp_str = <span class="kw-2">&amp;</span>queries[i].clone();
-        full_query.push_str(<span class="kw-2">&amp;</span>temp_str);
+        full_query.push_str(temp_str);
     }
     execute_query(<span class="kw-2">&amp;</span>full_query, host)<span class="question-mark">?</span>;
     <span class="kw">let </span>model_ids = module_query(host)<span class="question-mark">?</span>;
@@ -472,7 +504,7 @@
         ids = xs
             .iter()
             .filter_map(|x| <span class="kw">match </span>x {
-                Value::Int(x) =&gt; <span class="prelude-val">Some</span>(x.clone()),
+                Value::Int(x) =&gt; <span class="prelude-val">Some</span>(<span class="kw-2">*</span>x),
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             })
             .collect();
@@ -569,5 +601,35 @@
 </span><span class="kw">pub async fn </span>get_subgraph(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
     <span class="kw">let </span>response = get_subgraph_query(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
+}
+
+<span class="doccomment">/// This retrieves a PetriNet AMR based on model id.
+</span><span class="attr">#[utoipa::path(
+    responses(
+        (
+            status = <span class="number">200</span>, description = <span class="string">&quot;Successfully retrieved PN AMR&quot;</span>,
+            body = PetriNet
+        )
+    )
+)]
+#[get(<span class="string">&quot;/models/{id}/PN&quot;</span>)]
+</span><span class="kw">pub async fn </span>get_model_PN(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
+    <span class="kw">let </span>mathml_ast = module_id2mathml_ast(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host);
+    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(mathml_ast))))
+}
+
+<span class="doccomment">/// This retrieves a RegNet AMR based on model id.
+</span><span class="attr">#[utoipa::path(
+    responses(
+        (
+            status = <span class="number">200</span>, description = <span class="string">&quot;Successfully retrieved RN AMR&quot;</span>,
+            body = RegNet
+        )
+    )
+)]
+#[get(<span class="string">&quot;/models/{id}/RN&quot;</span>)]
+</span><span class="kw">pub async fn </span>get_model_RN(path: web::Path&lt;i64&gt;, config: web::Data&lt;Config&gt;) -&gt; HttpResponse {
+    <span class="kw">let </span>mathml_ast = module_id2mathml_ast(path.into_inner(), <span class="kw-2">&amp;</span>config.db_host);
+    HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
 }
 </code></pre></div></section></main></body></html>

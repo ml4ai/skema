@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["ACSet","ACSetTransition","Distribution","Grounding","Initial","InputArc","Model","ModelRepPn","OutputArc","Parameter","Properties","Rate","Specie","State","Transition"]};
+window.SIDEBAR_ITEMS = {"struct":["ACSet","ACSetTransition","AMRmathml","Distribution","Grounding","Identifier","Initial","InputArc","Metadata","ModelPetriNet","ModelRegNet","Observable","Ode","OutputArc","Parameter","PetriNet","Properties","Rate","RegNet","RegState","RegTransition","Semantics","Specie","State","Time","Transition","Units"]};

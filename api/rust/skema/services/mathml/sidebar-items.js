@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["get_acset","get_ast_graph","get_math_exp_graph"]};
+window.SIDEBAR_ITEMS = {"struct":["get_acset","get_amr","get_ast_graph","get_math_exp_graph","get_regnet"]};

@@ -2719,6 +2719,15 @@
 <a href="#2719" id="2719">2719</a>
 <a href="#2720" id="2720">2720</a>
 <a href="#2721" id="2721">2721</a>
+<a href="#2722" id="2722">2722</a>
+<a href="#2723" id="2723">2723</a>
+<a href="#2724" id="2724">2724</a>
+<a href="#2725" id="2725">2725</a>
+<a href="#2726" id="2726">2726</a>
+<a href="#2727" id="2727">2727</a>
+<a href="#2728" id="2728">2728</a>
+<a href="#2729" id="2729">2729</a>
+<a href="#2730" id="2730">2730</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     Math, MathExpression,
     MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msubsup, Msup},
@@ -3150,28 +3159,32 @@
                             ops_copy = ops.clone();
                             args_copy = args.clone();
                         }
-                        <span class="kw-2">*</span>ops = ops_copy.clone();
-                        <span class="kw-2">*</span>args = args_copy.clone();
+                        <span class="kw-2">*</span>ops = ops_copy;
+                        <span class="kw-2">*</span>args = args_copy;
                         <span class="kw">break</span>;
                     }
                 }
             }
 
-            <span class="kw">if </span>need_to_distribute_divs(ops.to_vec().clone(), args.to_vec().clone()) &amp;&amp; ops.len() &gt; <span class="number">1
-            </span>{
+            <span class="kw">if </span>need_to_distribute_divs(ops.to_vec(), args.to_vec()) &amp;&amp; ops.len() &gt; <span class="number">1 </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>new_expr = Expr::Expression {
                     ops: Vec::&lt;Operator&gt;::new(),
                     args: Vec::&lt;Expr&gt;::new(),
                     name: <span class="string">&quot;&quot;</span>.to_string(),
                 };
-                <span class="kw">if let </span>Expr::Expression { ops, args, name: <span class="kw">_ </span>} = <span class="kw-2">&amp;mut </span>new_expr {
+                <span class="kw">if let </span>Expr::Expression {
+                    ops,
+                    args: <span class="kw">_</span>,
+                    name: <span class="kw">_</span>,
+                } = <span class="kw-2">&amp;mut </span>new_expr
+                {
                     ops.push(Operator::Other(<span class="string">&quot;&quot;</span>.to_string()));
                 }
                 <span class="kw">let </span><span class="kw-2">mut </span>removed_idx: Vec&lt;usize&gt; = Vec::new();
                 <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..args.len() {
                     <span class="kw">if </span>ops[i] == Operator::Divide {
                         removed_idx.push(i);
-                        <span class="kw">let </span><span class="kw-2">mut </span>tmp_arg = args[i].clone();
+                        <span class="kw">let </span>tmp_arg = args[i].clone();
                         <span class="kw">if let </span>Expr::Expression { ops, args, name: <span class="kw">_ </span>} = <span class="kw-2">&amp;mut </span>new_expr {
                             <span class="kw">if </span>ops.len() == args.len() {
                                 ops.push(Operator::Multiply);
@@ -3657,7 +3670,7 @@
     <span class="kw">if </span>op == Operator::Divide {
         <span class="kw">return </span>Operator::Multiply;
     }
-    <span class="kw">return </span>switched_op;
+    switched_op
 }
 
 <span class="doccomment">///Switch the summation operator and the subtraction operator
@@ -3669,7 +3682,7 @@
     <span class="kw">if </span>op == Operator::Subtract {
         <span class="kw">return </span>Operator::Add;
     }
-    <span class="kw">return </span>switched_op;
+    switched_op
 }
 
 <span class="doccomment">/// Check if the current term&#39;s operators are all add or subtract.
@@ -3689,8 +3702,8 @@
             <span class="kw">return </span><span class="bool-val">true</span>;
         }
     }
-    <span class="kw">return </span><span class="bool-val">false</span>;
-}
+    <span class="bool-val">false
+</span>}
 
 <span class="doccomment">/// Check if the current term&#39;s operators contain multiple divisions, and the denominators contain
 /// add and subtract and without unary operators
@@ -3699,8 +3712,13 @@
     <span class="kw">let </span><span class="kw-2">mut </span>contain_add_subt_without_uop: bool = <span class="bool-val">false</span>;
     <span class="kw">for </span>o <span class="kw">in </span><span class="number">1</span>..=ops.len() - <span class="number">1 </span>{
         <span class="kw">if </span>ops[o] == Operator::Divide {
-            num_div = num_div + <span class="number">1</span>;
-            <span class="kw">if let </span>Expr::Expression { ops, args, name } = <span class="kw-2">&amp;</span>args[o] {
+            num_div += <span class="number">1</span>;
+            <span class="kw">if let </span>Expr::Expression {
+                ops,
+                args: <span class="kw">_</span>,
+                name: <span class="kw">_</span>,
+            } = <span class="kw-2">&amp;</span>args[o]
+            {
                 <span class="kw">if </span>ops[<span class="number">0</span>] == Operator::Other(<span class="string">&quot;&quot;</span>.to_string()) &amp;&amp; all_ops_are_add_or_subt(ops.clone())
                 {
                     contain_add_subt_without_uop = <span class="bool-val">true</span>;
@@ -3711,8 +3729,8 @@
             }
         }
     }
-    <span class="kw">return </span><span class="bool-val">false</span>;
-}
+    <span class="bool-val">false
+</span>}
 
 <span class="doccomment">/// Check if the current term&#39;s operators contain add or minus and without the unary operator.
 </span><span class="kw">pub fn </span>need_to_distribute(ops: Vec&lt;Operator&gt;) -&gt; bool {
@@ -3724,8 +3742,8 @@
             <span class="kw">return </span><span class="bool-val">true</span>;
         }
     }
-    <span class="kw">return </span><span class="bool-val">false</span>;
-}
+    <span class="bool-val">false
+</span>}
 
 <span class="kw">impl </span>PreExp {
     <span class="kw">pub fn </span>group_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {

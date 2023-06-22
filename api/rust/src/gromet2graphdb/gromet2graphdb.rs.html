@@ -48,10 +48,10 @@
 </pre></div><pre class="rust"><code><span class="doccomment">//! Program for inserting GroMEt models into a database from the command line.
 
 </span><span class="kw">use </span>clap::Parser;
-<span class="kw">use </span>serde_json;
+
 <span class="kw">use </span>skema::{
     database::{execute_query, parse_gromet_queries},
-    Gromet, ModuleCollection,
+    ModuleCollection,
 };
 <span class="kw">use </span>std::fs;
 
@@ -80,9 +80,9 @@
     <span class="comment">// need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     </span><span class="kw">let </span><span class="kw-2">mut </span>full_query = queries[<span class="number">0</span>].clone();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">1</span>..(queries.len()) {
-        full_query.push_str(<span class="string">&quot;\n&quot;</span>);
+        full_query.push(<span class="string">&#39;\n&#39;</span>);
         <span class="kw">let </span>temp_str = <span class="kw-2">&amp;</span>queries[i].clone();
-        full_query.push_str(<span class="kw-2">&amp;</span>temp_str);
+        full_query.push_str(temp_str);
     }
 
     <span class="kw">if </span>debug {

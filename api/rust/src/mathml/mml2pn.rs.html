@@ -433,13 +433,13 @@
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
-</pre></div><pre class="rust"><code><span class="kw">pub use </span><span class="kw">crate</span>::acset::ACSet;
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::acset;
+<span class="kw">pub use </span><span class="kw">crate</span>::acset::ACSet;
 <span class="kw">use </span><span class="kw">crate</span>::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
     Polarity, Rate, Specie, Var,
 };
 <span class="kw">use crate</span>::{
-    acset,
     ast::{
         Math,
         MathExpression::{Mn, Mo, Mrow},
@@ -500,7 +500,7 @@
 //     derivatives are being taken). The variables on the RHSes that correspond to variables on the
 //     LHS are species. The rest are rates.
 </span><span class="doccomment">/// Group the variables in the equations by the =, +, and - operators, and collect the variables.
-</span><span class="kw">fn </span>group_by_operators(
+</span><span class="kw">pub fn </span>group_by_operators(
     ast: Math,
     species: <span class="kw-2">&amp;mut </span>HashSet&lt;Var&gt;,
     vars: <span class="kw-2">&amp;mut </span>HashSet&lt;Var&gt;,

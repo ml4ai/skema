@@ -104,7 +104,7 @@
         alt((parse_comment, parse_next)),
         Vec::new,
         |<span class="kw-2">mut </span>acc: Vec&lt;Comment&gt;, span| {
-            <span class="kw">if </span>span.fragment().len() &gt; <span class="number">0 </span>{
+            <span class="kw">if </span>!span.fragment().is_empty() {
                 acc.push(Comment {
                     line_number: span.location_line().try_into().unwrap(),
                     contents: span.fragment().to_string(),
