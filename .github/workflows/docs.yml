@@ -51,7 +51,7 @@ jobs:
         sudo apt-get install -y graphviz \
         libgraphviz-dev
     # Install packages (for API doc gen)
-    - name: Install askem-skema-py
+    - name: Install askem (Python)
       working-directory: .
       run: |
         # retrieve latest model for img2mml component
@@ -66,13 +66,11 @@ jobs:
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.img2mml
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.isa
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.moviz
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.skema_py
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
         pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading.python
-        # remove intermediate `python` directory
-        mv docs/api/python/skema/text_reading/python/* docs/api/python/skema/text_reading/
-        rmdir docs/api/python/skema/text_reading/python
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading.mention_linking
     # generate Rust docs using cargo doc
     - name: "Create documentation for Rust components (API docs)"
       working-directory: ./skema/skema-rs
