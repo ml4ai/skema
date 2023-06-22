@@ -8,11 +8,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.skema-py
+    # open browser to http://localhost:8001/docs
+    entrypoint: uvicorn skema.img2mml.img2mml:app --host=0.0.0.0 --port 8001
+    ports:
+      - "8001:8001" # Change port mapping appropriately before deploying.
+  latex2mml:
+    #image: lumai/askem-skema-py:latest
+    # ... or to build locally:
+    image: lumai/askem-skema-latex2mml:local
+    build:
+      context: .
+      dockerfile: Dockerfile.skema-py
     depends_on:
       # FIXME: add `condition: service_healthy` and healthcheck
       - mathjax
     # open browser to http://localhost:8000/docs
-    entrypoint: uvicorn skema.img2mml.img2mml:app --host=0.0.0.0 --port 8000
+    entrypoint: uvicorn skema.img2mml.latex2mml:app --host=0.0.0.0 --port 8000
     ports:
       - "8000:8000" # Change port mapping appropriately before deploying.
     environment:
