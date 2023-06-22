@@ -1,31 +1,31 @@
 """ Temporary test script for development This will change to unit tests and example usage script """
 
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
-from skema.text_reading.mention_linking.gromet_linker.comment_aligner import (
+from .gromet_linker.comment_aligner import (
     CommentAlignerHelper,
     GrometFNModuleCommentAligner,
 )
-from skema.text_reading.mention_linking.gromet_linker.comment_debugger import (
+from .gromet_linker.comment_debugger import (
     CommentDebugger,
 )
-from skema.text_reading.mention_linking.gromet_linker.gromet_helper import (
+from .gromet_linker.gromet_helper import (
     GrometHelper,
 )
-from skema.text_reading.mention_linking.gromet_linker.source_comments import (
+from .gromet_linker.source_comments import (
     SourceComments,
 )
-from skema.text_reading.mention_linking.gromet_linker.text_reading_linker import (
+from .gromet_linker.text_reading_linker import (
     TextReadingLinker,
 )
-from skema.text_reading.mention_linking.gromet_linker.time_stamper import (
+from .gromet_linker.time_stamper import (
     DebugTimeStamper,
     NowTimeStamper,
 )
-from skema.text_reading.mention_linking.gromet_linker.uid_stamper import (
+from .gromet_linker.uid_stamper import (
     DocIdStamper,
     UidStamper,
 )
-from skema.text_reading.mention_linking.gromet_linker.variable_name_matcher import (
+from .gromet_linker.variable_name_matcher import (
     VariableNameMatcher,
 )
 

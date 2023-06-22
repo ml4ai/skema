@@ -3,11 +3,12 @@ version: "3.9"
 
 services:
   skema-py:
-    image: skema-py:latest
+    image: lumai/askem-skema-py:local
     build:
       context: .
       dockerfile: Dockerfile.skema-py
     container_name: skema-py
     ports:
     - "8000:8000" # Change port mapping appropriately before deploying.
-    command: ["uvicorn", "server:app", "--host", "0.0.0.0"]
+    # open browser to http://localhost:8000/docs
+    command: ["uvicorn", "skema.skema_py.server:app", "--host", "0.0.0.0", "--port", "8000"]
