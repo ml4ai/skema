@@ -69,7 +69,7 @@ def convert_to_mathml_tree(mathml_string: str) -> MathMLNode:
     """
     root = ET.fromstring(
         add_semicolon_to_unicode(mathml_string)
-        .replace('<mspace width="thinmathspace" />', "")
+        .replace('<mspace linebreak="newline" />', "")
         .replace("<unk>", "unk")
     )
     return convert_to_mathml_node(root)

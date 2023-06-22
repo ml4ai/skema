@@ -252,7 +252,7 @@ def remove_unecc_tokens(eqn):
     One can add or remove the token that needs to be removed.
     """
     eliminate = [
-        # "mspace",
+        "mspace",
         # "mtable",
         # "mathvariant",
         "class",
@@ -270,10 +270,13 @@ def remove_unecc_tokens(eqn):
         "minsize",
         "linethickness",
         "mstyle",
-        "mphantom"
+        "mphantom",
     ]
     if not args.with_boldface:
         eliminate.append("mathvariant")
+
+    #  Keep the newline tag
+    eqn = eqn.replace('<mspace linebreak="newline" />', "newline_placeholder")
     # if args.with_boldface:
     #     eqn = eqn.replace('mathvariant="bold"', "boldface_placeholder")
     #     eqn = eqn.replace('mathvariant="bold-italic"', "boldface_placeholder")
@@ -286,7 +289,7 @@ def remove_unecc_tokens(eqn):
         "mo",
         "mn",
         "mtext",
-        "mspace",
+        # "mspace",
         # "ms",
         "mfrac",
         "msqrt",
@@ -359,11 +362,12 @@ def remove_unecc_tokens(eqn):
     # if args.with_boldface:
     #     eqn = eqn.replace("boldface_placeholder", 'mathvariant="bold"')
 
+    eqn = eqn.replace("newline_placeholder", '<mspace linebreak="newline" />')
     # unify the space size
-    if 'mspace' in eqn:
-        # Remove existing attributes in mspace
-        eqn = re.sub(r'mspace[^>]*', 'mspace width="thinmathspace" /', eqn)
-    eqn = eqn.replace(" MJX-fixedlimits\"", "")
+    # if "mspace" in eqn:
+    #     # Remove existing attributes in mspace
+    #     eqn = re.sub(r"mspace[^>]*", 'mspace width="thinmathspace" /', eqn)
+    eqn = eqn.replace(' MJX-fixedlimits"', "")
 
     return eqn
 
