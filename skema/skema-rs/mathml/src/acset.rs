@@ -59,7 +59,7 @@ pub struct PetriNet {
     pub model_version: String,
     pub model: ModelPetriNet,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<serde_json::Map<String, Value>>,
+    pub metadata: Option<Metadata>,
 }
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 pub struct RegNet {
@@ -70,7 +70,7 @@ pub struct RegNet {
     pub model_version: String,
     pub model: ModelRegNet,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<serde_json::Map<String, Value>>,
+    pub metadata: Option<Metadata>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
