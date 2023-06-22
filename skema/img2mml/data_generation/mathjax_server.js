@@ -101,7 +101,7 @@ function port() {
 
 function host() {
     try {
-        var host = process.env.SKEMA_HOST
+        var host = process.env.SKEMA_MATHJAX_HOST
         if(host == undefined) {
             return "127.0.0.1";
         }
