@@ -13,11 +13,15 @@ RUN apt-get update &&\
         build-essential \
         graphviz \
         libgraphviz-dev \
-        python3-venv  &&\
-    # The two commands below are to reduce the size of the Docker image
-    apt-get clean &&\
-    rm -rf /var/lib/apt/lists/*
+        python3-venv 
 
+# Node needed for img2mml
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
+apt-get install -y nodejs
+
+# The two commands below are to reduce the size of the Docker image
+RUN apt-get clean &&\
+    rm -rf /var/lib/apt/lists/*
 
 # =====================
 # Setup the repository
@@ -44,9 +48,11 @@ RUN tree /app
 #RUN pip install ".[all]"
 # exclude dependencies for docs
 RUN pip install ".[core,dev]"
-
 # Build tree-sitter-fortran grammar required by Fortran code2fn
+RUN skema-tree-sitter-build-fortran-grammar
 #RUN python /app/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
 
+# img2mml JS dependencies for MathJax server
+RUN cd skema/img2mml/data_generation && npm install
 
 #CMD ["uvicorn", "skema.skema_py.server:app", "--host", "0.0.0.0", "--port", "8000"]
