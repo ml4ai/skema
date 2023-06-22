@@ -5,10 +5,9 @@ use crate::petri_net::{
     Polarity, Rate, Specie, Var,
 };
 use crate::{
-    acset::{ModelRegNet, Properties, RegState, RegTransition},
     ast::{
         Math,
-        MathExpression::{Mi, Mn, Mo, Mrow},
+        MathExpression::{Mn, Mo, Mrow},
         Operator,
     },
     parsing::parse,

@@ -1,15 +1,14 @@
 use mathml::ast::{Math, Operator};
-use mathml::mml2pn::get_mathml_asts_from_file;
+
 pub use mathml::mml2pn::{ACSet, Term};
 use petgraph::prelude::*;
 use rsmgclient::{ConnectParams, Connection, MgError, Node, Relationship, Value};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::string::ToString;
-use std::{env, fs};
 
 // new imports
-use mathml::acset::{ModelRegNet, PetriNet, RegNet};
+
 use mathml::ast::MathExpression;
 use mathml::ast::MathExpression::Mo;
 use mathml::ast::MathExpression::Mrow;
@@ -31,13 +30,13 @@ pub fn get_line_span(
     let mut line_nums = Vec::<i64>::new();
     for node in graph.node_indices() {
         if graph[node].id == node_id {
-            for n_node in graph.neighbors_directed(node.clone(), Outgoing) {
-                if graph[n_node.clone()].labels == ["Metadata"] {
+            for n_node in graph.neighbors_directed(node, Outgoing) {
+                if graph[n_node].labels == ["Metadata"] {
                     match &graph[n_node].properties["line_begin"] {
                         Value::List(x) => match x[0] {
                             Value::Int(y) => {
                                 //println!("line_begin: {:?}", y);
-                                line_nums.push(y.clone());
+                                line_nums.push(y);
                             }
                             _ => println!("error metadata type"),
                         },
@@ -47,7 +46,7 @@ pub fn get_line_span(
                         Value::List(x) => match x[0] {
                             Value::Int(y) => {
                                 //println!("line_end: {:?}", y);
-                                line_nums.push(y.clone());
+                                line_nums.push(y);
                             }
                             _ => println!("error metadata type"),
                         },
@@ -57,20 +56,19 @@ pub fn get_line_span(
             }
         }
     }
-    let line_span = LineSpan {
-        line_begin: line_nums[0].clone(),
-        line_end: line_nums[1].clone(),
-    };
 
-    return line_span;
+    LineSpan {
+        line_begin: line_nums[0],
+        line_end: line_nums[1],
+    }
 }
 
 pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
-    let graph = subgraph2petgraph(module_id, &host); // makes petgraph of graph
+    let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
-    let core_id = find_pn_dynamics(module_id, &host); // gives back list of function nodes that might contain the dynamics
+    let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
 
-    let line_span = get_line_span(core_id[0].clone(), graph.clone()); // get's the line span of function id
+    let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
 
     //println!("\n{:?}", line_span);
 
@@ -79,32 +77,31 @@ pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    let (mut core_dynamics_ast, metadata_map_ast) =
-        subgraph2_core_dyn_ast(core_id[0].clone(), &host).unwrap();
+    let (core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[0], host).unwrap();
 
     //println!("\ncore_dynamics_ast[0]: {:?}", core_dynamics_ast[0].clone());
 
     // need to convert core_synamics_ast to a Math object to then run the PN converter on it
     let mut math_content = Vec::<Math>::new();
-    for eq in core_dynamics_ast.clone().iter() {
+    for eq in core_dynamics_ast.iter() {
         let math_ast = Math {
             content: [Mrow(eq.clone())].to_vec(),
         };
         math_content.push(math_ast.clone());
     }
 
-    return math_content;
+    math_content
 }
 
 // this function finds the core dynamics and returns a vector of
 // node id's that meet the criteria for identification
 pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
-    let graph = subgraph2petgraph(module_id, &host);
+    let graph = subgraph2petgraph(module_id, host);
     // 1. find each function node
     let mut function_nodes = Vec::<NodeIndex>::new();
     for node in graph.node_indices() {
         if graph[node].labels == ["Function"] {
-            function_nodes.push(node.clone());
+            function_nodes.push(node);
         }
     }
     // 2. check and make sure only expressions in function
@@ -112,10 +109,7 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     let mut functions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..function_nodes.len() {
         // grab the subgraph of the given expression
-        functions.push(subgraph2petgraph(
-            graph[function_nodes[i]].id.clone(),
-            &host,
-        ));
+        functions.push(subgraph2petgraph(graph[function_nodes[i]].id, host));
     }
     // get a sense of the number of expressions in each function
     let mut func_counter = 0;
@@ -128,13 +122,13 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
                 expression_counter += 1;
             }
             if func[node].labels == ["Primitive"] {
-                if func[node].properties["name"].to_string() == "'ast.Mult'".to_string() {
+                if func[node].properties["name"].to_string() == *"'ast.Mult'" {
                     primitive_counter += 1;
-                } else if func[node].properties["name"].to_string() == "'ast.Add'".to_string() {
+                } else if func[node].properties["name"].to_string() == *"'ast.Add'" {
                     primitive_counter += 1;
-                } else if func[node].properties["name"].to_string() == "'ast.Sub'".to_string() {
+                } else if func[node].properties["name"].to_string() == *"'ast.Sub'" {
                     primitive_counter += 1;
-                } else if func[node].properties["name"].to_string() == "'ast.USub'".to_string() {
+                } else if func[node].properties["name"].to_string() == *"'ast.USub'" {
                     primitive_counter += 1;
                 }
             }
@@ -147,14 +141,14 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     // 4. get the id of functions with enough expressions
     let mut core_id = Vec::<i64>::new();
     for c_func in core_func.iter() {
-        for node in functions[c_func.clone()].clone().node_indices() {
-            if functions[c_func.clone()][node].labels == ["Function"] {
-                core_id.push(functions[c_func.clone()][node].id.clone());
+        for node in functions[(*c_func)].clone().node_indices() {
+            if functions[(*c_func)][node].labels == ["Function"] {
+                core_id.push(functions[(*c_func)][node].id);
             }
         }
     }
 
-    return core_id;
+    core_id
 }
 
 pub fn subgraph2_core_dyn_ast(
@@ -162,7 +156,7 @@ pub fn subgraph2_core_dyn_ast(
     host: &str,
 ) -> Result<(Vec<Vec<MathExpression>>, HashMap<String, rsmgclient::Node>), MgError> {
     // get the petgraph of the subgraph
-    let graph = subgraph2petgraph(root_node_id, &host);
+    let graph = subgraph2petgraph(root_node_id, host);
 
     /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
     // create the metadata rust rep
@@ -194,10 +188,7 @@ pub fn subgraph2_core_dyn_ast(
     let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the subgraph of the given expression
-        expressions.push(subgraph2petgraph(
-            graph[expression_nodes[i]].id.clone(),
-            &host,
-        ));
+        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
     }
 
     // initialize vector to collect all expression wiring graphs
@@ -205,8 +196,7 @@ pub fn subgraph2_core_dyn_ast(
         Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the wiring subgraph of the given expression
-        expressions_wiring
-            .push(subgraph_wiring(graph[expression_nodes[i]].id.clone(), &host).unwrap());
+        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, host).unwrap());
     }
 
     // now to trim off the un-named filler nodes and filler expressions
@@ -232,11 +222,11 @@ pub fn subgraph2_core_dyn_ast(
         if root_node.len() >= 2 {
             // println!("More than one Opo! Skipping Expression!");
         } else {
-            core_dynamics.push(tree_2_ast(expr.clone(), root_node[0].clone()).unwrap());
+            core_dynamics.push(tree_2_ast(expr.clone(), root_node[0]).unwrap());
         }
     }
 
-    return Ok((core_dynamics, metadata_map));
+    Ok((core_dynamics, metadata_map))
 }
 
 fn tree_2_ast(
@@ -245,9 +235,9 @@ fn tree_2_ast(
 ) -> Result<Vec<MathExpression>, MgError> {
     let mut math_vec = Vec::<MathExpression>::new();
 
-    if graph.clone()[root_node].labels == ["Opo"] {
+    if graph[root_node].labels == ["Opo"] {
         // we first construct the derivative of the first node
-        let mut deriv_name: &str = &graph[root_node].properties["name"].to_string().clone();
+        let deriv_name: &str = &graph[root_node].properties["name"].to_string();
         // this will let us know if additional trimming is needed to handle the code implementation of the equations
         let mut step_impl = false;
         // This is very bespoke right now
@@ -257,54 +247,54 @@ fn tree_2_ast(
             let deriv = MathExpression::Mfrac(
                 Box::new(Mrow(
                     [
-                        MathExpression::Mi(deriv_name[1..2].to_string().clone()),
-                        MathExpression::Mi(deriv_name[2..3].to_string().clone()),
+                        MathExpression::Mi(deriv_name[1..2].to_string()),
+                        MathExpression::Mi(deriv_name[2..3].to_string()),
                     ]
                     .to_vec(),
                 )),
                 Box::new(Mrow(
                     [
-                        MathExpression::Mi(deriv_name[3..4].to_string().clone()),
-                        MathExpression::Mi(deriv_name[4..5].to_string().clone()),
+                        MathExpression::Mi(deriv_name[3..4].to_string()),
+                        MathExpression::Mi(deriv_name[4..5].to_string()),
                     ]
                     .to_vec(),
                 )),
             );
-            math_vec.push(deriv.clone());
+            math_vec.push(deriv);
         } else {
             step_impl = true;
             let deriv = MathExpression::Mfrac(
                 Box::new(Mrow(
                     [
-                        MathExpression::Mi("d".to_string().clone()),
-                        MathExpression::Mi(deriv_name[1..2].to_string().clone()),
+                        MathExpression::Mi("d".to_string()),
+                        MathExpression::Mi(deriv_name[1..2].to_string()),
                     ]
                     .to_vec(),
                 )),
                 Box::new(Mrow(
                     [
-                        MathExpression::Mi("d".to_string().clone()),
-                        MathExpression::Mi("t".to_string().clone()),
+                        MathExpression::Mi("d".to_string()),
+                        MathExpression::Mi("t".to_string()),
                     ]
                     .to_vec(),
                 )),
             );
-            math_vec.push(deriv.clone());
+            math_vec.push(deriv);
         }
         // we also push an Mo('=') here before traversing the tree to parse the rhs
         math_vec.push(MathExpression::Mo(Operator::Equals));
         // now we walk through the tree to parse the rest
-        let mut rhs_eq = Vec::<MathExpression>::new();
+        let _rhs_eq = Vec::<MathExpression>::new();
         let mut first_op = Vec::<MathExpression>::new();
 
         // this only distributing if the multiplication is the first operator
         for node in graph.neighbors_directed(root_node, Outgoing) {
             if graph[node].labels == ["Primitive"]
-                && !(graph[node].properties["name"].to_string() == "'ast.USub'".to_string())
+                && graph[node].properties["name"].to_string() != *"'ast.USub'"
             {
-                first_op.push(get_operator(graph.clone(), node.clone()));
-                let mut arg1 = get_args(graph.clone(), node.clone());
-                if graph[node].properties["name"].to_string() == "'ast.Mult'".to_string() {
+                first_op.push(get_operator(graph.clone(), node));
+                let mut arg1 = get_args(graph.clone(), node);
+                if graph[node].properties["name"].to_string() == *"'ast.Mult'" {
                     let arg1_mult = is_multiple_terms(arg1[0].clone());
                     let arg2_mult = is_multiple_terms(arg1[1].clone());
                     if arg1_mult {
@@ -322,25 +312,25 @@ fn tree_2_ast(
                     // need to test for when we have USub next to mults in a term that might be needed
                     // these args should all be multiplications of each other, aka an individual term
                     // there for we just check for a usub and if it exists, we remove it and swap the operator + -> - or - -> +
-                    let mut new_arg = Vec::<MathExpression>::new();
+                    let _new_arg = Vec::<MathExpression>::new();
                     let mut usub_exist0 = false;
                     let mut usub_exist1 = false;
                     let mut usub_idx = Vec::<i32>::new();
                     for (i, ent) in arg1[0].clone().iter().enumerate() {
                         if *ent == MathExpression::Mo(Operator::Other("'ast.USub'".to_string())) {
                             usub_exist0 = true;
-                            usub_idx.push(i.clone().try_into().unwrap());
+                            usub_idx.push(i.try_into().unwrap());
                         }
                     }
                     for (i, ent) in arg1[1].clone().iter().enumerate() {
                         if *ent == MathExpression::Mo(Operator::Other("'ast.USub'".to_string())) {
                             usub_exist1 = true;
-                            usub_idx.push(i.clone().try_into().unwrap());
+                            usub_idx.push(i.try_into().unwrap());
                         }
                     }
                     if usub_exist0 {
                         for id in usub_idx.clone().iter().rev() {
-                            arg1[0].remove(id.clone() as usize);
+                            arg1[0].remove(*id as usize);
                         }
                         if first_op[0] == MathExpression::Mo(Operator::Add) {
                             first_op[0] = MathExpression::Mo(Operator::Subtract);
@@ -352,7 +342,7 @@ fn tree_2_ast(
                         math_vec.extend_from_slice(&arg1[1].clone());
                     } else if usub_exist1 {
                         for id in usub_idx.clone().iter().rev() {
-                            arg1[1].remove(id.clone() as usize);
+                            arg1[1].remove(*id as usize);
                         }
                         if first_op[0] == MathExpression::Mo(Operator::Add) {
                             first_op[0] = MathExpression::Mo(Operator::Subtract);
@@ -377,16 +367,15 @@ fn tree_2_ast(
         // we find the Mi of the state variable that doesn't have a multiplication next to it (including only one, if at the end of the vec)
         // we then remove it and the one of the addition operators next to it
         if step_impl {
-            let ref_name = deriv_name[1..2].to_string().clone();
+            let ref_name = deriv_name[1..2].to_string();
             for (idx, obj) in math_vec.clone().iter().enumerate() {
                 if *obj == MathExpression::Mi(ref_name.clone()) {
                     // find each index of the state variable on the rhs
                     // check if there is a multiplication to the right or left
                     // if no multiplication then delete entry and all neighboring addition operators
                     // this should complete the transformation to a leibniz diff eq from a euler method
-                    if math_vec[idx - 1 as usize].clone() == MathExpression::Mo(Operator::Add)
-                        || math_vec[idx - 1 as usize].clone()
-                            == MathExpression::Mo(Operator::Equals)
+                    if math_vec[idx - 1_usize].clone() == MathExpression::Mo(Operator::Add)
+                        || math_vec[idx - 1_usize].clone() == MathExpression::Mo(Operator::Equals)
                     {
                         // check right side of operator, but need to be wary of vec end
                         let mut idx_last = false;
@@ -394,28 +383,27 @@ fn tree_2_ast(
                             idx_last = true;
                         }
                         if !idx_last
-                            && math_vec[idx + 1 as usize].clone()
-                                == MathExpression::Mo(Operator::Add)
+                            && math_vec[idx + 1_usize].clone() == MathExpression::Mo(Operator::Add)
                         {
                             // delete idx and neighboring Add's (left side might be equals, which is kept)
-                            math_vec.remove(idx + 1 as usize);
-                            math_vec.remove(idx as usize);
-                            if math_vec[idx - 1 as usize].clone()
+                            math_vec.remove(idx + 1_usize);
+                            math_vec.remove(idx);
+                            if math_vec[idx - 1_usize].clone()
                                 != MathExpression::Mo(Operator::Equals)
                             {
-                                math_vec.remove(idx - 1 as usize);
+                                math_vec.remove(idx - 1_usize);
                             }
                         } else if !idx_last
-                            && math_vec[idx + 1 as usize].clone()
+                            && math_vec[idx + 1_usize].clone()
                                 == MathExpression::Mo(Operator::Subtract)
                         {
                             // delete idx and neighboring Add's (left side might be equals, which is kept)
-                            math_vec.remove(idx + 1 as usize);
-                            math_vec.remove(idx as usize);
-                            if math_vec[idx - 1 as usize].clone()
+                            math_vec.remove(idx + 1_usize);
+                            math_vec.remove(idx);
+                            if math_vec[idx - 1_usize].clone()
                                 != MathExpression::Mo(Operator::Equals)
                             {
-                                math_vec.remove(idx - 1 as usize);
+                                math_vec.remove(idx - 1_usize);
                             } else {
                                 // this puts the deleted subtract back but on the end, which will be correct once flipped
                                 math_vec.push(MathExpression::Mo(Operator::Subtract));
@@ -423,8 +411,8 @@ fn tree_2_ast(
                         } else if idx_last {
                             // delete idx and neighboring Add to the left
                             // need to delete from the largest index to the smallest as to not mess up the indexing
-                            math_vec.remove(idx as usize);
-                            math_vec.remove(idx - 1 as usize);
+                            math_vec.remove(idx);
+                            math_vec.remove(idx - 1_usize);
                         }
                     }
                 }
@@ -455,11 +443,11 @@ fn tree_2_ast(
 
     for (i, term) in reversed_final_math.clone().iter().enumerate().rev() {
         if *term == MathExpression::Mo(Operator::Multiply) {
-            reversed_final_math.remove(i as usize);
+            reversed_final_math.remove(i);
         }
     }
 
-    return Ok(reversed_final_math);
+    Ok(reversed_final_math)
 }
 
 // this function returns a bool of if an expression has multiple terms (conjuction of +/-'s)
@@ -468,14 +456,10 @@ fn is_multiple_terms(arg: Vec<MathExpression>) -> bool {
 
     for (i, expression) in arg.iter().enumerate() {
         if is_add_or_subtract_operator(expression) {
-            add_sub_index = i.clone();
+            add_sub_index = i;
         }
     }
-    if add_sub_index != 0 {
-        return true;
-    } else {
-        return false;
-    }
+    add_sub_index != 0
 }
 
 // This function returns a vector of indicies of where the operators that seperate terms in an expression are
@@ -487,7 +471,7 @@ fn terms_indicies(arg: Vec<MathExpression>) -> Vec<i32> {
             add_sub_index_vec.push(i.try_into().unwrap());
         }
     }
-    return add_sub_index_vec;
+    add_sub_index_vec
 }
 
 // the function takes two arguments and distributes them, made so the first argument is distributed over the second
@@ -506,7 +490,7 @@ fn distribute_args(
         println!("USub dist happens"); // This is never running
         println!("Entry 1"); // operator starts at begining of arg2
         if arg2_term_ind[0] == 0 {
-            for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
+            for (i, ind) in arg2_term_ind.iter().enumerate() {
                 if arg2[(*ind as usize)] == Mo(Operator::Add) {
                     arg2[(*ind as usize)] = Mo(Operator::Subtract);
                     if (i + 1) != arg2_term_ind.len() {
@@ -515,14 +499,14 @@ fn distribute_args(
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
                         );
                         //arg_dist.push(Mo(Operator::Multiply));
-                        let vec_len1 = (arg1.clone().len() - 1) as usize;
+                        let vec_len1 = arg1.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
                     } else {
                         // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
+                        let vec_len = arg2.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
                         //arg_dist.push(Mo(Operator::Multiply));
-                        let vec_len1 = (arg1.clone().len() - 1) as usize;
+                        let vec_len1 = arg1.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
                     }
                 } else {
@@ -533,11 +517,11 @@ fn distribute_args(
                                 [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
                         );
                         //arg_dist.push(Mo(Operator::Multiply));
-                        let vec_len1 = (arg1.clone().len() - 1) as usize;
+                        let vec_len1 = arg1.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
                     } else {
                         // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
+                        let vec_len = arg2.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
                         //arg_dist.push(Mo(Operator::Multiply));
                         arg_dist.extend_from_slice(&arg1.clone()[1..]);
@@ -548,11 +532,11 @@ fn distribute_args(
             println!("Entry 2");
             // operator doesn't start at beginning so have to add it manually
             arg_dist.push(Mo(Operator::Subtract));
-            arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind.clone()[0] - 1) as usize]);
+            arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind[0] - 1) as usize]);
             //arg_dist.push(Mo(Operator::Multiply));
-            let vec_len1 = (arg1.clone().len() - 1) as usize;
-            arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
-            for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
+            let vec_len1 = arg1.clone().len() - 1;
+            arg_dist.extend_from_slice(&arg1[1..vec_len1]);
+            for (i, ind) in arg2_term_ind.iter().enumerate() {
                 if arg2[(*ind as usize)] == Mo(Operator::Add) {
                     arg2[(*ind as usize)] = Mo(Operator::Subtract);
                     if (i + 1) != arg2_term_ind.len() {
@@ -564,10 +548,10 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()[1..]);
                     } else {
                         // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
+                        let vec_len = arg2.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
                         //arg_dist.push(Mo(Operator::Multiply));
-                        let vec_len1 = (arg1.clone().len() - 1) as usize;
+                        let vec_len1 = arg1.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
                     }
                 } else {
@@ -581,10 +565,10 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()[1..]);
                     } else {
                         // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
+                        let vec_len = arg2.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
                         //arg_dist.push(Mo(Operator::Multiply));
-                        let vec_len1 = (arg1.clone().len() - 1) as usize;
+                        let vec_len1 = arg1.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
                     }
                 }
@@ -594,7 +578,7 @@ fn distribute_args(
         // don't have to swap operators
         if arg2_term_ind[0] == 0 {
             println!("Entry 3");
-            for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
+            for (i, ind) in arg2_term_ind.iter().enumerate() {
                 if arg2[(*ind as usize)] == Mo(Operator::Add) {
                     if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
@@ -605,36 +589,33 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()); // check
                     } else {
                         // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
+                        let vec_len = arg2.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
                         //arg_dist.push(Mo(Operator::Multiply));
                         arg_dist.extend_from_slice(&arg1.clone()); // check
                     }
+                } else if (i + 1) != arg2_term_ind.len() {
+                    arg_dist.extend_from_slice(
+                        &arg2.clone()[(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
+                    );
+                    //arg_dist.push(Mo(Operator::Multiply));
+                    arg_dist.extend_from_slice(&arg1.clone()); // check
                 } else {
-                    if (i + 1) != arg2_term_ind.len() {
-                        arg_dist.extend_from_slice(
-                            &arg2.clone()
-                                [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
-                        );
-                        //arg_dist.push(Mo(Operator::Multiply));
-                        arg_dist.extend_from_slice(&arg1.clone()); // check
-                    } else {
-                        // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
-                        arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
-                        //arg_dist.push(Mo(Operator::Multiply));
-                        arg_dist.extend_from_slice(&arg1.clone()); // check
-                    }
+                    // last of the expression case
+                    let vec_len = arg2.clone().len() - 1;
+                    arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
+                    //arg_dist.push(Mo(Operator::Multiply));
+                    arg_dist.extend_from_slice(&arg1.clone()); // check
                 }
             }
         } else {
             println!("Entry 4");
             // don't swap operators manual beginning push
-            arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind.clone()[0] - 1) as usize]);
+            arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind[0] - 1) as usize]);
             //arg_dist.push(Mo(Operator::Multiply));
-            let vec_len1 = (arg1.clone().len() - 1) as usize;
-            arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
-            for (i, ind) in arg2_term_ind.clone().iter().enumerate() {
+            let vec_len1 = arg1.clone().len() - 1;
+            arg_dist.extend_from_slice(&arg1[1..vec_len1]);
+            for (i, ind) in arg2_term_ind.iter().enumerate() {
                 if arg2[*ind as usize] == Mo(Operator::Add) {
                     if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
@@ -645,31 +626,28 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()); // check
                     } else {
                         // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
+                        let vec_len = arg2.clone().len() - 1;
                         arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
                         //arg_dist.push(Mo(Operator::Multiply));
                         arg_dist.extend_from_slice(&arg1.clone()); // check
                     }
+                } else if (i + 1) != arg2_term_ind.len() {
+                    arg_dist.extend_from_slice(
+                        &arg2.clone()[(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
+                    );
+                    //arg_dist.push(Mo(Operator::Multiply));
+                    arg_dist.extend_from_slice(&arg1.clone()); // check
                 } else {
-                    if (i + 1) != arg2_term_ind.len() {
-                        arg_dist.extend_from_slice(
-                            &arg2.clone()
-                                [(*ind as usize)..(arg2_term_ind.clone()[i + 1] - 1) as usize],
-                        );
-                        //arg_dist.push(Mo(Operator::Multiply));
-                        arg_dist.extend_from_slice(&arg1.clone()); // check
-                    } else {
-                        // last of the expression case
-                        let vec_len = (arg2.clone().len() - 1) as usize;
-                        arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
-                        //arg_dist.push(Mo(Operator::Multiply));
-                        arg_dist.extend_from_slice(&arg1.clone()); // check
-                    }
+                    // last of the expression case
+                    let vec_len = arg2.clone().len() - 1;
+                    arg_dist.extend_from_slice(&arg2.clone()[(*ind as usize)..vec_len]);
+                    //arg_dist.push(Mo(Operator::Multiply));
+                    arg_dist.extend_from_slice(&arg1.clone()); // check
                 }
             }
         }
     }
-    return arg_dist;
+    arg_dist
 }
 
 // this will get the arguments for an operator/primitive of the graph, assumes it's binary
@@ -681,20 +659,17 @@ fn get_args(
     // need to construct the vector of length 2 with temporary filling since we might get the second
     // element first and tuples can't be dynamically indexed in rust
     let temp_op = Vec::<MathExpression>::new();
-    let mut args = vec![temp_op.clone(); 2];
+    let mut args = vec![temp_op; 2];
 
     for (i, node) in graph.neighbors_directed(root_node, Outgoing).enumerate() {
         if graph[node].labels == ["Primitive"]
-            && graph[node].properties["name"].to_string() == "'USub'".to_string()
+            && graph[node].properties["name"].to_string() == *"'USub'"
         {
-            op.push(get_operator(graph.clone(), node.clone()));
-            for node1 in graph.neighbors_directed(node.clone(), Outgoing) {
+            op.push(get_operator(graph.clone(), node));
+            for node1 in graph.neighbors_directed(node, Outgoing) {
                 let temp_mi = MathExpression::Mi(
-                    graph.clone()[node1].properties["name"].to_string()[1..(graph.clone()[node1]
-                        .properties["name"]
-                        .to_string()
-                        .len()
-                        - 1 as usize)]
+                    graph.clone()[node1].properties["name"].to_string()
+                        [1..(graph.clone()[node1].properties["name"].to_string().len() - 1_usize)]
                         .to_string()
                         .clone(),
                 );
@@ -704,22 +679,22 @@ fn get_args(
         } else if graph[node].labels == ["Opi"] || graph[node].labels == ["Literal"] {
             let temp_mi = MathExpression::Mi(
                 graph.clone()[node].properties["name"].to_string()
-                    [1..(graph.clone()[node].properties["name"].to_string().len() - 1 as usize)]
+                    [1..(graph.clone()[node].properties["name"].to_string().len() - 1_usize)]
                     .to_string()
                     .clone(),
             );
             args[i].push(temp_mi.clone());
         } else {
-            let n_args = get_args(graph.clone(), node.clone());
+            let n_args = get_args(graph.clone(), node);
             let mut temp_vec = Vec::<MathExpression>::new();
             temp_vec.extend_from_slice(&n_args[0]);
-            temp_vec.push(get_operator(graph.clone(), node.clone()));
+            temp_vec.push(get_operator(graph.clone(), node));
             temp_vec.extend_from_slice(&n_args[1]);
             args[i].extend_from_slice(&temp_vec.clone());
         }
     }
 
-    return args;
+    args
 }
 
 // this gets the operator from the node name
@@ -728,20 +703,20 @@ fn get_operator(
     root_node: NodeIndex,
 ) -> MathExpression {
     let mut op = Vec::<MathExpression>::new();
-    if graph[root_node].properties["name"].to_string() == "'ast.Mult'".to_string() {
+    if graph[root_node].properties["name"].to_string() == *"'ast.Mult'" {
         op.push(Mo(Operator::Multiply));
-    } else if graph[root_node].properties["name"].to_string() == "'ast.Add'".to_string() {
+    } else if graph[root_node].properties["name"].to_string() == *"'ast.Add'" {
         op.push(Mo(Operator::Add));
-    } else if graph[root_node].properties["name"].to_string() == "'ast.Sub'".to_string() {
+    } else if graph[root_node].properties["name"].to_string() == *"'ast.Sub'" {
         op.push(Mo(Operator::Subtract));
-    } else if graph[root_node].properties["name"].to_string() == "'ast.Div'".to_string() {
+    } else if graph[root_node].properties["name"].to_string() == *"'ast.Div'" {
         op.push(Mo(Operator::Divide));
     } else {
         op.push(Mo(Operator::Other(
             graph[root_node].properties["name"].to_string(),
         )));
     }
-    return op[0].clone();
+    op[0].clone()
 }
 
 // this currently only works for un-named nodes that are not chained or have multiple incoming/outgoing edges
@@ -752,8 +727,8 @@ fn trim_un_named(
     let mut bypass_graph = graph.clone();
 
     // iterate over the graph and add a new edge to bypass the un-named nodes
-    for node_index in graph.clone().node_indices() {
-        if graph[node_index].properties["name"].to_string() == "'un-named'".to_string() {
+    for node_index in graph.node_indices() {
+        if graph[node_index].properties["name"].to_string() == *"'un-named'" {
             let mut bypass = Vec::<NodeIndex>::new();
             for node1 in graph.neighbors_directed(node_index, Incoming) {
                 bypass.push(node1);
@@ -764,8 +739,8 @@ fn trim_un_named(
             // one incoming one outgoing
             if bypass.len() == 2 {
                 bypass_graph.add_edge(
-                    bypass[0].clone(),
-                    bypass[1].clone(),
+                    bypass[0],
+                    bypass[1],
                     graph
                         .edge_weight(graph.find_edge(node_index, bypass[1]).unwrap())
                         .unwrap()
@@ -776,18 +751,14 @@ fn trim_un_named(
                 // (incoming arrows) but only one outgoing arrow, this seems to be the case based on
                 // data too.
 
-                let end_node_idx = bypass.len().clone() - 1;
-                for (i, _ent) in bypass[0..(end_node_idx as usize)].iter().enumerate() {
+                let end_node_idx = bypass.len() - 1;
+                for (i, _ent) in bypass[0..end_node_idx].iter().enumerate() {
                     // this iterates over all but the last entry in the bypass vec
                     bypass_graph.add_edge(
-                        bypass[i as usize].clone(),
-                        bypass[end_node_idx as usize].clone(),
+                        bypass[i],
+                        bypass[end_node_idx],
                         graph
-                            .edge_weight(
-                                graph
-                                    .find_edge(node_index, bypass[end_node_idx as usize])
-                                    .unwrap(),
-                            )
+                            .edge_weight(graph.find_edge(node_index, bypass[end_node_idx]).unwrap())
                             .unwrap()
                             .clone(),
                     );
@@ -798,12 +769,11 @@ fn trim_un_named(
 
     // now we perform a filter_map to remove the un-named nodes and only the bypass edge will remain to connect the nodes
     // we also remove the unpack node if it is present here as well
-    let trimmed_graph = bypass_graph.filter_map(
+
+    bypass_graph.filter_map(
         |node_index, _edge_index| {
-            if !(bypass_graph[node_index].properties["name"].to_string()
-                == "'un-named'".to_string()
-                || bypass_graph[node_index].properties["name"].to_string()
-                    == "'unpack'".to_string())
+            if !(bypass_graph[node_index].properties["name"].to_string() == *"'un-named'"
+                || bypass_graph[node_index].properties["name"].to_string() == *"'unpack'")
             {
                 Some(graph[node_index].clone())
             } else {
@@ -811,9 +781,7 @@ fn trim_un_named(
             }
         },
         |_node_index, edge_index| Some(edge_index.clone()),
-    );
-
-    return trimmed_graph;
+    )
 }
 
 fn subgraph_wiring(
@@ -888,7 +856,7 @@ fn subgraph_wiring(
     let mut nodes = Vec::<NodeIndex>::new();
     for node in node_list {
         let n1 = graph.add_node(node);
-        nodes.push(n1.clone());
+        nodes.push(n1);
     }
 
     // add the edges to the petgraph
@@ -897,24 +865,24 @@ fn subgraph_wiring(
         let mut tgt = Vec::<NodeIndex>::new();
         for node_idx in nodes.clone() {
             if graph[node_idx].id == edge.start_id {
-                src.push(node_idx.clone());
+                src.push(node_idx);
             }
             if graph[node_idx].id == edge.end_id {
-                tgt.push(node_idx.clone());
+                tgt.push(node_idx);
             }
         }
         if (src.len() + tgt.len()) == 2 {
-            graph.add_edge(src[0].clone(), tgt[0].clone(), edge);
+            graph.add_edge(src[0], tgt[0], edge);
         }
     }
-    return Ok(graph);
+    Ok(graph)
 }
 
 fn subgraph2petgraph(
     module_id: i64,
     host: &str,
 ) -> petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> {
-    let (x, y) = get_subgraph(module_id, &host).unwrap();
+    let (x, y) = get_subgraph(module_id, host).unwrap();
 
     // Create a petgraph graph
     let mut graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship> = Graph::new();
@@ -923,7 +891,7 @@ fn subgraph2petgraph(
     let mut nodes = Vec::<NodeIndex>::new();
     for node in x {
         let n1 = graph.add_node(node);
-        nodes.push(n1.clone());
+        nodes.push(n1);
     }
 
     // add the edges to the petgraph
@@ -932,17 +900,17 @@ fn subgraph2petgraph(
         let mut tgt = Vec::<NodeIndex>::new();
         for node_idx in nodes.clone() {
             if graph[node_idx].id == edge.start_id {
-                src.push(node_idx.clone());
+                src.push(node_idx);
             }
             if graph[node_idx].id == edge.end_id {
-                tgt.push(node_idx.clone());
+                tgt.push(node_idx);
             }
         }
         if (src.len() + tgt.len()) == 2 {
-            graph.add_edge(src[0].clone(), tgt[0].clone(), edge);
+            graph.add_edge(src[0], tgt[0], edge);
         }
     }
-    return graph;
+    graph
 }
 
 pub fn get_subgraph(module_id: i64, host: &str) -> Result<(Vec<Node>, Vec<Relationship>), MgError> {
@@ -1007,5 +975,5 @@ pub fn get_subgraph(module_id: i64, host: &str) -> Result<(Vec<Node>, Vec<Relati
     }
     connection.commit()?;
 
-    return Ok((node_list, edge_list));
+    Ok((node_list, edge_list))
 }

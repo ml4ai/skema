@@ -2,7 +2,7 @@
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
 use crate::model_extraction::module_id2mathml_ast;
-use crate::{Gromet, ModuleCollection};
+use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
@@ -31,9 +31,9 @@ pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgE
     // need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     let mut full_query = queries[0].clone();
     for i in 1..(queries.len()) {
-        full_query.push_str("\n");
+        full_query.push('\n');
         let temp_str = &queries[i].clone();
-        full_query.push_str(&temp_str);
+        full_query.push_str(temp_str);
     }
     execute_query(&full_query, host)?;
     let model_ids = module_query(host)?;
@@ -187,7 +187,7 @@ pub fn module_query(host: &str) -> Result<Vec<i64>, MgError> {
         ids = xs
             .iter()
             .filter_map(|x| match x {
-                Value::Int(x) => Some(x.clone()),
+                Value::Int(x) => Some(*x),
                 _ => None,
             })
             .collect();

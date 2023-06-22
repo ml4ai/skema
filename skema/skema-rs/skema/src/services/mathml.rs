@@ -1,4 +1,4 @@
-use actix_web::{body::EitherBody, get, put, web, HttpResponse};
+use actix_web::{put, web, HttpResponse};
 use mathml::{
     acset::{ACSet, AMRmathml, PetriNet, RegNet},
     ast::Math,
@@ -6,7 +6,7 @@ use mathml::{
     parsing::parse,
 };
 use petgraph::dot::{Config, Dot};
-use serde::{Deserialize, Serialize};
+
 use std::string::String;
 use utoipa;
 use utoipa::ToSchema;
@@ -24,7 +24,8 @@ use utoipa::ToSchema;
 #[put("/mathml/ast-graph")]
 pub async fn get_ast_graph(payload: String) -> String {
     let contents = &payload;
-    let (_, math) = parse(&contents).expect(format!("Unable to parse payload!").as_str());
+    let (_, math) =
+        parse(contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
 
     let g = math.to_graph();
     let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
@@ -45,12 +46,13 @@ pub async fn get_ast_graph(payload: String) -> String {
 )]
 #[put("/mathml/math-exp-graph")]
 pub async fn get_math_exp_graph(payload: String) -> String {
-    let mut contents = payload.clone();
+    let mut contents = payload;
     contents = preprocess_content(contents);
-    let (_, mut math) = parse(&contents).expect(format!("Unable to parse payload!").as_str());
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
     math.normalize();
-    let mut new_math = wrap_math(math);
-    let g = new_math.clone().to_graph();
+    let new_math = wrap_math(math);
+    let g = new_math.to_graph();
     let dot_representation = Dot::new(&g);
     dot_representation.to_string()
 }
@@ -67,7 +69,7 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 )]
 #[put("/mathml/petrinet")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
+    let asts: Vec<Math> = payload.iter().map(|x| parse(x).unwrap().1).collect();
     HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
 }
 
@@ -83,7 +85,7 @@ pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/regnet")]
 pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<Math> = payload.iter().map(|x| parse(&x).unwrap().1).collect();
+    let asts: Vec<Math> = payload.iter().map(|x| parse(x).unwrap().1).collect();
     HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
 }
 
@@ -99,15 +101,11 @@ pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/amr")]
 pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
-    let asts: Vec<Math> = payload
-        .mathml
-        .iter()
-        .map(|x| parse(&x).unwrap().1)
-        .collect();
+    let asts: Vec<Math> = payload.mathml.iter().map(|x| parse(x).unwrap().1).collect();
     let model_type = payload.model.clone();
-    if model_type == "regnet".to_string() {
+    if model_type == *"regnet" {
         HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
-    } else if model_type == "petrinet".to_string() {
+    } else if model_type == *"petrinet" {
         HttpResponse::Ok().json(PetriNet::from(ACSet::from(asts)))
     } else {
         HttpResponse::BadRequest().into()

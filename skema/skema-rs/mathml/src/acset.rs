@@ -1,11 +1,11 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 use crate::ast::Math;
-use crate::ast::MathExpression::{Mi, Mo};
+use crate::ast::MathExpression::Mi;
 use crate::mml2pn::{group_by_operators, Term};
 use crate::petri_net::{Polarity, Var};
 use serde::{Deserialize, Serialize};
-use serde_json::{Map, Value};
+
 use std::collections::{HashMap, HashSet};
 use utoipa;
 use utoipa::ToSchema;
@@ -329,25 +329,25 @@ impl From<ACSet> for PetriNet {
             states_vec.push(states.clone());
         }
 
-        for (i, trans) in pn.T.clone().iter().enumerate() {
+        for (i, trans) in pn.T.iter().enumerate() {
             // convert transition index to base 1
             let transition = i + 1;
 
             // construct array of incoming states
             let mut string_vec1 = Vec::<String>::new();
             for incoming in pn.I.clone().iter() {
-                if incoming.it.clone() == transition {
-                    let state_idx = incoming.is.clone() - 1; // 0 based to index the rust vec
-                    let state_name = pn.S[state_idx as usize].sname.clone();
+                if incoming.it == transition {
+                    let state_idx = incoming.is - 1; // 0 based to index the rust vec
+                    let state_name = pn.S[state_idx].sname.clone();
                     string_vec1.push(state_name.clone());
                 }
             }
             // construct array of outgoing states
             let mut string_vec2 = Vec::<String>::new();
             for outgoing in pn.O.clone().iter() {
-                if outgoing.ot.clone() == transition {
-                    let state_idx = outgoing.os.clone() - 1; // 0 based to index the rust vec
-                    let state_name = pn.S[state_idx as usize].sname.clone();
+                if outgoing.ot == transition {
+                    let state_idx = outgoing.os - 1; // 0 based to index the rust vec
+                    let state_name = pn.S[state_idx].sname.clone();
                     string_vec2.push(state_name.clone());
                 }
             }
@@ -371,17 +371,15 @@ impl From<ACSet> for PetriNet {
             metadata: None,
         };
 
-        let mrp = PetriNet {
+        PetriNet {
         name: "mathml model".to_string(),
         schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
         schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model: model,
+        model,
         metadata: None,
-    };
-
-        return mrp;
+    }
     }
 }
 // This function takes in a mathml string and returns a Regnet
@@ -398,7 +396,7 @@ impl From<Vec<Math>> for RegNet {
         }
 
         // Get the rate variables
-        let rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
+        let _rate_vars: HashSet<&Var> = vars.difference(&specie_vars).collect();
 
         // -----------------------------------------------------------
         // -----------------------------------------------------------
@@ -416,22 +414,22 @@ impl From<Vec<Math>> for RegNet {
             //transition bits
             let mut trans_name = "temp".to_string();
             let mut trans_sign = false;
-            let mut trans_tgt = "temp".to_string();
+            let _trans_tgt = "temp".to_string();
             let mut trans_src = "temp".to_string();
 
             for (i, term) in eqns[&state].iter().enumerate() {
                 for variable in term.vars.clone().iter() {
                     if state == variable.clone() && term.vars.len() == 2 {
-                        term_idx = i.clone();
+                        term_idx = i;
                     }
                 }
             }
 
-            if eqns[&state.clone()][term_idx.clone() as usize].polarity == Polarity::Positive {
+            if eqns[&state.clone()][term_idx].polarity == Polarity::Positive {
                 rate_sign = true;
             }
 
-            for variable in eqns[&state][term_idx as usize].vars.iter() {
+            for variable in eqns[&state][term_idx].vars.iter() {
                 if state.clone() != variable.clone() {
                     match variable.clone() {
                         Var(Mi(x)) => {
@@ -456,7 +454,7 @@ impl From<Vec<Math>> for RegNet {
             let states = RegState {
                 id: state_name.clone(),
                 name: state_name.clone(),
-                sign: Some(rate_sign.clone()),
+                sign: Some(rate_sign),
                 rate_constant: Some(rate_const.clone()),
                 ..Default::default()
             };
@@ -473,12 +471,12 @@ impl From<Vec<Math>> for RegNet {
                     let mut other_state_indx = 0;
                     for (j, var) in term.vars.iter().enumerate() {
                         if state.clone() == var.clone() {
-                            state_indx = j.clone();
+                            state_indx = j;
                         }
                         for other_states in specie_vars.clone().into_iter() {
                             if *var != state && *var == other_states {
                                 // this means it is not the state, but is another state
-                                other_state_indx = j.clone();
+                                other_state_indx = j;
                             }
                         }
                     }
@@ -515,7 +513,7 @@ impl From<Vec<Math>> for RegNet {
                 id: trans_name.clone(),
                 target: Some([state_name.clone()].to_vec()), // tgt
                 source: Some([trans_src.clone()].to_vec()),  // src
-                sign: Some(trans_sign.clone()),
+                sign: Some(trans_sign),
                 properties: Some(prop.clone()),
                 ..Default::default()
             };
@@ -531,16 +529,14 @@ impl From<Vec<Math>> for RegNet {
             parameters: None,
         };
 
-        let mrp = RegNet {
+        RegNet {
         name: "Regnet mathml model".to_string(),
         schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
         schema_name: "regnet".to_string(),
         description: "This is a Regnet model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model: model,
+        model,
         metadata: None,
-        };
-
-        return mrp;
+        }
     }
 }

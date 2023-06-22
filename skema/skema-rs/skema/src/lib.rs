@@ -345,8 +345,8 @@ fn de_value<'de, D: Deserializer<'de>>(deserializer: D) -> Result<String, D::Err
         Value::Bool(boo) => boo.to_string(),
         Value::Array(vl) => {
             // need to construct an instance of the vector here then stringify it
-            let vals = serde_json::to_string(&vl).unwrap();
-            vals
+
+            serde_json::to_string(&vl).unwrap()
         } // this will encode the vector as a string, re-serializing will be more difficult though
         Value::Object(map) => {
             let f = format!("{:?}", map);
@@ -430,11 +430,10 @@ mod tests {
         let mut res_serialized = serde_json::to_string(&res).unwrap();
 
         // processing the imported data
-        file_contents = file_contents.replace('\n', "").replace(' ', "");
+        file_contents = file_contents.replace(['\n', ' '], "");
         res_serialized = res_serialized
             .replace("\\\\", "\\") // temp fix for the extra \\'s
-            .replace('\n', "")
-            .replace(' ', "");
+            .replace(['\n', ' '], "");
 
         assert_eq!(res_serialized, file_contents);
     }
