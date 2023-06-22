@@ -53,6 +53,6 @@ RUN skema-tree-sitter-build-fortran-grammar
 #RUN python /app/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
 
 # img2mml JS dependencies for MathJax server
-RUN cd skema/img2mml/data_generation && npm install
+RUN (cd skema/img2mml/data_generation && npm install)
 
 #CMD ["uvicorn", "skema.skema_py.server:app", "--host", "0.0.0.0", "--port", "8000"]
