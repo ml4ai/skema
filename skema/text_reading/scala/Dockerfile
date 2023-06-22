@@ -58,7 +58,8 @@ RUN mkdir -p /skema/text_reading
 COPY . /skema/text_reading
 WORKDIR /skema/text_reading
 # Compile the fat jar
-RUN sbt -J-Xmx6g assembly
+# NOTE: we don't need a fat JAR
+#RUN sbt -J-Xmx6g assembly
 
 # =============================================================================
 
