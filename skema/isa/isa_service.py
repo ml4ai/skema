@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from fastapi import FastAPI, File
-from lib import align_mathml_eqs
+from skema.isa.lib import align_mathml_eqs
 from pydantic import BaseModel
 
 # Create a web app using FastAPI
