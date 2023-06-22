@@ -38,13 +38,14 @@ def get_mathml_from_file(filepath) -> str:
     return get_mathml_from_bytes(data)
 
 
-def get_mathml_from_latex(eqn) -> str:
+def get_mathml_from_latex(eqn: str) -> str:
     """Read a LaTeX equation string and convert it to presentation MathML"""
 
     # Define the webservice address from the MathJAX service
+    protocol = os.environ.get('SKEMA_MATHJAX_PROTOCOL', 'http://')
     host = os.environ.get('SKEMA_MATHJAX_HOST', '127.0.0.1')
     port = os.environ.get('SKEMA_MATHJAX_PORT', 8031)
-    webservice = host + ':' + port
+    webservice = protocol + host + ':' + port
     print('Connecting to ' + webservice)
 
     # Translate and save each LaTeX string using the NodeJS service for MathJax
