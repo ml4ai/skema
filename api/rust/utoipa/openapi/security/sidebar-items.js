@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ApiKey","Flow","HttpAuthScheme","SecurityScheme"],"struct":["ApiKeyValue","AuthorizationCode","ClientCredentials","Http","HttpBuilder","Implicit","OAuth2","OpenIdConnect","Password","Scopes","SecurityRequirement"]};

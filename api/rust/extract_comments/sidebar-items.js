@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Convention","Language"],"fn":["__stability","__static_ref_initialize","extract_comments_from_directory","extract_comments_from_file","infer_language","main"],"static":["LAZY"],"struct":["CPP_C_EXTENSIONS","Cli","FORTRAN_EXTENSIONS"]};

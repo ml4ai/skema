@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["FnType","FunctionType"],"mod":["config","database","services"],"struct":["Attribute","Files","FunctionNet","Gromet","GrometBox","GrometBoxConditional","GrometBoxLoop","GrometPort","GrometWire","Grounding","Metadata","ModuleCollection","Provenance","TextExtraction","ValueL","ValueMeta"]};

@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from re import A
+import typing
+from collections import defaultdict
+from functools import singledispatchmethod
+
+from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+    call_container_name,
+)
+from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2FN.model.cast import (
+    ScalarType,
+    StructureType,
+    ValueConstructor,
+)
+
+
+class IdCollapsePass:
+    def __init__(self, pipeline_state: PipelineState):
+        self.pipeline_state = pipeline_state
+        # cache Call nodes so after visiting we can determine which Call&#39;s have associated
+        # FunctionDefs
+        # this dict maps call container name to the AnnCastCall node
+        self.cached_call_nodes: typing.Dict[str, AnnCastCall] = {}
+        # during the pass, we collpase Name ids to a range starting from zero
+        self.old_id_to_collapsed_id = {}
+        # this tracks what collapsed ids we have used so far
+        self.collapsed_id_counter = 0
+        # dict mapping collapsed function id to number of invocations
+        # used to populate `invocation_index` of AnnCastCall nodes
+        self.func_invocation_counter = defaultdict(int)
+        for node in self.pipeline_state.nodes:
+            at_module_scope = False
+            self.visit(node, at_module_scope)
+        self.nodes = self.pipeline_state.nodes
+        self.determine_function_defs_for_calls()
+        self.store_highest_id()
+
+    def store_highest_id(self):
+        self.pipeline_state.collapsed_id_counter = self.collapsed_id_counter
+
+    def collapse_id(self, id: int) -&gt; int:
+        &#34;&#34;&#34;
+        Returns the collapsed id for id if it already exists,
+        otherwise creates a collapsed id for it
+        &#34;&#34;&#34;
+        if id not in self.old_id_to_collapsed_id:
+            self.old_id_to_collapsed_id[id] = self.collapsed_id_counter
+            self.collapsed_id_counter += 1
+
+        return self.old_id_to_collapsed_id[id]
+
+    def next_function_invocation(self, coll_func_id: int) -&gt; int:
+        &#34;&#34;&#34;
+        Returns the next invocation index for function with collapsed id `coll_func_id`
+        &#34;&#34;&#34;
+        index = self.func_invocation_counter[coll_func_id]
+        self.func_invocation_counter[coll_func_id] += 1
+
+        return index
+
+    def determine_function_defs_for_calls(self):
+        for call_name, call in self.cached_call_nodes.items():
+            if isinstance(call.func, AnnCastAttribute):
+                func_id = call.func.attr.id
+            else:
+                func_id = call.func.id
+            call.has_func_def = self.pipeline_state.func_def_exists(func_id)
+
+            # DEBUG printing
+            if self.pipeline_state.PRINT_DEBUGGING_INFO:
+                print(f&#34;{call_name} has FunctionDef: {call.has_func_def}&#34;)
+
+    def visit(self, node: AnnCastNode, at_module_scope):
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f&#34;\nProcessing node type {class_name}&#34;)
+        try:
+            return self._visit(node, at_module_scope)
+        except Exception as e:
+            print(
+                f&#34;id_collapse_pass.py: Error for {type(node)} which has source ref information {node.source_refs}&#34;
+            )
+            raise e
+
+    def visit_node_list(
+        self, node_list: typing.List[AnnCastNode], at_module_scope
+    ):
+        return [self.visit(node, at_module_scope) for node in node_list]
+
+    @singledispatchmethod
+    def _visit(self, node: AnnCastNode, at_module_scope):
+        &#34;&#34;&#34;
+        Visit each AnnCastNode, collapsing AnnCastName ids along the way
+        &#34;&#34;&#34;
+        print(node.source_refs[0])
+        raise Exception(f&#34;Unimplemented AST node of type: {type(node)}&#34;)
+
+    @_visit.register
+    def visit_assignment(self, node: AnnCastAssignment, at_module_scope):
+        self.visit(node.right, at_module_scope)
+        # The AnnCastTuple is added to handle scenarios where an assignment
+        # is made by assigning to a tuple of values, as opposed to one singular value
+        assert (
+            isinstance(node.left, AnnCastVar)
+            or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
+            or isinstance(node.left, AnnCastAttribute)
+        ), f&#34;id_collapse: visit_assigment: node.left is {type(node.left)}&#34;
+        self.visit(node.left, at_module_scope)
+
+    @_visit.register
+    def visit_attribute(self, node: AnnCastAttribute, at_module_scope):
+        value = self.visit(node.value, at_module_scope)
+        attr = self.visit(node.attr, at_module_scope)
+
+    @_visit.register
+    def visit_call(self, node: AnnCastCall, at_module_scope):
+        if isinstance(node.func, AnnCastLiteralValue):
+            return
+
+        assert isinstance(node.func, AnnCastName) or isinstance(
+            node.func, AnnCastAttribute
+        ), f&#34;node.func is type f{type(node.func)}&#34;
+        if isinstance(node.func, AnnCastName):
+            node.func.id = self.collapse_id(node.func.id)
+            node.invocation_index = self.next_function_invocation(node.func.id)
+        else:
+            if isinstance(node.func.value, AnnCastCall):
+                self.visit(node.func.value, at_module_scope)
+            elif isinstance(node.func.value, AnnCastAttribute):
+                self.visit(node.func.value, at_module_scope)
+            #elif isinstance(node.func.value, AnnCastSubscript):
+            #    self.visit(node.func.value, at_module_scope)
+            elif isinstance(node.func.value, AnnCastOperator):
+                self.visit(node.func.value, at_module_scope)
+            elif isinstance(node.func.value, AnnCastAssignment):
+                self.visit(node.func.value, at_module_scope)
+            else:
+                if not isinstance(node.func.value, AnnCastLiteralValue):
+                    node.func.value.id = self.collapse_id(node.func.value.id)
+            node.func.attr.id = self.collapse_id(node.func.attr.id)
+            node.invocation_index = self.next_function_invocation(
+                node.func.attr.id
+            )
+
+        # cache Call node to later determine if this Call has a FunctionDef
+        call_name = call_container_name(node)
+        self.cached_call_nodes[call_name] = node
+
+        self.visit_node_list(node.arguments, at_module_scope)
+
+    @_visit.register
+    def visit_record_def(self, node: AnnCastRecordDef, at_module_scope):
+        at_module_scope = False
+
+        # Each base should be an AnnCastName node
+        self.visit_node_list(node.bases, at_module_scope)
+
+        # Each func is an AnnCastFuncDef node
+        self.visit_node_list(node.funcs, at_module_scope)
+
+        # Each field (attribute) is an AnnCastVar node
+        self.visit_node_list(node.fields, at_module_scope)
+
+    @_visit.register
+    def visit_function_def(self, node: AnnCastFunctionDef, at_module_scope):
+        # collapse the function id
+        node.name.id = self.collapse_id(node.name.id)
+        self.pipeline_state.func_id_to_def[node.name.id] = node
+
+        at_module_scope = False
+        self.visit_node_list(node.func_args, at_module_scope)
+        self.visit_node_list(node.body, at_module_scope)
+
+    @_visit.register
+    def visit_literal_value(self, node: AnnCastLiteralValue, at_module_scope):
+        if node.value_type == &#34;List[Any]&#34;:
+            # operator - string
+            # size - Var node or a LiteralValue node (for number)
+            # initial_value - LiteralValue node
+            val = node.value
+            self.visit(val.size, at_module_scope)
+
+            # List literal doesn&#39;t need to add any other changes
+            # to the anncast at this pass
+
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            self.visit_node_list(node.value, at_module_scope)
+        elif node.value_type == ScalarType.INTEGER:
+            pass
+        elif node.value_type == ScalarType.ABSTRACTFLOAT:
+            pass
+        pass
+
+    @_visit.register
+    def visit_loop(self, node: AnnCastLoop, at_module_scope):
+        self.visit_node_list(node.pre, at_module_scope)
+        self.visit(node.expr, at_module_scope)
+        self.visit_node_list(node.body, at_module_scope)
+        self.visit_node_list(node.post, at_module_scope)
+
+    @_visit.register
+    def visit_model_break(self, node: AnnCastModelBreak, at_module_scope):
+        pass
+
+    @_visit.register
+    def visit_model_continue(
+        self, node: AnnCastModelContinue, at_module_scope
+    ):
+        pass
+
+    @_visit.register
+    def visit_model_if(self, node: AnnCastModelIf, at_module_scope):
+        self.visit(node.expr, at_module_scope)
+        self.visit_node_list(node.body, at_module_scope)
+        self.visit_node_list(node.orelse, at_module_scope)
+
+    @_visit.register
+    def visit_return(self, node: AnnCastModelReturn, at_module_scope):
+        self.visit(node.value, at_module_scope)
+
+    @_visit.register
+    def visit_model_import(self, node: AnnCastModelImport, at_module_scope):
+        pass
+
+    @_visit.register
+    def visit_module(self, node: AnnCastModule, at_module_scope):
+        # we cache the module node in the AnnCast object
+        self.pipeline_state.module_node = node
+        at_module_scope = True
+        self.visit_node_list(node.body, at_module_scope)
+
+    @_visit.register
+    def visit_name(self, node: AnnCastName, at_module_scope):
+        node.id = self.collapse_id(node.id)
+
+        # we consider name nodes at the module scope to be globals
+        # and store them in the `used_vars` attribute of the module_node
+        if at_module_scope:
+            self.pipeline_state.module_node.used_vars[node.id] = node.name
+
+    @_visit.register
+    def visit_operator(self, node: AnnCastOperator, at_module_scope):
+        # visit operands
+        self.visit_node_list(node.operands, at_module_scope)
+
+    @_visit.register
+    def visit_var(self, node: AnnCastVar, at_module_scope):
+        self.visit(node.val, at_module_scope)
+        if node.default_value != None:
+            self.visit(node.default_value, at_module_scope)
+
+    @_visit.register
+    def visit_tuple(self, node: AnnCastTuple, at_module_scope):
+        # Tuple of vars: Visit them all to collapse IDs, nothing else to be done I think
+        self.visit_node_list(node.values, at_module_scope)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass"><code class="flex name class">
+<span>class <span class="ident">IdCollapsePass</span></span>
+<span>(</span><span>pipeline_state: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState">PipelineState</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class IdCollapsePass:
+    def __init__(self, pipeline_state: PipelineState):
+        self.pipeline_state = pipeline_state
+        # cache Call nodes so after visiting we can determine which Call&#39;s have associated
+        # FunctionDefs
+        # this dict maps call container name to the AnnCastCall node
+        self.cached_call_nodes: typing.Dict[str, AnnCastCall] = {}
+        # during the pass, we collpase Name ids to a range starting from zero
+        self.old_id_to_collapsed_id = {}
+        # this tracks what collapsed ids we have used so far
+        self.collapsed_id_counter = 0
+        # dict mapping collapsed function id to number of invocations
+        # used to populate `invocation_index` of AnnCastCall nodes
+        self.func_invocation_counter = defaultdict(int)
+        for node in self.pipeline_state.nodes:
+            at_module_scope = False
+            self.visit(node, at_module_scope)
+        self.nodes = self.pipeline_state.nodes
+        self.determine_function_defs_for_calls()
+        self.store_highest_id()
+
+    def store_highest_id(self):
+        self.pipeline_state.collapsed_id_counter = self.collapsed_id_counter
+
+    def collapse_id(self, id: int) -&gt; int:
+        &#34;&#34;&#34;
+        Returns the collapsed id for id if it already exists,
+        otherwise creates a collapsed id for it
+        &#34;&#34;&#34;
+        if id not in self.old_id_to_collapsed_id:
+            self.old_id_to_collapsed_id[id] = self.collapsed_id_counter
+            self.collapsed_id_counter += 1
+
+        return self.old_id_to_collapsed_id[id]
+
+    def next_function_invocation(self, coll_func_id: int) -&gt; int:
+        &#34;&#34;&#34;
+        Returns the next invocation index for function with collapsed id `coll_func_id`
+        &#34;&#34;&#34;
+        index = self.func_invocation_counter[coll_func_id]
+        self.func_invocation_counter[coll_func_id] += 1
+
+        return index
+
+    def determine_function_defs_for_calls(self):
+        for call_name, call in self.cached_call_nodes.items():
+            if isinstance(call.func, AnnCastAttribute):
+                func_id = call.func.attr.id
+            else:
+                func_id = call.func.id
+            call.has_func_def = self.pipeline_state.func_def_exists(func_id)
+
+            # DEBUG printing
+            if self.pipeline_state.PRINT_DEBUGGING_INFO:
+                print(f&#34;{call_name} has FunctionDef: {call.has_func_def}&#34;)
+
+    def visit(self, node: AnnCastNode, at_module_scope):
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f&#34;\nProcessing node type {class_name}&#34;)
+        try:
+            return self._visit(node, at_module_scope)
+        except Exception as e:
+            print(
+                f&#34;id_collapse_pass.py: Error for {type(node)} which has source ref information {node.source_refs}&#34;
+            )
+            raise e
+
+    def visit_node_list(
+        self, node_list: typing.List[AnnCastNode], at_module_scope
+    ):
+        return [self.visit(node, at_module_scope) for node in node_list]
+
+    @singledispatchmethod
+    def _visit(self, node: AnnCastNode, at_module_scope):
+        &#34;&#34;&#34;
+        Visit each AnnCastNode, collapsing AnnCastName ids along the way
+        &#34;&#34;&#34;
+        print(node.source_refs[0])
+        raise Exception(f&#34;Unimplemented AST node of type: {type(node)}&#34;)
+
+    @_visit.register
+    def visit_assignment(self, node: AnnCastAssignment, at_module_scope):
+        self.visit(node.right, at_module_scope)
+        # The AnnCastTuple is added to handle scenarios where an assignment
+        # is made by assigning to a tuple of values, as opposed to one singular value
+        assert (
+            isinstance(node.left, AnnCastVar)
+            or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
+            or isinstance(node.left, AnnCastAttribute)
+        ), f&#34;id_collapse: visit_assigment: node.left is {type(node.left)}&#34;
+        self.visit(node.left, at_module_scope)
+
+    @_visit.register
+    def visit_attribute(self, node: AnnCastAttribute, at_module_scope):
+        value = self.visit(node.value, at_module_scope)
+        attr = self.visit(node.attr, at_module_scope)
+
+    @_visit.register
+    def visit_call(self, node: AnnCastCall, at_module_scope):
+        if isinstance(node.func, AnnCastLiteralValue):
+            return
+
+        assert isinstance(node.func, AnnCastName) or isinstance(
+            node.func, AnnCastAttribute
+        ), f&#34;node.func is type f{type(node.func)}&#34;
+        if isinstance(node.func, AnnCastName):
+            node.func.id = self.collapse_id(node.func.id)
+            node.invocation_index = self.next_function_invocation(node.func.id)
+        else:
+            if isinstance(node.func.value, AnnCastCall):
+                self.visit(node.func.value, at_module_scope)
+            elif isinstance(node.func.value, AnnCastAttribute):
+                self.visit(node.func.value, at_module_scope)
+            #elif isinstance(node.func.value, AnnCastSubscript):
+            #    self.visit(node.func.value, at_module_scope)
+            elif isinstance(node.func.value, AnnCastOperator):
+                self.visit(node.func.value, at_module_scope)
+            elif isinstance(node.func.value, AnnCastAssignment):
+                self.visit(node.func.value, at_module_scope)
+            else:
+                if not isinstance(node.func.value, AnnCastLiteralValue):
+                    node.func.value.id = self.collapse_id(node.func.value.id)
+            node.func.attr.id = self.collapse_id(node.func.attr.id)
+            node.invocation_index = self.next_function_invocation(
+                node.func.attr.id
+            )
+
+        # cache Call node to later determine if this Call has a FunctionDef
+        call_name = call_container_name(node)
+        self.cached_call_nodes[call_name] = node
+
+        self.visit_node_list(node.arguments, at_module_scope)
+
+    @_visit.register
+    def visit_record_def(self, node: AnnCastRecordDef, at_module_scope):
+        at_module_scope = False
+
+        # Each base should be an AnnCastName node
+        self.visit_node_list(node.bases, at_module_scope)
+
+        # Each func is an AnnCastFuncDef node
+        self.visit_node_list(node.funcs, at_module_scope)
+
+        # Each field (attribute) is an AnnCastVar node
+        self.visit_node_list(node.fields, at_module_scope)
+
+    @_visit.register
+    def visit_function_def(self, node: AnnCastFunctionDef, at_module_scope):
+        # collapse the function id
+        node.name.id = self.collapse_id(node.name.id)
+        self.pipeline_state.func_id_to_def[node.name.id] = node
+
+        at_module_scope = False
+        self.visit_node_list(node.func_args, at_module_scope)
+        self.visit_node_list(node.body, at_module_scope)
+
+    @_visit.register
+    def visit_literal_value(self, node: AnnCastLiteralValue, at_module_scope):
+        if node.value_type == &#34;List[Any]&#34;:
+            # operator - string
+            # size - Var node or a LiteralValue node (for number)
+            # initial_value - LiteralValue node
+            val = node.value
+            self.visit(val.size, at_module_scope)
+
+            # List literal doesn&#39;t need to add any other changes
+            # to the anncast at this pass
+
+        elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+            self.visit_node_list(node.value, at_module_scope)
+        elif node.value_type == ScalarType.INTEGER:
+            pass
+        elif node.value_type == ScalarType.ABSTRACTFLOAT:
+            pass
+        pass
+
+    @_visit.register
+    def visit_loop(self, node: AnnCastLoop, at_module_scope):
+        self.visit_node_list(node.pre, at_module_scope)
+        self.visit(node.expr, at_module_scope)
+        self.visit_node_list(node.body, at_module_scope)
+        self.visit_node_list(node.post, at_module_scope)
+
+    @_visit.register
+    def visit_model_break(self, node: AnnCastModelBreak, at_module_scope):
+        pass
+
+    @_visit.register
+    def visit_model_continue(
+        self, node: AnnCastModelContinue, at_module_scope
+    ):
+        pass
+
+    @_visit.register
+    def visit_model_if(self, node: AnnCastModelIf, at_module_scope):
+        self.visit(node.expr, at_module_scope)
+        self.visit_node_list(node.body, at_module_scope)
+        self.visit_node_list(node.orelse, at_module_scope)
+
+    @_visit.register
+    def visit_return(self, node: AnnCastModelReturn, at_module_scope):
+        self.visit(node.value, at_module_scope)
+
+    @_visit.register
+    def visit_model_import(self, node: AnnCastModelImport, at_module_scope):
+        pass
+
+    @_visit.register
+    def visit_module(self, node: AnnCastModule, at_module_scope):
+        # we cache the module node in the AnnCast object
+        self.pipeline_state.module_node = node
+        at_module_scope = True
+        self.visit_node_list(node.body, at_module_scope)
+
+    @_visit.register
+    def visit_name(self, node: AnnCastName, at_module_scope):
+        node.id = self.collapse_id(node.id)
+
+        # we consider name nodes at the module scope to be globals
+        # and store them in the `used_vars` attribute of the module_node
+        if at_module_scope:
+            self.pipeline_state.module_node.used_vars[node.id] = node.name
+
+    @_visit.register
+    def visit_operator(self, node: AnnCastOperator, at_module_scope):
+        # visit operands
+        self.visit_node_list(node.operands, at_module_scope)
+
+    @_visit.register
+    def visit_var(self, node: AnnCastVar, at_module_scope):
+        self.visit(node.val, at_module_scope)
+        if node.default_value != None:
+            self.visit(node.default_value, at_module_scope)
+
+    @_visit.register
+    def visit_tuple(self, node: AnnCastTuple, at_module_scope):
+        # Tuple of vars: Visit them all to collapse IDs, nothing else to be done I think
+        self.visit_node_list(node.values, at_module_scope)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.collapse_id"><code class="name flex">
+<span>def <span class="ident">collapse_id</span></span>(<span>self, id: int) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the collapsed id for id if it already exists,
+otherwise creates a collapsed id for it</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def collapse_id(self, id: int) -&gt; int:
+    &#34;&#34;&#34;
+    Returns the collapsed id for id if it already exists,
+    otherwise creates a collapsed id for it
+    &#34;&#34;&#34;
+    if id not in self.old_id_to_collapsed_id:
+        self.old_id_to_collapsed_id[id] = self.collapsed_id_counter
+        self.collapsed_id_counter += 1
+
+    return self.old_id_to_collapsed_id[id]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.determine_function_defs_for_calls"><code class="name flex">
+<span>def <span class="ident">determine_function_defs_for_calls</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def determine_function_defs_for_calls(self):
+    for call_name, call in self.cached_call_nodes.items():
+        if isinstance(call.func, AnnCastAttribute):
+            func_id = call.func.attr.id
+        else:
+            func_id = call.func.id
+        call.has_func_def = self.pipeline_state.func_def_exists(func_id)
+
+        # DEBUG printing
+        if self.pipeline_state.PRINT_DEBUGGING_INFO:
+            print(f&#34;{call_name} has FunctionDef: {call.has_func_def}&#34;)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.next_function_invocation"><code class="name flex">
+<span>def <span class="ident">next_function_invocation</span></span>(<span>self, coll_func_id: int) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the next invocation index for function with collapsed id <code>coll_func_id</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def next_function_invocation(self, coll_func_id: int) -&gt; int:
+    &#34;&#34;&#34;
+    Returns the next invocation index for function with collapsed id `coll_func_id`
+    &#34;&#34;&#34;
+    index = self.func_invocation_counter[coll_func_id]
+    self.func_invocation_counter[coll_func_id] += 1
+
+    return index</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.store_highest_id"><code class="name flex">
+<span>def <span class="ident">store_highest_id</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def store_highest_id(self):
+    self.pipeline_state.collapsed_id_counter = self.collapsed_id_counter</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit(self, node: AnnCastNode, at_module_scope):
+    # print current node being visited.
+    # this can be useful for debugging
+    # class_name = node.__class__.__name__
+    # print(f&#34;\nProcessing node type {class_name}&#34;)
+    try:
+        return self._visit(node, at_module_scope)
+    except Exception as e:
+        print(
+            f&#34;id_collapse_pass.py: Error for {type(node)} which has source ref information {node.source_refs}&#34;
+        )
+        raise e</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_assignment"><code class="name flex">
+<span>def <span class="ident">visit_assignment</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment">AnnCastAssignment</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_assignment(self, node: AnnCastAssignment, at_module_scope):
+    self.visit(node.right, at_module_scope)
+    # The AnnCastTuple is added to handle scenarios where an assignment
+    # is made by assigning to a tuple of values, as opposed to one singular value
+    assert (
+        isinstance(node.left, AnnCastVar)
+        or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
+        or isinstance(node.left, AnnCastAttribute)
+    ), f&#34;id_collapse: visit_assigment: node.left is {type(node.left)}&#34;
+    self.visit(node.left, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_attribute"><code class="name flex">
+<span>def <span class="ident">visit_attribute</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute">AnnCastAttribute</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_attribute(self, node: AnnCastAttribute, at_module_scope):
+    value = self.visit(node.value, at_module_scope)
+    attr = self.visit(node.attr, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_call"><code class="name flex">
+<span>def <span class="ident">visit_call</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall">AnnCastCall</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_call(self, node: AnnCastCall, at_module_scope):
+    if isinstance(node.func, AnnCastLiteralValue):
+        return
+
+    assert isinstance(node.func, AnnCastName) or isinstance(
+        node.func, AnnCastAttribute
+    ), f&#34;node.func is type f{type(node.func)}&#34;
+    if isinstance(node.func, AnnCastName):
+        node.func.id = self.collapse_id(node.func.id)
+        node.invocation_index = self.next_function_invocation(node.func.id)
+    else:
+        if isinstance(node.func.value, AnnCastCall):
+            self.visit(node.func.value, at_module_scope)
+        elif isinstance(node.func.value, AnnCastAttribute):
+            self.visit(node.func.value, at_module_scope)
+        #elif isinstance(node.func.value, AnnCastSubscript):
+        #    self.visit(node.func.value, at_module_scope)
+        elif isinstance(node.func.value, AnnCastOperator):
+            self.visit(node.func.value, at_module_scope)
+        elif isinstance(node.func.value, AnnCastAssignment):
+            self.visit(node.func.value, at_module_scope)
+        else:
+            if not isinstance(node.func.value, AnnCastLiteralValue):
+                node.func.value.id = self.collapse_id(node.func.value.id)
+        node.func.attr.id = self.collapse_id(node.func.attr.id)
+        node.invocation_index = self.next_function_invocation(
+            node.func.attr.id
+        )
+
+    # cache Call node to later determine if this Call has a FunctionDef
+    call_name = call_container_name(node)
+    self.cached_call_nodes[call_name] = node
+
+    self.visit_node_list(node.arguments, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_function_def"><code class="name flex">
+<span>def <span class="ident">visit_function_def</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef">AnnCastFunctionDef</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_function_def(self, node: AnnCastFunctionDef, at_module_scope):
+    # collapse the function id
+    node.name.id = self.collapse_id(node.name.id)
+    self.pipeline_state.func_id_to_def[node.name.id] = node
+
+    at_module_scope = False
+    self.visit_node_list(node.func_args, at_module_scope)
+    self.visit_node_list(node.body, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_literal_value"><code class="name flex">
+<span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue">AnnCastLiteralValue</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_literal_value(self, node: AnnCastLiteralValue, at_module_scope):
+    if node.value_type == &#34;List[Any]&#34;:
+        # operator - string
+        # size - Var node or a LiteralValue node (for number)
+        # initial_value - LiteralValue node
+        val = node.value
+        self.visit(val.size, at_module_scope)
+
+        # List literal doesn&#39;t need to add any other changes
+        # to the anncast at this pass
+
+    elif node.value_type == StructureType.TUPLE: # or node.value_type == StructureType.LIST:
+        self.visit_node_list(node.value, at_module_scope)
+    elif node.value_type == ScalarType.INTEGER:
+        pass
+    elif node.value_type == ScalarType.ABSTRACTFLOAT:
+        pass
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_loop"><code class="name flex">
+<span>def <span class="ident">visit_loop</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop">AnnCastLoop</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_loop(self, node: AnnCastLoop, at_module_scope):
+    self.visit_node_list(node.pre, at_module_scope)
+    self.visit(node.expr, at_module_scope)
+    self.visit_node_list(node.body, at_module_scope)
+    self.visit_node_list(node.post, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_break"><code class="name flex">
+<span>def <span class="ident">visit_model_break</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak">AnnCastModelBreak</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_break(self, node: AnnCastModelBreak, at_module_scope):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_continue"><code class="name flex">
+<span>def <span class="ident">visit_model_continue</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue">AnnCastModelContinue</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_continue(
+    self, node: AnnCastModelContinue, at_module_scope
+):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_if"><code class="name flex">
+<span>def <span class="ident">visit_model_if</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf">AnnCastModelIf</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_if(self, node: AnnCastModelIf, at_module_scope):
+    self.visit(node.expr, at_module_scope)
+    self.visit_node_list(node.body, at_module_scope)
+    self.visit_node_list(node.orelse, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_import"><code class="name flex">
+<span>def <span class="ident">visit_model_import</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport">AnnCastModelImport</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_import(self, node: AnnCastModelImport, at_module_scope):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_module"><code class="name flex">
+<span>def <span class="ident">visit_module</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule">AnnCastModule</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_module(self, node: AnnCastModule, at_module_scope):
+    # we cache the module node in the AnnCast object
+    self.pipeline_state.module_node = node
+    at_module_scope = True
+    self.visit_node_list(node.body, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_name"><code class="name flex">
+<span>def <span class="ident">visit_name</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName">AnnCastName</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_name(self, node: AnnCastName, at_module_scope):
+    node.id = self.collapse_id(node.id)
+
+    # we consider name nodes at the module scope to be globals
+    # and store them in the `used_vars` attribute of the module_node
+    if at_module_scope:
+        self.pipeline_state.module_node.used_vars[node.id] = node.name</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_node_list"><code class="name flex">
+<span>def <span class="ident">visit_node_list</span></span>(<span>self, node_list: List[<a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a>], at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_node_list(
+    self, node_list: typing.List[AnnCastNode], at_module_scope
+):
+    return [self.visit(node, at_module_scope) for node in node_list]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_operator"><code class="name flex">
+<span>def <span class="ident">visit_operator</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator">AnnCastOperator</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_operator(self, node: AnnCastOperator, at_module_scope):
+    # visit operands
+    self.visit_node_list(node.operands, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_record_def"><code class="name flex">
+<span>def <span class="ident">visit_record_def</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef">AnnCastRecordDef</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_record_def(self, node: AnnCastRecordDef, at_module_scope):
+    at_module_scope = False
+
+    # Each base should be an AnnCastName node
+    self.visit_node_list(node.bases, at_module_scope)
+
+    # Each func is an AnnCastFuncDef node
+    self.visit_node_list(node.funcs, at_module_scope)
+
+    # Each field (attribute) is an AnnCastVar node
+    self.visit_node_list(node.fields, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_return"><code class="name flex">
+<span>def <span class="ident">visit_return</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn">AnnCastModelReturn</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_return(self, node: AnnCastModelReturn, at_module_scope):
+    self.visit(node.value, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_tuple"><code class="name flex">
+<span>def <span class="ident">visit_tuple</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple">AnnCastTuple</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_tuple(self, node: AnnCastTuple, at_module_scope):
+    # Tuple of vars: Visit them all to collapse IDs, nothing else to be done I think
+    self.visit_node_list(node.values, at_module_scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_var"><code class="name flex">
+<span>def <span class="ident">visit_var</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar">AnnCastVar</a>, at_module_scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_var(self, node: AnnCastVar, at_module_scope):
+    self.visit(node.val, at_module_scope)
+    if node.default_value != None:
+        self.visit(node.default_value, at_module_scope)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast" href="index.html">skema.program_analysis.CAST2FN.ann_cast</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass">IdCollapsePass</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.collapse_id" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.collapse_id">collapse_id</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.determine_function_defs_for_calls" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.determine_function_defs_for_calls">determine_function_defs_for_calls</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.next_function_invocation" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.next_function_invocation">next_function_invocation</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.store_highest_id" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.store_highest_id">store_highest_id</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit">visit</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_assignment" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_assignment">visit_assignment</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_attribute" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_attribute">visit_attribute</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_call" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_call">visit_call</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_function_def">visit_function_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_literal_value">visit_literal_value</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_loop">visit_loop</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_break">visit_model_break</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_continue" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_continue">visit_model_continue</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_if" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_if">visit_model_if</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_import" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_model_import">visit_model_import</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_module" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_module">visit_module</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_name" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_name">visit_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_node_list" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_node_list">visit_node_list</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_operator" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_operator">visit_operator</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_record_def" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_record_def">visit_record_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_return" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_return">visit_return</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_tuple" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_tuple">visit_tuple</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_var" href="#skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass.IdCollapsePass.visit_var">visit_var</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

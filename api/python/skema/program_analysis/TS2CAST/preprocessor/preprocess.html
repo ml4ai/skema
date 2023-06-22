@@ -1,0 +1,684 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.TS2CAST.preprocessor.preprocess API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.TS2CAST.preprocessor.preprocess</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import argparse
+import re
+import os
+import shutil
+from typing import List
+from subprocess import run, PIPE
+
+from tree_sitter import Parser, Node, Language, Tree
+
+from skema.program_analysis.TS2CAST.build_tree_sitter_fortran import (
+    LANGUAGE_LIBRARY_REL_PATH,
+)
+
+
+def preprocess(
+    source_path: str,
+    out_path: str,
+    overwrite=False,
+    out_missing_includes=False,
+    out_gcc=False,
+    out_unsupported=False,
+    out_corrected=False,
+    out_parse=False,
+) -&gt; Tree:
+    &#34;&#34;&#34;Run the full preprocessing pipeline for Fortran-&gt;Tree-Sitter-&gt;CAST
+    Takes the original source as input and will return the tree-sitter parse tree as output
+    An intermediary directory will also be created containing:
+    1. A log of missing files that are included by preprocessor directives in the source code
+    2. The intermediary product from running the c-preprocessor
+    3. A log of unsupported idioms
+    4. The source code with unsupported idioms corrected
+    5. The tree-sitter parse tree
+    &#34;&#34;&#34;
+
+    source = open(source_path, &#34;r&#34;).read()
+    source_file_name = os.path.basename(source_path).split(&#34;.&#34;)[0]
+    source_directory = os.path.dirname(source_path)
+    include_base_directory = os.path.join(
+        source_directory, f&#34;include_{source_file_name}&#34;
+    )
+
+    # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
+    try:
+        os.mkdir(out_path)
+    except FileExistsError:
+        if not overwrite:
+            exit()
+
+    # Step 1: Check for missing included files
+    missing_includes = check_for_missing_includes(source_path)
+    if out_missing_includes:
+        missing_includes_path = os.path.join(out_path, &#34;missing_includes.txt&#34;)
+        with open(missing_includes_path, &#34;w&#34;) as f:
+            f.write(&#34;\n&#34;.join(missing_includes))
+    if len(missing_includes) &gt; 0:
+        print(&#34;Missing required included files, missing files were:&#34;)
+        for include in missing_includes:
+            print(include)
+        exit()
+
+    # Step 2: Correct include directives to remove system references
+    source = fix_include_directives(source)
+
+    # Step 3: Process with gcc c-preprocessor
+    source = run_c_preprocessor(source, include_base_directory)
+    if out_gcc:
+        gcc_path = os.path.join(out_path, &#34;gcc.F&#34;)
+        with open(gcc_path, &#34;w&#34;) as f:
+            f.write(source)
+
+    # Step 4: Prepare for tree-sitter
+    # This step removes any additional preprocessor directives added or not removed by GCC
+    source = &#34;\n&#34;.join(
+        [&#34;!&#34; + line if line.startswith(&#34;#&#34;) else line for line in source.splitlines()]
+    )
+
+    # Step 5: Check for unsupported idioms
+    if out_unsupported:
+        unsupported_path = os.path.join(out_path, &#34;unsupported_idioms.txt&#34;)
+        with open(unsupported_path, &#34;w&#34;) as f:
+            f.writelines(search_for_unsupported_idioms(source, &#34;idioms_regex.txt&#34;))
+
+    # Step 6 : Fix unsupported idioms
+    source = fix_unsupported_idioms(source)
+    if out_corrected:
+        corrected_path = os.path.join(out_path, &#34;corrected.F&#34;)
+        with open(corrected_path, &#34;w&#34;) as f:
+            f.write(source)
+
+    # Stage 7: Parse with tree-sitter
+    parse_tree = tree_sitter_parse(source)
+    if out_parse:
+        parse_path = os.path.join(out_path, &#34;parse_tree.txt&#34;)
+        with open(parse_path, &#34;w&#34;) as f:
+            f.write(parse_tree.root_node.sexp())
+
+    return parse_tree
+
+
+def check_for_missing_includes(source_path: str):
+    &#34;&#34;&#34;Gathers all required includes and check if they have been added to the include_SOURCE directory&#34;&#34;&#34;
+
+    def produce_include_summary(source: str) -&gt; List:
+        &#34;&#34;&#34;Uses regex to produce a list of all included files in a source&#34;&#34;&#34;
+        includes = []
+
+        system_re = &#34;#include\s+&lt;(.*)&gt;&#34;
+        local_re = &#39;#include\s+&#34;(.*)&#34;&#39;
+
+        for match in re.finditer(system_re, source):
+            includes.append(match.group(1))
+        for match in re.finditer(local_re, source):
+            includes.append(match.group(1))
+
+        return includes
+
+    missing_files = []
+
+    # First we will check for the include directory
+    source_file_name = os.path.basename(source_path).split(&#34;.&#34;)[0]
+    source_directory = os.path.dirname(source_path)
+    include_base_directory = os.path.join(
+        source_directory, f&#34;include_{source_file_name}&#34;
+    )
+    if not os.path.isdir(include_base_directory):
+        missing_files.append(include_base_directory)
+        return missing_files
+
+    # Add original source to includes directory
+    shutil.copy2(source_path, include_base_directory)
+
+    # Next gather all includes in each source file
+    includes = []
+    for dirpath, dirnames, filenames in os.walk(include_base_directory):
+        for file in filenames:
+            file_source = open(os.path.join(dirpath, file), &#34;r&#34;).read()
+            includes.extend(produce_include_summary(file_source))
+
+    # Check for missing files
+    already_checked = set()
+    for include in includes:
+        if include in already_checked:
+            continue
+        if not os.path.isfile(os.path.join(include_base_directory, include)):
+            missing_files.append(include)
+        already_checked.add(include)
+    return missing_files
+
+
+def search_for_unsupported_idioms(source: str, idioms_regex_path: str):
+    &#34;&#34;&#34;Check source string for unsupported idioms using regex. Returns a log of found matches as well as line information&#34;&#34;&#34;
+    log = []
+    lines = open(idioms_regex_path, &#34;r&#34;).read().splitlines()
+    for line in lines:
+        for match in re.finditer(line, source, flags=re.MULTILINE):
+            line_number = source[: match.span()[0]].count(&#34;\n&#34;)
+            log.append(f&#34;Found unsupported idiom matching regex: {line}&#34; + &#34;\n&#34;)
+            log.append(f&#34;Match was: {match.group(0)}&#34; + &#34;\n&#34;)
+            log.append(f&#34;Line was: {line_number}&#34; + &#34;\n&#34;)
+            log.append(f&#34;\n&#34;)
+    return log
+
+
+def fix_unsupported_idioms(source: str):
+    &#34;&#34;&#34;
+    Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
+    1. Replaces the first occurrence of &#39;|&#39; with &#39;&amp;&#39; if it is the first non-whitespace character in the line.
+    2. Adds an additional &#39;&amp;&#39; to the previous line
+    &#34;&#34;&#34;
+    processed_lines = []
+    for i, line in enumerate(source.splitlines()):
+        if line.lstrip().startswith(&#34;|&#34;):
+            line = line.replace(&#34;|&#34;, &#34;&amp;&#34;, 1)
+            processed_lines[-1] += &#34;&amp;&#34;
+        processed_lines.append(line)
+    source = &#34;\n&#34;.join(processed_lines)
+
+    return source
+
+
+def fix_include_directives(source: str) -&gt; str:
+    &#34;&#34;&#34;There are a few corrections we need to make to the include statements
+    1. Convert system level includes to local includes
+    &#34;&#34;&#34;
+    processed_lines = []
+    for i, line in enumerate(source.splitlines()):
+        if &#34;#include&#34; in line:
+            line = line.replace(&#34;&lt;&#34;, &#39;&#34;&#39;).replace(&#34;&gt;&#34;, &#39;&#34;&#39;)
+        processed_lines.append(line)
+    source = &#34;\n&#34;.join(processed_lines)
+
+    return source
+
+
+def run_c_preprocessor(source: str, include_base_path: str) -&gt; str:
+    &#34;&#34;&#34;Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files&#34;&#34;&#34;
+    result = run(
+        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-&#34;],
+        input=source,
+        text=True,
+        capture_output=True,
+        universal_newlines=True,
+        cwd=include_base_path,
+    )
+    return result.stdout
+
+
+def tree_sitter_parse(source: str) -&gt; Tree:
+    &#34;&#34;&#34;Use tree-sitter to parse the source code and output the parse tree&#34;&#34;&#34;
+    parser = Parser()
+
+    parser.set_language(
+        Language(
+            os.path.join(os.path.dirname(&#34;../&#34;), LANGUAGE_LIBRARY_REL_PATH), &#34;fortran&#34;
+        )
+    )
+
+    return parser.parse(bytes(source, &#34;utf8&#34;))
+
+
+def main():
+    &#34;&#34;&#34;Run the preprocessor as a script&#34;&#34;&#34;
+    parser = argparse.ArgumentParser(description=&#34;Fortran preprocessing script&#34;)
+    parser.add_argument(&#34;source_path&#34;, type=str, help=&#34;Path to the source file&#34;)
+    parser.add_argument(&#34;out_path&#34;, type=str, help=&#34;Output directory path&#34;)
+    parser.add_argument(
+        &#34;-o&#34;,
+        &#34;--overwrite&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Overwrite existing output directory&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_missing_includes&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output missing includes log&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_gcc&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output source after running the GCC preprocessor&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_unsupported&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output unsupported idioms log&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_corrected&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output source after fixing unsupported idioms&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_parse&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output tree-sitter parse tree&#34;,
+    )
+    args = parser.parse_args()
+
+    preprocess(
+        args.source_path,
+        args.out_path,
+        args.overwrite,
+        args.out_missing_includes,
+        args.out_gcc,
+        args.out_unsupported,
+        args.out_corrected,
+        args.out_parse,
+    )
+
+
+if __name__ == &#34;__main__&#34;:
+    main()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.check_for_missing_includes"><code class="name flex">
+<span>def <span class="ident">check_for_missing_includes</span></span>(<span>source_path: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gathers all required includes and check if they have been added to the include_SOURCE directory</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_for_missing_includes(source_path: str):
+    &#34;&#34;&#34;Gathers all required includes and check if they have been added to the include_SOURCE directory&#34;&#34;&#34;
+
+    def produce_include_summary(source: str) -&gt; List:
+        &#34;&#34;&#34;Uses regex to produce a list of all included files in a source&#34;&#34;&#34;
+        includes = []
+
+        system_re = &#34;#include\s+&lt;(.*)&gt;&#34;
+        local_re = &#39;#include\s+&#34;(.*)&#34;&#39;
+
+        for match in re.finditer(system_re, source):
+            includes.append(match.group(1))
+        for match in re.finditer(local_re, source):
+            includes.append(match.group(1))
+
+        return includes
+
+    missing_files = []
+
+    # First we will check for the include directory
+    source_file_name = os.path.basename(source_path).split(&#34;.&#34;)[0]
+    source_directory = os.path.dirname(source_path)
+    include_base_directory = os.path.join(
+        source_directory, f&#34;include_{source_file_name}&#34;
+    )
+    if not os.path.isdir(include_base_directory):
+        missing_files.append(include_base_directory)
+        return missing_files
+
+    # Add original source to includes directory
+    shutil.copy2(source_path, include_base_directory)
+
+    # Next gather all includes in each source file
+    includes = []
+    for dirpath, dirnames, filenames in os.walk(include_base_directory):
+        for file in filenames:
+            file_source = open(os.path.join(dirpath, file), &#34;r&#34;).read()
+            includes.extend(produce_include_summary(file_source))
+
+    # Check for missing files
+    already_checked = set()
+    for include in includes:
+        if include in already_checked:
+            continue
+        if not os.path.isfile(os.path.join(include_base_directory, include)):
+            missing_files.append(include)
+        already_checked.add(include)
+    return missing_files</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.fix_include_directives"><code class="name flex">
+<span>def <span class="ident">fix_include_directives</span></span>(<span>source: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>There are a few corrections we need to make to the include statements
+1. Convert system level includes to local includes</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fix_include_directives(source: str) -&gt; str:
+    &#34;&#34;&#34;There are a few corrections we need to make to the include statements
+    1. Convert system level includes to local includes
+    &#34;&#34;&#34;
+    processed_lines = []
+    for i, line in enumerate(source.splitlines()):
+        if &#34;#include&#34; in line:
+            line = line.replace(&#34;&lt;&#34;, &#39;&#34;&#39;).replace(&#34;&gt;&#34;, &#39;&#34;&#39;)
+        processed_lines.append(line)
+    source = &#34;\n&#34;.join(processed_lines)
+
+    return source</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.fix_unsupported_idioms"><code class="name flex">
+<span>def <span class="ident">fix_unsupported_idioms</span></span>(<span>source: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
+1. Replaces the first occurrence of '|' with '&amp;' if it is the first non-whitespace character in the line.
+2. Adds an additional '&amp;' to the previous line</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def fix_unsupported_idioms(source: str):
+    &#34;&#34;&#34;
+    Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
+    1. Replaces the first occurrence of &#39;|&#39; with &#39;&amp;&#39; if it is the first non-whitespace character in the line.
+    2. Adds an additional &#39;&amp;&#39; to the previous line
+    &#34;&#34;&#34;
+    processed_lines = []
+    for i, line in enumerate(source.splitlines()):
+        if line.lstrip().startswith(&#34;|&#34;):
+            line = line.replace(&#34;|&#34;, &#34;&amp;&#34;, 1)
+            processed_lines[-1] += &#34;&amp;&#34;
+        processed_lines.append(line)
+    source = &#34;\n&#34;.join(processed_lines)
+
+    return source</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.main"><code class="name flex">
+<span>def <span class="ident">main</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run the preprocessor as a script</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def main():
+    &#34;&#34;&#34;Run the preprocessor as a script&#34;&#34;&#34;
+    parser = argparse.ArgumentParser(description=&#34;Fortran preprocessing script&#34;)
+    parser.add_argument(&#34;source_path&#34;, type=str, help=&#34;Path to the source file&#34;)
+    parser.add_argument(&#34;out_path&#34;, type=str, help=&#34;Output directory path&#34;)
+    parser.add_argument(
+        &#34;-o&#34;,
+        &#34;--overwrite&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Overwrite existing output directory&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_missing_includes&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output missing includes log&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_gcc&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output source after running the GCC preprocessor&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_unsupported&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output unsupported idioms log&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_corrected&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output source after fixing unsupported idioms&#34;,
+    )
+    parser.add_argument(
+        &#34;--out_parse&#34;,
+        action=&#34;store_true&#34;,
+        help=&#34;Output tree-sitter parse tree&#34;,
+    )
+    args = parser.parse_args()
+
+    preprocess(
+        args.source_path,
+        args.out_path,
+        args.overwrite,
+        args.out_missing_includes,
+        args.out_gcc,
+        args.out_unsupported,
+        args.out_corrected,
+        args.out_parse,
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.preprocess"><code class="name flex">
+<span>def <span class="ident">preprocess</span></span>(<span>source_path: str, out_path: str, overwrite=False, out_missing_includes=False, out_gcc=False, out_unsupported=False, out_corrected=False, out_parse=False) ‑> tree_sitter.Tree</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run the full preprocessing pipeline for Fortran-&gt;Tree-Sitter-&gt;CAST
+Takes the original source as input and will return the tree-sitter parse tree as output
+An intermediary directory will also be created containing:
+1. A log of missing files that are included by preprocessor directives in the source code
+2. The intermediary product from running the c-preprocessor
+3. A log of unsupported idioms
+4. The source code with unsupported idioms corrected
+5. The tree-sitter parse tree</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preprocess(
+    source_path: str,
+    out_path: str,
+    overwrite=False,
+    out_missing_includes=False,
+    out_gcc=False,
+    out_unsupported=False,
+    out_corrected=False,
+    out_parse=False,
+) -&gt; Tree:
+    &#34;&#34;&#34;Run the full preprocessing pipeline for Fortran-&gt;Tree-Sitter-&gt;CAST
+    Takes the original source as input and will return the tree-sitter parse tree as output
+    An intermediary directory will also be created containing:
+    1. A log of missing files that are included by preprocessor directives in the source code
+    2. The intermediary product from running the c-preprocessor
+    3. A log of unsupported idioms
+    4. The source code with unsupported idioms corrected
+    5. The tree-sitter parse tree
+    &#34;&#34;&#34;
+
+    source = open(source_path, &#34;r&#34;).read()
+    source_file_name = os.path.basename(source_path).split(&#34;.&#34;)[0]
+    source_directory = os.path.dirname(source_path)
+    include_base_directory = os.path.join(
+        source_directory, f&#34;include_{source_file_name}&#34;
+    )
+
+    # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
+    try:
+        os.mkdir(out_path)
+    except FileExistsError:
+        if not overwrite:
+            exit()
+
+    # Step 1: Check for missing included files
+    missing_includes = check_for_missing_includes(source_path)
+    if out_missing_includes:
+        missing_includes_path = os.path.join(out_path, &#34;missing_includes.txt&#34;)
+        with open(missing_includes_path, &#34;w&#34;) as f:
+            f.write(&#34;\n&#34;.join(missing_includes))
+    if len(missing_includes) &gt; 0:
+        print(&#34;Missing required included files, missing files were:&#34;)
+        for include in missing_includes:
+            print(include)
+        exit()
+
+    # Step 2: Correct include directives to remove system references
+    source = fix_include_directives(source)
+
+    # Step 3: Process with gcc c-preprocessor
+    source = run_c_preprocessor(source, include_base_directory)
+    if out_gcc:
+        gcc_path = os.path.join(out_path, &#34;gcc.F&#34;)
+        with open(gcc_path, &#34;w&#34;) as f:
+            f.write(source)
+
+    # Step 4: Prepare for tree-sitter
+    # This step removes any additional preprocessor directives added or not removed by GCC
+    source = &#34;\n&#34;.join(
+        [&#34;!&#34; + line if line.startswith(&#34;#&#34;) else line for line in source.splitlines()]
+    )
+
+    # Step 5: Check for unsupported idioms
+    if out_unsupported:
+        unsupported_path = os.path.join(out_path, &#34;unsupported_idioms.txt&#34;)
+        with open(unsupported_path, &#34;w&#34;) as f:
+            f.writelines(search_for_unsupported_idioms(source, &#34;idioms_regex.txt&#34;))
+
+    # Step 6 : Fix unsupported idioms
+    source = fix_unsupported_idioms(source)
+    if out_corrected:
+        corrected_path = os.path.join(out_path, &#34;corrected.F&#34;)
+        with open(corrected_path, &#34;w&#34;) as f:
+            f.write(source)
+
+    # Stage 7: Parse with tree-sitter
+    parse_tree = tree_sitter_parse(source)
+    if out_parse:
+        parse_path = os.path.join(out_path, &#34;parse_tree.txt&#34;)
+        with open(parse_path, &#34;w&#34;) as f:
+            f.write(parse_tree.root_node.sexp())
+
+    return parse_tree</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.run_c_preprocessor"><code class="name flex">
+<span>def <span class="ident">run_c_preprocessor</span></span>(<span>source: str, include_base_path: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_c_preprocessor(source: str, include_base_path: str) -&gt; str:
+    &#34;&#34;&#34;Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files&#34;&#34;&#34;
+    result = run(
+        [&#34;gcc&#34;, &#34;-cpp&#34;, &#34;-E&#34;, &#34;-&#34;],
+        input=source,
+        text=True,
+        capture_output=True,
+        universal_newlines=True,
+        cwd=include_base_path,
+    )
+    return result.stdout</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.search_for_unsupported_idioms"><code class="name flex">
+<span>def <span class="ident">search_for_unsupported_idioms</span></span>(<span>source: str, idioms_regex_path: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check source string for unsupported idioms using regex. Returns a log of found matches as well as line information</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def search_for_unsupported_idioms(source: str, idioms_regex_path: str):
+    &#34;&#34;&#34;Check source string for unsupported idioms using regex. Returns a log of found matches as well as line information&#34;&#34;&#34;
+    log = []
+    lines = open(idioms_regex_path, &#34;r&#34;).read().splitlines()
+    for line in lines:
+        for match in re.finditer(line, source, flags=re.MULTILINE):
+            line_number = source[: match.span()[0]].count(&#34;\n&#34;)
+            log.append(f&#34;Found unsupported idiom matching regex: {line}&#34; + &#34;\n&#34;)
+            log.append(f&#34;Match was: {match.group(0)}&#34; + &#34;\n&#34;)
+            log.append(f&#34;Line was: {line_number}&#34; + &#34;\n&#34;)
+            log.append(f&#34;\n&#34;)
+    return log</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.preprocessor.preprocess.tree_sitter_parse"><code class="name flex">
+<span>def <span class="ident">tree_sitter_parse</span></span>(<span>source: str) ‑> tree_sitter.Tree</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Use tree-sitter to parse the source code and output the parse tree</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def tree_sitter_parse(source: str) -&gt; Tree:
+    &#34;&#34;&#34;Use tree-sitter to parse the source code and output the parse tree&#34;&#34;&#34;
+    parser = Parser()
+
+    parser.set_language(
+        Language(
+            os.path.join(os.path.dirname(&#34;../&#34;), LANGUAGE_LIBRARY_REL_PATH), &#34;fortran&#34;
+        )
+    )
+
+    return parser.parse(bytes(source, &#34;utf8&#34;))</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor" href="index.html">skema.program_analysis.TS2CAST.preprocessor</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.check_for_missing_includes" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.check_for_missing_includes">check_for_missing_includes</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.fix_include_directives" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.fix_include_directives">fix_include_directives</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.fix_unsupported_idioms" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.fix_unsupported_idioms">fix_unsupported_idioms</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.main" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.main">main</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.preprocess" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.preprocess">preprocess</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.run_c_preprocessor" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.run_c_preprocessor">run_c_preprocessor</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.search_for_unsupported_idioms" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.search_for_unsupported_idioms">search_for_unsupported_idioms</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.preprocessor.preprocess.tree_sitter_parse" href="#skema.program_analysis.TS2CAST.preprocessor.preprocess.tree_sitter_parse">tree_sitter_parse</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

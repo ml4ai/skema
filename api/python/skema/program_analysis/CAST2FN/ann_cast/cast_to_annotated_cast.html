@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from functools import singledispatchmethod
+import typing
+
+from skema.program_analysis.CAST2FN.cast import CAST
+
+from skema.program_analysis.CAST2FN.model.cast import (
+    AstNode,
+    Assignment,
+    Attribute,
+    Call,
+    FunctionDef,
+    LiteralValue,
+    Loop,
+    ModelBreak,
+    ModelContinue,
+    ModelIf,
+    ModelReturn,
+    Module,
+    Name,
+    RecordDef,
+    ScalarType,
+    Var,
+)
+
+from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2FN.model.cast.structure_type import StructureType
+
+
+class CASTTypeError(TypeError):
+    &#34;&#34;&#34;Used to create errors in the visitor, in particular
+    when the visitor encounters some value that it wasn&#39;t expecting.
+
+    Args:
+        Exception: An exception that occurred during execution.
+    &#34;&#34;&#34;
+
+
+class CastToAnnotatedCastVisitor:
+    &#34;&#34;&#34;
+    class CastToAnnotatedCastVisitor - A visitor that traverses CAST nodes
+    and generates an annotated cast version of the CAST.
+
+    The AnnCastNodes have additional attributes (fields) that are used
+    in a later pass to maintain scoping information for GrFN containers.
+    &#34;&#34;&#34;
+
+    def __init__(self, cast: CAST):
+        self.cast = cast
+
+    def visit_node_list(self, node_list: typing.List[AstNode]):
+        return [self.visit(node) for node in node_list]
+
+    def generate_annotated_cast(self, grfn_2_2: bool = False):
+        nodes = self.cast.nodes
+
+        annotated_cast = []
+        for node in nodes:
+            annotated_cast.append(self.visit(node))
+
+        return PipelineState(annotated_cast, grfn_2_2)
+
+    def visit(self, node: AstNode) -&gt; AnnCastNode:
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f&#34;\nProcessing node type {class_name}&#34;)
+        return self._visit(node)
+
+    @singledispatchmethod
+    def _visit(self, node: AstNode):
+        raise NameError(f&#34;Unrecognized node type: {type(node)}&#34;)
+
+    @_visit.register
+    def visit_assignment(self, node: Assignment):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return AnnCastAssignment(left, right, node.source_refs)
+
+    @_visit.register
+    def visit_attribute(self, node: Attribute):
+        value = self.visit(node.value)
+        attr = self.visit(node.attr)
+        return AnnCastAttribute(value, attr, node.source_refs)
+
+    @_visit.register
+    def visit_operator(self, node: Operator):
+        operands = self.visit_node_list(node.operands)
+        return AnnCastOperator(node.source_language, node.interpreter, node.version, node.op, operands, node.source_refs)
+        
+    @_visit.register
+    def visit_call(self, node: Call):
+        func = self.visit(node.func)
+        arguments = self.visit_node_list(node.arguments)
+
+        return AnnCastCall(func, arguments, node.source_refs)
+
+    @_visit.register
+    def visit_record_def(self, node: RecordDef):
+        bases = self.visit_node_list(node.bases)
+        funcs = self.visit_node_list(node.funcs)
+        fields = self.visit_node_list(node.fields)
+        return AnnCastRecordDef(
+            node.name, bases, funcs, fields, node.source_refs
+        )
+        
+    @_visit.register
+    def visit_function_def(self, node: FunctionDef):
+        name = node.name
+        args = self.visit_node_list(node.func_args)
+        body = self.visit_node_list(node.body)
+        return AnnCastFunctionDef(name, args, body, node.source_refs)
+        
+    @_visit.register
+    def visit_literal_value(self, node: LiteralValue):
+        if node.value_type == &#34;List[Any]&#34;:
+            node.value.size = self.visit(
+                node.value.size
+            )  # Turns the cast var into annCast
+            node.value.initial_value = self.visit(
+                node.value.initial_value
+            )  # Turns the literalValue into annCast
+            return AnnCastLiteralValue(
+                node.value_type,
+                node.value,
+                node.source_code_data_type,
+                node.source_refs,
+            )
+        elif node.value_type == StructureType.TUPLE:
+            values = self.visit_node_list(node.value)
+            return AnnCastLiteralValue(
+                node.value_type,
+                values,
+                node.source_code_data_type,
+                node.source_refs,
+            )
+        return AnnCastLiteralValue(
+            node.value_type,
+            node.value,
+            node.source_code_data_type,
+            node.source_refs,
+        )
+
+    @_visit.register
+    def visit_loop(self, node: Loop):
+        if node.pre != None:
+            pre = self.visit_node_list(node.pre)
+        else:
+            pre = []
+        if node.post != None and len(node.post) &gt; 0:
+            post = self.visit_node_list(node.post)
+        else:   
+            post = []
+        expr = self.visit(node.expr)
+        body = self.visit_node_list(node.body)
+        return AnnCastLoop(pre, expr, body, post, node.source_refs)
+
+    @_visit.register
+    def visit_model_break(self, node: ModelBreak):
+        return AnnCastModelBreak(node.source_refs)
+
+    @_visit.register
+    def visit_model_continue(self, node: ModelContinue):
+        return AnnCastModelContinue(node)
+
+    @_visit.register
+    def visit_model_import(self, node: ModelImport):
+        return AnnCastModelImport(node)
+
+    @_visit.register
+    def visit_model_if(self, node: ModelIf):
+        expr = self.visit(node.expr)
+        body = self.visit_node_list(node.body)
+        orelse = self.visit_node_list(node.orelse)
+        return AnnCastModelIf(expr, body, orelse, node.source_refs)
+
+    @_visit.register
+    def visit_model_return(self, node: ModelReturn):
+        value = self.visit(node.value)
+        return AnnCastModelReturn(value, node.source_refs)
+
+    @_visit.register
+    def visit_module(self, node: Module):
+        body = self.visit_node_list(node.body)
+        return AnnCastModule(node.name, body, node.source_refs)
+
+    @_visit.register
+    def visit_name(self, node: Name):
+        return AnnCastName(node.name, node.id, node.source_refs)
+
+    @_visit.register
+    def visit_var(self, node: Var):
+        val = self.visit(node.val)
+        if node.default_value != None:
+            default_value = self.visit(node.default_value)
+        else:
+            default_value = None
+        return AnnCastVar(val, node.type, default_value, node.source_refs)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CASTTypeError"><code class="flex name class">
+<span>class <span class="ident">CASTTypeError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to create errors in the visitor, in particular
+when the visitor encounters some value that it wasn't expecting.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>An exception that occurred during execution.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CASTTypeError(TypeError):
+    &#34;&#34;&#34;Used to create errors in the visitor, in particular
+    when the visitor encounters some value that it wasn&#39;t expecting.
+
+    Args:
+        Exception: An exception that occurred during execution.
+    &#34;&#34;&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.TypeError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor"><code class="flex name class">
+<span>class <span class="ident">CastToAnnotatedCastVisitor</span></span>
+<span>(</span><span>cast: <a title="skema.program_analysis.CAST2FN.cast.CAST" href="../cast.html#skema.program_analysis.CAST2FN.cast.CAST">CAST</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>class CastToAnnotatedCastVisitor - A visitor that traverses CAST nodes
+and generates an annotated cast version of the CAST.</p>
+<p>The AnnCastNodes have additional attributes (fields) that are used
+in a later pass to maintain scoping information for GrFN containers.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CastToAnnotatedCastVisitor:
+    &#34;&#34;&#34;
+    class CastToAnnotatedCastVisitor - A visitor that traverses CAST nodes
+    and generates an annotated cast version of the CAST.
+
+    The AnnCastNodes have additional attributes (fields) that are used
+    in a later pass to maintain scoping information for GrFN containers.
+    &#34;&#34;&#34;
+
+    def __init__(self, cast: CAST):
+        self.cast = cast
+
+    def visit_node_list(self, node_list: typing.List[AstNode]):
+        return [self.visit(node) for node in node_list]
+
+    def generate_annotated_cast(self, grfn_2_2: bool = False):
+        nodes = self.cast.nodes
+
+        annotated_cast = []
+        for node in nodes:
+            annotated_cast.append(self.visit(node))
+
+        return PipelineState(annotated_cast, grfn_2_2)
+
+    def visit(self, node: AstNode) -&gt; AnnCastNode:
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f&#34;\nProcessing node type {class_name}&#34;)
+        return self._visit(node)
+
+    @singledispatchmethod
+    def _visit(self, node: AstNode):
+        raise NameError(f&#34;Unrecognized node type: {type(node)}&#34;)
+
+    @_visit.register
+    def visit_assignment(self, node: Assignment):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        return AnnCastAssignment(left, right, node.source_refs)
+
+    @_visit.register
+    def visit_attribute(self, node: Attribute):
+        value = self.visit(node.value)
+        attr = self.visit(node.attr)
+        return AnnCastAttribute(value, attr, node.source_refs)
+
+    @_visit.register
+    def visit_operator(self, node: Operator):
+        operands = self.visit_node_list(node.operands)
+        return AnnCastOperator(node.source_language, node.interpreter, node.version, node.op, operands, node.source_refs)
+        
+    @_visit.register
+    def visit_call(self, node: Call):
+        func = self.visit(node.func)
+        arguments = self.visit_node_list(node.arguments)
+
+        return AnnCastCall(func, arguments, node.source_refs)
+
+    @_visit.register
+    def visit_record_def(self, node: RecordDef):
+        bases = self.visit_node_list(node.bases)
+        funcs = self.visit_node_list(node.funcs)
+        fields = self.visit_node_list(node.fields)
+        return AnnCastRecordDef(
+            node.name, bases, funcs, fields, node.source_refs
+        )
+        
+    @_visit.register
+    def visit_function_def(self, node: FunctionDef):
+        name = node.name
+        args = self.visit_node_list(node.func_args)
+        body = self.visit_node_list(node.body)
+        return AnnCastFunctionDef(name, args, body, node.source_refs)
+        
+    @_visit.register
+    def visit_literal_value(self, node: LiteralValue):
+        if node.value_type == &#34;List[Any]&#34;:
+            node.value.size = self.visit(
+                node.value.size
+            )  # Turns the cast var into annCast
+            node.value.initial_value = self.visit(
+                node.value.initial_value
+            )  # Turns the literalValue into annCast
+            return AnnCastLiteralValue(
+                node.value_type,
+                node.value,
+                node.source_code_data_type,
+                node.source_refs,
+            )
+        elif node.value_type == StructureType.TUPLE:
+            values = self.visit_node_list(node.value)
+            return AnnCastLiteralValue(
+                node.value_type,
+                values,
+                node.source_code_data_type,
+                node.source_refs,
+            )
+        return AnnCastLiteralValue(
+            node.value_type,
+            node.value,
+            node.source_code_data_type,
+            node.source_refs,
+        )
+
+    @_visit.register
+    def visit_loop(self, node: Loop):
+        if node.pre != None:
+            pre = self.visit_node_list(node.pre)
+        else:
+            pre = []
+        if node.post != None and len(node.post) &gt; 0:
+            post = self.visit_node_list(node.post)
+        else:   
+            post = []
+        expr = self.visit(node.expr)
+        body = self.visit_node_list(node.body)
+        return AnnCastLoop(pre, expr, body, post, node.source_refs)
+
+    @_visit.register
+    def visit_model_break(self, node: ModelBreak):
+        return AnnCastModelBreak(node.source_refs)
+
+    @_visit.register
+    def visit_model_continue(self, node: ModelContinue):
+        return AnnCastModelContinue(node)
+
+    @_visit.register
+    def visit_model_import(self, node: ModelImport):
+        return AnnCastModelImport(node)
+
+    @_visit.register
+    def visit_model_if(self, node: ModelIf):
+        expr = self.visit(node.expr)
+        body = self.visit_node_list(node.body)
+        orelse = self.visit_node_list(node.orelse)
+        return AnnCastModelIf(expr, body, orelse, node.source_refs)
+
+    @_visit.register
+    def visit_model_return(self, node: ModelReturn):
+        value = self.visit(node.value)
+        return AnnCastModelReturn(value, node.source_refs)
+
+    @_visit.register
+    def visit_module(self, node: Module):
+        body = self.visit_node_list(node.body)
+        return AnnCastModule(node.name, body, node.source_refs)
+
+    @_visit.register
+    def visit_name(self, node: Name):
+        return AnnCastName(node.name, node.id, node.source_refs)
+
+    @_visit.register
+    def visit_var(self, node: Var):
+        val = self.visit(node.val)
+        if node.default_value != None:
+            default_value = self.visit(node.default_value)
+        else:
+            default_value = None
+        return AnnCastVar(val, node.type, default_value, node.source_refs)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.generate_annotated_cast"><code class="name flex">
+<span>def <span class="ident">generate_annotated_cast</span></span>(<span>self, grfn_2_2: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_annotated_cast(self, grfn_2_2: bool = False):
+    nodes = self.cast.nodes
+
+    annotated_cast = []
+    for node in nodes:
+        annotated_cast.append(self.visit(node))
+
+    return PipelineState(annotated_cast, grfn_2_2)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>) ‑> <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit(self, node: AstNode) -&gt; AnnCastNode:
+    # print current node being visited.
+    # this can be useful for debugging
+    # class_name = node.__class__.__name__
+    # print(f&#34;\nProcessing node type {class_name}&#34;)
+    return self._visit(node)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_assignment"><code class="name flex">
+<span>def <span class="ident">visit_assignment</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.assignment.Assignment" href="../model/cast/assignment.html#skema.program_analysis.CAST2FN.model.cast.assignment.Assignment">Assignment</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_assignment(self, node: Assignment):
+    left = self.visit(node.left)
+    right = self.visit(node.right)
+    return AnnCastAssignment(left, right, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_attribute"><code class="name flex">
+<span>def <span class="ident">visit_attribute</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.attribute.Attribute" href="../model/cast/attribute.html#skema.program_analysis.CAST2FN.model.cast.attribute.Attribute">Attribute</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_attribute(self, node: Attribute):
+    value = self.visit(node.value)
+    attr = self.visit(node.attr)
+    return AnnCastAttribute(value, attr, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_call"><code class="name flex">
+<span>def <span class="ident">visit_call</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.call.Call" href="../model/cast/call.html#skema.program_analysis.CAST2FN.model.cast.call.Call">Call</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_call(self, node: Call):
+    func = self.visit(node.func)
+    arguments = self.visit_node_list(node.arguments)
+
+    return AnnCastCall(func, arguments, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_function_def"><code class="name flex">
+<span>def <span class="ident">visit_function_def</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.function_def.FunctionDef" href="../model/cast/function_def.html#skema.program_analysis.CAST2FN.model.cast.function_def.FunctionDef">FunctionDef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_function_def(self, node: FunctionDef):
+    name = node.name
+    args = self.visit_node_list(node.func_args)
+    body = self.visit_node_list(node.body)
+    return AnnCastFunctionDef(name, args, body, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_literal_value"><code class="name flex">
+<span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.literal_value.LiteralValue" href="../model/cast/literal_value.html#skema.program_analysis.CAST2FN.model.cast.literal_value.LiteralValue">LiteralValue</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_literal_value(self, node: LiteralValue):
+    if node.value_type == &#34;List[Any]&#34;:
+        node.value.size = self.visit(
+            node.value.size
+        )  # Turns the cast var into annCast
+        node.value.initial_value = self.visit(
+            node.value.initial_value
+        )  # Turns the literalValue into annCast
+        return AnnCastLiteralValue(
+            node.value_type,
+            node.value,
+            node.source_code_data_type,
+            node.source_refs,
+        )
+    elif node.value_type == StructureType.TUPLE:
+        values = self.visit_node_list(node.value)
+        return AnnCastLiteralValue(
+            node.value_type,
+            values,
+            node.source_code_data_type,
+            node.source_refs,
+        )
+    return AnnCastLiteralValue(
+        node.value_type,
+        node.value,
+        node.source_code_data_type,
+        node.source_refs,
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_loop"><code class="name flex">
+<span>def <span class="ident">visit_loop</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.loop.Loop" href="../model/cast/loop.html#skema.program_analysis.CAST2FN.model.cast.loop.Loop">Loop</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_loop(self, node: Loop):
+    if node.pre != None:
+        pre = self.visit_node_list(node.pre)
+    else:
+        pre = []
+    if node.post != None and len(node.post) &gt; 0:
+        post = self.visit_node_list(node.post)
+    else:   
+        post = []
+    expr = self.visit(node.expr)
+    body = self.visit_node_list(node.body)
+    return AnnCastLoop(pre, expr, body, post, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_break"><code class="name flex">
+<span>def <span class="ident">visit_model_break</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.model_break.ModelBreak" href="../model/cast/model_break.html#skema.program_analysis.CAST2FN.model.cast.model_break.ModelBreak">ModelBreak</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_break(self, node: ModelBreak):
+    return AnnCastModelBreak(node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_continue"><code class="name flex">
+<span>def <span class="ident">visit_model_continue</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.model_continue.ModelContinue" href="../model/cast/model_continue.html#skema.program_analysis.CAST2FN.model.cast.model_continue.ModelContinue">ModelContinue</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_continue(self, node: ModelContinue):
+    return AnnCastModelContinue(node)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_if"><code class="name flex">
+<span>def <span class="ident">visit_model_if</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.model_if.ModelIf" href="../model/cast/model_if.html#skema.program_analysis.CAST2FN.model.cast.model_if.ModelIf">ModelIf</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_if(self, node: ModelIf):
+    expr = self.visit(node.expr)
+    body = self.visit_node_list(node.body)
+    orelse = self.visit_node_list(node.orelse)
+    return AnnCastModelIf(expr, body, orelse, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_import"><code class="name flex">
+<span>def <span class="ident">visit_model_import</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport" href="../model/cast/model_import.html#skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport">ModelImport</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_import(self, node: ModelImport):
+    return AnnCastModelImport(node)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_return"><code class="name flex">
+<span>def <span class="ident">visit_model_return</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.model_return.ModelReturn" href="../model/cast/model_return.html#skema.program_analysis.CAST2FN.model.cast.model_return.ModelReturn">ModelReturn</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_return(self, node: ModelReturn):
+    value = self.visit(node.value)
+    return AnnCastModelReturn(value, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_module"><code class="name flex">
+<span>def <span class="ident">visit_module</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.module.Module" href="../model/cast/module.html#skema.program_analysis.CAST2FN.model.cast.module.Module">Module</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_module(self, node: Module):
+    body = self.visit_node_list(node.body)
+    return AnnCastModule(node.name, body, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_name"><code class="name flex">
+<span>def <span class="ident">visit_name</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.name.Name" href="../model/cast/name.html#skema.program_analysis.CAST2FN.model.cast.name.Name">Name</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_name(self, node: Name):
+    return AnnCastName(node.name, node.id, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_node_list"><code class="name flex">
+<span>def <span class="ident">visit_node_list</span></span>(<span>self, node_list: List[<a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_node_list(self, node_list: typing.List[AstNode]):
+    return [self.visit(node) for node in node_list]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_operator"><code class="name flex">
+<span>def <span class="ident">visit_operator</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.operator.Operator" href="../model/cast/operator.html#skema.program_analysis.CAST2FN.model.cast.operator.Operator">Operator</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_operator(self, node: Operator):
+    operands = self.visit_node_list(node.operands)
+    return AnnCastOperator(node.source_language, node.interpreter, node.version, node.op, operands, node.source_refs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_record_def"><code class="name flex">
+<span>def <span class="ident">visit_record_def</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.record_def.RecordDef" href="../model/cast/record_def.html#skema.program_analysis.CAST2FN.model.cast.record_def.RecordDef">RecordDef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_record_def(self, node: RecordDef):
+    bases = self.visit_node_list(node.bases)
+    funcs = self.visit_node_list(node.funcs)
+    fields = self.visit_node_list(node.fields)
+    return AnnCastRecordDef(
+        node.name, bases, funcs, fields, node.source_refs
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_var"><code class="name flex">
+<span>def <span class="ident">visit_var</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.var.Var" href="../model/cast/var.html#skema.program_analysis.CAST2FN.model.cast.var.Var">Var</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_var(self, node: Var):
+    val = self.visit(node.val)
+    if node.default_value != None:
+        default_value = self.visit(node.default_value)
+    else:
+        default_value = None
+    return AnnCastVar(val, node.type, default_value, node.source_refs)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast" href="index.html">skema.program_analysis.CAST2FN.ann_cast</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CASTTypeError" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CASTTypeError">CASTTypeError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor">CastToAnnotatedCastVisitor</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.generate_annotated_cast" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.generate_annotated_cast">generate_annotated_cast</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit">visit</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_assignment" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_assignment">visit_assignment</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_attribute" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_attribute">visit_attribute</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_call" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_call">visit_call</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_function_def">visit_function_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_literal_value">visit_literal_value</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_loop">visit_loop</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_break">visit_model_break</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_continue" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_continue">visit_model_continue</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_if" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_if">visit_model_if</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_import" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_import">visit_model_import</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_return" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_model_return">visit_model_return</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_module" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_module">visit_module</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_name" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_name">visit_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_node_list" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_node_list">visit_node_list</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_operator" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_operator">visit_operator</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_record_def" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_record_def">visit_record_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_var" href="#skema.program_analysis.CAST2FN.ann_cast.cast_to_annotated_cast.CastToAnnotatedCastVisitor.visit_var">visit_var</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,3903 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST2FN.model.cast_to_air_model API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST2FN.model.cast_to_air_model</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from skema.program_analysis.CAST2FN.model.cast import source_ref
+from skema.program_analysis.CAST2FN.model.cast.source_ref import SourceRef
+from typing import List, Dict, NoReturn, Set
+from enum import Enum
+from dataclasses import dataclass
+from datetime import datetime
+
+from skema.program_analysis.CAST2FN.model.cast import AstNode, var
+from skema.model_assembly.metadata import (
+    BaseMetadata,
+    MetadataType,
+    TypedMetadata,
+    VariableFromSource,
+)
+
+
+class C2ATypeError(TypeError):
+    &#34;&#34;&#34;
+    Used to create exceptions during the CAST to AIR execution
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass
+
+
+class C2ARuntimeError(Exception):
+    &#34;&#34;&#34;
+    Used for any runtime errors that occur during CAST --&gt; AIR processing
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass
+
+
+class C2ANameError(NameError):
+    &#34;&#34;&#34;
+    Used when name errors occur (such as a missing member variable for some
+    object) during CAST
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass
+
+
+class C2AValueError(Exception):
+    &#34;&#34;&#34;
+    Used when an operation cannot be performed for a given value during CAST
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass
+
+
+class C2AException(Exception):
+    &#34;&#34;&#34;
+    Used to create exceptions during the CAST to AIR execution
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass
+
+
+class C2AIdentifierType(str, Enum):
+    UNKNOWN = &#34;unknown&#34;
+    VARIABLE = &#34;variable&#34;
+    CONTAINER = &#34;container&#34;
+    LAMBDA = &#34;lambda&#34;
+    DECISION = &#34;decision&#34;
+    PACK = &#34;pack&#34;
+    EXTRACT = &#34;extract&#34;
+
+
+@dataclass(repr=True, frozen=True)
+class C2AIdentifierInformation(object):
+
+    name: str
+    scope: List[str]
+    module: str
+    identifier_type: C2AIdentifierType
+
+    def build_identifier(self):
+        return f&#39;@{self.identifier_type}::{self.module}::{&#34;.&#34;.join(self.scope)}::{self.name}&#39;
+
+
+@dataclass(repr=True, frozen=True)
+class C2ASourceRef(object):
+    &#34;&#34;&#34;
+    Represents a reference point of the containing object in the original source
+    code. If a field of the line/col reference information is missing, it will
+    hold the value -1.
+    &#34;&#34;&#34;
+
+    file: str
+    line_begin: int
+    col_start: int
+    line_end: int
+    col_end: int
+
+    def to_AIR(self):
+        return self.__dict__
+
+
+class C2AVariable(object):
+
+    identifier_information: C2AIdentifierInformation
+    version: int
+    type_name: str
+    source_ref: C2ASourceRef
+    metadata: list
+
+    def __init__(
+        self,
+        identifier_information: C2AIdentifierInformation,
+        version: int,
+        type_name: str,
+        source_ref: C2ASourceRef,
+    ):
+        self.identifier_information = identifier_information
+        self.version = version
+        self.type_name = type_name
+        self.source_ref = source_ref
+        self.metadata = list()
+
+    def get_name(self):
+        return self.identifier_information.name
+
+    def build_identifier(self):
+        &#34;&#34;&#34;
+        Builds the variable identifier which uses the identifier from identifier
+        information plus the variable version
+
+        Returns:
+            str: Unique variable identifier
+        &#34;&#34;&#34;
+        return f&#34;{self.identifier_information.build_identifier()}::{str(self.version)}&#34;
+
+    def add_metadata(self, data: BaseMetadata):
+        self.metadata.append(data)
+
+    def to_AIR(self):
+        # TODO
+        domain = {
+            &#34;type&#34;: &#34;type&#34;,  # TODO what is this field?
+            &#34;mutable&#34;: False,  # TODO probably only mutable if object/list/dict type
+        }
+        if self.type_name == &#34;Number&#34;:
+            domain[&#34;name&#34;] = &#34;integer&#34;
+        elif self.type_name.startswith(&#34;object$&#34;):
+            name = self.type_name.split(&#34;object$&#34;)[-1]
+            domain.update(
+                {
+                    &#34;name&#34;: &#34;object&#34;,
+                    &#34;object_name&#34;: name,
+                }
+            )
+        else:
+            domain[&#34;name&#34;] = self.type_name
+
+        has_from_source_metadata = False
+        for m in self.metadata:
+            if m.type == MetadataType.FROM_SOURCE:
+                has_from_source_metadata = True
+                break
+        # If from_source does not exist already, then it wasnt handled by a special
+        # case where we added a variable during processing, so add True from_source
+        # metadata
+        if not has_from_source_metadata:
+            self.add_metadata(
+                TypedMetadata.from_data(
+                    {
+                        &#34;type&#34;: &#34;FROM_SOURCE&#34;,
+                        &#34;provenance&#34;: {
+                            &#34;method&#34;: &#34;PROGRAM_ANALYSIS_PIPELINE&#34;,
+                            &#34;timestamp&#34;: datetime.now(),
+                        },
+                        &#34;from_source&#34;: True,
+                        &#34;creation_reason&#34;: &#34;UNKNOWN&#34;,
+                    }
+                )
+            )
+
+        return {
+            &#34;name&#34;: self.build_identifier(),
+            &#34;source_refs&#34;: [self.source_ref.to_AIR()],
+            &#34;domain&#34;: domain,
+            &#34;domain_constraint&#34;: &#34;(and (&gt; v -infty) (&lt; v infty))&#34;,  # TODO
+            &#34;metadata&#34;: [m.to_dict() for m in self.metadata],
+        }
+
+
+class C2ALambdaType(str, Enum):
+    UNKNOWN = &#34;unknown&#34;
+    ASSIGN = &#34;assign&#34;
+    CONDITION = &#34;condition&#34;
+    DECISION = &#34;decision&#34;
+    EXIT = &#34;exit&#34;
+    RETURN = &#34;return&#34;
+    CONTAINER = &#34;container&#34;
+    OPERATOR = &#34;operator&#34;
+    EXTRACT = &#34;extract&#34;
+    PACK = &#34;pack&#34;
+
+
+def build_unique_list_with_order(l, predicate):
+    new_list = []
+    for i in l:
+        res = predicate(i)
+        if res not in new_list:
+            new_list.append(res)
+    return new_list
+
+
+@dataclass(repr=True, frozen=False)
+class C2ALambda(object):
+    &#34;&#34;&#34;
+    Represents an executable container/ function to transition between states in AIR
+
+    lambda, container, if-block, function
+    &#34;&#34;&#34;
+
+    # Identifying information for lambda function
+    identifier_information: C2AIdentifierInformation
+    # Represents the variables coming into a lambda or container
+    input_variables: List[C2AVariable]
+    # Represents the new versions of variables that are created and output
+    output_variables: List[C2AVariable]
+    # Represents variables that were updated (typically list/dict/object with fields changed)
+    updated_variables: List[C2AVariable]
+    # The type of the container.
+    container_type: C2ALambdaType
+    # The reference to the source code that this lambda was derived from
+    source_ref: C2ASourceRef
+
+    def build_name(self):
+        var = None
+        # TODO how should we build the name if there is multiple updated/output vars?
+        # Will this situation be possible?
+        if len(self.output_variables) &gt; 0:
+            var = self.output_variables[0]
+        elif len(self.updated_variables) &gt; 0:
+            var = self.updated_variables[0]
+        else:
+            raise C2AException(f&#34;No variables output or updated by lambda&#34;)
+
+        return (
+            f&#34;{self.identifier_information.module}&#34;
+            f&#34;__{&#39;.&#39;.join(self.identifier_information.scope)}&#34;
+            f&#34;__{self.container_type}&#34;
+            f&#34;__{var.identifier_information.name}&#34;
+            f&#34;__{var.version}&#34;
+        )
+
+    def to_AIR(self):
+        return self
+
+
+@dataclass(repr=True, frozen=False)
+class C2AExpressionLambda(C2ALambda):
+    &#34;&#34;&#34;
+    A type of function within AIR that represents an executable lambda expression that transitions
+    between states of the data flow of the program
+    &#34;&#34;&#34;
+
+    lambda_expr: str
+    cast: AstNode
+
+    def to_AIR(self):
+        return {
+            &#34;function&#34;: {
+                &#34;name&#34;: self.build_name(),
+                &#34;type&#34;: &#34;lambda&#34;,
+                &#34;code&#34;: self.lambda_expr,
+            },
+            &#34;input&#34;: build_unique_list_with_order(
+                self.input_variables, lambda v: v.build_identifier()
+            ),
+            &#34;output&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;source_ref&#34;: self.source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }
+
+
+@dataclass(repr=True, frozen=False)
+class C2AContainerCallLambda(C2ALambda):
+    &#34;&#34;&#34;
+    Represents the call/passing to another container found in the body of a container definition
+    &#34;&#34;&#34;
+
+    def build_name(self):
+        return self.identifier_information.build_identifier()
+
+    def to_AIR(self):
+        return {
+            &#34;function&#34;: {
+                &#34;name&#34;: self.identifier_information.build_identifier(),
+                &#34;type&#34;: self.container_type.value,
+            },
+            # Note: Do not build a unique list because the same var could be
+            # passed in multiple times
+            &#34;input&#34;: [v.build_identifier() for v in self.input_variables],
+            &#34;output&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;source_ref&#34;: self.source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }
+
+
+@dataclass(repr=True, frozen=False)
+class C2AContainerDef(object):
+    &#34;&#34;&#34;
+    Represents a top level AIR container def. Has its arguments, outputs/ updates, and a body
+
+    lambda, container, if-block, function
+    &#34;&#34;&#34;
+
+    # Name of the containrt
+    identifier_information: C2AIdentifierInformation
+    # Represents the variables coming into a lambda or container
+    arguments: List[C2AVariable]
+    # Represents the new versions of variables that are created and output
+    output_variables: List[C2AVariable]
+    # Represents variables that were updated (typically list/dict/object with fields changed)
+    updated_variables: List[C2AVariable]
+    # Represents the executable body statements
+    body: List[C2ALambda]
+    # Defines the span of code for this container body in the original source code
+    body_source_ref: C2ASourceRef
+    # Tracks what variables were added as arguments to container from previous scope
+    vars_from_previous_scope: List[C2AVariable]
+
+    def build_identifier(self):
+        return self.identifier_information.build_identifier()
+
+    def to_AIR(self):
+        return self
+
+    def add_arguments(self, arguments_to_add: List[C2AVariable]):
+        for v in arguments_to_add:
+            if v not in set(self.arguments):
+                self.arguments.append(v)
+
+    def add_outputs(self, output_variables_to_add: List[C2AVariable]):
+        # self.output_variables.update(set(output_variables_to_add))
+        for v in output_variables_to_add:
+            if v not in set(self.output_variables):
+                self.output_variables.append(v)
+
+    def add_updated(self, updated_variables_to_add: List[C2AVariable]):
+        # self.updated_variables.update(set(updated_variables_to_add))
+        for v in updated_variables_to_add:
+            if v not in set(self.updated_variables):
+                self.updated_variables.append(v)
+
+    def add_body_lambdas(self, body_to_add: List[C2ALambda]):
+        self.body.extend(body_to_add)
+
+    def add_body_source_ref(self, body_source_ref: SourceRef):
+        self.body_source_ref = body_source_ref
+
+    def add_var_used_from_previous_scope(self, var):
+        self.vars_from_previous_scope.append(var)
+
+
+@dataclass(repr=True, frozen=False)
+class C2AFunctionDefContainer(C2AContainerDef):
+    &#34;&#34;&#34;
+    Represents a top level container definition. Input variables will represent the arguments to the funciton in the AIR. Also contains a body.
+    &#34;&#34;&#34;
+
+    return_type_name: str
+
+    def to_AIR(self):
+        return {
+            # TODO
+            &#34;name&#34;: self.identifier_information.build_identifier(),
+            &#34;source_refs&#34;: [],
+            &#34;type&#34;: &#34;function&#34;,
+            &#34;arguments&#34;: build_unique_list_with_order(
+                self.arguments, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;return_value&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;body&#34;: [i.to_AIR() for i in self.body],
+            &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }
+
+
+@dataclass(repr=True, frozen=False)
+class C2ALoopContainer(C2AContainerDef):
+    &#34;&#34;&#34;
+    Represents a top level container definition. Input variables will represent
+    the arguments that go through the loop interface. Also contains a body.
+    &#34;&#34;&#34;
+
+    # Represents the reference to the source code where the conditional for this loop is
+    condition_source_ref: C2ASourceRef
+
+    def to_AIR(self):
+        return {
+            # TODO
+            &#34;name&#34;: self.identifier_information.build_identifier(),
+            &#34;source_refs&#34;: [],
+            &#34;type&#34;: &#34;loop&#34;,
+            &#34;arguments&#34;: build_unique_list_with_order(
+                self.arguments, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;return_value&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;body&#34;: [i.to_AIR() for i in self.body],
+            &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+            &#34;condition_source_ref&#34;: self.condition_source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }
+
+
+@dataclass(repr=True, frozen=False)
+class C2AIfContainer(C2AContainerDef):
+    &#34;&#34;&#34;
+    Represents a top level container definition. Input variables will represent
+    the arguments that go through the if interface. Also contains a body.
+    &#34;&#34;&#34;
+
+    # Represents the reference to the source code where the conditional for this if is
+    condition_source_ref: C2ASourceRef
+    # Output vars per each condition in the if block. Represent else condition
+    # as condition number -1.
+    output_per_condition: Dict[int, List[C2AVariable]]
+
+    def add_condition_outputs(self, condition_num, outputs):
+        if condition_num not in self.output_per_condition:
+            self.output_per_condition[condition_num] = []
+        self.output_per_condition[condition_num].extend(outputs)
+
+    def to_AIR(self):
+
+        return {
+            # TODO
+            &#34;name&#34;: self.identifier_information.build_identifier(),
+            &#34;source_refs&#34;: [],
+            &#34;type&#34;: &#34;if-block&#34;,
+            &#34;arguments&#34;: build_unique_list_with_order(
+                self.arguments, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;return_value&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;body&#34;: [i.to_AIR() for i in self.body],
+            &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+            &#34;condition_source_ref&#34;: self.condition_source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }
+
+
+@dataclass(repr=True, frozen=True)
+class C2ATypeDef(object):
+    class C2AType(str, Enum):
+        INTEGER = &#34;integer&#34;
+        FLOAT = &#34;float&#34;
+        STRING = &#34;string&#34;
+        LIST = &#34;list&#34;
+        DICT = &#34;dict&#34;
+        SET = &#34;set&#34;
+        OBJECT = &#34;object&#34;
+
+    name: str
+    given_type: C2AType
+    fields: Dict[str, C2AVariable]
+    function_identifiers: List[str]
+    source_ref: C2ASourceRef
+
+    def to_AIR(self):
+        air = self.__dict__
+        air.update({&#34;metadata&#34;: [], &#34;metatype&#34;: &#34;composite&#34;})
+        return air
+
+
+class C2AAttributeAccessState(object):
+
+    var_to_current_extract_node: Dict[str, C2ALambda]
+    var_to_current_pack_node: Dict[str, C2ALambda]
+
+    def __init__(self):
+        self.var_to_current_extract_node = {}
+        self.var_to_current_pack_node = {}
+
+    def need_attribute_extract(self, var, attr_var):
+        # Check if the attr_var name appears in either the extract node for the
+        # var or the current pack var. If it exists in either, we should not
+        # add the same attribute for extract.
+        vars_to_check = (
+            self.var_to_current_extract_node[var].output_variables
+            if var in self.var_to_current_extract_node
+            else []
+        ) + (
+            self.var_to_current_pack_node[var].input_variables
+            if var in self.var_to_current_pack_node
+            else []
+        )
+
+        return not any(
+            [
+                v.identifier_information.name
+                == attr_var.identifier_information.name
+                for v in vars_to_check
+            ]
+        )
+
+    def build_extract_lambda(self, extract_var, output_variables):
+        obj_var_name = extract_var.identifier_information.name
+        lambda_dict_keys = [
+            v.identifier_information.name.split(&#34;_&#34;, 1)[1]
+            for v in output_variables
+        ]
+        lambda_dict_accesses = &#34;,&#34;.join(
+            [
+                f&#39;{obj_var_name}[&#34;{v}&#34;]&#39;
+                for v in lambda_dict_keys
+                if obj_var_name != v
+            ]
+        )
+        lambda_expr = f&#34;lambda {obj_var_name}: ({lambda_dict_accesses})&#34;
+        return lambda_expr
+
+    def add_attribute_access(self, var, attr_var):
+        extract_lambda = self.var_to_current_extract_node.get(var, None)
+        if extract_lambda is None:
+            id = var.identifier_information
+            extract_lambda = C2AExpressionLambda(
+                C2AIdentifierInformation(
+                    &#34;EXTRACT&#34;, id.scope, id.module, C2AIdentifierType.CONTAINER
+                ),
+                [var],
+                [attr_var],
+                [],
+                C2ALambdaType.EXTRACT,
+                C2ASourceRef(&#34;&#34;, None, None, None, None),
+                self.build_extract_lambda(var, [attr_var]),
+                None,
+            )
+            self.var_to_current_extract_node[var] = extract_lambda
+            return extract_lambda
+
+        extract_lambda.output_variables.append(attr_var)
+        extract_lambda.lambda_expr = self.build_extract_lambda(
+            var, extract_lambda.output_variables
+        )
+
+    def add_attribute_to_pack(self, var, attr_var):
+        pack_lambda = self.var_to_current_pack_node.get(var, None)
+        if pack_lambda is None:
+            id = var.identifier_information
+            pack_lambda = C2AExpressionLambda(
+                C2AIdentifierInformation(
+                    &#34;PACK&#34;, id.scope, id.module, C2AIdentifierType.CONTAINER
+                ),
+                [var],
+                [],
+                [],
+                C2ALambdaType.PACK,
+                C2ASourceRef(&#34;&#34;, None, None, None, None),
+                &#34;&#34;,  # will be filled out when &#34;get_outstandin_pack_node&#34; is called
+                None,
+            )
+
+        for v in pack_lambda.input_variables:
+            if (
+                v.identifier_information.name
+                == attr_var.identifier_information.name
+            ):
+                pack_lambda.input_variables.remove(v)
+        pack_lambda.input_variables.append(attr_var)
+
+        self.var_to_current_pack_node[var] = pack_lambda
+
+    def has_outstanding_pack_nodes(self):
+        return bool(self.var_to_current_pack_node)
+
+    def get_outstanding_pack_node(self, var):
+        pack_lambda = self.var_to_current_pack_node.get(var)
+        # Add the updated version of the var after packing
+        new_var = C2AVariable(
+            var.identifier_information,
+            var.version + 1,
+            var.type_name,
+            var.source_ref,
+        )
+        pack_lambda.output_variables.append(new_var)
+
+        # Add the correct lambda now that we have all vars to pack
+        obj_var_name = var.identifier_information.name
+        lambda_inputs = [
+            v.identifier_information.name for v in pack_lambda.input_variables
+        ]
+        lambda_body_dict = &#34;,&#34;.join(
+            [
+                f&#39;&#34;{v.split(f&#34;{obj_var_name}_&#34;)[-1]}&#34;: &#39; + v
+                for v in lambda_inputs
+                if obj_var_name != v
+            ]
+        )
+        lambda_expr = (
+            f&#34;lambda {&#39;,&#39;.join(lambda_inputs)}:&#34;
+            f&#34;{{ **{obj_var_name}, **{{ {lambda_body_dict} }} }}&#34;
+        )
+        pack_lambda.lambda_expr = lambda_expr
+
+        # Delete from state map upon retrieval
+        del self.var_to_current_pack_node[var]
+        if var in self.var_to_current_extract_node:
+            del self.var_to_current_extract_node[var]
+
+        return pack_lambda
+
+    def get_outstanding_pack_nodes(self):
+        return [
+            self.get_outstanding_pack_node(k)
+            for k in self.var_to_current_pack_node.copy().keys()
+        ]
+
+
+class C2AVariableContext(Enum):
+    LOAD = 0
+    STORE = 1
+    ATTR_VALUE = 2
+    UNKNOWN = 3
+
+
+class C2AState(object):
+    containers: List[C2AContainerDef]
+    variables: List[C2AVariable]
+    types: List[C2ATypeDef]
+    scope_stack: List[str]
+    current_module: str
+    current_function: C2AFunctionDefContainer
+    current_conditional: int
+    attribute_access_state: C2AAttributeAccessState
+    current_context: C2AVariableContext
+
+    def __init__(self):
+        self.containers = list()
+        self.variables = list()
+        self.types = list()
+        self.scope_stack = []
+        self.current_module = &#34;initial&#34;
+        self.current_function = None
+        self.current_conditional = 0
+        self.current_context = C2AVariableContext.UNKNOWN
+        self.attribute_access_state = C2AAttributeAccessState()
+
+    def add_container(self, con: C2AContainerDef):
+        self.containers.append(con)
+
+    def add_variable(self, var: C2AVariable):
+        self.variables.append(var)
+
+    def add_type(self, type: C2ATypeDef):
+        self.types.append(type)
+
+    def get_scope_stack(self):
+        &#34;&#34;&#34;
+        Returns the current scope of the CAST to AIR state
+        &#34;&#34;&#34;
+        return self.scope_stack.copy()
+
+    def push_scope(self, scope):
+        &#34;&#34;&#34;
+        Places the name scope level name onto the scope stack
+        &#34;&#34;&#34;
+        self.scope_stack.append(scope)
+
+    def pop_scope(self):
+        &#34;&#34;&#34;
+        Removes the last scope name from the stack and returns it
+        &#34;&#34;&#34;
+        top = self.scope_stack[-1]
+        self.scope_stack = self.scope_stack[:-1]
+        return top
+
+    def is_var_identifier_in_variables(self, identifier):
+        for v in self.variables:
+            if v.build_identifier() == identifier:
+                return True
+        return False
+
+    def find_highest_version_var_in_scope(self, var_name, scope):
+        &#34;&#34;&#34;
+        Given a variable name, finds the highest version defined
+        for that variable given a scope
+        &#34;&#34;&#34;
+        # Check that the global/function_name are the same
+        # TODO define what needs to be checked here better
+        def share_scope(scope1, scope2):
+            return scope1 == scope2
+
+        instances = [
+            v
+            for v in self.variables
+            if v.identifier_information.name == var_name
+            and share_scope(scope, v.identifier_information.scope)
+        ]
+        return max(instances, key=lambda v: v.version, default=None)
+
+    def find_highest_version_var_in_previous_scopes(self, var_name):
+        &#34;&#34;&#34;
+        Given a variable name, finds the highest version defined
+        for that variable along our current scope path
+        &#34;&#34;&#34;
+        # Subtract one so we look at all scopes except &#34;global&#34;
+        i = len(self.scope_stack)
+        while i &gt;= 0:
+            res = self.find_highest_version_var_in_scope(
+                var_name, self.scope_stack[:i]
+            )
+            if res is not None:
+                return res
+            i -= 1
+
+        return None
+
+    def find_highest_version_var_in_current_scope(self, var_name):
+        &#34;&#34;&#34;
+        Given a variable name, finds the highest version defined
+        for that variable given the current scope
+        &#34;&#34;&#34;
+        return self.find_highest_version_var_in_scope(
+            var_name, self.scope_stack
+        )
+
+    def find_next_var_version(self, var_name):
+        &#34;&#34;&#34;
+        Determines the next version of a variable given its name and
+        variables in the current scope.
+        &#34;&#34;&#34;
+        current_highest_ver = self.find_highest_version_var_in_current_scope(
+            var_name
+        )
+        return (
+            current_highest_ver.version + 1
+            if current_highest_ver is not None
+            else -1
+        )
+
+    def find_container(self, scope):
+        matching = [
+            c
+            for c in self.containers
+            if c.identifier_information.scope + [c.identifier_information.name]
+            == scope
+        ]
+
+        return matching[0] if matching else None
+
+    def find_root_level_containers(self):
+        called_containers = [
+            s.identifier_information.build_identifier()
+            for c in self.containers
+            for s in c.body
+            if isinstance(s, C2AContainerCallLambda)
+        ]
+        root_containers = [
+            c.identifier_information.name
+            for c in self.containers
+            if c.build_identifier() not in called_containers
+        ]
+        return root_containers
+
+    def get_next_conditional(self):
+        cur_cond = self.current_conditional
+        self.current_conditional += 1
+        return cur_cond
+
+    def reset_conditional_count(self):
+        self.current_conditional = 0
+
+    def reset_current_function(self):
+        self.current_function = None
+
+    def set_variable_context(self, context):
+        self.current_context = context
+
+    def to_AIR(self):
+        &#34;&#34;&#34;
+        Translates the model used to translate CAST to AIR into the
+        final AIR structure.
+        &#34;&#34;&#34;
+        container_air = [c.to_AIR() for c in self.containers]
+        var_air = [v.to_AIR() for v in self.variables]
+        types_air = [t.to_AIR() for t in self.types]
+
+        # Trim variables that are just defined and hanging. This seems like a
+        # bug BUT it is actually a remnant of how GCC gives variable definitions.
+        all_input_vars = {
+            v for c in container_air for l in c[&#34;body&#34;] for v in l[&#34;input&#34;]
+        }
+        all_return_vars = {v for c in container_air for v in c[&#34;return_value&#34;]}
+        all_arg_vars = {v for c in container_air for v in c[&#34;arguments&#34;]}
+        # all_vars_into_lambdbas = {*all_input_vars, *all_return_vars, *all_arg_vars}
+
+        all_vars_passed_through_lambdas = {
+            v_name
+            for c in container_air
+            for l in c[&#34;body&#34;]
+            for v_name in l[&#34;input&#34;] + l[&#34;output&#34;]
+            if len(l[&#34;input&#34;]) &gt; 0
+        }
+        hanging_vars = [
+            v[&#34;name&#34;]
+            for v in var_air
+            if v[&#34;name&#34;] not in all_vars_passed_through_lambdas
+        ]
+
+        def is_hanging_lambda(l, c):
+            hanging_lambda = len(l[&#34;input&#34;]) == 0 and all(
+                [
+                    v not in {*all_input_vars, *all_return_vars, *all_arg_vars}
+                    for v in l[&#34;output&#34;]
+                ]
+            )
+            return hanging_lambda
+
+        for con in container_air:
+            hanging_lambda_vars = [
+                v
+                for l in con[&#34;body&#34;]
+                if is_hanging_lambda(l, con)
+                for v in l[&#34;output&#34;]
+            ]
+            # Trim variables
+            var_air = [
+                v for v in var_air if v[&#34;name&#34;] not in hanging_lambda_vars
+            ]
+            if &#34;return_value&#34; in con:
+                hanging_ret_vars = {
+                    v for v in con[&#34;return_value&#34;] if v in hanging_vars
+                }
+                lambdas_calling = [
+                    l
+                    for c in container_air
+                    for l in c[&#34;body&#34;]
+                    if l[&#34;function&#34;][&#34;type&#34;] == &#34;container&#34;
+                    and l[&#34;function&#34;][&#34;name&#34;] == con[&#34;name&#34;]
+                ]
+
+                if len(lambdas_calling) == 0:
+                    con[&#34;return_value&#34;] = [
+                        v
+                        for v in con[&#34;return_value&#34;]
+                        if v not in hanging_ret_vars
+                    ]
+                    all_return_vars.difference_update(hanging_ret_vars)
+                    var_air = [
+                        v for v in var_air if v[&#34;name&#34;] not in hanging_ret_vars
+                    ]
+
+            if &#34;arguments&#34; in con:
+                hanging_arg_vars = {
+                    v for v in con[&#34;arguments&#34;] if v in hanging_vars
+                }
+                con[&#34;arguments&#34;] = [
+                    v for v in con[&#34;arguments&#34;] if v not in hanging_arg_vars
+                ]
+                all_arg_vars.difference_update(hanging_arg_vars)
+                var_air = [
+                    v for v in var_air if v[&#34;name&#34;] not in hanging_arg_vars
+                ]
+
+            con[&#34;body&#34;] = [
+                l for l in con[&#34;body&#34;] if not is_hanging_lambda(l, con)
+            ]
+
+        return {
+            &#34;containers&#34;: container_air,
+            &#34;variables&#34;: var_air,
+            &#34;types&#34;: types_air,
+        }</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.build_unique_list_with_order"><code class="name flex">
+<span>def <span class="ident">build_unique_list_with_order</span></span>(<span>l, predicate)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_unique_list_with_order(l, predicate):
+    new_list = []
+    for i in l:
+        res = predicate(i)
+        if res not in new_list:
+            new_list.append(res)
+    return new_list</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState"><code class="flex name class">
+<span>class <span class="ident">C2AAttributeAccessState</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AAttributeAccessState(object):
+
+    var_to_current_extract_node: Dict[str, C2ALambda]
+    var_to_current_pack_node: Dict[str, C2ALambda]
+
+    def __init__(self):
+        self.var_to_current_extract_node = {}
+        self.var_to_current_pack_node = {}
+
+    def need_attribute_extract(self, var, attr_var):
+        # Check if the attr_var name appears in either the extract node for the
+        # var or the current pack var. If it exists in either, we should not
+        # add the same attribute for extract.
+        vars_to_check = (
+            self.var_to_current_extract_node[var].output_variables
+            if var in self.var_to_current_extract_node
+            else []
+        ) + (
+            self.var_to_current_pack_node[var].input_variables
+            if var in self.var_to_current_pack_node
+            else []
+        )
+
+        return not any(
+            [
+                v.identifier_information.name
+                == attr_var.identifier_information.name
+                for v in vars_to_check
+            ]
+        )
+
+    def build_extract_lambda(self, extract_var, output_variables):
+        obj_var_name = extract_var.identifier_information.name
+        lambda_dict_keys = [
+            v.identifier_information.name.split(&#34;_&#34;, 1)[1]
+            for v in output_variables
+        ]
+        lambda_dict_accesses = &#34;,&#34;.join(
+            [
+                f&#39;{obj_var_name}[&#34;{v}&#34;]&#39;
+                for v in lambda_dict_keys
+                if obj_var_name != v
+            ]
+        )
+        lambda_expr = f&#34;lambda {obj_var_name}: ({lambda_dict_accesses})&#34;
+        return lambda_expr
+
+    def add_attribute_access(self, var, attr_var):
+        extract_lambda = self.var_to_current_extract_node.get(var, None)
+        if extract_lambda is None:
+            id = var.identifier_information
+            extract_lambda = C2AExpressionLambda(
+                C2AIdentifierInformation(
+                    &#34;EXTRACT&#34;, id.scope, id.module, C2AIdentifierType.CONTAINER
+                ),
+                [var],
+                [attr_var],
+                [],
+                C2ALambdaType.EXTRACT,
+                C2ASourceRef(&#34;&#34;, None, None, None, None),
+                self.build_extract_lambda(var, [attr_var]),
+                None,
+            )
+            self.var_to_current_extract_node[var] = extract_lambda
+            return extract_lambda
+
+        extract_lambda.output_variables.append(attr_var)
+        extract_lambda.lambda_expr = self.build_extract_lambda(
+            var, extract_lambda.output_variables
+        )
+
+    def add_attribute_to_pack(self, var, attr_var):
+        pack_lambda = self.var_to_current_pack_node.get(var, None)
+        if pack_lambda is None:
+            id = var.identifier_information
+            pack_lambda = C2AExpressionLambda(
+                C2AIdentifierInformation(
+                    &#34;PACK&#34;, id.scope, id.module, C2AIdentifierType.CONTAINER
+                ),
+                [var],
+                [],
+                [],
+                C2ALambdaType.PACK,
+                C2ASourceRef(&#34;&#34;, None, None, None, None),
+                &#34;&#34;,  # will be filled out when &#34;get_outstandin_pack_node&#34; is called
+                None,
+            )
+
+        for v in pack_lambda.input_variables:
+            if (
+                v.identifier_information.name
+                == attr_var.identifier_information.name
+            ):
+                pack_lambda.input_variables.remove(v)
+        pack_lambda.input_variables.append(attr_var)
+
+        self.var_to_current_pack_node[var] = pack_lambda
+
+    def has_outstanding_pack_nodes(self):
+        return bool(self.var_to_current_pack_node)
+
+    def get_outstanding_pack_node(self, var):
+        pack_lambda = self.var_to_current_pack_node.get(var)
+        # Add the updated version of the var after packing
+        new_var = C2AVariable(
+            var.identifier_information,
+            var.version + 1,
+            var.type_name,
+            var.source_ref,
+        )
+        pack_lambda.output_variables.append(new_var)
+
+        # Add the correct lambda now that we have all vars to pack
+        obj_var_name = var.identifier_information.name
+        lambda_inputs = [
+            v.identifier_information.name for v in pack_lambda.input_variables
+        ]
+        lambda_body_dict = &#34;,&#34;.join(
+            [
+                f&#39;&#34;{v.split(f&#34;{obj_var_name}_&#34;)[-1]}&#34;: &#39; + v
+                for v in lambda_inputs
+                if obj_var_name != v
+            ]
+        )
+        lambda_expr = (
+            f&#34;lambda {&#39;,&#39;.join(lambda_inputs)}:&#34;
+            f&#34;{{ **{obj_var_name}, **{{ {lambda_body_dict} }} }}&#34;
+        )
+        pack_lambda.lambda_expr = lambda_expr
+
+        # Delete from state map upon retrieval
+        del self.var_to_current_pack_node[var]
+        if var in self.var_to_current_extract_node:
+            del self.var_to_current_extract_node[var]
+
+        return pack_lambda
+
+    def get_outstanding_pack_nodes(self):
+        return [
+            self.get_outstanding_pack_node(k)
+            for k in self.var_to_current_pack_node.copy().keys()
+        ]</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.var_to_current_extract_node"><code class="name">var <span class="ident">var_to_current_extract_node</span> : Dict[str, <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.var_to_current_pack_node"><code class="name">var <span class="ident">var_to_current_pack_node</span> : Dict[str, <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.add_attribute_access"><code class="name flex">
+<span>def <span class="ident">add_attribute_access</span></span>(<span>self, var, attr_var)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_attribute_access(self, var, attr_var):
+    extract_lambda = self.var_to_current_extract_node.get(var, None)
+    if extract_lambda is None:
+        id = var.identifier_information
+        extract_lambda = C2AExpressionLambda(
+            C2AIdentifierInformation(
+                &#34;EXTRACT&#34;, id.scope, id.module, C2AIdentifierType.CONTAINER
+            ),
+            [var],
+            [attr_var],
+            [],
+            C2ALambdaType.EXTRACT,
+            C2ASourceRef(&#34;&#34;, None, None, None, None),
+            self.build_extract_lambda(var, [attr_var]),
+            None,
+        )
+        self.var_to_current_extract_node[var] = extract_lambda
+        return extract_lambda
+
+    extract_lambda.output_variables.append(attr_var)
+    extract_lambda.lambda_expr = self.build_extract_lambda(
+        var, extract_lambda.output_variables
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.add_attribute_to_pack"><code class="name flex">
+<span>def <span class="ident">add_attribute_to_pack</span></span>(<span>self, var, attr_var)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_attribute_to_pack(self, var, attr_var):
+    pack_lambda = self.var_to_current_pack_node.get(var, None)
+    if pack_lambda is None:
+        id = var.identifier_information
+        pack_lambda = C2AExpressionLambda(
+            C2AIdentifierInformation(
+                &#34;PACK&#34;, id.scope, id.module, C2AIdentifierType.CONTAINER
+            ),
+            [var],
+            [],
+            [],
+            C2ALambdaType.PACK,
+            C2ASourceRef(&#34;&#34;, None, None, None, None),
+            &#34;&#34;,  # will be filled out when &#34;get_outstandin_pack_node&#34; is called
+            None,
+        )
+
+    for v in pack_lambda.input_variables:
+        if (
+            v.identifier_information.name
+            == attr_var.identifier_information.name
+        ):
+            pack_lambda.input_variables.remove(v)
+    pack_lambda.input_variables.append(attr_var)
+
+    self.var_to_current_pack_node[var] = pack_lambda</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.build_extract_lambda"><code class="name flex">
+<span>def <span class="ident">build_extract_lambda</span></span>(<span>self, extract_var, output_variables)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_extract_lambda(self, extract_var, output_variables):
+    obj_var_name = extract_var.identifier_information.name
+    lambda_dict_keys = [
+        v.identifier_information.name.split(&#34;_&#34;, 1)[1]
+        for v in output_variables
+    ]
+    lambda_dict_accesses = &#34;,&#34;.join(
+        [
+            f&#39;{obj_var_name}[&#34;{v}&#34;]&#39;
+            for v in lambda_dict_keys
+            if obj_var_name != v
+        ]
+    )
+    lambda_expr = f&#34;lambda {obj_var_name}: ({lambda_dict_accesses})&#34;
+    return lambda_expr</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.get_outstanding_pack_node"><code class="name flex">
+<span>def <span class="ident">get_outstanding_pack_node</span></span>(<span>self, var)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_outstanding_pack_node(self, var):
+    pack_lambda = self.var_to_current_pack_node.get(var)
+    # Add the updated version of the var after packing
+    new_var = C2AVariable(
+        var.identifier_information,
+        var.version + 1,
+        var.type_name,
+        var.source_ref,
+    )
+    pack_lambda.output_variables.append(new_var)
+
+    # Add the correct lambda now that we have all vars to pack
+    obj_var_name = var.identifier_information.name
+    lambda_inputs = [
+        v.identifier_information.name for v in pack_lambda.input_variables
+    ]
+    lambda_body_dict = &#34;,&#34;.join(
+        [
+            f&#39;&#34;{v.split(f&#34;{obj_var_name}_&#34;)[-1]}&#34;: &#39; + v
+            for v in lambda_inputs
+            if obj_var_name != v
+        ]
+    )
+    lambda_expr = (
+        f&#34;lambda {&#39;,&#39;.join(lambda_inputs)}:&#34;
+        f&#34;{{ **{obj_var_name}, **{{ {lambda_body_dict} }} }}&#34;
+    )
+    pack_lambda.lambda_expr = lambda_expr
+
+    # Delete from state map upon retrieval
+    del self.var_to_current_pack_node[var]
+    if var in self.var_to_current_extract_node:
+        del self.var_to_current_extract_node[var]
+
+    return pack_lambda</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.get_outstanding_pack_nodes"><code class="name flex">
+<span>def <span class="ident">get_outstanding_pack_nodes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_outstanding_pack_nodes(self):
+    return [
+        self.get_outstanding_pack_node(k)
+        for k in self.var_to_current_pack_node.copy().keys()
+    ]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.has_outstanding_pack_nodes"><code class="name flex">
+<span>def <span class="ident">has_outstanding_pack_nodes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def has_outstanding_pack_nodes(self):
+    return bool(self.var_to_current_pack_node)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.need_attribute_extract"><code class="name flex">
+<span>def <span class="ident">need_attribute_extract</span></span>(<span>self, var, attr_var)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def need_attribute_extract(self, var, attr_var):
+    # Check if the attr_var name appears in either the extract node for the
+    # var or the current pack var. If it exists in either, we should not
+    # add the same attribute for extract.
+    vars_to_check = (
+        self.var_to_current_extract_node[var].output_variables
+        if var in self.var_to_current_extract_node
+        else []
+    ) + (
+        self.var_to_current_pack_node[var].input_variables
+        if var in self.var_to_current_pack_node
+        else []
+    )
+
+    return not any(
+        [
+            v.identifier_information.name
+            == attr_var.identifier_information.name
+            for v in vars_to_check
+        ]
+    )</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda"><code class="flex name class">
+<span>class <span class="ident">C2AContainerCallLambda</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, input_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], output_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], updated_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], container_type: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType">C2ALambdaType</a>, source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents the call/passing to another container found in the body of a container definition</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AContainerCallLambda(C2ALambda):
+    &#34;&#34;&#34;
+    Represents the call/passing to another container found in the body of a container definition
+    &#34;&#34;&#34;
+
+    def build_name(self):
+        return self.identifier_information.build_identifier()
+
+    def to_AIR(self):
+        return {
+            &#34;function&#34;: {
+                &#34;name&#34;: self.identifier_information.build_identifier(),
+                &#34;type&#34;: self.container_type.value,
+            },
+            # Note: Do not build a unique list because the same var could be
+            # passed in multiple times
+            &#34;input&#34;: [v.build_identifier() for v in self.input_variables],
+            &#34;output&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;source_ref&#34;: self.source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.container_type"><code class="name">var <span class="ident">container_type</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType">C2ALambdaType</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.identifier_information"><code class="name">var <span class="ident">identifier_information</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.input_variables"><code class="name">var <span class="ident">input_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.output_variables"><code class="name">var <span class="ident">output_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.source_ref"><code class="name">var <span class="ident">source_ref</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.updated_variables"><code class="name">var <span class="ident">updated_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.build_name"><code class="name flex">
+<span>def <span class="ident">build_name</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_name(self):
+    return self.identifier_information.build_identifier()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    return {
+        &#34;function&#34;: {
+            &#34;name&#34;: self.identifier_information.build_identifier(),
+            &#34;type&#34;: self.container_type.value,
+        },
+        # Note: Do not build a unique list because the same var could be
+        # passed in multiple times
+        &#34;input&#34;: [v.build_identifier() for v in self.input_variables],
+        &#34;output&#34;: build_unique_list_with_order(
+            self.output_variables, lambda v: v.build_identifier()
+        ),
+        &#34;updated&#34;: build_unique_list_with_order(
+            self.updated_variables, lambda v: v.build_identifier()
+        ),
+        &#34;source_ref&#34;: self.source_ref.to_AIR(),
+        &#34;metadata&#34;: [],
+    }</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef"><code class="flex name class">
+<span>class <span class="ident">C2AContainerDef</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, arguments: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], output_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], updated_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], body: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>], body_source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>, vars_from_previous_scope: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents a top level AIR container def. Has its arguments, outputs/ updates, and a body</p>
+<p>lambda, container, if-block, function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AContainerDef(object):
+    &#34;&#34;&#34;
+    Represents a top level AIR container def. Has its arguments, outputs/ updates, and a body
+
+    lambda, container, if-block, function
+    &#34;&#34;&#34;
+
+    # Name of the containrt
+    identifier_information: C2AIdentifierInformation
+    # Represents the variables coming into a lambda or container
+    arguments: List[C2AVariable]
+    # Represents the new versions of variables that are created and output
+    output_variables: List[C2AVariable]
+    # Represents variables that were updated (typically list/dict/object with fields changed)
+    updated_variables: List[C2AVariable]
+    # Represents the executable body statements
+    body: List[C2ALambda]
+    # Defines the span of code for this container body in the original source code
+    body_source_ref: C2ASourceRef
+    # Tracks what variables were added as arguments to container from previous scope
+    vars_from_previous_scope: List[C2AVariable]
+
+    def build_identifier(self):
+        return self.identifier_information.build_identifier()
+
+    def to_AIR(self):
+        return self
+
+    def add_arguments(self, arguments_to_add: List[C2AVariable]):
+        for v in arguments_to_add:
+            if v not in set(self.arguments):
+                self.arguments.append(v)
+
+    def add_outputs(self, output_variables_to_add: List[C2AVariable]):
+        # self.output_variables.update(set(output_variables_to_add))
+        for v in output_variables_to_add:
+            if v not in set(self.output_variables):
+                self.output_variables.append(v)
+
+    def add_updated(self, updated_variables_to_add: List[C2AVariable]):
+        # self.updated_variables.update(set(updated_variables_to_add))
+        for v in updated_variables_to_add:
+            if v not in set(self.updated_variables):
+                self.updated_variables.append(v)
+
+    def add_body_lambdas(self, body_to_add: List[C2ALambda]):
+        self.body.extend(body_to_add)
+
+    def add_body_source_ref(self, body_source_ref: SourceRef):
+        self.body_source_ref = body_source_ref
+
+    def add_var_used_from_previous_scope(self, var):
+        self.vars_from_previous_scope.append(var)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer">C2AFunctionDefContainer</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer">C2AIfContainer</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer">C2ALoopContainer</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.arguments"><code class="name">var <span class="ident">arguments</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.body"><code class="name">var <span class="ident">body</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.body_source_ref"><code class="name">var <span class="ident">body_source_ref</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.identifier_information"><code class="name">var <span class="ident">identifier_information</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.output_variables"><code class="name">var <span class="ident">output_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.updated_variables"><code class="name">var <span class="ident">updated_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.vars_from_previous_scope"><code class="name">var <span class="ident">vars_from_previous_scope</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_arguments"><code class="name flex">
+<span>def <span class="ident">add_arguments</span></span>(<span>self, arguments_to_add: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_arguments(self, arguments_to_add: List[C2AVariable]):
+    for v in arguments_to_add:
+        if v not in set(self.arguments):
+            self.arguments.append(v)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_body_lambdas"><code class="name flex">
+<span>def <span class="ident">add_body_lambdas</span></span>(<span>self, body_to_add: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_body_lambdas(self, body_to_add: List[C2ALambda]):
+    self.body.extend(body_to_add)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_body_source_ref"><code class="name flex">
+<span>def <span class="ident">add_body_source_ref</span></span>(<span>self, body_source_ref: <a title="skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef" href="cast/source_ref.html#skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef">SourceRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_body_source_ref(self, body_source_ref: SourceRef):
+    self.body_source_ref = body_source_ref</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_outputs"><code class="name flex">
+<span>def <span class="ident">add_outputs</span></span>(<span>self, output_variables_to_add: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_outputs(self, output_variables_to_add: List[C2AVariable]):
+    # self.output_variables.update(set(output_variables_to_add))
+    for v in output_variables_to_add:
+        if v not in set(self.output_variables):
+            self.output_variables.append(v)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_updated"><code class="name flex">
+<span>def <span class="ident">add_updated</span></span>(<span>self, updated_variables_to_add: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_updated(self, updated_variables_to_add: List[C2AVariable]):
+    # self.updated_variables.update(set(updated_variables_to_add))
+    for v in updated_variables_to_add:
+        if v not in set(self.updated_variables):
+            self.updated_variables.append(v)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_var_used_from_previous_scope"><code class="name flex">
+<span>def <span class="ident">add_var_used_from_previous_scope</span></span>(<span>self, var)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_var_used_from_previous_scope(self, var):
+    self.vars_from_previous_scope.append(var)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.build_identifier"><code class="name flex">
+<span>def <span class="ident">build_identifier</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_identifier(self):
+    return self.identifier_information.build_identifier()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    return self</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AException"><code class="flex name class">
+<span>class <span class="ident">C2AException</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to create exceptions during the CAST to AIR execution</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>An exception that occured during CAST to AIR execution</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AException(Exception):
+    &#34;&#34;&#34;
+    Used to create exceptions during the CAST to AIR execution
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda"><code class="flex name class">
+<span>class <span class="ident">C2AExpressionLambda</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, input_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], output_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], updated_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], container_type: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType">C2ALambdaType</a>, source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>, lambda_expr: str, cast: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A type of function within AIR that represents an executable lambda expression that transitions
+between states of the data flow of the program</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AExpressionLambda(C2ALambda):
+    &#34;&#34;&#34;
+    A type of function within AIR that represents an executable lambda expression that transitions
+    between states of the data flow of the program
+    &#34;&#34;&#34;
+
+    lambda_expr: str
+    cast: AstNode
+
+    def to_AIR(self):
+        return {
+            &#34;function&#34;: {
+                &#34;name&#34;: self.build_name(),
+                &#34;type&#34;: &#34;lambda&#34;,
+                &#34;code&#34;: self.lambda_expr,
+            },
+            &#34;input&#34;: build_unique_list_with_order(
+                self.input_variables, lambda v: v.build_identifier()
+            ),
+            &#34;output&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;source_ref&#34;: self.source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.cast"><code class="name">var <span class="ident">cast</span> : <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.lambda_expr"><code class="name">var <span class="ident">lambda_expr</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    return {
+        &#34;function&#34;: {
+            &#34;name&#34;: self.build_name(),
+            &#34;type&#34;: &#34;lambda&#34;,
+            &#34;code&#34;: self.lambda_expr,
+        },
+        &#34;input&#34;: build_unique_list_with_order(
+            self.input_variables, lambda v: v.build_identifier()
+        ),
+        &#34;output&#34;: build_unique_list_with_order(
+            self.output_variables, lambda v: v.build_identifier()
+        ),
+        &#34;updated&#34;: build_unique_list_with_order(
+            self.updated_variables, lambda v: v.build_identifier()
+        ),
+        &#34;source_ref&#34;: self.source_ref.to_AIR(),
+        &#34;metadata&#34;: [],
+    }</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer"><code class="flex name class">
+<span>class <span class="ident">C2AFunctionDefContainer</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, arguments: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], output_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], updated_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], body: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>], body_source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>, vars_from_previous_scope: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], return_type_name: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents a top level container definition. Input variables will represent the arguments to the funciton in the AIR. Also contains a body.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AFunctionDefContainer(C2AContainerDef):
+    &#34;&#34;&#34;
+    Represents a top level container definition. Input variables will represent the arguments to the funciton in the AIR. Also contains a body.
+    &#34;&#34;&#34;
+
+    return_type_name: str
+
+    def to_AIR(self):
+        return {
+            # TODO
+            &#34;name&#34;: self.identifier_information.build_identifier(),
+            &#34;source_refs&#34;: [],
+            &#34;type&#34;: &#34;function&#34;,
+            &#34;arguments&#34;: build_unique_list_with_order(
+                self.arguments, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;return_value&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;body&#34;: [i.to_AIR() for i in self.body],
+            &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef">C2AContainerDef</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer.return_type_name"><code class="name">var <span class="ident">return_type_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    return {
+        # TODO
+        &#34;name&#34;: self.identifier_information.build_identifier(),
+        &#34;source_refs&#34;: [],
+        &#34;type&#34;: &#34;function&#34;,
+        &#34;arguments&#34;: build_unique_list_with_order(
+            self.arguments, lambda v: v.build_identifier()
+        ),
+        &#34;updated&#34;: build_unique_list_with_order(
+            self.updated_variables, lambda v: v.build_identifier()
+        ),
+        &#34;return_value&#34;: build_unique_list_with_order(
+            self.output_variables, lambda v: v.build_identifier()
+        ),
+        &#34;body&#34;: [i.to_AIR() for i in self.body],
+        &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+        &#34;metadata&#34;: [],
+    }</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation"><code class="flex name class">
+<span>class <span class="ident">C2AIdentifierInformation</span></span>
+<span>(</span><span>name: str, scope: List[str], module: str, identifier_type: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType">C2AIdentifierType</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>C2AIdentifierInformation(name: str, scope: List[str], module: str, identifier_type: skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AIdentifierInformation(object):
+
+    name: str
+    scope: List[str]
+    module: str
+    identifier_type: C2AIdentifierType
+
+    def build_identifier(self):
+        return f&#39;@{self.identifier_type}::{self.module}::{&#34;.&#34;.join(self.scope)}::{self.name}&#39;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.identifier_type"><code class="name">var <span class="ident">identifier_type</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType">C2AIdentifierType</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.module"><code class="name">var <span class="ident">module</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.scope"><code class="name">var <span class="ident">scope</span> : List[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.build_identifier"><code class="name flex">
+<span>def <span class="ident">build_identifier</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_identifier(self):
+    return f&#39;@{self.identifier_type}::{self.module}::{&#34;.&#34;.join(self.scope)}::{self.name}&#39;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType"><code class="flex name class">
+<span>class <span class="ident">C2AIdentifierType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AIdentifierType(str, Enum):
+    UNKNOWN = &#34;unknown&#34;
+    VARIABLE = &#34;variable&#34;
+    CONTAINER = &#34;container&#34;
+    LAMBDA = &#34;lambda&#34;
+    DECISION = &#34;decision&#34;
+    PACK = &#34;pack&#34;
+    EXTRACT = &#34;extract&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.CONTAINER"><code class="name">var <span class="ident">CONTAINER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.DECISION"><code class="name">var <span class="ident">DECISION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.EXTRACT"><code class="name">var <span class="ident">EXTRACT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.LAMBDA"><code class="name">var <span class="ident">LAMBDA</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.PACK"><code class="name">var <span class="ident">PACK</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.UNKNOWN"><code class="name">var <span class="ident">UNKNOWN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.VARIABLE"><code class="name">var <span class="ident">VARIABLE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer"><code class="flex name class">
+<span>class <span class="ident">C2AIfContainer</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, arguments: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], output_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], updated_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], body: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>], body_source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>, vars_from_previous_scope: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], condition_source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>, output_per_condition: Dict[int, List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents a top level container definition. Input variables will represent
+the arguments that go through the if interface. Also contains a body.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AIfContainer(C2AContainerDef):
+    &#34;&#34;&#34;
+    Represents a top level container definition. Input variables will represent
+    the arguments that go through the if interface. Also contains a body.
+    &#34;&#34;&#34;
+
+    # Represents the reference to the source code where the conditional for this if is
+    condition_source_ref: C2ASourceRef
+    # Output vars per each condition in the if block. Represent else condition
+    # as condition number -1.
+    output_per_condition: Dict[int, List[C2AVariable]]
+
+    def add_condition_outputs(self, condition_num, outputs):
+        if condition_num not in self.output_per_condition:
+            self.output_per_condition[condition_num] = []
+        self.output_per_condition[condition_num].extend(outputs)
+
+    def to_AIR(self):
+
+        return {
+            # TODO
+            &#34;name&#34;: self.identifier_information.build_identifier(),
+            &#34;source_refs&#34;: [],
+            &#34;type&#34;: &#34;if-block&#34;,
+            &#34;arguments&#34;: build_unique_list_with_order(
+                self.arguments, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;return_value&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;body&#34;: [i.to_AIR() for i in self.body],
+            &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+            &#34;condition_source_ref&#34;: self.condition_source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef">C2AContainerDef</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.condition_source_ref"><code class="name">var <span class="ident">condition_source_ref</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.output_per_condition"><code class="name">var <span class="ident">output_per_condition</span> : Dict[int, List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.add_condition_outputs"><code class="name flex">
+<span>def <span class="ident">add_condition_outputs</span></span>(<span>self, condition_num, outputs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_condition_outputs(self, condition_num, outputs):
+    if condition_num not in self.output_per_condition:
+        self.output_per_condition[condition_num] = []
+    self.output_per_condition[condition_num].extend(outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+
+    return {
+        # TODO
+        &#34;name&#34;: self.identifier_information.build_identifier(),
+        &#34;source_refs&#34;: [],
+        &#34;type&#34;: &#34;if-block&#34;,
+        &#34;arguments&#34;: build_unique_list_with_order(
+            self.arguments, lambda v: v.build_identifier()
+        ),
+        &#34;updated&#34;: build_unique_list_with_order(
+            self.updated_variables, lambda v: v.build_identifier()
+        ),
+        &#34;return_value&#34;: build_unique_list_with_order(
+            self.output_variables, lambda v: v.build_identifier()
+        ),
+        &#34;body&#34;: [i.to_AIR() for i in self.body],
+        &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+        &#34;condition_source_ref&#34;: self.condition_source_ref.to_AIR(),
+        &#34;metadata&#34;: [],
+    }</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda"><code class="flex name class">
+<span>class <span class="ident">C2ALambda</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, input_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], output_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], updated_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], container_type: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType">C2ALambdaType</a>, source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents an executable container/ function to transition between states in AIR</p>
+<p>lambda, container, if-block, function</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ALambda(object):
+    &#34;&#34;&#34;
+    Represents an executable container/ function to transition between states in AIR
+
+    lambda, container, if-block, function
+    &#34;&#34;&#34;
+
+    # Identifying information for lambda function
+    identifier_information: C2AIdentifierInformation
+    # Represents the variables coming into a lambda or container
+    input_variables: List[C2AVariable]
+    # Represents the new versions of variables that are created and output
+    output_variables: List[C2AVariable]
+    # Represents variables that were updated (typically list/dict/object with fields changed)
+    updated_variables: List[C2AVariable]
+    # The type of the container.
+    container_type: C2ALambdaType
+    # The reference to the source code that this lambda was derived from
+    source_ref: C2ASourceRef
+
+    def build_name(self):
+        var = None
+        # TODO how should we build the name if there is multiple updated/output vars?
+        # Will this situation be possible?
+        if len(self.output_variables) &gt; 0:
+            var = self.output_variables[0]
+        elif len(self.updated_variables) &gt; 0:
+            var = self.updated_variables[0]
+        else:
+            raise C2AException(f&#34;No variables output or updated by lambda&#34;)
+
+        return (
+            f&#34;{self.identifier_information.module}&#34;
+            f&#34;__{&#39;.&#39;.join(self.identifier_information.scope)}&#34;
+            f&#34;__{self.container_type}&#34;
+            f&#34;__{var.identifier_information.name}&#34;
+            f&#34;__{var.version}&#34;
+        )
+
+    def to_AIR(self):
+        return self</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda">C2AContainerCallLambda</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda">C2AExpressionLambda</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.container_type"><code class="name">var <span class="ident">container_type</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType">C2ALambdaType</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.identifier_information"><code class="name">var <span class="ident">identifier_information</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.input_variables"><code class="name">var <span class="ident">input_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.output_variables"><code class="name">var <span class="ident">output_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.source_ref"><code class="name">var <span class="ident">source_ref</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.updated_variables"><code class="name">var <span class="ident">updated_variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.build_name"><code class="name flex">
+<span>def <span class="ident">build_name</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_name(self):
+    var = None
+    # TODO how should we build the name if there is multiple updated/output vars?
+    # Will this situation be possible?
+    if len(self.output_variables) &gt; 0:
+        var = self.output_variables[0]
+    elif len(self.updated_variables) &gt; 0:
+        var = self.updated_variables[0]
+    else:
+        raise C2AException(f&#34;No variables output or updated by lambda&#34;)
+
+    return (
+        f&#34;{self.identifier_information.module}&#34;
+        f&#34;__{&#39;.&#39;.join(self.identifier_information.scope)}&#34;
+        f&#34;__{self.container_type}&#34;
+        f&#34;__{var.identifier_information.name}&#34;
+        f&#34;__{var.version}&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    return self</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType"><code class="flex name class">
+<span>class <span class="ident">C2ALambdaType</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ALambdaType(str, Enum):
+    UNKNOWN = &#34;unknown&#34;
+    ASSIGN = &#34;assign&#34;
+    CONDITION = &#34;condition&#34;
+    DECISION = &#34;decision&#34;
+    EXIT = &#34;exit&#34;
+    RETURN = &#34;return&#34;
+    CONTAINER = &#34;container&#34;
+    OPERATOR = &#34;operator&#34;
+    EXTRACT = &#34;extract&#34;
+    PACK = &#34;pack&#34;</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.str</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.ASSIGN"><code class="name">var <span class="ident">ASSIGN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.CONDITION"><code class="name">var <span class="ident">CONDITION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.CONTAINER"><code class="name">var <span class="ident">CONTAINER</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.DECISION"><code class="name">var <span class="ident">DECISION</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.EXIT"><code class="name">var <span class="ident">EXIT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.EXTRACT"><code class="name">var <span class="ident">EXTRACT</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.OPERATOR"><code class="name">var <span class="ident">OPERATOR</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.PACK"><code class="name">var <span class="ident">PACK</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.RETURN"><code class="name">var <span class="ident">RETURN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.UNKNOWN"><code class="name">var <span class="ident">UNKNOWN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer"><code class="flex name class">
+<span>class <span class="ident">C2ALoopContainer</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, arguments: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], output_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], updated_variables: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], body: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a>], body_source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>, vars_from_previous_scope: List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], condition_source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents a top level container definition. Input variables will represent
+the arguments that go through the loop interface. Also contains a body.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ALoopContainer(C2AContainerDef):
+    &#34;&#34;&#34;
+    Represents a top level container definition. Input variables will represent
+    the arguments that go through the loop interface. Also contains a body.
+    &#34;&#34;&#34;
+
+    # Represents the reference to the source code where the conditional for this loop is
+    condition_source_ref: C2ASourceRef
+
+    def to_AIR(self):
+        return {
+            # TODO
+            &#34;name&#34;: self.identifier_information.build_identifier(),
+            &#34;source_refs&#34;: [],
+            &#34;type&#34;: &#34;loop&#34;,
+            &#34;arguments&#34;: build_unique_list_with_order(
+                self.arguments, lambda v: v.build_identifier()
+            ),
+            &#34;updated&#34;: build_unique_list_with_order(
+                self.updated_variables, lambda v: v.build_identifier()
+            ),
+            &#34;return_value&#34;: build_unique_list_with_order(
+                self.output_variables, lambda v: v.build_identifier()
+            ),
+            &#34;body&#34;: [i.to_AIR() for i in self.body],
+            &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+            &#34;condition_source_ref&#34;: self.condition_source_ref.to_AIR(),
+            &#34;metadata&#34;: [],
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef">C2AContainerDef</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer.condition_source_ref"><code class="name">var <span class="ident">condition_source_ref</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    return {
+        # TODO
+        &#34;name&#34;: self.identifier_information.build_identifier(),
+        &#34;source_refs&#34;: [],
+        &#34;type&#34;: &#34;loop&#34;,
+        &#34;arguments&#34;: build_unique_list_with_order(
+            self.arguments, lambda v: v.build_identifier()
+        ),
+        &#34;updated&#34;: build_unique_list_with_order(
+            self.updated_variables, lambda v: v.build_identifier()
+        ),
+        &#34;return_value&#34;: build_unique_list_with_order(
+            self.output_variables, lambda v: v.build_identifier()
+        ),
+        &#34;body&#34;: [i.to_AIR() for i in self.body],
+        &#34;body_source_ref&#34;: self.body_source_ref.to_AIR(),
+        &#34;condition_source_ref&#34;: self.condition_source_ref.to_AIR(),
+        &#34;metadata&#34;: [],
+    }</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ANameError"><code class="flex name class">
+<span>class <span class="ident">C2ANameError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used when name errors occur (such as a missing member variable for some
+object) during CAST</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>An exception that occured during CAST to AIR execution</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ANameError(NameError):
+    &#34;&#34;&#34;
+    Used when name errors occur (such as a missing member variable for some
+    object) during CAST
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.NameError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ARuntimeError"><code class="flex name class">
+<span>class <span class="ident">C2ARuntimeError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used for any runtime errors that occur during CAST &ndash;&gt; AIR processing</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>An exception that occured during CAST to AIR execution</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ARuntimeError(Exception):
+    &#34;&#34;&#34;
+    Used for any runtime errors that occur during CAST --&gt; AIR processing
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef"><code class="flex name class">
+<span>class <span class="ident">C2ASourceRef</span></span>
+<span>(</span><span>file: str, line_begin: int, col_start: int, line_end: int, col_end: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Represents a reference point of the containing object in the original source
+code. If a field of the line/col reference information is missing, it will
+hold the value -1.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ASourceRef(object):
+    &#34;&#34;&#34;
+    Represents a reference point of the containing object in the original source
+    code. If a field of the line/col reference information is missing, it will
+    hold the value -1.
+    &#34;&#34;&#34;
+
+    file: str
+    line_begin: int
+    col_start: int
+    line_end: int
+    col_end: int
+
+    def to_AIR(self):
+        return self.__dict__</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.col_end"><code class="name">var <span class="ident">col_end</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.col_start"><code class="name">var <span class="ident">col_start</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.file"><code class="name">var <span class="ident">file</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.line_begin"><code class="name">var <span class="ident">line_begin</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.line_end"><code class="name">var <span class="ident">line_end</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    return self.__dict__</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState"><code class="flex name class">
+<span>class <span class="ident">C2AState</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AState(object):
+    containers: List[C2AContainerDef]
+    variables: List[C2AVariable]
+    types: List[C2ATypeDef]
+    scope_stack: List[str]
+    current_module: str
+    current_function: C2AFunctionDefContainer
+    current_conditional: int
+    attribute_access_state: C2AAttributeAccessState
+    current_context: C2AVariableContext
+
+    def __init__(self):
+        self.containers = list()
+        self.variables = list()
+        self.types = list()
+        self.scope_stack = []
+        self.current_module = &#34;initial&#34;
+        self.current_function = None
+        self.current_conditional = 0
+        self.current_context = C2AVariableContext.UNKNOWN
+        self.attribute_access_state = C2AAttributeAccessState()
+
+    def add_container(self, con: C2AContainerDef):
+        self.containers.append(con)
+
+    def add_variable(self, var: C2AVariable):
+        self.variables.append(var)
+
+    def add_type(self, type: C2ATypeDef):
+        self.types.append(type)
+
+    def get_scope_stack(self):
+        &#34;&#34;&#34;
+        Returns the current scope of the CAST to AIR state
+        &#34;&#34;&#34;
+        return self.scope_stack.copy()
+
+    def push_scope(self, scope):
+        &#34;&#34;&#34;
+        Places the name scope level name onto the scope stack
+        &#34;&#34;&#34;
+        self.scope_stack.append(scope)
+
+    def pop_scope(self):
+        &#34;&#34;&#34;
+        Removes the last scope name from the stack and returns it
+        &#34;&#34;&#34;
+        top = self.scope_stack[-1]
+        self.scope_stack = self.scope_stack[:-1]
+        return top
+
+    def is_var_identifier_in_variables(self, identifier):
+        for v in self.variables:
+            if v.build_identifier() == identifier:
+                return True
+        return False
+
+    def find_highest_version_var_in_scope(self, var_name, scope):
+        &#34;&#34;&#34;
+        Given a variable name, finds the highest version defined
+        for that variable given a scope
+        &#34;&#34;&#34;
+        # Check that the global/function_name are the same
+        # TODO define what needs to be checked here better
+        def share_scope(scope1, scope2):
+            return scope1 == scope2
+
+        instances = [
+            v
+            for v in self.variables
+            if v.identifier_information.name == var_name
+            and share_scope(scope, v.identifier_information.scope)
+        ]
+        return max(instances, key=lambda v: v.version, default=None)
+
+    def find_highest_version_var_in_previous_scopes(self, var_name):
+        &#34;&#34;&#34;
+        Given a variable name, finds the highest version defined
+        for that variable along our current scope path
+        &#34;&#34;&#34;
+        # Subtract one so we look at all scopes except &#34;global&#34;
+        i = len(self.scope_stack)
+        while i &gt;= 0:
+            res = self.find_highest_version_var_in_scope(
+                var_name, self.scope_stack[:i]
+            )
+            if res is not None:
+                return res
+            i -= 1
+
+        return None
+
+    def find_highest_version_var_in_current_scope(self, var_name):
+        &#34;&#34;&#34;
+        Given a variable name, finds the highest version defined
+        for that variable given the current scope
+        &#34;&#34;&#34;
+        return self.find_highest_version_var_in_scope(
+            var_name, self.scope_stack
+        )
+
+    def find_next_var_version(self, var_name):
+        &#34;&#34;&#34;
+        Determines the next version of a variable given its name and
+        variables in the current scope.
+        &#34;&#34;&#34;
+        current_highest_ver = self.find_highest_version_var_in_current_scope(
+            var_name
+        )
+        return (
+            current_highest_ver.version + 1
+            if current_highest_ver is not None
+            else -1
+        )
+
+    def find_container(self, scope):
+        matching = [
+            c
+            for c in self.containers
+            if c.identifier_information.scope + [c.identifier_information.name]
+            == scope
+        ]
+
+        return matching[0] if matching else None
+
+    def find_root_level_containers(self):
+        called_containers = [
+            s.identifier_information.build_identifier()
+            for c in self.containers
+            for s in c.body
+            if isinstance(s, C2AContainerCallLambda)
+        ]
+        root_containers = [
+            c.identifier_information.name
+            for c in self.containers
+            if c.build_identifier() not in called_containers
+        ]
+        return root_containers
+
+    def get_next_conditional(self):
+        cur_cond = self.current_conditional
+        self.current_conditional += 1
+        return cur_cond
+
+    def reset_conditional_count(self):
+        self.current_conditional = 0
+
+    def reset_current_function(self):
+        self.current_function = None
+
+    def set_variable_context(self, context):
+        self.current_context = context
+
+    def to_AIR(self):
+        &#34;&#34;&#34;
+        Translates the model used to translate CAST to AIR into the
+        final AIR structure.
+        &#34;&#34;&#34;
+        container_air = [c.to_AIR() for c in self.containers]
+        var_air = [v.to_AIR() for v in self.variables]
+        types_air = [t.to_AIR() for t in self.types]
+
+        # Trim variables that are just defined and hanging. This seems like a
+        # bug BUT it is actually a remnant of how GCC gives variable definitions.
+        all_input_vars = {
+            v for c in container_air for l in c[&#34;body&#34;] for v in l[&#34;input&#34;]
+        }
+        all_return_vars = {v for c in container_air for v in c[&#34;return_value&#34;]}
+        all_arg_vars = {v for c in container_air for v in c[&#34;arguments&#34;]}
+        # all_vars_into_lambdbas = {*all_input_vars, *all_return_vars, *all_arg_vars}
+
+        all_vars_passed_through_lambdas = {
+            v_name
+            for c in container_air
+            for l in c[&#34;body&#34;]
+            for v_name in l[&#34;input&#34;] + l[&#34;output&#34;]
+            if len(l[&#34;input&#34;]) &gt; 0
+        }
+        hanging_vars = [
+            v[&#34;name&#34;]
+            for v in var_air
+            if v[&#34;name&#34;] not in all_vars_passed_through_lambdas
+        ]
+
+        def is_hanging_lambda(l, c):
+            hanging_lambda = len(l[&#34;input&#34;]) == 0 and all(
+                [
+                    v not in {*all_input_vars, *all_return_vars, *all_arg_vars}
+                    for v in l[&#34;output&#34;]
+                ]
+            )
+            return hanging_lambda
+
+        for con in container_air:
+            hanging_lambda_vars = [
+                v
+                for l in con[&#34;body&#34;]
+                if is_hanging_lambda(l, con)
+                for v in l[&#34;output&#34;]
+            ]
+            # Trim variables
+            var_air = [
+                v for v in var_air if v[&#34;name&#34;] not in hanging_lambda_vars
+            ]
+            if &#34;return_value&#34; in con:
+                hanging_ret_vars = {
+                    v for v in con[&#34;return_value&#34;] if v in hanging_vars
+                }
+                lambdas_calling = [
+                    l
+                    for c in container_air
+                    for l in c[&#34;body&#34;]
+                    if l[&#34;function&#34;][&#34;type&#34;] == &#34;container&#34;
+                    and l[&#34;function&#34;][&#34;name&#34;] == con[&#34;name&#34;]
+                ]
+
+                if len(lambdas_calling) == 0:
+                    con[&#34;return_value&#34;] = [
+                        v
+                        for v in con[&#34;return_value&#34;]
+                        if v not in hanging_ret_vars
+                    ]
+                    all_return_vars.difference_update(hanging_ret_vars)
+                    var_air = [
+                        v for v in var_air if v[&#34;name&#34;] not in hanging_ret_vars
+                    ]
+
+            if &#34;arguments&#34; in con:
+                hanging_arg_vars = {
+                    v for v in con[&#34;arguments&#34;] if v in hanging_vars
+                }
+                con[&#34;arguments&#34;] = [
+                    v for v in con[&#34;arguments&#34;] if v not in hanging_arg_vars
+                ]
+                all_arg_vars.difference_update(hanging_arg_vars)
+                var_air = [
+                    v for v in var_air if v[&#34;name&#34;] not in hanging_arg_vars
+                ]
+
+            con[&#34;body&#34;] = [
+                l for l in con[&#34;body&#34;] if not is_hanging_lambda(l, con)
+            ]
+
+        return {
+            &#34;containers&#34;: container_air,
+            &#34;variables&#34;: var_air,
+            &#34;types&#34;: types_air,
+        }</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.attribute_access_state"><code class="name">var <span class="ident">attribute_access_state</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState">C2AAttributeAccessState</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.containers"><code class="name">var <span class="ident">containers</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef">C2AContainerDef</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_conditional"><code class="name">var <span class="ident">current_conditional</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_context"><code class="name">var <span class="ident">current_context</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext">C2AVariableContext</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_function"><code class="name">var <span class="ident">current_function</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer">C2AFunctionDefContainer</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_module"><code class="name">var <span class="ident">current_module</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.scope_stack"><code class="name">var <span class="ident">scope_stack</span> : List[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.types"><code class="name">var <span class="ident">types</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef">C2ATypeDef</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.variables"><code class="name">var <span class="ident">variables</span> : List[<a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_container"><code class="name flex">
+<span>def <span class="ident">add_container</span></span>(<span>self, con: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef">C2AContainerDef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_container(self, con: C2AContainerDef):
+    self.containers.append(con)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_type"><code class="name flex">
+<span>def <span class="ident">add_type</span></span>(<span>self, type: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef">C2ATypeDef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_type(self, type: C2ATypeDef):
+    self.types.append(type)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_variable"><code class="name flex">
+<span>def <span class="ident">add_variable</span></span>(<span>self, var: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_variable(self, var: C2AVariable):
+    self.variables.append(var)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_container"><code class="name flex">
+<span>def <span class="ident">find_container</span></span>(<span>self, scope)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_container(self, scope):
+    matching = [
+        c
+        for c in self.containers
+        if c.identifier_information.scope + [c.identifier_information.name]
+        == scope
+    ]
+
+    return matching[0] if matching else None</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_current_scope"><code class="name flex">
+<span>def <span class="ident">find_highest_version_var_in_current_scope</span></span>(<span>self, var_name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a variable name, finds the highest version defined
+for that variable given the current scope</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_highest_version_var_in_current_scope(self, var_name):
+    &#34;&#34;&#34;
+    Given a variable name, finds the highest version defined
+    for that variable given the current scope
+    &#34;&#34;&#34;
+    return self.find_highest_version_var_in_scope(
+        var_name, self.scope_stack
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_previous_scopes"><code class="name flex">
+<span>def <span class="ident">find_highest_version_var_in_previous_scopes</span></span>(<span>self, var_name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a variable name, finds the highest version defined
+for that variable along our current scope path</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_highest_version_var_in_previous_scopes(self, var_name):
+    &#34;&#34;&#34;
+    Given a variable name, finds the highest version defined
+    for that variable along our current scope path
+    &#34;&#34;&#34;
+    # Subtract one so we look at all scopes except &#34;global&#34;
+    i = len(self.scope_stack)
+    while i &gt;= 0:
+        res = self.find_highest_version_var_in_scope(
+            var_name, self.scope_stack[:i]
+        )
+        if res is not None:
+            return res
+        i -= 1
+
+    return None</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_scope"><code class="name flex">
+<span>def <span class="ident">find_highest_version_var_in_scope</span></span>(<span>self, var_name, scope)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a variable name, finds the highest version defined
+for that variable given a scope</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_highest_version_var_in_scope(self, var_name, scope):
+    &#34;&#34;&#34;
+    Given a variable name, finds the highest version defined
+    for that variable given a scope
+    &#34;&#34;&#34;
+    # Check that the global/function_name are the same
+    # TODO define what needs to be checked here better
+    def share_scope(scope1, scope2):
+        return scope1 == scope2
+
+    instances = [
+        v
+        for v in self.variables
+        if v.identifier_information.name == var_name
+        and share_scope(scope, v.identifier_information.scope)
+    ]
+    return max(instances, key=lambda v: v.version, default=None)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_next_var_version"><code class="name flex">
+<span>def <span class="ident">find_next_var_version</span></span>(<span>self, var_name)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Determines the next version of a variable given its name and
+variables in the current scope.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_next_var_version(self, var_name):
+    &#34;&#34;&#34;
+    Determines the next version of a variable given its name and
+    variables in the current scope.
+    &#34;&#34;&#34;
+    current_highest_ver = self.find_highest_version_var_in_current_scope(
+        var_name
+    )
+    return (
+        current_highest_ver.version + 1
+        if current_highest_ver is not None
+        else -1
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_root_level_containers"><code class="name flex">
+<span>def <span class="ident">find_root_level_containers</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_root_level_containers(self):
+    called_containers = [
+        s.identifier_information.build_identifier()
+        for c in self.containers
+        for s in c.body
+        if isinstance(s, C2AContainerCallLambda)
+    ]
+    root_containers = [
+        c.identifier_information.name
+        for c in self.containers
+        if c.build_identifier() not in called_containers
+    ]
+    return root_containers</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.get_next_conditional"><code class="name flex">
+<span>def <span class="ident">get_next_conditional</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_next_conditional(self):
+    cur_cond = self.current_conditional
+    self.current_conditional += 1
+    return cur_cond</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.get_scope_stack"><code class="name flex">
+<span>def <span class="ident">get_scope_stack</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the current scope of the CAST to AIR state</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_scope_stack(self):
+    &#34;&#34;&#34;
+    Returns the current scope of the CAST to AIR state
+    &#34;&#34;&#34;
+    return self.scope_stack.copy()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.is_var_identifier_in_variables"><code class="name flex">
+<span>def <span class="ident">is_var_identifier_in_variables</span></span>(<span>self, identifier)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_var_identifier_in_variables(self, identifier):
+    for v in self.variables:
+        if v.build_identifier() == identifier:
+            return True
+    return False</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.pop_scope"><code class="name flex">
+<span>def <span class="ident">pop_scope</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Removes the last scope name from the stack and returns it</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pop_scope(self):
+    &#34;&#34;&#34;
+    Removes the last scope name from the stack and returns it
+    &#34;&#34;&#34;
+    top = self.scope_stack[-1]
+    self.scope_stack = self.scope_stack[:-1]
+    return top</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.push_scope"><code class="name flex">
+<span>def <span class="ident">push_scope</span></span>(<span>self, scope)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Places the name scope level name onto the scope stack</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def push_scope(self, scope):
+    &#34;&#34;&#34;
+    Places the name scope level name onto the scope stack
+    &#34;&#34;&#34;
+    self.scope_stack.append(scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.reset_conditional_count"><code class="name flex">
+<span>def <span class="ident">reset_conditional_count</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset_conditional_count(self):
+    self.current_conditional = 0</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.reset_current_function"><code class="name flex">
+<span>def <span class="ident">reset_current_function</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def reset_current_function(self):
+    self.current_function = None</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.set_variable_context"><code class="name flex">
+<span>def <span class="ident">set_variable_context</span></span>(<span>self, context)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_variable_context(self, context):
+    self.current_context = context</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Translates the model used to translate CAST to AIR into the
+final AIR structure.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    &#34;&#34;&#34;
+    Translates the model used to translate CAST to AIR into the
+    final AIR structure.
+    &#34;&#34;&#34;
+    container_air = [c.to_AIR() for c in self.containers]
+    var_air = [v.to_AIR() for v in self.variables]
+    types_air = [t.to_AIR() for t in self.types]
+
+    # Trim variables that are just defined and hanging. This seems like a
+    # bug BUT it is actually a remnant of how GCC gives variable definitions.
+    all_input_vars = {
+        v for c in container_air for l in c[&#34;body&#34;] for v in l[&#34;input&#34;]
+    }
+    all_return_vars = {v for c in container_air for v in c[&#34;return_value&#34;]}
+    all_arg_vars = {v for c in container_air for v in c[&#34;arguments&#34;]}
+    # all_vars_into_lambdbas = {*all_input_vars, *all_return_vars, *all_arg_vars}
+
+    all_vars_passed_through_lambdas = {
+        v_name
+        for c in container_air
+        for l in c[&#34;body&#34;]
+        for v_name in l[&#34;input&#34;] + l[&#34;output&#34;]
+        if len(l[&#34;input&#34;]) &gt; 0
+    }
+    hanging_vars = [
+        v[&#34;name&#34;]
+        for v in var_air
+        if v[&#34;name&#34;] not in all_vars_passed_through_lambdas
+    ]
+
+    def is_hanging_lambda(l, c):
+        hanging_lambda = len(l[&#34;input&#34;]) == 0 and all(
+            [
+                v not in {*all_input_vars, *all_return_vars, *all_arg_vars}
+                for v in l[&#34;output&#34;]
+            ]
+        )
+        return hanging_lambda
+
+    for con in container_air:
+        hanging_lambda_vars = [
+            v
+            for l in con[&#34;body&#34;]
+            if is_hanging_lambda(l, con)
+            for v in l[&#34;output&#34;]
+        ]
+        # Trim variables
+        var_air = [
+            v for v in var_air if v[&#34;name&#34;] not in hanging_lambda_vars
+        ]
+        if &#34;return_value&#34; in con:
+            hanging_ret_vars = {
+                v for v in con[&#34;return_value&#34;] if v in hanging_vars
+            }
+            lambdas_calling = [
+                l
+                for c in container_air
+                for l in c[&#34;body&#34;]
+                if l[&#34;function&#34;][&#34;type&#34;] == &#34;container&#34;
+                and l[&#34;function&#34;][&#34;name&#34;] == con[&#34;name&#34;]
+            ]
+
+            if len(lambdas_calling) == 0:
+                con[&#34;return_value&#34;] = [
+                    v
+                    for v in con[&#34;return_value&#34;]
+                    if v not in hanging_ret_vars
+                ]
+                all_return_vars.difference_update(hanging_ret_vars)
+                var_air = [
+                    v for v in var_air if v[&#34;name&#34;] not in hanging_ret_vars
+                ]
+
+        if &#34;arguments&#34; in con:
+            hanging_arg_vars = {
+                v for v in con[&#34;arguments&#34;] if v in hanging_vars
+            }
+            con[&#34;arguments&#34;] = [
+                v for v in con[&#34;arguments&#34;] if v not in hanging_arg_vars
+            ]
+            all_arg_vars.difference_update(hanging_arg_vars)
+            var_air = [
+                v for v in var_air if v[&#34;name&#34;] not in hanging_arg_vars
+            ]
+
+        con[&#34;body&#34;] = [
+            l for l in con[&#34;body&#34;] if not is_hanging_lambda(l, con)
+        ]
+
+    return {
+        &#34;containers&#34;: container_air,
+        &#34;variables&#34;: var_air,
+        &#34;types&#34;: types_air,
+    }</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef"><code class="flex name class">
+<span>class <span class="ident">C2ATypeDef</span></span>
+<span>(</span><span>name: str, given_type: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType">C2ATypeDef.C2AType</a>, fields: Dict[str, <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>], function_identifiers: List[str], source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>C2ATypeDef(name: str, given_type: skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType, fields: Dict[str, skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable], function_identifiers: List[str], source_ref: skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ATypeDef(object):
+    class C2AType(str, Enum):
+        INTEGER = &#34;integer&#34;
+        FLOAT = &#34;float&#34;
+        STRING = &#34;string&#34;
+        LIST = &#34;list&#34;
+        DICT = &#34;dict&#34;
+        SET = &#34;set&#34;
+        OBJECT = &#34;object&#34;
+
+    name: str
+    given_type: C2AType
+    fields: Dict[str, C2AVariable]
+    function_identifiers: List[str]
+    source_ref: C2ASourceRef
+
+    def to_AIR(self):
+        air = self.__dict__
+        air.update({&#34;metadata&#34;: [], &#34;metatype&#34;: &#34;composite&#34;})
+        return air</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType"><code class="name">var <span class="ident">C2AType</span></code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.fields"><code class="name">var <span class="ident">fields</span> : Dict[str, <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.function_identifiers"><code class="name">var <span class="ident">function_identifiers</span> : List[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.given_type"><code class="name">var <span class="ident">given_type</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType">C2ATypeDef.C2AType</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.name"><code class="name">var <span class="ident">name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.source_ref"><code class="name">var <span class="ident">source_ref</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    air = self.__dict__
+    air.update({&#34;metadata&#34;: [], &#34;metatype&#34;: &#34;composite&#34;})
+    return air</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeError"><code class="flex name class">
+<span>class <span class="ident">C2ATypeError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to create exceptions during the CAST to AIR execution</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>An exception that occured during CAST to AIR execution</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2ATypeError(TypeError):
+    &#34;&#34;&#34;
+    Used to create exceptions during the CAST to AIR execution
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.TypeError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AValueError"><code class="flex name class">
+<span>class <span class="ident">C2AValueError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used when an operation cannot be performed for a given value during CAST</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>An exception that occured during CAST to AIR execution</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AValueError(Exception):
+    &#34;&#34;&#34;
+    Used when an operation cannot be performed for a given value during CAST
+
+    Args:
+        Exception: An exception that occured during CAST to AIR execution
+    &#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable"><code class="flex name class">
+<span>class <span class="ident">C2AVariable</span></span>
+<span>(</span><span>identifier_information: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a>, version: int, type_name: str, source_ref: <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AVariable(object):
+
+    identifier_information: C2AIdentifierInformation
+    version: int
+    type_name: str
+    source_ref: C2ASourceRef
+    metadata: list
+
+    def __init__(
+        self,
+        identifier_information: C2AIdentifierInformation,
+        version: int,
+        type_name: str,
+        source_ref: C2ASourceRef,
+    ):
+        self.identifier_information = identifier_information
+        self.version = version
+        self.type_name = type_name
+        self.source_ref = source_ref
+        self.metadata = list()
+
+    def get_name(self):
+        return self.identifier_information.name
+
+    def build_identifier(self):
+        &#34;&#34;&#34;
+        Builds the variable identifier which uses the identifier from identifier
+        information plus the variable version
+
+        Returns:
+            str: Unique variable identifier
+        &#34;&#34;&#34;
+        return f&#34;{self.identifier_information.build_identifier()}::{str(self.version)}&#34;
+
+    def add_metadata(self, data: BaseMetadata):
+        self.metadata.append(data)
+
+    def to_AIR(self):
+        # TODO
+        domain = {
+            &#34;type&#34;: &#34;type&#34;,  # TODO what is this field?
+            &#34;mutable&#34;: False,  # TODO probably only mutable if object/list/dict type
+        }
+        if self.type_name == &#34;Number&#34;:
+            domain[&#34;name&#34;] = &#34;integer&#34;
+        elif self.type_name.startswith(&#34;object$&#34;):
+            name = self.type_name.split(&#34;object$&#34;)[-1]
+            domain.update(
+                {
+                    &#34;name&#34;: &#34;object&#34;,
+                    &#34;object_name&#34;: name,
+                }
+            )
+        else:
+            domain[&#34;name&#34;] = self.type_name
+
+        has_from_source_metadata = False
+        for m in self.metadata:
+            if m.type == MetadataType.FROM_SOURCE:
+                has_from_source_metadata = True
+                break
+        # If from_source does not exist already, then it wasnt handled by a special
+        # case where we added a variable during processing, so add True from_source
+        # metadata
+        if not has_from_source_metadata:
+            self.add_metadata(
+                TypedMetadata.from_data(
+                    {
+                        &#34;type&#34;: &#34;FROM_SOURCE&#34;,
+                        &#34;provenance&#34;: {
+                            &#34;method&#34;: &#34;PROGRAM_ANALYSIS_PIPELINE&#34;,
+                            &#34;timestamp&#34;: datetime.now(),
+                        },
+                        &#34;from_source&#34;: True,
+                        &#34;creation_reason&#34;: &#34;UNKNOWN&#34;,
+                    }
+                )
+            )
+
+        return {
+            &#34;name&#34;: self.build_identifier(),
+            &#34;source_refs&#34;: [self.source_ref.to_AIR()],
+            &#34;domain&#34;: domain,
+            &#34;domain_constraint&#34;: &#34;(and (&gt; v -infty) (&lt; v infty))&#34;,  # TODO
+            &#34;metadata&#34;: [m.to_dict() for m in self.metadata],
+        }</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.identifier_information"><code class="name">var <span class="ident">identifier_information</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.metadata"><code class="name">var <span class="ident">metadata</span> : list</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.source_ref"><code class="name">var <span class="ident">source_ref</span> : <a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.type_name"><code class="name">var <span class="ident">type_name</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.version"><code class="name">var <span class="ident">version</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.add_metadata"><code class="name flex">
+<span>def <span class="ident">add_metadata</span></span>(<span>self, data: skema.model_assembly.metadata.BaseMetadata)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_metadata(self, data: BaseMetadata):
+    self.metadata.append(data)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.build_identifier"><code class="name flex">
+<span>def <span class="ident">build_identifier</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Builds the variable identifier which uses the identifier from identifier
+information plus the variable version</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>Unique variable identifier</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_identifier(self):
+    &#34;&#34;&#34;
+    Builds the variable identifier which uses the identifier from identifier
+    information plus the variable version
+
+    Returns:
+        str: Unique variable identifier
+    &#34;&#34;&#34;
+    return f&#34;{self.identifier_information.build_identifier()}::{str(self.version)}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.get_name"><code class="name flex">
+<span>def <span class="ident">get_name</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_name(self):
+    return self.identifier_information.name</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.to_AIR"><code class="name flex">
+<span>def <span class="ident">to_AIR</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_AIR(self):
+    # TODO
+    domain = {
+        &#34;type&#34;: &#34;type&#34;,  # TODO what is this field?
+        &#34;mutable&#34;: False,  # TODO probably only mutable if object/list/dict type
+    }
+    if self.type_name == &#34;Number&#34;:
+        domain[&#34;name&#34;] = &#34;integer&#34;
+    elif self.type_name.startswith(&#34;object$&#34;):
+        name = self.type_name.split(&#34;object$&#34;)[-1]
+        domain.update(
+            {
+                &#34;name&#34;: &#34;object&#34;,
+                &#34;object_name&#34;: name,
+            }
+        )
+    else:
+        domain[&#34;name&#34;] = self.type_name
+
+    has_from_source_metadata = False
+    for m in self.metadata:
+        if m.type == MetadataType.FROM_SOURCE:
+            has_from_source_metadata = True
+            break
+    # If from_source does not exist already, then it wasnt handled by a special
+    # case where we added a variable during processing, so add True from_source
+    # metadata
+    if not has_from_source_metadata:
+        self.add_metadata(
+            TypedMetadata.from_data(
+                {
+                    &#34;type&#34;: &#34;FROM_SOURCE&#34;,
+                    &#34;provenance&#34;: {
+                        &#34;method&#34;: &#34;PROGRAM_ANALYSIS_PIPELINE&#34;,
+                        &#34;timestamp&#34;: datetime.now(),
+                    },
+                    &#34;from_source&#34;: True,
+                    &#34;creation_reason&#34;: &#34;UNKNOWN&#34;,
+                }
+            )
+        )
+
+    return {
+        &#34;name&#34;: self.build_identifier(),
+        &#34;source_refs&#34;: [self.source_ref.to_AIR()],
+        &#34;domain&#34;: domain,
+        &#34;domain_constraint&#34;: &#34;(and (&gt; v -infty) (&lt; v infty))&#34;,  # TODO
+        &#34;metadata&#34;: [m.to_dict() for m in self.metadata],
+    }</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext"><code class="flex name class">
+<span>class <span class="ident">C2AVariableContext</span></span>
+<span>(</span><span>value, names=None, *, module=None, qualname=None, type=None, start=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class C2AVariableContext(Enum):
+    LOAD = 0
+    STORE = 1
+    ATTR_VALUE = 2
+    UNKNOWN = 3</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.ATTR_VALUE"><code class="name">var <span class="ident">ATTR_VALUE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.LOAD"><code class="name">var <span class="ident">LOAD</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.STORE"><code class="name">var <span class="ident">STORE</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.UNKNOWN"><code class="name">var <span class="ident">UNKNOWN</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST2FN.model" href="index.html">skema.program_analysis.CAST2FN.model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.build_unique_list_with_order" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.build_unique_list_with_order">build_unique_list_with_order</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState">C2AAttributeAccessState</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.add_attribute_access" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.add_attribute_access">add_attribute_access</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.add_attribute_to_pack" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.add_attribute_to_pack">add_attribute_to_pack</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.build_extract_lambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.build_extract_lambda">build_extract_lambda</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.get_outstanding_pack_node" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.get_outstanding_pack_node">get_outstanding_pack_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.get_outstanding_pack_nodes" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.get_outstanding_pack_nodes">get_outstanding_pack_nodes</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.has_outstanding_pack_nodes" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.has_outstanding_pack_nodes">has_outstanding_pack_nodes</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.need_attribute_extract" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.need_attribute_extract">need_attribute_extract</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.var_to_current_extract_node" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.var_to_current_extract_node">var_to_current_extract_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.var_to_current_pack_node" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AAttributeAccessState.var_to_current_pack_node">var_to_current_pack_node</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda">C2AContainerCallLambda</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.build_name" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.build_name">build_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.container_type" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.container_type">container_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.identifier_information" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.identifier_information">identifier_information</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.input_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.input_variables">input_variables</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.output_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.output_variables">output_variables</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.source_ref">source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.to_AIR">to_AIR</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.updated_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerCallLambda.updated_variables">updated_variables</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef">C2AContainerDef</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_arguments" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_arguments">add_arguments</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_body_lambdas" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_body_lambdas">add_body_lambdas</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_body_source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_body_source_ref">add_body_source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_outputs" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_outputs">add_outputs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_updated" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_updated">add_updated</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_var_used_from_previous_scope" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.add_var_used_from_previous_scope">add_var_used_from_previous_scope</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.arguments" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.arguments">arguments</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.body" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.body">body</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.body_source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.body_source_ref">body_source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.build_identifier" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.build_identifier">build_identifier</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.identifier_information" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.identifier_information">identifier_information</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.output_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.output_variables">output_variables</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.to_AIR">to_AIR</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.updated_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.updated_variables">updated_variables</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.vars_from_previous_scope" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AContainerDef.vars_from_previous_scope">vars_from_previous_scope</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AException" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AException">C2AException</a></code></h4>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda">C2AExpressionLambda</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.cast" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.cast">cast</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.lambda_expr" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.lambda_expr">lambda_expr</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AExpressionLambda.to_AIR">to_AIR</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer">C2AFunctionDefContainer</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer.return_type_name" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer.return_type_name">return_type_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AFunctionDefContainer.to_AIR">to_AIR</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation">C2AIdentifierInformation</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.build_identifier" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.build_identifier">build_identifier</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.identifier_type" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.identifier_type">identifier_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.module" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.module">module</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.name" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.name">name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.scope" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierInformation.scope">scope</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType">C2AIdentifierType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.CONTAINER" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.CONTAINER">CONTAINER</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.DECISION" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.DECISION">DECISION</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.EXTRACT" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.EXTRACT">EXTRACT</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.LAMBDA" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.LAMBDA">LAMBDA</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.PACK" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.PACK">PACK</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.UNKNOWN" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.UNKNOWN">UNKNOWN</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.VARIABLE" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIdentifierType.VARIABLE">VARIABLE</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer">C2AIfContainer</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.add_condition_outputs" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.add_condition_outputs">add_condition_outputs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.condition_source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.condition_source_ref">condition_source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.output_per_condition" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.output_per_condition">output_per_condition</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AIfContainer.to_AIR">to_AIR</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda">C2ALambda</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.build_name" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.build_name">build_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.container_type" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.container_type">container_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.identifier_information" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.identifier_information">identifier_information</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.input_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.input_variables">input_variables</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.output_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.output_variables">output_variables</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.source_ref">source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.to_AIR">to_AIR</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.updated_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambda.updated_variables">updated_variables</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType">C2ALambdaType</a></code></h4>
+<ul class="two-column">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.ASSIGN" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.ASSIGN">ASSIGN</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.CONDITION" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.CONDITION">CONDITION</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.CONTAINER" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.CONTAINER">CONTAINER</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.DECISION" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.DECISION">DECISION</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.EXIT" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.EXIT">EXIT</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.EXTRACT" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.EXTRACT">EXTRACT</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.OPERATOR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.OPERATOR">OPERATOR</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.PACK" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.PACK">PACK</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.RETURN" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.RETURN">RETURN</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.UNKNOWN" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALambdaType.UNKNOWN">UNKNOWN</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer">C2ALoopContainer</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer.condition_source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer.condition_source_ref">condition_source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ALoopContainer.to_AIR">to_AIR</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ANameError" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ANameError">C2ANameError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ARuntimeError" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ARuntimeError">C2ARuntimeError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef">C2ASourceRef</a></code></h4>
+<ul class="two-column">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.col_end" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.col_end">col_end</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.col_start" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.col_start">col_start</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.file" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.file">file</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.line_begin" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.line_begin">line_begin</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.line_end" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.line_end">line_end</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ASourceRef.to_AIR">to_AIR</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState">C2AState</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_container" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_container">add_container</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_type" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_type">add_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_variable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.add_variable">add_variable</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.attribute_access_state" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.attribute_access_state">attribute_access_state</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.containers" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.containers">containers</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_conditional" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_conditional">current_conditional</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_context" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_context">current_context</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_function" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_function">current_function</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_module" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.current_module">current_module</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_container" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_container">find_container</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_current_scope" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_current_scope">find_highest_version_var_in_current_scope</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_previous_scopes" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_previous_scopes">find_highest_version_var_in_previous_scopes</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_scope" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_highest_version_var_in_scope">find_highest_version_var_in_scope</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_next_var_version" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_next_var_version">find_next_var_version</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_root_level_containers" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.find_root_level_containers">find_root_level_containers</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.get_next_conditional" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.get_next_conditional">get_next_conditional</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.get_scope_stack" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.get_scope_stack">get_scope_stack</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.is_var_identifier_in_variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.is_var_identifier_in_variables">is_var_identifier_in_variables</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.pop_scope" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.pop_scope">pop_scope</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.push_scope" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.push_scope">push_scope</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.reset_conditional_count" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.reset_conditional_count">reset_conditional_count</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.reset_current_function" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.reset_current_function">reset_current_function</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.scope_stack" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.scope_stack">scope_stack</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.set_variable_context" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.set_variable_context">set_variable_context</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.to_AIR">to_AIR</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.types" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.types">types</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.variables" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AState.variables">variables</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef">C2ATypeDef</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.C2AType">C2AType</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.fields" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.fields">fields</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.function_identifiers" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.function_identifiers">function_identifiers</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.given_type" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.given_type">given_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.name" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.name">name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.source_ref">source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeDef.to_AIR">to_AIR</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeError" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2ATypeError">C2ATypeError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AValueError" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AValueError">C2AValueError</a></code></h4>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable">C2AVariable</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.add_metadata" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.add_metadata">add_metadata</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.build_identifier" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.build_identifier">build_identifier</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.get_name" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.get_name">get_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.identifier_information" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.identifier_information">identifier_information</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.metadata" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.metadata">metadata</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.source_ref" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.source_ref">source_ref</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.to_AIR" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.to_AIR">to_AIR</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.type_name" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.type_name">type_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.version" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariable.version">version</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext">C2AVariableContext</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.ATTR_VALUE" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.ATTR_VALUE">ATTR_VALUE</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.LOAD" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.LOAD">LOAD</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.STORE" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.STORE">STORE</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.UNKNOWN" href="#skema.program_analysis.CAST2FN.model.cast_to_air_model.C2AVariableContext.UNKNOWN">UNKNOWN</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

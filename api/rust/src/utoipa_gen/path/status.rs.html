@@ -1,0 +1,127 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.0.3/src/path/status.rs`."><title>status.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa_gen/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<a href="#2" id="2">2</a>
+<a href="#3" id="3">3</a>
+<a href="#4" id="4">4</a>
+<a href="#5" id="5">5</a>
+<a href="#6" id="6">6</a>
+<a href="#7" id="7">7</a>
+<a href="#8" id="8">8</a>
+<a href="#9" id="9">9</a>
+<a href="#10" id="10">10</a>
+<a href="#11" id="11">11</a>
+<a href="#12" id="12">12</a>
+<a href="#13" id="13">13</a>
+<a href="#14" id="14">14</a>
+<a href="#15" id="15">15</a>
+<a href="#16" id="16">16</a>
+<a href="#17" id="17">17</a>
+<a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
+<a href="#31" id="31">31</a>
+<a href="#32" id="32">32</a>
+<a href="#33" id="33">33</a>
+<a href="#34" id="34">34</a>
+<a href="#35" id="35">35</a>
+<a href="#36" id="36">36</a>
+<a href="#37" id="37">37</a>
+<a href="#38" id="38">38</a>
+<a href="#39" id="39">39</a>
+<a href="#40" id="40">40</a>
+<a href="#41" id="41">41</a>
+<a href="#42" id="42">42</a>
+<a href="#43" id="43">43</a>
+<a href="#44" id="44">44</a>
+<a href="#45" id="45">45</a>
+<a href="#46" id="46">46</a>
+<a href="#47" id="47">47</a>
+<a href="#48" id="48">48</a>
+<a href="#49" id="49">49</a>
+<a href="#50" id="50">50</a>
+<a href="#51" id="51">51</a>
+<a href="#52" id="52">52</a>
+<a href="#53" id="53">53</a>
+<a href="#54" id="54">54</a>
+<a href="#55" id="55">55</a>
+<a href="#56" id="56">56</a>
+<a href="#57" id="57">57</a>
+<a href="#58" id="58">58</a>
+<a href="#59" id="59">59</a>
+<a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+</pre></div><pre class="rust"><code><span class="doccomment">/// Known http `StatusCode`s available in `http::status::StatusCode` struct in `http` crate.
+</span><span class="kw">pub const </span>STATUS_CODES: [(i16, <span class="kw-2">&amp;</span>str); <span class="number">60</span>] = [
+    (<span class="number">100</span>, <span class="string">&quot;CONTINUE&quot;</span>),
+    (<span class="number">101</span>, <span class="string">&quot;SWITCHING_PROTOCOLS&quot;</span>),
+    (<span class="number">102</span>, <span class="string">&quot;PROCESSING&quot;</span>),
+    (<span class="number">200</span>, <span class="string">&quot;OK&quot;</span>),
+    (<span class="number">201</span>, <span class="string">&quot;CREATED&quot;</span>),
+    (<span class="number">202</span>, <span class="string">&quot;ACCEPTED&quot;</span>),
+    (<span class="number">203</span>, <span class="string">&quot;NON_AUTHORITATIVE_INFORMATION&quot;</span>),
+    (<span class="number">204</span>, <span class="string">&quot;NO_CONTENT&quot;</span>),
+    (<span class="number">205</span>, <span class="string">&quot;RESET_CONTENT&quot;</span>),
+    (<span class="number">206</span>, <span class="string">&quot;PARTIAL_CONTENT&quot;</span>),
+    (<span class="number">207</span>, <span class="string">&quot;MULTI_STATUS&quot;</span>),
+    (<span class="number">208</span>, <span class="string">&quot;ALREADY_REPORTED&quot;</span>),
+    (<span class="number">226</span>, <span class="string">&quot;IM_USED&quot;</span>),
+    (<span class="number">300</span>, <span class="string">&quot;MULTIPLE_CHOICES&quot;</span>),
+    (<span class="number">301</span>, <span class="string">&quot;MOVED_PERMANENTLY&quot;</span>),
+    (<span class="number">302</span>, <span class="string">&quot;FOUND&quot;</span>),
+    (<span class="number">303</span>, <span class="string">&quot;SEE_OTHER&quot;</span>),
+    (<span class="number">304</span>, <span class="string">&quot;NOT_MODIFIED&quot;</span>),
+    (<span class="number">305</span>, <span class="string">&quot;USE_PROXY&quot;</span>),
+    (<span class="number">307</span>, <span class="string">&quot;TEMPORARY_REDIRECT&quot;</span>),
+    (<span class="number">308</span>, <span class="string">&quot;PERMANENT_REDIRECT&quot;</span>),
+    (<span class="number">400</span>, <span class="string">&quot;BAD_REQUEST&quot;</span>),
+    (<span class="number">401</span>, <span class="string">&quot;UNAUTHORIZED&quot;</span>),
+    (<span class="number">402</span>, <span class="string">&quot;PAYMENT_REQUIRED&quot;</span>),
+    (<span class="number">403</span>, <span class="string">&quot;FORBIDDEN&quot;</span>),
+    (<span class="number">404</span>, <span class="string">&quot;NOT_FOUND&quot;</span>),
+    (<span class="number">405</span>, <span class="string">&quot;METHOD_NOT_ALLOWED&quot;</span>),
+    (<span class="number">406</span>, <span class="string">&quot;NOT_ACCEPTABLE&quot;</span>),
+    (<span class="number">407</span>, <span class="string">&quot;PROXY_AUTHENTICATION_REQUIRED&quot;</span>),
+    (<span class="number">408</span>, <span class="string">&quot;REQUEST_TIMEOUT&quot;</span>),
+    (<span class="number">409</span>, <span class="string">&quot;CONFLICT&quot;</span>),
+    (<span class="number">410</span>, <span class="string">&quot;GONE&quot;</span>),
+    (<span class="number">411</span>, <span class="string">&quot;LENGTH_REQUIRED&quot;</span>),
+    (<span class="number">412</span>, <span class="string">&quot;PRECONDITION_FAILED&quot;</span>),
+    (<span class="number">413</span>, <span class="string">&quot;PAYLOAD_TOO_LARGE&quot;</span>),
+    (<span class="number">414</span>, <span class="string">&quot;URI_TOO_LONG&quot;</span>),
+    (<span class="number">415</span>, <span class="string">&quot;UNSUPPORTED_MEDIA_TYPE&quot;</span>),
+    (<span class="number">416</span>, <span class="string">&quot;RANGE_NOT_SATISFIABLE&quot;</span>),
+    (<span class="number">417</span>, <span class="string">&quot;EXPECTATION_FAILED&quot;</span>),
+    (<span class="number">418</span>, <span class="string">&quot;IM_A_TEAPOT&quot;</span>),
+    (<span class="number">421</span>, <span class="string">&quot;MISDIRECTED_REQUEST&quot;</span>),
+    (<span class="number">422</span>, <span class="string">&quot;UNPROCESSABLE_ENTITY&quot;</span>),
+    (<span class="number">423</span>, <span class="string">&quot;LOCKED&quot;</span>),
+    (<span class="number">424</span>, <span class="string">&quot;FAILED_DEPENDENCY&quot;</span>),
+    (<span class="number">426</span>, <span class="string">&quot;UPGRADE_REQUIRED&quot;</span>),
+    (<span class="number">428</span>, <span class="string">&quot;PRECONDITION_REQUIRED&quot;</span>),
+    (<span class="number">429</span>, <span class="string">&quot;TOO_MANY_REQUESTS&quot;</span>),
+    (<span class="number">431</span>, <span class="string">&quot;REQUEST_HEADER_FIELDS_TOO_LARGE&quot;</span>),
+    (<span class="number">451</span>, <span class="string">&quot;UNAVAILABLE_FOR_LEGAL_REASONS&quot;</span>),
+    (<span class="number">500</span>, <span class="string">&quot;INTERNAL_SERVER_ERROR&quot;</span>),
+    (<span class="number">501</span>, <span class="string">&quot;NOT_IMPLEMENTED&quot;</span>),
+    (<span class="number">502</span>, <span class="string">&quot;BAD_GATEWAY&quot;</span>),
+    (<span class="number">503</span>, <span class="string">&quot;SERVICE_UNAVAILABLE&quot;</span>),
+    (<span class="number">504</span>, <span class="string">&quot;GATEWAY_TIMEOUT&quot;</span>),
+    (<span class="number">505</span>, <span class="string">&quot;HTTP_VERSION_NOT_SUPPORTED&quot;</span>),
+    (<span class="number">506</span>, <span class="string">&quot;VARIANT_ALSO_NEGOTIATES&quot;</span>),
+    (<span class="number">507</span>, <span class="string">&quot;INSUFFICIENT_STORAGE&quot;</span>),
+    (<span class="number">508</span>, <span class="string">&quot;LOOP_DETECTED&quot;</span>),
+    (<span class="number">510</span>, <span class="string">&quot;NOT_EXTENDED&quot;</span>),
+    (<span class="number">511</span>, <span class="string">&quot;NETWORK_AUTHENTICATION_REQUIRED&quot;</span>),
+];
+</code></pre></div></section></main></body></html>

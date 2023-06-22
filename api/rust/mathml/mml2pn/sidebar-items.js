@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["PetriNetElement"],"fn":["get_mathml_asts_from_file"],"struct":["Term"]};

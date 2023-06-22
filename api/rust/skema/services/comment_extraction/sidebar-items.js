@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Language"],"struct":["CommentExtractionRequest","CommentExtractionResponse","Docstring","SingleLineComment","get_comments"]};

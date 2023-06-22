@@ -1,0 +1,2672 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import typing
+from functools import singledispatchmethod
+
+import networkx as nx
+from skema.model_assembly.metadata import LambdaType
+from skema.model_assembly.networks import (
+    GenericNode,
+    GrFNLoopSubgraph,
+    GrFNSubgraph,
+    GroundedFunctionNetwork,
+    HyperEdge,
+    LambdaNode,
+    LoopTopInterface,
+    UnpackNode,
+    PackNode,
+)
+from skema.model_assembly.sandbox import load_lambda_function
+from skema.model_assembly.structures import ContainerIdentifier
+from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+    ELSEBODY,
+    IFBODY,
+    MODULE_SCOPE,
+    GrfnAssignment,
+    call_container_name,
+    con_scope_to_str,
+    create_container_metadata,
+    is_func_def_main,
+    lambda_var_from_fullid,
+)
+from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2FN.model.cast import (
+    ScalarType,
+    ValueConstructor,
+)
+
+
+class ToGrfnPass:
+    def __init__(self, pipeline_state: PipelineState):
+        self.pipeline_state = pipeline_state
+        self.nodes = self.pipeline_state.nodes
+        self.network = nx.DiGraph()
+        self.subgraphs = nx.DiGraph()
+        self.hyper_edges = []
+
+        # populate network with variable nodes
+        for grfn_var in self.pipeline_state.grfn_id_to_grfn_var.values():
+            self.network.add_node(grfn_var, **grfn_var.get_kwargs())
+
+        # the fullid of a AnnCastName node is a string which includes its
+        # variable name, numerical id, version, and scope
+        for node in self.pipeline_state.nodes:
+            self.visit(node, subgraph=None)
+
+        # build GrFN
+        grfn_uid = GenericNode.create_node_id()
+        timestamp = &#34;timestamp&#34;
+        type_defs = []
+        metadata = []
+        ns = &#34;default-ns&#34;
+        scope = &#34;default&#34;
+        con_name = &#34;GrFN&#34;
+        identifier = ContainerIdentifier(ns, scope, con_name)
+
+        # store GrFN in PipelineState
+        self.pipeline_state.grfn = GroundedFunctionNetwork(
+            grfn_uid,
+            identifier,
+            timestamp,
+            self.network,
+            self.hyper_edges,
+            self.subgraphs,
+            type_defs,
+            metadata,
+        )
+
+    def grfn_vars_from_fullids(self, fullids: typing.Iterable):
+        &#34;&#34;&#34;
+        Return the list of GrFN Variables that are associated with the fullids
+        from `fullids`
+        Paramters:
+            - `fullids`: an iterable of fullids
+        &#34;&#34;&#34;
+        grfn_vars = []
+        for fullid in fullids:
+            grfn_var = self.pipeline_state.get_grfn_var(fullid)
+            grfn_vars.append(grfn_var)
+
+        return grfn_vars
+
+    def create_interface_node(self, lambda_expr):
+        # we should never create an interface node if we have an empty lambda expr
+        assert len(lambda_expr) &gt; 0
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for interface nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.INTERFACE
+
+        interface_node = LambdaNode(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+
+        return interface_node
+
+    def create_loop_top_interface(self, lambda_expr):
+        # we should never create an interface node if we have an empty lambda expr
+        assert len(lambda_expr) &gt; 0
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for interface nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.LOOP_TOP_INTERFACE
+
+        interface_node = LoopTopInterface(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+
+        return interface_node
+
+    def add_grfn_edges(
+        self, inputs: typing.List, lambda_node, outputs: typing.List
+    ):
+        &#34;&#34;&#34;Parameters:
+          - `inputs` and `outputs` are lists of GrFN VariableNode&#39;s
+          - `lambda_node` is a GrFN LambdaNode
+
+        For each input in `inputs`, adds an edge from input to `lambda_node`
+        For each output in `outputs`, adds an edge from `lambda_node` to output
+        Adds a `HyperEdge` between `inputs`, `lambda_node`, and `outputs`
+        &#34;&#34;&#34;
+        # build input edge set
+        input_edges = zip(inputs, [lambda_node] * len(inputs))
+        # build output edge set
+        output_edges = zip([lambda_node] * len(outputs), outputs)
+        # add edges to network
+        self.network.add_edges_from(input_edges)
+        self.network.add_edges_from(output_edges)
+        # add HyperEdges to GrFN
+        self.hyper_edges.append(HyperEdge(inputs, lambda_node, outputs))
+
+    def create_condition_node(
+        self, condition_in, condition_out, lambda_expr, subgraph: GrFNSubgraph
+    ):
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for condition nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.CONDITION
+
+        condition_node = LambdaNode(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+        self.network.add_node(condition_node, **condition_node.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(condition_in.values())
+        outputs = self.grfn_vars_from_fullids(condition_out.values())
+        self.add_grfn_edges(inputs, condition_node, outputs)
+
+        # add nodes to subgraph
+        subgraph.nodes.extend(inputs + [condition_node] + outputs)
+
+    def create_decision_node(
+        self,
+        decision_in,
+        decision_out,
+        condition_var,
+        lambda_expr,
+        subgraph: GrFNSubgraph,
+    ):
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for decision nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.DECISION
+
+        decision_node = LambdaNode(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+        self.network.add_node(decision_node, **decision_node.get_kwargs())
+
+        # FUTURE: modifying the order grfn_vars are added
+        # to inputs may be necessary to perform correct execution
+        # For now, we are following the pattern in `lambda_for_decision()` of
+        # lambda COND, x_if, y_if, x_else, y_else: (x_if, y_if) if COND else (x_else, y_else)
+
+        # values for decision in are two element dicts with keys IFBODY and ELSEBODY
+        if_body_dict = {}
+        else_body_dict = {}
+        for var_id, fullid in decision_in.items():
+            if_body_dict[var_id] = fullid[IFBODY]
+            else_body_dict[var_id] = fullid[ELSEBODY]
+
+        if_body_inputs = self.grfn_vars_from_fullids(if_body_dict.values())
+        else_body_inputs = self.grfn_vars_from_fullids(else_body_dict.values())
+
+        # concatenate if and else inputs after condition_var input to follow pattern
+        inputs = [condition_var] + if_body_inputs + else_body_inputs
+        outputs = self.grfn_vars_from_fullids(decision_out.values())
+        self.add_grfn_edges(inputs, decision_node, outputs)
+
+        # add nodes to subraph
+        subgraph.nodes.extend(inputs + [decision_node] + outputs)
+
+    def visit_grfn_assignment(
+        self, grfn_assignment: GrfnAssignment, subgraph: GrFNSubgraph
+    ):
+        assignment_node = grfn_assignment.assignment_node
+        # update func_str and function for assignment node
+        assignment_node.func_str = grfn_assignment.lambda_expr
+        assignment_node.function = load_lambda_function(
+            assignment_node.func_str
+        )
+
+        self.network.add_node(assignment_node, **assignment_node.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(grfn_assignment.inputs.keys())
+        outputs = self.grfn_vars_from_fullids(grfn_assignment.outputs.keys())
+        self.add_grfn_edges(inputs, assignment_node, outputs)
+
+        # Create strings representing the inputs and outputs for pack and unpack
+        if isinstance(assignment_node, (PackNode, UnpackNode)):
+            assignment_node.inputs = &#34;,&#34;.join(
+                list(
+                    map(lambda_var_from_fullid, grfn_assignment.inputs.keys())
+                )
+            )
+            assignment_node.output = &#34;,&#34;.join(
+                list(
+                    map(lambda_var_from_fullid, grfn_assignment.outputs.keys())
+                )
+            )
+
+        # add subgraph nodes
+        subgraph.nodes.extend(inputs + [assignment_node] + outputs)
+
+    def visit(self, node: AnnCastNode, subgraph: GrFNSubgraph):
+        &#34;&#34;&#34;
+        External visit that callsthe internal visit
+        Useful for debugging/development.  For example,
+        printing the nodes that are visited
+        &#34;&#34;&#34;
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f&#34;\nProcessing node type {class_name}&#34;)
+
+        # call internal visit
+        return self._visit(node, subgraph)
+
+    def visit_node_list(
+        self, node_list: typing.List[AnnCastNode], subgraph: GrFNSubgraph
+    ):
+        return [self.visit(node, subgraph) for node in node_list]
+
+    @singledispatchmethod
+    def _visit(self, node: AnnCastNode, subgraph: GrFNSubgraph):
+        &#34;&#34;&#34;
+        Internal visit
+        &#34;&#34;&#34;
+        raise NameError(f&#34;Unrecognized node type: {type(node)}&#34;)
+
+    @_visit.register
+    def visit_assignment(
+        self, node: AnnCastAssignment, subgraph: GrFNSubgraph
+    ):
+        self.visit(node.right, subgraph)
+        self.visit_grfn_assignment(node.grfn_assignment, subgraph)
+
+    @_visit.register
+    def visit_attribute(self, node: AnnCastAttribute, subgraph: GrFNSubgraph):
+        pass
+
+    @_visit.register
+    def visit_call(self, node: AnnCastCall, subgraph: GrFNSubgraph):
+        if node.is_grfn_2_2:
+            self.visit_call_grfn_2_2(node, subgraph)
+            return
+
+        self.visit_node_list(node.arguments, subgraph)
+        for index, assignment in node.arg_assignments.items():
+            self.visit_grfn_assignment(assignment, subgraph)
+
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;CallContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(
+            node.func.con_scope + [call_container_name(node)]
+        )
+        basename = node.func.name  # change from &#39;scope&#39; to its function name
+        basename_id = (
+            node.func.id
+        )  # NOTE: represents the function&#39;s name ID, not the call number (i.e. invocation index)
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface if needed
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # container includes top_interface and top_interface outputs
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        # build bot interface if needed
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    def visit_call_grfn_2_2(self, node: AnnCastCall, subgraph: GrFNSubgraph):
+        # assert isinstance(node.func, AnnCastName)
+        self.visit_node_list(node.arguments, subgraph)
+        for assignment in node.arg_assignments.values():
+            self.visit_grfn_assignment(assignment, subgraph)
+
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;FuncContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(
+            node.func_def_copy.grfn_con_src_ref
+        )
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = node.invocation_index
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(
+            node.func.con_scope + [call_container_name(node)]
+        )
+        basename = node.func.name
+        basename_id = node.func.id
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # container includes top_interface and top_interface outputs
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        self.visit_function_def_copy(node.func_def_copy, subgraph)
+
+        # build bot interface
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    @_visit.register
+    def visit_record_def(self, node: AnnCastRecordDef, subgraph: GrFNSubgraph):
+        pass
+
+    def visit_function_def_copy(
+        self, node: AnnCastFunctionDef, subgraph: GrFNSubgraph
+    ):
+        for dummy_assignment in node.dummy_grfn_assignments:
+            self.visit_grfn_assignment(dummy_assignment, subgraph)
+
+        self.visit_node_list(node.func_args, subgraph)
+        self.visit_node_list(node.body, subgraph)
+
+    @_visit.register
+    def visit_function_def(
+        self, node: AnnCastFunctionDef, subgraph: GrFNSubgraph
+    ):
+        # for GrFN 2.2, we create function containers at call sites,
+        # so we skip all functions except &#34;main&#34;
+        if self.pipeline_state.GENERATE_GRFN_2_2 and not is_func_def_main(
+            node
+        ):
+            return
+
+        parent = subgraph
+        type = &#34;FuncContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(node.con_scope)
+        basename = (
+            node.name.name
+        )  # was originally assigned to &#39;scope&#39;, changed to node.name.name
+        basename_id = node.name.id  # added
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+
+        self.visit_node_list(node.func_args, subgraph)
+
+        # build top interface if needed
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # add inputs to parent graph
+            parent.nodes.extend(inputs)
+            # add interface node and outputs to subraph
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        # visit dummy assignments before body
+        for dummy_assignment in node.dummy_grfn_assignments:
+            self.visit_grfn_assignment(dummy_assignment, subgraph)
+
+        # visit body
+        self.visit_node_list(node.body, subgraph)
+
+        # build bot interface if needed
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # add interface node and inputs to subraph
+            subgraph.nodes.extend([bot_interface] + inputs)
+            # add outputs to parent graph
+            parent.nodes.extend(outputs)
+
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+    @_visit.register
+    def visit_literal_value(
+        self, node: AnnCastLiteralValue, subgraph: GrFNSubgraph
+    ):
+        pass
+
+    @_visit.register
+    def visit_loop(self, node: AnnCastLoop, subgraph: GrFNSubgraph):
+        if len(node.init) &gt; 0:
+            self.visit_node_list(node.init, subgraph)
+
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;LoopContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(node.con_scope)
+        basename = &#34;loop&#34;  # changed from &#39;scope&#39; to the string &#39;loop&#39;
+        basename_id = int(
+            node.con_scope[-1][4:]
+        )  # stripping out the word &#39;loop&#39; to obtain a numerical ID
+        subgraph = GrFNLoopSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface
+        if len(node.top_interface_initial) &gt; 0:
+            top_interface = self.create_loop_top_interface(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+            # collect initial GrFN VariableNodes
+            grfn_initial = self.grfn_vars_from_fullids(
+                node.top_interface_initial.values()
+            )
+            # collect updated GrFN VariableNodes
+            grfn_updated = self.grfn_vars_from_fullids(
+                node.top_interface_updated.values()
+            )
+            # combine initial and updated for inputs to loop top interface
+            inputs = grfn_initial + grfn_updated
+            # collect ouput GrFN VariableNodes
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # add interface node, updated variables, and output variables to subgraph
+            subgraph.nodes.extend([top_interface] + grfn_updated + outputs)
+
+        # visit expr, then setup condition info
+        self.visit(node.expr, subgraph)
+        self.create_condition_node(
+            node.condition_in,
+            node.condition_out,
+            node.condition_lambda,
+            subgraph,
+        )
+
+        self.visit_node_list(node.body, subgraph)
+
+        # build bot interface
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    @_visit.register
+    def visit_model_break(
+        self, node: AnnCastModelBreak, subgraph: GrFNSubgraph
+    ):
+        pass
+
+    @_visit.register
+    def visit_model_continue(
+        self, node: AnnCastModelContinue, subgraph: GrFNSubgraph
+    ):
+        pass
+
+    @_visit.register
+    def visit_model_if(self, node: AnnCastModelIf, subgraph: GrFNSubgraph):
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;CondContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(node.con_scope)
+        basename = &#34;if&#34;  # changed from &#39;scope&#39; to the string &#39;if&#39;
+        basename_id = int(
+            node.con_scope[-1][2:]
+        )  # stripping out the word &#39;if&#39; to obtain a numerical ID
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # container includes top_interface and top_interface outputs
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        # visit expr, then setup condition info
+        self.visit(node.expr, subgraph)
+        self.create_condition_node(
+            node.condition_in,
+            node.condition_out,
+            node.condition_lambda,
+            subgraph,
+        )
+
+        self.visit_node_list(node.body, subgraph)
+        self.visit_node_list(node.orelse, subgraph)
+
+        condition_var = node.condition_var
+        if len(node.decision_in) &gt; 0:
+            self.create_decision_node(
+                node.decision_in,
+                node.decision_out,
+                condition_var,
+                node.decision_lambda,
+                subgraph,
+            )
+
+        # build bot interface
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    @_visit.register
+    def visit_model_return(
+        self, node: AnnCastModelReturn, subgraph: GrFNSubgraph
+    ):
+        self.visit(node.value, subgraph)
+
+        self.visit_grfn_assignment(node.grfn_assignment, subgraph)
+
+    @_visit.register
+    def visit_module(self, node: AnnCastModule, subgraph: GrFNSubgraph):
+        type = &#34;ModuleContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        occs = 0
+        parent_str = None
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = MODULE_SCOPE
+        basename = MODULE_SCOPE
+        basename_id = -1
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+
+        self.visit_node_list(node.body, subgraph)
+
+    @_visit.register
+    def visit_name(self, node: AnnCastName, subgraph: GrFNSubgraph):
+        pass
+
+    @_visit.register
+    def visit_set(self, node: AnnCastSet, subgraph: GrFNSubgraph):
+        pass
+
+    @_visit.register
+    def visit_tuple(self, node: AnnCastTuple, subgraph: GrFNSubgraph):
+        self.visit_node_list(node.values, subgraph)
+
+    @_visit.register
+    def visit_var(self, node: AnnCastVar, subgraph: GrFNSubgraph):
+        self.visit(node.val, subgraph)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass"><code class="flex name class">
+<span>class <span class="ident">ToGrfnPass</span></span>
+<span>(</span><span>pipeline_state: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState">PipelineState</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class ToGrfnPass:
+    def __init__(self, pipeline_state: PipelineState):
+        self.pipeline_state = pipeline_state
+        self.nodes = self.pipeline_state.nodes
+        self.network = nx.DiGraph()
+        self.subgraphs = nx.DiGraph()
+        self.hyper_edges = []
+
+        # populate network with variable nodes
+        for grfn_var in self.pipeline_state.grfn_id_to_grfn_var.values():
+            self.network.add_node(grfn_var, **grfn_var.get_kwargs())
+
+        # the fullid of a AnnCastName node is a string which includes its
+        # variable name, numerical id, version, and scope
+        for node in self.pipeline_state.nodes:
+            self.visit(node, subgraph=None)
+
+        # build GrFN
+        grfn_uid = GenericNode.create_node_id()
+        timestamp = &#34;timestamp&#34;
+        type_defs = []
+        metadata = []
+        ns = &#34;default-ns&#34;
+        scope = &#34;default&#34;
+        con_name = &#34;GrFN&#34;
+        identifier = ContainerIdentifier(ns, scope, con_name)
+
+        # store GrFN in PipelineState
+        self.pipeline_state.grfn = GroundedFunctionNetwork(
+            grfn_uid,
+            identifier,
+            timestamp,
+            self.network,
+            self.hyper_edges,
+            self.subgraphs,
+            type_defs,
+            metadata,
+        )
+
+    def grfn_vars_from_fullids(self, fullids: typing.Iterable):
+        &#34;&#34;&#34;
+        Return the list of GrFN Variables that are associated with the fullids
+        from `fullids`
+        Paramters:
+            - `fullids`: an iterable of fullids
+        &#34;&#34;&#34;
+        grfn_vars = []
+        for fullid in fullids:
+            grfn_var = self.pipeline_state.get_grfn_var(fullid)
+            grfn_vars.append(grfn_var)
+
+        return grfn_vars
+
+    def create_interface_node(self, lambda_expr):
+        # we should never create an interface node if we have an empty lambda expr
+        assert len(lambda_expr) &gt; 0
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for interface nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.INTERFACE
+
+        interface_node = LambdaNode(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+
+        return interface_node
+
+    def create_loop_top_interface(self, lambda_expr):
+        # we should never create an interface node if we have an empty lambda expr
+        assert len(lambda_expr) &gt; 0
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for interface nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.LOOP_TOP_INTERFACE
+
+        interface_node = LoopTopInterface(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+
+        return interface_node
+
+    def add_grfn_edges(
+        self, inputs: typing.List, lambda_node, outputs: typing.List
+    ):
+        &#34;&#34;&#34;Parameters:
+          - `inputs` and `outputs` are lists of GrFN VariableNode&#39;s
+          - `lambda_node` is a GrFN LambdaNode
+
+        For each input in `inputs`, adds an edge from input to `lambda_node`
+        For each output in `outputs`, adds an edge from `lambda_node` to output
+        Adds a `HyperEdge` between `inputs`, `lambda_node`, and `outputs`
+        &#34;&#34;&#34;
+        # build input edge set
+        input_edges = zip(inputs, [lambda_node] * len(inputs))
+        # build output edge set
+        output_edges = zip([lambda_node] * len(outputs), outputs)
+        # add edges to network
+        self.network.add_edges_from(input_edges)
+        self.network.add_edges_from(output_edges)
+        # add HyperEdges to GrFN
+        self.hyper_edges.append(HyperEdge(inputs, lambda_node, outputs))
+
+    def create_condition_node(
+        self, condition_in, condition_out, lambda_expr, subgraph: GrFNSubgraph
+    ):
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for condition nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.CONDITION
+
+        condition_node = LambdaNode(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+        self.network.add_node(condition_node, **condition_node.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(condition_in.values())
+        outputs = self.grfn_vars_from_fullids(condition_out.values())
+        self.add_grfn_edges(inputs, condition_node, outputs)
+
+        # add nodes to subgraph
+        subgraph.nodes.extend(inputs + [condition_node] + outputs)
+
+    def create_decision_node(
+        self,
+        decision_in,
+        decision_out,
+        condition_var,
+        lambda_expr,
+        subgraph: GrFNSubgraph,
+    ):
+        lambda_uuid = GenericNode.create_node_id()
+        lambda_str = lambda_expr
+        lambda_func = load_lambda_function(lambda_str)
+        # FUTURE: decide on metadata for decision nodes
+        lambda_metadata = []
+        lambda_type = LambdaType.DECISION
+
+        decision_node = LambdaNode(
+            lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+        )
+        self.network.add_node(decision_node, **decision_node.get_kwargs())
+
+        # FUTURE: modifying the order grfn_vars are added
+        # to inputs may be necessary to perform correct execution
+        # For now, we are following the pattern in `lambda_for_decision()` of
+        # lambda COND, x_if, y_if, x_else, y_else: (x_if, y_if) if COND else (x_else, y_else)
+
+        # values for decision in are two element dicts with keys IFBODY and ELSEBODY
+        if_body_dict = {}
+        else_body_dict = {}
+        for var_id, fullid in decision_in.items():
+            if_body_dict[var_id] = fullid[IFBODY]
+            else_body_dict[var_id] = fullid[ELSEBODY]
+
+        if_body_inputs = self.grfn_vars_from_fullids(if_body_dict.values())
+        else_body_inputs = self.grfn_vars_from_fullids(else_body_dict.values())
+
+        # concatenate if and else inputs after condition_var input to follow pattern
+        inputs = [condition_var] + if_body_inputs + else_body_inputs
+        outputs = self.grfn_vars_from_fullids(decision_out.values())
+        self.add_grfn_edges(inputs, decision_node, outputs)
+
+        # add nodes to subraph
+        subgraph.nodes.extend(inputs + [decision_node] + outputs)
+
+    def visit_grfn_assignment(
+        self, grfn_assignment: GrfnAssignment, subgraph: GrFNSubgraph
+    ):
+        assignment_node = grfn_assignment.assignment_node
+        # update func_str and function for assignment node
+        assignment_node.func_str = grfn_assignment.lambda_expr
+        assignment_node.function = load_lambda_function(
+            assignment_node.func_str
+        )
+
+        self.network.add_node(assignment_node, **assignment_node.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(grfn_assignment.inputs.keys())
+        outputs = self.grfn_vars_from_fullids(grfn_assignment.outputs.keys())
+        self.add_grfn_edges(inputs, assignment_node, outputs)
+
+        # Create strings representing the inputs and outputs for pack and unpack
+        if isinstance(assignment_node, (PackNode, UnpackNode)):
+            assignment_node.inputs = &#34;,&#34;.join(
+                list(
+                    map(lambda_var_from_fullid, grfn_assignment.inputs.keys())
+                )
+            )
+            assignment_node.output = &#34;,&#34;.join(
+                list(
+                    map(lambda_var_from_fullid, grfn_assignment.outputs.keys())
+                )
+            )
+
+        # add subgraph nodes
+        subgraph.nodes.extend(inputs + [assignment_node] + outputs)
+
+    def visit(self, node: AnnCastNode, subgraph: GrFNSubgraph):
+        &#34;&#34;&#34;
+        External visit that callsthe internal visit
+        Useful for debugging/development.  For example,
+        printing the nodes that are visited
+        &#34;&#34;&#34;
+        # print current node being visited.
+        # this can be useful for debugging
+        # class_name = node.__class__.__name__
+        # print(f&#34;\nProcessing node type {class_name}&#34;)
+
+        # call internal visit
+        return self._visit(node, subgraph)
+
+    def visit_node_list(
+        self, node_list: typing.List[AnnCastNode], subgraph: GrFNSubgraph
+    ):
+        return [self.visit(node, subgraph) for node in node_list]
+
+    @singledispatchmethod
+    def _visit(self, node: AnnCastNode, subgraph: GrFNSubgraph):
+        &#34;&#34;&#34;
+        Internal visit
+        &#34;&#34;&#34;
+        raise NameError(f&#34;Unrecognized node type: {type(node)}&#34;)
+
+    @_visit.register
+    def visit_assignment(
+        self, node: AnnCastAssignment, subgraph: GrFNSubgraph
+    ):
+        self.visit(node.right, subgraph)
+        self.visit_grfn_assignment(node.grfn_assignment, subgraph)
+
+    @_visit.register
+    def visit_attribute(self, node: AnnCastAttribute, subgraph: GrFNSubgraph):
+        pass
+
+    @_visit.register
+    def visit_call(self, node: AnnCastCall, subgraph: GrFNSubgraph):
+        if node.is_grfn_2_2:
+            self.visit_call_grfn_2_2(node, subgraph)
+            return
+
+        self.visit_node_list(node.arguments, subgraph)
+        for index, assignment in node.arg_assignments.items():
+            self.visit_grfn_assignment(assignment, subgraph)
+
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;CallContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(
+            node.func.con_scope + [call_container_name(node)]
+        )
+        basename = node.func.name  # change from &#39;scope&#39; to its function name
+        basename_id = (
+            node.func.id
+        )  # NOTE: represents the function&#39;s name ID, not the call number (i.e. invocation index)
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface if needed
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # container includes top_interface and top_interface outputs
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        # build bot interface if needed
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    def visit_call_grfn_2_2(self, node: AnnCastCall, subgraph: GrFNSubgraph):
+        # assert isinstance(node.func, AnnCastName)
+        self.visit_node_list(node.arguments, subgraph)
+        for assignment in node.arg_assignments.values():
+            self.visit_grfn_assignment(assignment, subgraph)
+
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;FuncContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(
+            node.func_def_copy.grfn_con_src_ref
+        )
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = node.invocation_index
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(
+            node.func.con_scope + [call_container_name(node)]
+        )
+        basename = node.func.name
+        basename_id = node.func.id
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # container includes top_interface and top_interface outputs
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        self.visit_function_def_copy(node.func_def_copy, subgraph)
+
+        # build bot interface
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    @_visit.register
+    def visit_record_def(self, node: AnnCastRecordDef, subgraph: GrFNSubgraph):
+        pass
+
+    def visit_function_def_copy(
+        self, node: AnnCastFunctionDef, subgraph: GrFNSubgraph
+    ):
+        for dummy_assignment in node.dummy_grfn_assignments:
+            self.visit_grfn_assignment(dummy_assignment, subgraph)
+
+        self.visit_node_list(node.func_args, subgraph)
+        self.visit_node_list(node.body, subgraph)
+
+    @_visit.register
+    def visit_function_def(
+        self, node: AnnCastFunctionDef, subgraph: GrFNSubgraph
+    ):
+        # for GrFN 2.2, we create function containers at call sites,
+        # so we skip all functions except &#34;main&#34;
+        if self.pipeline_state.GENERATE_GRFN_2_2 and not is_func_def_main(
+            node
+        ):
+            return
+
+        parent = subgraph
+        type = &#34;FuncContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(node.con_scope)
+        basename = (
+            node.name.name
+        )  # was originally assigned to &#39;scope&#39;, changed to node.name.name
+        basename_id = node.name.id  # added
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+
+        self.visit_node_list(node.func_args, subgraph)
+
+        # build top interface if needed
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # add inputs to parent graph
+            parent.nodes.extend(inputs)
+            # add interface node and outputs to subraph
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        # visit dummy assignments before body
+        for dummy_assignment in node.dummy_grfn_assignments:
+            self.visit_grfn_assignment(dummy_assignment, subgraph)
+
+        # visit body
+        self.visit_node_list(node.body, subgraph)
+
+        # build bot interface if needed
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # add interface node and inputs to subraph
+            subgraph.nodes.extend([bot_interface] + inputs)
+            # add outputs to parent graph
+            parent.nodes.extend(outputs)
+
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+    @_visit.register
+    def visit_literal_value(
+        self, node: AnnCastLiteralValue, subgraph: GrFNSubgraph
+    ):
+        pass
+
+    @_visit.register
+    def visit_loop(self, node: AnnCastLoop, subgraph: GrFNSubgraph):
+        if len(node.init) &gt; 0:
+            self.visit_node_list(node.init, subgraph)
+
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;LoopContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(node.con_scope)
+        basename = &#34;loop&#34;  # changed from &#39;scope&#39; to the string &#39;loop&#39;
+        basename_id = int(
+            node.con_scope[-1][4:]
+        )  # stripping out the word &#39;loop&#39; to obtain a numerical ID
+        subgraph = GrFNLoopSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface
+        if len(node.top_interface_initial) &gt; 0:
+            top_interface = self.create_loop_top_interface(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+            # collect initial GrFN VariableNodes
+            grfn_initial = self.grfn_vars_from_fullids(
+                node.top_interface_initial.values()
+            )
+            # collect updated GrFN VariableNodes
+            grfn_updated = self.grfn_vars_from_fullids(
+                node.top_interface_updated.values()
+            )
+            # combine initial and updated for inputs to loop top interface
+            inputs = grfn_initial + grfn_updated
+            # collect ouput GrFN VariableNodes
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # add interface node, updated variables, and output variables to subgraph
+            subgraph.nodes.extend([top_interface] + grfn_updated + outputs)
+
+        # visit expr, then setup condition info
+        self.visit(node.expr, subgraph)
+        self.create_condition_node(
+            node.condition_in,
+            node.condition_out,
+            node.condition_lambda,
+            subgraph,
+        )
+
+        self.visit_node_list(node.body, subgraph)
+
+        # build bot interface
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    @_visit.register
+    def visit_model_break(
+        self, node: AnnCastModelBreak, subgraph: GrFNSubgraph
+    ):
+        pass
+
+    @_visit.register
+    def visit_model_continue(
+        self, node: AnnCastModelContinue, subgraph: GrFNSubgraph
+    ):
+        pass
+
+    @_visit.register
+    def visit_model_if(self, node: AnnCastModelIf, subgraph: GrFNSubgraph):
+        parent = subgraph
+        # make a new subgraph for this If Container
+        type = &#34;CondContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        parent_str = parent.uid if parent is not None else None
+        occs = 0
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = con_scope_to_str(node.con_scope)
+        basename = &#34;if&#34;  # changed from &#39;scope&#39; to the string &#39;if&#39;
+        basename_id = int(
+            node.con_scope[-1][2:]
+        )  # stripping out the word &#39;if&#39; to obtain a numerical ID
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+        self.subgraphs.add_edge(parent, subgraph)
+
+        # build top interface
+        if len(node.top_interface_in) &gt; 0:
+            top_interface = self.create_interface_node(
+                node.top_interface_lambda
+            )
+            self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.top_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.top_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, top_interface, outputs)
+
+            # container includes top_interface and top_interface outputs
+            subgraph.nodes.extend([top_interface] + outputs)
+
+        # visit expr, then setup condition info
+        self.visit(node.expr, subgraph)
+        self.create_condition_node(
+            node.condition_in,
+            node.condition_out,
+            node.condition_lambda,
+            subgraph,
+        )
+
+        self.visit_node_list(node.body, subgraph)
+        self.visit_node_list(node.orelse, subgraph)
+
+        condition_var = node.condition_var
+        if len(node.decision_in) &gt; 0:
+            self.create_decision_node(
+                node.decision_in,
+                node.decision_out,
+                condition_var,
+                node.decision_lambda,
+                subgraph,
+            )
+
+        # build bot interface
+        if len(node.bot_interface_in) &gt; 0:
+            bot_interface = self.create_interface_node(
+                node.bot_interface_lambda
+            )
+            self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+            inputs = self.grfn_vars_from_fullids(
+                node.bot_interface_in.values()
+            )
+            outputs = self.grfn_vars_from_fullids(
+                node.bot_interface_out.values()
+            )
+            self.add_grfn_edges(inputs, bot_interface, outputs)
+
+            # container includes input and bot interface
+            # the outputs need to be added to the parent subgraph
+            subgraph.nodes.extend(inputs + [bot_interface])
+            parent.nodes.extend(outputs)
+
+    @_visit.register
+    def visit_model_return(
+        self, node: AnnCastModelReturn, subgraph: GrFNSubgraph
+    ):
+        self.visit(node.value, subgraph)
+
+        self.visit_grfn_assignment(node.grfn_assignment, subgraph)
+
+    @_visit.register
+    def visit_module(self, node: AnnCastModule, subgraph: GrFNSubgraph):
+        type = &#34;ModuleContainer&#34;
+        border_color = GrFNSubgraph.get_border_color(type)
+        metadata = create_container_metadata(node.grfn_con_src_ref)
+        nodes = []
+        occs = 0
+        parent_str = None
+        uid = GenericNode.create_node_id()
+        ns = &#34;default-ns&#34;
+        scope = MODULE_SCOPE
+        basename = MODULE_SCOPE
+        basename_id = -1
+        subgraph = GrFNSubgraph(
+            uid,
+            ns,
+            scope,
+            basename,
+            basename_id,
+            occs,
+            parent_str,
+            type,
+            border_color,
+            nodes,
+            metadata,
+        )
+        self.subgraphs.add_node(subgraph)
+
+        self.visit_node_list(node.body, subgraph)
+
+    @_visit.register
+    def visit_name(self, node: AnnCastName, subgraph: GrFNSubgraph):
+        pass
+
+    @_visit.register
+    def visit_set(self, node: AnnCastSet, subgraph: GrFNSubgraph):
+        pass
+
+    @_visit.register
+    def visit_tuple(self, node: AnnCastTuple, subgraph: GrFNSubgraph):
+        self.visit_node_list(node.values, subgraph)
+
+    @_visit.register
+    def visit_var(self, node: AnnCastVar, subgraph: GrFNSubgraph):
+        self.visit(node.val, subgraph)</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.add_grfn_edges"><code class="name flex">
+<span>def <span class="ident">add_grfn_edges</span></span>(<span>self, inputs: List[~T], lambda_node, outputs: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="parameters">Parameters</h2>
+<ul>
+<li><code>inputs</code> and <code>outputs</code> are lists of GrFN VariableNode's</li>
+<li><code>lambda_node</code> is a GrFN LambdaNode</li>
+</ul>
+<p>For each input in <code>inputs</code>, adds an edge from input to <code>lambda_node</code>
+For each output in <code>outputs</code>, adds an edge from <code>lambda_node</code> to output
+Adds a <code>HyperEdge</code> between <code>inputs</code>, <code>lambda_node</code>, and <code>outputs</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_grfn_edges(
+    self, inputs: typing.List, lambda_node, outputs: typing.List
+):
+    &#34;&#34;&#34;Parameters:
+      - `inputs` and `outputs` are lists of GrFN VariableNode&#39;s
+      - `lambda_node` is a GrFN LambdaNode
+
+    For each input in `inputs`, adds an edge from input to `lambda_node`
+    For each output in `outputs`, adds an edge from `lambda_node` to output
+    Adds a `HyperEdge` between `inputs`, `lambda_node`, and `outputs`
+    &#34;&#34;&#34;
+    # build input edge set
+    input_edges = zip(inputs, [lambda_node] * len(inputs))
+    # build output edge set
+    output_edges = zip([lambda_node] * len(outputs), outputs)
+    # add edges to network
+    self.network.add_edges_from(input_edges)
+    self.network.add_edges_from(output_edges)
+    # add HyperEdges to GrFN
+    self.hyper_edges.append(HyperEdge(inputs, lambda_node, outputs))</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_condition_node"><code class="name flex">
+<span>def <span class="ident">create_condition_node</span></span>(<span>self, condition_in, condition_out, lambda_expr, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_condition_node(
+    self, condition_in, condition_out, lambda_expr, subgraph: GrFNSubgraph
+):
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = lambda_expr
+    lambda_func = load_lambda_function(lambda_str)
+    # FUTURE: decide on metadata for condition nodes
+    lambda_metadata = []
+    lambda_type = LambdaType.CONDITION
+
+    condition_node = LambdaNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+    )
+    self.network.add_node(condition_node, **condition_node.get_kwargs())
+
+    inputs = self.grfn_vars_from_fullids(condition_in.values())
+    outputs = self.grfn_vars_from_fullids(condition_out.values())
+    self.add_grfn_edges(inputs, condition_node, outputs)
+
+    # add nodes to subgraph
+    subgraph.nodes.extend(inputs + [condition_node] + outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_decision_node"><code class="name flex">
+<span>def <span class="ident">create_decision_node</span></span>(<span>self, decision_in, decision_out, condition_var, lambda_expr, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_decision_node(
+    self,
+    decision_in,
+    decision_out,
+    condition_var,
+    lambda_expr,
+    subgraph: GrFNSubgraph,
+):
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = lambda_expr
+    lambda_func = load_lambda_function(lambda_str)
+    # FUTURE: decide on metadata for decision nodes
+    lambda_metadata = []
+    lambda_type = LambdaType.DECISION
+
+    decision_node = LambdaNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+    )
+    self.network.add_node(decision_node, **decision_node.get_kwargs())
+
+    # FUTURE: modifying the order grfn_vars are added
+    # to inputs may be necessary to perform correct execution
+    # For now, we are following the pattern in `lambda_for_decision()` of
+    # lambda COND, x_if, y_if, x_else, y_else: (x_if, y_if) if COND else (x_else, y_else)
+
+    # values for decision in are two element dicts with keys IFBODY and ELSEBODY
+    if_body_dict = {}
+    else_body_dict = {}
+    for var_id, fullid in decision_in.items():
+        if_body_dict[var_id] = fullid[IFBODY]
+        else_body_dict[var_id] = fullid[ELSEBODY]
+
+    if_body_inputs = self.grfn_vars_from_fullids(if_body_dict.values())
+    else_body_inputs = self.grfn_vars_from_fullids(else_body_dict.values())
+
+    # concatenate if and else inputs after condition_var input to follow pattern
+    inputs = [condition_var] + if_body_inputs + else_body_inputs
+    outputs = self.grfn_vars_from_fullids(decision_out.values())
+    self.add_grfn_edges(inputs, decision_node, outputs)
+
+    # add nodes to subraph
+    subgraph.nodes.extend(inputs + [decision_node] + outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_interface_node"><code class="name flex">
+<span>def <span class="ident">create_interface_node</span></span>(<span>self, lambda_expr)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_interface_node(self, lambda_expr):
+    # we should never create an interface node if we have an empty lambda expr
+    assert len(lambda_expr) &gt; 0
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = lambda_expr
+    lambda_func = load_lambda_function(lambda_str)
+    # FUTURE: decide on metadata for interface nodes
+    lambda_metadata = []
+    lambda_type = LambdaType.INTERFACE
+
+    interface_node = LambdaNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+    )
+
+    return interface_node</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_loop_top_interface"><code class="name flex">
+<span>def <span class="ident">create_loop_top_interface</span></span>(<span>self, lambda_expr)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_loop_top_interface(self, lambda_expr):
+    # we should never create an interface node if we have an empty lambda expr
+    assert len(lambda_expr) &gt; 0
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = lambda_expr
+    lambda_func = load_lambda_function(lambda_str)
+    # FUTURE: decide on metadata for interface nodes
+    lambda_metadata = []
+    lambda_type = LambdaType.LOOP_TOP_INTERFACE
+
+    interface_node = LoopTopInterface(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, lambda_metadata
+    )
+
+    return interface_node</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.grfn_vars_from_fullids"><code class="name flex">
+<span>def <span class="ident">grfn_vars_from_fullids</span></span>(<span>self, fullids: Iterable[+T_co])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the list of GrFN Variables that are associated with the fullids
+from <code>fullids</code></p>
+<h2 id="paramters">Paramters</h2>
+<ul>
+<li><code>fullids</code>: an iterable of fullids</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def grfn_vars_from_fullids(self, fullids: typing.Iterable):
+    &#34;&#34;&#34;
+    Return the list of GrFN Variables that are associated with the fullids
+    from `fullids`
+    Paramters:
+        - `fullids`: an iterable of fullids
+    &#34;&#34;&#34;
+    grfn_vars = []
+    for fullid in fullids:
+        grfn_var = self.pipeline_state.get_grfn_var(fullid)
+        grfn_vars.append(grfn_var)
+
+    return grfn_vars</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>External visit that callsthe internal visit
+Useful for debugging/development.
+For example,
+printing the nodes that are visited</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit(self, node: AnnCastNode, subgraph: GrFNSubgraph):
+    &#34;&#34;&#34;
+    External visit that callsthe internal visit
+    Useful for debugging/development.  For example,
+    printing the nodes that are visited
+    &#34;&#34;&#34;
+    # print current node being visited.
+    # this can be useful for debugging
+    # class_name = node.__class__.__name__
+    # print(f&#34;\nProcessing node type {class_name}&#34;)
+
+    # call internal visit
+    return self._visit(node, subgraph)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_assignment"><code class="name flex">
+<span>def <span class="ident">visit_assignment</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment">AnnCastAssignment</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_assignment(
+    self, node: AnnCastAssignment, subgraph: GrFNSubgraph
+):
+    self.visit(node.right, subgraph)
+    self.visit_grfn_assignment(node.grfn_assignment, subgraph)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_attribute"><code class="name flex">
+<span>def <span class="ident">visit_attribute</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute">AnnCastAttribute</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_attribute(self, node: AnnCastAttribute, subgraph: GrFNSubgraph):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_call"><code class="name flex">
+<span>def <span class="ident">visit_call</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall">AnnCastCall</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_call(self, node: AnnCastCall, subgraph: GrFNSubgraph):
+    if node.is_grfn_2_2:
+        self.visit_call_grfn_2_2(node, subgraph)
+        return
+
+    self.visit_node_list(node.arguments, subgraph)
+    for index, assignment in node.arg_assignments.items():
+        self.visit_grfn_assignment(assignment, subgraph)
+
+    parent = subgraph
+    # make a new subgraph for this If Container
+    type = &#34;CallContainer&#34;
+    border_color = GrFNSubgraph.get_border_color(type)
+    metadata = create_container_metadata(node.grfn_con_src_ref)
+    nodes = []
+    parent_str = parent.uid if parent is not None else None
+    occs = 0
+    uid = GenericNode.create_node_id()
+    ns = &#34;default-ns&#34;
+    scope = con_scope_to_str(
+        node.func.con_scope + [call_container_name(node)]
+    )
+    basename = node.func.name  # change from &#39;scope&#39; to its function name
+    basename_id = (
+        node.func.id
+    )  # NOTE: represents the function&#39;s name ID, not the call number (i.e. invocation index)
+    subgraph = GrFNSubgraph(
+        uid,
+        ns,
+        scope,
+        basename,
+        basename_id,
+        occs,
+        parent_str,
+        type,
+        border_color,
+        nodes,
+        metadata,
+    )
+
+    self.subgraphs.add_node(subgraph)
+    self.subgraphs.add_edge(parent, subgraph)
+
+    # build top interface if needed
+    if len(node.top_interface_in) &gt; 0:
+        top_interface = self.create_interface_node(
+            node.top_interface_lambda
+        )
+        self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.top_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.top_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, top_interface, outputs)
+
+        # container includes top_interface and top_interface outputs
+        subgraph.nodes.extend([top_interface] + outputs)
+
+    # build bot interface if needed
+    if len(node.bot_interface_in) &gt; 0:
+        bot_interface = self.create_interface_node(
+            node.bot_interface_lambda
+        )
+        self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.bot_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.bot_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, bot_interface, outputs)
+
+        # container includes input and bot interface
+        # the outputs need to be added to the parent subgraph
+        subgraph.nodes.extend(inputs + [bot_interface])
+        parent.nodes.extend(outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_call_grfn_2_2"><code class="name flex">
+<span>def <span class="ident">visit_call_grfn_2_2</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall">AnnCastCall</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_call_grfn_2_2(self, node: AnnCastCall, subgraph: GrFNSubgraph):
+    # assert isinstance(node.func, AnnCastName)
+    self.visit_node_list(node.arguments, subgraph)
+    for assignment in node.arg_assignments.values():
+        self.visit_grfn_assignment(assignment, subgraph)
+
+    parent = subgraph
+    # make a new subgraph for this If Container
+    type = &#34;FuncContainer&#34;
+    border_color = GrFNSubgraph.get_border_color(type)
+    metadata = create_container_metadata(
+        node.func_def_copy.grfn_con_src_ref
+    )
+    nodes = []
+    parent_str = parent.uid if parent is not None else None
+    occs = node.invocation_index
+    uid = GenericNode.create_node_id()
+    ns = &#34;default-ns&#34;
+    scope = con_scope_to_str(
+        node.func.con_scope + [call_container_name(node)]
+    )
+    basename = node.func.name
+    basename_id = node.func.id
+    subgraph = GrFNSubgraph(
+        uid,
+        ns,
+        scope,
+        basename,
+        basename_id,
+        occs,
+        parent_str,
+        type,
+        border_color,
+        nodes,
+        metadata,
+    )
+    self.subgraphs.add_node(subgraph)
+    self.subgraphs.add_edge(parent, subgraph)
+
+    # build top interface
+    if len(node.top_interface_in) &gt; 0:
+        top_interface = self.create_interface_node(
+            node.top_interface_lambda
+        )
+        self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.top_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.top_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, top_interface, outputs)
+
+        # container includes top_interface and top_interface outputs
+        subgraph.nodes.extend([top_interface] + outputs)
+
+    self.visit_function_def_copy(node.func_def_copy, subgraph)
+
+    # build bot interface
+    if len(node.bot_interface_in) &gt; 0:
+        bot_interface = self.create_interface_node(
+            node.bot_interface_lambda
+        )
+        self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.bot_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.bot_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, bot_interface, outputs)
+
+        # container includes input and bot interface
+        # the outputs need to be added to the parent subgraph
+        subgraph.nodes.extend(inputs + [bot_interface])
+        parent.nodes.extend(outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_function_def"><code class="name flex">
+<span>def <span class="ident">visit_function_def</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef">AnnCastFunctionDef</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_function_def(
+    self, node: AnnCastFunctionDef, subgraph: GrFNSubgraph
+):
+    # for GrFN 2.2, we create function containers at call sites,
+    # so we skip all functions except &#34;main&#34;
+    if self.pipeline_state.GENERATE_GRFN_2_2 and not is_func_def_main(
+        node
+    ):
+        return
+
+    parent = subgraph
+    type = &#34;FuncContainer&#34;
+    border_color = GrFNSubgraph.get_border_color(type)
+    metadata = create_container_metadata(node.grfn_con_src_ref)
+    nodes = []
+    parent_str = parent.uid if parent is not None else None
+    occs = 0
+    uid = GenericNode.create_node_id()
+    ns = &#34;default-ns&#34;
+    scope = con_scope_to_str(node.con_scope)
+    basename = (
+        node.name.name
+    )  # was originally assigned to &#39;scope&#39;, changed to node.name.name
+    basename_id = node.name.id  # added
+    subgraph = GrFNSubgraph(
+        uid,
+        ns,
+        scope,
+        basename,
+        basename_id,
+        occs,
+        parent_str,
+        type,
+        border_color,
+        nodes,
+        metadata,
+    )
+
+    self.visit_node_list(node.func_args, subgraph)
+
+    # build top interface if needed
+    if len(node.top_interface_in) &gt; 0:
+        top_interface = self.create_interface_node(
+            node.top_interface_lambda
+        )
+        self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.top_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.top_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, top_interface, outputs)
+
+        # add inputs to parent graph
+        parent.nodes.extend(inputs)
+        # add interface node and outputs to subraph
+        subgraph.nodes.extend([top_interface] + outputs)
+
+    # visit dummy assignments before body
+    for dummy_assignment in node.dummy_grfn_assignments:
+        self.visit_grfn_assignment(dummy_assignment, subgraph)
+
+    # visit body
+    self.visit_node_list(node.body, subgraph)
+
+    # build bot interface if needed
+    if len(node.bot_interface_in) &gt; 0:
+        bot_interface = self.create_interface_node(
+            node.bot_interface_lambda
+        )
+        self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.bot_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.bot_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, bot_interface, outputs)
+
+        # add interface node and inputs to subraph
+        subgraph.nodes.extend([bot_interface] + inputs)
+        # add outputs to parent graph
+        parent.nodes.extend(outputs)
+
+    self.subgraphs.add_node(subgraph)
+    self.subgraphs.add_edge(parent, subgraph)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_function_def_copy"><code class="name flex">
+<span>def <span class="ident">visit_function_def_copy</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef">AnnCastFunctionDef</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_function_def_copy(
+    self, node: AnnCastFunctionDef, subgraph: GrFNSubgraph
+):
+    for dummy_assignment in node.dummy_grfn_assignments:
+        self.visit_grfn_assignment(dummy_assignment, subgraph)
+
+    self.visit_node_list(node.func_args, subgraph)
+    self.visit_node_list(node.body, subgraph)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_grfn_assignment"><code class="name flex">
+<span>def <span class="ident">visit_grfn_assignment</span></span>(<span>self, grfn_assignment: <a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment" href="ann_cast_helpers.html#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment">GrfnAssignment</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_grfn_assignment(
+    self, grfn_assignment: GrfnAssignment, subgraph: GrFNSubgraph
+):
+    assignment_node = grfn_assignment.assignment_node
+    # update func_str and function for assignment node
+    assignment_node.func_str = grfn_assignment.lambda_expr
+    assignment_node.function = load_lambda_function(
+        assignment_node.func_str
+    )
+
+    self.network.add_node(assignment_node, **assignment_node.get_kwargs())
+
+    inputs = self.grfn_vars_from_fullids(grfn_assignment.inputs.keys())
+    outputs = self.grfn_vars_from_fullids(grfn_assignment.outputs.keys())
+    self.add_grfn_edges(inputs, assignment_node, outputs)
+
+    # Create strings representing the inputs and outputs for pack and unpack
+    if isinstance(assignment_node, (PackNode, UnpackNode)):
+        assignment_node.inputs = &#34;,&#34;.join(
+            list(
+                map(lambda_var_from_fullid, grfn_assignment.inputs.keys())
+            )
+        )
+        assignment_node.output = &#34;,&#34;.join(
+            list(
+                map(lambda_var_from_fullid, grfn_assignment.outputs.keys())
+            )
+        )
+
+    # add subgraph nodes
+    subgraph.nodes.extend(inputs + [assignment_node] + outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_literal_value"><code class="name flex">
+<span>def <span class="ident">visit_literal_value</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue">AnnCastLiteralValue</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_literal_value(
+    self, node: AnnCastLiteralValue, subgraph: GrFNSubgraph
+):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_loop"><code class="name flex">
+<span>def <span class="ident">visit_loop</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop">AnnCastLoop</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_loop(self, node: AnnCastLoop, subgraph: GrFNSubgraph):
+    if len(node.init) &gt; 0:
+        self.visit_node_list(node.init, subgraph)
+
+    parent = subgraph
+    # make a new subgraph for this If Container
+    type = &#34;LoopContainer&#34;
+    border_color = GrFNSubgraph.get_border_color(type)
+    metadata = create_container_metadata(node.grfn_con_src_ref)
+    nodes = []
+    parent_str = parent.uid if parent is not None else None
+    occs = 0
+    uid = GenericNode.create_node_id()
+    ns = &#34;default-ns&#34;
+    scope = con_scope_to_str(node.con_scope)
+    basename = &#34;loop&#34;  # changed from &#39;scope&#39; to the string &#39;loop&#39;
+    basename_id = int(
+        node.con_scope[-1][4:]
+    )  # stripping out the word &#39;loop&#39; to obtain a numerical ID
+    subgraph = GrFNLoopSubgraph(
+        uid,
+        ns,
+        scope,
+        basename,
+        basename_id,
+        occs,
+        parent_str,
+        type,
+        border_color,
+        nodes,
+        metadata,
+    )
+    self.subgraphs.add_node(subgraph)
+    self.subgraphs.add_edge(parent, subgraph)
+
+    # build top interface
+    if len(node.top_interface_initial) &gt; 0:
+        top_interface = self.create_loop_top_interface(
+            node.top_interface_lambda
+        )
+        self.network.add_node(top_interface, **top_interface.get_kwargs())
+        # collect initial GrFN VariableNodes
+        grfn_initial = self.grfn_vars_from_fullids(
+            node.top_interface_initial.values()
+        )
+        # collect updated GrFN VariableNodes
+        grfn_updated = self.grfn_vars_from_fullids(
+            node.top_interface_updated.values()
+        )
+        # combine initial and updated for inputs to loop top interface
+        inputs = grfn_initial + grfn_updated
+        # collect ouput GrFN VariableNodes
+        outputs = self.grfn_vars_from_fullids(
+            node.top_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, top_interface, outputs)
+
+        # add interface node, updated variables, and output variables to subgraph
+        subgraph.nodes.extend([top_interface] + grfn_updated + outputs)
+
+    # visit expr, then setup condition info
+    self.visit(node.expr, subgraph)
+    self.create_condition_node(
+        node.condition_in,
+        node.condition_out,
+        node.condition_lambda,
+        subgraph,
+    )
+
+    self.visit_node_list(node.body, subgraph)
+
+    # build bot interface
+    if len(node.bot_interface_in) &gt; 0:
+        bot_interface = self.create_interface_node(
+            node.bot_interface_lambda
+        )
+        self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.bot_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.bot_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, bot_interface, outputs)
+
+        # container includes input and bot interface
+        # the outputs need to be added to the parent subgraph
+        subgraph.nodes.extend(inputs + [bot_interface])
+        parent.nodes.extend(outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_break"><code class="name flex">
+<span>def <span class="ident">visit_model_break</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak">AnnCastModelBreak</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_break(
+    self, node: AnnCastModelBreak, subgraph: GrFNSubgraph
+):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_continue"><code class="name flex">
+<span>def <span class="ident">visit_model_continue</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue">AnnCastModelContinue</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_continue(
+    self, node: AnnCastModelContinue, subgraph: GrFNSubgraph
+):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_if"><code class="name flex">
+<span>def <span class="ident">visit_model_if</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf">AnnCastModelIf</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_if(self, node: AnnCastModelIf, subgraph: GrFNSubgraph):
+    parent = subgraph
+    # make a new subgraph for this If Container
+    type = &#34;CondContainer&#34;
+    border_color = GrFNSubgraph.get_border_color(type)
+    metadata = create_container_metadata(node.grfn_con_src_ref)
+    nodes = []
+    parent_str = parent.uid if parent is not None else None
+    occs = 0
+    uid = GenericNode.create_node_id()
+    ns = &#34;default-ns&#34;
+    scope = con_scope_to_str(node.con_scope)
+    basename = &#34;if&#34;  # changed from &#39;scope&#39; to the string &#39;if&#39;
+    basename_id = int(
+        node.con_scope[-1][2:]
+    )  # stripping out the word &#39;if&#39; to obtain a numerical ID
+    subgraph = GrFNSubgraph(
+        uid,
+        ns,
+        scope,
+        basename,
+        basename_id,
+        occs,
+        parent_str,
+        type,
+        border_color,
+        nodes,
+        metadata,
+    )
+    self.subgraphs.add_node(subgraph)
+    self.subgraphs.add_edge(parent, subgraph)
+
+    # build top interface
+    if len(node.top_interface_in) &gt; 0:
+        top_interface = self.create_interface_node(
+            node.top_interface_lambda
+        )
+        self.network.add_node(top_interface, **top_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.top_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.top_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, top_interface, outputs)
+
+        # container includes top_interface and top_interface outputs
+        subgraph.nodes.extend([top_interface] + outputs)
+
+    # visit expr, then setup condition info
+    self.visit(node.expr, subgraph)
+    self.create_condition_node(
+        node.condition_in,
+        node.condition_out,
+        node.condition_lambda,
+        subgraph,
+    )
+
+    self.visit_node_list(node.body, subgraph)
+    self.visit_node_list(node.orelse, subgraph)
+
+    condition_var = node.condition_var
+    if len(node.decision_in) &gt; 0:
+        self.create_decision_node(
+            node.decision_in,
+            node.decision_out,
+            condition_var,
+            node.decision_lambda,
+            subgraph,
+        )
+
+    # build bot interface
+    if len(node.bot_interface_in) &gt; 0:
+        bot_interface = self.create_interface_node(
+            node.bot_interface_lambda
+        )
+        self.network.add_node(bot_interface, **bot_interface.get_kwargs())
+
+        inputs = self.grfn_vars_from_fullids(
+            node.bot_interface_in.values()
+        )
+        outputs = self.grfn_vars_from_fullids(
+            node.bot_interface_out.values()
+        )
+        self.add_grfn_edges(inputs, bot_interface, outputs)
+
+        # container includes input and bot interface
+        # the outputs need to be added to the parent subgraph
+        subgraph.nodes.extend(inputs + [bot_interface])
+        parent.nodes.extend(outputs)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_return"><code class="name flex">
+<span>def <span class="ident">visit_model_return</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn">AnnCastModelReturn</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_model_return(
+    self, node: AnnCastModelReturn, subgraph: GrFNSubgraph
+):
+    self.visit(node.value, subgraph)
+
+    self.visit_grfn_assignment(node.grfn_assignment, subgraph)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_module"><code class="name flex">
+<span>def <span class="ident">visit_module</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule">AnnCastModule</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_module(self, node: AnnCastModule, subgraph: GrFNSubgraph):
+    type = &#34;ModuleContainer&#34;
+    border_color = GrFNSubgraph.get_border_color(type)
+    metadata = create_container_metadata(node.grfn_con_src_ref)
+    nodes = []
+    occs = 0
+    parent_str = None
+    uid = GenericNode.create_node_id()
+    ns = &#34;default-ns&#34;
+    scope = MODULE_SCOPE
+    basename = MODULE_SCOPE
+    basename_id = -1
+    subgraph = GrFNSubgraph(
+        uid,
+        ns,
+        scope,
+        basename,
+        basename_id,
+        occs,
+        parent_str,
+        type,
+        border_color,
+        nodes,
+        metadata,
+    )
+    self.subgraphs.add_node(subgraph)
+
+    self.visit_node_list(node.body, subgraph)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_name"><code class="name flex">
+<span>def <span class="ident">visit_name</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName">AnnCastName</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_name(self, node: AnnCastName, subgraph: GrFNSubgraph):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_node_list"><code class="name flex">
+<span>def <span class="ident">visit_node_list</span></span>(<span>self, node_list: List[<a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a>], subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_node_list(
+    self, node_list: typing.List[AnnCastNode], subgraph: GrFNSubgraph
+):
+    return [self.visit(node, subgraph) for node in node_list]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_record_def"><code class="name flex">
+<span>def <span class="ident">visit_record_def</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef">AnnCastRecordDef</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_record_def(self, node: AnnCastRecordDef, subgraph: GrFNSubgraph):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_set"><code class="name flex">
+<span>def <span class="ident">visit_set</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet">AnnCastSet</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_set(self, node: AnnCastSet, subgraph: GrFNSubgraph):
+    pass</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_tuple"><code class="name flex">
+<span>def <span class="ident">visit_tuple</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple">AnnCastTuple</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_tuple(self, node: AnnCastTuple, subgraph: GrFNSubgraph):
+    self.visit_node_list(node.values, subgraph)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_var"><code class="name flex">
+<span>def <span class="ident">visit_var</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar" href="annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar">AnnCastVar</a>, subgraph: skema.model_assembly.networks.GrFNSubgraph)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@_visit.register
+def visit_var(self, node: AnnCastVar, subgraph: GrFNSubgraph):
+    self.visit(node.val, subgraph)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast" href="index.html">skema.program_analysis.CAST2FN.ann_cast</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass">ToGrfnPass</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.add_grfn_edges" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.add_grfn_edges">add_grfn_edges</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_condition_node" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_condition_node">create_condition_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_decision_node" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_decision_node">create_decision_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_interface_node" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_interface_node">create_interface_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_loop_top_interface" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.create_loop_top_interface">create_loop_top_interface</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.grfn_vars_from_fullids" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.grfn_vars_from_fullids">grfn_vars_from_fullids</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit">visit</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_assignment" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_assignment">visit_assignment</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_attribute" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_attribute">visit_attribute</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_call" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_call">visit_call</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_call_grfn_2_2" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_call_grfn_2_2">visit_call_grfn_2_2</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_function_def" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_function_def">visit_function_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_function_def_copy" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_function_def_copy">visit_function_def_copy</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_grfn_assignment" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_grfn_assignment">visit_grfn_assignment</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_literal_value" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_literal_value">visit_literal_value</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_loop" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_loop">visit_loop</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_break" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_break">visit_model_break</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_continue" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_continue">visit_model_continue</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_if" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_if">visit_model_if</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_return" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_model_return">visit_model_return</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_module" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_module">visit_module</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_name" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_name">visit_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_node_list" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_node_list">visit_node_list</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_record_def" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_record_def">visit_record_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_set" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_set">visit_set</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_tuple" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_tuple">visit_tuple</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_var" href="#skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass.ToGrfnPass.visit_var">visit_var</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

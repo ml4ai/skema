@@ -1,0 +1,165 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Want to have your API documented with OpenAPI? But you don’t want to see the trouble with manual yaml or json tweaking? Would like it to be so easy that it would almost be like utopic? Don’t worry utoipa is just there to fill this gap. It aims to do if not all then the most of heavy lifting for you enabling you to focus writing the actual API logic instead of documentation. It aims to be minimal, simple and fast. It uses simple proc macros which you can use to annotate your code to have items documented."><title>utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../crates.js"></script><script defer src="../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../utoipa/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../utoipa/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Crate utoipa</a></h2><div class="sidebar-elems"><ul class="block"><li class="version">Version 3.0.3</li><li><a id="all-types" href="all.html">All Items</a></li></ul><section><ul class="block"><li><a href="#modules">Modules</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li><li><a href="#attributes">Attribute Macros</a></li><li><a href="#derives">Derive Macros</a></li></ul></section></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Crate <a class="mod" href="#">utoipa</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/utoipa/lib.rs.html#1-681">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Want to have your API documented with OpenAPI? But you don’t want to see the
+trouble with manual yaml or json tweaking? Would like it to be so easy that it would almost
+be like utopic? Don’t worry utoipa is just there to fill this gap. It aims to do if not all then
+the most of heavy lifting for you enabling you to focus writing the actual API logic instead of
+documentation. It aims to be <em>minimal</em>, <em>simple</em> and <em>fast</em>. It uses simple proc macros which
+you can use to annotate your code to have items documented.</p>
+<p>Utoipa crate provides autogenerated OpenAPI documentation for Rust REST APIs. It treats
+code first approach as a first class citizen and simplifies API documentation by providing
+simple macros for generating the documentation from your code.</p>
+<p>It also contains Rust types of OpenAPI spec allowing you to write the OpenAPI spec only using
+Rust if auto-generation is not your flavor or does not fit your purpose.</p>
+<p>Long term goal of the library is to be the place to go when OpenAPI documentation is needed in Rust
+codebase.</p>
+<p>Utoipa is framework agnostic and could be used together with any web framework or even without one. While
+being portable and standalone one of it’s key aspects is simple integration with web frameworks.</p>
+<p>Currently utoipa provides simple integration with actix-web framework but is not limited to the actix-web
+framework. All functionalities are not restricted to any specific framework.</p>
+<h2 id="choose-your-flavor-and-document-your-api-with-ice-cold-ipa"><a href="#choose-your-flavor-and-document-your-api-with-ice-cold-ipa">Choose your flavor and document your API with ice cold IPA</a></h2>
+<p>Existing <a href="https://github.com/juhaku/utoipa/tree/master/examples">examples</a> for following frameworks:</p>
+<ul>
+<li><strong>actix-web</strong></li>
+<li><strong>axum</strong></li>
+<li><strong>warp</strong></li>
+<li><strong>tide</strong></li>
+<li><strong>rocket</strong></li>
+</ul>
+<p>Even if there is no example for your favorite framework <code>utoipa</code> can be used with any
+web framework which supports decorating functions with macros similarly to <strong>warp</strong> and <strong>tide</strong> examples.</p>
+<h2 id="whats-up-with-the-word-play"><a href="#whats-up-with-the-word-play">What’s up with the word play?</a></h2>
+<p>The name comes from words <code>utopic</code> and <code>api</code> where <code>uto</code> is the first three letters of <em>utopic</em>
+and the <code>ipa</code> is <em>api</em> reversed. Aaand… <code>ipa</code> is also awesome type of beer.</p>
+<h2 id="crate-features"><a href="#crate-features">Crate Features</a></h2>
+<ul>
+<li><strong>yaml</strong> Enables <strong>serde_yaml</strong> serialization of OpenAPI objects.</li>
+<li><strong>actix_extras</strong> Enhances <a href="https://github.com/actix/actix-web/">actix-web</a> integration with being able to
+parse <code>path</code>, <code>path</code> and <code>query</code> parameters from actix web path attribute macros. See <a href="attr.path.html#actix_extras-support-for-actix-web">actix extras support</a> or
+<a href="https://github.com/juhaku/utoipa/tree/master/examples">examples</a> for more details.</li>
+<li><strong>rocket_extras</strong> Enhances <a href="https://github.com/SergioBenitez/Rocket">rocket</a> framework integration with being
+able to parse <code>path</code>, <code>path</code> and <code>query</code> parameters from rocket path attribute macros. See <a href="attr.path.html#rocket_extras-support-for-rocket">rocket extras support</a>
+or <a href="https://github.com/juhaku/utoipa/tree/master/examples">examples</a> for more details</li>
+<li><strong>axum_extras</strong> Enhances <a href="https://github.com/tokio-rs/axum">axum</a> framework integration allowing users to use <code>IntoParams</code>
+without defining the <code>parameter_in</code> attribute. See <a href="attr.path.html#axum_extras-support-for-axum">axum extras support</a>
+or <a href="https://github.com/juhaku/utoipa/tree/master/examples">examples</a> for more details.</li>
+<li><strong>debug</strong> Add extra traits such as debug traits to openapi definitions and elsewhere.</li>
+<li><strong>chrono</strong> Add support for <a href="https://crates.io/crates/chrono">chrono</a> <code>DateTime</code>, <code>Date</code>, <code>NaiveDate</code> and <code>Duration</code>
+types. By default these types are parsed to <code>string</code> types with additional <code>format</code> information.
+<code>format: date-time</code> for <code>DateTime</code> and <code>format: date</code> for <code>Date</code> and <code>NaiveDate</code> according
+<a href="https://xml2rfc.ietf.org/public/rfc/html/rfc3339.html#anchor14">RFC3339</a> as <code>ISO-8601</code>. To
+override default <code>string</code> representation users have to use <code>value_type</code> attribute to override the type.
+See <a href="https://docs.rs/utoipa/latest/utoipa/derive.ToSchema.html">docs</a> for more details.</li>
+<li><strong>time</strong> Add support for <a href="https://crates.io/crates/time">time</a> <code>OffsetDateTime</code>, <code>PrimitiveDateTime</code>, <code>Date</code>, and <code>Duration</code> types.
+By default these types are parsed as <code>string</code>. <code>OffsetDateTime</code> and <code>PrimitiveDateTime</code> will use <code>date-time</code> format. <code>Date</code> will use
+<code>date</code> format and <code>Duration</code> will not have any format. To override default <code>string</code> representation users have to use <code>value_type</code> attribute
+to override the type. See <a href="https://docs.rs/utoipa/latest/utoipa/derive.ToSchema.html">docs</a> for more details.</li>
+<li><strong>decimal</strong> Add support for <a href="https://crates.io/crates/rust_decimal">rust_decimal</a> <code>Decimal</code> type. <strong>By default</strong>
+it is interpreted as <code>String</code>. If you wish to change the format you need to override the type.
+See the <code>value_type</code> in <a href="derive.ToSchema.html"><code>ToSchema</code> derive docs</a>.</li>
+<li><strong>uuid</strong> Add support for <a href="https://github.com/uuid-rs/uuid">uuid</a>. <code>Uuid</code> type will be presented as <code>String</code> with
+format <code>uuid</code> in OpenAPI spec.</li>
+<li><strong>smallvec</strong> Add support for <a href="https://crates.io/crates/smallvec">smallvec</a>. <code>SmallVec</code> will be treated as <code>Vec</code>.</li>
+<li><strong>openapi_extensions</strong> Adds convenience functions for documenting common scenarios, such as JSON request bodies and responses.
+See the <a href="https://docs.rs/utoipa/latest/utoipa/openapi/request_body/index.html"><code>request_body</code></a> and
+<a href="https://docs.rs/utoipa/latest/utoipa/openapi/response/index.html"><code>response</code></a> docs for examples.</li>
+<li><strong>repr</strong> Add support for <a href="https://github.com/dtolnay/serde-repr">repr_serde</a>’s <code>repr(u*)</code> and <code>repr(i*)</code> attributes to unit type enums for
+C-like enum representation. See <a href="https://docs.rs/utoipa/latest/utoipa/derive.ToSchema.html">docs</a> for more details.</li>
+<li><strong>preserve_order</strong> Preserve order of properties when serializing the schema for a component.
+When enabled, the properties are listed in order of fields in the corresponding struct definition.
+When disabled, the properties are listed in alphabetical order.</li>
+</ul>
+<p>Utoipa implicitly has partial support for <code>serde</code> attributes. See <a href="derive.ToSchema.html#partial-serde-attributes-support"><code>ToSchema</code> derive</a> for more details.</p>
+<h2 id="install"><a href="#install">Install</a></h2>
+<p>Add minimal dependency declaration to Cargo.toml.</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+utoipa = &quot;3&quot;
+</code></pre></div>
+<p>To enable more features such as use actix framework extras you could define the
+dependency as follows.</p>
+<div class="example-wrap"><pre class="language-toml"><code>[dependencies]
+utoipa = { version = &quot;3&quot;, features = [&quot;actix_extras&quot;] }
+</code></pre></div>
+<p><strong>Note!</strong> To use <code>utoipa</code> together with Swagger UI you can use the <a href="https://docs.rs/utoipa-swagger-ui/"><code>utoipa-swagger-ui</code></a> crate.</p>
+<h2 id="examples"><a href="#examples">Examples</a></h2>
+<p>Create a struct or it could be an enum also. Add <code>ToSchema</code> derive macro to it so it can be registered
+as a component in openapi schema.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>utoipa::ToSchema;
+<span class="attr">#[derive(ToSchema)]
+</span><span class="kw">struct </span>Pet {
+   id: u64,
+   name: String,
+   age: <span class="prelude-ty">Option</span>&lt;i32&gt;,
+}</code></pre></div>
+<p>Create an handler that would handle your business logic and add <code>path</code> proc attribute macro over it.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">mod </span>pet_api {
+    <span class="doccomment">/// Get pet by id
+    ///
+    /// Get pet from database by pet id
+    </span><span class="attr">#[utoipa::path(
+        get,
+        path = <span class="string">&quot;/pets/{id}&quot;</span>,
+        responses(
+            (status = <span class="number">200</span>, description = <span class="string">&quot;Pet found successfully&quot;</span>, body = Pet),
+            (status = NOT_FOUND, description = <span class="string">&quot;Pet was not found&quot;</span>)
+        ),
+        params(
+            (<span class="string">&quot;id&quot; </span>= u64, Path, description = <span class="string">&quot;Pet database id to get Pet for&quot;</span>),
+        )
+    )]
+    </span><span class="kw">async fn </span>get_pet_by_id(pet_id: u64) -&gt; Pet {
+        Pet {
+            id: pet_id,
+            age: <span class="prelude-val">None</span>,
+            name: <span class="string">&quot;lightning&quot;</span>.to_string(),
+        }
+    }
+}</code></pre></div>
+<p>Utoipa has support for <a href="https://crates.io/crates/http">http</a> <code>StatusCode</code> in responses.</p>
+<p>Tie the component and the above api to the openapi schema with following <code>OpenApi</code> derive proc macro.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(OpenApi)]
+#[openapi(paths(pet_api::get_pet_by_id), components(schemas(Pet)))]
+</span><span class="kw">struct </span>ApiDoc;
+
+<span class="macro">println!</span>(<span class="string">&quot;{}&quot;</span>, ApiDoc::openapi().to_pretty_json().unwrap());</code></pre></div>
+<h2 id="modify-openapi-at-runtime"><a href="#modify-openapi-at-runtime">Modify OpenAPI at runtime</a></h2>
+<p>You can modify generated OpenAPI at runtime either via generated types directly or using
+<a href="trait.Modify.html" title="trait utoipa::Modify"><code>Modify</code></a> trait.</p>
+<p><em><strong>Modify generated OpenAPI via types directly.</strong></em></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(OpenApi)]
+#[openapi(
+    info(description = <span class="string">&quot;My Api description&quot;</span>),
+)]
+</span><span class="kw">struct </span>ApiDoc;
+
+<span class="kw">let </span><span class="kw-2">mut </span>doc = ApiDoc::openapi();
+doc.info.title = String::from(<span class="string">&quot;My Api&quot;</span>);</code></pre></div>
+<p><em><strong>You can even convert the generated <a href="trait.OpenApi.html" title="trait utoipa::OpenApi"><code>OpenApi</code></a> to <a href="openapi/struct.OpenApiBuilder.html" title="struct utoipa::openapi::OpenApiBuilder"><code>openapi::OpenApiBuilder</code></a>.</strong></em></p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="attr">#[derive(OpenApi)]
+#[openapi(
+    info(description = <span class="string">&quot;My Api description&quot;</span>),
+)]
+</span><span class="kw">struct </span>ApiDoc;
+
+<span class="kw">let </span>builder: OpenApiBuilder = ApiDoc::openapi().into();</code></pre></div>
+<p>See <a href="trait.Modify.html" title="trait utoipa::Modify"><code>Modify</code></a> trait for examples on how to modify generated OpenAPI via it.</p>
+<h2 id="go-beyond-the-surface"><a href="#go-beyond-the-surface">Go beyond the surface</a></h2>
+<ul>
+<li>See how to serve OpenAPI doc via Swagger UI check <a href="https://docs.rs/utoipa-swagger-ui/"><code>utoipa-swagger-ui</code></a> crate for more details.</li>
+<li>Browse to <a href="https://github.com/juhaku/utoipa/tree/master/examples">examples</a> for more comprehensive examples.</li>
+<li>Check <a href="derive.IntoResponses.html" title="derive utoipa::IntoResponses"><code>IntoResponses</code></a> and <a href="derive.ToResponse.html" title="derive utoipa::ToResponse"><code>ToResponse</code></a> for examples on deriving responses.</li>
+<li>More about OpenAPI security in <a href="openapi/security/index.html">security documentation</a>.</li>
+</ul>
+</div></details><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2><ul class="item-table"><li><div class="item-name"><a class="mod" href="openapi/index.html" title="mod utoipa::openapi">openapi</a></div><div class="desc docblock-short">Rust implementation of Openapi Spec V3.</div></li></ul><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2><ul class="item-table"><li><div class="item-name"><a class="trait" href="trait.IntoParams.html" title="trait utoipa::IntoParams">IntoParams</a></div><div class="desc docblock-short">Trait used to convert implementing type to OpenAPI parameters.</div></li><li><div class="item-name"><a class="trait" href="trait.IntoResponses.html" title="trait utoipa::IntoResponses">IntoResponses</a></div><div class="desc docblock-short">This trait is implemented to document a type (like an enum) which can represent multiple
+responses, to be used in an operation.</div></li><li><div class="item-name"><a class="trait" href="trait.Modify.html" title="trait utoipa::Modify">Modify</a></div><div class="desc docblock-short">Trait that allows OpenApi modification at runtime.</div></li><li><div class="item-name"><a class="trait" href="trait.OpenApi.html" title="trait utoipa::OpenApi">OpenApi</a></div><div class="desc docblock-short">Trait for implementing OpenAPI specification in Rust.</div></li><li><div class="item-name"><a class="trait" href="trait.Path.html" title="trait utoipa::Path">Path</a></div><div class="desc docblock-short">Trait for implementing OpenAPI PathItem object with path.</div></li><li><div class="item-name"><a class="trait" href="trait.ToResponse.html" title="trait utoipa::ToResponse">ToResponse</a></div><div class="desc docblock-short">This trait is implemented to document a type which represents a single response which can be
+referenced or reused as a component in multiple operations.</div></li><li><div class="item-name"><a class="trait" href="trait.ToSchema.html" title="trait utoipa::ToSchema">ToSchema</a></div><div class="desc docblock-short">Trait for implementing OpenAPI Schema object.</div></li></ul><h2 id="types" class="small-section-header"><a href="#types">Type Definitions</a></h2><ul class="item-table"><li><div class="item-name"><a class="type" href="type.TupleUnit.html" title="type utoipa::TupleUnit">TupleUnit</a></div><div class="desc docblock-short">Represents <em><code>nullable</code></em> type. This can be used anywhere where “nothing” needs to be evaluated.
+This will serialize to <em><code>null</code></em> in JSON and <a href="openapi/schema/fn.empty.html" title="fn utoipa::openapi::schema::empty"><code>openapi::schema::empty</code></a> is used to create the
+<a href="openapi/schema/enum.Schema.html" title="enum utoipa::openapi::schema::Schema"><code>openapi::schema::Schema</code></a> for the type.</div></li></ul><h2 id="attributes" class="small-section-header"><a href="#attributes">Attribute Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="attr" href="attr.path.html" title="attr utoipa::path">path</a></div><div class="desc docblock-short">Path attribute macro implements OpenAPI path for the decorated function.</div></li></ul><h2 id="derives" class="small-section-header"><a href="#derives">Derive Macros</a></h2><ul class="item-table"><li><div class="item-name"><a class="derive" href="derive.IntoParams.html" title="derive utoipa::IntoParams">IntoParams</a></div><div class="desc docblock-short">Generate <a href="attr.path.html#params-attributes">path parameters</a> from struct’s
+fields.</div></li><li><div class="item-name"><a class="derive" href="derive.IntoResponses.html" title="derive utoipa::IntoResponses">IntoResponses</a></div><div class="desc docblock-short">Generate responses with status codes what
+can be attached to the <a href="attr.path.html#responses-from-intoresponses"><code>utoipa::path</code></a>.</div></li><li><div class="item-name"><a class="derive" href="derive.OpenApi.html" title="derive utoipa::OpenApi">OpenApi</a></div><div class="desc docblock-short">Generate OpenApi base object with defaults from
+project settings.</div></li><li><div class="item-name"><a class="derive" href="derive.ToResponse.html" title="derive utoipa::ToResponse">ToResponse</a></div><div class="desc docblock-short">Generate reusable OpenAPI response what can be used
+in <a href="attr.path.html"><code>utoipa::path</code></a> or in <a href="derive.OpenApi.html"><code>OpenApi</code></a>.</div></li><li><div class="item-name"><a class="derive" href="derive.ToSchema.html" title="derive utoipa::ToSchema">ToSchema</a></div><div class="desc docblock-short">Generate reusable OpenAPI schema to be used
+together with <a href="derive.OpenApi.html"><code>OpenApi</code></a>.</div></li></ul></section></div></main></body></html>

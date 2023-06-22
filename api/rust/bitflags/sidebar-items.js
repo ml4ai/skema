@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"macro":["bitflags"],"mod":["parser"],"trait":["BitFlags"]};

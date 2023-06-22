@@ -1,0 +1,2253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.gromet.execution_engine.types.binary API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.gromet.execution_engine.types.binary</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from typing import Union, Any
+
+from skema.gromet.execution_engine.types.defined_types import Field
+
+
+class Add(object):
+    source_language_name = {&#34;Python&#34;: &#34;Add&#34;, &#34;GCC&#34;: &#34;plus_expr&#34;, &#34;CAST&#34;: &#34;Add&#34;}
+    inputs = [Field(&#34;augend&#34;, &#34;Number&#34;), Field(&#34;addend&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;sum&#34;, &#34;Number&#34;)]
+    shorthand = &#34;+&#34;
+    documentation = &#34;Add is the numerical addition operator. For a general addition operation (For example, the case of concatanation with +) see GenAdd.&#34;
+
+    @staticmethod  # TODO: Look into if this is required. Only need @staticmethod if you intend to call the method from an instance of class
+    def exec(
+        augend: Union[int, float, complex], addend: Union[int, float, complex]
+    ) -&gt; Union[int, float, complex]:
+        return augend + addend
+
+
+class GenAdd(object):
+    source_language_name = {&#34;Python&#34;: &#34;Add&#34;}
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Any&#34;)]
+    shorthand = &#34;g+&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; Any:
+        return operand1 + operand2
+
+
+class Sub(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Sub&#34;,
+        &#34;GCC&#34;: &#34;minus_expr&#34;,
+        &#34;CAST&#34;: &#34;Sub&#34;,
+    }
+    inputs = [Field(&#34;minuend&#34;, &#34;Number&#34;), Field(&#34;subtrahend&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;difference&#34;, &#34;Number&#34;)]
+    shorthand = &#34;-&#34;
+    documentation = &#34;Sub is the numerical subtraction operator. For a general subtraction operation () see GenSub.&#34;
+
+    def exec(
+        minuend: Union[int, float, complex],
+        subtahend: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return minuend - subtahend
+
+
+class GenSub(object):
+    source_language_name = {&#34;Python&#34;: &#34;Sub&#34;}
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Any&#34;)]
+    shorthand = &#34;g-&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; Any:
+        return operand1 - operand2
+
+
+class Mult(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Mult&#34;,
+        &#34;GCC&#34;: &#34;mult_expr&#34;,
+        &#34;CAST&#34;: &#34;Mult&#34;,
+    }
+    inputs = [Field(&#34;multiplier&#34;, &#34;Number&#34;), Field(&#34;multiplicand&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;product&#34;, &#34;Number&#34;)]
+    shorthand = &#34;*&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        multiplier: Union[int, float, complex],
+        multiplicand: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return multiplier * multiplicand
+
+
+# TODO: Do we need a general operator for all overloadable operators in Python (https://www.programiz.com/python-programming/operator-overloading)?
+
+
+class Div(object):
+    source_language_name = {&#34;Python&#34;: &#34;Div&#34;, &#34;GCC&#34;: &#34;rdiv_expr&#34;, &#34;CAST&#34;: &#34;Div&#34;}
+    inputs = [Field(&#34;dividend&#34;, &#34;Number&#34;), Field(&#34;divisor&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;quotient&#34;, &#34;Number&#34;)]
+    shorthand = &#34;/&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        dividend: Union[int, float, complex],
+        divisor: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return dividend / divisor
+
+
+class FloorDiv(object):
+    source_language_name = {&#34;Python&#34;: &#34;FloorDiv&#34;, &#34;CAST&#34;: &#34;FloorDiv&#34;}
+    inputs = [Field(&#34;dividend&#34;, &#34;Number&#34;), Field(&#34;divisor&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;quotient&#34;, &#34;Number&#34;)]
+    shorthand = &#34;//&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        dividend: Union[int, float, complex],
+        divisor: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return dividend // divisor
+
+
+class Mod(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Mod&#34;,
+        &#34;GCC&#34;: &#34;trunc_mod_expr&#34;,
+        &#34;CAST&#34;: &#34;Mod&#34;,
+    }
+    inputs = [Field(&#34;dividend&#34;, &#34;Number&#34;), Field(&#34;divisor&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;remainder&#34;, &#34;Number&#34;)]
+    shorthand = &#34;%&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        dividend: Union[int, float, complex],
+        divisor: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return dividend % divisor
+
+
+class Pow(object):
+    source_language_name = {&#34;Python&#34;: &#34;Pow&#34;, &#34;CAST&#34;: &#34;Pow&#34;}
+    inputs = [Field(&#34;base&#34;, &#34;Number&#34;), Field(&#34;exponent&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;power&#34;, &#34;Number&#34;)]
+    shorthand = &#34;**&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        base: Union[int, float, complex], power: Union[int, float, complex]
+    ) -&gt; Union[int, float, complex]:
+        return base**power
+
+
+class LShift(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;LShift&#34;,
+        &#34;GCC&#34;: &#34;lshift_expr&#34;,
+        &#34;CAST&#34;: &#34;LShift&#34;,
+    }
+    inputs = [Field(&#34;operand1&#34;, &#34;Number&#34;), Field(&#34;operand2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;&lt;&lt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        operand1: Union[int, float, complex],
+        operand2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return operand1 &lt;&lt; operand2
+
+
+class RShift(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;RShift&#34;,
+        &#34;GCC&#34;: &#34;rshift_expr&#34;,
+        &#34;CAST&#34;: &#34;RShift&#34;,
+    }
+    inputs = [Field(&#34;operand1&#34;, &#34;Number&#34;), Field(&#34;operand2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;&gt;&gt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        operand1: Union[int, float, complex],
+        operand2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return operand1 &gt;&gt; operand2
+
+
+class BitOr(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;BitOr&#34;,
+        &#34;GCC&#34;: &#34;bit_ior_expr&#34;,
+        &#34;CAST&#34;: &#34;BitOr&#34;,
+    }
+    inputs = [Field(&#34;binary1&#34;, &#34;Number&#34;), Field(&#34;binary2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;|&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        binary1: Union[int, float, complex],
+        binary2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return binary1 | binary2
+
+
+class BitXor(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;BitXor&#34;,
+        &#34;GCC&#34;: &#34;bit_xor_expr&#34;,
+        &#34;CAST&#34;: &#34;BitXor&#34;,
+    }
+    inputs = [Field(&#34;binary1&#34;, &#34;Number&#34;), Field(&#34;binary2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;^&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        binary1: Union[int, float, complex],
+        binary2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return binary1 ^ binary2
+
+
+class BitAnd(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;BitAnd&#34;,
+        &#34;GCC&#34;: &#34;bit_and_expr&#34;,
+        &#34;CAST&#34;: &#34;BitAnd&#34;,
+    }
+    inputs = [Field(&#34;binary1&#34;, &#34;Number&#34;), Field(&#34;binary2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;&amp;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        binary1: Union[int, float, complex],
+        binary2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return binary1 &amp; binary2
+
+
+class And(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;And&#34;,
+        &#34;GCC&#34;: &#34;logical_and&#34;,
+        &#34;CAST&#34;: &#34;And&#34;,
+    }
+    inputs = [Field(&#34;logical1&#34;, &#34;Boolean&#34;), Field(&#34;logical2&#34;, &#34;Boolean&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;and&#34;
+    documentation = &#34;&#34;
+
+    def exec(logical1: bool, logical2: bool) -&gt; bool:
+        return logical1 and logical2
+
+
+class Or(object):
+    source_language_name = {&#34;Python&#34;: &#34;Or&#34;, &#34;GCC&#34;: &#34;logical_or&#34;, &#34;CAST&#34;: &#34;Or&#34;}
+    inputs = [Field(&#34;logical1&#34;, &#34;Boolean&#34;), Field(&#34;logical2&#34;, &#34;Boolean&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;or&#34;
+    documentation = &#34;&#34;
+
+    def exec(logical1: bool, logical2: bool) -&gt; bool:
+        return logical1 or logical2
+
+
+class Eq(object):
+    source_language_name = {&#34;Python&#34;: &#34;Eq&#34;, &#34;GCC&#34;: &#34;eq_expr&#34;, &#34;CAST&#34;: &#34;Eq&#34;}
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;==&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; bool:
+        return operand1 == operand2
+
+
+class NotEq(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;NotEq&#34;,
+        &#34;GCC&#34;: &#34;ne_expr&#34;,
+        &#34;CAST&#34;: &#34;NotEq&#34;,
+    }
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;!=&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; bool:
+        return operand1 != operand2
+
+
+class Lt(object):
+    source_language_name = {&#34;Python&#34;: &#34;Lt&#34;, &#34;GCC&#34;: &#34;lt_expr&#34;, &#34;CAST&#34;: &#34;Lt&#34;}
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&lt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &lt; number2
+
+
+class Lte(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Lte&#34;,
+        &#34;GCC&#34;: &#34;le_expr&#34;,
+        &#34;CAST&#34;: &#34;Lte&#34;,
+    }  # TODO: Is it LtE or Lte for Python and CAST
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&lt;=&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &lt;= number2
+
+
+class Gt(object):
+    source_language_name = {&#34;Python&#34;: &#34;Gt&#34;, &#34;GCC&#34;: &#34;gt_expr&#34;, &#34;CAST&#34;: &#34;Gt&#34;}
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&gt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &gt; number2
+
+
+class Gte(object):
+    source_language_name = {&#34;Python&#34;: &#34;GtE&#34;, &#34;GCC&#34;: &#34;ge_expr&#34;, &#34;CAST&#34;: &#34;Gte&#34;}
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&gt;=&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &gt;= number2
+
+
+class In(
+    object
+):  # TODO: How should In and NotIn work? What is the difference between in, member, List_in?
+    source_language_name = {&#34;Python&#34;: &#34;In&#34;, &#34;CAST&#34;: &#34;In&#34;}
+    inputs = [Field(&#34;container_input&#34;, &#34;Any&#34;), Field(&#34;value&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;in&#34;
+    documentation = &#34;&#34;
+
+    def exec(container_input: Any, value: Any) -&gt; bool:
+        return value in container_input
+
+
+class NotIn(
+    object
+):  # TODO: How should In and NotIn work? What is the difference between in, member, List_in?
+    source_language_name = {&#34;Python&#34;: &#34;NotIn&#34;, &#34;CAST&#34;: &#34;NotIn&#34;}
+    inputs = [Field(&#34;container_input&#34;, &#34;Any&#34;), Field(&#34;value&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;not in&#34;
+    documentation = &#34;&#34;
+
+    def exec(container_input: Any, value: Any) -&gt; bool:
+        return value not in container_input</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Add"><code class="flex name class">
+<span>class <span class="ident">Add</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Add(object):
+    source_language_name = {&#34;Python&#34;: &#34;Add&#34;, &#34;GCC&#34;: &#34;plus_expr&#34;, &#34;CAST&#34;: &#34;Add&#34;}
+    inputs = [Field(&#34;augend&#34;, &#34;Number&#34;), Field(&#34;addend&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;sum&#34;, &#34;Number&#34;)]
+    shorthand = &#34;+&#34;
+    documentation = &#34;Add is the numerical addition operator. For a general addition operation (For example, the case of concatanation with +) see GenAdd.&#34;
+
+    @staticmethod  # TODO: Look into if this is required. Only need @staticmethod if you intend to call the method from an instance of class
+    def exec(
+        augend: Union[int, float, complex], addend: Union[int, float, complex]
+    ) -&gt; Union[int, float, complex]:
+        return augend + addend</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Add.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Add.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Add.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Add.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Add.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Static methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Add.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>augend: Union[int, float, complex], addend: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod  # TODO: Look into if this is required. Only need @staticmethod if you intend to call the method from an instance of class
+def exec(
+    augend: Union[int, float, complex], addend: Union[int, float, complex]
+) -&gt; Union[int, float, complex]:
+    return augend + addend</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.And"><code class="flex name class">
+<span>class <span class="ident">And</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class And(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;And&#34;,
+        &#34;GCC&#34;: &#34;logical_and&#34;,
+        &#34;CAST&#34;: &#34;And&#34;,
+    }
+    inputs = [Field(&#34;logical1&#34;, &#34;Boolean&#34;), Field(&#34;logical2&#34;, &#34;Boolean&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;and&#34;
+    documentation = &#34;&#34;
+
+    def exec(logical1: bool, logical2: bool) -&gt; bool:
+        return logical1 and logical2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.And.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.And.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.And.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.And.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.And.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.And.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>logical1: bool, logical2: bool) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(logical1: bool, logical2: bool) -&gt; bool:
+    return logical1 and logical2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitAnd"><code class="flex name class">
+<span>class <span class="ident">BitAnd</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BitAnd(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;BitAnd&#34;,
+        &#34;GCC&#34;: &#34;bit_and_expr&#34;,
+        &#34;CAST&#34;: &#34;BitAnd&#34;,
+    }
+    inputs = [Field(&#34;binary1&#34;, &#34;Number&#34;), Field(&#34;binary2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;&amp;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        binary1: Union[int, float, complex],
+        binary2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return binary1 &amp; binary2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.BitAnd.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitAnd.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitAnd.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitAnd.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitAnd.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.BitAnd.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>binary1: Union[int, float, complex], binary2: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    binary1: Union[int, float, complex],
+    binary2: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return binary1 &amp; binary2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitOr"><code class="flex name class">
+<span>class <span class="ident">BitOr</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BitOr(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;BitOr&#34;,
+        &#34;GCC&#34;: &#34;bit_ior_expr&#34;,
+        &#34;CAST&#34;: &#34;BitOr&#34;,
+    }
+    inputs = [Field(&#34;binary1&#34;, &#34;Number&#34;), Field(&#34;binary2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;|&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        binary1: Union[int, float, complex],
+        binary2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return binary1 | binary2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.BitOr.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitOr.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitOr.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitOr.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitOr.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.BitOr.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>binary1: Union[int, float, complex], binary2: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    binary1: Union[int, float, complex],
+    binary2: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return binary1 | binary2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitXor"><code class="flex name class">
+<span>class <span class="ident">BitXor</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BitXor(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;BitXor&#34;,
+        &#34;GCC&#34;: &#34;bit_xor_expr&#34;,
+        &#34;CAST&#34;: &#34;BitXor&#34;,
+    }
+    inputs = [Field(&#34;binary1&#34;, &#34;Number&#34;), Field(&#34;binary2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;^&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        binary1: Union[int, float, complex],
+        binary2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return binary1 ^ binary2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.BitXor.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitXor.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitXor.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitXor.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.BitXor.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.BitXor.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>binary1: Union[int, float, complex], binary2: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    binary1: Union[int, float, complex],
+    binary2: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return binary1 ^ binary2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Div"><code class="flex name class">
+<span>class <span class="ident">Div</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Div(object):
+    source_language_name = {&#34;Python&#34;: &#34;Div&#34;, &#34;GCC&#34;: &#34;rdiv_expr&#34;, &#34;CAST&#34;: &#34;Div&#34;}
+    inputs = [Field(&#34;dividend&#34;, &#34;Number&#34;), Field(&#34;divisor&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;quotient&#34;, &#34;Number&#34;)]
+    shorthand = &#34;/&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        dividend: Union[int, float, complex],
+        divisor: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return dividend / divisor</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Div.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Div.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Div.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Div.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Div.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Div.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>dividend: Union[int, float, complex], divisor: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    dividend: Union[int, float, complex],
+    divisor: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return dividend / divisor</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Eq"><code class="flex name class">
+<span>class <span class="ident">Eq</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Eq(object):
+    source_language_name = {&#34;Python&#34;: &#34;Eq&#34;, &#34;GCC&#34;: &#34;eq_expr&#34;, &#34;CAST&#34;: &#34;Eq&#34;}
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;==&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; bool:
+        return operand1 == operand2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Eq.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Eq.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Eq.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Eq.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Eq.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Eq.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>operand1: Any, operand2: Any) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(operand1: Any, operand2: Any) -&gt; bool:
+    return operand1 == operand2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.FloorDiv"><code class="flex name class">
+<span>class <span class="ident">FloorDiv</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class FloorDiv(object):
+    source_language_name = {&#34;Python&#34;: &#34;FloorDiv&#34;, &#34;CAST&#34;: &#34;FloorDiv&#34;}
+    inputs = [Field(&#34;dividend&#34;, &#34;Number&#34;), Field(&#34;divisor&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;quotient&#34;, &#34;Number&#34;)]
+    shorthand = &#34;//&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        dividend: Union[int, float, complex],
+        divisor: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return dividend // divisor</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.FloorDiv.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.FloorDiv.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.FloorDiv.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.FloorDiv.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.FloorDiv.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.FloorDiv.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>dividend: Union[int, float, complex], divisor: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    dividend: Union[int, float, complex],
+    divisor: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return dividend // divisor</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenAdd"><code class="flex name class">
+<span>class <span class="ident">GenAdd</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GenAdd(object):
+    source_language_name = {&#34;Python&#34;: &#34;Add&#34;}
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Any&#34;)]
+    shorthand = &#34;g+&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; Any:
+        return operand1 + operand2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.GenAdd.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenAdd.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenAdd.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenAdd.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenAdd.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.GenAdd.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>operand1: Any, operand2: Any) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(operand1: Any, operand2: Any) -&gt; Any:
+    return operand1 + operand2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenSub"><code class="flex name class">
+<span>class <span class="ident">GenSub</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GenSub(object):
+    source_language_name = {&#34;Python&#34;: &#34;Sub&#34;}
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Any&#34;)]
+    shorthand = &#34;g-&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; Any:
+        return operand1 - operand2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.GenSub.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenSub.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenSub.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenSub.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.GenSub.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.GenSub.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>operand1: Any, operand2: Any) ‑> Any</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(operand1: Any, operand2: Any) -&gt; Any:
+    return operand1 - operand2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gt"><code class="flex name class">
+<span>class <span class="ident">Gt</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Gt(object):
+    source_language_name = {&#34;Python&#34;: &#34;Gt&#34;, &#34;GCC&#34;: &#34;gt_expr&#34;, &#34;CAST&#34;: &#34;Gt&#34;}
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&gt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &gt; number2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Gt.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gt.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gt.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gt.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gt.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Gt.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>number1: Union[int, float, complex], number2: Union[int, float, complex]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    number1: Union[int, float, complex],
+    number2: Union[int, float, complex],
+) -&gt; bool:
+    return number1 &gt; number2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gte"><code class="flex name class">
+<span>class <span class="ident">Gte</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Gte(object):
+    source_language_name = {&#34;Python&#34;: &#34;GtE&#34;, &#34;GCC&#34;: &#34;ge_expr&#34;, &#34;CAST&#34;: &#34;Gte&#34;}
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&gt;=&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &gt;= number2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Gte.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gte.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gte.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gte.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Gte.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Gte.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>number1: Union[int, float, complex], number2: Union[int, float, complex]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    number1: Union[int, float, complex],
+    number2: Union[int, float, complex],
+) -&gt; bool:
+    return number1 &gt;= number2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.In"><code class="flex name class">
+<span>class <span class="ident">In</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class In(
+    object
+):  # TODO: How should In and NotIn work? What is the difference between in, member, List_in?
+    source_language_name = {&#34;Python&#34;: &#34;In&#34;, &#34;CAST&#34;: &#34;In&#34;}
+    inputs = [Field(&#34;container_input&#34;, &#34;Any&#34;), Field(&#34;value&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;in&#34;
+    documentation = &#34;&#34;
+
+    def exec(container_input: Any, value: Any) -&gt; bool:
+        return value in container_input</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.In.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.In.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.In.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.In.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.In.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.In.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>container_input: Any, value: Any) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(container_input: Any, value: Any) -&gt; bool:
+    return value in container_input</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.LShift"><code class="flex name class">
+<span>class <span class="ident">LShift</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LShift(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;LShift&#34;,
+        &#34;GCC&#34;: &#34;lshift_expr&#34;,
+        &#34;CAST&#34;: &#34;LShift&#34;,
+    }
+    inputs = [Field(&#34;operand1&#34;, &#34;Number&#34;), Field(&#34;operand2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;&lt;&lt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        operand1: Union[int, float, complex],
+        operand2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return operand1 &lt;&lt; operand2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.LShift.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.LShift.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.LShift.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.LShift.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.LShift.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.LShift.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>operand1: Union[int, float, complex], operand2: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    operand1: Union[int, float, complex],
+    operand2: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return operand1 &lt;&lt; operand2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lt"><code class="flex name class">
+<span>class <span class="ident">Lt</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Lt(object):
+    source_language_name = {&#34;Python&#34;: &#34;Lt&#34;, &#34;GCC&#34;: &#34;lt_expr&#34;, &#34;CAST&#34;: &#34;Lt&#34;}
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&lt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &lt; number2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Lt.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lt.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lt.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lt.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lt.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Lt.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>number1: Union[int, float, complex], number2: Union[int, float, complex]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    number1: Union[int, float, complex],
+    number2: Union[int, float, complex],
+) -&gt; bool:
+    return number1 &lt; number2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lte"><code class="flex name class">
+<span>class <span class="ident">Lte</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Lte(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Lte&#34;,
+        &#34;GCC&#34;: &#34;le_expr&#34;,
+        &#34;CAST&#34;: &#34;Lte&#34;,
+    }  # TODO: Is it LtE or Lte for Python and CAST
+    inputs = [Field(&#34;number1&#34;, &#34;Number&#34;), Field(&#34;number2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;&lt;=&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        number1: Union[int, float, complex],
+        number2: Union[int, float, complex],
+    ) -&gt; bool:
+        return number1 &lt;= number2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Lte.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lte.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lte.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lte.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Lte.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Lte.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>number1: Union[int, float, complex], number2: Union[int, float, complex]) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    number1: Union[int, float, complex],
+    number2: Union[int, float, complex],
+) -&gt; bool:
+    return number1 &lt;= number2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mod"><code class="flex name class">
+<span>class <span class="ident">Mod</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Mod(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Mod&#34;,
+        &#34;GCC&#34;: &#34;trunc_mod_expr&#34;,
+        &#34;CAST&#34;: &#34;Mod&#34;,
+    }
+    inputs = [Field(&#34;dividend&#34;, &#34;Number&#34;), Field(&#34;divisor&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;remainder&#34;, &#34;Number&#34;)]
+    shorthand = &#34;%&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        dividend: Union[int, float, complex],
+        divisor: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return dividend % divisor</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Mod.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mod.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mod.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mod.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mod.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Mod.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>dividend: Union[int, float, complex], divisor: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    dividend: Union[int, float, complex],
+    divisor: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return dividend % divisor</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mult"><code class="flex name class">
+<span>class <span class="ident">Mult</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Mult(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Mult&#34;,
+        &#34;GCC&#34;: &#34;mult_expr&#34;,
+        &#34;CAST&#34;: &#34;Mult&#34;,
+    }
+    inputs = [Field(&#34;multiplier&#34;, &#34;Number&#34;), Field(&#34;multiplicand&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;product&#34;, &#34;Number&#34;)]
+    shorthand = &#34;*&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        multiplier: Union[int, float, complex],
+        multiplicand: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return multiplier * multiplicand</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Mult.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mult.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mult.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mult.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Mult.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Mult.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>multiplier: Union[int, float, complex], multiplicand: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    multiplier: Union[int, float, complex],
+    multiplicand: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return multiplier * multiplicand</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotEq"><code class="flex name class">
+<span>class <span class="ident">NotEq</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NotEq(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;NotEq&#34;,
+        &#34;GCC&#34;: &#34;ne_expr&#34;,
+        &#34;CAST&#34;: &#34;NotEq&#34;,
+    }
+    inputs = [Field(&#34;operand1&#34;, &#34;Any&#34;), Field(&#34;operand2&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;!=&#34;
+    documentation = &#34;&#34;
+
+    def exec(operand1: Any, operand2: Any) -&gt; bool:
+        return operand1 != operand2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.NotEq.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotEq.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotEq.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotEq.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotEq.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.NotEq.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>operand1: Any, operand2: Any) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(operand1: Any, operand2: Any) -&gt; bool:
+    return operand1 != operand2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotIn"><code class="flex name class">
+<span>class <span class="ident">NotIn</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class NotIn(
+    object
+):  # TODO: How should In and NotIn work? What is the difference between in, member, List_in?
+    source_language_name = {&#34;Python&#34;: &#34;NotIn&#34;, &#34;CAST&#34;: &#34;NotIn&#34;}
+    inputs = [Field(&#34;container_input&#34;, &#34;Any&#34;), Field(&#34;value&#34;, &#34;Any&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;not in&#34;
+    documentation = &#34;&#34;
+
+    def exec(container_input: Any, value: Any) -&gt; bool:
+        return value not in container_input</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.NotIn.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotIn.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotIn.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotIn.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.NotIn.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.NotIn.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>container_input: Any, value: Any) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(container_input: Any, value: Any) -&gt; bool:
+    return value not in container_input</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Or"><code class="flex name class">
+<span>class <span class="ident">Or</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Or(object):
+    source_language_name = {&#34;Python&#34;: &#34;Or&#34;, &#34;GCC&#34;: &#34;logical_or&#34;, &#34;CAST&#34;: &#34;Or&#34;}
+    inputs = [Field(&#34;logical1&#34;, &#34;Boolean&#34;), Field(&#34;logical2&#34;, &#34;Boolean&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Boolean&#34;)]
+    shorthand = &#34;or&#34;
+    documentation = &#34;&#34;
+
+    def exec(logical1: bool, logical2: bool) -&gt; bool:
+        return logical1 or logical2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Or.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Or.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Or.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Or.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Or.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Or.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>logical1: bool, logical2: bool) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(logical1: bool, logical2: bool) -&gt; bool:
+    return logical1 or logical2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Pow"><code class="flex name class">
+<span>class <span class="ident">Pow</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Pow(object):
+    source_language_name = {&#34;Python&#34;: &#34;Pow&#34;, &#34;CAST&#34;: &#34;Pow&#34;}
+    inputs = [Field(&#34;base&#34;, &#34;Number&#34;), Field(&#34;exponent&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;power&#34;, &#34;Number&#34;)]
+    shorthand = &#34;**&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        base: Union[int, float, complex], power: Union[int, float, complex]
+    ) -&gt; Union[int, float, complex]:
+        return base**power</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Pow.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Pow.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Pow.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Pow.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Pow.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Pow.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>base: Union[int, float, complex], power: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    base: Union[int, float, complex], power: Union[int, float, complex]
+) -&gt; Union[int, float, complex]:
+    return base**power</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.RShift"><code class="flex name class">
+<span>class <span class="ident">RShift</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RShift(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;RShift&#34;,
+        &#34;GCC&#34;: &#34;rshift_expr&#34;,
+        &#34;CAST&#34;: &#34;RShift&#34;,
+    }
+    inputs = [Field(&#34;operand1&#34;, &#34;Number&#34;), Field(&#34;operand2&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;result&#34;, &#34;Number&#34;)]
+    shorthand = &#34;&gt;&gt;&#34;
+    documentation = &#34;&#34;
+
+    def exec(
+        operand1: Union[int, float, complex],
+        operand2: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return operand1 &gt;&gt; operand2</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.RShift.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.RShift.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.RShift.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.RShift.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.RShift.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.RShift.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>operand1: Union[int, float, complex], operand2: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    operand1: Union[int, float, complex],
+    operand2: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return operand1 &gt;&gt; operand2</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Sub"><code class="flex name class">
+<span>class <span class="ident">Sub</span></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Sub(object):
+    source_language_name = {
+        &#34;Python&#34;: &#34;Sub&#34;,
+        &#34;GCC&#34;: &#34;minus_expr&#34;,
+        &#34;CAST&#34;: &#34;Sub&#34;,
+    }
+    inputs = [Field(&#34;minuend&#34;, &#34;Number&#34;), Field(&#34;subtrahend&#34;, &#34;Number&#34;)]
+    outputs = [Field(&#34;difference&#34;, &#34;Number&#34;)]
+    shorthand = &#34;-&#34;
+    documentation = &#34;Sub is the numerical subtraction operator. For a general subtraction operation () see GenSub.&#34;
+
+    def exec(
+        minuend: Union[int, float, complex],
+        subtahend: Union[int, float, complex],
+    ) -&gt; Union[int, float, complex]:
+        return minuend - subtahend</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Sub.documentation"><code class="name">var <span class="ident">documentation</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Sub.inputs"><code class="name">var <span class="ident">inputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Sub.outputs"><code class="name">var <span class="ident">outputs</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Sub.shorthand"><code class="name">var <span class="ident">shorthand</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.gromet.execution_engine.types.binary.Sub.source_language_name"><code class="name">var <span class="ident">source_language_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.types.binary.Sub.exec"><code class="name flex">
+<span>def <span class="ident">exec</span></span>(<span>minuend: Union[int, float, complex], subtahend: Union[int, float, complex]) ‑> Union[int, float, complex]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exec(
+    minuend: Union[int, float, complex],
+    subtahend: Union[int, float, complex],
+) -&gt; Union[int, float, complex]:
+    return minuend - subtahend</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.gromet.execution_engine.types" href="index.html">skema.gromet.execution_engine.types</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Add" href="#skema.gromet.execution_engine.types.binary.Add">Add</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Add.documentation" href="#skema.gromet.execution_engine.types.binary.Add.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Add.exec" href="#skema.gromet.execution_engine.types.binary.Add.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Add.inputs" href="#skema.gromet.execution_engine.types.binary.Add.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Add.outputs" href="#skema.gromet.execution_engine.types.binary.Add.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Add.shorthand" href="#skema.gromet.execution_engine.types.binary.Add.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Add.source_language_name" href="#skema.gromet.execution_engine.types.binary.Add.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.And" href="#skema.gromet.execution_engine.types.binary.And">And</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.And.documentation" href="#skema.gromet.execution_engine.types.binary.And.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.And.exec" href="#skema.gromet.execution_engine.types.binary.And.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.And.inputs" href="#skema.gromet.execution_engine.types.binary.And.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.And.outputs" href="#skema.gromet.execution_engine.types.binary.And.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.And.shorthand" href="#skema.gromet.execution_engine.types.binary.And.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.And.source_language_name" href="#skema.gromet.execution_engine.types.binary.And.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.BitAnd" href="#skema.gromet.execution_engine.types.binary.BitAnd">BitAnd</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitAnd.documentation" href="#skema.gromet.execution_engine.types.binary.BitAnd.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitAnd.exec" href="#skema.gromet.execution_engine.types.binary.BitAnd.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitAnd.inputs" href="#skema.gromet.execution_engine.types.binary.BitAnd.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitAnd.outputs" href="#skema.gromet.execution_engine.types.binary.BitAnd.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitAnd.shorthand" href="#skema.gromet.execution_engine.types.binary.BitAnd.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitAnd.source_language_name" href="#skema.gromet.execution_engine.types.binary.BitAnd.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.BitOr" href="#skema.gromet.execution_engine.types.binary.BitOr">BitOr</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitOr.documentation" href="#skema.gromet.execution_engine.types.binary.BitOr.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitOr.exec" href="#skema.gromet.execution_engine.types.binary.BitOr.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitOr.inputs" href="#skema.gromet.execution_engine.types.binary.BitOr.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitOr.outputs" href="#skema.gromet.execution_engine.types.binary.BitOr.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitOr.shorthand" href="#skema.gromet.execution_engine.types.binary.BitOr.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitOr.source_language_name" href="#skema.gromet.execution_engine.types.binary.BitOr.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.BitXor" href="#skema.gromet.execution_engine.types.binary.BitXor">BitXor</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitXor.documentation" href="#skema.gromet.execution_engine.types.binary.BitXor.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitXor.exec" href="#skema.gromet.execution_engine.types.binary.BitXor.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitXor.inputs" href="#skema.gromet.execution_engine.types.binary.BitXor.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitXor.outputs" href="#skema.gromet.execution_engine.types.binary.BitXor.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitXor.shorthand" href="#skema.gromet.execution_engine.types.binary.BitXor.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.BitXor.source_language_name" href="#skema.gromet.execution_engine.types.binary.BitXor.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Div" href="#skema.gromet.execution_engine.types.binary.Div">Div</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Div.documentation" href="#skema.gromet.execution_engine.types.binary.Div.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Div.exec" href="#skema.gromet.execution_engine.types.binary.Div.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Div.inputs" href="#skema.gromet.execution_engine.types.binary.Div.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Div.outputs" href="#skema.gromet.execution_engine.types.binary.Div.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Div.shorthand" href="#skema.gromet.execution_engine.types.binary.Div.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Div.source_language_name" href="#skema.gromet.execution_engine.types.binary.Div.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Eq" href="#skema.gromet.execution_engine.types.binary.Eq">Eq</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Eq.documentation" href="#skema.gromet.execution_engine.types.binary.Eq.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Eq.exec" href="#skema.gromet.execution_engine.types.binary.Eq.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Eq.inputs" href="#skema.gromet.execution_engine.types.binary.Eq.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Eq.outputs" href="#skema.gromet.execution_engine.types.binary.Eq.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Eq.shorthand" href="#skema.gromet.execution_engine.types.binary.Eq.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Eq.source_language_name" href="#skema.gromet.execution_engine.types.binary.Eq.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.FloorDiv" href="#skema.gromet.execution_engine.types.binary.FloorDiv">FloorDiv</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.FloorDiv.documentation" href="#skema.gromet.execution_engine.types.binary.FloorDiv.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.FloorDiv.exec" href="#skema.gromet.execution_engine.types.binary.FloorDiv.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.FloorDiv.inputs" href="#skema.gromet.execution_engine.types.binary.FloorDiv.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.FloorDiv.outputs" href="#skema.gromet.execution_engine.types.binary.FloorDiv.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.FloorDiv.shorthand" href="#skema.gromet.execution_engine.types.binary.FloorDiv.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.FloorDiv.source_language_name" href="#skema.gromet.execution_engine.types.binary.FloorDiv.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.GenAdd" href="#skema.gromet.execution_engine.types.binary.GenAdd">GenAdd</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenAdd.documentation" href="#skema.gromet.execution_engine.types.binary.GenAdd.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenAdd.exec" href="#skema.gromet.execution_engine.types.binary.GenAdd.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenAdd.inputs" href="#skema.gromet.execution_engine.types.binary.GenAdd.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenAdd.outputs" href="#skema.gromet.execution_engine.types.binary.GenAdd.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenAdd.shorthand" href="#skema.gromet.execution_engine.types.binary.GenAdd.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenAdd.source_language_name" href="#skema.gromet.execution_engine.types.binary.GenAdd.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.GenSub" href="#skema.gromet.execution_engine.types.binary.GenSub">GenSub</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenSub.documentation" href="#skema.gromet.execution_engine.types.binary.GenSub.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenSub.exec" href="#skema.gromet.execution_engine.types.binary.GenSub.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenSub.inputs" href="#skema.gromet.execution_engine.types.binary.GenSub.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenSub.outputs" href="#skema.gromet.execution_engine.types.binary.GenSub.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenSub.shorthand" href="#skema.gromet.execution_engine.types.binary.GenSub.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.GenSub.source_language_name" href="#skema.gromet.execution_engine.types.binary.GenSub.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Gt" href="#skema.gromet.execution_engine.types.binary.Gt">Gt</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gt.documentation" href="#skema.gromet.execution_engine.types.binary.Gt.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gt.exec" href="#skema.gromet.execution_engine.types.binary.Gt.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gt.inputs" href="#skema.gromet.execution_engine.types.binary.Gt.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gt.outputs" href="#skema.gromet.execution_engine.types.binary.Gt.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gt.shorthand" href="#skema.gromet.execution_engine.types.binary.Gt.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gt.source_language_name" href="#skema.gromet.execution_engine.types.binary.Gt.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Gte" href="#skema.gromet.execution_engine.types.binary.Gte">Gte</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gte.documentation" href="#skema.gromet.execution_engine.types.binary.Gte.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gte.exec" href="#skema.gromet.execution_engine.types.binary.Gte.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gte.inputs" href="#skema.gromet.execution_engine.types.binary.Gte.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gte.outputs" href="#skema.gromet.execution_engine.types.binary.Gte.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gte.shorthand" href="#skema.gromet.execution_engine.types.binary.Gte.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Gte.source_language_name" href="#skema.gromet.execution_engine.types.binary.Gte.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.In" href="#skema.gromet.execution_engine.types.binary.In">In</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.In.documentation" href="#skema.gromet.execution_engine.types.binary.In.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.In.exec" href="#skema.gromet.execution_engine.types.binary.In.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.In.inputs" href="#skema.gromet.execution_engine.types.binary.In.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.In.outputs" href="#skema.gromet.execution_engine.types.binary.In.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.In.shorthand" href="#skema.gromet.execution_engine.types.binary.In.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.In.source_language_name" href="#skema.gromet.execution_engine.types.binary.In.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.LShift" href="#skema.gromet.execution_engine.types.binary.LShift">LShift</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.LShift.documentation" href="#skema.gromet.execution_engine.types.binary.LShift.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.LShift.exec" href="#skema.gromet.execution_engine.types.binary.LShift.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.LShift.inputs" href="#skema.gromet.execution_engine.types.binary.LShift.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.LShift.outputs" href="#skema.gromet.execution_engine.types.binary.LShift.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.LShift.shorthand" href="#skema.gromet.execution_engine.types.binary.LShift.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.LShift.source_language_name" href="#skema.gromet.execution_engine.types.binary.LShift.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Lt" href="#skema.gromet.execution_engine.types.binary.Lt">Lt</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lt.documentation" href="#skema.gromet.execution_engine.types.binary.Lt.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lt.exec" href="#skema.gromet.execution_engine.types.binary.Lt.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lt.inputs" href="#skema.gromet.execution_engine.types.binary.Lt.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lt.outputs" href="#skema.gromet.execution_engine.types.binary.Lt.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lt.shorthand" href="#skema.gromet.execution_engine.types.binary.Lt.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lt.source_language_name" href="#skema.gromet.execution_engine.types.binary.Lt.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Lte" href="#skema.gromet.execution_engine.types.binary.Lte">Lte</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lte.documentation" href="#skema.gromet.execution_engine.types.binary.Lte.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lte.exec" href="#skema.gromet.execution_engine.types.binary.Lte.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lte.inputs" href="#skema.gromet.execution_engine.types.binary.Lte.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lte.outputs" href="#skema.gromet.execution_engine.types.binary.Lte.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lte.shorthand" href="#skema.gromet.execution_engine.types.binary.Lte.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Lte.source_language_name" href="#skema.gromet.execution_engine.types.binary.Lte.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Mod" href="#skema.gromet.execution_engine.types.binary.Mod">Mod</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mod.documentation" href="#skema.gromet.execution_engine.types.binary.Mod.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mod.exec" href="#skema.gromet.execution_engine.types.binary.Mod.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mod.inputs" href="#skema.gromet.execution_engine.types.binary.Mod.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mod.outputs" href="#skema.gromet.execution_engine.types.binary.Mod.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mod.shorthand" href="#skema.gromet.execution_engine.types.binary.Mod.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mod.source_language_name" href="#skema.gromet.execution_engine.types.binary.Mod.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Mult" href="#skema.gromet.execution_engine.types.binary.Mult">Mult</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mult.documentation" href="#skema.gromet.execution_engine.types.binary.Mult.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mult.exec" href="#skema.gromet.execution_engine.types.binary.Mult.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mult.inputs" href="#skema.gromet.execution_engine.types.binary.Mult.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mult.outputs" href="#skema.gromet.execution_engine.types.binary.Mult.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mult.shorthand" href="#skema.gromet.execution_engine.types.binary.Mult.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Mult.source_language_name" href="#skema.gromet.execution_engine.types.binary.Mult.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.NotEq" href="#skema.gromet.execution_engine.types.binary.NotEq">NotEq</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotEq.documentation" href="#skema.gromet.execution_engine.types.binary.NotEq.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotEq.exec" href="#skema.gromet.execution_engine.types.binary.NotEq.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotEq.inputs" href="#skema.gromet.execution_engine.types.binary.NotEq.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotEq.outputs" href="#skema.gromet.execution_engine.types.binary.NotEq.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotEq.shorthand" href="#skema.gromet.execution_engine.types.binary.NotEq.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotEq.source_language_name" href="#skema.gromet.execution_engine.types.binary.NotEq.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.NotIn" href="#skema.gromet.execution_engine.types.binary.NotIn">NotIn</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotIn.documentation" href="#skema.gromet.execution_engine.types.binary.NotIn.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotIn.exec" href="#skema.gromet.execution_engine.types.binary.NotIn.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotIn.inputs" href="#skema.gromet.execution_engine.types.binary.NotIn.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotIn.outputs" href="#skema.gromet.execution_engine.types.binary.NotIn.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotIn.shorthand" href="#skema.gromet.execution_engine.types.binary.NotIn.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.NotIn.source_language_name" href="#skema.gromet.execution_engine.types.binary.NotIn.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Or" href="#skema.gromet.execution_engine.types.binary.Or">Or</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Or.documentation" href="#skema.gromet.execution_engine.types.binary.Or.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Or.exec" href="#skema.gromet.execution_engine.types.binary.Or.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Or.inputs" href="#skema.gromet.execution_engine.types.binary.Or.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Or.outputs" href="#skema.gromet.execution_engine.types.binary.Or.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Or.shorthand" href="#skema.gromet.execution_engine.types.binary.Or.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Or.source_language_name" href="#skema.gromet.execution_engine.types.binary.Or.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Pow" href="#skema.gromet.execution_engine.types.binary.Pow">Pow</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Pow.documentation" href="#skema.gromet.execution_engine.types.binary.Pow.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Pow.exec" href="#skema.gromet.execution_engine.types.binary.Pow.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Pow.inputs" href="#skema.gromet.execution_engine.types.binary.Pow.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Pow.outputs" href="#skema.gromet.execution_engine.types.binary.Pow.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Pow.shorthand" href="#skema.gromet.execution_engine.types.binary.Pow.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Pow.source_language_name" href="#skema.gromet.execution_engine.types.binary.Pow.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.RShift" href="#skema.gromet.execution_engine.types.binary.RShift">RShift</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.RShift.documentation" href="#skema.gromet.execution_engine.types.binary.RShift.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.RShift.exec" href="#skema.gromet.execution_engine.types.binary.RShift.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.RShift.inputs" href="#skema.gromet.execution_engine.types.binary.RShift.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.RShift.outputs" href="#skema.gromet.execution_engine.types.binary.RShift.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.RShift.shorthand" href="#skema.gromet.execution_engine.types.binary.RShift.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.RShift.source_language_name" href="#skema.gromet.execution_engine.types.binary.RShift.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.types.binary.Sub" href="#skema.gromet.execution_engine.types.binary.Sub">Sub</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.types.binary.Sub.documentation" href="#skema.gromet.execution_engine.types.binary.Sub.documentation">documentation</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Sub.exec" href="#skema.gromet.execution_engine.types.binary.Sub.exec">exec</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Sub.inputs" href="#skema.gromet.execution_engine.types.binary.Sub.inputs">inputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Sub.outputs" href="#skema.gromet.execution_engine.types.binary.Sub.outputs">outputs</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Sub.shorthand" href="#skema.gromet.execution_engine.types.binary.Sub.shorthand">shorthand</a></code></li>
+<li><code><a title="skema.gromet.execution_engine.types.binary.Sub.source_language_name" href="#skema.gromet.execution_engine.types.binary.Sub.source_language_name">source_language_name</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

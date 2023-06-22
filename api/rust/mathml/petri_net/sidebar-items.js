@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Polarity"],"mod":["recognizers"],"struct":["Rate","Specie","Var"]};

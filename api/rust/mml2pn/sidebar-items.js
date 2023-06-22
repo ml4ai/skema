@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["OutputFormat"],"fn":["main"],"static":["DEFAULT_VALUE"],"struct":["Cli"]};

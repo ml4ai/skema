@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["main","ping"],"static":["DEFAULT_VALUE"],"struct":["ApiDoc","Cli","ping"]};

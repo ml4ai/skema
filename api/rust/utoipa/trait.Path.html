@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Trait for implementing OpenAPI PathItem object with path."><title>Path in utoipa - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../static.files/storage-62ce34ea385b278a.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="logo-container" href="../utoipa/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2></h2></nav><nav class="sidebar"><a class="logo-container" href="../utoipa/index.html"><img class="rust-logo" src="../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><h2 class="location"><a href="#">Path</a></h2><div class="sidebar-elems"><section><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.path">path</a></li><li><a href="#tymethod.path_item">path_item</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><h2><a href="index.html">In utoipa</a></h2></div></nav><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Trait <a href="index.html">utoipa</a>::<wbr><a class="trait" href="#">Path</a><button id="copy-path" title="Copy item path to clipboard"><img src="../static.files/clipboard-7571035ce49a181d.svg" width="19" height="18" alt="Copy item path"></button></h1><span class="out-of-band"><a class="srclink" href="../src/utoipa/lib.rs.html#478-482">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>pub trait Path {
+    // Required methods
+    fn <a href="#tymethod.path" class="fn">path</a>() -&gt; &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.70.0/std/primitive.str.html">str</a>;
+<span class="item-spacer"></span>    fn <a href="#tymethod.path_item" class="fn">path_item</a>(default_tag: <a class="enum" href="https://doc.rust-lang.org/1.70.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/1.70.0/std/primitive.str.html">str</a>&gt;) -&gt; <a class="struct" href="openapi/path/struct.PathItem.html" title="struct utoipa::openapi::path::PathItem">PathItem</a>;
+}</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Trait for implementing OpenAPI PathItem object with path.</p>
+<p>This trait is implemented via <a href="attr.path.html"><code>#[utoipa::path(...)]</code></a> attribute macro and there
+is no need to implement this trait manually.</p>
+<h2 id="examples"><a href="#examples">Examples</a></h2>
+<p>Use <code>#[utoipa::path(..)]</code> to implement Path trait</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="doccomment">/// Get pet by id
+///
+/// Get pet from database by pet database id
+</span><span class="attr">#[utoipa::path(
+    get,
+    path = <span class="string">&quot;/pets/{id}&quot;</span>,
+    responses(
+        (status = <span class="number">200</span>, description = <span class="string">&quot;Pet found successfully&quot;</span>, body = Pet),
+        (status = <span class="number">404</span>, description = <span class="string">&quot;Pet was not found&quot;</span>)
+    ),
+    params(
+        (<span class="string">&quot;id&quot; </span>= u64, Path, description = <span class="string">&quot;Pet database id to get Pet for&quot;</span>),
+    )
+)]
+</span><span class="kw">async fn </span>get_pet_by_id(pet_id: u64) -&gt; Pet {
+    Pet {
+        id: pet_id,
+        name: <span class="string">&quot;lightning&quot;</span>.to_string(),
+    }
+}</code></pre></div>
+<p>Example of what would manual implementation roughly look like of above <code>#[utoipa::path(...)]</code> macro.</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code>utoipa::openapi::PathsBuilder::new().path(
+        <span class="string">&quot;/pets/{id}&quot;</span>,
+        utoipa::openapi::PathItem::new(
+            utoipa::openapi::PathItemType::Get,
+            utoipa::openapi::path::OperationBuilder::new()
+                .responses(
+                    utoipa::openapi::ResponsesBuilder::new()
+                        .response(
+                            <span class="string">&quot;200&quot;</span>,
+                            utoipa::openapi::ResponseBuilder::new()
+                                .description(<span class="string">&quot;Pet found successfully&quot;</span>)
+                                .content(<span class="string">&quot;application/json&quot;</span>,
+                                    utoipa::openapi::Content::new(
+                                        utoipa::openapi::Ref::from_schema_name(<span class="string">&quot;Pet&quot;</span>),
+                                    ),
+                            ),
+                        )
+                        .response(<span class="string">&quot;404&quot;</span>, utoipa::openapi::Response::new(<span class="string">&quot;Pet was not found&quot;</span>)),
+                )
+                .operation_id(<span class="prelude-val">Some</span>(<span class="string">&quot;get_pet_by_id&quot;</span>))
+                .deprecated(<span class="prelude-val">Some</span>(utoipa::openapi::Deprecated::False))
+                .summary(<span class="prelude-val">Some</span>(<span class="string">&quot;Get pet by id&quot;</span>))
+                .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Get pet by id\n\nGet pet from database by pet database id\n&quot;</span>))
+                .parameter(
+                    utoipa::openapi::path::ParameterBuilder::new()
+                        .name(<span class="string">&quot;id&quot;</span>)
+                        .parameter_in(utoipa::openapi::path::ParameterIn::Path)
+                        .required(utoipa::openapi::Required::True)
+                        .deprecated(<span class="prelude-val">Some</span>(utoipa::openapi::Deprecated::False))
+                        .description(<span class="prelude-val">Some</span>(<span class="string">&quot;Pet database id to get Pet for&quot;</span>))
+                        .schema(
+                            <span class="prelude-val">Some</span>(utoipa::openapi::ObjectBuilder::new()
+                                .schema_type(utoipa::openapi::SchemaType::Integer)
+                                .format(<span class="prelude-val">Some</span>(utoipa::openapi::SchemaFormat::KnownFormat(utoipa::openapi::KnownFormat::Int64)))),
+                        ),
+                )
+                .tag(<span class="string">&quot;pet_api&quot;</span>),
+        ),
+    );</code></pre></div>
+</div></details><h2 id="required-methods" class="small-section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><section id="tymethod.path" class="method"><a class="srclink rightside" href="../src/utoipa/lib.rs.html#479">source</a><h4 class="code-header">fn <a href="#tymethod.path" class="fn">path</a>() -&gt; &amp;'static <a class="primitive" href="https://doc.rust-lang.org/1.70.0/std/primitive.str.html">str</a></h4></section><section id="tymethod.path_item" class="method"><a class="srclink rightside" href="../src/utoipa/lib.rs.html#481">source</a><h4 class="code-header">fn <a href="#tymethod.path_item" class="fn">path_item</a>(default_tag: <a class="enum" href="https://doc.rust-lang.org/1.70.0/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/1.70.0/std/primitive.str.html">str</a>&gt;) -&gt; <a class="struct" href="openapi/path/struct.PathItem.html" title="struct utoipa::openapi::path::PathItem">PathItem</a></h4></section></div><h2 id="implementors" class="small-section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"></div><script src="../implementors/utoipa/trait.Path.js" async></script></section></div></main></body></html>

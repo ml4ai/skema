@@ -1,77 +1,203 @@
-<html lang="en">
-    <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content>
-    <meta name="author" content>
-    <link rel="icon" href="favicon.ico">
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SKEMA project documentation.">
+  <meta name="author" content="University of Arizona &amp; Lum AI">
+  <link rel="canonical" href="https://ml4ai.github.io/skema/">
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>skema</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
-    <title>SKEMA | Home</title>
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/github.min.css" />
+  <link href="css/extra.css" rel="stylesheet" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Home";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = "/skema/";
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/yaml.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+</head>
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-    <link href="./css/style.css" rel="stylesheet">
-    <link href="./css/syntax.css" rel="stylesheet">
+<body class="wy-body-for-nav" role="document">
 
-  </head>
+  <div class="wy-grid-for-nav">
 
-  <body>
-    <nav class="navbar navbar-expand-md navbar-light navbar-fixed-top">
-  <div class="container-fluid">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> skema</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
 
-  <a class="navbar-brand" href="./" style="color:maroon;">SKEMA</a>
-
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarsExampleDefault">
-    <ul class="navbar-nav ml-auto">
-
-      <li class="nav-item">
-        <a class="nav-link" href="./">Home</a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" href="./team.html">Team</a>
-      </li>
-
-      <li class="nav-item">
-        <a class="nav-link" href="./software.html">Software</a>
-      </li>
-
-    </ul>
-  </div>
-  </div>
-</nav>
-<hr class="featurette-divider">
-
-    <div class="container">
-        <p>Computational models are powerful tools for exploring and verifying hypotheses
-about complex systems. However, the scientific knowledge that drives their
-creation and results from their use is largely fractured among a number of
-different media, and the model implementations themselves are often difficult
-to share, extend and maintain. The Scientific Knowledge Extraction and Model
-Assembly (SKEMA) framework aims to make fundamental contributions to
-machine-assisted knowledge discovery, curation, and modeling.</p>
-<p>The SKEMA project is supported by DARPA under contract HR00112290092.</p>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="software/">Software</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">About</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="team/">Team</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="license/">License</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">Developing</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="dev/env/">Configuring your development environment</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="dev/docs/">Building documentation</a>
+                    </li>
+                    <li class="toctree-l1"><a class="" href="coverage/index.md">Test coverage reports</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="dev/docker/">Building docker images</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Python)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="api/python/skema/gromet/"><code>skema.gromet</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api/python/skema/img2mml/"><code>skema.img2mml</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api/python/skema/isa/"><code>skema.isa</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="" href="api/python/skema/moviz/index.html"><code>skema.moviz</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api/python/skema/skema_py/"><code>skema.skema_py</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="api/python/skema/text_reading/mention_linking/"><code>skema.text_reading.mention_linking</code></a>
+                    </li>
+                    <li class="toctree-l1"><a class="" href="api/python/skema/utils/index.html"><code>skema.utils</code></a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Rust)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="api/rust/help.html"><code>skema.rust</code></a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">API (Scala)</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="" href="api/scala/index.html"><code>skema.scala</code></a>
+                    </li>
+                </ul>
+      </div>
     </div>
-    <!-- Bootstrap -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+    </nav>
 
-<!-- MathJax -->
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  "HTML-CSS": {
-    preferredFont: null,
-    availableFonts: [],
-    webFont: "Gyre-Pagella"
-  }
-});
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
-  </body>
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">skema</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Home</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/ml4ai/skema/blob/main/docs/index.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+
+          <div role="main">
+            <div class="section">
+              
+                <p>Computational models are powerful tools for exploring and verifying hypotheses about complex systems. However, the scientific knowledge that drives their creation and results from their use is largely fractured among a number of different media, and the model implementations themselves are often difficult to share, extend and maintain.  The Scientific Knowledge Extraction and Model Assembly (SKEMA) framework aims to make fundamental contributions to machine-assisted knowledge discovery, curation, and modeling.</p>
+<p>The SKEMA project is supported by DARPA under contract HR00112290092.</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="software/" class="btn btn-neutral float-right" title="Software">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+      <p>Copyright &copy; 2023 University of Arizona &amp; Lum AI.</p>
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/ml4ai/skema/" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="software/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme_extra.js" defer></script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
 </html>
+
+<!--
+MkDocs version : 1.2.3
+Build Date UTC : 2023-06-22 06:39:15.643989+00:00
+-->

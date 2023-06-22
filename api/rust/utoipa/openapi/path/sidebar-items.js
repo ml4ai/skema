@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ParameterIn","ParameterStyle","PathItemType"],"struct":["Operation","OperationBuilder","Parameter","ParameterBuilder","PathItem","PathItemBuilder","Paths","PathsBuilder"]};

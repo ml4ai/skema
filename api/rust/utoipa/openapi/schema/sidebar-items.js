@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["KnownFormat","Schema","SchemaFormat","SchemaType"],"fn":["empty"],"struct":["AllOf","AllOfBuilder","Array","ArrayBuilder","Components","ComponentsBuilder","Discriminator","Object","ObjectBuilder","OneOf","OneOfBuilder","Ref"],"trait":["ToArray"]};

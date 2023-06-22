@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"extract_comments":[["impl <a class=\"trait\" href=\"lazy_static/trait.LazyStatic.html\" title=\"trait lazy_static::LazyStatic\">LazyStatic</a> for <a class=\"struct\" href=\"extract_comments/struct.CPP_C_EXTENSIONS.html\" title=\"struct extract_comments::CPP_C_EXTENSIONS\">CPP_C_EXTENSIONS</a>"],["impl <a class=\"trait\" href=\"lazy_static/trait.LazyStatic.html\" title=\"trait lazy_static::LazyStatic\">LazyStatic</a> for <a class=\"struct\" href=\"extract_comments/struct.FORTRAN_EXTENSIONS.html\" title=\"struct extract_comments::FORTRAN_EXTENSIONS\">FORTRAN_EXTENSIONS</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

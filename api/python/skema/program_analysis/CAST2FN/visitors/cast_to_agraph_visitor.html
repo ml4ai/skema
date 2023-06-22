@@ -1,0 +1,2232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import networkx as nx
+
+from functools import singledispatchmethod
+from skema.utils.misc import uuid
+
+from .cast_visitor import CASTVisitor
+from skema.program_analysis.CAST2FN.cast import CAST
+from skema.program_analysis.CAST2FN.model.cast import (
+    AstNode,
+    Assignment,
+    Attribute,
+    Call,
+    FunctionDef,
+    LiteralValue,
+    Loop,
+    ModelBreak,
+    ModelContinue,
+    ModelIf,
+    ModelImport,
+    ModelReturn,
+    Module,
+    Name,
+    Operator,
+    RecordDef,
+    ScalarType,
+    StructureType,
+    SourceRef,
+    VarType,
+    Var,
+    ValueConstructor,
+)
+from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+    var_dict_to_str,
+    interface_to_str,
+    decision_in_to_str,
+)
+
+
+class CASTTypeError(TypeError):
+    &#34;&#34;&#34;Used to create errors in the CASTToAGraphVisitor, in particular
+    when the visitor encounters some value that it wasn&#39;t expecting.
+
+    Args:
+        Exception: An exception that occurred during execution.
+    &#34;&#34;&#34;
+
+    pass
+
+
+class CASTToAGraphVisitor(CASTVisitor):
+    &#34;&#34;&#34;class CASTToAGraphVisitor - A visitor that traverses
+    CAST nodes to generate a networkx DiGraph that represents
+    the CAST as a DiGraph. The CAST object itself is a representation
+    of a program.
+    A common theme across most visitors is they generate a UID
+    that is used with networkx as identifiers for the nodes in the digraph,
+    so we know which nodes to connect to other nodes with edges. They then
+    add themselves to a networkx DiGraph object that is updated across
+    most the visitors by either adding nodes or edges.
+    A lot of the visitors are relatively straightforward and
+    follow this pattern for a particular node
+        - Visit the node&#39;s children
+        - Generate a UID for the current node
+        - Add the node to the graph with the UID
+        - Add edges connecting the node to its children
+        - Return the Node&#39;s UID, so this can be repeated as necessary
+
+    Some do a little bit of extra work to make the visualization look
+    nicer, like add extra &#39;group&#39; nodes to group certain nodes together
+    (i.e. function arguments, class attributes)
+
+    Inherits from CASTVisitor to use its visit functions.
+
+    Attributes:
+        cast (CAST): The CAST object representation of the program
+                     we&#39;re generating a DiGraph for.
+        G (nx.DiGraph): The graph of the program. Gets populated as
+                     nodes are visited.
+
+    &#34;&#34;&#34;
+
+    cast: CAST
+    G: nx.DiGraph
+
+    def __init__(self, cast: CAST):
+        self.cast = cast
+        self.G = nx.DiGraph()
+
+    def to_agraph(self):
+        &#34;&#34;&#34;Visits the entire CAST object to populate the graph G
+        and returns an AGraph of the graph G as a result.
+        &#34;&#34;&#34;
+        self.visit_list(self.cast.nodes)
+        A = nx.nx_agraph.to_agraph(self.G)
+        A.graph_attr.update(
+            {&#34;dpi&#34;: 227, &#34;fontsize&#34;: 20, &#34;fontname&#34;: &#34;Menlo&#34;, &#34;rankdir&#34;: &#34;TB&#34;}
+        )
+        A.node_attr.update(
+            {
+                &#34;shape&#34;: &#34;rectangle&#34;,
+                &#34;color&#34;: &#34;#650021&#34;,
+                &#34;style&#34;: &#34;rounded&#34;,
+                &#34;fontname&#34;: &#34;Menlo&#34;,
+            }
+        )
+        for node in A.iternodes():
+            node.attr[&#34;fontcolor&#34;] = &#34;black&#34;
+            node.attr[&#34;style&#34;] = &#34;rounded&#34;
+        A.edge_attr.update({&#34;color&#34;: &#34;#650021&#34;, &#34;arrowsize&#34;: 0.5})
+
+        return A
+
+    def to_pdf(self, pdf_filepath: str):
+        &#34;&#34;&#34;Generates an agraph, and uses it
+        to create a PDF using the &#39;dot&#39; program&#34;&#34;&#34;
+        # import skema.utils.misc.test_pygraphviz
+        # test_pygraphviz(
+        #  &#34;For the agraph generation in the python_to_cast &#34;
+        # &#34;function to work, pygraphviz must be installed.&#34;
+        # )
+
+        A = self.to_agraph()
+        A.draw(pdf_filepath, prog=&#34;dot&#34;)
+
+    @singledispatchmethod
+    def visit(self, node: AstNode):
+        &#34;&#34;&#34;Generic visitor for unimplemented/unexpected nodes&#34;&#34;&#34;
+        raise CASTTypeError(f&#34;Unrecognized node type: {type(node)}&#34;)
+
+    @visit.register
+    def _(self, node: Assignment):
+        &#34;&#34;&#34;Visits Assignment nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Assignment&#34;)
+        self.G.add_edge(node_uid, left)
+        self.G.add_edge(node_uid, right)
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastAssignment):
+        &#34;&#34;&#34;Visits Assignment nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Assignment&#34;)
+        self.G.add_edge(node_uid, left)
+        self.G.add_edge(node_uid, right)
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastAttribute):
+        &#34;&#34;&#34;Visits Attribute nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        value = self.visit(node.value)
+        attr = self.visit(node.attr)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Attribute&#34;)
+        self.G.add_edge(node_uid, value)
+        self.G.add_edge(node_uid, attr)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Attribute):
+        &#34;&#34;&#34;Visits Attribute nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        value = self.visit(node.value)
+        attr = self.visit(node.attr)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Attribute&#34;)
+        self.G.add_edge(node_uid, value)
+        self.G.add_edge(node_uid, attr)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Operator):
+        &#34;&#34;&#34;Visits BinaryOp nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        operands = self.visit_list(node.operands)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=node.op)
+        
+        for opd in operands:
+            self.G.add_edge(node_uid, opd)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastOperator):
+        &#34;&#34;&#34;Visits BinaryOp nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        operands = self.visit_list(node.operands)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=node.op)
+
+        for opd in operands:
+            self.G.add_edge(node_uid, opd)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Call):
+        &#34;&#34;&#34;Visits Call (function call) nodes. We check to see
+        if we have arguments to the node and act accordingly.
+        Appending all the arguments of the function to this node,
+        if we have any. The node&#39;s UID is returned.&#34;&#34;&#34;
+        func = self.visit(node.func)
+        args = []
+
+        if node.arguments != None and len(node.arguments) &gt; 0:
+            args = self.visit_list(node.arguments)
+
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;FunctionCall&#34;)
+        self.G.add_edge(node_uid, func)
+
+        args_uid = uuid.uuid4()
+        self.G.add_node(args_uid, label=&#34;Arguments&#34;)
+        self.G.add_edge(node_uid, args_uid)
+
+        for n in args:
+            self.G.add_edge(args_uid, n)
+
+        return node_uid
+
+    def visit_call_grfn_2_2(self, node: AnnCastCall):
+        &#34;&#34;&#34;Visits Call (function call) nodes. We check to see
+        if we have arguments to the node and act accordingly.
+        Appending all the arguments of the function to this node,
+        if we have any. The node&#39;s UID is returned.&#34;&#34;&#34;
+        func = self.visit(node.func)
+        args = []
+        if len(node.arguments) &gt; 0:
+            args = self.visit_list(node.arguments)
+
+        node_uid = uuid.uuid4()
+        label = &#34;CallGrfn2_2&#34;
+        top_iface_in_vars_str = var_dict_to_str(
+            &#34;Top In: &#34;, node.top_interface_in
+        )
+        top_iface_out_vars_str = var_dict_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        bot_iface_in_vars_str = var_dict_to_str(
+            &#34;Bot In: &#34;, node.bot_interface_in
+        )
+        bot_iface_out_vars_str = var_dict_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        globals_in_str = var_dict_to_str(
+            &#34;Globals In: &#34;, node.func_def_copy.used_globals
+        )
+        globals_out_str = var_dict_to_str(
+            &#34;Globals Out: &#34;, node.func_def_copy.modified_globals
+        )
+        label = f&#34;{label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}&#34;
+        label = f&#34;{label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}&#34;
+        label = f&#34;{label}\n{globals_in_str}\n{globals_out_str}&#34;
+        self.G.add_node(node_uid, label=label)
+        self.G.add_edge(node_uid, func)
+
+        args_uid = uuid.uuid4()
+        self.G.add_node(args_uid, label=&#34;Arguments&#34;)
+        self.G.add_edge(node_uid, args_uid)
+
+        for n in args:
+            self.G.add_edge(args_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastCall):
+        &#34;&#34;&#34;Visits Call (function call) nodes. We check to see
+        if we have arguments to the node and act accordingly.
+        Appending all the arguments of the function to this node,
+        if we have any. The node&#39;s UID is returned.&#34;&#34;&#34;
+
+        if node.is_grfn_2_2:
+            return self.visit_call_grfn_2_2(node)
+
+        func = self.visit(node.func)
+        args = []
+        if len(node.arguments) &gt; 0:
+            args = self.visit_list(node.arguments)
+
+        node_uid = uuid.uuid4()
+        label = &#34;Call&#34;
+        top_iface_in_vars_str = var_dict_to_str(
+            &#34;Top In: &#34;, node.top_interface_in
+        )
+        top_iface_out_vars_str = var_dict_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        bot_iface_in_vars_str = var_dict_to_str(
+            &#34;Bot In: &#34;, node.bot_interface_in
+        )
+        bot_iface_out_vars_str = var_dict_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        label = f&#34;{label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}&#34;
+        label = f&#34;{label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}&#34;
+        self.G.add_node(node_uid, label=label)
+        self.G.add_edge(node_uid, func)
+
+        args_uid = uuid.uuid4()
+        self.G.add_node(args_uid, label=&#34;Arguments&#34;)
+        self.G.add_edge(node_uid, args_uid)
+
+        for n in args:
+            self.G.add_edge(args_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: RecordDef):
+        &#34;&#34;&#34;Visits RecordDef nodes. We visit all fields and functions
+        of the class definition, and connect them to this node.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        # TODO: Where should bases field be used?
+        funcs = []
+        fields = []
+        bases = []
+        if len(node.funcs) &gt; 0:
+            funcs = self.visit_list(node.funcs)
+        if len(node.fields) &gt; 0:
+            fields = self.visit_list(node.fields)
+        if len(node.bases) &gt; 0:
+            bases = self.visit_list(node.bases)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Record: &#34; + node.name)
+
+        # Add bases to the graph (currently name nodes)
+        base_uid = uuid.uuid4()
+        self.G.add_node(base_uid, label=&#34;Parent Classes (bases)&#34;)
+        self.G.add_edge(node_uid, base_uid)
+        for n in bases:
+            self.G.add_edge(base_uid, n)
+
+        # Add attributes to the graph
+        attr_uid = uuid.uuid4()
+        self.G.add_node(attr_uid, label=&#34;Attributes&#34;)
+        self.G.add_edge(node_uid, attr_uid)
+        for n in fields:
+            self.G.add_edge(attr_uid, n)
+
+        # Add functions to the graph
+        funcs_uid = uuid.uuid4()
+        self.G.add_node(funcs_uid, label=&#34;Functions&#34;)
+        self.G.add_edge(node_uid, funcs_uid)
+        for n in funcs:
+            self.G.add_edge(funcs_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastRecordDef):
+        &#34;&#34;&#34;Visits RecordDef nodes. We visit all fields and functions
+        of the class definition, and connect them to this node.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        # TODO: Where should bases field be used?
+        funcs = []
+        fields = []
+        if len(node.funcs) &gt; 0:
+            funcs = self.visit_list(node.funcs)
+        if len(node.fields) &gt; 0:
+            fields = self.visit_list(node.fields)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Class: &#34; + node.name)
+
+        # Add attributes to the graph
+        attr_uid = uuid.uuid4()
+        self.G.add_node(attr_uid, label=&#34;Attributes&#34;)
+        self.G.add_edge(node_uid, attr_uid)
+        for n in fields:
+            self.G.add_edge(attr_uid, n)
+
+        # Add functions to the graph
+        funcs_uid = uuid.uuid4()
+        self.G.add_node(funcs_uid, label=&#34;Functions&#34;)
+        self.G.add_edge(node_uid, funcs_uid)
+        for n in funcs:
+            self.G.add_edge(funcs_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastFunctionDef):
+        &#34;&#34;&#34;Visits FunctionDef nodes. We visit all the arguments, and then
+        we visit the function&#39;s statements. They&#39;re then added to the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        args = []
+        body = []
+        # print(node.name)
+        if len(node.func_args) &gt; 0:
+            args = self.visit_list(node.func_args)
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+
+        node_uid = uuid.uuid4()
+        args_node = uuid.uuid4()
+        body_node = uuid.uuid4()
+
+        modified_vars_str = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        highest_ver = var_dict_to_str(&#34;HiVer: &#34;, node.body_highest_var_vers)
+        globals_in_str = var_dict_to_str(&#34;Globals In: &#34;, node.used_globals)
+        globals_out_str = var_dict_to_str(
+            &#34;Globals Out: &#34;, node.modified_globals
+        )
+        func_label = f&#34;Function: {node.name}\n{modified_vars_str}\n{vars_accessed_before_mod_str}\n{highest_ver}&#34;
+        func_label = f&#34;{func_label}\n{globals_in_str}\n{globals_out_str}&#34;
+        self.G.add_node(node_uid, label=func_label)
+        self.G.add_node(args_node, label=&#34;Arguments&#34;)
+        self.G.add_node(body_node, label=&#34;Body&#34;)
+
+        self.G.add_edge(node_uid, body_node)
+        self.G.add_edge(node_uid, args_node)
+        for n in args:
+            self.G.add_edge(args_node, n)
+
+        for n in body:
+            self.G.add_edge(body_node, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: FunctionDef):
+        &#34;&#34;&#34;Visits FunctionDef nodes. We visit all the arguments, and then
+        we visit the function&#39;s statements. They&#39;re then added to the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        args = []
+        body = []
+        # print(node.name)
+        if len(node.func_args) &gt; 0:
+            args = self.visit_list(node.func_args)
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+
+        node_uid = uuid.uuid4()
+        args_node = uuid.uuid4()
+        body_node = uuid.uuid4()
+
+        # include the Name node&#39;s id if we have it
+        if isinstance(node.name, Name):
+            label = (
+                &#34;Function: &#34;
+                + str(node.name.name)
+                + &#34; (id: &#34;
+                + str(node.name.id)
+                + &#34;)&#34;
+            )
+        # otherwise name is just str
+        else:
+            label = f&#34;Function: {node.name}&#34;
+        self.G.add_node(node_uid, label=label)
+        self.G.add_node(args_node, label=&#34;Arguments&#34;)
+        self.G.add_node(body_node, label=&#34;Body&#34;)
+
+        self.G.add_edge(node_uid, body_node)
+        self.G.add_edge(node_uid, args_node)
+        for n in args:
+            self.G.add_edge(args_node, n)
+
+        for n in body:
+            self.G.add_edge(body_node, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Loop):
+        &#34;&#34;&#34;Visits Loop nodes. We visit the conditional expression and the
+        body of the loop, and connect them to this node in the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        pre = []
+        body = []
+        post = []
+
+        if node.pre != None and len(node.pre) &gt; 0:
+            pre = self.visit_list(node.pre)
+
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        
+        if node.post != None and len(node.post) &gt; 0:
+            post = self.visit_list(node.post)
+
+        node_uid = uuid.uuid4()
+        pre_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+        body_uid = uuid.uuid4()
+        post_uid = uuid.uuid4()
+
+        self.G.add_node(node_uid, label=&#34;Loop&#34;)
+        self.G.add_node(pre_uid, label=&#34;Pre&#34;)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_node(body_uid, label=&#34;Body&#34;)
+        self.G.add_node(post_uid, label=&#34;Post&#34;)
+
+        self.G.add_edge(node_uid, pre_uid)
+        for n in pre:
+            self.G.add_edge(pre_uid, n)
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+        self.G.add_edge(node_uid, body_uid)
+        self.G.add_edge(node_uid, post_uid)
+        for n in body:
+            self.G.add_edge(body_uid, n)
+        for n in post:
+            self.G.add_edge(post_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastLiteralValue):
+        if node.value_type == ScalarType.INTEGER:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Integer: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.BOOLEAN:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Boolean: {str(node.value)}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.ABSTRACTFLOAT:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;abstractFloat: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == StructureType.LIST:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;List (str or list): [...]&#34;)
+            return node_uid
+        elif node.value_type == StructureType.TUPLE:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Tuple (...)&#34;)
+            return node_uid
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=&#34;Dict: {...}&#34;)
+            return node_uid
+        elif node.value_type == &#34;List[Any]&#34;:
+            node_uid = uuid.uuid4()
+            if isinstance(node.value, ValueConstructor):
+                op = node.value.operator
+                init_val = node.value.initial_value.value
+                if isinstance(node.value.size, LiteralValue):
+                    size = node.value.size.value
+                    id = -1
+                else:
+                    size = node.value.size.name
+                    id = node.value.size.id
+
+                # self.G.add_node(node_uid, label=f&#34;List: Init_Val: [{init_val}], Size: {size} &#34;)
+                self.G.add_node(
+                    node_uid,
+                    label=f&#34;List: [{init_val}] {op} {size} (id: {id})&#34;,
+                )
+            return node_uid
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Dict: {node.value}&#34;)
+            return node_uid
+        else:
+            assert (
+                False
+            ), f&#34;cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}&#34;
+
+    @visit.register
+    def _(self, node: LiteralValue):
+        if node.value_type == ScalarType.INTEGER:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Integer: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.BOOLEAN:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Boolean: {str(node.value)}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.ABSTRACTFLOAT:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;abstractFloat: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == StructureType.LIST:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;List (str or list): [...]&#34;)
+            return node_uid
+        elif node.value_type == StructureType.TUPLE:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Tuple (...)&#34;)
+            return node_uid
+        elif node.value_type == None:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;None&#34;)
+            return node_uid
+        elif node.value_type == &#34;List[Any]&#34;:
+            node_uid = uuid.uuid4()
+            if isinstance(node.value, ValueConstructor):
+                op = node.value.operator
+                init_val = node.value.initial_value.value
+                if isinstance(node.value.size, LiteralValue):
+                    size = node.value.size.value
+                    id = -1
+                else:
+                    size = node.value.size.name
+                    id = node.value.size.id
+
+                # self.G.add_node(node_uid, label=f&#34;List: Init_Val: [{init_val}], Size: {size} &#34;)
+                self.G.add_node(
+                    node_uid,
+                    label=f&#34;List: [{init_val}] {op} {size} (id: {id})&#34;,
+                )
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Dict: {node.value}&#34;)
+            return node_uid
+        else:
+            print(node)
+            assert (
+                False
+            ), f&#34;cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}&#34;
+
+    @visit.register
+    def _(self, node: AnnCastLoop):
+        &#34;&#34;&#34;Visits Loop nodes. We visit the initial statements, the conditional expression and the
+        body of the loop, and connect them to this node in the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        init = []
+        body = []
+        if len(node.init) &gt; 0:
+            init = self.visit_list(node.init)
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        node_uid = uuid.uuid4()
+        init_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+        body_uid = uuid.uuid4()
+
+        modified_vars = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        top_iface_init_vars = interface_to_str(
+            &#34;Top Init: &#34;, node.top_interface_initial
+        )
+        top_iface_updt_vars = interface_to_str(
+            &#34;Top Updt: &#34;, node.top_interface_updated
+        )
+        top_iface_out_vars = interface_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        bot_iface_in_vars = interface_to_str(&#34;Bot In: &#34;, node.bot_interface_in)
+        bot_iface_out_vars = interface_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        loop_label = f&#34;Loop\n{modified_vars}\n{vars_accessed_before_mod}&#34;
+        loop_label = f&#34;{loop_label}\n{top_iface_init_vars}\n{top_iface_updt_vars}\n{top_iface_out_vars}&#34;
+        loop_label = f&#34;{loop_label}\n{bot_iface_in_vars}\n{bot_iface_out_vars}&#34;
+        self.G.add_node(node_uid, label=loop_label)
+        self.G.add_node(init_uid, label=&#34;Init&#34;)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_node(body_uid, label=&#34;Body&#34;)
+
+        self.G.add_edge(node_uid, init_uid)
+        for n in init:
+            self.G.add_edge(init_uid, n)
+
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+        self.G.add_edge(node_uid, body_uid)
+        for n in body:
+            self.G.add_edge(body_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelBreak):
+        &#34;&#34;&#34;Visits a ModelBreak (break statment) node.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Break&#34;)
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelContinue):
+        &#34;&#34;&#34;Visits a ModelContinue (continue statment) node.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Continue&#34;)
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelIf):
+        &#34;&#34;&#34;Visits a ModelIf (If statement) node.
+        We visit the condition, and then the body and orelse
+        attributes if we have any. They&#39;re all added to the Graph
+        accordingly. The node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        body = []
+        orelse = []
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        if len(node.orelse) &gt; 0:
+            orelse = self.visit_list(node.orelse)
+
+        node_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;If&#34;)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+
+        body_uid = uuid.uuid4()
+        orelse_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(body_uid, label=&#34;If Body&#34;)
+        self.G.add_node(orelse_uid, label=&#34;Else Body&#34;)
+
+        self.G.add_edge(node_uid, body_uid)
+        self.G.add_edge(node_uid, orelse_uid)
+
+        for n in body:
+            self.G.add_edge(body_uid, n)
+
+        for n in orelse:
+            self.G.add_edge(orelse_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModelImport):
+        &#34;&#34;&#34;Visits a ModelImport (Import statement) node.
+        name, alias, symbol, all
+
+        The node&#39;s UID is returned.&#34;&#34;&#34;
+
+        node_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(
+            node_uid,
+            label=f&#34;Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}&#34;,
+        )
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelImport):
+        &#34;&#34;&#34;Visits a ModelImport (Import statement) node.
+        name, alias, symbol, all
+
+        The node&#39;s UID is returned.&#34;&#34;&#34;
+
+        node_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(
+            node_uid,
+            label=f&#34;Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}&#34;,
+        )
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModelIf):
+        &#34;&#34;&#34;Visits a ModelIf (If statement) node.
+        We visit the condition, and then the body and orelse
+        attributes if we have any. They&#39;re all added to the Graph
+        accordingly. The node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        body = []
+        orelse = []
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        if len(node.orelse) &gt; 0:
+            orelse = self.visit_list(node.orelse)
+
+        node_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+
+        modified_vars_str = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        # top inteface
+        top_iface_in_vars_str = interface_to_str(
+            &#34;Top In: &#34;, node.top_interface_in
+        )
+        top_iface_out_vars_str = interface_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        # condition node
+        condition_in = interface_to_str(&#34;Cond In: &#34;, node.condition_in)
+        condition_out = interface_to_str(&#34;Cond Out: &#34;, node.condition_out)
+        # decision node
+        decision_in = decision_in_to_str(&#34;Dec In: &#34;, node.decision_in)
+        decision_out = interface_to_str(&#34;Dec Out: &#34;, node.decision_out)
+        # bot interface
+        bot_iface_in_vars_str = interface_to_str(
+            &#34;Bot In: &#34;, node.bot_interface_in
+        )
+        bot_iface_out_vars_str = interface_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        if_label = f&#34;If\n{modified_vars_str}\n{vars_accessed_before_mod_str}&#34;
+        if_label = (
+            f&#34;{if_label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}&#34;
+        )
+        if_label = f&#34;{if_label}\n{condition_in}\n{condition_out}&#34;
+        if_label = f&#34;{if_label}\n{decision_in}\n{decision_out}&#34;
+        if_label = (
+            f&#34;{if_label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}&#34;
+        )
+        self.G.add_node(node_uid, label=if_label)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+
+        body_uid = uuid.uuid4()
+        orelse_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(body_uid, label=&#34;If Body&#34;)
+        self.G.add_node(orelse_uid, label=&#34;Else Body&#34;)
+
+        self.G.add_edge(node_uid, body_uid)
+        self.G.add_edge(node_uid, orelse_uid)
+
+        for n in body:
+            self.G.add_edge(body_uid, n)
+
+        for n in orelse:
+            self.G.add_edge(orelse_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModelReturn):
+        &#34;&#34;&#34;Visits a ModelReturn (return statment) node.
+        We add the return value to this node with an edge.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        value = self.visit(node.value)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Return&#34;)
+        self.G.add_edge(node_uid, value)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelReturn):
+        &#34;&#34;&#34;Visits a ModelReturn (return statment) node.
+        We add the return value to this node with an edge.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        value = self.visit(node.value)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Return&#34;)
+        self.G.add_edge(node_uid, value)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModule):
+        &#34;&#34;&#34;Visits a Module node. This is the starting point for visiting
+        a CAST object. The return value isn&#39;t relevant here (I think)&#34;&#34;&#34;
+        program_uuid = uuid.uuid4()
+        self.G.add_node(program_uuid, label=&#34;Program: &#34; + node.name)
+
+        module_uuid = uuid.uuid4()
+        modified_vars_str = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        used_vars_str = var_dict_to_str(&#34;Used: &#34;, node.used_vars)
+        module_label = f&#34;Module: {node.name}\n{modified_vars_str}\n{vars_accessed_before_mod_str}&#34;
+        module_label = f&#34;{module_label}\n{used_vars_str}&#34;
+        self.G.add_node(module_uuid, label=module_label)
+        self.G.add_edge(program_uuid, module_uuid)
+
+        body = self.visit_list(node.body)
+        for b in body:
+            self.G.add_edge(module_uuid, b)
+
+        return program_uuid
+
+    @visit.register
+    def _(self, node: Module):
+        &#34;&#34;&#34;Visits a Module node. This is the starting point for visiting
+        a CAST object. The return value isn&#39;t relevant here (I think)&#34;&#34;&#34;
+        program_uuid = uuid.uuid4()
+        
+        if node.name != None:
+            self.G.add_node(program_uuid, label=&#34;Program: &#34; + node.name)
+        else:
+            self.G.add_node(program_uuid, label=&#34;Program&#34;)
+
+
+        module_uuid = uuid.uuid4()
+        if node.name != None:
+            self.G.add_node(module_uuid, label=&#34;Module: &#34; + node.name)
+        else:
+            self.G.add_node(module_uuid, label=&#34;Module&#34;)
+
+        self.G.add_edge(program_uuid, module_uuid)
+
+        body = self.visit_list(node.body)
+        for b in body:
+            self.G.add_edge(module_uuid, b)
+
+        return program_uuid
+
+    @visit.register
+    def _(self, node: AnnCastName):
+        &#34;&#34;&#34;Visits a Name node. We check to see if this Name node
+        belongs to a class. In which case it&#39;s being called as an
+        init(), and add this node&#39;s name to the graph accordingly,
+        and return the UID of this node.&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+
+        class_init = False
+        for n in self.cast.nodes[0].body:
+            if isinstance(n, RecordDef) and n.name == node.name:
+                class_init = True
+                self.G.add_node(node_uid, label=node.name + &#34; Init()&#34;)
+                break
+
+        if not class_init:
+            if isinstance(node.con_scope, list):
+                label = node.name + &#34;\n&#34; + &#34;.&#34;.join(node.con_scope)
+            else:
+                label = node.name
+            label += f&#34;\nver: {str(node.version)}, id: {str(node.id)}&#34;
+
+            self.G.add_node(node_uid, label=label)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Name):
+        &#34;&#34;&#34;Visits a Name node. We check to see if this Name node
+        belongs to a class. In which case it&#39;s being called as an
+        init(), and add this node&#39;s name to the graph accordingly,
+        and return the UID of this node.&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+
+        class_init = False
+        for n in self.cast.nodes[0].body:
+            if isinstance(n, RecordDef) and n.name == node.name:
+                class_init = True
+                self.G.add_node(node_uid, label=node.name + &#34; Init()&#34;)
+                break
+
+        if not class_init:
+            if node.name == None:
+                self.G.add_node(
+                    node_uid, label=&#34;NONAME (id: &#34; + str(node.id) + &#34;)&#34;
+                )
+            else:
+                self.G.add_node(
+                    node_uid, label=node.name + &#34; (id: &#34; + str(node.id) + &#34;)&#34;
+                )
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastVar):
+        &#34;&#34;&#34;Visits a Var node by visiting its value&#34;&#34;&#34;
+        val = self.visit(node.val)
+        return val
+
+    @visit.register
+    def _(self, node: Var):
+        &#34;&#34;&#34;Visits a Var node by visiting its value&#34;&#34;&#34;
+        if node.default_value == None:
+            val = self.visit(node.val)
+            return val
+        else:
+            val = self.visit(node.default_value)
+            node_uid = uuid.uuid4()
+            self.G.add_node(
+                node_uid, label=f&#34;{node.val.name} (id: {str(node.val.id)})&#34;
+            )  # value: {node.default_value.value}&#34;)
+            self.G.add_edge(node_uid, val)
+            return node_uid</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor"><code class="flex name class">
+<span>class <span class="ident">CASTToAGraphVisitor</span></span>
+<span>(</span><span>cast: <a title="skema.program_analysis.CAST2FN.cast.CAST" href="../cast.html#skema.program_analysis.CAST2FN.cast.CAST">CAST</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>class CASTToAGraphVisitor - A visitor that traverses
+CAST nodes to generate a networkx DiGraph that represents
+the CAST as a DiGraph. The CAST object itself is a representation
+of a program.
+A common theme across most visitors is they generate a UID
+that is used with networkx as identifiers for the nodes in the digraph,
+so we know which nodes to connect to other nodes with edges. They then
+add themselves to a networkx DiGraph object that is updated across
+most the visitors by either adding nodes or edges.
+A lot of the visitors are relatively straightforward and
+follow this pattern for a particular node
+- Visit the node's children
+- Generate a UID for the current node
+- Add the node to the graph with the UID
+- Add edges connecting the node to its children
+- Return the Node's UID, so this can be repeated as necessary</p>
+<p>Some do a little bit of extra work to make the visualization look
+nicer, like add extra 'group' nodes to group certain nodes together
+(i.e. function arguments, class attributes)</p>
+<p>Inherits from CASTVisitor to use its visit functions.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>cast</code></strong> :&ensp;<code>CAST</code></dt>
+<dd>The CAST object representation of the program
+we're generating a DiGraph for.</dd>
+<dt><strong><code>G</code></strong> :&ensp;<code>nx.DiGraph</code></dt>
+<dd>The graph of the program. Gets populated as
+nodes are visited.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CASTToAGraphVisitor(CASTVisitor):
+    &#34;&#34;&#34;class CASTToAGraphVisitor - A visitor that traverses
+    CAST nodes to generate a networkx DiGraph that represents
+    the CAST as a DiGraph. The CAST object itself is a representation
+    of a program.
+    A common theme across most visitors is they generate a UID
+    that is used with networkx as identifiers for the nodes in the digraph,
+    so we know which nodes to connect to other nodes with edges. They then
+    add themselves to a networkx DiGraph object that is updated across
+    most the visitors by either adding nodes or edges.
+    A lot of the visitors are relatively straightforward and
+    follow this pattern for a particular node
+        - Visit the node&#39;s children
+        - Generate a UID for the current node
+        - Add the node to the graph with the UID
+        - Add edges connecting the node to its children
+        - Return the Node&#39;s UID, so this can be repeated as necessary
+
+    Some do a little bit of extra work to make the visualization look
+    nicer, like add extra &#39;group&#39; nodes to group certain nodes together
+    (i.e. function arguments, class attributes)
+
+    Inherits from CASTVisitor to use its visit functions.
+
+    Attributes:
+        cast (CAST): The CAST object representation of the program
+                     we&#39;re generating a DiGraph for.
+        G (nx.DiGraph): The graph of the program. Gets populated as
+                     nodes are visited.
+
+    &#34;&#34;&#34;
+
+    cast: CAST
+    G: nx.DiGraph
+
+    def __init__(self, cast: CAST):
+        self.cast = cast
+        self.G = nx.DiGraph()
+
+    def to_agraph(self):
+        &#34;&#34;&#34;Visits the entire CAST object to populate the graph G
+        and returns an AGraph of the graph G as a result.
+        &#34;&#34;&#34;
+        self.visit_list(self.cast.nodes)
+        A = nx.nx_agraph.to_agraph(self.G)
+        A.graph_attr.update(
+            {&#34;dpi&#34;: 227, &#34;fontsize&#34;: 20, &#34;fontname&#34;: &#34;Menlo&#34;, &#34;rankdir&#34;: &#34;TB&#34;}
+        )
+        A.node_attr.update(
+            {
+                &#34;shape&#34;: &#34;rectangle&#34;,
+                &#34;color&#34;: &#34;#650021&#34;,
+                &#34;style&#34;: &#34;rounded&#34;,
+                &#34;fontname&#34;: &#34;Menlo&#34;,
+            }
+        )
+        for node in A.iternodes():
+            node.attr[&#34;fontcolor&#34;] = &#34;black&#34;
+            node.attr[&#34;style&#34;] = &#34;rounded&#34;
+        A.edge_attr.update({&#34;color&#34;: &#34;#650021&#34;, &#34;arrowsize&#34;: 0.5})
+
+        return A
+
+    def to_pdf(self, pdf_filepath: str):
+        &#34;&#34;&#34;Generates an agraph, and uses it
+        to create a PDF using the &#39;dot&#39; program&#34;&#34;&#34;
+        # import skema.utils.misc.test_pygraphviz
+        # test_pygraphviz(
+        #  &#34;For the agraph generation in the python_to_cast &#34;
+        # &#34;function to work, pygraphviz must be installed.&#34;
+        # )
+
+        A = self.to_agraph()
+        A.draw(pdf_filepath, prog=&#34;dot&#34;)
+
+    @singledispatchmethod
+    def visit(self, node: AstNode):
+        &#34;&#34;&#34;Generic visitor for unimplemented/unexpected nodes&#34;&#34;&#34;
+        raise CASTTypeError(f&#34;Unrecognized node type: {type(node)}&#34;)
+
+    @visit.register
+    def _(self, node: Assignment):
+        &#34;&#34;&#34;Visits Assignment nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Assignment&#34;)
+        self.G.add_edge(node_uid, left)
+        self.G.add_edge(node_uid, right)
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastAssignment):
+        &#34;&#34;&#34;Visits Assignment nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        left = self.visit(node.left)
+        right = self.visit(node.right)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Assignment&#34;)
+        self.G.add_edge(node_uid, left)
+        self.G.add_edge(node_uid, right)
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastAttribute):
+        &#34;&#34;&#34;Visits Attribute nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        value = self.visit(node.value)
+        attr = self.visit(node.attr)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Attribute&#34;)
+        self.G.add_edge(node_uid, value)
+        self.G.add_edge(node_uid, attr)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Attribute):
+        &#34;&#34;&#34;Visits Attribute nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        value = self.visit(node.value)
+        attr = self.visit(node.attr)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Attribute&#34;)
+        self.G.add_edge(node_uid, value)
+        self.G.add_edge(node_uid, attr)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Operator):
+        &#34;&#34;&#34;Visits BinaryOp nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        operands = self.visit_list(node.operands)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=node.op)
+        
+        for opd in operands:
+            self.G.add_edge(node_uid, opd)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastOperator):
+        &#34;&#34;&#34;Visits BinaryOp nodes, the node&#39;s UID is returned
+        so it can be used to connect nodes in the digraph&#34;&#34;&#34;
+        operands = self.visit_list(node.operands)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=node.op)
+
+        for opd in operands:
+            self.G.add_edge(node_uid, opd)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Call):
+        &#34;&#34;&#34;Visits Call (function call) nodes. We check to see
+        if we have arguments to the node and act accordingly.
+        Appending all the arguments of the function to this node,
+        if we have any. The node&#39;s UID is returned.&#34;&#34;&#34;
+        func = self.visit(node.func)
+        args = []
+
+        if node.arguments != None and len(node.arguments) &gt; 0:
+            args = self.visit_list(node.arguments)
+
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;FunctionCall&#34;)
+        self.G.add_edge(node_uid, func)
+
+        args_uid = uuid.uuid4()
+        self.G.add_node(args_uid, label=&#34;Arguments&#34;)
+        self.G.add_edge(node_uid, args_uid)
+
+        for n in args:
+            self.G.add_edge(args_uid, n)
+
+        return node_uid
+
+    def visit_call_grfn_2_2(self, node: AnnCastCall):
+        &#34;&#34;&#34;Visits Call (function call) nodes. We check to see
+        if we have arguments to the node and act accordingly.
+        Appending all the arguments of the function to this node,
+        if we have any. The node&#39;s UID is returned.&#34;&#34;&#34;
+        func = self.visit(node.func)
+        args = []
+        if len(node.arguments) &gt; 0:
+            args = self.visit_list(node.arguments)
+
+        node_uid = uuid.uuid4()
+        label = &#34;CallGrfn2_2&#34;
+        top_iface_in_vars_str = var_dict_to_str(
+            &#34;Top In: &#34;, node.top_interface_in
+        )
+        top_iface_out_vars_str = var_dict_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        bot_iface_in_vars_str = var_dict_to_str(
+            &#34;Bot In: &#34;, node.bot_interface_in
+        )
+        bot_iface_out_vars_str = var_dict_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        globals_in_str = var_dict_to_str(
+            &#34;Globals In: &#34;, node.func_def_copy.used_globals
+        )
+        globals_out_str = var_dict_to_str(
+            &#34;Globals Out: &#34;, node.func_def_copy.modified_globals
+        )
+        label = f&#34;{label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}&#34;
+        label = f&#34;{label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}&#34;
+        label = f&#34;{label}\n{globals_in_str}\n{globals_out_str}&#34;
+        self.G.add_node(node_uid, label=label)
+        self.G.add_edge(node_uid, func)
+
+        args_uid = uuid.uuid4()
+        self.G.add_node(args_uid, label=&#34;Arguments&#34;)
+        self.G.add_edge(node_uid, args_uid)
+
+        for n in args:
+            self.G.add_edge(args_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastCall):
+        &#34;&#34;&#34;Visits Call (function call) nodes. We check to see
+        if we have arguments to the node and act accordingly.
+        Appending all the arguments of the function to this node,
+        if we have any. The node&#39;s UID is returned.&#34;&#34;&#34;
+
+        if node.is_grfn_2_2:
+            return self.visit_call_grfn_2_2(node)
+
+        func = self.visit(node.func)
+        args = []
+        if len(node.arguments) &gt; 0:
+            args = self.visit_list(node.arguments)
+
+        node_uid = uuid.uuid4()
+        label = &#34;Call&#34;
+        top_iface_in_vars_str = var_dict_to_str(
+            &#34;Top In: &#34;, node.top_interface_in
+        )
+        top_iface_out_vars_str = var_dict_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        bot_iface_in_vars_str = var_dict_to_str(
+            &#34;Bot In: &#34;, node.bot_interface_in
+        )
+        bot_iface_out_vars_str = var_dict_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        label = f&#34;{label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}&#34;
+        label = f&#34;{label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}&#34;
+        self.G.add_node(node_uid, label=label)
+        self.G.add_edge(node_uid, func)
+
+        args_uid = uuid.uuid4()
+        self.G.add_node(args_uid, label=&#34;Arguments&#34;)
+        self.G.add_edge(node_uid, args_uid)
+
+        for n in args:
+            self.G.add_edge(args_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: RecordDef):
+        &#34;&#34;&#34;Visits RecordDef nodes. We visit all fields and functions
+        of the class definition, and connect them to this node.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        # TODO: Where should bases field be used?
+        funcs = []
+        fields = []
+        bases = []
+        if len(node.funcs) &gt; 0:
+            funcs = self.visit_list(node.funcs)
+        if len(node.fields) &gt; 0:
+            fields = self.visit_list(node.fields)
+        if len(node.bases) &gt; 0:
+            bases = self.visit_list(node.bases)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Record: &#34; + node.name)
+
+        # Add bases to the graph (currently name nodes)
+        base_uid = uuid.uuid4()
+        self.G.add_node(base_uid, label=&#34;Parent Classes (bases)&#34;)
+        self.G.add_edge(node_uid, base_uid)
+        for n in bases:
+            self.G.add_edge(base_uid, n)
+
+        # Add attributes to the graph
+        attr_uid = uuid.uuid4()
+        self.G.add_node(attr_uid, label=&#34;Attributes&#34;)
+        self.G.add_edge(node_uid, attr_uid)
+        for n in fields:
+            self.G.add_edge(attr_uid, n)
+
+        # Add functions to the graph
+        funcs_uid = uuid.uuid4()
+        self.G.add_node(funcs_uid, label=&#34;Functions&#34;)
+        self.G.add_edge(node_uid, funcs_uid)
+        for n in funcs:
+            self.G.add_edge(funcs_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastRecordDef):
+        &#34;&#34;&#34;Visits RecordDef nodes. We visit all fields and functions
+        of the class definition, and connect them to this node.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        # TODO: Where should bases field be used?
+        funcs = []
+        fields = []
+        if len(node.funcs) &gt; 0:
+            funcs = self.visit_list(node.funcs)
+        if len(node.fields) &gt; 0:
+            fields = self.visit_list(node.fields)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Class: &#34; + node.name)
+
+        # Add attributes to the graph
+        attr_uid = uuid.uuid4()
+        self.G.add_node(attr_uid, label=&#34;Attributes&#34;)
+        self.G.add_edge(node_uid, attr_uid)
+        for n in fields:
+            self.G.add_edge(attr_uid, n)
+
+        # Add functions to the graph
+        funcs_uid = uuid.uuid4()
+        self.G.add_node(funcs_uid, label=&#34;Functions&#34;)
+        self.G.add_edge(node_uid, funcs_uid)
+        for n in funcs:
+            self.G.add_edge(funcs_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastFunctionDef):
+        &#34;&#34;&#34;Visits FunctionDef nodes. We visit all the arguments, and then
+        we visit the function&#39;s statements. They&#39;re then added to the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        args = []
+        body = []
+        # print(node.name)
+        if len(node.func_args) &gt; 0:
+            args = self.visit_list(node.func_args)
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+
+        node_uid = uuid.uuid4()
+        args_node = uuid.uuid4()
+        body_node = uuid.uuid4()
+
+        modified_vars_str = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        highest_ver = var_dict_to_str(&#34;HiVer: &#34;, node.body_highest_var_vers)
+        globals_in_str = var_dict_to_str(&#34;Globals In: &#34;, node.used_globals)
+        globals_out_str = var_dict_to_str(
+            &#34;Globals Out: &#34;, node.modified_globals
+        )
+        func_label = f&#34;Function: {node.name}\n{modified_vars_str}\n{vars_accessed_before_mod_str}\n{highest_ver}&#34;
+        func_label = f&#34;{func_label}\n{globals_in_str}\n{globals_out_str}&#34;
+        self.G.add_node(node_uid, label=func_label)
+        self.G.add_node(args_node, label=&#34;Arguments&#34;)
+        self.G.add_node(body_node, label=&#34;Body&#34;)
+
+        self.G.add_edge(node_uid, body_node)
+        self.G.add_edge(node_uid, args_node)
+        for n in args:
+            self.G.add_edge(args_node, n)
+
+        for n in body:
+            self.G.add_edge(body_node, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: FunctionDef):
+        &#34;&#34;&#34;Visits FunctionDef nodes. We visit all the arguments, and then
+        we visit the function&#39;s statements. They&#39;re then added to the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        args = []
+        body = []
+        # print(node.name)
+        if len(node.func_args) &gt; 0:
+            args = self.visit_list(node.func_args)
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+
+        node_uid = uuid.uuid4()
+        args_node = uuid.uuid4()
+        body_node = uuid.uuid4()
+
+        # include the Name node&#39;s id if we have it
+        if isinstance(node.name, Name):
+            label = (
+                &#34;Function: &#34;
+                + str(node.name.name)
+                + &#34; (id: &#34;
+                + str(node.name.id)
+                + &#34;)&#34;
+            )
+        # otherwise name is just str
+        else:
+            label = f&#34;Function: {node.name}&#34;
+        self.G.add_node(node_uid, label=label)
+        self.G.add_node(args_node, label=&#34;Arguments&#34;)
+        self.G.add_node(body_node, label=&#34;Body&#34;)
+
+        self.G.add_edge(node_uid, body_node)
+        self.G.add_edge(node_uid, args_node)
+        for n in args:
+            self.G.add_edge(args_node, n)
+
+        for n in body:
+            self.G.add_edge(body_node, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Loop):
+        &#34;&#34;&#34;Visits Loop nodes. We visit the conditional expression and the
+        body of the loop, and connect them to this node in the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        pre = []
+        body = []
+        post = []
+
+        if node.pre != None and len(node.pre) &gt; 0:
+            pre = self.visit_list(node.pre)
+
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        
+        if node.post != None and len(node.post) &gt; 0:
+            post = self.visit_list(node.post)
+
+        node_uid = uuid.uuid4()
+        pre_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+        body_uid = uuid.uuid4()
+        post_uid = uuid.uuid4()
+
+        self.G.add_node(node_uid, label=&#34;Loop&#34;)
+        self.G.add_node(pre_uid, label=&#34;Pre&#34;)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_node(body_uid, label=&#34;Body&#34;)
+        self.G.add_node(post_uid, label=&#34;Post&#34;)
+
+        self.G.add_edge(node_uid, pre_uid)
+        for n in pre:
+            self.G.add_edge(pre_uid, n)
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+        self.G.add_edge(node_uid, body_uid)
+        self.G.add_edge(node_uid, post_uid)
+        for n in body:
+            self.G.add_edge(body_uid, n)
+        for n in post:
+            self.G.add_edge(post_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastLiteralValue):
+        if node.value_type == ScalarType.INTEGER:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Integer: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.BOOLEAN:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Boolean: {str(node.value)}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.ABSTRACTFLOAT:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;abstractFloat: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == StructureType.LIST:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;List (str or list): [...]&#34;)
+            return node_uid
+        elif node.value_type == StructureType.TUPLE:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Tuple (...)&#34;)
+            return node_uid
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=&#34;Dict: {...}&#34;)
+            return node_uid
+        elif node.value_type == &#34;List[Any]&#34;:
+            node_uid = uuid.uuid4()
+            if isinstance(node.value, ValueConstructor):
+                op = node.value.operator
+                init_val = node.value.initial_value.value
+                if isinstance(node.value.size, LiteralValue):
+                    size = node.value.size.value
+                    id = -1
+                else:
+                    size = node.value.size.name
+                    id = node.value.size.id
+
+                # self.G.add_node(node_uid, label=f&#34;List: Init_Val: [{init_val}], Size: {size} &#34;)
+                self.G.add_node(
+                    node_uid,
+                    label=f&#34;List: [{init_val}] {op} {size} (id: {id})&#34;,
+                )
+            return node_uid
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Dict: {node.value}&#34;)
+            return node_uid
+        else:
+            assert (
+                False
+            ), f&#34;cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}&#34;
+
+    @visit.register
+    def _(self, node: LiteralValue):
+        if node.value_type == ScalarType.INTEGER:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Integer: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.BOOLEAN:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Boolean: {str(node.value)}&#34;)
+            return node_uid
+        elif node.value_type == ScalarType.ABSTRACTFLOAT:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;abstractFloat: {node.value}&#34;)
+            return node_uid
+        elif node.value_type == StructureType.LIST:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;List (str or list): [...]&#34;)
+            return node_uid
+        elif node.value_type == StructureType.TUPLE:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Tuple (...)&#34;)
+            return node_uid
+        elif node.value_type == None:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;None&#34;)
+            return node_uid
+        elif node.value_type == &#34;List[Any]&#34;:
+            node_uid = uuid.uuid4()
+            if isinstance(node.value, ValueConstructor):
+                op = node.value.operator
+                init_val = node.value.initial_value.value
+                if isinstance(node.value.size, LiteralValue):
+                    size = node.value.size.value
+                    id = -1
+                else:
+                    size = node.value.size.name
+                    id = node.value.size.id
+
+                # self.G.add_node(node_uid, label=f&#34;List: Init_Val: [{init_val}], Size: {size} &#34;)
+                self.G.add_node(
+                    node_uid,
+                    label=f&#34;List: [{init_val}] {op} {size} (id: {id})&#34;,
+                )
+        elif node.value_type == StructureType.MAP:
+            node_uid = uuid.uuid4()
+            self.G.add_node(node_uid, label=f&#34;Dict: {node.value}&#34;)
+            return node_uid
+        else:
+            print(node)
+            assert (
+                False
+            ), f&#34;cast_to_agraph_visitor LiteralValue: type not supported yet {type(node)}&#34;
+
+    @visit.register
+    def _(self, node: AnnCastLoop):
+        &#34;&#34;&#34;Visits Loop nodes. We visit the initial statements, the conditional expression and the
+        body of the loop, and connect them to this node in the graph.
+        This node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        init = []
+        body = []
+        if len(node.init) &gt; 0:
+            init = self.visit_list(node.init)
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        node_uid = uuid.uuid4()
+        init_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+        body_uid = uuid.uuid4()
+
+        modified_vars = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        top_iface_init_vars = interface_to_str(
+            &#34;Top Init: &#34;, node.top_interface_initial
+        )
+        top_iface_updt_vars = interface_to_str(
+            &#34;Top Updt: &#34;, node.top_interface_updated
+        )
+        top_iface_out_vars = interface_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        bot_iface_in_vars = interface_to_str(&#34;Bot In: &#34;, node.bot_interface_in)
+        bot_iface_out_vars = interface_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        loop_label = f&#34;Loop\n{modified_vars}\n{vars_accessed_before_mod}&#34;
+        loop_label = f&#34;{loop_label}\n{top_iface_init_vars}\n{top_iface_updt_vars}\n{top_iface_out_vars}&#34;
+        loop_label = f&#34;{loop_label}\n{bot_iface_in_vars}\n{bot_iface_out_vars}&#34;
+        self.G.add_node(node_uid, label=loop_label)
+        self.G.add_node(init_uid, label=&#34;Init&#34;)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_node(body_uid, label=&#34;Body&#34;)
+
+        self.G.add_edge(node_uid, init_uid)
+        for n in init:
+            self.G.add_edge(init_uid, n)
+
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+        self.G.add_edge(node_uid, body_uid)
+        for n in body:
+            self.G.add_edge(body_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelBreak):
+        &#34;&#34;&#34;Visits a ModelBreak (break statment) node.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Break&#34;)
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelContinue):
+        &#34;&#34;&#34;Visits a ModelContinue (continue statment) node.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Continue&#34;)
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelIf):
+        &#34;&#34;&#34;Visits a ModelIf (If statement) node.
+        We visit the condition, and then the body and orelse
+        attributes if we have any. They&#39;re all added to the Graph
+        accordingly. The node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        body = []
+        orelse = []
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        if len(node.orelse) &gt; 0:
+            orelse = self.visit_list(node.orelse)
+
+        node_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;If&#34;)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+
+        body_uid = uuid.uuid4()
+        orelse_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(body_uid, label=&#34;If Body&#34;)
+        self.G.add_node(orelse_uid, label=&#34;Else Body&#34;)
+
+        self.G.add_edge(node_uid, body_uid)
+        self.G.add_edge(node_uid, orelse_uid)
+
+        for n in body:
+            self.G.add_edge(body_uid, n)
+
+        for n in orelse:
+            self.G.add_edge(orelse_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModelImport):
+        &#34;&#34;&#34;Visits a ModelImport (Import statement) node.
+        name, alias, symbol, all
+
+        The node&#39;s UID is returned.&#34;&#34;&#34;
+
+        node_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(
+            node_uid,
+            label=f&#34;Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}&#34;,
+        )
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelImport):
+        &#34;&#34;&#34;Visits a ModelImport (Import statement) node.
+        name, alias, symbol, all
+
+        The node&#39;s UID is returned.&#34;&#34;&#34;
+
+        node_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(
+            node_uid,
+            label=f&#34;Import {node.name}\nAlias: {node.alias}\nSymbol: {node.symbol}\nAll: {node.all}&#34;,
+        )
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModelIf):
+        &#34;&#34;&#34;Visits a ModelIf (If statement) node.
+        We visit the condition, and then the body and orelse
+        attributes if we have any. They&#39;re all added to the Graph
+        accordingly. The node&#39;s UID is returned.&#34;&#34;&#34;
+        expr = self.visit(node.expr)
+        body = []
+        orelse = []
+        if len(node.body) &gt; 0:
+            body = self.visit_list(node.body)
+        if len(node.orelse) &gt; 0:
+            orelse = self.visit_list(node.orelse)
+
+        node_uid = uuid.uuid4()
+        test_uid = uuid.uuid4()
+
+        modified_vars_str = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        # top inteface
+        top_iface_in_vars_str = interface_to_str(
+            &#34;Top In: &#34;, node.top_interface_in
+        )
+        top_iface_out_vars_str = interface_to_str(
+            &#34;Top Out: &#34;, node.top_interface_out
+        )
+        # condition node
+        condition_in = interface_to_str(&#34;Cond In: &#34;, node.condition_in)
+        condition_out = interface_to_str(&#34;Cond Out: &#34;, node.condition_out)
+        # decision node
+        decision_in = decision_in_to_str(&#34;Dec In: &#34;, node.decision_in)
+        decision_out = interface_to_str(&#34;Dec Out: &#34;, node.decision_out)
+        # bot interface
+        bot_iface_in_vars_str = interface_to_str(
+            &#34;Bot In: &#34;, node.bot_interface_in
+        )
+        bot_iface_out_vars_str = interface_to_str(
+            &#34;Bot Out: &#34;, node.bot_interface_out
+        )
+        if_label = f&#34;If\n{modified_vars_str}\n{vars_accessed_before_mod_str}&#34;
+        if_label = (
+            f&#34;{if_label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}&#34;
+        )
+        if_label = f&#34;{if_label}\n{condition_in}\n{condition_out}&#34;
+        if_label = f&#34;{if_label}\n{decision_in}\n{decision_out}&#34;
+        if_label = (
+            f&#34;{if_label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}&#34;
+        )
+        self.G.add_node(node_uid, label=if_label)
+        self.G.add_node(test_uid, label=&#34;Test&#34;)
+        self.G.add_edge(node_uid, test_uid)
+        self.G.add_edge(test_uid, expr)
+
+        body_uid = uuid.uuid4()
+        orelse_uid = uuid.uuid4()
+
+        # TODO: Handle strings of If/Elif/Elif/... constructs
+        self.G.add_node(body_uid, label=&#34;If Body&#34;)
+        self.G.add_node(orelse_uid, label=&#34;Else Body&#34;)
+
+        self.G.add_edge(node_uid, body_uid)
+        self.G.add_edge(node_uid, orelse_uid)
+
+        for n in body:
+            self.G.add_edge(body_uid, n)
+
+        for n in orelse:
+            self.G.add_edge(orelse_uid, n)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModelReturn):
+        &#34;&#34;&#34;Visits a ModelReturn (return statment) node.
+        We add the return value to this node with an edge.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        value = self.visit(node.value)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Return&#34;)
+        self.G.add_edge(node_uid, value)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: ModelReturn):
+        &#34;&#34;&#34;Visits a ModelReturn (return statment) node.
+        We add the return value to this node with an edge.
+        The node&#39;s UID is returned&#34;&#34;&#34;
+        value = self.visit(node.value)
+        node_uid = uuid.uuid4()
+        self.G.add_node(node_uid, label=&#34;Return&#34;)
+        self.G.add_edge(node_uid, value)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastModule):
+        &#34;&#34;&#34;Visits a Module node. This is the starting point for visiting
+        a CAST object. The return value isn&#39;t relevant here (I think)&#34;&#34;&#34;
+        program_uuid = uuid.uuid4()
+        self.G.add_node(program_uuid, label=&#34;Program: &#34; + node.name)
+
+        module_uuid = uuid.uuid4()
+        modified_vars_str = var_dict_to_str(&#34;Modified: &#34;, node.modified_vars)
+        vars_accessed_before_mod_str = var_dict_to_str(
+            &#34;Accessed: &#34;, node.vars_accessed_before_mod
+        )
+        used_vars_str = var_dict_to_str(&#34;Used: &#34;, node.used_vars)
+        module_label = f&#34;Module: {node.name}\n{modified_vars_str}\n{vars_accessed_before_mod_str}&#34;
+        module_label = f&#34;{module_label}\n{used_vars_str}&#34;
+        self.G.add_node(module_uuid, label=module_label)
+        self.G.add_edge(program_uuid, module_uuid)
+
+        body = self.visit_list(node.body)
+        for b in body:
+            self.G.add_edge(module_uuid, b)
+
+        return program_uuid
+
+    @visit.register
+    def _(self, node: Module):
+        &#34;&#34;&#34;Visits a Module node. This is the starting point for visiting
+        a CAST object. The return value isn&#39;t relevant here (I think)&#34;&#34;&#34;
+        program_uuid = uuid.uuid4()
+        
+        if node.name != None:
+            self.G.add_node(program_uuid, label=&#34;Program: &#34; + node.name)
+        else:
+            self.G.add_node(program_uuid, label=&#34;Program&#34;)
+
+
+        module_uuid = uuid.uuid4()
+        if node.name != None:
+            self.G.add_node(module_uuid, label=&#34;Module: &#34; + node.name)
+        else:
+            self.G.add_node(module_uuid, label=&#34;Module&#34;)
+
+        self.G.add_edge(program_uuid, module_uuid)
+
+        body = self.visit_list(node.body)
+        for b in body:
+            self.G.add_edge(module_uuid, b)
+
+        return program_uuid
+
+    @visit.register
+    def _(self, node: AnnCastName):
+        &#34;&#34;&#34;Visits a Name node. We check to see if this Name node
+        belongs to a class. In which case it&#39;s being called as an
+        init(), and add this node&#39;s name to the graph accordingly,
+        and return the UID of this node.&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+
+        class_init = False
+        for n in self.cast.nodes[0].body:
+            if isinstance(n, RecordDef) and n.name == node.name:
+                class_init = True
+                self.G.add_node(node_uid, label=node.name + &#34; Init()&#34;)
+                break
+
+        if not class_init:
+            if isinstance(node.con_scope, list):
+                label = node.name + &#34;\n&#34; + &#34;.&#34;.join(node.con_scope)
+            else:
+                label = node.name
+            label += f&#34;\nver: {str(node.version)}, id: {str(node.id)}&#34;
+
+            self.G.add_node(node_uid, label=label)
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: Name):
+        &#34;&#34;&#34;Visits a Name node. We check to see if this Name node
+        belongs to a class. In which case it&#39;s being called as an
+        init(), and add this node&#39;s name to the graph accordingly,
+        and return the UID of this node.&#34;&#34;&#34;
+        node_uid = uuid.uuid4()
+
+        class_init = False
+        for n in self.cast.nodes[0].body:
+            if isinstance(n, RecordDef) and n.name == node.name:
+                class_init = True
+                self.G.add_node(node_uid, label=node.name + &#34; Init()&#34;)
+                break
+
+        if not class_init:
+            if node.name == None:
+                self.G.add_node(
+                    node_uid, label=&#34;NONAME (id: &#34; + str(node.id) + &#34;)&#34;
+                )
+            else:
+                self.G.add_node(
+                    node_uid, label=node.name + &#34; (id: &#34; + str(node.id) + &#34;)&#34;
+                )
+
+        return node_uid
+
+    @visit.register
+    def _(self, node: AnnCastVar):
+        &#34;&#34;&#34;Visits a Var node by visiting its value&#34;&#34;&#34;
+        val = self.visit(node.val)
+        return val
+
+    @visit.register
+    def _(self, node: Var):
+        &#34;&#34;&#34;Visits a Var node by visiting its value&#34;&#34;&#34;
+        if node.default_value == None:
+            val = self.visit(node.val)
+            return val
+        else:
+            val = self.visit(node.default_value)
+            node_uid = uuid.uuid4()
+            self.G.add_node(
+                node_uid, label=f&#34;{node.val.name} (id: {str(node.val.id)})&#34;
+            )  # value: {node.default_value.value}&#34;)
+            self.G.add_edge(node_uid, val)
+            return node_uid</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.visitors.cast_visitor.CASTVisitor" href="cast_visitor.html#skema.program_analysis.CAST2FN.visitors.cast_visitor.CASTVisitor">CASTVisitor</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.G"><code class="name">var <span class="ident">G</span> : networkx.classes.digraph.DiGraph</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.cast"><code class="name">var <span class="ident">cast</span> : <a title="skema.program_analysis.CAST2FN.cast.CAST" href="../cast.html#skema.program_analysis.CAST2FN.cast.CAST">CAST</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.to_agraph"><code class="name flex">
+<span>def <span class="ident">to_agraph</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Visits the entire CAST object to populate the graph G
+and returns an AGraph of the graph G as a result.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_agraph(self):
+    &#34;&#34;&#34;Visits the entire CAST object to populate the graph G
+    and returns an AGraph of the graph G as a result.
+    &#34;&#34;&#34;
+    self.visit_list(self.cast.nodes)
+    A = nx.nx_agraph.to_agraph(self.G)
+    A.graph_attr.update(
+        {&#34;dpi&#34;: 227, &#34;fontsize&#34;: 20, &#34;fontname&#34;: &#34;Menlo&#34;, &#34;rankdir&#34;: &#34;TB&#34;}
+    )
+    A.node_attr.update(
+        {
+            &#34;shape&#34;: &#34;rectangle&#34;,
+            &#34;color&#34;: &#34;#650021&#34;,
+            &#34;style&#34;: &#34;rounded&#34;,
+            &#34;fontname&#34;: &#34;Menlo&#34;,
+        }
+    )
+    for node in A.iternodes():
+        node.attr[&#34;fontcolor&#34;] = &#34;black&#34;
+        node.attr[&#34;style&#34;] = &#34;rounded&#34;
+    A.edge_attr.update({&#34;color&#34;: &#34;#650021&#34;, &#34;arrowsize&#34;: 0.5})
+
+    return A</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.to_pdf"><code class="name flex">
+<span>def <span class="ident">to_pdf</span></span>(<span>self, pdf_filepath: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generates an agraph, and uses it
+to create a PDF using the 'dot' program</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def to_pdf(self, pdf_filepath: str):
+    &#34;&#34;&#34;Generates an agraph, and uses it
+    to create a PDF using the &#39;dot&#39; program&#34;&#34;&#34;
+    # import skema.utils.misc.test_pygraphviz
+    # test_pygraphviz(
+    #  &#34;For the agraph generation in the python_to_cast &#34;
+    # &#34;function to work, pygraphviz must be installed.&#34;
+    # )
+
+    A = self.to_agraph()
+    A.draw(pdf_filepath, prog=&#34;dot&#34;)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generic visitor for unimplemented/unexpected nodes</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@singledispatchmethod
+def visit(self, node: AstNode):
+    &#34;&#34;&#34;Generic visitor for unimplemented/unexpected nodes&#34;&#34;&#34;
+    raise CASTTypeError(f&#34;Unrecognized node type: {type(node)}&#34;)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.visit_call_grfn_2_2"><code class="name flex">
+<span>def <span class="ident">visit_call_grfn_2_2</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall" href="../ann_cast/annotated_cast.html#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall">AnnCastCall</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Visits Call (function call) nodes. We check to see
+if we have arguments to the node and act accordingly.
+Appending all the arguments of the function to this node,
+if we have any. The node's UID is returned.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_call_grfn_2_2(self, node: AnnCastCall):
+    &#34;&#34;&#34;Visits Call (function call) nodes. We check to see
+    if we have arguments to the node and act accordingly.
+    Appending all the arguments of the function to this node,
+    if we have any. The node&#39;s UID is returned.&#34;&#34;&#34;
+    func = self.visit(node.func)
+    args = []
+    if len(node.arguments) &gt; 0:
+        args = self.visit_list(node.arguments)
+
+    node_uid = uuid.uuid4()
+    label = &#34;CallGrfn2_2&#34;
+    top_iface_in_vars_str = var_dict_to_str(
+        &#34;Top In: &#34;, node.top_interface_in
+    )
+    top_iface_out_vars_str = var_dict_to_str(
+        &#34;Top Out: &#34;, node.top_interface_out
+    )
+    bot_iface_in_vars_str = var_dict_to_str(
+        &#34;Bot In: &#34;, node.bot_interface_in
+    )
+    bot_iface_out_vars_str = var_dict_to_str(
+        &#34;Bot Out: &#34;, node.bot_interface_out
+    )
+    globals_in_str = var_dict_to_str(
+        &#34;Globals In: &#34;, node.func_def_copy.used_globals
+    )
+    globals_out_str = var_dict_to_str(
+        &#34;Globals Out: &#34;, node.func_def_copy.modified_globals
+    )
+    label = f&#34;{label}\n{top_iface_in_vars_str}\n{top_iface_out_vars_str}&#34;
+    label = f&#34;{label}\n{bot_iface_in_vars_str}\n{bot_iface_out_vars_str}&#34;
+    label = f&#34;{label}\n{globals_in_str}\n{globals_out_str}&#34;
+    self.G.add_node(node_uid, label=label)
+    self.G.add_edge(node_uid, func)
+
+    args_uid = uuid.uuid4()
+    self.G.add_node(args_uid, label=&#34;Arguments&#34;)
+    self.G.add_edge(node_uid, args_uid)
+
+    for n in args:
+        self.G.add_edge(args_uid, n)
+
+    return node_uid</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTTypeError"><code class="flex name class">
+<span>class <span class="ident">CASTTypeError</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to create errors in the CASTToAGraphVisitor, in particular
+when the visitor encounters some value that it wasn't expecting.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>Exception</code></strong></dt>
+<dd>An exception that occurred during execution.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class CASTTypeError(TypeError):
+    &#34;&#34;&#34;Used to create errors in the CASTToAGraphVisitor, in particular
+    when the visitor encounters some value that it wasn&#39;t expecting.
+
+    Args:
+        Exception: An exception that occurred during execution.
+    &#34;&#34;&#34;
+
+    pass</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.TypeError</li>
+<li>builtins.Exception</li>
+<li>builtins.BaseException</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST2FN.visitors" href="index.html">skema.program_analysis.CAST2FN.visitors</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor">CASTToAGraphVisitor</a></code></h4>
+<ul class="two-column">
+<li><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.G" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.G">G</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.cast" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.cast">cast</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.to_agraph" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.to_agraph">to_agraph</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.to_pdf" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.to_pdf">to_pdf</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.visit" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.visit">visit</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.visit_call_grfn_2_2" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTToAGraphVisitor.visit_call_grfn_2_2">visit_call_grfn_2_2</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTTypeError" href="#skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor.CASTTypeError">CASTTypeError</a></code></h4>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

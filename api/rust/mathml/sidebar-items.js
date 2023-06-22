@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["acset","ast","expression","graph","mml2pn","normalization","parsing","petri_net"]};

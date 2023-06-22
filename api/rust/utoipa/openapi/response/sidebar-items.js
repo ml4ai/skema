@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Response","ResponseBuilder","Responses","ResponsesBuilder"]};

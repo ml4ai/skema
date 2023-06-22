@@ -1,0 +1,1766 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import re
+import sys
+import typing
+from dataclasses import dataclass, field
+from datetime import datetime
+
+from skema.model_assembly.metadata import (
+    CodeSpanReference,
+    Domain,
+    LambdaType,
+    MetadataMethod,
+    ProvenanceData,
+    VariableCreationReason,
+    VariableFromSource,
+)
+from skema.model_assembly.networks import (
+    GenericNode,
+    LambdaNode,
+    VariableNode,
+    PackNode,
+    UnpackNode,
+)
+from skema.model_assembly.structures import VariableIdentifier
+from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST2FN.model.cast import SourceRef
+
+# NOTE: the GrFN json loading seems to rely on &#34;.&#34; as the separator for container scopes
+# For the Annotated Cast pipeline, it is fine to change these separators as long as they
+# don&#39;t collide
+# used in ContainerScopePass functions `con_scope_to_str()` and `visit_name()`
+CON_STR_SEP = &#34;.&#34;
+# delimiter for fullids
+FULLID_SEP = &#34;:&#34;
+
+# NOTE: we use hyphens between names to create illegal identifiers to prevent name collisions
+LOOPBODY = &#34;loop-body&#34;
+ELSEBODY = &#34;else-body&#34;
+IFBODY = &#34;if-body&#34;
+LOOPPRE = &#34;loop-pre&#34;
+LOOPEXPR = &#34;loop-expr&#34;
+LOOPPOST = &#34;loop-post&#34;
+IFEXPR = &#34;if-expr&#34;
+
+MODULE_SCOPE = &#34;module&#34;
+
+VAR_INIT_VERSION = 0
+VAR_EXIT_VERSION = 1
+
+# the variable versions for loop interface are extended
+# to include `LOOP_VAR_UPDATED_VERSION`
+# because the top loop interface has special semantics
+# it chooses between the initial version, or the version
+# updated after loop body execution
+# However, the top_interface_out produces `VAR_INIT_VERSION`
+# and bot_interface_in accepts `VAR_EXIT_VERSION` which is consistent
+# with other containers
+LOOP_VAR_UPDATED_VERSION = 2
+
+
+@dataclass
+class GrfnContainerSrcRef:
+    &#34;&#34;&#34;
+    Used to track the line begin, line end, and source file for ModelIf and Loop
+    Containers.  This data will eventually be added to the containers metadata
+    &#34;&#34;&#34;
+
+    line_begin: typing.Optional[int]
+    line_end: typing.Optional[int]
+    source_file_name: typing.Optional[str]
+
+
+@dataclass
+class GrfnAssignment:
+    assignment_node: LambdaNode
+    assignment_type: LambdaType
+    # inputs and outputs map fullid to GrFN Var uid
+    inputs: typing.Dict[str, str] = field(default_factory=dict)
+    outputs: typing.Dict[str, str] = field(default_factory=dict)
+    lambda_expr: str = &#34;&#34;
+
+
+def cast_op_to_str(op):
+    op_map = {
+        &#34;Pow&#34;: &#34;^&#34;,
+        &#34;Mult&#34;: &#34;*&#34;,
+        &#34;Add&#34;: &#34;+&#34;,
+        &#34;Sub&#34;: &#34;-&#34;,
+        &#34;Div&#34;: &#34;/&#34;,
+        &#34;Gt&#34;: &#34;&gt;&#34;,
+        &#34;Gte&#34;: &#34;&gt;=&#34;,
+        &#34;Lt&#34;: &#34;&lt;&#34;,
+        &#34;Lte&#34;: &#34;&lt;=&#34;,
+        &#34;Eq&#34;: &#34;==&#34;,
+        &#34;NotEq&#34;: &#34;!=&#34;,
+        &#34;BitXor&#34;: &#34;^&#34;,
+        &#34;BitAnd&#34;: &#34;&amp;&#34;,
+        &#34;BitOr&#34;: &#34;|&#34;,
+        &#34;LShift&#34;: &#34;&lt;&lt;&#34;,
+        &#34;RShift&#34;: &#34;&gt;&gt;&#34;,
+        &#34;Not&#34;: &#34;not &#34;,
+        &#34;Invert&#34;: &#34;~&#34;,
+        &#34;USub&#34;: &#34;- &#34;,
+        &#34;And&#34;: &#34;&amp;&amp;&#34;,
+        &#34;Or&#34;: &#34;||&#34;,
+        &#34;Mod&#34;: &#34;%&#34;,
+    }
+    return op_map[op] if op in op_map else None
+
+
+# Metadata functions
+def source_ref_dict(source_ref: SourceRef):
+    to_return = dict()
+    to_return[&#34;line_begin&#34;] = source_ref.row_start
+    to_return[&#34;line_end&#34;] = source_ref.row_end
+    to_return[&#34;col_start&#34;] = source_ref.col_start
+    to_return[&#34;col_end&#34;] = source_ref.col_end
+    return to_return
+
+
+def combine_source_refs(source_refs: typing.List[SourceRef]):
+    &#34;&#34;&#34;
+    From a list of SourceRefs return a single SourceRef with
+    row and column range covering all row/column ranges from the list
+    &#34;&#34;&#34;
+    row_start = sys.maxsize
+    row_end = -1
+    col_start = sys.maxsize
+    col_end = -1
+    source_file_name = None
+
+    for src_ref in source_refs:
+        if src_ref.row_start is not None and src_ref.row_start &lt; row_start:
+            row_start = src_ref.row_start
+        if src_ref.row_end is not None and src_ref.row_end &gt; row_end:
+            row_end = src_ref.row_end
+        if src_ref.col_start is not None and src_ref.col_start &lt; col_start:
+            col_start = src_ref.col_start
+        if src_ref.col_end is not None and src_ref.col_end &gt; col_end:
+            col_end = src_ref.col_end
+        if src_ref.source_file_name is not None:
+            assert (
+                source_file_name is None
+                or source_file_name == src_ref.source_file_name
+            )
+            source_file_name = src_ref.source_file_name
+
+    # use None instead of providing incorrect data
+    row_start = None if row_start in [-1, sys.maxsize] else row_start
+    row_end = None if row_end in [-1, sys.maxsize] else row_end
+    col_start = None if col_start in [-1, sys.maxsize] else col_start
+    col_end = None if col_end in [-1, sys.maxsize] else col_end
+
+    # due to incomplete source ref data, it is possible
+    # to combine source refs and end up in a situation where we no longer have a valid
+    # range i.e. row_end &lt; row_start.
+    # if we run into this, we swap them
+    if row_end is not None and row_start is not None and row_end &lt; row_start:
+        row_end, row_start = row_start, row_end
+    if col_end is not None and col_start is not None and col_end &lt; col_start:
+        col_end, col_start = col_start, col_end
+
+    return SourceRef(source_file_name, col_start, col_end, row_start, row_end)
+
+
+def generate_domain_metadata():
+    # FUTURE: this is metadata needs to be updated
+    # This is just default data that is often incorrect.
+    # We borrowed this default from the legacy AIR -&gt; GrFN pipeline
+    data = dict()
+    data[&#34;type&#34;] = &#34;domain&#34;
+    data[&#34;provenance&#34;] = ProvenanceData.from_data(
+        {
+            &#34;method&#34;: &#34;PROGRAM_ANALYSIS_PIPELINE&#34;,
+            &#34;timestamp&#34;: datetime.now(),
+        }
+    )
+    data[&#34;data_type&#34;] = &#34;integer&#34;
+    data[&#34;measurement_scale&#34;] = &#34;discrete&#34;
+    data[&#34;elements&#34;] = []
+
+    return Domain.from_data(data=data)
+
+
+def generate_from_source_metadata(
+    from_source: bool, reason: VariableCreationReason
+):
+    provenance = ProvenanceData(
+        MetadataMethod.PROGRAM_ANALYSIS_PIPELINE,
+        ProvenanceData.get_dt_timestamp(),
+    )
+    data = {
+        &#34;type&#34;: &#34;FROM_SOURCE&#34;,
+        &#34;provenance&#34;: provenance,
+        &#34;from_source&#34;: str(from_source),
+        &#34;creation_reason&#34;: reason,
+    }
+    return VariableFromSource.from_ann_cast_data(data=data)
+
+
+def generate_variable_node_span_metadata(source_refs):
+    src_ref_dict = {}
+    file_ref = &#34;&#34;
+    if source_refs:
+        # FUTURE: the source_refs attribute of CAST nodes is a list.  Because
+        # of this, it may be good to combine/consolidate source_refs that have multiple
+        # elements.  For now, we just take the first source_ref
+        src_ref = source_refs[0]
+        src_ref_dict = source_ref_dict(src_ref)
+        file_ref = src_ref.source_file_name
+
+    code_span_data = {
+        &#34;source_ref&#34;: src_ref_dict,
+        &#34;file_uid&#34;: file_ref,
+        &#34;code_type&#34;: &#34;identifier&#34;,
+    }
+    return CodeSpanReference.from_air_data(code_span_data)
+
+
+def add_metadata_from_name_node(grfn_var, name_node):
+    &#34;&#34;&#34;
+    Adds metadata to the GrFN VariableNode inferred from the (Ann)CAST Name node
+
+    Currently, all Name nodes are obtained from source, so we generate
+    the from source metadata accordingly.
+    &#34;&#34;&#34;
+    from_source = True
+    from_source_mdata = generate_from_source_metadata(
+        from_source, VariableCreationReason.UNKNOWN
+    )
+    span_mdata = generate_variable_node_span_metadata(name_node.source_refs)
+    add_metadata_to_grfn_var(grfn_var, from_source_mdata, span_mdata)
+
+
+def add_metadata_to_grfn_var(
+    grfn_var, from_source_mdata=None, span_mdata=None, domain_mdata=None
+):
+    if from_source_mdata is None:
+        from_source = True
+        from_source_mdata = generate_from_source_metadata(
+            from_source, VariableCreationReason.UNKNOWN
+        )
+
+    # if this GrFN variable is from source, and we don&#39;t have span metadata, create
+    # an blank SourceRef for its span metadata
+    if from_source_mdata.from_source and span_mdata is None:
+        source_refs = [SourceRef(None, None, None, None, None)]
+        span_mdata = generate_variable_node_span_metadata(source_refs)
+
+    if domain_mdata is None:
+        domain_mdata = generate_domain_metadata()
+
+    new_metadata = [from_source_mdata, domain_mdata, span_mdata]
+    grfn_var.metadata = new_metadata
+
+
+def create_lambda_node_metadata(source_refs):
+    &#34;&#34;&#34;
+    source_refs is either None or a List of SourceRefs
+    This is what the spec for CAST implements
+    &#34;&#34;&#34;
+    src_ref_dict = {}
+    file_ref = &#34;&#34;
+    if source_refs:
+        # FUTURE: the source_refs attribute of CAST nodes is a list.  Because
+        # of this, it may be good to combine/consolidate source_refs that have multiple
+        # elements.  For now, we just take the first source_ref
+        src_ref = source_refs[0]
+        src_ref_dict = source_ref_dict(src_ref)
+        file_ref = src_ref.source_file_name
+
+    code_span_data = {
+        &#34;source_ref&#34;: src_ref_dict,
+        &#34;file_uid&#34;: file_ref,
+        &#34;code_type&#34;: &#34;block&#34;,
+    }
+    metadata = [CodeSpanReference.from_air_data(code_span_data)]
+
+    return metadata
+
+
+def create_container_metadata(grfn_src_ref: GrfnContainerSrcRef):
+    src_ref_dict = {}
+    src_ref_dict[&#34;line_begin&#34;] = grfn_src_ref.line_begin
+    src_ref_dict[&#34;line_end&#34;] = grfn_src_ref.line_end
+
+    code_span_data = {
+        &#34;source_ref&#34;: src_ref_dict,
+        &#34;file_uid&#34;: grfn_src_ref.source_file_name,
+        &#34;code_type&#34;: &#34;block&#34;,
+    }
+    metadata = [CodeSpanReference.from_air_data(code_span_data)]
+
+    return metadata
+
+
+def combine_grfn_con_src_refs(source_refs: typing.List[GrfnContainerSrcRef]):
+    &#34;&#34;&#34;
+    From a list of GrfnContainerSrcRef return a single GrfnContainerSrcRef with
+    line range covering all line ranges from the list
+    &#34;&#34;&#34;
+    line_begin = sys.maxsize
+    line_end = -1
+    source_file_name = None
+
+    for src_ref in source_refs:
+        if src_ref.line_begin is not None and src_ref.line_begin &lt; line_begin:
+            line_begin = src_ref.line_begin
+        if src_ref.line_end is not None and src_ref.line_end &gt; line_end:
+            line_end = src_ref.line_end
+        if src_ref.source_file_name is not None:
+            source_file_name = src_ref.source_file_name
+
+    # use None instead of providing incorrect data
+    line_begin = None if line_begin in [-1, sys.maxsize] else line_begin
+    line_end = None if line_end in [-1, sys.maxsize] else line_end
+
+    # due to incomplete source ref data, it is possible
+    # to combine source refs and end up in a situation where we no longer have a valid
+    # range i.e. line_end &lt; line_begin.
+    # if we run into this, we swap them
+    if (
+        line_end is not None
+        and line_begin is not None
+        and line_end &lt; line_begin
+    ):
+        line_end, line_begin = line_begin, line_end
+
+    return GrfnContainerSrcRef(line_begin, line_end, source_file_name)
+
+
+# End Metadata functions
+
+
+def union_dicts(dict1, dict2):
+    &#34;&#34;&#34;
+    Combines the key value pairs of dict1 and dict2.
+    For collisions, don&#39;t assume which key-value pair will be chosen.
+    &#34;&#34;&#34;
+    return {**dict1, **dict2}
+
+
+def con_scope_to_str(scope: typing.List):
+    return CON_STR_SEP.join(scope)
+
+
+def var_dict_to_str(str_start, vars):
+    vars_id_and_names = [f&#34; {name}: {id}&#34; for id, name in vars.items()]
+    return str_start + &#34;, &#34;.join(vars_id_and_names)
+
+
+def interface_to_str(str_start, interface):
+    return str_start + &#34;, &#34;.join(interface.values())
+
+
+def decision_in_to_str(str_start, decision):
+    if_else_fullids = []
+    for d in decision.values():
+        ifid = d[IFBODY]
+        elseid = d[ELSEBODY]
+        if_else_fullids.append(f&#34; If: {ifid}; Else: {elseid}&#34;)
+
+    return str_start + &#34;, &#34;.join(if_else_fullids)
+
+
+def make_cond_var_name(con_scopestr):
+    &#34;&#34;&#34;
+    Make a condition variable name from the scope string `con_scopestr`
+    &#34;&#34;&#34;
+    # FUTURE: potentially add scoping info
+    return &#34;COND&#34;
+
+
+def make_loop_exit_name(con_scopestr):
+    &#34;&#34;&#34;
+    Makes a Loop exit variable to be used for GrFN condition node
+    &#34;&#34;&#34;
+    # FUTURE: potentially add scoping info
+    return &#34;EXIT&#34;
+
+
+def is_literal_assignment(node):
+    &#34;&#34;&#34;
+    Check if the node is a Number, Boolean, or String
+    This may need to updated later
+    &#34;&#34;&#34;
+    # FUTURE: may need to augment this list e.g. AnnCastList/AnnCastDict etc
+    if isinstance(
+        node,
+        (AnnCastLiteralValue),
+        # (AnnCastNumber, AnnCastBoolean, AnnCastString, AnnCastLiteralValue),
+    ):
+        return True
+
+    return False
+
+
+def is_func_def_main(node) -&gt; bool:
+    &#34;&#34;&#34;
+    Parameter: AnnCastFuncitonDef
+    Checks if node is the FunctionDef for &#34;main&#34;
+    &#34;&#34;&#34;
+    # FUTURE: this may need to be extended or adjusted for Python
+    MAIN_FUNC_DEF_NAME = &#34;main&#34;
+    return node.name.name == MAIN_FUNC_DEF_NAME
+
+
+def func_def_container_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Parameter: AnnCastFunctionDef
+    Returns function container name in the form &#34;name_id&#34;
+    &#34;&#34;&#34;
+    return func_container_name_from_name_node(node.name)
+
+
+def func_container_name_from_name_node(node) -&gt; str:
+    &#34;&#34;&#34;
+    Parameter: AnnCastNameNode
+    Returns function container name in the form &#34;name_id&#34;
+    &#34;&#34;&#34;
+    if isinstance(node, AnnCastAttribute):
+        return f&#34;{node.attr.name}_id{node.attr.id}&#34;
+    else:
+        return f&#34;{node.name}_id{node.id}&#34;
+
+
+def func_def_argument_name(node, arg_index: int) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the FunctionDef argument name for argument with index `arg_index`
+    Used for the AnnCastCall&#39;s top interface in
+    &#34;&#34;&#34;
+    return f&#34;{func_def_container_name(node)}_arg{arg_index}&#34;
+
+
+def func_def_ret_val_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the FunctionDef return value name
+    Used for the AnnCastCall&#39;s bot interface out
+    &#34;&#34;&#34;
+    return f&#34;{func_def_container_name(node)}_ret_val&#34;
+
+
+def specialized_global_name(node, var_name) -&gt; str:
+    &#34;&#34;&#34;
+    Parameters:
+        - node: a AnnCastFunctionDef
+        - var_name: the variable name for the global
+    Returns the specialized global name for FunctionDef `func_def_node`
+    &#34;&#34;&#34;
+    return f&#34;{func_def_container_name(node)}_{var_name}&#34;
+
+
+def call_argument_name(node, arg_index: int) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site argument name for argument with index `arg_index`
+    Used for the AnnCastCall&#39;s top interface in
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}_arg{arg_index}&#34;
+
+
+def call_param_name(node, arg_index: int) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site parameter name for argument with index `arg_index`
+    Used for the AnnCastCall&#39;s top interface in
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}_param{arg_index}&#34;
+
+
+def call_container_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site container name
+    Used for the AnnCastCall&#39;s top interface out and bot interface in
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}&#34;
+
+
+def call_ret_val_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site return value name
+    Used for the AnnCastCall&#39;s bot interface out
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}_ret_val&#34;
+
+
+def ann_cast_name_to_fullid(node):
+    &#34;&#34;&#34;
+    Returns a string representing the fullid of the name node.
+    The fullid has format
+      &#39;name.id.version.con_scopestr&#39;
+    This should only be called after both VariableVersionPass and
+    ContainerScopePass have completed
+    &#34;&#34;&#34;
+    return build_fullid(
+        node.name, node.id, node.version, con_scope_to_str(node.con_scope)
+    )
+
+
+def build_fullid(var_name: str, id: int, version: int, con_scopestr: str):
+    &#34;&#34;&#34;
+    Returns a string representing the fullid.
+    The fullid has format
+      &#39;var_name.id.version.con_scopestr&#39;
+    &#34;&#34;&#34;
+    pieces = [var_name, str(id), str(version), con_scopestr]
+    if pieces[0] == None:
+        pieces[0] = &#34;&#34;
+    return FULLID_SEP.join(pieces)
+
+
+def parse_fullid(fullid: str) -&gt; typing.Dict:
+    &#34;&#34;&#34;
+    Parses the fullid, returning a dict with mapping the strings
+      - &#34;var_name&#34;
+      - &#34;id&#34;
+      - &#34;version&#34;
+      - &#34;con_scopestr&#34;
+    to their respective values determined by the fullid
+    &#34;&#34;&#34;
+    keys = [&#34;var_name&#34;, &#34;id&#34;, &#34;version&#34;, &#34;con_scopestr&#34;]
+    values = fullid.split(FULLID_SEP)
+
+    assert len(keys) == len(values)
+
+    return dict(zip(keys, values))
+
+
+def lambda_var_from_fullid(fullid: str) -&gt; str:
+    &#34;&#34;&#34;
+    Return a suitable lambda variable name for variable with fullid `fullid`
+    &#34;&#34;&#34;
+    parsed = parse_fullid(fullid)
+    return f&#34;{parsed[&#39;var_name&#39;]}_{parsed[&#39;id&#39;]}&#34;
+
+
+def var_name_from_fullid(fullid: str) -&gt; str:
+    &#34;&#34;&#34;
+    Return the variable name for variable with fullid `fullid`
+    &#34;&#34;&#34;
+    return parse_fullid(fullid)[&#34;var_name&#34;]
+
+
+def create_grfn_literal_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `LITERAL` and metadata `metadata`.
+    The created node has an empty lambda expression (`func_str` attribute)
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    # we fill out lambda expression in a later pass
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.LITERAL
+    return LambdaNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata
+    )
+
+
+def create_grfn_assign_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `ASSIGN` and metadata `metadata`.
+    The created node has an empty lambda expression (`func_str` attribute)
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    # we fill out lambda expression in a later pass
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.ASSIGN
+    return LambdaNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata
+    )
+
+
+def create_grfn_pack_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `PACK` and metadata `metadata`.
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.PACK
+    return PackNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata, &#34;&#34;, &#34;&#34;
+    )
+
+
+def create_grfn_unpack_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `UNPACK` and metadata `metadata`.
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.UNPACK
+    return UnpackNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata, &#34;&#34;, &#34;&#34;
+    )
+
+
+def create_grfn_var_from_name_node(node):
+    &#34;&#34;&#34;
+    Creates a GrFN `VariableNode` for this `AnnCastName` node.
+    &#34;&#34;&#34;
+    con_scopestr = con_scope_to_str(node.con_scope)
+    return create_grfn_var(node.name, node.id, node.version, con_scopestr)
+
+
+def create_grfn_var(var_name: str, id: int, version: int, con_scopestr: str):
+    &#34;&#34;&#34;
+    Creates a GrFN `VariableNode` using the parameters
+    &#34;&#34;&#34;
+    identifier = VariableIdentifier(
+        &#34;default_ns&#34;, con_scopestr, var_name, version
+    )
+
+    uid = GenericNode.create_node_id()
+
+    # we initialize the GrFN VariableNode with an empty metadata list.
+    # we fill in the metadata later with a call to add_metadata_to_grfn_var()
+    metadata = []
+    return VariableNode(uid, identifier, metadata)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.add_metadata_from_name_node"><code class="name flex">
+<span>def <span class="ident">add_metadata_from_name_node</span></span>(<span>grfn_var, name_node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Adds metadata to the GrFN VariableNode inferred from the (Ann)CAST Name node</p>
+<p>Currently, all Name nodes are obtained from source, so we generate
+the from source metadata accordingly.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_metadata_from_name_node(grfn_var, name_node):
+    &#34;&#34;&#34;
+    Adds metadata to the GrFN VariableNode inferred from the (Ann)CAST Name node
+
+    Currently, all Name nodes are obtained from source, so we generate
+    the from source metadata accordingly.
+    &#34;&#34;&#34;
+    from_source = True
+    from_source_mdata = generate_from_source_metadata(
+        from_source, VariableCreationReason.UNKNOWN
+    )
+    span_mdata = generate_variable_node_span_metadata(name_node.source_refs)
+    add_metadata_to_grfn_var(grfn_var, from_source_mdata, span_mdata)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.add_metadata_to_grfn_var"><code class="name flex">
+<span>def <span class="ident">add_metadata_to_grfn_var</span></span>(<span>grfn_var, from_source_mdata=None, span_mdata=None, domain_mdata=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_metadata_to_grfn_var(
+    grfn_var, from_source_mdata=None, span_mdata=None, domain_mdata=None
+):
+    if from_source_mdata is None:
+        from_source = True
+        from_source_mdata = generate_from_source_metadata(
+            from_source, VariableCreationReason.UNKNOWN
+        )
+
+    # if this GrFN variable is from source, and we don&#39;t have span metadata, create
+    # an blank SourceRef for its span metadata
+    if from_source_mdata.from_source and span_mdata is None:
+        source_refs = [SourceRef(None, None, None, None, None)]
+        span_mdata = generate_variable_node_span_metadata(source_refs)
+
+    if domain_mdata is None:
+        domain_mdata = generate_domain_metadata()
+
+    new_metadata = [from_source_mdata, domain_mdata, span_mdata]
+    grfn_var.metadata = new_metadata</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.ann_cast_name_to_fullid"><code class="name flex">
+<span>def <span class="ident">ann_cast_name_to_fullid</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a string representing the fullid of the name node.
+The fullid has format
+'name.id.version.con_scopestr'
+This should only be called after both VariableVersionPass and
+ContainerScopePass have completed</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def ann_cast_name_to_fullid(node):
+    &#34;&#34;&#34;
+    Returns a string representing the fullid of the name node.
+    The fullid has format
+      &#39;name.id.version.con_scopestr&#39;
+    This should only be called after both VariableVersionPass and
+    ContainerScopePass have completed
+    &#34;&#34;&#34;
+    return build_fullid(
+        node.name, node.id, node.version, con_scope_to_str(node.con_scope)
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.build_fullid"><code class="name flex">
+<span>def <span class="ident">build_fullid</span></span>(<span>var_name: str, id: int, version: int, con_scopestr: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a string representing the fullid.
+The fullid has format
+'var_name.id.version.con_scopestr'</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def build_fullid(var_name: str, id: int, version: int, con_scopestr: str):
+    &#34;&#34;&#34;
+    Returns a string representing the fullid.
+    The fullid has format
+      &#39;var_name.id.version.con_scopestr&#39;
+    &#34;&#34;&#34;
+    pieces = [var_name, str(id), str(version), con_scopestr]
+    if pieces[0] == None:
+        pieces[0] = &#34;&#34;
+    return FULLID_SEP.join(pieces)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_argument_name"><code class="name flex">
+<span>def <span class="ident">call_argument_name</span></span>(<span>node, arg_index: int) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the call site argument name for argument with index <code>arg_index</code>
+Used for the AnnCastCall's top interface in</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def call_argument_name(node, arg_index: int) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site argument name for argument with index `arg_index`
+    Used for the AnnCastCall&#39;s top interface in
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}_arg{arg_index}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_container_name"><code class="name flex">
+<span>def <span class="ident">call_container_name</span></span>(<span>node) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the call site container name
+Used for the AnnCastCall's top interface out and bot interface in</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def call_container_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site container name
+    Used for the AnnCastCall&#39;s top interface out and bot interface in
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_param_name"><code class="name flex">
+<span>def <span class="ident">call_param_name</span></span>(<span>node, arg_index: int) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the call site parameter name for argument with index <code>arg_index</code>
+Used for the AnnCastCall's top interface in</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def call_param_name(node, arg_index: int) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site parameter name for argument with index `arg_index`
+    Used for the AnnCastCall&#39;s top interface in
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}_param{arg_index}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_ret_val_name"><code class="name flex">
+<span>def <span class="ident">call_ret_val_name</span></span>(<span>node) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the call site return value name
+Used for the AnnCastCall's bot interface out</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def call_ret_val_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the call site return value name
+    Used for the AnnCastCall&#39;s bot interface out
+    &#34;&#34;&#34;
+    func_con_name = func_container_name_from_name_node(node.func)
+    return f&#34;{func_con_name}_call{node.invocation_index}_ret_val&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.cast_op_to_str"><code class="name flex">
+<span>def <span class="ident">cast_op_to_str</span></span>(<span>op)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cast_op_to_str(op):
+    op_map = {
+        &#34;Pow&#34;: &#34;^&#34;,
+        &#34;Mult&#34;: &#34;*&#34;,
+        &#34;Add&#34;: &#34;+&#34;,
+        &#34;Sub&#34;: &#34;-&#34;,
+        &#34;Div&#34;: &#34;/&#34;,
+        &#34;Gt&#34;: &#34;&gt;&#34;,
+        &#34;Gte&#34;: &#34;&gt;=&#34;,
+        &#34;Lt&#34;: &#34;&lt;&#34;,
+        &#34;Lte&#34;: &#34;&lt;=&#34;,
+        &#34;Eq&#34;: &#34;==&#34;,
+        &#34;NotEq&#34;: &#34;!=&#34;,
+        &#34;BitXor&#34;: &#34;^&#34;,
+        &#34;BitAnd&#34;: &#34;&amp;&#34;,
+        &#34;BitOr&#34;: &#34;|&#34;,
+        &#34;LShift&#34;: &#34;&lt;&lt;&#34;,
+        &#34;RShift&#34;: &#34;&gt;&gt;&#34;,
+        &#34;Not&#34;: &#34;not &#34;,
+        &#34;Invert&#34;: &#34;~&#34;,
+        &#34;USub&#34;: &#34;- &#34;,
+        &#34;And&#34;: &#34;&amp;&amp;&#34;,
+        &#34;Or&#34;: &#34;||&#34;,
+        &#34;Mod&#34;: &#34;%&#34;,
+    }
+    return op_map[op] if op in op_map else None</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.combine_grfn_con_src_refs"><code class="name flex">
+<span>def <span class="ident">combine_grfn_con_src_refs</span></span>(<span>source_refs: List[<a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef">GrfnContainerSrcRef</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>From a list of GrfnContainerSrcRef return a single GrfnContainerSrcRef with
+line range covering all line ranges from the list</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def combine_grfn_con_src_refs(source_refs: typing.List[GrfnContainerSrcRef]):
+    &#34;&#34;&#34;
+    From a list of GrfnContainerSrcRef return a single GrfnContainerSrcRef with
+    line range covering all line ranges from the list
+    &#34;&#34;&#34;
+    line_begin = sys.maxsize
+    line_end = -1
+    source_file_name = None
+
+    for src_ref in source_refs:
+        if src_ref.line_begin is not None and src_ref.line_begin &lt; line_begin:
+            line_begin = src_ref.line_begin
+        if src_ref.line_end is not None and src_ref.line_end &gt; line_end:
+            line_end = src_ref.line_end
+        if src_ref.source_file_name is not None:
+            source_file_name = src_ref.source_file_name
+
+    # use None instead of providing incorrect data
+    line_begin = None if line_begin in [-1, sys.maxsize] else line_begin
+    line_end = None if line_end in [-1, sys.maxsize] else line_end
+
+    # due to incomplete source ref data, it is possible
+    # to combine source refs and end up in a situation where we no longer have a valid
+    # range i.e. line_end &lt; line_begin.
+    # if we run into this, we swap them
+    if (
+        line_end is not None
+        and line_begin is not None
+        and line_end &lt; line_begin
+    ):
+        line_end, line_begin = line_begin, line_end
+
+    return GrfnContainerSrcRef(line_begin, line_end, source_file_name)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.combine_source_refs"><code class="name flex">
+<span>def <span class="ident">combine_source_refs</span></span>(<span>source_refs: List[<a title="skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef" href="../model/cast/source_ref.html#skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef">SourceRef</a>])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>From a list of SourceRefs return a single SourceRef with
+row and column range covering all row/column ranges from the list</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def combine_source_refs(source_refs: typing.List[SourceRef]):
+    &#34;&#34;&#34;
+    From a list of SourceRefs return a single SourceRef with
+    row and column range covering all row/column ranges from the list
+    &#34;&#34;&#34;
+    row_start = sys.maxsize
+    row_end = -1
+    col_start = sys.maxsize
+    col_end = -1
+    source_file_name = None
+
+    for src_ref in source_refs:
+        if src_ref.row_start is not None and src_ref.row_start &lt; row_start:
+            row_start = src_ref.row_start
+        if src_ref.row_end is not None and src_ref.row_end &gt; row_end:
+            row_end = src_ref.row_end
+        if src_ref.col_start is not None and src_ref.col_start &lt; col_start:
+            col_start = src_ref.col_start
+        if src_ref.col_end is not None and src_ref.col_end &gt; col_end:
+            col_end = src_ref.col_end
+        if src_ref.source_file_name is not None:
+            assert (
+                source_file_name is None
+                or source_file_name == src_ref.source_file_name
+            )
+            source_file_name = src_ref.source_file_name
+
+    # use None instead of providing incorrect data
+    row_start = None if row_start in [-1, sys.maxsize] else row_start
+    row_end = None if row_end in [-1, sys.maxsize] else row_end
+    col_start = None if col_start in [-1, sys.maxsize] else col_start
+    col_end = None if col_end in [-1, sys.maxsize] else col_end
+
+    # due to incomplete source ref data, it is possible
+    # to combine source refs and end up in a situation where we no longer have a valid
+    # range i.e. row_end &lt; row_start.
+    # if we run into this, we swap them
+    if row_end is not None and row_start is not None and row_end &lt; row_start:
+        row_end, row_start = row_start, row_end
+    if col_end is not None and col_start is not None and col_end &lt; col_start:
+        col_end, col_start = col_start, col_end
+
+    return SourceRef(source_file_name, col_start, col_end, row_start, row_end)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.con_scope_to_str"><code class="name flex">
+<span>def <span class="ident">con_scope_to_str</span></span>(<span>scope: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def con_scope_to_str(scope: typing.List):
+    return CON_STR_SEP.join(scope)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_container_metadata"><code class="name flex">
+<span>def <span class="ident">create_container_metadata</span></span>(<span>grfn_src_ref: <a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef">GrfnContainerSrcRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_container_metadata(grfn_src_ref: GrfnContainerSrcRef):
+    src_ref_dict = {}
+    src_ref_dict[&#34;line_begin&#34;] = grfn_src_ref.line_begin
+    src_ref_dict[&#34;line_end&#34;] = grfn_src_ref.line_end
+
+    code_span_data = {
+        &#34;source_ref&#34;: src_ref_dict,
+        &#34;file_uid&#34;: grfn_src_ref.source_file_name,
+        &#34;code_type&#34;: &#34;block&#34;,
+    }
+    metadata = [CodeSpanReference.from_air_data(code_span_data)]
+
+    return metadata</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_assign_node"><code class="name flex">
+<span>def <span class="ident">create_grfn_assign_node</span></span>(<span>metadata: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a GrFN <code>LambdaNode</code> with type <code>ASSIGN</code> and metadata <code>metadata</code>.
+The created node has an empty lambda expression (<code>func_str</code> attribute)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_grfn_assign_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `ASSIGN` and metadata `metadata`.
+    The created node has an empty lambda expression (`func_str` attribute)
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    # we fill out lambda expression in a later pass
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.ASSIGN
+    return LambdaNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_literal_node"><code class="name flex">
+<span>def <span class="ident">create_grfn_literal_node</span></span>(<span>metadata: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a GrFN <code>LambdaNode</code> with type <code>LITERAL</code> and metadata <code>metadata</code>.
+The created node has an empty lambda expression (<code>func_str</code> attribute)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_grfn_literal_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `LITERAL` and metadata `metadata`.
+    The created node has an empty lambda expression (`func_str` attribute)
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    # we fill out lambda expression in a later pass
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.LITERAL
+    return LambdaNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_pack_node"><code class="name flex">
+<span>def <span class="ident">create_grfn_pack_node</span></span>(<span>metadata: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a GrFN <code>LambdaNode</code> with type <code>PACK</code> and metadata <code>metadata</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_grfn_pack_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `PACK` and metadata `metadata`.
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.PACK
+    return PackNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata, &#34;&#34;, &#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_unpack_node"><code class="name flex">
+<span>def <span class="ident">create_grfn_unpack_node</span></span>(<span>metadata: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a GrFN <code>LambdaNode</code> with type <code>UNPACK</code> and metadata <code>metadata</code>.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_grfn_unpack_node(metadata: typing.List):
+    &#34;&#34;&#34;
+    Creates a GrFN `LambdaNode` with type `UNPACK` and metadata `metadata`.
+    &#34;&#34;&#34;
+    lambda_uuid = GenericNode.create_node_id()
+    lambda_str = &#34;&#34;
+    lambda_func = lambda: None
+    lambda_type = LambdaType.UNPACK
+    return UnpackNode(
+        lambda_uuid, lambda_type, lambda_str, lambda_func, metadata, &#34;&#34;, &#34;&#34;
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_var"><code class="name flex">
+<span>def <span class="ident">create_grfn_var</span></span>(<span>var_name: str, id: int, version: int, con_scopestr: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a GrFN <code>VariableNode</code> using the parameters</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_grfn_var(var_name: str, id: int, version: int, con_scopestr: str):
+    &#34;&#34;&#34;
+    Creates a GrFN `VariableNode` using the parameters
+    &#34;&#34;&#34;
+    identifier = VariableIdentifier(
+        &#34;default_ns&#34;, con_scopestr, var_name, version
+    )
+
+    uid = GenericNode.create_node_id()
+
+    # we initialize the GrFN VariableNode with an empty metadata list.
+    # we fill in the metadata later with a call to add_metadata_to_grfn_var()
+    metadata = []
+    return VariableNode(uid, identifier, metadata)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_var_from_name_node"><code class="name flex">
+<span>def <span class="ident">create_grfn_var_from_name_node</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Creates a GrFN <code>VariableNode</code> for this <code>AnnCastName</code> node.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_grfn_var_from_name_node(node):
+    &#34;&#34;&#34;
+    Creates a GrFN `VariableNode` for this `AnnCastName` node.
+    &#34;&#34;&#34;
+    con_scopestr = con_scope_to_str(node.con_scope)
+    return create_grfn_var(node.name, node.id, node.version, con_scopestr)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_lambda_node_metadata"><code class="name flex">
+<span>def <span class="ident">create_lambda_node_metadata</span></span>(<span>source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>source_refs is either None or a List of SourceRefs
+This is what the spec for CAST implements</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_lambda_node_metadata(source_refs):
+    &#34;&#34;&#34;
+    source_refs is either None or a List of SourceRefs
+    This is what the spec for CAST implements
+    &#34;&#34;&#34;
+    src_ref_dict = {}
+    file_ref = &#34;&#34;
+    if source_refs:
+        # FUTURE: the source_refs attribute of CAST nodes is a list.  Because
+        # of this, it may be good to combine/consolidate source_refs that have multiple
+        # elements.  For now, we just take the first source_ref
+        src_ref = source_refs[0]
+        src_ref_dict = source_ref_dict(src_ref)
+        file_ref = src_ref.source_file_name
+
+    code_span_data = {
+        &#34;source_ref&#34;: src_ref_dict,
+        &#34;file_uid&#34;: file_ref,
+        &#34;code_type&#34;: &#34;block&#34;,
+    }
+    metadata = [CodeSpanReference.from_air_data(code_span_data)]
+
+    return metadata</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.decision_in_to_str"><code class="name flex">
+<span>def <span class="ident">decision_in_to_str</span></span>(<span>str_start, decision)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def decision_in_to_str(str_start, decision):
+    if_else_fullids = []
+    for d in decision.values():
+        ifid = d[IFBODY]
+        elseid = d[ELSEBODY]
+        if_else_fullids.append(f&#34; If: {ifid}; Else: {elseid}&#34;)
+
+    return str_start + &#34;, &#34;.join(if_else_fullids)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_container_name_from_name_node"><code class="name flex">
+<span>def <span class="ident">func_container_name_from_name_node</span></span>(<span>node) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parameter: AnnCastNameNode
+Returns function container name in the form "name_id"</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def func_container_name_from_name_node(node) -&gt; str:
+    &#34;&#34;&#34;
+    Parameter: AnnCastNameNode
+    Returns function container name in the form &#34;name_id&#34;
+    &#34;&#34;&#34;
+    if isinstance(node, AnnCastAttribute):
+        return f&#34;{node.attr.name}_id{node.attr.id}&#34;
+    else:
+        return f&#34;{node.name}_id{node.id}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_argument_name"><code class="name flex">
+<span>def <span class="ident">func_def_argument_name</span></span>(<span>node, arg_index: int) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the FunctionDef argument name for argument with index <code>arg_index</code>
+Used for the AnnCastCall's top interface in</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def func_def_argument_name(node, arg_index: int) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the FunctionDef argument name for argument with index `arg_index`
+    Used for the AnnCastCall&#39;s top interface in
+    &#34;&#34;&#34;
+    return f&#34;{func_def_container_name(node)}_arg{arg_index}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_container_name"><code class="name flex">
+<span>def <span class="ident">func_def_container_name</span></span>(<span>node) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parameter: AnnCastFunctionDef
+Returns function container name in the form "name_id"</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def func_def_container_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Parameter: AnnCastFunctionDef
+    Returns function container name in the form &#34;name_id&#34;
+    &#34;&#34;&#34;
+    return func_container_name_from_name_node(node.name)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_ret_val_name"><code class="name flex">
+<span>def <span class="ident">func_def_ret_val_name</span></span>(<span>node) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the FunctionDef return value name
+Used for the AnnCastCall's bot interface out</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def func_def_ret_val_name(node) -&gt; str:
+    &#34;&#34;&#34;
+    Returns the FunctionDef return value name
+    Used for the AnnCastCall&#39;s bot interface out
+    &#34;&#34;&#34;
+    return f&#34;{func_def_container_name(node)}_ret_val&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_domain_metadata"><code class="name flex">
+<span>def <span class="ident">generate_domain_metadata</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_domain_metadata():
+    # FUTURE: this is metadata needs to be updated
+    # This is just default data that is often incorrect.
+    # We borrowed this default from the legacy AIR -&gt; GrFN pipeline
+    data = dict()
+    data[&#34;type&#34;] = &#34;domain&#34;
+    data[&#34;provenance&#34;] = ProvenanceData.from_data(
+        {
+            &#34;method&#34;: &#34;PROGRAM_ANALYSIS_PIPELINE&#34;,
+            &#34;timestamp&#34;: datetime.now(),
+        }
+    )
+    data[&#34;data_type&#34;] = &#34;integer&#34;
+    data[&#34;measurement_scale&#34;] = &#34;discrete&#34;
+    data[&#34;elements&#34;] = []
+
+    return Domain.from_data(data=data)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_from_source_metadata"><code class="name flex">
+<span>def <span class="ident">generate_from_source_metadata</span></span>(<span>from_source: bool, reason: skema.model_assembly.metadata.VariableCreationReason)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_from_source_metadata(
+    from_source: bool, reason: VariableCreationReason
+):
+    provenance = ProvenanceData(
+        MetadataMethod.PROGRAM_ANALYSIS_PIPELINE,
+        ProvenanceData.get_dt_timestamp(),
+    )
+    data = {
+        &#34;type&#34;: &#34;FROM_SOURCE&#34;,
+        &#34;provenance&#34;: provenance,
+        &#34;from_source&#34;: str(from_source),
+        &#34;creation_reason&#34;: reason,
+    }
+    return VariableFromSource.from_ann_cast_data(data=data)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_variable_node_span_metadata"><code class="name flex">
+<span>def <span class="ident">generate_variable_node_span_metadata</span></span>(<span>source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_variable_node_span_metadata(source_refs):
+    src_ref_dict = {}
+    file_ref = &#34;&#34;
+    if source_refs:
+        # FUTURE: the source_refs attribute of CAST nodes is a list.  Because
+        # of this, it may be good to combine/consolidate source_refs that have multiple
+        # elements.  For now, we just take the first source_ref
+        src_ref = source_refs[0]
+        src_ref_dict = source_ref_dict(src_ref)
+        file_ref = src_ref.source_file_name
+
+    code_span_data = {
+        &#34;source_ref&#34;: src_ref_dict,
+        &#34;file_uid&#34;: file_ref,
+        &#34;code_type&#34;: &#34;identifier&#34;,
+    }
+    return CodeSpanReference.from_air_data(code_span_data)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.interface_to_str"><code class="name flex">
+<span>def <span class="ident">interface_to_str</span></span>(<span>str_start, interface)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def interface_to_str(str_start, interface):
+    return str_start + &#34;, &#34;.join(interface.values())</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.is_func_def_main"><code class="name flex">
+<span>def <span class="ident">is_func_def_main</span></span>(<span>node) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parameter: AnnCastFuncitonDef
+Checks if node is the FunctionDef for "main"</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_func_def_main(node) -&gt; bool:
+    &#34;&#34;&#34;
+    Parameter: AnnCastFuncitonDef
+    Checks if node is the FunctionDef for &#34;main&#34;
+    &#34;&#34;&#34;
+    # FUTURE: this may need to be extended or adjusted for Python
+    MAIN_FUNC_DEF_NAME = &#34;main&#34;
+    return node.name.name == MAIN_FUNC_DEF_NAME</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.is_literal_assignment"><code class="name flex">
+<span>def <span class="ident">is_literal_assignment</span></span>(<span>node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the node is a Number, Boolean, or String
+This may need to updated later</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_literal_assignment(node):
+    &#34;&#34;&#34;
+    Check if the node is a Number, Boolean, or String
+    This may need to updated later
+    &#34;&#34;&#34;
+    # FUTURE: may need to augment this list e.g. AnnCastList/AnnCastDict etc
+    if isinstance(
+        node,
+        (AnnCastLiteralValue),
+        # (AnnCastNumber, AnnCastBoolean, AnnCastString, AnnCastLiteralValue),
+    ):
+        return True
+
+    return False</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.lambda_var_from_fullid"><code class="name flex">
+<span>def <span class="ident">lambda_var_from_fullid</span></span>(<span>fullid: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return a suitable lambda variable name for variable with fullid <code>fullid</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def lambda_var_from_fullid(fullid: str) -&gt; str:
+    &#34;&#34;&#34;
+    Return a suitable lambda variable name for variable with fullid `fullid`
+    &#34;&#34;&#34;
+    parsed = parse_fullid(fullid)
+    return f&#34;{parsed[&#39;var_name&#39;]}_{parsed[&#39;id&#39;]}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.make_cond_var_name"><code class="name flex">
+<span>def <span class="ident">make_cond_var_name</span></span>(<span>con_scopestr)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Make a condition variable name from the scope string <code>con_scopestr</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def make_cond_var_name(con_scopestr):
+    &#34;&#34;&#34;
+    Make a condition variable name from the scope string `con_scopestr`
+    &#34;&#34;&#34;
+    # FUTURE: potentially add scoping info
+    return &#34;COND&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.make_loop_exit_name"><code class="name flex">
+<span>def <span class="ident">make_loop_exit_name</span></span>(<span>con_scopestr)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Makes a Loop exit variable to be used for GrFN condition node</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def make_loop_exit_name(con_scopestr):
+    &#34;&#34;&#34;
+    Makes a Loop exit variable to be used for GrFN condition node
+    &#34;&#34;&#34;
+    # FUTURE: potentially add scoping info
+    return &#34;EXIT&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.parse_fullid"><code class="name flex">
+<span>def <span class="ident">parse_fullid</span></span>(<span>fullid: str) ‑> Dict[~KT, ~VT]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Parses the fullid, returning a dict with mapping the strings
+- "var_name"
+- "id"
+- "version"
+- "con_scopestr"
+to their respective values determined by the fullid</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def parse_fullid(fullid: str) -&gt; typing.Dict:
+    &#34;&#34;&#34;
+    Parses the fullid, returning a dict with mapping the strings
+      - &#34;var_name&#34;
+      - &#34;id&#34;
+      - &#34;version&#34;
+      - &#34;con_scopestr&#34;
+    to their respective values determined by the fullid
+    &#34;&#34;&#34;
+    keys = [&#34;var_name&#34;, &#34;id&#34;, &#34;version&#34;, &#34;con_scopestr&#34;]
+    values = fullid.split(FULLID_SEP)
+
+    assert len(keys) == len(values)
+
+    return dict(zip(keys, values))</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.source_ref_dict"><code class="name flex">
+<span>def <span class="ident">source_ref_dict</span></span>(<span>source_ref: <a title="skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef" href="../model/cast/source_ref.html#skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef">SourceRef</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def source_ref_dict(source_ref: SourceRef):
+    to_return = dict()
+    to_return[&#34;line_begin&#34;] = source_ref.row_start
+    to_return[&#34;line_end&#34;] = source_ref.row_end
+    to_return[&#34;col_start&#34;] = source_ref.col_start
+    to_return[&#34;col_end&#34;] = source_ref.col_end
+    return to_return</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.specialized_global_name"><code class="name flex">
+<span>def <span class="ident">specialized_global_name</span></span>(<span>node, var_name) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><h2 id="parameters">Parameters</h2>
+<ul>
+<li>node: a AnnCastFunctionDef</li>
+<li>var_name: the variable name for the global
+Returns the specialized global name for FunctionDef <code>func_def_node</code></li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def specialized_global_name(node, var_name) -&gt; str:
+    &#34;&#34;&#34;
+    Parameters:
+        - node: a AnnCastFunctionDef
+        - var_name: the variable name for the global
+    Returns the specialized global name for FunctionDef `func_def_node`
+    &#34;&#34;&#34;
+    return f&#34;{func_def_container_name(node)}_{var_name}&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.union_dicts"><code class="name flex">
+<span>def <span class="ident">union_dicts</span></span>(<span>dict1, dict2)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Combines the key value pairs of dict1 and dict2.
+For collisions, don't assume which key-value pair will be chosen.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def union_dicts(dict1, dict2):
+    &#34;&#34;&#34;
+    Combines the key value pairs of dict1 and dict2.
+    For collisions, don&#39;t assume which key-value pair will be chosen.
+    &#34;&#34;&#34;
+    return {**dict1, **dict2}</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.var_dict_to_str"><code class="name flex">
+<span>def <span class="ident">var_dict_to_str</span></span>(<span>str_start, vars)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def var_dict_to_str(str_start, vars):
+    vars_id_and_names = [f&#34; {name}: {id}&#34; for id, name in vars.items()]
+    return str_start + &#34;, &#34;.join(vars_id_and_names)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.var_name_from_fullid"><code class="name flex">
+<span>def <span class="ident">var_name_from_fullid</span></span>(<span>fullid: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the variable name for variable with fullid <code>fullid</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def var_name_from_fullid(fullid: str) -&gt; str:
+    &#34;&#34;&#34;
+    Return the variable name for variable with fullid `fullid`
+    &#34;&#34;&#34;
+    return parse_fullid(fullid)[&#34;var_name&#34;]</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment"><code class="flex name class">
+<span>class <span class="ident">GrfnAssignment</span></span>
+<span>(</span><span>assignment_node: skema.model_assembly.networks.LambdaNode, assignment_type: skema.model_assembly.metadata.LambdaType, inputs: Dict[str, str] = &lt;factory&gt;, outputs: Dict[str, str] = &lt;factory&gt;, lambda_expr: str = '')</span>
+</code></dt>
+<dd>
+<div class="desc"><p>GrfnAssignment(assignment_node: skema.model_assembly.networks.LambdaNode, assignment_type: skema.model_assembly.metadata.LambdaType, inputs: Dict[str, str] = <factory>, outputs: Dict[str, str] = <factory>, lambda_expr: str = '')</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GrfnAssignment:
+    assignment_node: LambdaNode
+    assignment_type: LambdaType
+    # inputs and outputs map fullid to GrFN Var uid
+    inputs: typing.Dict[str, str] = field(default_factory=dict)
+    outputs: typing.Dict[str, str] = field(default_factory=dict)
+    lambda_expr: str = &#34;&#34;</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.assignment_node"><code class="name">var <span class="ident">assignment_node</span> : skema.model_assembly.networks.LambdaNode</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.assignment_type"><code class="name">var <span class="ident">assignment_type</span> : skema.model_assembly.metadata.LambdaType</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.inputs"><code class="name">var <span class="ident">inputs</span> : Dict[str, str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.lambda_expr"><code class="name">var <span class="ident">lambda_expr</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.outputs"><code class="name">var <span class="ident">outputs</span> : Dict[str, str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef"><code class="flex name class">
+<span>class <span class="ident">GrfnContainerSrcRef</span></span>
+<span>(</span><span>line_begin: Optional[int], line_end: Optional[int], source_file_name: Optional[str])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Used to track the line begin, line end, and source file for ModelIf and Loop
+Containers.
+This data will eventually be added to the containers metadata</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class GrfnContainerSrcRef:
+    &#34;&#34;&#34;
+    Used to track the line begin, line end, and source file for ModelIf and Loop
+    Containers.  This data will eventually be added to the containers metadata
+    &#34;&#34;&#34;
+
+    line_begin: typing.Optional[int]
+    line_end: typing.Optional[int]
+    source_file_name: typing.Optional[str]</code></pre>
+</details>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.line_begin"><code class="name">var <span class="ident">line_begin</span> : Optional[int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.line_end"><code class="name">var <span class="ident">line_end</span> : Optional[int]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.source_file_name"><code class="name">var <span class="ident">source_file_name</span> : Optional[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast" href="index.html">skema.program_analysis.CAST2FN.ann_cast</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.add_metadata_from_name_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.add_metadata_from_name_node">add_metadata_from_name_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.add_metadata_to_grfn_var" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.add_metadata_to_grfn_var">add_metadata_to_grfn_var</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.ann_cast_name_to_fullid" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.ann_cast_name_to_fullid">ann_cast_name_to_fullid</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.build_fullid" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.build_fullid">build_fullid</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_argument_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_argument_name">call_argument_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_container_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_container_name">call_container_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_param_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_param_name">call_param_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_ret_val_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.call_ret_val_name">call_ret_val_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.cast_op_to_str" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.cast_op_to_str">cast_op_to_str</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.combine_grfn_con_src_refs" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.combine_grfn_con_src_refs">combine_grfn_con_src_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.combine_source_refs" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.combine_source_refs">combine_source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.con_scope_to_str" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.con_scope_to_str">con_scope_to_str</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_container_metadata" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_container_metadata">create_container_metadata</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_assign_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_assign_node">create_grfn_assign_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_literal_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_literal_node">create_grfn_literal_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_pack_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_pack_node">create_grfn_pack_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_unpack_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_unpack_node">create_grfn_unpack_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_var" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_var">create_grfn_var</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_var_from_name_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_grfn_var_from_name_node">create_grfn_var_from_name_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_lambda_node_metadata" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.create_lambda_node_metadata">create_lambda_node_metadata</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.decision_in_to_str" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.decision_in_to_str">decision_in_to_str</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_container_name_from_name_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_container_name_from_name_node">func_container_name_from_name_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_argument_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_argument_name">func_def_argument_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_container_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_container_name">func_def_container_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_ret_val_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.func_def_ret_val_name">func_def_ret_val_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_domain_metadata" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_domain_metadata">generate_domain_metadata</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_from_source_metadata" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_from_source_metadata">generate_from_source_metadata</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_variable_node_span_metadata" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.generate_variable_node_span_metadata">generate_variable_node_span_metadata</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.interface_to_str" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.interface_to_str">interface_to_str</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.is_func_def_main" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.is_func_def_main">is_func_def_main</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.is_literal_assignment" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.is_literal_assignment">is_literal_assignment</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.lambda_var_from_fullid" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.lambda_var_from_fullid">lambda_var_from_fullid</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.make_cond_var_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.make_cond_var_name">make_cond_var_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.make_loop_exit_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.make_loop_exit_name">make_loop_exit_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.parse_fullid" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.parse_fullid">parse_fullid</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.source_ref_dict" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.source_ref_dict">source_ref_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.specialized_global_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.specialized_global_name">specialized_global_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.union_dicts" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.union_dicts">union_dicts</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.var_dict_to_str" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.var_dict_to_str">var_dict_to_str</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.var_name_from_fullid" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.var_name_from_fullid">var_name_from_fullid</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment">GrfnAssignment</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.assignment_node" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.assignment_node">assignment_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.assignment_type" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.assignment_type">assignment_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.inputs" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.inputs">inputs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.lambda_expr" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.lambda_expr">lambda_expr</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.outputs" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnAssignment.outputs">outputs</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef">GrfnContainerSrcRef</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.line_begin" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.line_begin">line_begin</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.line_end" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.line_end">line_end</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.source_file_name" href="#skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers.GrfnContainerSrcRef.source_file_name">source_file_name</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

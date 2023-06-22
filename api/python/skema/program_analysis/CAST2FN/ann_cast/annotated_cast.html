@@ -1,0 +1,3040 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST2FN.ann_cast.annotated_cast API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST2FN.ann_cast.annotated_cast</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import typing
+import difflib
+
+from skema.program_analysis.CAST2FN.model.cast import (
+    AstNode,
+    Assignment,
+    Attribute,
+    Call,
+    FunctionDef,
+    LiteralValue,
+    Loop,
+    ModelBreak,
+    ModelContinue,
+    ModelIf,
+    ModelReturn,
+    Module,
+    Name,
+    Operator,
+    RecordDef,
+    Var,
+)
+
+from skema.model_assembly.networks import GroundedFunctionNetwork, VariableNode
+from skema.program_analysis.CAST2FN.model.cast.model_import import (
+    ModelImport,
+)
+
+
+class PipelineState:
+    def __init__(self, ann_nodes: typing.List, grfn2_2: bool):
+        self.GENERATE_GRFN_2_2 = grfn2_2
+        self.PRINT_DEBUGGING_INFO = False
+        self.nodes = ann_nodes
+        # populated after IdCollapsePass, and used to give ids to GrFN condition variables
+        self.collapsed_id_counter = 0
+        # dict mapping FunctionDef container scopestr to its id
+        self.func_con_scopestr_to_id = {}
+        # dict mapping container scope strings to their nodes
+        self.con_scopestr_to_node = {}
+        # dict mapping function IDs to their FunctionDef nodes.
+        self.func_id_to_def = {}
+        self.grfn_id_to_grfn_var = {}
+        # the fullid of a AnnCastName node is a string which includes its
+        # variable name, numerical id, version, and scope
+        self.fullid_to_grfn_id = {}
+        # `module_node` is simply a reference to the AnnCastModule node
+        # FUTURE: to handle multiple modules for Python this will need to be extended
+        # for the most part, the module node is used to determine globals
+        self.module_node = None
+        # GrFN stored after ToGrfnPass
+        self.grfn: typing.Optional[GroundedFunctionNetwork] = None
+
+        # flag deciding whether or not to use GE&#39;s interpretation of From Source
+        # when populating metadata information
+        #
+        # For GE, all instances of a variable which exists in the source code should
+        # be considered from source.
+        # We think this loses information about the GrFN variables we create to facilitate
+        # transition between interfaces. That is, we create many GrFN variables which
+        # do not literally exist in source, and so don&#39;t consider those to be from source
+        self.FROM_SOURCE_FOR_GE = True
+
+        self.gromet_collection = None
+
+    def get_nodes(self):
+        return self.nodes
+
+    def is_var_local_to_func(self, scopestr: str, id: int):
+        &#34;&#34;&#34;
+        Precondition: scopestr is the scopestr of a FunctionDef
+        Check if the variable with id `id` is neither a global nor a formal parameter
+        &#34;&#34;&#34;
+        if self.is_global_var(id):
+            return False
+
+        func_def_node = self.func_def_node_from_scopestr(scopestr)
+        for param in func_def_node.func_args:
+            if id == param.val.id:
+                return False
+
+        return True
+
+    def is_container(self, scopestr: str):
+        &#34;&#34;&#34;
+        Check if scopestr is a container scopestr
+        &#34;&#34;&#34;
+        return scopestr in self.con_scopestr_to_node
+
+    def con_node_from_scopestr(self, scopestr: str):
+        &#34;&#34;&#34;
+        Precondition: scopestr is a container scopestr
+        Return the container node associated with scopestr
+        &#34;&#34;&#34;
+        return self.con_scopestr_to_node[scopestr]
+
+    def get_grfn(self) -&gt; typing.Optional[GroundedFunctionNetwork]:
+        return self.grfn
+
+    def func_def_exists(self, id: int) -&gt; bool:
+        &#34;&#34;&#34;
+        Check if there is a FuncionDef for id
+        &#34;&#34;&#34;
+        return id in self.func_id_to_def
+
+    def is_con_scopestr_func_def(self, con_scopestr: str):
+        return con_scopestr in self.func_con_scopestr_to_id
+
+    def func_def_node_from_scopestr(self, con_scopestr: str):
+        &#34;&#34;&#34;
+        Return the AnnCastFuncitonDef node for the container scope
+        defined by `con_scopestr`
+        &#34;&#34;&#34;
+        function_id = self.func_con_scopestr_to_id[con_scopestr]
+        return self.func_id_to_def[function_id]
+
+    def func_def_node_from_id(self, id: int):
+        &#34;&#34;&#34;
+        Return the FunctionDef for `id`
+        &#34;&#34;&#34;
+        assert self.func_def_exists(id)
+        return self.func_id_to_def[id]
+
+    def is_global_var(self, id: int):
+        &#34;&#34;&#34;
+        Check if id is in the used_variables attribute of the module node
+        &#34;&#34;&#34;
+        return id in self.module_node.used_vars
+
+    def all_globals_dict(self):
+        &#34;&#34;&#34;
+        Return a dict mapping id to string name for all global variables
+        &#34;&#34;&#34;
+        return self.module_node.used_vars
+
+    def next_collapsed_id(self):
+        &#34;&#34;&#34;
+        Return the next collapsed id, and increment `collapsed_id_counter`
+        &#34;&#34;&#34;
+        to_return = self.collapsed_id_counter
+        self.collapsed_id_counter += 1
+        return to_return
+
+    def store_grfn_var(self, fullid: str, grfn_var: VariableNode):
+        &#34;&#34;&#34;
+        Cache `grfn_var` in `grfn_id_to_grfn_var` and add `fullid` to `fullid_to_grfn_id`
+        &#34;&#34;&#34;
+        self.fullid_to_grfn_id[fullid] = grfn_var.uid
+        self.grfn_id_to_grfn_var[grfn_var.uid] = grfn_var
+
+    def grfn_var_exists(self, fullid: str):
+        &#34;&#34;&#34;
+        Returns the whether the GrFN VariableNode associated with `fullid` has already been created
+        &#34;&#34;&#34;
+        return fullid in self.fullid_to_grfn_id
+
+    def get_grfn_var(self, fullid: str):
+        &#34;&#34;&#34;
+        Returns the cached GrFN VariableNode associated with `fullid`
+        &#34;&#34;&#34;
+        grfn_id = self.fullid_to_grfn_id[fullid]
+        return self.grfn_id_to_grfn_var[grfn_id]
+
+    def alias_grfn_vars(self, src_fullid: str, tgt_fullid: str):
+        &#34;&#34;&#34;
+        Put the GrFN id associated with `tgt_fullid` into dict `fullid_to_grfn_id` for key
+        `src_fullid`
+        &#34;&#34;&#34;
+        self.fullid_to_grfn_id[src_fullid] = self.fullid_to_grfn_id[tgt_fullid]
+
+    def equiv(self, other):
+        &#34;&#34;&#34;
+        Check if the PipelineState nodes are equivalent to other&#39;s
+        Used in the test suite
+        &#34;&#34;&#34;
+        # FUTURE: once the PiplelineState nodes attribute stores multiple modules,
+        # we may need to check that the ordering is consistent.  Currently,
+        # CAST and the AnnnotatedCast nodes only have a single module, so this is not a concern
+        for i, node in enumerate(self.nodes):
+            if not node.equiv(other.nodes[i]):
+                # printing diff to help locating difference
+                # because we do not overwrite the __str__() methods,
+                # this has limited usefullness, but its better than nothing
+                print(f&#34;AnnCast equiv failed:&#34;)
+                self_lines = str(node).splitlines()
+                other_lines = str(other.nodes[i]).splitlines()
+                for i, diff in enumerate(
+                    difflib.ndiff(self_lines, other_lines)
+                ):
+                    if diff[0] == &#34; &#34;:
+                        continue
+                    print(f&#34;Line {i}: {diff}&#34;)
+
+                return False
+
+        return True
+
+
+class AnnCastNode(AstNode):
+    def __init__(self, *args, **kwargs):
+        super().__init__(self)
+        self.expr_str: str = &#34;&#34;
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;expr_str&#34;] = self.expr_str
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastNode):
+            return False
+        return self.to_dict() == other.to_dict()
+
+
+class AnnCastAssignment(AnnCastNode):
+    def __init__(self, left, right, source_refs):
+        super().__init__(self)
+        self.left = left
+        self.right = right
+        self.source_refs = source_refs
+
+        self.grfn_assignment: GrfnAssignment
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;left&#34;] = self.left.to_dict()
+        result[&#34;right&#34;] = self.right.to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastAssignment):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Assignment.__str__(self)
+
+
+class AnnCastAttribute(AnnCastNode):
+    def __init__(self, value, attr, source_refs):
+        super().__init__(self)
+        self.value = value
+        self.attr = attr
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add value and attr to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastAttribute):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Attribute.__str__(self)
+
+
+class AnnCastCall(AnnCastNode):
+    def __init__(self, func, arguments, source_refs):
+        super().__init__(self)
+        self.func: AnnCastName = func
+        self.arguments = arguments
+        self.source_refs = source_refs
+
+        # the index of this Call node over all invocations of this function
+        self.invocation_index: int
+
+        # dicts mapping a Name id to its fullid
+        self.top_interface_in = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        # dicts mapping Name id to Name string
+        self.top_interface_vars = {}
+        self.bot_interface_vars = {}
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+
+        # for top_interface_out
+        # mapping Name id to fullid
+        # to determine this, we check if we store version 0 on any Name node
+        self.globals_accessed_before_mod = {}
+        self.used_globals = {}
+
+        # for bot_interface
+        # map Name id to fullid
+        self.in_ret_val = {}
+        self.out_ret_val = {}
+
+        # if this is a GrFN 2.2 Call, we will copy the associated FunctionDef
+        # to make the GrFN 2.2 container
+        self.is_grfn_2_2: bool = False
+        # copied function def for GrFN 2.2
+        self.func_def_copy: typing.Optional[AnnCastFunctionDef] = None
+
+        # keep track of whether the Call has an associated FunctionDef
+        # and if the Call should return a value
+        self.has_func_def: bool = False
+        self.has_ret_val: bool = False
+
+        # dict mapping argument index to created argument fullid
+        self.arg_index_to_fullid = {}
+        self.param_index_to_fullid = {}
+        # this dict maps argument positional index to GrfnAssignment&#39;s
+        # Each GrfnAssignment stores the ASSIGN/LITERAL node,
+        # the inputs to the ASSIGN/LITERAL node, and the outputs to the ASSIGN/LITERAL node
+        # In this case, the output will map the arguments fullid to its grfn_id
+        self.arg_assignments: typing.Dict[int, GrfnAssignment] = {}
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;func&#34;] = self.func.to_dict()
+        result[&#34;arguments&#34;] = [arg.to_dict() for arg in self.arguments]
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastCall):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Call.__str__(self)
+
+class AnnCastFunctionDef(AnnCastNode):
+    def __init__(self, name, func_args, body, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.func_args = func_args
+        self.body = body
+        self.source_refs = source_refs
+
+        self.con_scope: typing.List
+
+        # For CAST coming from C, we determine if the function
+        # has a return value by looking for a CAST Return node.
+        # We do this during the ContainerScopePass.
+        # FUTURE: What should be done with CAST coming from Python?
+        # In Python, every function returns something,
+        # either None or the explicit return value
+        self.has_ret_val: bool = False
+        # for bot_interface
+        # in_ret_val and out_ret_val map Name id to fullid
+        self.in_ret_val = {}
+        self.out_ret_val = {}
+
+        # dicts mapping a Name id to its string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str]
+        self.vars_accessed_before_mod: typing.Dict[int, str]
+        self.used_vars: typing.Dict[int, str]
+        # for now, top_interface_vars and bot_interface_vars only include globals
+        # since those variables cross the container boundaries
+        self.top_interface_vars: typing.Dict[int, str] = {}
+        self.bot_interface_vars: typing.Dict[int, str] = {}
+        # dicts for global variables
+        # for top_interface_out
+        # mapping Name id to fullid
+        # to determine this, we check if we store version 0 on any Name node
+        self.globals_accessed_before_mod = {}
+        self.used_globals = {}
+        # for bot interface in
+        self.modified_globals = {}
+
+        # dict mapping argument index to created argument fullid
+        self.arg_index_to_fullid = {}
+        self.param_index_to_fullid = {}
+
+        # dicts mapping a Name id to its fullid
+        self.top_interface_in = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+
+        # dict mapping Name id to highest version at end of &#34;block&#34;
+        self.body_highest_var_vers = {}
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+        # dummy assignments to handle Python dynamic variable creation
+        self.dummy_grfn_assignments = []
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;name&#34;] = self.name.to_dict()
+        result[&#34;func_args&#34;] = [arg.to_dict() for arg in self.func_args]
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;con_scope&#34;] = self.con_scope
+        result[&#34;has_ret_val&#34;] = self.has_ret_val
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastFunctionDef):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return FunctionDef.__str__(self)
+
+class AnnCastRecordDef(AnnCastNode):
+    def __init__(self, name, bases, funcs, fields, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.bases = bases
+        self.funcs = funcs
+        self.fields = fields
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add attributes to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastRecordDef):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return RecordDef.__str__(self)
+
+
+class AnnCastLiteralValue(AnnCastNode):
+    def __init__(self, value_type, value, source_code_data_type, source_refs):
+        super().__init__(self)
+        self.value_type = value_type
+        self.value = value
+        self.source_code_data_type = source_code_data_type
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastLiteralValue):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return LiteralValue.__str__(self)
+
+
+class AnnCastLoop(AnnCastNode):
+    def __init__(self, pre, expr, body, post, source_refs):
+        super().__init__(self)
+        self.pre = pre
+        self.expr = expr
+        self.body = body
+        self.post = post
+        self.source_refs = source_refs
+
+        # Loop container scope
+        self.con_scope: typing.List
+        # Function scopestr this Loop node is &#34;living&#34; in
+        self.base_func_scopestr: str = &#34;&#34;
+
+        # dicts mapping a Name id to its string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str]
+        self.vars_accessed_before_mod: typing.Dict[int, str]
+        self.used_vars: typing.Dict[int, str]
+        self.top_interface_vars: typing.Dict[int, str] = {}
+        self.top_interface_updated_vars: typing.Dict[int, str] = {}
+        self.bot_interface_vars: typing.Dict[int, str] = {}
+
+        # dicts mapping Name id to highest version at end of &#34;block&#34;
+        self.pre_highest_var_vers = {}
+        self.expr_highest_var_vers = {}
+        self.body_highest_var_vers = {}
+        self.post_highest_var_vers = {}
+
+        # dicts mapping a Name id to variable string name
+        # for variables used in the Loop expr
+        self.expr_vars_accessed_before_mod = {}
+        self.expr_modified_vars = {}
+        self.expr_used_vars = {}
+
+        # dicts mapping a Name id to its fullid
+        # initial versions for the top interface come from enclosing scope
+        # updated versions for the top interface are versions
+        # at the bottom of the loop after one or more executions of the loop
+        self.top_interface_initial = {}
+        self.top_interface_updated = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        self.condition_in = {}
+        self.condition_out = {}
+        # GrFN VariableNode for the condition node
+        self.condition_var = None
+
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+        self.condition_lambda: str
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        # result[&#34;init&#34;] = [node.to_dict() for node in self.init]
+        result[&#34;expr&#34;] = self.expr.to_dict()
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;con_scope&#34;] = self.con_scope
+        result[&#34;base_func_scopestr&#34;] = self.base_func_scopestr
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastLoop):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Loop.__str__(self)
+
+
+class AnnCastModelBreak(AnnCastNode):
+    def __init__(self, source_refs):
+        super().__init__(self)
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelBreak):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelBreak.__str__(self)
+
+
+class AnnCastModelContinue(AnnCastNode):
+    def __init__(self, node: ModelContinue):
+        super().__init__(self)
+        self.source_refs = node.source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelContinue):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelContinue.__str__(self)
+
+
+class AnnCastModelImport(AnnCastNode):
+    def __init__(self, node: ModelImport):
+        super().__init__(self)
+        self.name = node.name
+        self.alias = node.alias
+        self.symbol = node.symbol
+        self.all = node.all
+        self.source_refs = node.source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelImport):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelImport.__str__(self)
+
+
+class AnnCastModelIf(AnnCastNode):
+    def __init__(self, expr, body, orelse, source_refs):
+        super().__init__(self)
+        self.expr = expr
+        self.body = body
+        self.orelse = orelse
+        self.source_refs = source_refs
+
+        # ModelIf container scope
+        self.con_scope: typing.List
+        # Function scopestr this ModelIf node is &#34;living&#34; in
+        self.base_func_scopestr: str = &#34;&#34;
+
+        # dicts mapping a Name id to string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str]
+        self.vars_accessed_before_mod: typing.Dict[int, str]
+        self.used_vars: typing.Dict[int, str]
+        self.top_interface_vars: typing.Dict[int, str] = {}
+        self.bot_interface_vars: typing.Dict[int, str] = {}
+        # dicts mapping a Name id to variable string name
+        # for variables used in the if expr
+        self.expr_vars_accessed_before_mod = {}
+        self.expr_modified_vars = {}
+        self.expr_used_vars = {}
+        # dicts mapping Name id to highest version at end of &#34;block&#34;
+        self.expr_highest_var_vers = {}
+        self.ifbody_highest_var_vers = {}
+        self.elsebody_highest_var_vers = {}
+
+        # dicts mapping a Name id to its fullid
+        self.top_interface_in = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        self.condition_in = {}
+        self.condition_out = {}
+        self.decision_in = {}
+        self.decision_out = {}
+        # GrFN VariableNode for the condition node
+        self.condition_var = None
+
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+        self.condition_lambda: str
+        self.decision_lambda: str
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;expr&#34;] = self.expr.to_dict()
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;orelse&#34;] = [node.to_dict() for node in self.orelse]
+        result[&#34;con_scope&#34;] = self.con_scope
+        result[&#34;base_func_scopestr&#34;] = self.base_func_scopestr
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelIf):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelIf.__str__(self)
+
+
+class AnnCastModelReturn(AnnCastNode):
+    def __init__(self, value, source_refs):
+        super().__init__(self)
+        self.value = value
+        self.source_refs = source_refs
+        # cache the FunctionDef node that this return statement lies in
+        self.owning_func_def: typing.Optional[AnnCastFunctionDef] = None
+        # store GrfnAssignment for use in GrFN generation
+        self.grfn_assignment: typing.Optional[GrfnAssignment] = None
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;value&#34;] = self.value.to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelReturn):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelReturn.__str__(self)
+
+
+class AnnCastModule(AnnCastNode):
+    def __init__(self, name, body, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.body = body
+        self.source_refs = source_refs
+
+        # dicts mapping a Name id to string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str] = {}
+        self.vars_accessed_before_mod: typing.Dict[int, str] = {}
+        self.used_vars: typing.Dict[int, str] = {}
+        self.con_scope: typing.List
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;name&#34;] = str(self.name)
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;con_scope&#34;] = self.con_scope
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModule):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Module.__str__(self)
+
+
+class AnnCastName(AnnCastNode):
+    def __init__(self, name, id, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.id = id
+        self.source_refs = source_refs
+        # container_scope is used to aid GrFN generation
+        self.con_scope: typing.List = []
+        # Function scopestr this Name node is &#34;living&#34; in
+        self.base_func_scopestr: str = &#34;&#34;
+        # versions are bound to the cope of the variable
+        self.version = None
+        self.grfn_id = None
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;name&#34;] = self.name
+        result[&#34;id&#34;] = self.id
+        result[&#34;version&#34;] = self.version
+        result[&#34;con_scope&#34;] = self.con_scope
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastName):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Name.__str__(self)
+
+class AnnCastOperator(AnnCastNode):
+    def __init__(self, source_language, interpreter, version, op, operands, source_refs):
+        super().__init__(self)
+        self.source_language = source_language
+        self.interpreter = interpreter
+        self.version = version
+        self.op = op
+        self.operands = operands
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;source_language&#34;] = str(self.source_language)
+        result[&#34;interpreter&#34;] = str(self.interpreter)
+        result[&#34;version&#34;] = str(self.version)
+        result[&#34;op&#34;] = str(self.op)
+        result[&#34;operands&#34;] = [operand.to_dict() for operand in self.operands]
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastOperator):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Operator.__str__(self)
+
+
+class AnnCastSet(AnnCastNode):
+    def __init__(self, values, source_refs):
+        super().__init__(self)
+        self.values = values
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add values to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastSet):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Set.__str__(self)
+
+
+class AnnCastTuple(AnnCastNode):
+    def __init__(self, values, source_refs):
+        super().__init__(self)
+        self.values = values
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add values to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastTuple):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Tuple.__str__(self)
+
+
+class AnnCastVar(AnnCastNode):
+    def __init__(self, val, type, default_value, source_refs):
+        super().__init__(self)
+        self.val = val
+        self.type = type
+        self.default_value = default_value
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;val&#34;] = self.val.to_dict()
+        result[&#34;type&#34;] = str(self.type)
+        result[&#34;default_value&#34;] = str(self.default_value)
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastVar):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Var.__str__(self)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment"><code class="flex name class">
+<span>class <span class="ident">AnnCastAssignment</span></span>
+<span>(</span><span>left, right, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastAssignment(AnnCastNode):
+    def __init__(self, left, right, source_refs):
+        super().__init__(self)
+        self.left = left
+        self.right = right
+        self.source_refs = source_refs
+
+        self.grfn_assignment: GrfnAssignment
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;left&#34;] = self.left.to_dict()
+        result[&#34;right&#34;] = self.right.to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastAssignment):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Assignment.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastAssignment):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute"><code class="flex name class">
+<span>class <span class="ident">AnnCastAttribute</span></span>
+<span>(</span><span>value, attr, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastAttribute(AnnCastNode):
+    def __init__(self, value, attr, source_refs):
+        super().__init__(self)
+        self.value = value
+        self.attr = attr
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add value and attr to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastAttribute):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Attribute.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastAttribute):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall"><code class="flex name class">
+<span>class <span class="ident">AnnCastCall</span></span>
+<span>(</span><span>func, arguments, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastCall(AnnCastNode):
+    def __init__(self, func, arguments, source_refs):
+        super().__init__(self)
+        self.func: AnnCastName = func
+        self.arguments = arguments
+        self.source_refs = source_refs
+
+        # the index of this Call node over all invocations of this function
+        self.invocation_index: int
+
+        # dicts mapping a Name id to its fullid
+        self.top_interface_in = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        # dicts mapping Name id to Name string
+        self.top_interface_vars = {}
+        self.bot_interface_vars = {}
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+
+        # for top_interface_out
+        # mapping Name id to fullid
+        # to determine this, we check if we store version 0 on any Name node
+        self.globals_accessed_before_mod = {}
+        self.used_globals = {}
+
+        # for bot_interface
+        # map Name id to fullid
+        self.in_ret_val = {}
+        self.out_ret_val = {}
+
+        # if this is a GrFN 2.2 Call, we will copy the associated FunctionDef
+        # to make the GrFN 2.2 container
+        self.is_grfn_2_2: bool = False
+        # copied function def for GrFN 2.2
+        self.func_def_copy: typing.Optional[AnnCastFunctionDef] = None
+
+        # keep track of whether the Call has an associated FunctionDef
+        # and if the Call should return a value
+        self.has_func_def: bool = False
+        self.has_ret_val: bool = False
+
+        # dict mapping argument index to created argument fullid
+        self.arg_index_to_fullid = {}
+        self.param_index_to_fullid = {}
+        # this dict maps argument positional index to GrfnAssignment&#39;s
+        # Each GrfnAssignment stores the ASSIGN/LITERAL node,
+        # the inputs to the ASSIGN/LITERAL node, and the outputs to the ASSIGN/LITERAL node
+        # In this case, the output will map the arguments fullid to its grfn_id
+        self.arg_assignments: typing.Dict[int, GrfnAssignment] = {}
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;func&#34;] = self.func.to_dict()
+        result[&#34;arguments&#34;] = [arg.to_dict() for arg in self.arguments]
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastCall):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Call.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastCall):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef"><code class="flex name class">
+<span>class <span class="ident">AnnCastFunctionDef</span></span>
+<span>(</span><span>name, func_args, body, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastFunctionDef(AnnCastNode):
+    def __init__(self, name, func_args, body, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.func_args = func_args
+        self.body = body
+        self.source_refs = source_refs
+
+        self.con_scope: typing.List
+
+        # For CAST coming from C, we determine if the function
+        # has a return value by looking for a CAST Return node.
+        # We do this during the ContainerScopePass.
+        # FUTURE: What should be done with CAST coming from Python?
+        # In Python, every function returns something,
+        # either None or the explicit return value
+        self.has_ret_val: bool = False
+        # for bot_interface
+        # in_ret_val and out_ret_val map Name id to fullid
+        self.in_ret_val = {}
+        self.out_ret_val = {}
+
+        # dicts mapping a Name id to its string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str]
+        self.vars_accessed_before_mod: typing.Dict[int, str]
+        self.used_vars: typing.Dict[int, str]
+        # for now, top_interface_vars and bot_interface_vars only include globals
+        # since those variables cross the container boundaries
+        self.top_interface_vars: typing.Dict[int, str] = {}
+        self.bot_interface_vars: typing.Dict[int, str] = {}
+        # dicts for global variables
+        # for top_interface_out
+        # mapping Name id to fullid
+        # to determine this, we check if we store version 0 on any Name node
+        self.globals_accessed_before_mod = {}
+        self.used_globals = {}
+        # for bot interface in
+        self.modified_globals = {}
+
+        # dict mapping argument index to created argument fullid
+        self.arg_index_to_fullid = {}
+        self.param_index_to_fullid = {}
+
+        # dicts mapping a Name id to its fullid
+        self.top_interface_in = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+
+        # dict mapping Name id to highest version at end of &#34;block&#34;
+        self.body_highest_var_vers = {}
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+        # dummy assignments to handle Python dynamic variable creation
+        self.dummy_grfn_assignments = []
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;name&#34;] = self.name.to_dict()
+        result[&#34;func_args&#34;] = [arg.to_dict() for arg in self.func_args]
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;con_scope&#34;] = self.con_scope
+        result[&#34;has_ret_val&#34;] = self.has_ret_val
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastFunctionDef):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return FunctionDef.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastFunctionDef):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue"><code class="flex name class">
+<span>class <span class="ident">AnnCastLiteralValue</span></span>
+<span>(</span><span>value_type, value, source_code_data_type, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastLiteralValue(AnnCastNode):
+    def __init__(self, value_type, value, source_code_data_type, source_refs):
+        super().__init__(self)
+        self.value_type = value_type
+        self.value = value
+        self.source_code_data_type = source_code_data_type
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastLiteralValue):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return LiteralValue.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastLiteralValue):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop"><code class="flex name class">
+<span>class <span class="ident">AnnCastLoop</span></span>
+<span>(</span><span>pre, expr, body, post, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastLoop(AnnCastNode):
+    def __init__(self, pre, expr, body, post, source_refs):
+        super().__init__(self)
+        self.pre = pre
+        self.expr = expr
+        self.body = body
+        self.post = post
+        self.source_refs = source_refs
+
+        # Loop container scope
+        self.con_scope: typing.List
+        # Function scopestr this Loop node is &#34;living&#34; in
+        self.base_func_scopestr: str = &#34;&#34;
+
+        # dicts mapping a Name id to its string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str]
+        self.vars_accessed_before_mod: typing.Dict[int, str]
+        self.used_vars: typing.Dict[int, str]
+        self.top_interface_vars: typing.Dict[int, str] = {}
+        self.top_interface_updated_vars: typing.Dict[int, str] = {}
+        self.bot_interface_vars: typing.Dict[int, str] = {}
+
+        # dicts mapping Name id to highest version at end of &#34;block&#34;
+        self.pre_highest_var_vers = {}
+        self.expr_highest_var_vers = {}
+        self.body_highest_var_vers = {}
+        self.post_highest_var_vers = {}
+
+        # dicts mapping a Name id to variable string name
+        # for variables used in the Loop expr
+        self.expr_vars_accessed_before_mod = {}
+        self.expr_modified_vars = {}
+        self.expr_used_vars = {}
+
+        # dicts mapping a Name id to its fullid
+        # initial versions for the top interface come from enclosing scope
+        # updated versions for the top interface are versions
+        # at the bottom of the loop after one or more executions of the loop
+        self.top_interface_initial = {}
+        self.top_interface_updated = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        self.condition_in = {}
+        self.condition_out = {}
+        # GrFN VariableNode for the condition node
+        self.condition_var = None
+
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+        self.condition_lambda: str
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        # result[&#34;init&#34;] = [node.to_dict() for node in self.init]
+        result[&#34;expr&#34;] = self.expr.to_dict()
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;con_scope&#34;] = self.con_scope
+        result[&#34;base_func_scopestr&#34;] = self.base_func_scopestr
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastLoop):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Loop.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastLoop):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak"><code class="flex name class">
+<span>class <span class="ident">AnnCastModelBreak</span></span>
+<span>(</span><span>source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastModelBreak(AnnCastNode):
+    def __init__(self, source_refs):
+        super().__init__(self)
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelBreak):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelBreak.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastModelBreak):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue"><code class="flex name class">
+<span>class <span class="ident">AnnCastModelContinue</span></span>
+<span>(</span><span>node: <a title="skema.program_analysis.CAST2FN.model.cast.model_continue.ModelContinue" href="../model/cast/model_continue.html#skema.program_analysis.CAST2FN.model.cast.model_continue.ModelContinue">ModelContinue</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastModelContinue(AnnCastNode):
+    def __init__(self, node: ModelContinue):
+        super().__init__(self)
+        self.source_refs = node.source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelContinue):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelContinue.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastModelContinue):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf"><code class="flex name class">
+<span>class <span class="ident">AnnCastModelIf</span></span>
+<span>(</span><span>expr, body, orelse, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastModelIf(AnnCastNode):
+    def __init__(self, expr, body, orelse, source_refs):
+        super().__init__(self)
+        self.expr = expr
+        self.body = body
+        self.orelse = orelse
+        self.source_refs = source_refs
+
+        # ModelIf container scope
+        self.con_scope: typing.List
+        # Function scopestr this ModelIf node is &#34;living&#34; in
+        self.base_func_scopestr: str = &#34;&#34;
+
+        # dicts mapping a Name id to string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str]
+        self.vars_accessed_before_mod: typing.Dict[int, str]
+        self.used_vars: typing.Dict[int, str]
+        self.top_interface_vars: typing.Dict[int, str] = {}
+        self.bot_interface_vars: typing.Dict[int, str] = {}
+        # dicts mapping a Name id to variable string name
+        # for variables used in the if expr
+        self.expr_vars_accessed_before_mod = {}
+        self.expr_modified_vars = {}
+        self.expr_used_vars = {}
+        # dicts mapping Name id to highest version at end of &#34;block&#34;
+        self.expr_highest_var_vers = {}
+        self.ifbody_highest_var_vers = {}
+        self.elsebody_highest_var_vers = {}
+
+        # dicts mapping a Name id to its fullid
+        self.top_interface_in = {}
+        self.top_interface_out = {}
+        self.bot_interface_in = {}
+        self.bot_interface_out = {}
+        self.condition_in = {}
+        self.condition_out = {}
+        self.decision_in = {}
+        self.decision_out = {}
+        # GrFN VariableNode for the condition node
+        self.condition_var = None
+
+        # GrFN lambda expressions
+        self.top_interface_lambda: str
+        self.bot_interface_lambda: str
+        self.condition_lambda: str
+        self.decision_lambda: str
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;expr&#34;] = self.expr.to_dict()
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;orelse&#34;] = [node.to_dict() for node in self.orelse]
+        result[&#34;con_scope&#34;] = self.con_scope
+        result[&#34;base_func_scopestr&#34;] = self.base_func_scopestr
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelIf):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelIf.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastModelIf):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport"><code class="flex name class">
+<span>class <span class="ident">AnnCastModelImport</span></span>
+<span>(</span><span>node: <a title="skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport" href="../model/cast/model_import.html#skema.program_analysis.CAST2FN.model.cast.model_import.ModelImport">ModelImport</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastModelImport(AnnCastNode):
+    def __init__(self, node: ModelImport):
+        super().__init__(self)
+        self.name = node.name
+        self.alias = node.alias
+        self.symbol = node.symbol
+        self.all = node.all
+        self.source_refs = node.source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelImport):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelImport.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastModelImport):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn"><code class="flex name class">
+<span>class <span class="ident">AnnCastModelReturn</span></span>
+<span>(</span><span>value, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastModelReturn(AnnCastNode):
+    def __init__(self, value, source_refs):
+        super().__init__(self)
+        self.value = value
+        self.source_refs = source_refs
+        # cache the FunctionDef node that this return statement lies in
+        self.owning_func_def: typing.Optional[AnnCastFunctionDef] = None
+        # store GrfnAssignment for use in GrFN generation
+        self.grfn_assignment: typing.Optional[GrfnAssignment] = None
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;value&#34;] = self.value.to_dict()
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModelReturn):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return ModelReturn.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastModelReturn):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule"><code class="flex name class">
+<span>class <span class="ident">AnnCastModule</span></span>
+<span>(</span><span>name, body, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastModule(AnnCastNode):
+    def __init__(self, name, body, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.body = body
+        self.source_refs = source_refs
+
+        # dicts mapping a Name id to string name
+        # used for container interfaces
+        self.modified_vars: typing.Dict[int, str] = {}
+        self.vars_accessed_before_mod: typing.Dict[int, str] = {}
+        self.used_vars: typing.Dict[int, str] = {}
+        self.con_scope: typing.List
+
+        # metadata attributes
+        self.grfn_con_src_ref: GrfnContainerSrcRef
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;name&#34;] = str(self.name)
+        result[&#34;body&#34;] = [node.to_dict() for node in self.body]
+        result[&#34;con_scope&#34;] = self.con_scope
+        # FUTURE: add attributes to enhance test coverage
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastModule):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Module.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastModule):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName"><code class="flex name class">
+<span>class <span class="ident">AnnCastName</span></span>
+<span>(</span><span>name, id, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastName(AnnCastNode):
+    def __init__(self, name, id, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.id = id
+        self.source_refs = source_refs
+        # container_scope is used to aid GrFN generation
+        self.con_scope: typing.List = []
+        # Function scopestr this Name node is &#34;living&#34; in
+        self.base_func_scopestr: str = &#34;&#34;
+        # versions are bound to the cope of the variable
+        self.version = None
+        self.grfn_id = None
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;name&#34;] = self.name
+        result[&#34;id&#34;] = self.id
+        result[&#34;version&#34;] = self.version
+        result[&#34;con_scope&#34;] = self.con_scope
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastName):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Name.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastName):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode"><code class="flex name class">
+<span>class <span class="ident">AnnCastNode</span></span>
+<span>(</span><span>*args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastNode(AstNode):
+    def __init__(self, *args, **kwargs):
+        super().__init__(self)
+        self.expr_str: str = &#34;&#34;
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;expr_str&#34;] = self.expr_str
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastNode):
+            return False
+        return self.to_dict() == other.to_dict()</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment">AnnCastAssignment</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute">AnnCastAttribute</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall">AnnCastCall</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef">AnnCastFunctionDef</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue">AnnCastLiteralValue</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop">AnnCastLoop</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak">AnnCastModelBreak</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue">AnnCastModelContinue</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf">AnnCastModelIf</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport">AnnCastModelImport</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn">AnnCastModelReturn</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule">AnnCastModule</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName">AnnCastName</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator">AnnCastOperator</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef">AnnCastRecordDef</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet">AnnCastSet</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple">AnnCastTuple</a></li>
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar">AnnCastVar</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastNode):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator"><code class="flex name class">
+<span>class <span class="ident">AnnCastOperator</span></span>
+<span>(</span><span>source_language, interpreter, version, op, operands, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastOperator(AnnCastNode):
+    def __init__(self, source_language, interpreter, version, op, operands, source_refs):
+        super().__init__(self)
+        self.source_language = source_language
+        self.interpreter = interpreter
+        self.version = version
+        self.op = op
+        self.operands = operands
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;source_language&#34;] = str(self.source_language)
+        result[&#34;interpreter&#34;] = str(self.interpreter)
+        result[&#34;version&#34;] = str(self.version)
+        result[&#34;op&#34;] = str(self.op)
+        result[&#34;operands&#34;] = [operand.to_dict() for operand in self.operands]
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastOperator):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Operator.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastOperator):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef"><code class="flex name class">
+<span>class <span class="ident">AnnCastRecordDef</span></span>
+<span>(</span><span>name, bases, funcs, fields, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastRecordDef(AnnCastNode):
+    def __init__(self, name, bases, funcs, fields, source_refs):
+        super().__init__(self)
+        self.name = name
+        self.bases = bases
+        self.funcs = funcs
+        self.fields = fields
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add attributes to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastRecordDef):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return RecordDef.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastRecordDef):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet"><code class="flex name class">
+<span>class <span class="ident">AnnCastSet</span></span>
+<span>(</span><span>values, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastSet(AnnCastNode):
+    def __init__(self, values, source_refs):
+        super().__init__(self)
+        self.values = values
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add values to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastSet):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Set.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastSet):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple"><code class="flex name class">
+<span>class <span class="ident">AnnCastTuple</span></span>
+<span>(</span><span>values, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastTuple(AnnCastNode):
+    def __init__(self, values, source_refs):
+        super().__init__(self)
+        self.values = values
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        # FUTURE: add values to result
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastTuple):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Tuple.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastTuple):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar"><code class="flex name class">
+<span>class <span class="ident">AnnCastVar</span></span>
+<span>(</span><span>val, type, default_value, source_refs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>NOTE: This class is auto generated by the swagger code generator program.</p>
+<p>Do not edit the class manually.</p>
+<p>AstNode - a model defined in Swagger</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class AnnCastVar(AnnCastNode):
+    def __init__(self, val, type, default_value, source_refs):
+        super().__init__(self)
+        self.val = val
+        self.type = type
+        self.default_value = default_value
+        self.source_refs = source_refs
+
+    def to_dict(self):
+        result = super().to_dict()
+        result[&#34;val&#34;] = self.val.to_dict()
+        result[&#34;type&#34;] = str(self.type)
+        result[&#34;default_value&#34;] = str(self.default_value)
+        return result
+
+    def equiv(self, other):
+        if not isinstance(other, AnnCastVar):
+            return False
+        return self.to_dict() == other.to_dict()
+
+    def __str__(self):
+        return Var.__str__(self)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></li>
+<li><a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    if not isinstance(other, AnnCastVar):
+        return False
+    return self.to_dict() == other.to_dict()</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></b></code>:
+<ul class="hlist">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.source_refs" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.source_refs">source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_dict" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_dict">to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.to_str" href="../model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode.to_str">to_str</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState"><code class="flex name class">
+<span>class <span class="ident">PipelineState</span></span>
+<span>(</span><span>ann_nodes: List[~T], grfn2_2: bool)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PipelineState:
+    def __init__(self, ann_nodes: typing.List, grfn2_2: bool):
+        self.GENERATE_GRFN_2_2 = grfn2_2
+        self.PRINT_DEBUGGING_INFO = False
+        self.nodes = ann_nodes
+        # populated after IdCollapsePass, and used to give ids to GrFN condition variables
+        self.collapsed_id_counter = 0
+        # dict mapping FunctionDef container scopestr to its id
+        self.func_con_scopestr_to_id = {}
+        # dict mapping container scope strings to their nodes
+        self.con_scopestr_to_node = {}
+        # dict mapping function IDs to their FunctionDef nodes.
+        self.func_id_to_def = {}
+        self.grfn_id_to_grfn_var = {}
+        # the fullid of a AnnCastName node is a string which includes its
+        # variable name, numerical id, version, and scope
+        self.fullid_to_grfn_id = {}
+        # `module_node` is simply a reference to the AnnCastModule node
+        # FUTURE: to handle multiple modules for Python this will need to be extended
+        # for the most part, the module node is used to determine globals
+        self.module_node = None
+        # GrFN stored after ToGrfnPass
+        self.grfn: typing.Optional[GroundedFunctionNetwork] = None
+
+        # flag deciding whether or not to use GE&#39;s interpretation of From Source
+        # when populating metadata information
+        #
+        # For GE, all instances of a variable which exists in the source code should
+        # be considered from source.
+        # We think this loses information about the GrFN variables we create to facilitate
+        # transition between interfaces. That is, we create many GrFN variables which
+        # do not literally exist in source, and so don&#39;t consider those to be from source
+        self.FROM_SOURCE_FOR_GE = True
+
+        self.gromet_collection = None
+
+    def get_nodes(self):
+        return self.nodes
+
+    def is_var_local_to_func(self, scopestr: str, id: int):
+        &#34;&#34;&#34;
+        Precondition: scopestr is the scopestr of a FunctionDef
+        Check if the variable with id `id` is neither a global nor a formal parameter
+        &#34;&#34;&#34;
+        if self.is_global_var(id):
+            return False
+
+        func_def_node = self.func_def_node_from_scopestr(scopestr)
+        for param in func_def_node.func_args:
+            if id == param.val.id:
+                return False
+
+        return True
+
+    def is_container(self, scopestr: str):
+        &#34;&#34;&#34;
+        Check if scopestr is a container scopestr
+        &#34;&#34;&#34;
+        return scopestr in self.con_scopestr_to_node
+
+    def con_node_from_scopestr(self, scopestr: str):
+        &#34;&#34;&#34;
+        Precondition: scopestr is a container scopestr
+        Return the container node associated with scopestr
+        &#34;&#34;&#34;
+        return self.con_scopestr_to_node[scopestr]
+
+    def get_grfn(self) -&gt; typing.Optional[GroundedFunctionNetwork]:
+        return self.grfn
+
+    def func_def_exists(self, id: int) -&gt; bool:
+        &#34;&#34;&#34;
+        Check if there is a FuncionDef for id
+        &#34;&#34;&#34;
+        return id in self.func_id_to_def
+
+    def is_con_scopestr_func_def(self, con_scopestr: str):
+        return con_scopestr in self.func_con_scopestr_to_id
+
+    def func_def_node_from_scopestr(self, con_scopestr: str):
+        &#34;&#34;&#34;
+        Return the AnnCastFuncitonDef node for the container scope
+        defined by `con_scopestr`
+        &#34;&#34;&#34;
+        function_id = self.func_con_scopestr_to_id[con_scopestr]
+        return self.func_id_to_def[function_id]
+
+    def func_def_node_from_id(self, id: int):
+        &#34;&#34;&#34;
+        Return the FunctionDef for `id`
+        &#34;&#34;&#34;
+        assert self.func_def_exists(id)
+        return self.func_id_to_def[id]
+
+    def is_global_var(self, id: int):
+        &#34;&#34;&#34;
+        Check if id is in the used_variables attribute of the module node
+        &#34;&#34;&#34;
+        return id in self.module_node.used_vars
+
+    def all_globals_dict(self):
+        &#34;&#34;&#34;
+        Return a dict mapping id to string name for all global variables
+        &#34;&#34;&#34;
+        return self.module_node.used_vars
+
+    def next_collapsed_id(self):
+        &#34;&#34;&#34;
+        Return the next collapsed id, and increment `collapsed_id_counter`
+        &#34;&#34;&#34;
+        to_return = self.collapsed_id_counter
+        self.collapsed_id_counter += 1
+        return to_return
+
+    def store_grfn_var(self, fullid: str, grfn_var: VariableNode):
+        &#34;&#34;&#34;
+        Cache `grfn_var` in `grfn_id_to_grfn_var` and add `fullid` to `fullid_to_grfn_id`
+        &#34;&#34;&#34;
+        self.fullid_to_grfn_id[fullid] = grfn_var.uid
+        self.grfn_id_to_grfn_var[grfn_var.uid] = grfn_var
+
+    def grfn_var_exists(self, fullid: str):
+        &#34;&#34;&#34;
+        Returns the whether the GrFN VariableNode associated with `fullid` has already been created
+        &#34;&#34;&#34;
+        return fullid in self.fullid_to_grfn_id
+
+    def get_grfn_var(self, fullid: str):
+        &#34;&#34;&#34;
+        Returns the cached GrFN VariableNode associated with `fullid`
+        &#34;&#34;&#34;
+        grfn_id = self.fullid_to_grfn_id[fullid]
+        return self.grfn_id_to_grfn_var[grfn_id]
+
+    def alias_grfn_vars(self, src_fullid: str, tgt_fullid: str):
+        &#34;&#34;&#34;
+        Put the GrFN id associated with `tgt_fullid` into dict `fullid_to_grfn_id` for key
+        `src_fullid`
+        &#34;&#34;&#34;
+        self.fullid_to_grfn_id[src_fullid] = self.fullid_to_grfn_id[tgt_fullid]
+
+    def equiv(self, other):
+        &#34;&#34;&#34;
+        Check if the PipelineState nodes are equivalent to other&#39;s
+        Used in the test suite
+        &#34;&#34;&#34;
+        # FUTURE: once the PiplelineState nodes attribute stores multiple modules,
+        # we may need to check that the ordering is consistent.  Currently,
+        # CAST and the AnnnotatedCast nodes only have a single module, so this is not a concern
+        for i, node in enumerate(self.nodes):
+            if not node.equiv(other.nodes[i]):
+                # printing diff to help locating difference
+                # because we do not overwrite the __str__() methods,
+                # this has limited usefullness, but its better than nothing
+                print(f&#34;AnnCast equiv failed:&#34;)
+                self_lines = str(node).splitlines()
+                other_lines = str(other.nodes[i]).splitlines()
+                for i, diff in enumerate(
+                    difflib.ndiff(self_lines, other_lines)
+                ):
+                    if diff[0] == &#34; &#34;:
+                        continue
+                    print(f&#34;Line {i}: {diff}&#34;)
+
+                return False
+
+        return True</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.alias_grfn_vars"><code class="name flex">
+<span>def <span class="ident">alias_grfn_vars</span></span>(<span>self, src_fullid: str, tgt_fullid: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Put the GrFN id associated with <code>tgt_fullid</code> into dict <code>fullid_to_grfn_id</code> for key
+<code>src_fullid</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def alias_grfn_vars(self, src_fullid: str, tgt_fullid: str):
+    &#34;&#34;&#34;
+    Put the GrFN id associated with `tgt_fullid` into dict `fullid_to_grfn_id` for key
+    `src_fullid`
+    &#34;&#34;&#34;
+    self.fullid_to_grfn_id[src_fullid] = self.fullid_to_grfn_id[tgt_fullid]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.all_globals_dict"><code class="name flex">
+<span>def <span class="ident">all_globals_dict</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return a dict mapping id to string name for all global variables</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def all_globals_dict(self):
+    &#34;&#34;&#34;
+    Return a dict mapping id to string name for all global variables
+    &#34;&#34;&#34;
+    return self.module_node.used_vars</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.con_node_from_scopestr"><code class="name flex">
+<span>def <span class="ident">con_node_from_scopestr</span></span>(<span>self, scopestr: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Precondition: scopestr is a container scopestr
+Return the container node associated with scopestr</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def con_node_from_scopestr(self, scopestr: str):
+    &#34;&#34;&#34;
+    Precondition: scopestr is a container scopestr
+    Return the container node associated with scopestr
+    &#34;&#34;&#34;
+    return self.con_scopestr_to_node[scopestr]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.equiv"><code class="name flex">
+<span>def <span class="ident">equiv</span></span>(<span>self, other)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the PipelineState nodes are equivalent to other's
+Used in the test suite</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def equiv(self, other):
+    &#34;&#34;&#34;
+    Check if the PipelineState nodes are equivalent to other&#39;s
+    Used in the test suite
+    &#34;&#34;&#34;
+    # FUTURE: once the PiplelineState nodes attribute stores multiple modules,
+    # we may need to check that the ordering is consistent.  Currently,
+    # CAST and the AnnnotatedCast nodes only have a single module, so this is not a concern
+    for i, node in enumerate(self.nodes):
+        if not node.equiv(other.nodes[i]):
+            # printing diff to help locating difference
+            # because we do not overwrite the __str__() methods,
+            # this has limited usefullness, but its better than nothing
+            print(f&#34;AnnCast equiv failed:&#34;)
+            self_lines = str(node).splitlines()
+            other_lines = str(other.nodes[i]).splitlines()
+            for i, diff in enumerate(
+                difflib.ndiff(self_lines, other_lines)
+            ):
+                if diff[0] == &#34; &#34;:
+                    continue
+                print(f&#34;Line {i}: {diff}&#34;)
+
+            return False
+
+    return True</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_exists"><code class="name flex">
+<span>def <span class="ident">func_def_exists</span></span>(<span>self, id: int) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if there is a FuncionDef for id</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def func_def_exists(self, id: int) -&gt; bool:
+    &#34;&#34;&#34;
+    Check if there is a FuncionDef for id
+    &#34;&#34;&#34;
+    return id in self.func_id_to_def</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_node_from_id"><code class="name flex">
+<span>def <span class="ident">func_def_node_from_id</span></span>(<span>self, id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the FunctionDef for <code>id</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def func_def_node_from_id(self, id: int):
+    &#34;&#34;&#34;
+    Return the FunctionDef for `id`
+    &#34;&#34;&#34;
+    assert self.func_def_exists(id)
+    return self.func_id_to_def[id]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_node_from_scopestr"><code class="name flex">
+<span>def <span class="ident">func_def_node_from_scopestr</span></span>(<span>self, con_scopestr: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the AnnCastFuncitonDef node for the container scope
+defined by <code>con_scopestr</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def func_def_node_from_scopestr(self, con_scopestr: str):
+    &#34;&#34;&#34;
+    Return the AnnCastFuncitonDef node for the container scope
+    defined by `con_scopestr`
+    &#34;&#34;&#34;
+    function_id = self.func_con_scopestr_to_id[con_scopestr]
+    return self.func_id_to_def[function_id]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_grfn"><code class="name flex">
+<span>def <span class="ident">get_grfn</span></span>(<span>self) ‑> Optional[skema.model_assembly.networks.GroundedFunctionNetwork]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_grfn(self) -&gt; typing.Optional[GroundedFunctionNetwork]:
+    return self.grfn</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_grfn_var"><code class="name flex">
+<span>def <span class="ident">get_grfn_var</span></span>(<span>self, fullid: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the cached GrFN VariableNode associated with <code>fullid</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_grfn_var(self, fullid: str):
+    &#34;&#34;&#34;
+    Returns the cached GrFN VariableNode associated with `fullid`
+    &#34;&#34;&#34;
+    grfn_id = self.fullid_to_grfn_id[fullid]
+    return self.grfn_id_to_grfn_var[grfn_id]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_nodes"><code class="name flex">
+<span>def <span class="ident">get_nodes</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_nodes(self):
+    return self.nodes</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.grfn_var_exists"><code class="name flex">
+<span>def <span class="ident">grfn_var_exists</span></span>(<span>self, fullid: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns the whether the GrFN VariableNode associated with <code>fullid</code> has already been created</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def grfn_var_exists(self, fullid: str):
+    &#34;&#34;&#34;
+    Returns the whether the GrFN VariableNode associated with `fullid` has already been created
+    &#34;&#34;&#34;
+    return fullid in self.fullid_to_grfn_id</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_con_scopestr_func_def"><code class="name flex">
+<span>def <span class="ident">is_con_scopestr_func_def</span></span>(<span>self, con_scopestr: str)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_con_scopestr_func_def(self, con_scopestr: str):
+    return con_scopestr in self.func_con_scopestr_to_id</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_container"><code class="name flex">
+<span>def <span class="ident">is_container</span></span>(<span>self, scopestr: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if scopestr is a container scopestr</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_container(self, scopestr: str):
+    &#34;&#34;&#34;
+    Check if scopestr is a container scopestr
+    &#34;&#34;&#34;
+    return scopestr in self.con_scopestr_to_node</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_global_var"><code class="name flex">
+<span>def <span class="ident">is_global_var</span></span>(<span>self, id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if id is in the used_variables attribute of the module node</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_global_var(self, id: int):
+    &#34;&#34;&#34;
+    Check if id is in the used_variables attribute of the module node
+    &#34;&#34;&#34;
+    return id in self.module_node.used_vars</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_var_local_to_func"><code class="name flex">
+<span>def <span class="ident">is_var_local_to_func</span></span>(<span>self, scopestr: str, id: int)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Precondition: scopestr is the scopestr of a FunctionDef
+Check if the variable with id <code>id</code> is neither a global nor a formal parameter</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_var_local_to_func(self, scopestr: str, id: int):
+    &#34;&#34;&#34;
+    Precondition: scopestr is the scopestr of a FunctionDef
+    Check if the variable with id `id` is neither a global nor a formal parameter
+    &#34;&#34;&#34;
+    if self.is_global_var(id):
+        return False
+
+    func_def_node = self.func_def_node_from_scopestr(scopestr)
+    for param in func_def_node.func_args:
+        if id == param.val.id:
+            return False
+
+    return True</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.next_collapsed_id"><code class="name flex">
+<span>def <span class="ident">next_collapsed_id</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the next collapsed id, and increment <code>collapsed_id_counter</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def next_collapsed_id(self):
+    &#34;&#34;&#34;
+    Return the next collapsed id, and increment `collapsed_id_counter`
+    &#34;&#34;&#34;
+    to_return = self.collapsed_id_counter
+    self.collapsed_id_counter += 1
+    return to_return</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.store_grfn_var"><code class="name flex">
+<span>def <span class="ident">store_grfn_var</span></span>(<span>self, fullid: str, grfn_var: skema.model_assembly.networks.VariableNode)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Cache <code>grfn_var</code> in <code>grfn_id_to_grfn_var</code> and add <code>fullid</code> to <code>fullid_to_grfn_id</code></p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def store_grfn_var(self, fullid: str, grfn_var: VariableNode):
+    &#34;&#34;&#34;
+    Cache `grfn_var` in `grfn_id_to_grfn_var` and add `fullid` to `fullid_to_grfn_id`
+    &#34;&#34;&#34;
+    self.fullid_to_grfn_id[fullid] = grfn_var.uid
+    self.grfn_id_to_grfn_var[grfn_var.uid] = grfn_var</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast" href="index.html">skema.program_analysis.CAST2FN.ann_cast</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment">AnnCastAssignment</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAssignment.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute">AnnCastAttribute</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastAttribute.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall">AnnCastCall</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastCall.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef">AnnCastFunctionDef</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastFunctionDef.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue">AnnCastLiteralValue</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLiteralValue.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop">AnnCastLoop</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastLoop.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak">AnnCastModelBreak</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelBreak.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue">AnnCastModelContinue</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelContinue.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf">AnnCastModelIf</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelIf.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport">AnnCastModelImport</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelImport.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn">AnnCastModelReturn</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModelReturn.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule">AnnCastModule</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastModule.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName">AnnCastName</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastName.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode">AnnCastNode</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastNode.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator">AnnCastOperator</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastOperator.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef">AnnCastRecordDef</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastRecordDef.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet">AnnCastSet</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastSet.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple">AnnCastTuple</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastTuple.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar">AnnCastVar</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.AnnCastVar.equiv">equiv</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState">PipelineState</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.alias_grfn_vars" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.alias_grfn_vars">alias_grfn_vars</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.all_globals_dict" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.all_globals_dict">all_globals_dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.con_node_from_scopestr" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.con_node_from_scopestr">con_node_from_scopestr</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.equiv" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.equiv">equiv</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_exists" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_exists">func_def_exists</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_node_from_id" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_node_from_id">func_def_node_from_id</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_node_from_scopestr" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.func_def_node_from_scopestr">func_def_node_from_scopestr</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_grfn" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_grfn">get_grfn</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_grfn_var" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_grfn_var">get_grfn_var</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_nodes" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.get_nodes">get_nodes</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.grfn_var_exists" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.grfn_var_exists">grfn_var_exists</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_con_scopestr_func_def" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_con_scopestr_func_def">is_con_scopestr_func_def</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_container" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_container">is_container</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_global_var" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_global_var">is_global_var</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_var_local_to_func" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.is_var_local_to_func">is_var_local_to_func</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.next_collapsed_id" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.next_collapsed_id">next_collapsed_id</a></code></li>
+<li><code><a title="skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.store_grfn_var" href="#skema.program_analysis.CAST2FN.ann_cast.annotated_cast.PipelineState.store_grfn_var">store_grfn_var</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ConnectionStatus","QueryParam","SSLMode","Value"],"struct":["ConnectParams","Connection","MgError","Node","Path","Record","Relationship","UnboundRelationship"]};

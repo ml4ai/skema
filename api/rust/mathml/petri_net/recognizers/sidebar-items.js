@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_polarity","get_specie_var","is_add_or_subtract_operator","is_leibniz_diff_operator","is_var_candidate"]};
