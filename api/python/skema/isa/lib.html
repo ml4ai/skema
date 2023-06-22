@@ -7,7 +7,7 @@
 <title>skema.isa.lib API documentation</title>
 <meta name="description" content="All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: April 12, 2023" />
+Updated date: June 21, 2023" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -27,7 +27,7 @@ Updated date: April 12, 2023" />
 <section id="section-intro">
 <p>All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: April 12, 2023</p>
+Updated date: June 21, 2023</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -36,7 +36,7 @@ Updated date: April 12, 2023</p>
 &#34;&#34;&#34;
 All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: April 12, 2023
+Updated date: June 21, 2023
 &#34;&#34;&#34;
 
 import warnings
@@ -54,6 +54,9 @@ from graspologic.match import graph_match
 from graphviz import Source
 import graphviz
 from copy import deepcopy
+import Levenshtein
+from typing import Tuple
+import re
 
 # Set up the random seed
 np.random.seed(1)
@@ -61,6 +64,63 @@ rng = np.random.default_rng(1)
 
 # The encodings of basic operators when converting adjacency matrix
 op_dict = {&#34;+&#34;: 1, &#34;-&#34;: 2, &#34;*&#34;: 3, &#34;/&#34;: 4, &#34;=&#34;: 5, &#34;√&#34;: 6}
+
+
+def levenshtein_similarity(var1: str, var2: str) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the Levenshtein similarity between two variable names.
+    The Levenshtein similarity is the ratio of the Levenshtein distance to the maximum length.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The Levenshtein similarity between the two variable names.
+    &#34;&#34;&#34;
+    distance = Levenshtein.distance(var1, var2)
+    max_length = max(len(var1), len(var2))
+    similarity = 1 - (distance / max_length)
+    return similarity
+
+
+def jaccard_similarity(var1: str, var2: str) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the Jaccard similarity between two variable names.
+    The Jaccard similarity is the size of the intersection divided by the size of the union of the variable names.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The Jaccard similarity between the two variable names.
+    &#34;&#34;&#34;
+    set1 = set(var1)
+    set2 = set(var2)
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    similarity = intersection / union
+    return similarity
+
+
+def cosine_similarity(var1: str, var2: str) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the cosine similarity between two variable names.
+    The cosine similarity is the dot product of the character frequency vectors divided by the product of their norms.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The cosine similarity between the two variable names.
+    &#34;&#34;&#34;
+    char_freq1 = {char: var1.count(char) for char in var1}
+    char_freq2 = {char: var2.count(char) for char in var2}
+
+    dot_product = sum(
+        char_freq1.get(char, 0) * char_freq2.get(char, 0) for char in set(var1 + var2)
+    )
+    norm1 = sum(freq**2 for freq in char_freq1.values()) ** 0.5
+    norm2 = sum(freq**2 for freq in char_freq2.values()) ** 0.5
+
+    similarity = dot_product / (norm1 * norm2)
+    return similarity
 
 
 def generate_graph(file: str = &#34;&#34;, render: bool = False) -&gt; pydot.Dot:
@@ -106,21 +166,107 @@ def generate_amatrix(graph: pydot.Dot) -&gt; Tuple[ndarray, List[str]]:
     return amatrix, node_labels
 
 
+def heuristic_compare_variable_names(var1: str, var2: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Compare two variable names in a formula, accounting for Unicode representations.
+    Convert the variable names to English letter representations before comparison.
+
+    Args:
+        var1 (str): The first variable name.
+        var2 (str): The second variable name.
+
+    Returns:
+        bool: True if the variable names are the same, False otherwise.
+    &#34;&#34;&#34;
+    # Mapping of Greek letters to English letter representations
+    greek_letters = {
+        &#34;α&#34;: &#34;alpha&#34;,
+        &#34;β&#34;: &#34;beta&#34;,
+        &#34;γ&#34;: &#34;gamma&#34;,
+        &#34;δ&#34;: &#34;delta&#34;,
+        &#34;ε&#34;: &#34;epsilon&#34;,
+        &#34;ζ&#34;: &#34;zeta&#34;,
+        &#34;η&#34;: &#34;eta&#34;,
+        &#34;θ&#34;: &#34;theta&#34;,
+        &#34;ι&#34;: &#34;iota&#34;,
+        &#34;κ&#34;: &#34;kappa&#34;,
+        &#34;λ&#34;: &#34;lambda&#34;,
+        &#34;μ&#34;: &#34;mu&#34;,
+        &#34;ν&#34;: &#34;nu&#34;,
+        &#34;ξ&#34;: &#34;xi&#34;,
+        &#34;ο&#34;: &#34;omicron&#34;,
+        &#34;π&#34;: &#34;pi&#34;,
+        &#34;ρ&#34;: &#34;rho&#34;,
+        &#34;σ&#34;: &#34;sigma&#34;,
+        &#34;τ&#34;: &#34;tau&#34;,
+        &#34;υ&#34;: &#34;upsilon&#34;,
+        &#34;φ&#34;: &#34;phi&#34;,
+        &#34;χ&#34;: &#34;chi&#34;,
+        &#34;ψ&#34;: &#34;psi&#34;,
+        &#34;ω&#34;: &#34;omega&#34;,
+    }
+
+    # Convert Unicode representations to English letter representations
+    var1 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var1)
+    var2 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var2)
+
+    # Convert Greek letter representations to English letter representations
+    for greek_letter, english_letter in greek_letters.items():
+        var1 = var1.replace(greek_letter, english_letter)
+        var2 = var2.replace(greek_letter, english_letter)
+
+    # Remove trailing quotation marks, if present
+    var1 = var1.strip(&#34;&#39;\&#34;&#34;)
+    var2 = var2.strip(&#34;&#39;\&#34;&#34;)
+
+    # Compare the variable names
+    return var1.lower() == var2.lower()
+
+
 def get_seeds(
-    node_labels1: List[str], node_labels2: List[str]
+    node_labels1: List[str],
+    node_labels2: List[str],
+    method: str = &#34;heuristic&#34;,
+    threshold: float = 0.8,
 ) -&gt; Tuple[List[int], List[int]]:
     &#34;&#34;&#34;
-    Calculate the seeds in the two equations
-    Input: the name lists of the variables and terms in the equation 1 and the equation 2
-    Output: the seed indices from the equations 1 and the equation 2
+    Calculate the seeds in the two equations.
+
+    Args:
+        node_labels1: The name lists of the variables and terms in equation 1.
+        node_labels2: The name lists of the variables and terms in equation 2.
+        method: The method to get seeds.
+            - &#34;heuristic&#34;: Based on variable name identification.
+            - &#34;levenshtein&#34;: Based on Levenshtein similarity of variable names.
+            - &#34;jaccard&#34;: Based on Jaccard similarity of variable names.
+            - &#34;cosine&#34;: Based on cosine similarity of variable names.
+        threshold: The threshold to use for Levenshtein, Jaccard, and cosine methods.
+
+    Returns:
+        A tuple of two lists:
+        - seed1: The seed indices from equation 1.
+        - seed2: The seed indices from equation 2.
     &#34;&#34;&#34;
     seed1 = [0, 1]
     seed2 = [0, 1]
     for i in range(2, len(node_labels1)):
         for j in range(2, len(node_labels2)):
-            if node_labels1[i].lower() == node_labels2[j].lower():
-                seed1.append(i)
-                seed2.append(j)
+            if method == &#34;heuristic&#34;:
+                if heuristic_compare_variable_names(node_labels1[i], node_labels2[j]):
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == &#34;levenshtein&#34;:
+                if levenshtein_similarity(node_labels1[i], node_labels2[j]) &gt; threshold:
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == &#34;jaccard&#34;:
+                if jaccard_similarity(node_labels1[i], node_labels2[j]) &gt; threshold:
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == &#34;cosine&#34;:
+                if cosine_similarity(node_labels1[i], node_labels2[j]) &gt; threshold:
+                    seed1.append(i)
+                    seed2.append(j)
 
     return seed1, seed2
 
@@ -559,6 +705,48 @@ List[int]: a list of 0s and 1s</p></div>
     return result</code></pre>
 </details>
 </dd>
+<dt id="skema.isa.lib.cosine_similarity"><code class="name flex">
+<span>def <span class="ident">cosine_similarity</span></span>(<span>var1: str, var2: str) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the cosine similarity between two variable names.
+The cosine similarity is the dot product of the character frequency vectors divided by the product of their norms.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>var1</code></strong></dt>
+<dd>The first variable name.</dd>
+<dt><strong><code>var2</code></strong></dt>
+<dd>The second variable name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The cosine similarity between the two variable names.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def cosine_similarity(var1: str, var2: str) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the cosine similarity between two variable names.
+    The cosine similarity is the dot product of the character frequency vectors divided by the product of their norms.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The cosine similarity between the two variable names.
+    &#34;&#34;&#34;
+    char_freq1 = {char: var1.count(char) for char in var1}
+    char_freq2 = {char: var2.count(char) for char in var2}
+
+    dot_product = sum(
+        char_freq1.get(char, 0) * char_freq2.get(char, 0) for char in set(var1 + var2)
+    )
+    norm1 = sum(freq**2 for freq in char_freq1.values()) ** 0.5
+    norm2 = sum(freq**2 for freq in char_freq2.values()) ** 0.5
+
+    similarity = dot_product / (norm1 * norm2)
+    return similarity</code></pre>
+</details>
+</dd>
 <dt id="skema.isa.lib.generate_amatrix"><code class="name flex">
 <span>def <span class="ident">generate_amatrix</span></span>(<span>graph: pydot.Dot) ‑> Tuple[numpy.ndarray, List[str]]</span>
 </code></dt>
@@ -626,31 +814,77 @@ Output: the GraphViz representation (pydot.Dot)</p></div>
 </details>
 </dd>
 <dt id="skema.isa.lib.get_seeds"><code class="name flex">
-<span>def <span class="ident">get_seeds</span></span>(<span>node_labels1: List[str], node_labels2: List[str]) ‑> Tuple[List[int], List[int]]</span>
+<span>def <span class="ident">get_seeds</span></span>(<span>node_labels1: List[str], node_labels2: List[str], method: str = 'heuristic', threshold: float = 0.8) ‑> Tuple[List[int], List[int]]</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Calculate the seeds in the two equations
-Input: the name lists of the variables and terms in the equation 1 and the equation 2
-Output: the seed indices from the equations 1 and the equation 2</p></div>
+<div class="desc"><p>Calculate the seeds in the two equations.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>node_labels1</code></strong></dt>
+<dd>The name lists of the variables and terms in equation 1.</dd>
+<dt><strong><code>node_labels2</code></strong></dt>
+<dd>The name lists of the variables and terms in equation 2.</dd>
+<dt><strong><code>method</code></strong></dt>
+<dd>The method to get seeds.
+- "heuristic": Based on variable name identification.
+- "levenshtein": Based on Levenshtein similarity of variable names.
+- "jaccard": Based on Jaccard similarity of variable names.
+- "cosine": Based on cosine similarity of variable names.</dd>
+<dt><strong><code>threshold</code></strong></dt>
+<dd>The threshold to use for Levenshtein, Jaccard, and cosine methods.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>A tuple of two lists:
+- seed1: The seed indices from equation 1.
+- seed2: The seed indices from equation 2.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def get_seeds(
-    node_labels1: List[str], node_labels2: List[str]
+    node_labels1: List[str],
+    node_labels2: List[str],
+    method: str = &#34;heuristic&#34;,
+    threshold: float = 0.8,
 ) -&gt; Tuple[List[int], List[int]]:
     &#34;&#34;&#34;
-    Calculate the seeds in the two equations
-    Input: the name lists of the variables and terms in the equation 1 and the equation 2
-    Output: the seed indices from the equations 1 and the equation 2
+    Calculate the seeds in the two equations.
+
+    Args:
+        node_labels1: The name lists of the variables and terms in equation 1.
+        node_labels2: The name lists of the variables and terms in equation 2.
+        method: The method to get seeds.
+            - &#34;heuristic&#34;: Based on variable name identification.
+            - &#34;levenshtein&#34;: Based on Levenshtein similarity of variable names.
+            - &#34;jaccard&#34;: Based on Jaccard similarity of variable names.
+            - &#34;cosine&#34;: Based on cosine similarity of variable names.
+        threshold: The threshold to use for Levenshtein, Jaccard, and cosine methods.
+
+    Returns:
+        A tuple of two lists:
+        - seed1: The seed indices from equation 1.
+        - seed2: The seed indices from equation 2.
     &#34;&#34;&#34;
     seed1 = [0, 1]
     seed2 = [0, 1]
     for i in range(2, len(node_labels1)):
         for j in range(2, len(node_labels2)):
-            if node_labels1[i].lower() == node_labels2[j].lower():
-                seed1.append(i)
-                seed2.append(j)
+            if method == &#34;heuristic&#34;:
+                if heuristic_compare_variable_names(node_labels1[i], node_labels2[j]):
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == &#34;levenshtein&#34;:
+                if levenshtein_similarity(node_labels1[i], node_labels2[j]) &gt; threshold:
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == &#34;jaccard&#34;:
+                if jaccard_similarity(node_labels1[i], node_labels2[j]) &gt; threshold:
+                    seed1.append(i)
+                    seed2.append(j)
+            elif method == &#34;cosine&#34;:
+                if cosine_similarity(node_labels1[i], node_labels2[j]) &gt; threshold:
+                    seed1.append(i)
+                    seed2.append(j)
 
     return seed1, seed2</code></pre>
 </details>
@@ -801,6 +1035,157 @@ output: dot graph</p></div>
     return False</code></pre>
 </details>
 </dd>
+<dt id="skema.isa.lib.heuristic_compare_variable_names"><code class="name flex">
+<span>def <span class="ident">heuristic_compare_variable_names</span></span>(<span>var1: str, var2: str) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compare two variable names in a formula, accounting for Unicode representations.
+Convert the variable names to English letter representations before comparison.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>var1</code></strong> :&ensp;<code>str</code></dt>
+<dd>The first variable name.</dd>
+<dt><strong><code>var2</code></strong> :&ensp;<code>str</code></dt>
+<dd>The second variable name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>True if the variable names are the same, False otherwise.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def heuristic_compare_variable_names(var1: str, var2: str) -&gt; bool:
+    &#34;&#34;&#34;
+    Compare two variable names in a formula, accounting for Unicode representations.
+    Convert the variable names to English letter representations before comparison.
+
+    Args:
+        var1 (str): The first variable name.
+        var2 (str): The second variable name.
+
+    Returns:
+        bool: True if the variable names are the same, False otherwise.
+    &#34;&#34;&#34;
+    # Mapping of Greek letters to English letter representations
+    greek_letters = {
+        &#34;α&#34;: &#34;alpha&#34;,
+        &#34;β&#34;: &#34;beta&#34;,
+        &#34;γ&#34;: &#34;gamma&#34;,
+        &#34;δ&#34;: &#34;delta&#34;,
+        &#34;ε&#34;: &#34;epsilon&#34;,
+        &#34;ζ&#34;: &#34;zeta&#34;,
+        &#34;η&#34;: &#34;eta&#34;,
+        &#34;θ&#34;: &#34;theta&#34;,
+        &#34;ι&#34;: &#34;iota&#34;,
+        &#34;κ&#34;: &#34;kappa&#34;,
+        &#34;λ&#34;: &#34;lambda&#34;,
+        &#34;μ&#34;: &#34;mu&#34;,
+        &#34;ν&#34;: &#34;nu&#34;,
+        &#34;ξ&#34;: &#34;xi&#34;,
+        &#34;ο&#34;: &#34;omicron&#34;,
+        &#34;π&#34;: &#34;pi&#34;,
+        &#34;ρ&#34;: &#34;rho&#34;,
+        &#34;σ&#34;: &#34;sigma&#34;,
+        &#34;τ&#34;: &#34;tau&#34;,
+        &#34;υ&#34;: &#34;upsilon&#34;,
+        &#34;φ&#34;: &#34;phi&#34;,
+        &#34;χ&#34;: &#34;chi&#34;,
+        &#34;ψ&#34;: &#34;psi&#34;,
+        &#34;ω&#34;: &#34;omega&#34;,
+    }
+
+    # Convert Unicode representations to English letter representations
+    var1 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var1)
+    var2 = re.sub(r&#34;&amp;#x(\w+);?&#34;, lambda m: chr(int(m.group(1), 16)), var2)
+
+    # Convert Greek letter representations to English letter representations
+    for greek_letter, english_letter in greek_letters.items():
+        var1 = var1.replace(greek_letter, english_letter)
+        var2 = var2.replace(greek_letter, english_letter)
+
+    # Remove trailing quotation marks, if present
+    var1 = var1.strip(&#34;&#39;\&#34;&#34;)
+    var2 = var2.strip(&#34;&#39;\&#34;&#34;)
+
+    # Compare the variable names
+    return var1.lower() == var2.lower()</code></pre>
+</details>
+</dd>
+<dt id="skema.isa.lib.jaccard_similarity"><code class="name flex">
+<span>def <span class="ident">jaccard_similarity</span></span>(<span>var1: str, var2: str) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the Jaccard similarity between two variable names.
+The Jaccard similarity is the size of the intersection divided by the size of the union of the variable names.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>var1</code></strong></dt>
+<dd>The first variable name.</dd>
+<dt><strong><code>var2</code></strong></dt>
+<dd>The second variable name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The Jaccard similarity between the two variable names.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def jaccard_similarity(var1: str, var2: str) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the Jaccard similarity between two variable names.
+    The Jaccard similarity is the size of the intersection divided by the size of the union of the variable names.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The Jaccard similarity between the two variable names.
+    &#34;&#34;&#34;
+    set1 = set(var1)
+    set2 = set(var2)
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    similarity = intersection / union
+    return similarity</code></pre>
+</details>
+</dd>
+<dt id="skema.isa.lib.levenshtein_similarity"><code class="name flex">
+<span>def <span class="ident">levenshtein_similarity</span></span>(<span>var1: str, var2: str) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the Levenshtein similarity between two variable names.
+The Levenshtein similarity is the ratio of the Levenshtein distance to the maximum length.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>var1</code></strong></dt>
+<dd>The first variable name.</dd>
+<dt><strong><code>var2</code></strong></dt>
+<dd>The second variable name.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The Levenshtein similarity between the two variable names.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def levenshtein_similarity(var1: str, var2: str) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the Levenshtein similarity between two variable names.
+    The Levenshtein similarity is the ratio of the Levenshtein distance to the maximum length.
+    Args:
+        var1: The first variable name.
+        var2: The second variable name.
+    Returns:
+        The Levenshtein similarity between the two variable names.
+    &#34;&#34;&#34;
+    distance = Levenshtein.distance(var1, var2)
+    max_length = max(len(var1), len(var2))
+    similarity = 1 - (distance / max_length)
+    return similarity</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -818,14 +1203,18 @@ output: dot graph</p></div>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="skema.isa.lib.align_mathml_eqs" href="#skema.isa.lib.align_mathml_eqs">align_mathml_eqs</a></code></li>
 <li><code><a title="skema.isa.lib.check_square_array" href="#skema.isa.lib.check_square_array">check_square_array</a></code></li>
+<li><code><a title="skema.isa.lib.cosine_similarity" href="#skema.isa.lib.cosine_similarity">cosine_similarity</a></code></li>
 <li><code><a title="skema.isa.lib.generate_amatrix" href="#skema.isa.lib.generate_amatrix">generate_amatrix</a></code></li>
 <li><code><a title="skema.isa.lib.generate_graph" href="#skema.isa.lib.generate_graph">generate_graph</a></code></li>
 <li><code><a title="skema.isa.lib.get_seeds" href="#skema.isa.lib.get_seeds">get_seeds</a></code></li>
 <li><code><a title="skema.isa.lib.get_union_graph" href="#skema.isa.lib.get_union_graph">get_union_graph</a></code></li>
 <li><code><a title="skema.isa.lib.has_edge" href="#skema.isa.lib.has_edge">has_edge</a></code></li>
+<li><code><a title="skema.isa.lib.heuristic_compare_variable_names" href="#skema.isa.lib.heuristic_compare_variable_names">heuristic_compare_variable_names</a></code></li>
+<li><code><a title="skema.isa.lib.jaccard_similarity" href="#skema.isa.lib.jaccard_similarity">jaccard_similarity</a></code></li>
+<li><code><a title="skema.isa.lib.levenshtein_similarity" href="#skema.isa.lib.levenshtein_similarity">levenshtein_similarity</a></code></li>
 </ul>
 </li>
 </ul>
