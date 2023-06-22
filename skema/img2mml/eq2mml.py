@@ -64,7 +64,7 @@ def ping():
     return "The eq2mml service is running."
 
 @app.post("/image/mml", summary="Get MathML representation of an equation image", response_model=Text)
-async def image_mathml(data: ImageBytes) -> Text:
+async def post_image_to_mathml(data: ImageBytes) -> Text:
     """
     Endpoint for generating MathML from an input image.
     """
@@ -73,14 +73,14 @@ async def image_mathml(data: ImageBytes) -> Text:
     return get_mathml_from_bytes(data)
 
 @app.get("/latex/mml", summary="Get MathML representation of a LaTeX equation", response_model=Text)
-async def tex_to_mathml(tex_src: EquationQueryParameter) -> Text:
+async def get_tex_to_mathml(tex_src: EquationQueryParameter) -> Text:
     """
     GET endpoint for generating MathML from an input LaTeX equation.
     """
     return get_mathml_from_latex(tex_src)
 
 @app.post("/latex/mml", summary="Get MathML representation of a LaTeX equation")
-async def mathml(eqn: LatexEquation):
+async def post_tex_to_mathml(eqn: LatexEquation):
     """
     Endpoint for generating MathML from an input LaTeX equation.
     """
