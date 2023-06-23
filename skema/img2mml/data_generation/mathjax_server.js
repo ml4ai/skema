@@ -59,10 +59,11 @@ function tex2mml(tex) {
 // Process a single TeX equation string into a MathML string
 app.post('/tex2mml', function (req, res) {
     // Access the LaTeX source from the request object
-    var tex_str = JSON.parse(req.body.tex_src)
+    var tex_str = req.body.tex_src
     tex2mml(tex_str)
         .then((data) => {
-            res.send(JSON.stringify(data.mml));
+            res.setHeader('Content-Type', "application/xml");
+            res.send(data.mml);
         })
         .catch((err) => {
             res.send(JSON.stringify(`FAILED::${err}::${tex_str}`));
