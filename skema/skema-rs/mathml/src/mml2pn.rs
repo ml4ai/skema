@@ -1,10 +1,10 @@
+use crate::acset;
 pub use crate::acset::ACSet;
 use crate::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
     Polarity, Rate, Specie, Var,
 };
 use crate::{
-    acset,
     ast::{
         Math,
         MathExpression::{Mn, Mo, Mrow},
@@ -51,10 +51,10 @@ impl fmt::Display for Var {
 /// be noise, this accommodates possibly reading several names of things
 /// that should be combined into a single rate.
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Default)]
-struct Term {
-    polarity: Polarity,
-    species: Vec<Specie>,
-    vars: Vec<Var>,
+pub struct Term {
+    pub polarity: Polarity,
+    pub species: Vec<Specie>,
+    pub vars: Vec<Var>,
 }
 
 // MathML to Petri Net algorithm
@@ -65,7 +65,7 @@ struct Term {
 //     derivatives are being taken). The variables on the RHSes that correspond to variables on the
 //     LHS are species. The rest are rates.
 /// Group the variables in the equations by the =, +, and - operators, and collect the variables.
-fn group_by_operators(
+pub fn group_by_operators(
     ast: Math,
     species: &mut HashSet<Var>,
     vars: &mut HashSet<Var>,
@@ -180,7 +180,7 @@ struct Exponents(BTreeMap<Specie, BTreeMap<Monomial, Exponent>>);
 #[derive(Debug, Clone)]
 pub enum PetriNetElement {
     Specie(acset::Specie),
-    Transition(acset::Transition),
+    Transition(acset::ACSetTransition),
 }
 
 impl From<Vec<Math>> for acset::ACSet {
@@ -255,7 +255,7 @@ impl From<Vec<Math>> for acset::ACSet {
         let mut exponents = Exponents::default();
 
         for (i, monomial) in monomials.0.iter().enumerate() {
-            acset.T.push(acset::Transition {
+            acset.T.push(acset::ACSetTransition {
                 tname: monomial.0 .0.to_string(),
             });
             for (specie, exponent) in monomial.0 .1.clone() {

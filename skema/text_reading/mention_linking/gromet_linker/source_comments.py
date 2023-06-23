@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from typing import Dict, List, Tuple
 import json
 
 
@@ -13,8 +13,8 @@ class SourceComments:
     def __init__(
         self,
         path: Path,
-        line_comments: dict[int, str],
-        docstrings: dict[str, list[str]],
+        line_comments: Dict[int, str],
+        docstrings: Dict[str, List[str]],
     ):
         """
         This is a docstring for the __init__ method.
@@ -24,7 +24,7 @@ class SourceComments:
         self.docstrings = docstrings
         self.line_docstrings = self.make_line_docstrings()
 
-    def make_line_docstrings(self) -> dict[str, list[tuple[int, str]]]:
+    def make_line_docstrings(self) -> Dict[str, List[Tuple[int, str]]]:
 
         # TODO: Until we get the real line numbers, they are all -1 and then filtered out later.
         return {
@@ -38,7 +38,7 @@ class SourceComments:
     def file_path(self) -> str:
         return str(self.path.absolute)
 
-    def get_line_docstrings(self, name: str) -> list[tuple[int, str]]:
+    def get_line_docstrings(self, name: str) -> List[Tuple[int, str]]:
         return self.line_docstrings.get(name, [])
 
     @staticmethod
