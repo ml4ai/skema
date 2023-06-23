@@ -62,7 +62,8 @@ app.post('/tex2mml', function (req, res) {
     var tex_str = req.body.tex_src
     tex2mml(tex_str)
         .then((data) => {
-            res.send(JSON.stringify(data.mml));
+            res.setHeader('Content-Type', "application/xml");
+            res.send(data.mml);
         })
         .catch((err) => {
             res.send(JSON.stringify(`FAILED::${err}::${tex_str}`));

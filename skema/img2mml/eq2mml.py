@@ -7,11 +7,9 @@ node data_generation/mathjax_server.js
 
 from typing import Text, Union
 from typing_extensions import Annotated
-from fastapi import Body, FastAPI, File, Request, Query
+from fastapi import FastAPI, File, Response, Query
 from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
 from pydantic import BaseModel, Field
-#from skema.data.eq2mml import img_path_bayes_rule_eqn
-#import base64
 
 
 EquationQueryParameter = Annotated[
@@ -58,31 +56,35 @@ class LatexEquation(BaseModel):
 
 app = FastAPI()
 
+def process_latex_equation(eqn: Text) -> Response:
+    """Helper function used by both GET and POST LaTeX equation processing endpoints"""
+    res = get_mathml_from_latex(eqn)
+    return Response(content=res, media_type="application/xml")
+
 # FIXME: have this test the mathjax endpoint (and perhaps check the pt model loaded)
 @app.get("/healthcheck", summary="Ping endpoint to test health of service", response_model=Text, status_code=200)
-def ping():
+def healthcheck():
     return "The eq2mml service is running."
 
-@app.post("/image/mml", summary="Get MathML representation of an equation image", response_model=Text)
+@app.post("/image/mml", summary="Get MathML representation of an equation image")
 async def post_image_to_mathml(data: ImageBytes) -> Text:
     """
     Endpoint for generating MathML from an input image.
     """
     # convert bytes of png image to tensor
-    print(data)
     return get_mathml_from_bytes(data)
 
-@app.get("/latex/mml", summary="Get MathML representation of a LaTeX equation", response_model=Text)
-async def get_tex_to_mathml(tex_src: EquationQueryParameter) -> Text:
+@app.get("/latex/mml", summary="Get MathML representation of a LaTeX equation")
+async def get_tex_to_mathml(tex_src: EquationQueryParameter) -> Response:
     """
     GET endpoint for generating MathML from an input LaTeX equation.
     """
-    return get_mathml_from_latex(tex_src)
+    return process_latex_equation(tex_src)
 
 @app.post("/latex/mml", summary="Get MathML representation of a LaTeX equation")
-async def post_tex_to_mathml(eqn: LatexEquation):
+async def post_tex_to_mathml(eqn: LatexEquation) -> Response:
     """
     Endpoint for generating MathML from an input LaTeX equation.
     """
     # convert latex string to presentation mathml
-    return get_mathml_from_latex(eqn.tex_src)
+    return process_latex_equation(eqn.tex_src)
