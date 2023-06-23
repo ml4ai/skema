@@ -1,0 +1,1756 @@
+{
+    "schema": "FN",
+    "schema_version": "0.1.7",
+    "name": "sir_core",
+    "modules": [
+        {
+            "schema": "FN",
+            "schema_version": "0.1.7",
+            "name": "sir_core",
+            "fn": {
+                "b": [
+                    {
+                        "function_type": "MODULE",
+                        "gromet_type": "GrometBoxFunction",
+                        "name": "module",
+                        "metadata": 3
+                    }
+                ],
+                "gromet_type": "GrometFN"
+            },
+            "fn_array": [
+                {
+                    "b": [
+                        {
+                            "function_type": "FUNCTION",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "sir",
+                            "metadata": 4
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,
+                            "name": "s",
+                            "box": 1,
+                            "gromet_type": "GrometPort",
+                            "metadata": 5
+                        },
+                        {
+                            "id": 2,
+                            "name": "i",
+                            "box": 1,
+                            "gromet_type": "GrometPort",
+                            "metadata": 6
+                        },
+                        {
+                            "id": 3,
+                            "name": "r",
+                            "box": 1,
+                            "gromet_type": "GrometPort",
+                            "metadata": 7
+                        },
+                        {
+                            "id": 4,
+                            "name": "beta",
+                            "box": 1,
+                            "gromet_type": "GrometPort",
+                            "metadata": 8
+                        },
+                        {
+                            "id": 5,
+                            "name": "gamma",
+                            "box": 1,
+                            "gromet_type": "GrometPort",
+                            "metadata": 9
+                        },
+                        {
+                            "id": 6,
+                            "name": "n",
+                            "box": 1,
+                            "gromet_type": "GrometPort",
+                            "metadata": 10
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort",
+                            "metadata": 36
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LITERAL",
+                            "value": {
+                                "value_type": "List",
+                                "value": "\n    The SIR model, one time step\n    :param s: Current amount of individuals that are susceptible\n    :param i: Current amount of individuals that are infectious\n    :param r: Current amount of individuals that are recovered\n    :param beta: The rate of exposure of individuals to persons infected with COVID-19\n    :param gamma: Rate of recovery for infected individuals\n    :param n: Total population size\n    :return:\n    ",
+                                "gromet_type": "LiteralValue"
+                            },
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 11
+                        },
+                        {
+                            "function_type": "EXPRESSION",
+                            "body": 2,
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 16
+                        },
+                        {
+                            "function_type": "EXPRESSION",
+                            "body": 3,
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 22
+                        },
+                        {
+                            "function_type": "EXPRESSION",
+                            "body": 4,
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 25
+                        },
+                        {
+                            "function_type": "EXPRESSION",
+                            "body": 5,
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 29
+                        },
+                        {
+                            "function_type": "EXPRESSION",
+                            "body": 6,
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 31
+                        },
+                        {
+                            "function_type": "EXPRESSION",
+                            "body": 7,
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 33
+                        },
+                        {
+                            "function_type": "EXPRESSION",
+                            "body": 8,
+                            "gromet_type": "GrometBoxFunction",
+                            "metadata": 35
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 4,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 4,
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 6,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 6,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 7,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 7,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 8,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 8,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "name": "s_n",
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "name": "i_n",
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "name": "r_n",
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "name": "scale",
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "name": "s",
+                            "box": 6,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "name": "i",
+                            "box": 7,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "name": "r",
+                            "box": 8,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 2,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 3,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 4,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 5,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 6,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 7,
+                            "tgt": 5,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 8,
+                            "tgt": 5,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 9,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 10,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 14,
+                            "tgt": 6,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wff": [
+                        {
+                            "src": 11,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 12,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 13,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 15,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 16,
+                            "tgt": 5,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 17,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 18,
+                            "tgt": 5,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 19,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 20,
+                            "tgt": 5,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [
+                        {
+                            "function_type": "EXPRESSION",
+                            "gromet_type": "GrometBoxFunction"
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,"box": 1,"gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,"box": 1,"gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,"box": 1,"gromet_type": "GrometPort"
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,"box": 1,"gromet_type": "GrometPort"
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE","gromet_type": "GrometBoxFunction","name": "ast.USub","metadata": 12
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE","gromet_type": "GrometBoxFunction","name": "ast.Mult","metadata": 13
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE","gromet_type": "GrometBoxFunction","name": "ast.Mult","metadata": 14
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Add",
+                            "metadata": 15
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 3,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 5,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 7,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wff": [
+                        {
+                            "src": 2,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 4,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 6,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wfopo": [
+                        {
+                            "src": 1,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [
+                        {
+                            "function_type": "EXPRESSION",
+                            "gromet_type": "GrometBoxFunction"
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 4,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Mult",
+                            "metadata": 17
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Mult",
+                            "metadata": 18
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Mult",
+                            "metadata": 19
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Sub",
+                            "metadata": 20
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Add",
+                            "metadata": 21
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 4,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 5,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 2,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 4,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 5,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 6,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 10,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wff": [
+                        {
+                            "src": 3,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 7,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 8,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 9,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wfopo": [
+                        {
+                            "src": 1,
+                            "tgt": 5,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [
+                        {
+                            "function_type": "EXPRESSION",
+                            "gromet_type": "GrometBoxFunction"
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Mult",
+                            "metadata": 23
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Add",
+                            "metadata": 24
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 2,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 4,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wff": [
+                        {
+                            "src": 3,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wfopo": [
+                        {
+                            "src": 1,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [
+                        {
+                            "function_type": "EXPRESSION",
+                            "gromet_type": "GrometBoxFunction"
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 3,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 4,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Add",
+                            "metadata": 26
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Add",
+                            "metadata": 27
+                        },
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Div",
+                            "metadata": 28
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 2,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 1,
+                            "box": 3,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 2,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 4,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 5,
+                            "tgt": 4,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wff": [
+                        {
+                            "src": 3,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 6,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wfopo": [
+                        {
+                            "src": 1,
+                            "tgt": 3,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [
+                        {
+                            "function_type": "EXPRESSION",
+                            "gromet_type": "GrometBoxFunction"
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Mult",
+                            "metadata": 30
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 2,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wfopo": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [
+                        {
+                            "function_type": "EXPRESSION",
+                            "gromet_type": "GrometBoxFunction"
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Mult",
+                            "metadata": 32
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 2,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wfopo": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                },
+                {
+                    "b": [
+                        {
+                            "function_type": "EXPRESSION",
+                            "gromet_type": "GrometBoxFunction"
+                        }
+                    ],
+                    "opi": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "opo": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "bf": [
+                        {
+                            "function_type": "LANGUAGE_PRIMITIVE",
+                            "gromet_type": "GrometBoxFunction",
+                            "name": "ast.Mult",
+                            "metadata": 34
+                        }
+                    ],
+                    "pif": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        },
+                        {
+                            "id": 2,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "pof": [
+                        {
+                            "id": 1,
+                            "box": 1,
+                            "gromet_type": "GrometPort"
+                        }
+                    ],
+                    "wfopi": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        },
+                        {
+                            "src": 2,
+                            "tgt": 2,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "wfopo": [
+                        {
+                            "src": 1,
+                            "tgt": 1,
+                            "gromet_type": "GrometWire"
+                        }
+                    ],
+                    "gromet_type": "GrometFN"
+                }
+            ],
+            "metadata_collection": [
+                [],
+                [
+                    {
+                        "metadata_type": "source_code_collection",
+                        "name": "",
+                        "global_reference_id": "",
+                        "files": [
+                            {
+                                "uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                                "name": "sir_core.py",
+                                "path": ""
+                            }
+                        ],
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090151"
+                        }
+                    },
+                    {
+                        "metadata_type": "gromet_creation",
+                        "gromet_version": "0.1.7",
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090199"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 21,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090229"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 21,
+                        "col_begin": 0,
+                        "col_end": 18,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090327"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 1,
+                        "col_begin": 8,
+                        "col_end": 9,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090361"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 1,
+                        "col_begin": 11,
+                        "col_end": 12,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090397"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 1,
+                        "col_begin": 14,
+                        "col_end": 15,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090424"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 1,
+                        "col_begin": 17,
+                        "col_end": 21,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090449"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 1,
+                        "col_begin": 23,
+                        "col_end": 28,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090473"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 1,
+                        "line_end": 1,
+                        "col_begin": 30,
+                        "col_end": 31,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090497"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_data_type",
+                        "source_language": "Python",
+                        "source_language_version": "3.8",
+                        "data_type": "<class 'str'>",
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090531"
+                        }
+                    },
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 2,
+                        "line_end": 11,
+                        "col_begin": 4,
+                        "col_end": 7,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090523"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 12,
+                        "line_end": 12,
+                        "col_begin": 11,
+                        "col_end": 16,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090629"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 12,
+                        "line_end": 12,
+                        "col_begin": 11,
+                        "col_end": 20,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090677"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 12,
+                        "line_end": 12,
+                        "col_begin": 11,
+                        "col_end": 24,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090727"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 12,
+                        "line_end": 12,
+                        "col_begin": 10,
+                        "col_end": 29,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090774"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 12,
+                        "line_end": 12,
+                        "col_begin": 4,
+                        "col_end": 29,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090584"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 13,
+                        "line_end": 13,
+                        "col_begin": 11,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090899"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 13,
+                        "line_end": 13,
+                        "col_begin": 11,
+                        "col_end": 23,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090950"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 13,
+                        "line_end": 13,
+                        "col_begin": 26,
+                        "col_end": 35,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091003"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 13,
+                        "line_end": 13,
+                        "col_begin": 11,
+                        "col_end": 35,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091049"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 13,
+                        "line_end": 13,
+                        "col_begin": 10,
+                        "col_end": 40,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091088"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 13,
+                        "line_end": 13,
+                        "col_begin": 4,
+                        "col_end": 40,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.090857"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 14,
+                        "line_end": 14,
+                        "col_begin": 10,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091216"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 14,
+                        "line_end": 14,
+                        "col_begin": 10,
+                        "col_end": 23,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.791265"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 14,
+                        "line_end": 14,
+                        "col_begin": 4,
+                        "col_end": 23,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091181"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 16,
+                        "line_end": 16,
+                        "col_begin": 17,
+                        "col_end": 26,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091396"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 16,
+                        "line_end": 16,
+                        "col_begin": 17,
+                        "col_end": 32,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091447"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 16,
+                        "line_end": 16,
+                        "col_begin": 12,
+                        "col_end": 33,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091487"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 16,
+                        "line_end": 16,
+                        "col_begin": 4,
+                        "col_end": 33,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091351"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 18,
+                        "line_end": 18,
+                        "col_begin": 8,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091620"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 18,
+                        "line_end": 18,
+                        "col_begin": 4,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091587"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 19,
+                        "line_end": 19,
+                        "col_begin": 8,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091736"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 19,
+                        "line_end": 19,
+                        "col_begin": 4,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091705"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 20,
+                        "line_end": 20,
+                        "col_begin": 8,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091856"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 20,
+                        "line_end": 20,
+                        "col_begin": 4,
+                        "col_end": 19,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091825"
+                        }
+                    }
+                ],
+                [
+                    {
+                        "metadata_type": "source_code_reference",
+                        "code_file_reference_uid": "26137245-541e-49a6-31b3-e9a238b0c5e6",
+                        "line_begin": 21,
+                        "line_end": 21,
+                        "col_begin": 4,
+                        "col_end": 18,
+                        "provenance": {
+                            "method": "skema_code2fn_program_analysis",
+                            "timestamp": "2023-06-20 09:43:36.091949"
+                        }
+                    }
+                ]
+            ],
+            "gromet_type": "GrometFNModule",
+            "metadata": 2
+        }
+    ],
+    "module_index": [
+        "sir_core"
+    ],
+    "executables": [],
+    "gromet_type": "GrometFNModuleCollection"
+}
