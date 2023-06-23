@@ -59,7 +59,7 @@ def generate_gromet(test_file_string):
 
     return gromet
 
-def test_closures():
+def test_recursion():
     prog1_gromet = generate_gromet(recurse1())
     prog2_gromet = generate_gromet(recurse2())
     prog3_gromet = generate_gromet(recurse3())

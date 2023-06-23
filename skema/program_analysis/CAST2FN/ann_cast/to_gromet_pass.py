@@ -217,7 +217,7 @@ class ToGrometPass:
         # visiting nodes adds FNs
         self.gromet_module = GrometFNModule(
             schema="FN",
-            schema_version="0.1.6",
+            schema_version="0.1.7",
             name="",
             fn=None,
             fn_array=[],
@@ -270,10 +270,7 @@ class ToGrometPass:
 
     def wire_from_var_env(self, name, gromet_fn):
         var_environment = self.symtab_variables()
-        # print(var_environment)
 
-        # print(name)
-        # print(var_environment["args"])
         if name in var_environment["local"]:
             local_env = var_environment["local"]
             entry = local_env[name]
@@ -2222,8 +2219,6 @@ class ToGrometPass:
         # identified_func_name = ".".join(node.func.con_scope)
         identified_func_name = f"{func_name}_id{node.func.id}"
         in_module = self.func_in_module(func_name)
-        # print(f"Calling {identified_func_name}")
-        # print("---")
         # NOTE: This allows us to wire arguments that aren't originally in the CAST but are necessary
         # For the functional GroMEt structure.  This will probably change
         if (parent_gromet_fn.pof != None and parent_gromet_fn.pif != None):  
@@ -2238,7 +2233,6 @@ class ToGrometPass:
 
         # in_module = self.func_in_module(node.func.name)
         # in_module = (False, "")
-        # print(in_module)
 
         # Certain functions (special functions that PA has designated as primitive)
         # Are considered 'primitive' operations, in other words calls to them aren't
@@ -2376,7 +2370,6 @@ class ToGrometPass:
             # that a GroMEt FN isn't guaranteed to exist before a Call
             # to it is made. So we either find the GroMEt in the collection of
             # FNs or we create a 'temporary' one that will be filled out later
-            # qualified_func_name = f"{'.'.join(node.func.con_scope)}.{node.func.name}_{node.invocation_index}"
             qualified_func_name = f"{node.func.name}_id{node.func.id}"
             func_name = node.func.name
 
