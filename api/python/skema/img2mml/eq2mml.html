@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.img2mml.eq2mml API documentation</title>
+<meta name="description" content="Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
+Please run the following command to initialize the …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.img2mml.eq2mml</code></h1>
+</header>
+<section id="section-intro">
+<p>Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
+Please run the following command to initialize the MathJAX service:
+node data_generation/mathjax_server.js</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python"># -*- coding: utf-8 -*-
+&#34;&#34;&#34;
+Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
+Please run the following command to initialize the MathJAX service:
+node data_generation/mathjax_server.js
+&#34;&#34;&#34;
+
+from typing import Text, Union
+from typing_extensions import Annotated
+from fastapi import FastAPI, Body, File, Response, Request, Query
+from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
+from skema.data.eq2mml import img_b64_bayes_white_bg
+from pydantic import BaseModel, Field
+import base64
+
+EquationQueryParameter = Annotated[
+  Text,
+  Query(
+      examples={
+          &#34;simple&#34;: {
+              &#34;summary&#34;: &#34;A familiar equation&#34;,
+              &#34;description&#34;: &#34;A simple equation (mass-energy equivalence)&#34;,
+              &#34;value&#34;: &#34;E = mc^{2}&#34;,
+          },
+          &#34;complex&#34;: {
+              &#34;summary&#34;: &#34;A more feature-rich equation (Bayes&#39; rule)&#34;,
+              &#34;description&#34;: &#34;A equation drawing on latex features&#34;,
+              &#34;value&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
+          }
+      },
+  ),
+]
+
+ImageBytes = Annotated[
+  bytes,
+  File(
+      description=&#34;bytes of a PNG of an equation&#34;,
+      # examples={
+      #     &#34;bayes-rule&#34;: {
+      #         &#34;summary&#34;: &#34;PNG of Bayes&#39; rule&#34;,
+      #         &#34;description&#34;: &#34;PNG of Bayes&#39; rule&#34;,
+      #         &#34;value&#34;: str(img_path_bayes_rule_eqn),
+      #     }
+      # },
+  ),
+]
+
+class LatexEquation(BaseModel):
+    tex_src: Text = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
+    class Config:
+        schema_extra = {
+            &#34;example&#34;: {
+                &#34;tex_src&#34;: &#34;E = mc^{c}&#34;,
+            }
+        }
+
+
+app = FastAPI()
+
+def process_latex_equation(eqn: Text) -&gt; Response:
+    &#34;&#34;&#34;Helper function used by both GET and POST LaTeX equation processing endpoints&#34;&#34;&#34;
+    res = get_mathml_from_latex(eqn)
+    return Response(content=res, media_type=&#34;application/xml&#34;)
+
+# FIXME: have this test the mathjax endpoint (and perhaps check the pt model loaded)
+@app.get(&#34;/healthcheck&#34;, summary=&#34;Ping endpoint to test health of service&#34;, response_model=Text, status_code=200)
+def healthcheck():
+    return &#34;The eq2mml service is running.&#34;
+
+@app.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
+    &#34;&#34;&#34;
+    Endpoint for generating MathML from an input image.
+
+    ### Python example
+    ```
+    import requests
+
+    files = {
+      &#34;data&#34;: open(&#34;bayes-rule-white-bg.png&#34;, &#34;rb&#34;),
+    }
+    r = requests.post(&#34;http://0.0.0.0:8000/image/mml&#34;, files=files)
+    print(r.text)
+    &#34;&#34;&#34;
+    # convert bytes of png image to tensor
+    res =  get_mathml_from_bytes(data)
+    print(res)
+    print(type(res))
+    return Response(content=res, media_type=&#34;application/xml&#34;)
+
+@app.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+async def post_b64image_to_mathml(request: Request) -&gt; Response:
+    &#34;&#34;&#34;
+    Endpoint for generating MathML from an input image.
+
+    ### Python example
+    ```
+    from pathlib import Path
+    import base64
+    import requests
+
+    url = &#34;http://0.0.0.0:8000/image/base64/mml&#34;
+    with Path(&#34;bayes-rule-white-bg.png&#34;).open(&#34;rb&#34;) as infile:
+      img_bytes = infile.read()
+    img_b64 = base64.b64encode(img_bytes).decode(&#34;utf-8&#34;)
+    r = requests.post(url, data=img_b64)
+    print(r.text)
+    &#34;&#34;&#34;
+    img_b64 = await request.body()
+    img_bytes = base64.b64decode(img_b64)
+    # convert bytes of png image to tensor
+    res =  get_mathml_from_bytes(img_bytes)
+    return Response(content=res, media_type=&#34;application/xml&#34;)
+
+@app.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
+    &#34;&#34;&#34;
+    GET endpoint for generating MathML from an input LaTeX equation.
+
+    ### Python example
+    ```
+    import requests
+
+    r = requests.get(&#34;http://0.0.0.0:8000/latex/mml&#34;, params={&#34;tex_src&#34;:&#34;E = mc^{c}&#34;})
+    print(r.text)
+    &#34;&#34;&#34;
+    return process_latex_equation(tex_src)
+
+@app.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
+    &#34;&#34;&#34;
+    Endpoint for generating MathML from an input LaTeX equation.
+
+    ### Python example
+    ```
+    import requests
+
+    r = requests.post(&#34;http://0.0.0.0:8000/latex/mml&#34;, json={&#34;tex_src&#34;:&#34;E = mc^{c}&#34;})
+    print(r.text)
+    &#34;&#34;&#34;
+    # convert latex string to presentation mathml
+    return process_latex_equation(eqn.tex_src)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.img2mml.eq2mml.get_tex_to_mathml"><code class="name flex">
+<span>async def <span class="ident">get_tex_to_mathml</span></span>(<span>tex_src: typing_extensions.Annotated[str, Query(PydanticUndefined)]) ‑> starlette.responses.Response</span>
+</code></dt>
+<dd>
+<div class="desc"><p>GET endpoint for generating MathML from an input LaTeX equation.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>r = requests.get("http://0.0.0.0:8000/latex/mml", params={"tex_src":"E = mc^{c}"})
+print(r.text)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
+    &#34;&#34;&#34;
+    GET endpoint for generating MathML from an input LaTeX equation.
+
+    ### Python example
+    ```
+    import requests
+
+    r = requests.get(&#34;http://0.0.0.0:8000/latex/mml&#34;, params={&#34;tex_src&#34;:&#34;E = mc^{c}&#34;})
+    print(r.text)
+    &#34;&#34;&#34;
+    return process_latex_equation(tex_src)</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.eq2mml.healthcheck"><code class="name flex">
+<span>def <span class="ident">healthcheck</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.get(&#34;/healthcheck&#34;, summary=&#34;Ping endpoint to test health of service&#34;, response_model=Text, status_code=200)
+def healthcheck():
+    return &#34;The eq2mml service is running.&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.eq2mml.post_b64image_to_mathml"><code class="name flex">
+<span>async def <span class="ident">post_b64image_to_mathml</span></span>(<span>request: starlette.requests.Request) ‑> starlette.responses.Response</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Endpoint for generating MathML from an input image.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+from pathlib import Path
+import base64
+import requests</p>
+<p>url = "http://0.0.0.0:8000/image/base64/mml"
+with Path("bayes-rule-white-bg.png").open("rb") as infile:
+img_bytes = infile.read()
+img_b64 = base64.b64encode(img_bytes).decode("utf-8")
+r = requests.post(url, data=img_b64)
+print(r.text)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+async def post_b64image_to_mathml(request: Request) -&gt; Response:
+    &#34;&#34;&#34;
+    Endpoint for generating MathML from an input image.
+
+    ### Python example
+    ```
+    from pathlib import Path
+    import base64
+    import requests
+
+    url = &#34;http://0.0.0.0:8000/image/base64/mml&#34;
+    with Path(&#34;bayes-rule-white-bg.png&#34;).open(&#34;rb&#34;) as infile:
+      img_bytes = infile.read()
+    img_b64 = base64.b64encode(img_bytes).decode(&#34;utf-8&#34;)
+    r = requests.post(url, data=img_b64)
+    print(r.text)
+    &#34;&#34;&#34;
+    img_b64 = await request.body()
+    img_bytes = base64.b64decode(img_b64)
+    # convert bytes of png image to tensor
+    res =  get_mathml_from_bytes(img_bytes)
+    return Response(content=res, media_type=&#34;application/xml&#34;)</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.eq2mml.post_image_to_mathml"><code class="name flex">
+<span>async def <span class="ident">post_image_to_mathml</span></span>(<span>data: typing_extensions.Annotated[bytes, File(PydanticUndefined)]) ‑> starlette.responses.Response</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Endpoint for generating MathML from an input image.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>files = {
+"data": open("bayes-rule-white-bg.png", "rb"),
+}
+r = requests.post("http://0.0.0.0:8000/image/mml", files=files)
+print(r.text)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
+    &#34;&#34;&#34;
+    Endpoint for generating MathML from an input image.
+
+    ### Python example
+    ```
+    import requests
+
+    files = {
+      &#34;data&#34;: open(&#34;bayes-rule-white-bg.png&#34;, &#34;rb&#34;),
+    }
+    r = requests.post(&#34;http://0.0.0.0:8000/image/mml&#34;, files=files)
+    print(r.text)
+    &#34;&#34;&#34;
+    # convert bytes of png image to tensor
+    res =  get_mathml_from_bytes(data)
+    print(res)
+    print(type(res))
+    return Response(content=res, media_type=&#34;application/xml&#34;)</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.eq2mml.post_tex_to_mathml"><code class="name flex">
+<span>async def <span class="ident">post_tex_to_mathml</span></span>(<span>eqn: <a title="skema.img2mml.eq2mml.LatexEquation" href="#skema.img2mml.eq2mml.LatexEquation">LatexEquation</a>) ‑> starlette.responses.Response</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Endpoint for generating MathML from an input LaTeX equation.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>r = requests.post("http://0.0.0.0:8000/latex/mml", json={"tex_src":"E = mc^{c}"})
+print(r.text)</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
+    &#34;&#34;&#34;
+    Endpoint for generating MathML from an input LaTeX equation.
+
+    ### Python example
+    ```
+    import requests
+
+    r = requests.post(&#34;http://0.0.0.0:8000/latex/mml&#34;, json={&#34;tex_src&#34;:&#34;E = mc^{c}&#34;})
+    print(r.text)
+    &#34;&#34;&#34;
+    # convert latex string to presentation mathml
+    return process_latex_equation(eqn.tex_src)</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.eq2mml.process_latex_equation"><code class="name flex">
+<span>def <span class="ident">process_latex_equation</span></span>(<span>eqn: str) ‑> starlette.responses.Response</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Helper function used by both GET and POST LaTeX equation processing endpoints</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_latex_equation(eqn: Text) -&gt; Response:
+    &#34;&#34;&#34;Helper function used by both GET and POST LaTeX equation processing endpoints&#34;&#34;&#34;
+    res = get_mathml_from_latex(eqn)
+    return Response(content=res, media_type=&#34;application/xml&#34;)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.img2mml.eq2mml.LatexEquation"><code class="flex name class">
+<span>class <span class="ident">LatexEquation</span></span>
+<span>(</span><span>**data: Any)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class LatexEquation(BaseModel):
+    tex_src: Text = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
+    class Config:
+        schema_extra = {
+            &#34;example&#34;: {
+                &#34;tex_src&#34;: &#34;E = mc^{c}&#34;,
+            }
+        }</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pydantic.main.BaseModel</li>
+<li>pydantic.utils.Representation</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.img2mml.eq2mml.LatexEquation.Config"><code class="name">var <span class="ident">Config</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.img2mml.eq2mml.LatexEquation.tex_src"><code class="name">var <span class="ident">tex_src</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.img2mml" href="index.html">skema.img2mml</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.img2mml.eq2mml.get_tex_to_mathml" href="#skema.img2mml.eq2mml.get_tex_to_mathml">get_tex_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eq2mml.healthcheck" href="#skema.img2mml.eq2mml.healthcheck">healthcheck</a></code></li>
+<li><code><a title="skema.img2mml.eq2mml.post_b64image_to_mathml" href="#skema.img2mml.eq2mml.post_b64image_to_mathml">post_b64image_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eq2mml.post_image_to_mathml" href="#skema.img2mml.eq2mml.post_image_to_mathml">post_image_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eq2mml.post_tex_to_mathml" href="#skema.img2mml.eq2mml.post_tex_to_mathml">post_tex_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eq2mml.process_latex_equation" href="#skema.img2mml.eq2mml.process_latex_equation">process_latex_equation</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.img2mml.eq2mml.LatexEquation" href="#skema.img2mml.eq2mml.LatexEquation">LatexEquation</a></code></h4>
+<ul class="">
+<li><code><a title="skema.img2mml.eq2mml.LatexEquation.Config" href="#skema.img2mml.eq2mml.LatexEquation.Config">Config</a></code></li>
+<li><code><a title="skema.img2mml.eq2mml.LatexEquation.tex_src" href="#skema.img2mml.eq2mml.LatexEquation.tex_src">tex_src</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

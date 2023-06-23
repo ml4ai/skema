@@ -67,32 +67,24 @@ def get_mathml_from_file(filepath) -&gt; str:
     return get_mathml_from_bytes(data)
 
 
-def get_mathml_from_latex(eqn) -&gt; str:
+def get_mathml_from_latex(eqn: str) -&gt; str:
     &#34;&#34;&#34;Read a LaTeX equation string and convert it to presentation MathML&#34;&#34;&#34;
 
     # Define the webservice address from the MathJAX service
+    protocol = os.environ.get(&#39;SKEMA_MATHJAX_PROTOCOL&#39;, &#39;http://&#39;)
     host = os.environ.get(&#39;SKEMA_MATHJAX_HOST&#39;, &#39;127.0.0.1&#39;)
-    port = os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031)
-    webservice = host + &#39;:&#39; + port
+    port = str(os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031))
+    webservice = protocol + host + &#39;:&#39; + port
     print(&#39;Connecting to &#39; + webservice)
 
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
         f&#34;{webservice}/tex2mml&#34;,
         headers={&#34;Content-type&#34;: &#34;application/json&#34;},
-        json={&#34;tex_src&#34;: json.dumps(eqn)},
+        json={&#34;tex_src&#34;: eqn},
     )
-
     if res.status_code == 200:
-        clean_res = (
-            res.content.decode(&#34;utf-8&#34;)[1:-1]
-            .replace(&#34;\\n&#34;, &#34;&#34;)
-            .replace(&#39;\\&#34;&#39;, &#39;&#34;&#39;)
-            .replace(&#34;\\\\&#34;, &#34;\\&#34;)
-            .strip()
-        )
-        clean_res = re.sub(r&#34;\s+&#34;, &#34; &#34;, clean_res)
-        return clean_res
+        return res.text
     else:
         try:
             res.raise_for_status()
@@ -166,7 +158,7 @@ def get_mathml_from_latex(eqn) -&gt; str:
 </details>
 </dd>
 <dt id="skema.img2mml.api.get_mathml_from_latex"><code class="name flex">
-<span>def <span class="ident">get_mathml_from_latex</span></span>(<span>eqn) ‑> str</span>
+<span>def <span class="ident">get_mathml_from_latex</span></span>(<span>eqn: str) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Read a LaTeX equation string and convert it to presentation MathML</p></div>
@@ -174,32 +166,24 @@ def get_mathml_from_latex(eqn) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_mathml_from_latex(eqn) -&gt; str:
+<pre><code class="python">def get_mathml_from_latex(eqn: str) -&gt; str:
     &#34;&#34;&#34;Read a LaTeX equation string and convert it to presentation MathML&#34;&#34;&#34;
 
     # Define the webservice address from the MathJAX service
+    protocol = os.environ.get(&#39;SKEMA_MATHJAX_PROTOCOL&#39;, &#39;http://&#39;)
     host = os.environ.get(&#39;SKEMA_MATHJAX_HOST&#39;, &#39;127.0.0.1&#39;)
-    port = os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031)
-    webservice = host + &#39;:&#39; + port
+    port = str(os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031))
+    webservice = protocol + host + &#39;:&#39; + port
     print(&#39;Connecting to &#39; + webservice)
 
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
         f&#34;{webservice}/tex2mml&#34;,
         headers={&#34;Content-type&#34;: &#34;application/json&#34;},
-        json={&#34;tex_src&#34;: json.dumps(eqn)},
+        json={&#34;tex_src&#34;: eqn},
     )
-
     if res.status_code == 200:
-        clean_res = (
-            res.content.decode(&#34;utf-8&#34;)[1:-1]
-            .replace(&#34;\\n&#34;, &#34;&#34;)
-            .replace(&#39;\\&#34;&#39;, &#39;&#34;&#39;)
-            .replace(&#34;\\\\&#34;, &#34;\\&#34;)
-            .strip()
-        )
-        clean_res = re.sub(r&#34;\s+&#34;, &#34; &#34;, clean_res)
-        return clean_res
+        return res.text
     else:
         try:
             res.raise_for_status()
