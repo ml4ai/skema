@@ -38,7 +38,7 @@ fn parse(s: Span) -> IResult<Span, Vec<Comment>> {
         alt((parse_comment, parse_next)),
         Vec::new,
         |mut acc: Vec<Comment>, span| {
-            if span.fragment().len() > 0 {
+            if !span.fragment().is_empty() {
                 acc.push(Comment {
                     line_number: span.location_line().try_into().unwrap(),
                     contents: span.fragment().to_string(),

@@ -1,10 +1,10 @@
+use crate::acset;
 pub use crate::acset::ACSet;
 use crate::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
     Polarity, Rate, Specie, Var,
 };
 use crate::{
-    acset,
     ast::{
         Math,
         MathExpression::{Mn, Mo, Mrow},
@@ -65,7 +65,7 @@ pub struct Term {
 //     derivatives are being taken). The variables on the RHSes that correspond to variables on the
 //     LHS are species. The rest are rates.
 /// Group the variables in the equations by the =, +, and - operators, and collect the variables.
-fn group_by_operators(
+pub fn group_by_operators(
     ast: Math,
     species: &mut HashSet<Var>,
     vars: &mut HashSet<Var>,
