@@ -5,6 +5,7 @@ import torch.nn as nn
 from skema.img2mml.utils.utils import *
 from skema.img2mml.src.train import *
 
+
 def evaluate(
     model,
     model_type,
