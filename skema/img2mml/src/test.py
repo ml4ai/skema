@@ -3,7 +3,7 @@
 import torch
 import torch.nn as nn
 from skema.img2mml.utils.utils import *
-
+from skema.img2mml.src.train import *
 
 def evaluate(
     model,
@@ -19,7 +19,8 @@ def evaluate(
     ddp=False,
     rank=None,
     g2p=False,
-    config=None
+    config=None,
+    weight=0.5,
 ):
     model.eval()
     epoch_loss = 0
@@ -40,11 +41,7 @@ def evaluate(
             mml = mml.to(device, dtype=torch.long)
             imgs = list()
             for im in img:
-                imgs.append(
-                    torch.load(
-                        f"{img_tnsr_path}/{int(im.item())}.txt"
-                    )
-                )
+                imgs.append(torch.load(f"{img_tnsr_path}/{int(im.item())}.txt"))
             img = torch.stack(imgs).to(device)
 
             """
@@ -58,6 +55,7 @@ def evaluate(
             if is_test:
                 preds = garbage2pad(preds, vocab, is_test=is_test)
                 output_dim = outputs.shape[-1]
+                batch_ted_loss = get_batch_ted_loss(outputs, mml[:, 1:], vocab)
                 mml_reshaped = mml[:, 1:].contiguous().view(-1)
                 if model_type == "opennmt":
                     outputs_reshaped = (
@@ -70,6 +68,7 @@ def evaluate(
 
             else:
                 output_dim = outputs.shape[-1]
+                batch_ted_loss = get_batch_ted_loss(outputs, mml[:, 1:], vocab)
                 if model_type == "opennmt":
                     outputs_reshaped = (
                         outputs[:, 1:, :].contiguous().view(-1, output_dim)
@@ -80,7 +79,7 @@ def evaluate(
                     )  # (B * max_len-1, output_dim)
                 mml_reshaped = mml[:, 1:].contiguous().view(-1)
 
-            loss = criterion(outputs_reshaped, mml_reshaped)
+            loss = criterion(outputs_reshaped, mml_reshaped) + weight * batch_ted_loss
 
             epoch_loss += loss.item()
 
@@ -106,9 +105,7 @@ def evaluate(
                         )  # list of all eqns and score
                         pred = predicted_seq[0][0]
 
-                    pred_arr = [
-                        vocab.itos[ipred] for ipred in preds.int()[idx, :]
-                    ]
+                    pred_arr = [vocab.itos[ipred] for ipred in preds.int()[idx, :]]
                     pred_seq = " ".join(pred_arr)
                     pred_seqs.write(pred_seq + "\n")
 
