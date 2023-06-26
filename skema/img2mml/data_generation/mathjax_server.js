@@ -1,7 +1,8 @@
 const express = require('express');
 const mjAPI = require("mathjax-node");
 const _ = require('lodash');
-const PORT = 8031;
+
+
 
 // ==== Initialize the express server ==========================================
 var app = express();
@@ -58,10 +59,11 @@ function tex2mml(tex) {
 // Process a single TeX equation string into a MathML string
 app.post('/tex2mml', function (req, res) {
     // Access the LaTeX source from the request object
-    var tex_str = JSON.parse(req.body.tex_src)
+    var tex_str = req.body.tex_src
     tex2mml(tex_str)
         .then((data) => {
-            res.send(JSON.stringify(data.mml));
+            res.setHeader('Content-Type', "application/xml");
+            res.send(data.mml);
         })
         .catch((err) => {
             res.send(JSON.stringify(`FAILED::${err}::${tex_str}`));
@@ -86,9 +88,32 @@ app.get('/restart', function (req, res) {
     res.send("MathJax service restarted");
 });
 
+function port() {
+    try {
+        var port = process.env.SKEMA_MATHJAX_PORT
+        if(port == undefined) {
+            port = "8031";
+        }
+        return port;
+    } catch(err) {
+        return "8031";
+    }
+}
+
+function host() {
+    try {
+        var host = process.env.SKEMA_MATHJAX_HOST
+        if(host == undefined) {
+            return "127.0.0.1";
+        }
+        return host;
+    } catch(err) {
+        return "127.0.0.1";
+    }
+}
 
 // Start the express application server
-var server = app.listen(PORT, function () {
-    var port = server.address().port
-    console.log("MathJax server listening at http://localhost:%s", port)
+var server = app.listen(port(), host(), function(){
+    console.log("MathJax server listening at %s:%s", server.address().address, server.address().port);
 });
+
