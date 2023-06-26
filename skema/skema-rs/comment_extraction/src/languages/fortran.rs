@@ -4,7 +4,7 @@
 
 use lazy_static::lazy_static;
 use regex::Regex;
-use serde::{Deserialize, Serialize};
+
 use std::collections::HashSet;
 
 /// From FORTRAN Language Reference
