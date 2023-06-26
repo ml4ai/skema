@@ -29,15 +29,19 @@
 </summary>
 <pre><code class="python">import os
 import tempfile
-from typing import List
-
-from fastapi import FastAPI, Body
+from pathlib import Path
+from typing import List, Optional
+from io import BytesIO
+from zipfile import ZipFile
+from urllib.request import urlopen
+from fastapi import FastAPI, Body, File, UploadFile
 from pydantic import BaseModel
 
 import skema.skema_py.acsets
 import skema.skema_py.petris
 
 from skema.program_analysis.multi_file_ingester import process_file_system
+from skema.program_analysis.snippet_ingester import process_snippet
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
@@ -45,11 +49,47 @@ class Ports(BaseModel):
     opis: List[str]
     opos: List[str]
 
+
 class System(BaseModel):
-    files: List[str]
+    files: List[str] = []
     blobs: List[str]
-    system_name: str
-    root_name: str
+    system_name: Optional[str] = &#34;&#34;
+    root_name: Optional[str] = &#34;&#34;
+
+
+def system_to_gromet(system: System):
+    &#34;&#34;&#34;Convert a System to Gromet JSON&#34;&#34;&#34;
+
+    # The CODE2FN Pipeline requires a file path as input.
+    # We are receiving a serialized version of the code system as input, so we must store the file in a temporary directory.
+    # This temp directory only persists during execution of the CODE2FN pipeline.
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+
+        # Create files and intermediate directories
+        for index, file in enumerate(system.files):
+            file_path = Path(
+                tmp_path, system.root_name, file
+            )
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(system.blobs[index])
+
+        # Create system_filepaths.txt
+        system_filepaths = Path(
+            tmp_path, &#34;system_filepaths.txt&#34;
+        )
+        system_filepaths.write_text(&#34;\n&#34;.join(system.files))
+
+        ## Run pipeline
+        gromet_collection = process_file_system(
+            system.system_name,
+            str(Path(tmp_path, system.root_name)),
+            str(system_filepaths),
+        )
+
+    # Convert gromet data-model to json
+    gromet_collection_dict = gromet_collection.to_dict()
+    return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
 
 
 app = FastAPI()
@@ -68,31 +108,67 @@ def ping():
     ),
 )
 async def fn_given_filepaths(system: System):
-    # Create a tempory directory to store module
-    with tempfile.TemporaryDirectory() as tmp:
-        # Recreate module structure
-        for index, file in enumerate(system.files):
-            full_path = os.path.join(tmp, system.root_name, file)
-            # Create file and intermediate directories first
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-            with open(full_path, &#34;w&#34;) as f:
-                f.write(system.blobs[index])
+    &#34;&#34;&#34;
+    Endpoint for generating Gromet JSON from a .
 
-        # Create system_filepaths.txt file
-        system_filepaths = os.path.join(tmp, &#34;system_filepaths.txt&#34;)
-        with open(system_filepaths, &#34;w&#34;) as f:
-            f.writelines(file + &#34;\n&#34; for file in system.files)
+    ### Python example
+    ```
+    import requests
 
-        ## Run pipeline
-        gromet_collection = process_file_system(
-            system.system_name,
-            os.path.join(tmp, system.root_name),
-            system_filepaths,
-        )
+    system = {
+      &#34;files&#34;: [&#34;exp1.py&#34;],
+      &#34;blobs&#34;: [&#34;x=2&#34;]
+    }
+    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
+    gromet_json = response.json()
+    &#34;&#34;&#34;
+    return system_to_gromet(system)
 
-    # Convert output to json
-    gromet_collection_dict = gromet_collection.to_dict()
-    return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
+
+@app.post(
+    &#34;/fn-given-filepaths-zip&#34;,
+    summary=(
+        &#34;Send a zip file containing a code system,&#34;
+        &#34; get a GroMEt FN Module collection back.&#34;
+    ),
+)
+async def root(zip_file: UploadFile = File()):
+    &#34;&#34;&#34;
+    Endpoint for generating Gromet JSON from a zip archive.
+
+    ### Python example
+    ```
+    import requests
+
+    files = {
+      &#34;zip_file&#34;: open(&#34;code_system.zip&#34;, &#34;rb&#34;),
+    }
+    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths-zip&#34;, files=files)
+    gromet_json = response.json()
+    &#34;&#34;&#34;
+
+    # Currently, we rely on the file extension to know which language front end to send the source code to.
+    supported_file_extensions = [&#34;.py&#34;, &#34;.f&#34;, &#34;.f95&#34;]
+
+    # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
+    files = []
+    blobs = []
+    with ZipFile(BytesIO(zip_file.file.read()), &#34;r&#34;) as zip:
+        for file in zip.namelist():
+            file_obj = Path(file)
+            if file_obj.suffix in supported_file_extensions:
+                files.append(file)
+                blobs.append(zip.open(file).read())
+
+    zip_obj = Path(zip_file.filename)
+    system_name = zip_obj.name
+    root_name = zip_obj.name
+
+    system = System(
+        files=files, blobs=blobs, system_name=system_name, root_name=root_name
+    )
+    return system_to_gromet(system)
+
 
 @app.post(
     &#34;/get-pyacset&#34;,
@@ -125,7 +201,16 @@ async def get_pyacset(ports: Ports):
 <span>async def <span class="ident">fn_given_filepaths</span></span>(<span>system: <a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a>)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Endpoint for generating Gromet JSON from a .</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>system = {
+"files": ["exp1.py"],
+"blobs": ["x=2"]
+}
+response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
+gromet_json = response.json()</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -138,31 +223,21 @@ async def get_pyacset(ports: Ports):
     ),
 )
 async def fn_given_filepaths(system: System):
-    # Create a tempory directory to store module
-    with tempfile.TemporaryDirectory() as tmp:
-        # Recreate module structure
-        for index, file in enumerate(system.files):
-            full_path = os.path.join(tmp, system.root_name, file)
-            # Create file and intermediate directories first
-            os.makedirs(os.path.dirname(full_path), exist_ok=True)
-            with open(full_path, &#34;w&#34;) as f:
-                f.write(system.blobs[index])
+    &#34;&#34;&#34;
+    Endpoint for generating Gromet JSON from a .
 
-        # Create system_filepaths.txt file
-        system_filepaths = os.path.join(tmp, &#34;system_filepaths.txt&#34;)
-        with open(system_filepaths, &#34;w&#34;) as f:
-            f.writelines(file + &#34;\n&#34; for file in system.files)
+    ### Python example
+    ```
+    import requests
 
-        ## Run pipeline
-        gromet_collection = process_file_system(
-            system.system_name,
-            os.path.join(tmp, system.root_name),
-            system_filepaths,
-        )
-
-    # Convert output to json
-    gromet_collection_dict = gromet_collection.to_dict()
-    return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))</code></pre>
+    system = {
+      &#34;files&#34;: [&#34;exp1.py&#34;],
+      &#34;blobs&#34;: [&#34;x=2&#34;]
+    }
+    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
+    gromet_json = response.json()
+    &#34;&#34;&#34;
+    return system_to_gromet(system)</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.get_pyacset"><code class="name flex">
@@ -206,6 +281,112 @@ async def get_pyacset(ports: Ports):
 <pre><code class="python">@app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
 def ping():
     return &#34;The skema-py service is running.&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.server.root"><code class="name flex">
+<span>async def <span class="ident">root</span></span>(<span>zip_file: fastapi.datastructures.UploadFile = File(PydanticUndefined))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Endpoint for generating Gromet JSON from a zip archive.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>files = {
+"zip_file": open("code_system.zip", "rb"),
+}
+response = requests.post("http://0.0.0.0:8000/fn-given-filepaths-zip", files=files)
+gromet_json = response.json()</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.post(
+    &#34;/fn-given-filepaths-zip&#34;,
+    summary=(
+        &#34;Send a zip file containing a code system,&#34;
+        &#34; get a GroMEt FN Module collection back.&#34;
+    ),
+)
+async def root(zip_file: UploadFile = File()):
+    &#34;&#34;&#34;
+    Endpoint for generating Gromet JSON from a zip archive.
+
+    ### Python example
+    ```
+    import requests
+
+    files = {
+      &#34;zip_file&#34;: open(&#34;code_system.zip&#34;, &#34;rb&#34;),
+    }
+    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths-zip&#34;, files=files)
+    gromet_json = response.json()
+    &#34;&#34;&#34;
+
+    # Currently, we rely on the file extension to know which language front end to send the source code to.
+    supported_file_extensions = [&#34;.py&#34;, &#34;.f&#34;, &#34;.f95&#34;]
+
+    # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
+    files = []
+    blobs = []
+    with ZipFile(BytesIO(zip_file.file.read()), &#34;r&#34;) as zip:
+        for file in zip.namelist():
+            file_obj = Path(file)
+            if file_obj.suffix in supported_file_extensions:
+                files.append(file)
+                blobs.append(zip.open(file).read())
+
+    zip_obj = Path(zip_file.filename)
+    system_name = zip_obj.name
+    root_name = zip_obj.name
+
+    system = System(
+        files=files, blobs=blobs, system_name=system_name, root_name=root_name
+    )
+    return system_to_gromet(system)</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.server.system_to_gromet"><code class="name flex">
+<span>def <span class="ident">system_to_gromet</span></span>(<span>system: <a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert a System to Gromet JSON</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def system_to_gromet(system: System):
+    &#34;&#34;&#34;Convert a System to Gromet JSON&#34;&#34;&#34;
+
+    # The CODE2FN Pipeline requires a file path as input.
+    # We are receiving a serialized version of the code system as input, so we must store the file in a temporary directory.
+    # This temp directory only persists during execution of the CODE2FN pipeline.
+    with tempfile.TemporaryDirectory() as tmp:
+        tmp_path = Path(tmp)
+
+        # Create files and intermediate directories
+        for index, file in enumerate(system.files):
+            file_path = Path(
+                tmp_path, system.root_name, file
+            )
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(system.blobs[index])
+
+        # Create system_filepaths.txt
+        system_filepaths = Path(
+            tmp_path, &#34;system_filepaths.txt&#34;
+        )
+        system_filepaths.write_text(&#34;\n&#34;.join(system.files))
+
+        ## Run pipeline
+        gromet_collection = process_file_system(
+            system.system_name,
+            str(Path(tmp_path, system.root_name)),
+            str(system_filepaths),
+        )
+
+    # Convert gromet data-model to json
+    gromet_collection_dict = gromet_collection.to_dict()
+    return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))</code></pre>
 </details>
 </dd>
 </dl>
@@ -257,10 +438,10 @@ def ping():
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class System(BaseModel):
-    files: List[str]
+    files: List[str] = []
     blobs: List[str]
-    system_name: str
-    root_name: str</code></pre>
+    system_name: Optional[str] = &#34;&#34;
+    root_name: Optional[str] = &#34;&#34;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -277,11 +458,11 @@ def ping():
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="skema.skema_py.server.System.root_name"><code class="name">var <span class="ident">root_name</span> : str</code></dt>
+<dt id="skema.skema_py.server.System.root_name"><code class="name">var <span class="ident">root_name</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="skema.skema_py.server.System.system_name"><code class="name">var <span class="ident">system_name</span> : str</code></dt>
+<dt id="skema.skema_py.server.System.system_name"><code class="name">var <span class="ident">system_name</span> : Optional[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -306,6 +487,8 @@ def ping():
 <li><code><a title="skema.skema_py.server.fn_given_filepaths" href="#skema.skema_py.server.fn_given_filepaths">fn_given_filepaths</a></code></li>
 <li><code><a title="skema.skema_py.server.get_pyacset" href="#skema.skema_py.server.get_pyacset">get_pyacset</a></code></li>
 <li><code><a title="skema.skema_py.server.ping" href="#skema.skema_py.server.ping">ping</a></code></li>
+<li><code><a title="skema.skema_py.server.root" href="#skema.skema_py.server.root">root</a></code></li>
+<li><code><a title="skema.skema_py.server.system_to_gromet" href="#skema.skema_py.server.system_to_gromet">system_to_gromet</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
