@@ -84,16 +84,24 @@ class TS2CAST(object):
         for context in contexts:
             modules.append(self.visit(context))
 
-        '''
-        self.module.source_refs = [self.node_helper.get_source_ref(root)]
-        self.module.body = []
-        for child in root.children:
-            child_cast = self.visit(child)
-            if isinstance(child_cast, List):
-                self.module.body.extend(child_cast)
-            else:
-                self.module.body.append(child_cast)
-        '''
+        # Currently, we are supporting functions and subroutines defined outside of programs and modules
+        # Other than comments, it is unclear if anything else is allowed.
+        # TODO: Research the above
+        outer_body_nodes = get_children_by_types(root, ["function", "subroutine"])
+        if len(outer_body_nodes) > 0:
+            body = []
+            for body_node in outer_body_nodes:
+                child_cast = self.visit(body_node)
+                if isinstance(child_cast, List):
+                    body.extend(child_cast)
+                elif isinstance(child_cast, AstNode):
+                    body.append(child_cast)
+            modules.append(Module(
+                name=None,
+                body=body,
+                source_refs=[self.node_helper.get_source_ref(root)]
+            ))
+    
         return modules
 
     def visit(self, node):
