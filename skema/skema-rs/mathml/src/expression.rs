@@ -429,28 +429,32 @@ impl Expr {
                             ops_copy = ops.clone();
                             args_copy = args.clone();
                         }
-                        *ops = ops_copy.clone();
-                        *args = args_copy.clone();
+                        *ops = ops_copy;
+                        *args = args_copy;
                         break;
                     }
                 }
             }
 
-            if need_to_distribute_divs(ops.to_vec().clone(), args.to_vec().clone()) && ops.len() > 1
-            {
+            if need_to_distribute_divs(ops.to_vec(), args.to_vec()) && ops.len() > 1 {
                 let mut new_expr = Expr::Expression {
                     ops: Vec::<Operator>::new(),
                     args: Vec::<Expr>::new(),
                     name: "".to_string(),
                 };
-                if let Expr::Expression { ops, args, name: _ } = &mut new_expr {
+                if let Expr::Expression {
+                    ops,
+                    args: _,
+                    name: _,
+                } = &mut new_expr
+                {
                     ops.push(Operator::Other("".to_string()));
                 }
                 let mut removed_idx: Vec<usize> = Vec::new();
                 for i in 0..args.len() {
                     if ops[i] == Operator::Divide {
                         removed_idx.push(i);
-                        let mut tmp_arg = args[i].clone();
+                        let tmp_arg = args[i].clone();
                         if let Expr::Expression { ops, args, name: _ } = &mut new_expr {
                             if ops.len() == args.len() {
                                 ops.push(Operator::Multiply);
@@ -936,7 +940,7 @@ pub fn switch_mul_div(op: Operator) -> Operator {
     if op == Operator::Divide {
         return Operator::Multiply;
     }
-    return switched_op;
+    switched_op
 }
 
 ///Switch the summation operator and the subtraction operator
@@ -948,7 +952,7 @@ pub fn switch_add_subt(op: Operator) -> Operator {
     if op == Operator::Subtract {
         return Operator::Add;
     }
-    return switched_op;
+    switched_op
 }
 
 /// Check if the current term's operators are all add or subtract.
@@ -968,7 +972,7 @@ pub fn ops_contain_mult(ops: Vec<Operator>) -> bool {
             return true;
         }
     }
-    return false;
+    false
 }
 
 /// Check if the current term's operators contain multiple divisions, and the denominators contain
@@ -978,8 +982,13 @@ pub fn need_to_distribute_divs(ops: Vec<Operator>, args: Vec<Expr>) -> bool {
     let mut contain_add_subt_without_uop: bool = false;
     for o in 1..=ops.len() - 1 {
         if ops[o] == Operator::Divide {
-            num_div = num_div + 1;
-            if let Expr::Expression { ops, args, name } = &args[o] {
+            num_div += 1;
+            if let Expr::Expression {
+                ops,
+                args: _,
+                name: _,
+            } = &args[o]
+            {
                 if ops[0] == Operator::Other("".to_string()) && all_ops_are_add_or_subt(ops.clone())
                 {
                     contain_add_subt_without_uop = true;
@@ -990,7 +999,7 @@ pub fn need_to_distribute_divs(ops: Vec<Operator>, args: Vec<Expr>) -> bool {
             }
         }
     }
-    return false;
+    false
 }
 
 /// Check if the current term's operators contain add or minus and without the unary operator.
@@ -1003,7 +1012,7 @@ pub fn need_to_distribute(ops: Vec<Operator>) -> bool {
             return true;
         }
     }
-    return false;
+    false
 }
 
 impl PreExp {

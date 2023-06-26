@@ -217,7 +217,7 @@ class ToGrometPass:
         # visiting nodes adds FNs
         self.gromet_module = GrometFNModule(
             schema="FN",
-            schema_version="0.1.6",
+            schema_version="0.1.7",
             name="",
             fn=None,
             fn_array=[],
@@ -385,6 +385,7 @@ class ToGrometPass:
         else:
             func_name = node.func.name
 
+        # print(f"PRIMITIVE {func_name}")
         # primitives that come from something other than an assignment or functions designated to be inlined at all times have
         # special semantics in that they're inlined as opposed to creating their own GroMEt FNs
         if (not from_assignment) or is_inline(func_name):
@@ -402,6 +403,7 @@ class ToGrometPass:
                     parent_gromet_fn.pif, GrometPort(box=inline_bf_loc)
                 )
                 if isinstance(arg, AnnCastName):
+                    # print("yeah")
                     self.wire_from_var_env(arg.name, parent_gromet_fn)
                 elif isinstance(arg, AnnCastVar):
                     self.wire_from_var_env(arg.val.name, parent_gromet_fn)
@@ -571,6 +573,7 @@ class ToGrometPass:
             gromet_fn = attribute
             if gromet_fn.b != None:
                 gromet_fn_b = gromet_fn.b[0]
+                # print(f"{gromet_fn_b.name} == {func_name}")
                 if gromet_fn_b.name == func_name:
                     found_func = True
                     break
@@ -2213,13 +2216,13 @@ class ToGrometPass:
             return func_call_idx
 
         func_name = node.func.name
-        in_module = self.func_in_module(node.func.name)
-        # print(in_module)
+        # identified_func_name = ".".join(node.func.con_scope)
+        identified_func_name = f"{func_name}_id{node.func.id}"
+        in_module = self.func_in_module(func_name)
         # NOTE: This allows us to wire arguments that aren't originally in the CAST but are necessary
         # For the functional GroMEt structure.  This will probably change
-        if (
-            parent_gromet_fn.pof != None and parent_gromet_fn.pif != None
-        ):  # NOTE: this is a good guard probably don't need to remove
+        if (parent_gromet_fn.pof != None and parent_gromet_fn.pif != None):  
+            # NOTE: this is a good guard probably don't need to remove
             for i, pof in enumerate(parent_gromet_fn.pof, 1):
                 if pof.name != None:
                     for j, pif in enumerate(parent_gromet_fn.pif, 1):
@@ -2230,14 +2233,13 @@ class ToGrometPass:
 
         # in_module = self.func_in_module(node.func.name)
         # in_module = (False, "")
-        # print(in_module)
 
         # Certain functions (special functions that PA has designated as primitive)
         # Are considered 'primitive' operations, in other words calls to them aren't
         # considered function calls but rather they're considered expressions, so we
         # call a special handler to handle these
         if is_primitive(node.func.name, "CAST") and not in_module[0]:
-            # print(node.func.name)
+            # print(f"PRIMITIVE {node.func.name}")
             self.handle_primitive_function(
                 node, parent_gromet_fn, parent_cast_node, from_assignment
             )
@@ -2349,7 +2351,7 @@ class ToGrometPass:
             parent_gromet_fn.bf = insert_gromet_object(
                 parent_gromet_fn.bf,
                 GrometBoxFunction(
-                    name=f"{in_module[1]}.{func_name}",
+                    name=f"{in_module[1]}.{func_name}_id{node.func.id}",
                     function_type=func_info[0],
                     import_type=func_info[1],
                     import_version=func_info[2],
@@ -2368,7 +2370,7 @@ class ToGrometPass:
             # that a GroMEt FN isn't guaranteed to exist before a Call
             # to it is made. So we either find the GroMEt in the collection of
             # FNs or we create a 'temporary' one that will be filled out later
-            qualified_func_name = f"{'.'.join(node.func.con_scope)}.{node.func.name}_{node.invocation_index}"
+            qualified_func_name = f"{node.func.name}_id{node.func.id}"
             func_name = node.func.name
 
             # print(func_name in BUILTINS)
@@ -2393,7 +2395,11 @@ class ToGrometPass:
                     ),
                 )
             else:
-                idx, found = self.find_gromet(func_name)
+                # idx, found = self.find_gromet(func_name)
+                #print(identified_func_name)
+                #print(qualified_func_name)
+                #print("---")
+                idx, found = self.find_gromet(identified_func_name)
                 if not found and func_name not in self.record.keys():
                     temp_gromet_fn = GrometFN()
                     temp_gromet_fn.b = insert_gromet_object(
@@ -2731,13 +2737,11 @@ class ToGrometPass:
         # function definition
         var_environment = self.symtab_variables()
         
+        prev_local_env = {}
         if isinstance(parent_cast_node, AnnCastFunctionDef):
             prev_local_env = deepcopy(var_environment["local"])
-        else:
-            # Initialize the function argument variable environment and populate it as we
-            # visit the function arguments
-            prev_local_env = {}
-            var_environment["local"] = {}
+
+        var_environment["local"] = {}
 
         for n in func_body:
             self.visit(n, new_gromet_fn, node)
@@ -2790,8 +2794,9 @@ class ToGrometPass:
         self, node: AnnCastFunctionDef, parent_gromet_fn, parent_cast_node
     ):
         # print(f"-----{node.name.name}------")
-        func_name = node.name.name
+        func_name = f"{node.name.name}_id{node.name.id}"
         identified_func_name = ".".join(node.con_scope)
+        # print(f"Adding {func_name}")
         idx, found = self.find_gromet(func_name)
 
         ref = node.source_refs[0]
@@ -2807,6 +2812,7 @@ class ToGrometPass:
                 new_gromet.b,
                 GrometBoxFunction(
                     name=func_name, function_type=FunctionType.FUNCTION
+                    # name=func_name, function_type=FunctionType.FUNCTION
                 ),
             )
         else:
@@ -2832,7 +2838,19 @@ class ToGrometPass:
             # visit the function arguments
             prev_arg_env = {}
             var_environment["args"] = {}
-        arg_env = var_environment["args"]
+        # arg_env = var_environment["args"]
+
+        # Copy the previous local and argument environments
+        # If we're a function within a function this effectively lets us
+        # see all the local and arguments from the outer scope and use them
+        # within here
+        # If we have an argument or a local variable that share a name
+        # With a variable or argument in the outer scope, then they get
+        # overwritten (to simulate scope shadowing)
+        # The use of {**var_env_args, **var_env_local} here creates new dictionaries,
+        # so the old environments are left unchanged
+        arg_env = {**var_environment["args"], **var_environment["local"]}
+        var_environment["args"] = arg_env
 
         for arg in node.func_args:
             # print("VISITING ARG ----")
@@ -2841,6 +2859,8 @@ class ToGrometPass:
 
             # for each argument we want to have a corresponding port (OPI) here
             arg_ref = arg.source_refs[0]
+            arg_name = arg.val.name
+
             if arg.default_value != None:
                 # if isinstance(arg.default_value, AnnCastTuple):
                 if is_tuple(arg.default_value):
@@ -2848,7 +2868,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=arg.default_value.value,
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2860,7 +2880,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=None,  # TODO: What's the actual default value?
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2872,7 +2892,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=None,  # TODO: M7 placeholder
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2884,7 +2904,7 @@ class ToGrometPass:
                         new_gromet.opi,
                         GrometPort(
                             box=len(new_gromet.b),
-                            name=arg.val.name,
+                            name=arg_name,
                             default_value=arg.default_value.value,
                             metadata=self.insert_metadata(
                                 self.create_source_code_reference(arg_ref)
@@ -2896,7 +2916,7 @@ class ToGrometPass:
                     new_gromet.opi,
                     GrometPort(
                         box=len(new_gromet.b),
-                        name=arg.val.name,
+                        name=arg_name,
                         metadata=self.insert_metadata(
                             self.create_source_code_reference(arg_ref)
                         ),
@@ -2906,11 +2926,30 @@ class ToGrometPass:
             # Store each argument, its opi, and where it is in the opi table
             # For use when creating wfopi wires
             # Have to add 1 to the third value if we want to use it as an index reference
-            arg_env[arg.val.name] = (
+            arg_env[arg_name] = (
                 arg,
                 new_gromet.opi[-1],
                 len(new_gromet.opi),
             )
+
+        for var in var_environment["args"]:
+            if new_gromet.opi != None and not var in [opi.name for opi in new_gromet.opi]:
+                new_gromet.opi = insert_gromet_object(
+                    new_gromet.opi,
+                    GrometPort(
+                        box=len(new_gromet.b),
+                        name=var,
+                        metadata=self.insert_metadata(
+                            self.create_source_code_reference(arg_ref)
+                        ),
+                    ),
+                )
+                arg_env[var] = (
+                    var_environment["args"][var][0],
+                    new_gromet.opi[-1],
+                    len(new_gromet.opi)
+                )
+
 
         # handle_function_def() will visit the body of the function and take care of
         # wiring any GroMEt FNs in its body

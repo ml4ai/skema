@@ -63,7 +63,7 @@ fn infer_language(filepath: &str) -> Language {
 
     let extension = Path::new(filepath)
         .extension()
-        .expect(&format!("Unable to get extension for {}!", filepath))
+        .unwrap_or_else(|| panic!("Unable to get extension for {}!", filepath))
         .to_str()
         .expect("Unable to convert extension to a valid string!");
     if FORTRAN_EXTENSIONS.contains(extension) {

@@ -1,8 +1,8 @@
 //! Comment extraction services
 
 use actix_web::{get, web, HttpResponse};
-use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
 use comment_extraction::comments::Comments;
+use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
 use serde::{Deserialize, Serialize};
 use utoipa;
 use utoipa::ToSchema;

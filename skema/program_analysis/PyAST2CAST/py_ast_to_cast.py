@@ -57,20 +57,20 @@ def get_python_version():
     return string_version
 
 
-def merge_dicts(prev_scope, curr_scope):
+def merge_dicts(source, destination):
     """merge_dicts
     Helper function to isolate the work of merging two dictionaries by merging
-    key : value pairs from prev_scope into curr_scope
-    The merging is done 'in_place'. That is, after the function is done, curr_scope
+    key : value pairs from source into curr_scope
+    The merging is done 'in_place'. That is, after the function is done, destination
     is updated with any new key : value pairs that weren't in there before.
 
     Args:
-        prev_scope (dict): Dictionary of name : ID pairs for variables in the enclosing scope
-        curr_scope (dict): Dictionary of name : ID pairs for variables in the current scope
+        source (dict): Dictionary of name : ID pairs
+        destination (dict): Dictionary of name : ID pairs
     """
-    for k in prev_scope.keys():
-        if k not in curr_scope.keys():
-            curr_scope[k] = prev_scope[k]
+    for k in source.keys():
+        if k not in destination.keys():
+            destination[k] = source[k]
 
 
 def construct_unique_name(attr_name, var_name):
@@ -89,15 +89,25 @@ def construct_unique_name(attr_name, var_name):
 
 def get_node_name(ast_node):
     if isinstance(ast_node, ast.Assign):
-        return [ast_node[0].id]
+        return get_node_name(ast_node.targets[0])
+        # return [ast_node[0].id]
+    elif isinstance(ast_node, ast.Name):
+        return [ast_node.id]
     elif isinstance(ast_node, ast.Attribute):
-        return [""]
+        return get_node_name(ast_node.value)
+    elif isinstance(ast_node, ast.Tuple):
+        elements = []
+        for elem in ast_node.elts:
+            elements.extend(get_node_name(elem))
+        return elements
     elif isinstance(ast_node, Attribute):
         return [ast_node.attr.name]
     elif isinstance(ast_node, Var):
         return [ast_node.val.name]
     elif isinstance(ast_node, Assignment):
         return get_node_name(ast_node.left)
+    elif isinstance(ast_node, ast.Subscript):
+        return get_node_name(ast_node.value)
     elif (
         isinstance(ast_node, LiteralValue)
         and (ast_node.value_type == StructureType.LIST or ast_node.value_type == StructureType.TUPLE)
@@ -644,13 +654,10 @@ class PyASTToCAST:
         left = []
         right = []
 
-        if (
-            len(node.targets) == 1
-        ):  # x = 1, or maybe x = y, in general x = {expression}
-
-            if isinstance(
-                node.targets[0], ast.Subscript
-            ):  # List subscript nodes get replaced out by
+        if len(node.targets) == 1:  
+            # x = 1, or maybe x = y, in general x = {expression}
+            if isinstance(node.targets[0], ast.Subscript):  
+                # List subscript nodes get replaced out by
                 # A function call to a "list_set"
                 sub_node = node.targets[0]
                 if isinstance(node.value, ast.Subscript):
@@ -793,9 +800,7 @@ class PyASTToCAST:
                     )
                 ]
 
-            if isinstance(
-                node.value, ast.BinOp
-            ):  # Checking if we have an assignment of the form
+            if isinstance(node.value, ast.BinOp):  # Checking if we have an assignment of the form
                 # x = LIST * NUM or x = NUM * LIST
                 binop = node.value
                 list_node = None
@@ -889,9 +894,8 @@ class PyASTToCAST:
             )
             left.extend(l_visit)
             right.extend(r_visit)
-        elif (
-            len(node.targets) > 1
-        ):  # x = y = z = ... {Expression} (multiple assignments in one line)
+        elif len(node.targets) > 1:
+            # x = y = z = ... {Expression} (multiple assignments in one line)
             left.extend(
                 self.visit(
                     node.targets[0], prev_scope_id_dict, curr_scope_id_dict
@@ -1431,8 +1435,7 @@ class PyASTToCAST:
                     unique_name = construct_unique_name(
                         self.filenames[-1], node.func.id
                     )
-            if unique_name not in prev_scope_id_dict.keys():
-
+            if unique_name not in prev_scope_id_dict.keys(): # and unique_name not in curr_scope_id_dict.keys():
                 # If a built-in is called, then it gets added to the global dictionary if
                 # it hasn't been called before. This is to maintain one consistent ID per built-in
                 # function
@@ -1504,7 +1507,7 @@ class PyASTToCAST:
                         Call(
                             func=Name(
                                 node.func.id,
-                                id=prev_scope_id_dict[unique_name],
+                                id=curr_scope_id_dict[unique_name] if unique_name in curr_scope_id_dict else prev_scope_id_dict[unique_name], # NOTE: do this everywhere?
                                 source_refs=ref,
                             ),
                             arguments=args,
@@ -1615,10 +1618,14 @@ class PyASTToCAST:
                 funcs.extend(
                     self.visit(func, prev_scope_id_dict, curr_scope_id_dict)
                 )
+                # curr_scope_id_dict = {}
                 # if isinstance(func,ast.FunctionDef):
                 self.classes[name].append(func.name)
-                self.insert_next_id(prev_scope_id_dict, name)
+                # self.insert_next_id(prev_scope_id_dict, name)
+                self.insert_next_id(prev_scope_id_dict, f"{name}.{func.name}")
 
+        # print(prev_scope_id_dict)
+        # print(curr_scope_id_dict)
         # Get the fields in the class from init
         init_func = None
         for f in node.body:
@@ -2165,34 +2172,22 @@ class PyASTToCAST:
             if default_val_count == 0:
                 for arg in node.args.args:
                     # unique_name = construct_unique_name(self.filenames[-1], arg.arg)
-                    self.insert_next_id(curr_scope_id_dict, arg.arg)
+                    # self.insert_next_id(curr_scope_id_dict, arg.arg)
+                    # self.insert_next_id(curr_scope_id_dict, f"{node.name}.{arg.arg}")
+                    self.insert_next_id(curr_scope_id_dict, f"{arg.arg}")
                     # self.insert_next_id(curr_scope_id_dict, unique_name)
+                    arg_ref = SourceRef(self.filenames[-1], arg.col_offset, arg.end_col_offset, arg.lineno, arg.end_lineno)
                     args.append(
                         Var(
                             Name(
                                 arg.arg,
                                 id=curr_scope_id_dict[arg.arg],
-                                source_refs=[
-                                    SourceRef(
-                                        self.filenames[-1],
-                                        arg.col_offset,
-                                        arg.end_col_offset,
-                                        arg.lineno,
-                                        arg.end_lineno,
-                                    )
-                                ],
+                                # id=curr_scope_id_dict[f"{node.name}.{arg.arg}"],
+                                source_refs=[arg_ref]
                             ),
                             "float",  # TODO: Correct typing instead of just 'float'
                             None,
-                            source_refs=[
-                                SourceRef(
-                                    self.filenames[-1],
-                                    arg.col_offset,
-                                    arg.end_col_offset,
-                                    arg.lineno,
-                                    arg.end_lineno,
-                                )
-                            ],
+                            source_refs=[arg_ref]
                         )
                     )
             else:
@@ -2422,15 +2417,30 @@ class PyASTToCAST:
         if len(node.body) > 0:
             # To account for nested loops we check to see if the CAST node is in a list and
             # extend accordingly
+
             for piece in node.body:
-                # We defer visiting function defs until we've cleared the rest of the code in the function
+                if isinstance(piece, ast.Assign):
+                    names = get_node_name(piece)
+
+                    for var_name in names:
+                        # unique_name = construct_unique_name(
+                        #    self.filenames[-1], var_name
+                        # )
+                        self.insert_next_id(curr_scope_id_dict, var_name)
+                            
+                    merge_dicts(curr_scope_id_dict, prev_scope_id_dict)
+            # merge_dicts(prev_scope_id_dict, curr_scope_id_dict)
+            for piece in node.body:
+
                 if isinstance(piece, ast.FunctionDef):
-                    self.insert_next_id(curr_scope_id_dict, piece.name)
-                    prev_scope_id_dict[piece.name] = curr_scope_id_dict[
-                        piece.name
-                    ]
-                    functions_to_visit.append(piece)
-                    continue
+                    unique_name = construct_unique_name(self.filenames[-1], piece.name)
+                    self.insert_next_id(curr_scope_id_dict, unique_name)
+                    prev_scope_id_dict[unique_name] = curr_scope_id_dict[unique_name]
+                    # functions_to_visit.append(piece)
+                    #continue
+
+                    # print(curr_scope_id_dict)
+                    # print(prev_scope_id_dict)
 
                 # Have to figure out name IDs for imports (i.e. other modules)
                 # These asserts will keep us from visiting them from now
@@ -2453,12 +2463,12 @@ class PyASTToCAST:
                     )
 
             # Merge keys from prev_scope not in cur_scope into cur_scope
-            merge_dicts(prev_scope_id_dict, curr_scope_id_dict)
+            # merge_dicts(prev_scope_id_dict, curr_scope_id_dict)
 
             # Visit the deferred functions
-            for piece in functions_to_visit:
-                to_add = self.visit(piece, curr_scope_id_dict, {})
-                body.extend(to_add)
+            #for piece in functions_to_visit:
+             #   to_add = self.visit(piece, curr_scope_id_dict, {})
+              #  body.extend(to_add)
 
         # TODO: Decorators? Returns? Type_comment?
         ref = [
@@ -3412,6 +3422,22 @@ class PyASTToCAST:
             )
         ]
         self.module_stack.append(node)
+        
+        # Attempt to capture all global variable names
+        # before we do any function definitions
+        # (functions can use global variables so they need them all available)
+        for line in node.body:
+            if isinstance(line, ast.Assign):
+                names = get_node_name(line)
+
+                for var_name in names:
+                    unique_name = construct_unique_name(
+                        self.filenames[-1], var_name
+                    )
+                    self.insert_next_id(self.global_identifier_dict, unique_name)
+        
+        merge_dicts(self.global_identifier_dict, curr_scope_id_dict)
+        merge_dicts(curr_scope_id_dict, prev_scope_id_dict)
         for piece in node.body:
             # Defer visiting function defs until all global vars are processed
             if isinstance(piece, ast.FunctionDef):
@@ -3422,8 +3448,8 @@ class PyASTToCAST:
                 prev_scope_id_dict[unique_name] = curr_scope_id_dict[
                     unique_name
                 ]
-                funcs.append(piece)
-                continue
+                #funcs.append(piece)
+                #continue
 
             to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
 
@@ -3442,30 +3468,29 @@ class PyASTToCAST:
             if isinstance(piece, ast.Assign):
                 names = get_node_name(to_add[0])
 
-                # print(piece.lineno)
                 for var_name in names:
-                    temp_id = curr_scope_id_dict[var_name]
+                    #temp_id = curr_scope_id_dict[var_name]
                     del curr_scope_id_dict[var_name]
-                    unique_name = construct_unique_name(
-                        self.filenames[-1], var_name
-                    )
-                    curr_scope_id_dict[unique_name] = temp_id
-                    merge_dicts(
-                        curr_scope_id_dict, self.global_identifier_dict
-                    )
+                    #unique_name = construct_unique_name(
+                    #    self.filenames[-1], var_name
+                    #)
+                    #curr_scope_id_dict[unique_name] = temp_id
+                    #merge_dicts(
+                    #    curr_scope_id_dict, self.global_identifier_dict
+                    #)
 
             if isinstance(to_add, Module):
                 body.extend([to_add])
             else:
                 body.extend(to_add)
 
-        merge_dicts(curr_scope_id_dict, self.global_identifier_dict)
-        merge_dicts(prev_scope_id_dict, curr_scope_id_dict)
+        #merge_dicts(curr_scope_id_dict, self.global_identifier_dict)
+        #merge_dicts(prev_scope_id_dict, curr_scope_id_dict)
 
         # Visit all the functions
-        for piece in funcs:
-            to_add = self.visit(piece, curr_scope_id_dict, {})
-            body.extend(to_add)
+        #for piece in funcs:
+         #   to_add = self.visit(piece, curr_scope_id_dict, {})
+          #  body.extend(to_add)
 
         self.module_stack.pop()
         return Module(
