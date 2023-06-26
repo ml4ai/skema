@@ -76,7 +76,7 @@ impl CommentExtractionRequest {
         (status = 200, description = "Get comments", body = CommentExtractionResponse)
     )
 )]
-#[get("/get_comments")]
+#[post("/get-comments")]
 pub async fn get_comments(payload: web::Json<CommentExtractionRequest>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(get_python_comments(&payload.code)))
 }
