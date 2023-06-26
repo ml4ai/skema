@@ -25,20 +25,20 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
 }
 
 pub fn model_to_RN(gromet: ModuleCollection, host: &str) -> Result<RegNet, MgError> {
-    let module_id = push_model_to_db(gromet, &host); // pushes model to db and gets id
-    let ref_module_id1 = module_id.as_ref().clone();
-    let ref_module_id2 = module_id.as_ref().clone();
-    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), &host); // turns model into mathml ast equations
-    let _del_response = delete_module(*ref_module_id2.unwrap(), &host); // deletes model from db
+    let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
+    let ref_module_id1 = module_id.as_ref();
+    let ref_module_id2 = module_id.as_ref();
+    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), host); // deletes model from db
     Ok(RegNet::from(mathml_ast))
 }
 
 pub fn model_to_PN(gromet: ModuleCollection, host: &str) -> Result<PetriNet, MgError> {
-    let module_id = push_model_to_db(gromet, &host); // pushes model to db and gets id
-    let ref_module_id1 = module_id.as_ref().clone();
-    let ref_module_id2 = module_id.as_ref().clone();
-    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), &host); // turns model into mathml ast equations
-    let _del_response = delete_module(*ref_module_id2.unwrap(), &host); // deletes model from db
+    let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
+    let ref_module_id1 = module_id.as_ref();
+    let ref_module_id2 = module_id.as_ref();
+    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), host); // deletes model from db
     Ok(PetriNet::from(ACSet::from(mathml_ast)))
 }
 
