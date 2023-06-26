@@ -4,7 +4,7 @@ use crate::database::{execute_query, parse_gromet_queries};
 use crate::model_extraction::module_id2mathml_ast;
 use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
-use actix_web::{delete, get, post, web, put, HttpResponse};
+use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
 use mathml::mml2pn::ACSet;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
@@ -344,11 +344,13 @@ pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> Ht
     )
 )]
 #[put("/models/PN")]
-pub async fn model2PN(    
-        payload: web::Json<ModuleCollection>,
-        config: web::Data<Config>
-    ) -> HttpResponse {
-    HttpResponse::Ok().json(web::Json(model_to_PN(payload.into_inner(), &config.db_host).unwrap()))
+pub async fn model2PN(
+    payload: web::Json<ModuleCollection>,
+    config: web::Data<Config>,
+) -> HttpResponse {
+    HttpResponse::Ok().json(web::Json(
+        model_to_PN(payload.into_inner(), &config.db_host).unwrap(),
+    ))
 }
 
 /// This returns a RegNet AMR from a gromet.
@@ -361,9 +363,11 @@ pub async fn model2PN(
     )
 )]
 #[put("/models/RN")]
-pub async fn model2RN(    
-        payload: web::Json<ModuleCollection>,
-        config: web::Data<Config>
-    ) -> HttpResponse {
-    HttpResponse::Ok().json(web::Json(model_to_RN(payload.into_inner(), &config.db_host).unwrap()))
+pub async fn model2RN(
+    payload: web::Json<ModuleCollection>,
+    config: web::Data<Config>,
+) -> HttpResponse {
+    HttpResponse::Ok().json(web::Json(
+        model_to_RN(payload.into_inner(), &config.db_host).unwrap(),
+    ))
 }

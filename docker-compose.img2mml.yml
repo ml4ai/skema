@@ -1,12 +1,37 @@
 # Docker Compose file for the img2mml service
 version: "3"
 services:
-  img2mml:
-    image: lumai/askem-skema-img2mml:local
+  eq2mml:
+    #image: lumai/askem-skema-py:latest
+    # ... or to build locally:
+    image: lumai/askem-skema-eq2mml:local
     build:
       context: .
       dockerfile: Dockerfile.skema-py
+    depends_on:
+      # FIXME: add `condition: service_healthy` and healthcheck
+      - mathjax
     # open browser to http://localhost:8000/docs
-    entrypoint: uvicorn skema.img2mml.img2mml:app --host=0.0.0.0 --port 8000
+    entrypoint: uvicorn skema.img2mml.eq2mml:app --host=0.0.0.0 --port 8000
     ports:
       - "8000:8000" # Change port mapping appropriately before deploying.
+    environment:
+      - "SKEMA_MATHJAX_HOST=mathjax"
+      - "SKEMA_MATHJAX_PORT=8031"
+  # example cmd: curl -X POST http://0.0.0.0:8031/tex2mml \
+  # -H "Content-Type: application/json" \
+  # -d '{"tex_src": "E = mc^{2}"}'
+  mathjax:
+    #image: lumai/askem-skema-py:latest
+    # ... or to build locally:
+    image: lumai/askem-skema-mathjax:local
+    build:
+      context: .
+      dockerfile: Dockerfile.skema-py
+    environment:
+      - "SKEMA_MATHJAX_HOST=0.0.0.0"
+      - "SKEMA_MATHJAX_PORT=8031"
+    ports:
+      - "8031:8031"
+    working_dir: /app/skema/img2mml/data_generation
+    entrypoint: ["npm", "start"]

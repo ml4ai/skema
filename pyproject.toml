@@ -72,19 +72,19 @@ all = ["skema[core]", "skema[dev]", "skema[doc]"]
 "skema.skema_py" = "skema/skema_py"
 # re-map skema/text_reading/python to skema.text_reading
 "skema.text_reading.mention_linking" = "skema/text_reading/mention_linking"
+"skema.data" = "skema/data"
 
 # [tool.setuptools.packages]
 # find = {}  # Scan the project directory with the default parameters
 
 [tool.setuptools.package-data]
 # needed to ensure models are included in package/discoverable
-"*" = ["*.json", "vocab.txt", "*.pt"]
+"*" = ["*.json", "vocab.txt", "*.pt", "*.png"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
 # runnables
 [project.scripts]
-skema-tr-cosmos-integration = "skema.text_reading.cosmos_integration:main"
 skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
 
 # Minimum requirements for the build system to execute.

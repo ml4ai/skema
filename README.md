@@ -1,4 +1,8 @@
-![](http://ci.kraken.sista.arizona.edu/api/badges/ml4ai/skema/status.svg)
+![](http://ci.kraken.sista.arizona.edu/api/badges/ml4ai/skema/status.svg)  
+![Docker lumai/askem-skema-py Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-py?sort=date&logo=docker&label=lumai%2Faskem-skema-py)  
+![Docker lumai/askem-skema-img2mml Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-img2mml?sort=date&logo=docker&label=lumai%2Faskem-skema-img2mml)  
+![Docker lumai/askem-skema-rs Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-rs?sort=date&logo=docker&label=lumai%2Faskem-skema-rs)  
+![Docker lumai/askem-skema-text-reading Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-text-reading?sort=date&logo=docker&label=lumai%2Faskem-skema-text-reading)
 
 # SKEMA: Scientific Knowledge Extraction and Model Analysis
 
@@ -97,6 +101,6 @@ To run the img2mml Dockerized service, run
 docker-compose -f docker-compose.img2mml.yml up --build
 ```
 
-(make sure the appropriate img2mml model is in the
-`skema/img2mml/trained_models` directory - see the `README.md` file in
+(if you're not using a published docker image with the default model, make sure that the appropriate img2mml model is in the
+`skema/img2mml/trained_models` directory before building - see the `README.md` file in
 `skema/img2mml` for details)
