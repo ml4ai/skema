@@ -76,7 +76,7 @@ impl CommentExtractionRequest {
         (status = 200, description = "Get comments", body = CommentExtractionResponse)
     )
 )]
-#[post("/get-comments")]
+#[post("/extract-comments")]
 pub async fn get_comments(payload: web::Json<CommentExtractionRequest>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(get_python_comments(&payload.code)))
 }
@@ -88,7 +88,7 @@ pub async fn get_comments(payload: web::Json<CommentExtractionRequest>) -> HttpR
         (status = 200, description = "Get comments from zipfile")
     )
 )]
-#[post("/get-comments-from-zipfile")]
+#[post("/extract-comments-from-zipfile")]
 pub async fn get_comments_from_zipfile(payload: web::Bytes) -> HttpResponse {
     debug!("Zip file received. Size: {} bytes", payload.len());
     let tmp_dir = TempDir::new("comment_extraction_input").unwrap();
