@@ -79,6 +79,20 @@ def ping():
     ),
 )
 async def fn_given_filepaths(system: System):
+    """
+    Endpoint for generating Gromet JSON from a .
+
+    ### Python example
+    ```
+    import requests
+
+    system = {
+      "files": ["exp1.py"],
+      "blobs": ["x=2"]
+    }
+    response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
+    gromet_json = response.json()
+    """
     return system_to_gromet(system)
 
 
@@ -90,6 +104,20 @@ async def fn_given_filepaths(system: System):
     ),
 )
 async def root(zip_file: UploadFile = File()):
+    """
+    Endpoint for generating Gromet JSON from a zip archive.
+
+    ### Python example
+    ```
+    import requests
+
+    files = {
+      "zip_file": open("code_system.zip", "rb"),
+    }
+    response = requests.post("http://0.0.0.0:8000/fn-given-filepaths-zip", files=files)
+    gromet_json = response.json()
+    """
+
     # Currently, we rely on the file extension to know which language front end to send the source code to.
     supported_file_extensions = [".py", ".f", ".f95"]
 
