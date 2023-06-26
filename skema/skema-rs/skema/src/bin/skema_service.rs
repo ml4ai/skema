@@ -52,6 +52,8 @@ async fn main() -> std::io::Result<()> {
             gromet::get_subgraph,
             gromet::get_model_PN,
             gromet::get_model_RN,
+            gromet::model2PN,
+            gromet::model2RN,
             ping
         ),
         components(
@@ -126,6 +128,8 @@ async fn main() -> std::io::Result<()> {
             .service(skema::services::mathml::get_amr)
             .service(gromet::get_model_PN)
             .service(gromet::get_model_RN)
+            .service(gromet::model2PN)
+            .service(gromet::model2RN)
             .service(ping)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })
