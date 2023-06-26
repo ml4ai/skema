@@ -93,7 +93,6 @@ pub async fn get_comments_from_zipfile(payload: web::Bytes) -> HttpResponse {
     debug!("Zip file received. Size: {} bytes", payload.len());
     let tmp_dir = TempDir::new("comment_extraction_input").unwrap();
     let file_path = tmp_dir.path().join("directory.zip");
-    //let file_path = "test.zip";
     let mut f = fs::File::create(file_path.clone()).unwrap();
     f.write_all(&payload).unwrap();
     drop(f);
@@ -107,5 +106,4 @@ pub async fn get_comments_from_zipfile(payload: web::Bytes) -> HttpResponse {
     tmp_dir.close().unwrap();
 
     HttpResponse::Ok().json(web::Json(comments))
-    //HttpResponse::Ok().finish()
 }
