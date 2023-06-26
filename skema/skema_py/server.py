@@ -41,14 +41,14 @@ def system_to_gromet(system: System):
         for index, file in enumerate(system.files):
             file_path = Path(
                 tmp_path, system.root_name, file
-            )  # os.path.join(tmp, system.root_name, file)
+            )
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(system.blobs[index])
 
         # Create system_filepaths.txt
         system_filepaths = Path(
             tmp_path, "system_filepaths.txt"
-        )  # os.path.join(tmp, "system_filepaths.txt")
+        )
         system_filepaths.write_text("\n".join(system.files))
 
         ## Run pipeline
