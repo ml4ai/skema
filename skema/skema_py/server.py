@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 from pathlib import Path
@@ -28,6 +29,7 @@ class System(BaseModel):
     root_name: Optional[str] = ""
 
 
+# FIXME: why does this return a a string?
 def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
@@ -93,7 +95,8 @@ async def fn_given_filepaths(system: System):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
     gromet_json = response.json()
     """
-    return system_to_gromet(system)
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))
 
 
 @app.post(
@@ -138,7 +141,8 @@ async def root(zip_file: UploadFile = File()):
     system = System(
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
     )
-    return system_to_gromet(system)
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))
 
 
 @app.post(
