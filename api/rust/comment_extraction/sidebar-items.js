@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["comments","conventions","languages"]};
+window.SIDEBAR_ITEMS = {"mod":["comments","conventions","extraction","languages"]};

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/env_logger-0.7.1/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="env_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://www.rust-lang.org/static/images/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../env_logger/index.html"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/env_logger-0.10.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-ba5701c5741a7b69.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="env_logger" data-themes="" data-resource-suffix="" data-rustdoc-version="1.70.0 (90c541806 2023-05-31)" data-search-js="search-e077946657036a58.js" data-settings-js="settings-298e1ea74db45b39.js" data-settings-css="settings-7bfb4c59cc6bc502.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../static.files/source-script-905937fbbdc8e9ea.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-f61008743c98d196.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="icon" href="https://www.rust-lang.org/static/images/favicon.ico"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../env_logger/index.html"><img src="https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1175,37 +1175,169 @@
 <a href="#1175" id="1175">1175</a>
 <a href="#1176" id="1176">1176</a>
 <a href="#1177" id="1177">1177</a>
-</pre></div><pre class="rust"><code><span class="comment">// Copyright 2014-2015 The Rust Project Developers. See the COPYRIGHT
-// file at the top-level directory of this distribution and at
-// http://rust-lang.org/COPYRIGHT.
-//
-// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
-// http://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
-// &lt;LICENSE-MIT or http://opensource.org/licenses/MIT&gt;, at your
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
+<a href="#1210" id="1210">1210</a>
+<a href="#1211" id="1211">1211</a>
+<a href="#1212" id="1212">1212</a>
+<a href="#1213" id="1213">1213</a>
+<a href="#1214" id="1214">1214</a>
+<a href="#1215" id="1215">1215</a>
+<a href="#1216" id="1216">1216</a>
+<a href="#1217" id="1217">1217</a>
+<a href="#1218" id="1218">1218</a>
+<a href="#1219" id="1219">1219</a>
+<a href="#1220" id="1220">1220</a>
+<a href="#1221" id="1221">1221</a>
+<a href="#1222" id="1222">1222</a>
+<a href="#1223" id="1223">1223</a>
+<a href="#1224" id="1224">1224</a>
+<a href="#1225" id="1225">1225</a>
+<a href="#1226" id="1226">1226</a>
+<a href="#1227" id="1227">1227</a>
+<a href="#1228" id="1228">1228</a>
+<a href="#1229" id="1229">1229</a>
+<a href="#1230" id="1230">1230</a>
+<a href="#1231" id="1231">1231</a>
+<a href="#1232" id="1232">1232</a>
+<a href="#1233" id="1233">1233</a>
+<a href="#1234" id="1234">1234</a>
+<a href="#1235" id="1235">1235</a>
+<a href="#1236" id="1236">1236</a>
+<a href="#1237" id="1237">1237</a>
+<a href="#1238" id="1238">1238</a>
+<a href="#1239" id="1239">1239</a>
+<a href="#1240" id="1240">1240</a>
+<a href="#1241" id="1241">1241</a>
+<a href="#1242" id="1242">1242</a>
+<a href="#1243" id="1243">1243</a>
+<a href="#1244" id="1244">1244</a>
+<a href="#1245" id="1245">1245</a>
+<a href="#1246" id="1246">1246</a>
+<a href="#1247" id="1247">1247</a>
+<a href="#1248" id="1248">1248</a>
+<a href="#1249" id="1249">1249</a>
+<a href="#1250" id="1250">1250</a>
+<a href="#1251" id="1251">1251</a>
+<a href="#1252" id="1252">1252</a>
+<a href="#1253" id="1253">1253</a>
+<a href="#1254" id="1254">1254</a>
+<a href="#1255" id="1255">1255</a>
+<a href="#1256" id="1256">1256</a>
+<a href="#1257" id="1257">1257</a>
+<a href="#1258" id="1258">1258</a>
+<a href="#1259" id="1259">1259</a>
+<a href="#1260" id="1260">1260</a>
+<a href="#1261" id="1261">1261</a>
+<a href="#1262" id="1262">1262</a>
+<a href="#1263" id="1263">1263</a>
+<a href="#1264" id="1264">1264</a>
+<a href="#1265" id="1265">1265</a>
+<a href="#1266" id="1266">1266</a>
+<a href="#1267" id="1267">1267</a>
+<a href="#1268" id="1268">1268</a>
+<a href="#1269" id="1269">1269</a>
+<a href="#1270" id="1270">1270</a>
+<a href="#1271" id="1271">1271</a>
+<a href="#1272" id="1272">1272</a>
+<a href="#1273" id="1273">1273</a>
+<a href="#1274" id="1274">1274</a>
+<a href="#1275" id="1275">1275</a>
+<a href="#1276" id="1276">1276</a>
+<a href="#1277" id="1277">1277</a>
+<a href="#1278" id="1278">1278</a>
+<a href="#1279" id="1279">1279</a>
+<a href="#1280" id="1280">1280</a>
+<a href="#1281" id="1281">1281</a>
+<a href="#1282" id="1282">1282</a>
+<a href="#1283" id="1283">1283</a>
+<a href="#1284" id="1284">1284</a>
+<a href="#1285" id="1285">1285</a>
+<a href="#1286" id="1286">1286</a>
+<a href="#1287" id="1287">1287</a>
+<a href="#1288" id="1288">1288</a>
+<a href="#1289" id="1289">1289</a>
+<a href="#1290" id="1290">1290</a>
+<a href="#1291" id="1291">1291</a>
+<a href="#1292" id="1292">1292</a>
+<a href="#1293" id="1293">1293</a>
+<a href="#1294" id="1294">1294</a>
+<a href="#1295" id="1295">1295</a>
+<a href="#1296" id="1296">1296</a>
+<a href="#1297" id="1297">1297</a>
+<a href="#1298" id="1298">1298</a>
+<a href="#1299" id="1299">1299</a>
+<a href="#1300" id="1300">1300</a>
+<a href="#1301" id="1301">1301</a>
+<a href="#1302" id="1302">1302</a>
+<a href="#1303" id="1303">1303</a>
+<a href="#1304" id="1304">1304</a>
+<a href="#1305" id="1305">1305</a>
+<a href="#1306" id="1306">1306</a>
+<a href="#1307" id="1307">1307</a>
+<a href="#1308" id="1308">1308</a>
+<a href="#1309" id="1309">1309</a>
+<a href="#1310" id="1310">1310</a>
+<a href="#1311" id="1311">1311</a>
+</pre></div><pre class="rust"><code><span class="comment">// Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or
+// https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license
+// &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-</span><span class="doccomment">//! A simple logger configured via environment variables which writes
-//! to stdout or stderr, for use with the logging facade exposed by the
-//! [`log` crate][log-crate-url].
+</span><span class="doccomment">//! A simple logger that can be configured via environment variables, for use
+//! with the logging facade exposed by the [`log` crate][log-crate-url].
+//!
+//! Despite having &quot;env&quot; in its name, **`env_logger`** can also be configured by
+//! other means besides environment variables. See [the examples][gh-repo-examples]
+//! in the source repository for more approaches.
+//!
+//! By default, `env_logger` writes logs to `stderr`, but can be configured to
+//! instead write them to `stdout`.
 //!
 //! ## Example
 //!
 //! ```
-//! #[macro_use] extern crate log;
+//! use log::{debug, error, log_enabled, info, Level};
 //!
-//! use log::Level;
+//! env_logger::init();
 //!
-//! fn main() {
-//!     env_logger::init();
+//! debug!(&quot;this is a debug {}&quot;, &quot;message&quot;);
+//! error!(&quot;this is printed by default&quot;);
 //!
-//!     debug!(&quot;this is a debug {}&quot;, &quot;message&quot;);
-//!     error!(&quot;this is printed by default&quot;);
-//!
-//!     if log_enabled!(Level::Info) {
-//!         let x = 3 * 4; // expensive computation
-//!         info!(&quot;the answer was: {}&quot;, x);
-//!     }
+//! if log_enabled!(Level::Info) {
+//!     let x = 3 * 4; // expensive computation
+//!     info!(&quot;the answer was: {}&quot;, x);
 //! }
 //! ```
 //!
@@ -1264,37 +1396,78 @@
 //!
 //! ## Enabling logging
 //!
-//! Log levels are controlled on a per-module basis, and by default all logging
-//! is disabled except for `error!`. Logging is controlled via the `RUST_LOG`
-//! environment variable. The value of this environment variable is a
-//! comma-separated list of logging directives. A logging directive is of the
-//! form:
+//! Log levels are controlled on a per-module basis, and **by default all
+//! logging is disabled except for the `error` level**.
+//!
+//! Logging is controlled via the **`RUST_LOG`** environment variable. The
+//! value of this environment variable is a comma-separated list of *logging
+//! directives*. A logging directive is of the form:
 //!
 //! ```text
-//! path::to::module=level
+//! example::log::target=level
 //! ```
 //!
-//! The path to the module is rooted in the name of the crate it was compiled
-//! for, so if your program is contained in a file `hello.rs`, for example, to
-//! turn on logging for this file you would use a value of `RUST_LOG=hello`.
-//! Furthermore, this path is a prefix-search, so all modules nested in the
-//! specified module will also have logging enabled.
+//! The log target is typically equal to the path of the module the message
+//! in question originated from, though it can be overridden.
 //!
-//! The actual `level` is optional to specify. If omitted, all logging will
-//! be enabled. If specified, it must be one of the strings `debug`, `error`,
-//! `info`, `warn`, or `trace`.
+//! The path is rooted in the name of the crate it was compiled for, so if
+//! your program is in a file called, for example, `hello.rs`, the path would
+//! simply be be `hello`.
+//!
+//! Furthermore, the log can be filtered using prefix-search based on the
+//! specified log target. A value of, for example, `RUST_LOG=example`, would
+//! match all of the messages with targets:
+//!
+//! * `example`
+//! * `example::test`
+//! * `example::test::module::submodule`
+//! * `examples::and_more_examples`
+//!
+//! When providing the crate name or a module path, explicitly specifying the
+//! log level is optional. If omitted, all logging for the item will be
+//! enabled.
+//!
+//! The names of the log levels that may be specified correspond to the
+//! variations of the [`log::Level`][level-enum] enum from the `log`
+//! crate. They are:
+//!
+//! * `error`
+//! * `warn`
+//! * `info`
+//! * `debug`
+//! * `trace`
+//!
+//! There is also a pseudo logging level, `off`, which may be specified to
+//! disable all logging for a given module or for the entire application. As
+//! with the logging levels, the letter case is not significant[^fn-off].
+//!
+//! [^fn-off]: Similar to the universe of log level names, the `off` pseudo
+//!    log level feature is also provided by the underlying `log` crate.
+//!
+//! The letter case is not significant for the logging level names; e.g.,
+//! `debug`, `DEBUG`, and `dEbuG` all represent the same logging level. For
+//! consistency, our convention is to use the lower case names. Where our docs
+//! do use other forms, they do so in the context of specific examples, so you
+//! won&#39;t be surprised if you see similar usage in the wild.
 //!
 //! As the log level for a module is optional, the module to enable logging for
-//! is also optional. If only a `level` is provided, then the global log
-//! level for all modules is set to this value.
+//! is also optional. **If only a level is provided, then the global log
+//! level for all modules is set to this value.**
 //!
 //! Some examples of valid values of `RUST_LOG` are:
 //!
 //! * `hello` turns on all logging for the &#39;hello&#39; module
+//! * `trace` turns on all logging for the application, regardless of its name
+//! * `TRACE` turns on all logging for the application, regardless of its name (same as previous)
 //! * `info` turns on all info logging
+//! * `INFO` turns on all info logging (same as previous)
 //! * `hello=debug` turns on debug logging for &#39;hello&#39;
+//! * `hello=DEBUG` turns on debug logging for &#39;hello&#39; (same as previous)
 //! * `hello,std::option` turns on hello, and std&#39;s option logging
 //! * `error,hello=warn` turn on global error logging and also warn for hello
+//! * `error,hello=off`  turn on global error logging, but turn off logging for hello
+//! * `off` turns off all logging for the application
+//! * `OFF` turns off all logging for the application (same as previous)
 //!
 //! ## Filtering results
 //!
@@ -1323,7 +1496,6 @@
 //!
 //! ```
 //! # #[macro_use] extern crate log;
-//! # fn main() {}
 //! #[cfg(test)]
 //! mod tests {
 //!     fn init() {
@@ -1402,9 +1574,11 @@
 //! ```
 //! use env_logger::Env;
 //!
-//! env_logger::from_env(Env::default().default_filter_or(&quot;warn&quot;)).init();
+//! env_logger::Builder::from_env(Env::default().default_filter_or(&quot;warn&quot;)).init();
 //! ```
 //!
+//! [gh-repo-examples]: https://github.com/env-logger-rs/env_logger/tree/main/examples
+//! [level-enum]: https://docs.rs/log/latest/log/enum.Level.html
 //! [log-crate-url]: https://docs.rs/log/
 //! [`Builder`]: struct.Builder.html
 //! [`Builder::is_test`]: struct.Builder.html#method.is_test
@@ -1413,15 +1587,13 @@
 
 </span><span class="attr">#![doc(
     html_logo_url = <span class="string">&quot;https://www.rust-lang.org/logos/rust-logo-128x128-blk-v2.png&quot;</span>,
-    html_favicon_url = <span class="string">&quot;https://www.rust-lang.org/static/images/favicon.ico&quot;</span>,
-    html_root_url = <span class="string">&quot;https://docs.rs/env_logger/0.7.1&quot;
+    html_favicon_url = <span class="string">&quot;https://www.rust-lang.org/static/images/favicon.ico&quot;
 </span>)]
-#![cfg_attr(test, deny(warnings))]
 </span><span class="comment">// When compiled for the rustc compiler itself we want to make sure that this is
 // an unstable crate
 </span><span class="attr">#![cfg_attr(rustbuild, feature(staged_api, rustc_private))]
 #![cfg_attr(rustbuild, unstable(feature = <span class="string">&quot;rustc_private&quot;</span>, issue = <span class="string">&quot;27812&quot;</span>))]
-#![deny(missing_debug_implementations, missing_docs, warnings)]
+#![deny(missing_debug_implementations, missing_docs)]
 
 </span><span class="kw">use </span>std::{borrow::Cow, cell::RefCell, env, io};
 
@@ -1434,13 +1606,13 @@
 
 <span class="kw">use </span><span class="self">self</span>::filter::Filter;
 <span class="kw">use </span><span class="self">self</span>::fmt::writer::{<span class="self">self</span>, Writer};
-<span class="kw">use </span><span class="self">self</span>::fmt::Formatter;
+<span class="kw">use </span><span class="self">self</span>::fmt::{FormatFn, Formatter};
 
 <span class="doccomment">/// The default name for the environment variable to read filters from.
-</span><span class="kw">pub const </span>DEFAULT_FILTER_ENV: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;RUST_LOG&quot;</span>;
+</span><span class="kw">pub const </span>DEFAULT_FILTER_ENV: <span class="kw-2">&amp;</span>str = <span class="string">&quot;RUST_LOG&quot;</span>;
 
 <span class="doccomment">/// The default name for the environment variable to read style preferences from.
-</span><span class="kw">pub const </span>DEFAULT_WRITE_STYLE_ENV: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;RUST_LOG_STYLE&quot;</span>;
+</span><span class="kw">pub const </span>DEFAULT_WRITE_STYLE_ENV: <span class="kw-2">&amp;</span>str = <span class="string">&quot;RUST_LOG_STYLE&quot;</span>;
 
 <span class="doccomment">/// Set of environment variables to configure from.
 ///
@@ -1486,8 +1658,7 @@
 </span><span class="kw">pub struct </span>Logger {
     writer: Writer,
     filter: Filter,
-    <span class="attr">#[allow(unknown_lints, bare_trait_objects)]
-    </span>format: Box&lt;Fn(<span class="kw-2">&amp;mut </span>Formatter, <span class="kw-2">&amp;</span>Record) -&gt; io::Result&lt;()&gt; + Sync + Send&gt;,
+    format: FormatFn,
 }
 
 <span class="doccomment">/// `Builder` acts as builder for initializing a `Logger`.
@@ -1498,23 +1669,20 @@
 /// # Examples
 ///
 /// ```
-/// #[macro_use] extern crate log;
-///
-/// use std::env;
-/// use std::io::Write;
-/// use log::LevelFilter;
+/// # #[macro_use] extern crate log;
+/// # use std::io::Write;
 /// use env_logger::Builder;
+/// use log::LevelFilter;
 ///
-/// fn main() {
-///     let mut builder = Builder::from_default_env();
+/// let mut builder = Builder::from_default_env();
 ///
-///     builder.format(|buf, record| writeln!(buf, &quot;{} - {}&quot;, record.level(), record.args()))
-///            .filter(None, LevelFilter::Info)
-///            .init();
+/// builder
+///     .format(|buf, record| writeln!(buf, &quot;{} - {}&quot;, record.level(), record.args()))
+///     .filter(None, LevelFilter::Info)
+///     .init();
 ///
-///     error!(&quot;error message&quot;);
-///     info!(&quot;info message&quot;);
-/// }
+/// error!(&quot;error message&quot;);
+/// info!(&quot;info message&quot;);
 /// ```
 </span><span class="attr">#[derive(Default)]
 </span><span class="kw">pub struct </span>Builder {
@@ -1536,16 +1704,15 @@
     /// Create a new builder and configure filters and style:
     ///
     /// ```
-    /// # fn main() {
     /// use log::LevelFilter;
     /// use env_logger::{Builder, WriteStyle};
     ///
     /// let mut builder = Builder::new();
     ///
-    /// builder.filter(None, LevelFilter::Info)
-    ///        .write_style(WriteStyle::Always)
-    ///        .init();
-    /// # }
+    /// builder
+    ///     .filter(None, LevelFilter::Info)
+    ///     .write_style(WriteStyle::Always)
+    ///     .init();
     /// ```
     ///
     /// [`filter`]: #method.filter
@@ -1589,18 +1756,62 @@
         </span>E: Into&lt;Env&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
     {
         <span class="kw">let </span><span class="kw-2">mut </span>builder = Builder::new();
+        builder.parse_env(env);
+        builder
+    }
+
+    <span class="doccomment">/// Applies the configuration from the environment.
+    ///
+    /// This function allows a builder to be configured with default parameters,
+    /// to be then overridden by the environment.
+    ///
+    /// # Examples
+    ///
+    /// Initialise a logger with filter level `Off`, then override the log
+    /// filter from an environment variable called `MY_LOG`:
+    ///
+    /// ```
+    /// use log::LevelFilter;
+    /// use env_logger::Builder;
+    ///
+    /// let mut builder = Builder::new();
+    ///
+    /// builder.filter_level(LevelFilter::Off);
+    /// builder.parse_env(&quot;MY_LOG&quot;);
+    /// builder.init();
+    /// ```
+    ///
+    /// Initialise a logger with filter level `Off`, then use the `MY_LOG`
+    /// variable to override filtering and `MY_LOG_STYLE` to override  whether
+    /// or not to write styles:
+    ///
+    /// ```
+    /// use log::LevelFilter;
+    /// use env_logger::{Builder, Env};
+    ///
+    /// let env = Env::new().filter(&quot;MY_LOG&quot;).write_style(&quot;MY_LOG_STYLE&quot;);
+    ///
+    /// let mut builder = Builder::new();
+    /// builder.filter_level(LevelFilter::Off);
+    /// builder.parse_env(env);
+    /// builder.init();
+    /// ```
+    </span><span class="kw">pub fn </span>parse_env&lt;<span class="lifetime">&#39;a</span>, E&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, env: E) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self
+    </span><span class="kw">where
+        </span>E: Into&lt;Env&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
+    {
         <span class="kw">let </span>env = env.into();
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = env.get_filter() {
-            builder.parse_filters(<span class="kw-2">&amp;</span>s);
+            <span class="self">self</span>.parse_filters(<span class="kw-2">&amp;</span>s);
         }
 
         <span class="kw">if let </span><span class="prelude-val">Some</span>(s) = env.get_write_style() {
-            builder.parse_write_style(<span class="kw-2">&amp;</span>s);
+            <span class="self">self</span>.parse_write_style(<span class="kw-2">&amp;</span>s);
         }
 
-        builder
-    }
+        <span class="self">self
+    </span>}
 
     <span class="doccomment">/// Initializes the log builder from the environment using default variable names.
     ///
@@ -1622,6 +1833,32 @@
     /// [default environment variables]: struct.Env.html#default-environment-variables
     </span><span class="kw">pub fn </span>from_default_env() -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::from_env(Env::default())
+    }
+
+    <span class="doccomment">/// Applies the configuration from the environment using default variable names.
+    ///
+    /// This method is a convenient way to call `parse_env(Env::default())` without
+    /// having to use the `Env` type explicitly. The builder will use the
+    /// [default environment variables].
+    ///
+    /// # Examples
+    ///
+    /// Initialise a logger with filter level `Off`, then configure it using the
+    /// default environment variables:
+    ///
+    /// ```
+    /// use log::LevelFilter;
+    /// use env_logger::Builder;
+    ///
+    /// let mut builder = Builder::new();
+    /// builder.filter_level(LevelFilter::Off);
+    /// builder.parse_default_env();
+    /// builder.init();
+    /// ```
+    ///
+    /// [default environment variables]: struct.Env.html#default-environment-variables
+    </span><span class="kw">pub fn </span>parse_default_env(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.parse_env(Env::default())
     }
 
     <span class="doccomment">/// Sets the format function for formatting the log output.
@@ -1678,6 +1915,12 @@
         <span class="self">self
     </span>}
 
+    <span class="doccomment">/// Whether or not to write the target in the default format.
+    </span><span class="kw">pub fn </span>format_target(<span class="kw-2">&amp;mut </span><span class="self">self</span>, write: bool) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.format.format_target = write;
+        <span class="self">self
+    </span>}
+
     <span class="doccomment">/// Configures the amount of spaces to use to indent multiline log records.
     /// A value of `None` disables any kind of indentation.
     </span><span class="kw">pub fn </span>format_indent(<span class="kw-2">&amp;mut </span><span class="self">self</span>, indent: <span class="prelude-ty">Option</span>&lt;usize&gt;) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
@@ -1711,21 +1954,25 @@
         <span class="self">self</span>.format_timestamp(<span class="prelude-val">Some</span>(fmt::TimestampPrecision::Nanos))
     }
 
+    <span class="doccomment">/// Configures the end of line suffix.
+    </span><span class="kw">pub fn </span>format_suffix(<span class="kw-2">&amp;mut </span><span class="self">self</span>, suffix: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
+        <span class="self">self</span>.format.format_suffix = suffix;
+        <span class="self">self
+    </span>}
+
     <span class="doccomment">/// Adds a directive to the filter for a specific module.
     ///
     /// # Examples
     ///
-    /// Only include messages for warning and above for logs in `path::to::module`:
+    /// Only include messages for info and above for logs in `path::to::module`:
     ///
     /// ```
-    /// # fn main() {
-    /// use log::LevelFilter;
     /// use env_logger::Builder;
+    /// use log::LevelFilter;
     ///
     /// let mut builder = Builder::new();
     ///
     /// builder.filter_module(&quot;path::to::module&quot;, LevelFilter::Info);
-    /// # }
     /// ```
     </span><span class="kw">pub fn </span>filter_module(<span class="kw-2">&amp;mut </span><span class="self">self</span>, module: <span class="kw-2">&amp;</span>str, level: LevelFilter) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.filter.filter_module(module, level);
@@ -1736,17 +1983,15 @@
     ///
     /// # Examples
     ///
-    /// Only include messages for warning and above for logs in `path::to::module`:
+    /// Only include messages for info and above for logs globally:
     ///
     /// ```
-    /// # fn main() {
-    /// use log::LevelFilter;
     /// use env_logger::Builder;
+    /// use log::LevelFilter;
     ///
     /// let mut builder = Builder::new();
     ///
     /// builder.filter_level(LevelFilter::Info);
-    /// # }
     /// ```
     </span><span class="kw">pub fn </span>filter_level(<span class="kw-2">&amp;mut </span><span class="self">self</span>, level: LevelFilter) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.filter.filter_level(level);
@@ -1760,17 +2005,15 @@
     ///
     /// # Examples
     ///
-    /// Only include messages for warning and above for logs in `path::to::module`:
+    /// Only include messages for info and above for logs in `path::to::module`:
     ///
     /// ```
-    /// # fn main() {
-    /// use log::LevelFilter;
     /// use env_logger::Builder;
+    /// use log::LevelFilter;
     ///
     /// let mut builder = Builder::new();
     ///
     /// builder.filter(Some(&quot;path::to::module&quot;), LevelFilter::Info);
-    /// # }
     /// ```
     </span><span class="kw">pub fn </span>filter(<span class="kw-2">&amp;mut </span><span class="self">self</span>, module: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt;, level: LevelFilter) -&gt; <span class="kw-2">&amp;mut </span><span class="self">Self </span>{
         <span class="self">self</span>.filter.filter(module, level);
@@ -1788,7 +2031,10 @@
 
     <span class="doccomment">/// Sets the target for the log output.
     ///
-    /// Env logger can log to either stdout or stderr. The default is stderr.
+    /// Env logger can log to either stdout, stderr or a custom pipe. The default is stderr.
+    ///
+    /// The custom pipe can be used to send the log messages to a custom sink (for example a file).
+    /// Do note that direct writes to a file can become a bottleneck due to IO operation times.
     ///
     /// # Examples
     ///
@@ -1972,7 +2218,7 @@
     <span class="kw">fn </span>log(<span class="kw-2">&amp;</span><span class="self">self</span>, record: <span class="kw-2">&amp;</span>Record) {
         <span class="kw">if </span><span class="self">self</span>.matches(record) {
             <span class="comment">// Log records are written to a thread-local buffer before being printed
-            // to the terminal. We clear these buffers afterwards, but they aren&#39;t shrinked
+            // to the terminal. We clear these buffers afterwards, but they aren&#39;t shrunk
             // so will always at least have capacity for the largest log record formatted
             // on that thread.
             //
@@ -2231,17 +2477,16 @@
 /// and `MY_LOG_STYLE` for writing colors:
 ///
 /// ```
-/// # extern crate env_logger;
 /// use env_logger::{Builder, Env};
 ///
-/// # fn run() -&gt; Result&lt;(), Box&lt;::std::error::Error&gt;&gt; {
+/// # fn run() -&gt; Result&lt;(), Box&lt;dyn ::std::error::Error&gt;&gt; {
 /// let env = Env::new().filter(&quot;MY_LOG&quot;).write_style(&quot;MY_LOG_STYLE&quot;);
 ///
 /// env_logger::try_init_from_env(env)?;
 ///
 /// Ok(())
 /// # }
-/// # fn main() { run().unwrap(); }
+/// # run().unwrap();
 /// ```
 ///
 /// # Errors
@@ -2291,6 +2536,9 @@
 <span class="doccomment">/// Create a new builder with the default environment variables.
 ///
 /// The builder can be configured before being initialized.
+/// This is a convenient way of calling [`Builder::from_default_env`].
+///
+/// [`Builder::from_default_env`]: struct.Builder.html#method.from_default_env
 </span><span class="kw">pub fn </span>builder() -&gt; Builder {
     Builder::from_default_env()
 }
@@ -2298,6 +2546,10 @@
 <span class="doccomment">/// Create a builder from the given environment variables.
 ///
 /// The builder can be configured before being initialized.
+</span><span class="attr">#[deprecated(
+    since = <span class="string">&quot;0.8.0&quot;</span>,
+    note = <span class="string">&quot;Prefer `env_logger::Builder::from_env()` instead.&quot;
+</span>)]
 </span><span class="kw">pub fn </span>from_env&lt;<span class="lifetime">&#39;a</span>, E&gt;(env: E) -&gt; Builder
 <span class="kw">where
     </span>E: Into&lt;Env&lt;<span class="lifetime">&#39;a</span>&gt;&gt;,
@@ -2350,6 +2602,22 @@
         );
 
         <span class="macro">assert_eq!</span>(<span class="prelude-val">Some</span>(<span class="string">&quot;from default&quot;</span>.to_owned()), env.get_write_style());
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>builder_parse_env_overrides_existing_filters() {
+        env::set_var(
+            <span class="string">&quot;builder_parse_default_env_overrides_existing_filters&quot;</span>,
+            <span class="string">&quot;debug&quot;</span>,
+        );
+        <span class="kw">let </span>env = Env::new().filter(<span class="string">&quot;builder_parse_default_env_overrides_existing_filters&quot;</span>);
+
+        <span class="kw">let </span><span class="kw-2">mut </span>builder = Builder::new();
+        builder.filter_level(LevelFilter::Trace);
+        <span class="comment">// Overrides global level to debug
+        </span>builder.parse_env(env);
+
+        <span class="macro">assert_eq!</span>(builder.filter.build().filter(), LevelFilter::Debug);
     }
 }
 </code></pre></div></section></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["extract_comments_from_directory","extract_comments_from_file"]};

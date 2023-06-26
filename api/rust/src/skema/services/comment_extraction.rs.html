@@ -77,14 +77,47 @@
 <a href="#77" id="77">77</a>
 <a href="#78" id="78">78</a>
 <a href="#79" id="79">79</a>
+<a href="#80" id="80">80</a>
+<a href="#81" id="81">81</a>
+<a href="#82" id="82">82</a>
+<a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
+<a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Comment extraction services
 
-</span><span class="kw">use </span>actix_web::{get, web, HttpResponse};
-<span class="kw">use </span>comment_extraction::comments::Comments;
+</span><span class="kw">use </span>actix_web::{get, post, web, HttpResponse};
+<span class="kw">use </span>comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
 <span class="kw">use </span>comment_extraction::languages::python::get_comments_from_string <span class="kw">as </span>get_python_comments;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>utoipa;
 <span class="kw">use </span>utoipa::ToSchema;
+<span class="kw">use </span>std::{fs, io::Write};
+<span class="kw">use </span>log::debug;
+<span class="kw">use </span>tempdir::TempDir;
 
 <span class="attr">#[derive(Debug, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub enum </span>Language {
@@ -152,8 +185,35 @@
         (status = <span class="number">200</span>, description = <span class="string">&quot;Get comments&quot;</span>, body = CommentExtractionResponse)
     )
 )]
-#[get(<span class="string">&quot;/get_comments&quot;</span>)]
+#[post(<span class="string">&quot;/extract-comments&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_comments(payload: web::Json&lt;CommentExtractionRequest&gt;) -&gt; HttpResponse {
     HttpResponse::Ok().json(web::Json(get_python_comments(<span class="kw-2">&amp;</span>payload.code)))
+}
+
+
+<span class="doccomment">/// Get comments for a zipfile containing a directory of code
+</span><span class="attr">#[utoipa::path(
+    responses(
+        (status = <span class="number">200</span>, description = <span class="string">&quot;Get comments from zipfile&quot;</span>)
+    )
+)]
+#[post(<span class="string">&quot;/extract-comments-from-zipfile&quot;</span>)]
+</span><span class="kw">pub async fn </span>get_comments_from_zipfile(payload: web::Bytes) -&gt; HttpResponse {
+    <span class="macro">debug!</span>(<span class="string">&quot;Zip file received. Size: {} bytes&quot;</span>, payload.len());
+    <span class="kw">let </span>tmp_dir = TempDir::new(<span class="string">&quot;comment_extraction_input&quot;</span>).unwrap();
+    <span class="kw">let </span>file_path = tmp_dir.path().join(<span class="string">&quot;directory.zip&quot;</span>);
+    <span class="kw">let </span><span class="kw-2">mut </span>f = fs::File::create(file_path.clone()).unwrap();
+    f.write_all(<span class="kw-2">&amp;</span>payload).unwrap();
+    drop(f);
+
+    <span class="comment">// Read zipfile
+    </span><span class="kw">let </span>file = fs::File::open(file_path).unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>archive = zip::ZipArchive::new(file).unwrap();
+    archive.extract(<span class="kw-2">&amp;</span>tmp_dir).unwrap();
+    <span class="kw">let </span>comments = extract_comments_from_directory(<span class="kw-2">&amp;</span>tmp_dir, <span class="kw-2">&amp;</span><span class="prelude-val">None</span>);
+
+    tmp_dir.close().unwrap();
+
+    HttpResponse::Ok().json(web::Json(comments))
 }
 </code></pre></div></section></main></body></html>
