@@ -27,7 +27,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import os
+<pre><code class="python">import json
+import os
 import tempfile
 from pathlib import Path
 from typing import List, Optional
@@ -35,7 +36,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
 from fastapi import FastAPI, Body, File, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
 import skema.skema_py.petris
@@ -51,12 +52,13 @@ class Ports(BaseModel):
 
 
 class System(BaseModel):
-    files: List[str] = []
-    blobs: List[str]
-    system_name: Optional[str] = &#34;&#34;
-    root_name: Optional[str] = &#34;&#34;
+    files: List[str] = Field(description=&#34;The file name corresponding to each entry in `blobs`&#34;, example=[&#34;example.py&#34;])
+    blobs: List[str] = Field(decription=&#34;Contents of each file to be analyzed&#34;, example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;])
+    system_name: Optional[str] = Field(default=None, decription=&#34;A model name to associate with the provided code&#34;, example=&#34;my-system&#34;)
+    root_name: Optional[str] = Field(default=None, decription=&#34;????&#34;, example=None)
 
 
+# FIXME: why does this return a a string?
 def system_to_gromet(system: System):
     &#34;&#34;&#34;Convert a System to Gromet JSON&#34;&#34;&#34;
 
@@ -122,7 +124,8 @@ async def fn_given_filepaths(system: System):
     response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
     gromet_json = response.json()
     &#34;&#34;&#34;
-    return system_to_gromet(system)
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))
 
 
 @app.post(
@@ -167,7 +170,8 @@ async def root(zip_file: UploadFile = File()):
     system = System(
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
     )
-    return system_to_gromet(system)
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))
 
 
 @app.post(
@@ -237,7 +241,8 @@ async def fn_given_filepaths(system: System):
     response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
     gromet_json = response.json()
     &#34;&#34;&#34;
-    return system_to_gromet(system)</code></pre>
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.get_pyacset"><code class="name flex">
@@ -342,7 +347,8 @@ async def root(zip_file: UploadFile = File()):
     system = System(
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
     )
-    return system_to_gromet(system)</code></pre>
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.system_to_gromet"><code class="name flex">
@@ -438,10 +444,10 @@ async def root(zip_file: UploadFile = File()):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class System(BaseModel):
-    files: List[str] = []
-    blobs: List[str]
-    system_name: Optional[str] = &#34;&#34;
-    root_name: Optional[str] = &#34;&#34;</code></pre>
+    files: List[str] = Field(description=&#34;The file name corresponding to each entry in `blobs`&#34;, example=[&#34;example.py&#34;])
+    blobs: List[str] = Field(decription=&#34;Contents of each file to be analyzed&#34;, example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;])
+    system_name: Optional[str] = Field(default=None, decription=&#34;A model name to associate with the provided code&#34;, example=&#34;my-system&#34;)
+    root_name: Optional[str] = Field(default=None, decription=&#34;????&#34;, example=None)</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
