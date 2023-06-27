@@ -33,6 +33,7 @@ import glob
 import sys
 import os.path
 
+from skema.gromet import GROMET_VERSION
 from skema.gromet.fn import (
     GrometFNModuleCollection,
 )
@@ -73,7 +74,7 @@ def process_file_system(
     file_list = open(files, &#34;r&#34;).readlines()
 
     module_collection = GrometFNModuleCollection(
-        schema_version=&#34;0.1.6&#34;,
+        schema_version=GROMET_VERSION,
         name=system_name,
         modules=[],
         module_index=[],
@@ -216,7 +217,7 @@ if __name__ == &#34;__main__&#34;:
     file_list = open(files, &#34;r&#34;).readlines()
 
     module_collection = GrometFNModuleCollection(
-        schema_version=&#34;0.1.6&#34;,
+        schema_version=GROMET_VERSION,
         name=system_name,
         modules=[],
         module_index=[],
