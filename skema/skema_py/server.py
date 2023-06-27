@@ -1,3 +1,4 @@
+import json
 import os
 import tempfile
 from pathlib import Path
@@ -6,7 +7,7 @@ from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
 from fastapi import FastAPI, Body, File, UploadFile
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
 import skema.skema_py.petris
@@ -22,12 +23,13 @@ class Ports(BaseModel):
 
 
 class System(BaseModel):
-    files: List[str] = []
-    blobs: List[str]
-    system_name: Optional[str] = ""
-    root_name: Optional[str] = ""
+    files: List[str] = Field(description="The file name corresponding to each entry in `blobs`", example=["example.py"])
+    blobs: List[str] = Field(decription="Contents of each file to be analyzed", example=["greet = lambda: print('howdy!')\ngreet()"])
+    system_name: Optional[str] = Field(default=None, decription="A model name to associate with the provided code", example="my-system")
+    root_name: Optional[str] = Field(default=None, decription="????", example=None)
 
 
+# FIXME: why does this return a a string?
 def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
@@ -93,7 +95,8 @@ async def fn_given_filepaths(system: System):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
     gromet_json = response.json()
     """
-    return system_to_gromet(system)
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))
 
 
 @app.post(
@@ -138,7 +141,8 @@ async def root(zip_file: UploadFile = File()):
     system = System(
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
     )
-    return system_to_gromet(system)
+    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
+    return json.loads(system_to_gromet(system))
 
 
 @app.post(
