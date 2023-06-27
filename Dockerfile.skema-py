@@ -8,16 +8,16 @@ FROM  python:3.8-bullseye
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update &&\
     apt-get -y --no-install-recommends install \
-        tree \
-        # Required for pygraphviz
-        build-essential \
-        graphviz \
-        libgraphviz-dev \
-        python3-venv 
+    tree \
+    # Required for pygraphviz
+    build-essential \
+    graphviz \
+    libgraphviz-dev \
+    python3-venv 
 
 # Node needed for img2mml
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
-apt-get install -y nodejs
+    apt-get install -y nodejs
 
 # The two commands below are to reduce the size of the Docker image
 RUN apt-get clean &&\

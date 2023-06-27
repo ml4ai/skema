@@ -43,8 +43,12 @@ moviz = ["flask", "graphviz"]
 # ISA dependencies.
 isa = [
   "pydot", 
+<<<<<<< HEAD
   "graspologic", # NOTE: this depends on rust when installing on an M1/ARM64 machine
   "Levenshtein"
+=======
+  "graspologic" # NOTE: this depends on rust
+>>>>>>> 7863b1bbbc024b3f05adeb993aa0da4b3f181ec8
 ]
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
@@ -71,20 +75,32 @@ all = ["skema[core]", "skema[dev]", "skema[doc]"]
 "skema.program_analysis" = "skema/program_analysis"
 "skema.skema_py" = "skema/skema_py"
 # re-map skema/text_reading/python to skema.text_reading
+<<<<<<< HEAD
 "skema.text_reading.mention_linking" = "skema/text_reading/mention_linking"
 "skema.data" = "skema/data"
+=======
+"skema.text_reading" = "skema/text_reading/python"
+>>>>>>> 7863b1bbbc024b3f05adeb993aa0da4b3f181ec8
 
 # [tool.setuptools.packages]
 # find = {}  # Scan the project directory with the default parameters
 
 [tool.setuptools.package-data]
 # needed to ensure models are included in package/discoverable
+<<<<<<< HEAD
 "*" = ["*.json", "vocab.txt", "*.pt", "*.png"]
+=======
+"*" = ["*.json", "vocab.txt", "*.pt"]
+>>>>>>> 7863b1bbbc024b3f05adeb993aa0da4b3f181ec8
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
 # runnables
 [project.scripts]
+<<<<<<< HEAD
+=======
+skema-tr-cosmos-integration = "skema.text_reading.cosmos_integration:main"
+>>>>>>> 7863b1bbbc024b3f05adeb993aa0da4b3f181ec8
 skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
 
 # Minimum requirements for the build system to execute.
@@ -118,4 +134,8 @@ extend-exclude = '''
   | tests/data
   | profiling
 )/
+<<<<<<< HEAD
 '''
+=======
+'''
+>>>>>>> 7863b1bbbc024b3f05adeb993aa0da4b3f181ec8
