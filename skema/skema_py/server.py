@@ -42,7 +42,7 @@ def system_to_gromet(system: System):
         # Create files and intermediate directories
         for index, file in enumerate(system.files):
             file_path = Path(
-                tmp_path, system.root_name, file
+                tmp_path, system.root_name or "", file
             )
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(system.blobs[index])
@@ -55,8 +55,8 @@ def system_to_gromet(system: System):
 
         ## Run pipeline
         gromet_collection = process_file_system(
-            system.system_name,
-            str(Path(tmp_path, system.root_name)),
+            system.system_name or "",
+            str(Path(tmp_path, system.root_name or "")),
             str(system_filepaths),
         )
 
