@@ -36,6 +36,8 @@ dynamic = ["readme"]
 # - six: Required by auto-generated Swagger models
 dev = ["fastapi", "requests", "uvicorn", "pytest", "pytest-cov", "pytest-xdist", "black", "mypy", "coverage", "pygraphviz", "six"]
 
+demo = ["jupyter==1.0.0"]
+
 # MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
 # the skema/moviz directory).
 moviz = ["flask", "graphviz"]
@@ -60,7 +62,7 @@ doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-gi
 core = ["skema[moviz]", "skema[img2mml]", "skema[isa]", "skema[tr]"]
 
 # all extras
-all = ["skema[core]", "skema[dev]", "skema[doc]"]
+all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
 
 [tool.setuptools.package-dir]
 "skema.gromet" = "skema/gromet"
