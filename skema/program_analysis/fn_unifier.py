@@ -8,12 +8,15 @@ from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 from skema.gromet.metadata.source_code_comment import SourceCodeComment
 from skema.gromet.metadata.source_code_reference import SourceCodeReference
 from skema.gromet.metadata.comment_type import CommentType
+from skema.gromet.fn.gromet_fn_module_collection import GrometFNModuleCollection
 
+from skema.utils.fold import dictionary_to_gromet_json, del_nulls
+
+from typing import Dict, Text, Any 
 import argparse
 import json
 import re
 
-from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 def normalize_module_path(path: str):
     # The module paths in the GroMEt FN are dotted
@@ -221,7 +224,7 @@ def align_full_system(gromet_obj, extraction):
                         for FN in module_FN.fn_array:
                             align_fn(FN_metadata, file_comments, FN)
         
-def process_alignment(gromet_json, comments_json):
+def process_alignment(gromet_json: Dict[Text, Any], comments_json: Dict[Text, Any]) -> GrometFNModuleCollection:
     # Given a GroMEt json and a comments json 
     # We run the alignment on the GroMEt to unify the comments with
     # The gromet JSON
