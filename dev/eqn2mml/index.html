@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="University of Arizona &amp; Lum AI">
-  <link rel="canonical" href="https://ml4ai.github.io/skema/dev/docs/">
+  <link rel="canonical" href="https://ml4ai.github.io/skema/dev/eqn2mml/">
   <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Building documentation - skema</title>
+  <title>Configuring <code>img2mml</code> - skema</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../../css/theme.css" />
@@ -19,9 +19,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Building documentation";
-    var mkdocs_page_input_path = "dev/docs.md";
-    var mkdocs_page_url = "/skema/dev/docs/";
+    var mkdocs_page_name = "Configuring <code>img2mml</code>";
+    var mkdocs_page_input_path = "dev/eqn2mml.md";
+    var mkdocs_page_url = "/skema/dev/eqn2mml/";
   </script>
   
   <script src="../../js/jquery-2.1.1.min.js" defer></script>
@@ -71,11 +71,11 @@
                 <ul class="current">
                     <li class="toctree-l1"><a class="reference internal" href="../env/">Configuring your development environment</a>
                     </li>
-                    <li class="toctree-l1"><a class="reference internal" href="../eqn2mml/">Configuring <code>img2mml</code></a>
-                    </li>
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Building documentation</a>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Configuring <code>img2mml</code></a>
     <ul class="current">
     </ul>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../docs/">Building documentation</a>
                     </li>
                     <li class="toctree-l1"><a class="reference internal" href="../../coverage/">Test coverage reports</a>
                     </li>
@@ -134,10 +134,10 @@
         
       
     
-    <li>Building documentation</li>
+    <li>Configuring <code>img2mml</code></li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/ml4ai/skema/blob/main/docs/dev/docs.md"
+        <a href="https://github.com/ml4ai/skema/blob/main/docs/dev/eqn2mml.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -149,19 +149,9 @@
           <div role="main">
             <div class="section">
               
-                <p>Documentation is built using <a href="https://www.mkdocs.org/"><code>mkdocs</code>, a static site generator written in Python</a>.</p>
-<h1 id="building-the-docs">Building the docs<a class="headerlink" href="#building-the-docs" title="Permanent link"></a></h1>
-<p>Assuming you've <a href="../env/">configured your development enviroment</a>:</p>
-<pre><code class="language-bash">conda activate skema
-mkdocs serve
-</code></pre>
-<p>Open your browser to <a href="http://127.0.0.1:8000/skema/">http://127.0.0.1:8000/skema/</a>.</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p><code>mkdocs serve</code> supports <strong>live reloading</strong>.  Any changes to the source will be reflected immediately. </p>
-</div>
-<h1 id="adding-navigation-links">Adding navigation links<a class="headerlink" href="#adding-navigation-links" title="Permanent link"></a></h1>
-<p>Site navigation is defined in <a href="https://github.com/ml4ai/skema/blob/main/mkdocs.yml"><code>mkdocs.yml</code></a> and references markdown and html pages located under <code>docs</code>.</p>
+                <h2 id="equation-images-pmml">Equation images &rarr; pMML<a class="headerlink" href="#equation-images-pmml" title="Permanent link"></a></h2>
+<p>Published docker images include our latest model release for converting images of equations to pMML.  When developing and testing new models for this conversion, make sure that the appropriate <code>img2mml</code> model is in the <code>skema/img2mml/trained_models</code> directory before building.  See the 
+<a href="https://github.com/ml4ai/skema/blob/main/skema/img2mml/README.md"><code>skema/img2mml</code> README for details</a>.</p>
               
             </div>
           </div>
@@ -169,10 +159,10 @@ mkdocs serve
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../../coverage/" class="btn btn-neutral float-right" title="Test coverage reports">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../docs/" class="btn btn-neutral float-right" title="Building documentation">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../eqn2mml/" class="btn btn-neutral" title="Configuring <code>img2mml</code>"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../env/" class="btn btn-neutral" title="Configuring your development environment"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -204,10 +194,10 @@ mkdocs serve
         </span>
     
     
-      <span><a href="../eqn2mml/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../env/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../../coverage/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../docs/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
