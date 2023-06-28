@@ -188,20 +188,20 @@ def align_full_system(gromet_obj, extraction, extraction_file_name):
     # We can check what kind of extracted comments file we have by checking the structure of the dictionary
     if "comments" in extraction.keys() and "docstrings" in extraction.keys(): 
         # Single file system
+        # NOTE: We assume for the moment that if we're aligning a single file that
+        # The corresponding GroMEt has exactly one module
         
-        for module in gromet_obj.module_index:
-            # Go through each file in the GroMEt FN
-            normalized_path = normalize_module_path(module)
-            if normalized_path == extraction_file_name:
-                # Find the current FN in the collection
-                module_FN = find_fn(gromet_obj.modules, normalized_path)
-                if module_FN != None:
-                    FN_metadata = module_FN.metadata_collection
-                    align_fn(FN_metadata, extraction, module_FN.fn)
+        if len(gromet_obj.modules[0]) != 1:
+            raise NotImplementedError("Single file alignment from a multi module GroMEt system not supported yet")
 
-                    if len(module_FN.fn_array) > 0:
-                        for FN in module_FN.fn_array:
-                            align_fn(FN_metadata, extraction, FN)
+        module_FN = gromet_obj.modules[0]
+        if module_FN != None:
+            FN_metadata = module_FN.metadata_collection
+            align_fn(FN_metadata, extraction, module_FN.fn)
+
+            if len(module_FN.fn_array) > 0:
+                for FN in module_FN.fn_array:
+                    align_fn(FN_metadata, extraction, FN)
     else:
         # Multi-file system
         extraction = normalize_extraction_names(extraction)
@@ -221,6 +221,14 @@ def align_full_system(gromet_obj, extraction, extraction_file_name):
                         for FN in module_FN.fn_array:
                             align_fn(FN_metadata, file_comments, FN)
         
+def process_alignment(gromet_json, comments_json):
+    # Given a GroMEt json and a comments json 
+    # We run the alignment on the GroMEt to unify the comments with
+    # The gromet JSON
+    gromet_object = json_to_gromet(gromet_json)
+    align_full_system(gromet_object, comments_json)
+
+    return gromet_object
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -240,9 +248,7 @@ if __name__ == "__main__":
     comments_json = json.load(comments_file)
     comments_file.close()
 
-    comments_file_name = args.comments.split("--")[0]
-
-    align_full_system(gromet_object, comments_json, comments_file_name)
+    align_full_system(gromet_object, comments_json)
 
     # Write out the gromet with the comments
     with open(args.gromet, "w") as f:
