@@ -230,7 +230,7 @@ def train(
     ddp=False,
     rank=None,
     vocab=None,
-    weight=0.5,
+    weight=0.25,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
