@@ -20,16 +20,16 @@ layout: page
 
 **Postdocs**:
 
-- Justin Lieffers
-- Liang Zhang
+- Justin Lieffers (University of Arizona)
+- Liang Zhang (University of Arizona)
 
 **Graduate Students**:
 
-- Deepsana Shahi
-- Isha Talegaonkar
+- Deepsana Shahi (University of Arizona)
+- Isha Talegaonkar (University of Utah)
 
 **Research Programmers**:
 
 - [Tito Ferra](https://github.com/titomeister) (LUM AI)
-- Jack Ladwig
+- Jack Ladwig (SIFT)
 - [Vincent Raymond](https://github.com/vincentraymond-ua) (LUM AI)
