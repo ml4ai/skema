@@ -175,7 +175,7 @@ def find_fn(gromet_modules, fn_name):
     return None
 
 
-def align_full_system(gromet_obj, extraction, extraction_file_name):
+def align_full_system(gromet_obj, extraction):
     # Comments extraction file holds comments for all files in the system
 
     # The extracted comments json file can appear in two ways:
@@ -191,7 +191,7 @@ def align_full_system(gromet_obj, extraction, extraction_file_name):
         # NOTE: We assume for the moment that if we're aligning a single file that
         # The corresponding GroMEt has exactly one module
         
-        if len(gromet_obj.modules[0]) != 1:
+        if len(gromet_obj.modules) != 1:
             raise NotImplementedError("Single file alignment from a multi module GroMEt system not supported yet")
 
         module_FN = gromet_obj.modules[0]
