@@ -40,8 +40,6 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 RUN pip install wheel
 RUN pip install fastapi uvicorn
 RUN pip install six
-# Install the ASKEM-DataFormat library
-RUN pip install git+https://github.com/ml4ai/ASKEM-TA1-DataModel.git
 # Download ML model (~150MB)
 # FIXME: consider publishing and retrieving this model from HF Hub
 RUN curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
