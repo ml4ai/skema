@@ -1,8 +1,8 @@
 ![](http://ci.kraken.sista.arizona.edu/api/badges/ml4ai/skema/status.svg)  
-![Docker lumai/askem-skema-py Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-py?sort=date&logo=docker&label=lumai%2Faskem-skema-py)  
-![Docker lumai/askem-skema-img2mml Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-img2mml?sort=date&logo=docker&label=lumai%2Faskem-skema-img2mml)  
-![Docker lumai/askem-skema-rs Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-rs?sort=date&logo=docker&label=lumai%2Faskem-skema-rs)  
-![Docker lumai/askem-skema-text-reading Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-text-reading?sort=date&logo=docker&label=lumai%2Faskem-skema-text-reading)
+[![Docker lumai/askem-skema-py Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-py?sort=date&logo=docker&label=lumai%2Faskem-skema-py)](https://hub.docker.com/r/lumai/askem-skema-py)  
+[![Docker lumai/askem-skema-img2mml Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-img2mml?sort=date&logo=docker&label=lumai%2Faskem-skema-img2mml)](https://hub.docker.com/r/lumai/askem-skema-img2mml)  
+[![Docker lumai/askem-skema-rs Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-rs?sort=date&logo=docker&label=lumai%2Faskem-skema-rs)](https://hub.docker.com/r/lumai/askem-skema-rs)  
+[![Docker lumai/askem-skema-text-reading Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-text-reading?sort=date&logo=docker&label=lumai%2Faskem-skema-text-reading)](https://hub.docker.com/r/lumai/askem-skema-text-reading)
 
 # SKEMA: Scientific Knowledge Extraction and Model Analysis
 
