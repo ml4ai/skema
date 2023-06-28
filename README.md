@@ -10,6 +10,8 @@ This is the main code repository for the SKEMA project. It contains the source
 code and documentation for the text reading, structural alignment, and model
 role analysis components of SKEMA.
 
+[For details, see our project documentation](https://ml4ai.github.io/skema/)
+
 ## Directory structure
 
 This repository contains code written in Python, Rust, and Scala. The directory
@@ -23,14 +25,6 @@ At the top level, we have the following files and directories:
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
-- `docker-compose.skema-py.yml`: Docker Compose file for the skema-py service.
-- `docker-compose.skema-rs.yml`: Docker Compose file for the skema-rs service.
-- `docker-compose.yml`: Docker Compose file for multiple SKEMA services
-  (currently skema-py and skema-rs).
-- `docker-compose.memgraph.yml`: Docker Compose file for the memgraph database.
-- `docker-compose.img2mml.yml`: Docker Compose file for the img2mml service.
-- `docs`: Source code for the project website.
-- `notebooks`: Jupyter notebooks for demoing SKEMA functionality.
 - `scripts`: Miscellaneous scripts
 - `pyproject.toml`: This file declares and defines the `skema` Python package.
 - `skema`
@@ -56,51 +50,14 @@ The `text_reading` directory contains three subdirectories:
 - `text_reading`: Scala project for rule-based extraction of mentions of scientific concepts.
 - `notebooks`: Jupyter notebooks for demoing text reading/mention linking functionality.
 
-Running the following command in this directory will install the `skema` Python
-package into your Python virtual environment (we assume you have one active),
-so that it is available for scripts running in that virtual environment.
+## Python
+[For instructions on installing our Python library, please see our developer documentation](https://ml4ai.github.io/skema/dev/env/).
 
-```bash
-pip install -e ".[core]"
-```
-
-The command above installs the minimum set packages required for the Code2FN
-pipeline. 
-
-To additionally install dev dependencies:
-
-```bash
-pip install -e ".[core,dev]"
-```
-
-To install **all** components (including dev dependencies for documentation generation):
-```bash
-pip install ".[all]"
-```
-
-For more details on the available extras, see the `pyproject.toml` file.
-
+## Other
 The `README.md` files in the `skema/skema-rs` and
 `skema/text_reading/text_reading` directories provide instructions on how to
 run the software components that are written in Rust and Scala respectively.
 
-## Dockerized services
+## Examples
 
-To run the `skema-py` and `skema-rs` services in conjunction, do:
-
-```
-docker-compose up --build
-```
-
-You can also launch the skema-py and skema-rs services individually by using
-their individual `docker-compose.*.yml` files.
-
-To run the img2mml Dockerized service, run
-
-```
-docker-compose -f docker-compose.img2mml.yml up --build
-```
-
-(if you're not using a published docker image with the default model, make sure that the appropriate img2mml model is in the
-`skema/img2mml/trained_models` directory before building - see the `README.md` file in
-`skema/img2mml` for details)
+We maintain several containerized examples demonstrating system capabilities at [https://github.com/ml4ai/ASKEM-TA1-DockerVM](https://github.com/ml4ai/ASKEM-TA1-DockerVM).
