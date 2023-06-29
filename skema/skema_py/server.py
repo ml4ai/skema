@@ -173,16 +173,13 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     gromet_json = response.json()
     """
 
-    # Currently, we rely on the file extension to know which language front end to send the source code to.
-    supported_file_extensions = [".py", ".f", ".f95"]
-
     # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
     files = []
     blobs = []
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
             file_obj = Path(file)
-            if file_obj.suffix in supported_file_extensions:
+            if file_obj.suffix in FN_SUPPORTED_FILE_EXTENSIONS:
                 files.append(file)
                 blobs.append(zip.open(file).read())
 
