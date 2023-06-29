@@ -18,15 +18,32 @@ from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
+
 class Ports(BaseModel):
     opis: List[str]
     opos: List[str]
 
+
 class System(BaseModel):
-    files: List[str] = Field(description="The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`", example=["example1.py", "dir/example2.py"])
-    blobs: List[str] = Field(decription="Contents of each file to be analyzed", example=["greet = lambda: print('howdy!')\ngreet()"])
-    system_name: Optional[str] = Field(default=None, decription="A model name to associate with the provided code", example="my-system")
-    root_name: Optional[str] = Field(default=None, decription="The name of the code system's root directory.", example="my-system")
+    files: List[str] = Field(
+        description="The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`",
+        example=["example1.py", "dir/example2.py"],
+    )
+    blobs: List[str] = Field(
+        decription="Contents of each file to be analyzed",
+        example=["greet = lambda: print('howdy!')\ngreet()"],
+    )
+    system_name: Optional[str] = Field(
+        default=None,
+        decription="A model name to associate with the provided code",
+        example="my-system",
+    )
+    root_name: Optional[str] = Field(
+        default=None,
+        decription="The name of the code system's root directory.",
+        example="my-system",
+    )
+
 
 def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
@@ -39,16 +56,12 @@ def system_to_gromet(system: System):
 
         # Create files and intermediate directories
         for index, file in enumerate(system.files):
-            file_path = Path(
-                tmp_path, system.root_name or "", file
-            )
+            file_path = Path(tmp_path, system.root_name or "", file)
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(system.blobs[index])
 
         # Create system_filepaths.txt
-        system_filepaths = Path(
-            tmp_path, "system_filepaths.txt"
-        )
+        system_filepaths = Path(tmp_path, "system_filepaths.txt")
         system_filepaths.write_text("\n".join(system.files))
 
         ## Run pipeline
@@ -64,11 +77,16 @@ def system_to_gromet(system: System):
 
 app = FastAPI()
 
+
 @app.get("/ping", summary="Ping endpoint to test health of service")
 def ping():
     return "The skema-py service is running."
 
-@app.get("/fn-supported-file-extensions", summary="Endpoint for checking which files extensions are currently supported by code2fn pipeline.")
+
+@app.get(
+    "/fn-supported-file-extensions",
+    summary="Endpoint for checking which files extensions are currently supported by code2fn pipeline.",
+)
 def fn_supported_file_extensions():
     """
     Returns a List[str] where each entry in the list represents a file extension.
@@ -79,9 +97,10 @@ def fn_supported_file_extensions():
 
     response = requests.get("http://0.0.0.0:8000/fn-supported-file-extensions")
     supported_extensions = response.json()
-    
+
     """
     return FN_SUPPORTED_FILE_EXTENSIONS
+
 
 @app.post(
     "/fn-given-filepaths",
@@ -92,12 +111,12 @@ def fn_supported_file_extensions():
 )
 async def fn_given_filepaths(system: System):
     """
-    Endpoint for generating Gromet JSON from a serialized code system. 
+    Endpoint for generating Gromet JSON from a serialized code system.
     ### Python example
-    
+
     ```
     import requests
-    
+
     # Single file
     system = {
       "files": ["exp1.py"],
@@ -110,7 +129,7 @@ async def fn_given_filepaths(system: System):
     system = {
       "files": ["exp1.py", "exp1.f"],
       "blobs": ["x=2", "program exp1\\ninteger::x=2\\nend program exp1"],
-      "system_name": "exp1", 
+      "system_name": "exp1",
       "root_name": "exp1"
     }
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
@@ -143,7 +162,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     output_name = "system_test.zip"
     input_path = Path("/data") / "skema" / "code" / input_name
     output_path = Path("/data") / "skema" / "code" / output_name
-    
+
     # Convert source directory to zip archive
     shutil.make_archive(input_path, "zip", input_path)
 
