@@ -33,6 +33,21 @@ class MathMLNode:
         self.content = content
         self.children = children if children else []
 
+    def count_nodes(self) -> int:
+        """
+        Count the number of nodes in the MathML tree.
+
+        Returns:
+            int: The total number of nodes.
+        """
+        count: int = 1  # Initialize with 1 to include the current node
+
+        # Traverse child nodes recursively and count each child node
+        for child in self.children:
+            count += child.count_nodes()
+
+        return count
+
 
 def add_semicolon_to_unicode(string: str) -> str:
     """
@@ -116,6 +131,10 @@ def calculate_tree_edit_distance(mathml_pred: str, mathml_label: str) -> int:
         mathml_tree2 = convert_to_mathml_tree(mathml_label)
     except:
         return 0
+
+    # If the node number difference of two trees is larger than 10, it returns -1
+    if abs(mathml_tree1.count_nodes() - mathml_tree2.count_nodes()) >= 10:
+        return -1
 
     def get_label(node: MathMLNode) -> str:
         """
@@ -230,7 +249,7 @@ def train(
     ddp=False,
     rank=None,
     vocab=None,
-    weight=0.25,
+    weight=0.1,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
