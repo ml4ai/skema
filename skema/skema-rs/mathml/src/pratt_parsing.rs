@@ -1,21 +1,24 @@
-//! Pratt parsing module.
+//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
 use crate::{
-    ast::{MathExpression, Operator},
+    ast::{Math, MathExpression, Operator},
     parsing::math_expression,
 };
 use nom::multi::many0;
 use std::fmt;
-enum S {
+
+/// An S-expression like structure.
+enum MathExpressionTree {
     Atom(MathExpression),
-    Cons(Operator, Vec<S>),
+    Cons(Operator, Vec<MathExpressionTree>),
 }
-impl fmt::Display for S {
+
+impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            S::Atom(i) => write!(f, "{}", i),
-            S::Cons(head, rest) => {
+            MathExpressionTree::Atom(i) => write!(f, "{}", i),
+            MathExpressionTree::Cons(head, rest) => {
                 write!(f, "({}", head)?;
                 for s in rest {
                     write!(f, " {}", s)?
@@ -191,14 +194,20 @@ impl Lexer {
     }
 }
 
-fn expr(input: Vec<MathExpression>) -> S {
+fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
     expr_bp(&mut lexer, 0)
 }
 
-fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> S {
+impl From<Math> for MathExpressionTree {
+    fn from(input: Math) -> Self {
+        expr(input.content)
+    }
+}
+
+fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     let mut lhs = match lexer.next() {
-        Token::Atom(it) => S::Atom(it),
+        Token::Atom(it) => MathExpressionTree::Atom(it),
         Token::Op(Operator::Lparen) => {
             let lhs = expr_bp(lexer, 0);
             assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
@@ -207,7 +216,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> S {
         Token::Op(op) => {
             let ((), r_bp) = prefix_binding_power(&op);
             let rhs = expr_bp(lexer, r_bp);
-            S::Cons(op, vec![rhs])
+            MathExpressionTree::Cons(op, vec![rhs])
         }
         t => panic!("bad token: {:?}", t),
     };
@@ -222,7 +231,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> S {
                 break;
             }
             lexer.next();
-            lhs = S::Cons(op, vec![lhs]);
+            lhs = MathExpressionTree::Cons(op, vec![lhs]);
             continue;
         }
         if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
@@ -232,7 +241,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> S {
             lexer.next();
             lhs = {
                 let rhs = expr_bp(lexer, r_bp);
-                S::Cons(op, vec![lhs, rhs])
+                MathExpressionTree::Cons(op, vec![lhs, rhs])
             };
             continue;
         }
@@ -304,17 +313,20 @@ fn test_conversion() {
     println!("Input: {input}");
     let (_, elements) = many0(math_expression)(input.into()).unwrap();
     let s = expr(elements);
+    assert_eq!(s.to_string(), "(+ a (- b))");
     println!("Output: {s}\n");
 
     let input = "<mn>2</mn><mi>a</mi><mo>(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>)</mo>";
     println!("Input: {input}");
     let (_, elements) = many0(math_expression)(input.into()).unwrap();
     let s = expr(elements);
+    assert_eq!(s.to_string(), "(* (* 2 a) (+ c d))");
     println!("Output: {s}\n");
 
     let input = "<mfrac><mrow><mi>d</mi><mi>S</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>";
     println!("Input: {input}");
     let (_, elements) = many0(math_expression)(input.into()).unwrap();
     let s = expr(elements);
+    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 }
