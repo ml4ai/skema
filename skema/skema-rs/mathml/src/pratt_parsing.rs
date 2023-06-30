@@ -1,3 +1,6 @@
+//! Pratt parsing module.
+//! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
+
 use crate::{
     ast::{MathExpression, Operator},
     parsing::math_expression,
