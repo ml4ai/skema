@@ -392,35 +392,6 @@ fn test_mover() {
     )
 }
 
-//#[test]
-//fn test_munder() {
-//let expr = Munder(vec![
-//Mo(Operator::Other("inf".to_string())),
-//Mn("0".to_string()),
-//Mo(Operator::Other("≤".to_string())),
-//Mi("t".to_string()),
-//Mo(Operator::Other("≤".to_string())),
-//]);
-//test_parser(
-//"<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
-//munder,
-//expr,
-//)
-//}
-
-//#[test]
-//fn test_msubsup() {
-//test_parser(
-//"<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
-//msubsup,
-//Msubsup(vec![
-//Mi("L".to_string()),
-//Mi("t".to_string()),
-//Mi("∞".to_string()),
-//]),
-//)
-//}
-
 #[test]
 fn test_mtext() {
     test_parser("<mtext>if</mtext>", mtext, Mtext("if".to_string()));
