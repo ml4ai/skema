@@ -33,6 +33,59 @@ struct Lexer {
     tokens: Vec<Token>,
 }
 
+/// Check if fraction is a derivative of a single-variable function expressed in Leibniz notation,
+/// and if so, return a derivative operator and the identifier of the function.
+pub fn recognize_leibniz_diff_op<'a>(
+    numerator: &Box<MathExpression>,
+    denominator: &Box<MathExpression>,
+) -> Result<(Operator, MathExpression), &'a str> {
+    let mut numerator_contains_d = false;
+    let mut denominator_contains_d = false;
+
+    let mut numerator_contains_partial = false;
+    let mut denominator_contains_partial = false;
+    let mut function_candidate: Option<MathExpression> = None;
+
+    // Check if numerator is an mrow
+    if let MathExpression::Mrow(num_expressions) = &**numerator {
+        // Check if first element of numerator is an mi
+        if let MathExpression::Mi(num_id) = &num_expressions[0] {
+            // Check if mi contains 'd'
+            if num_id == "d" {
+                numerator_contains_d = true;
+            }
+
+            if num_id == "∂" {
+                numerator_contains_partial = true;
+            }
+
+            // Gather the second identifier as a potential candidate function.
+            function_candidate = Some(num_expressions[1].clone());
+        }
+    }
+
+    if let MathExpression::Mrow(denom_expressions) = &**denominator {
+        // Check if first element of denominator is an mi
+        if let MathExpression::Mi(denom_id) = &denom_expressions[0] {
+            // Check if mi contains 'd'
+            if denom_id == "d" {
+                denominator_contains_d = true;
+            }
+            if denom_id == "∂" {
+                denominator_contains_partial = true;
+            }
+        }
+    }
+
+    if (numerator_contains_d && denominator_contains_d)
+        || (numerator_contains_partial && denominator_contains_partial)
+    {
+        Ok((Operator::new_derivative(1, 1), function_candidate.unwrap()))
+    } else {
+        Err("This Mfrac does not correspond to a derivative in Leibniz notation")
+    }
+}
+
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
         // Recognize derivatives whenever possible.
@@ -53,16 +106,30 @@ impl Lexer {
                 }
                 _ => todo!(),
             },
+            // TODO Implement detecting derivatives in Leibniz notation.
+            MathExpression::Mfrac(numerator, denominator) => {
+                if let Ok((derivative, function)) =
+                    recognize_leibniz_diff_op(numerator, denominator)
+                {
+                    acc.push(MathExpression::Mo(derivative));
+                    acc.push(function);
+                } else {
+                    acc.push(*numerator.clone());
+                    acc.push(MathExpression::Mo(Operator::Divide));
+                    acc.push(*denominator.clone());
+                }
+                acc
+            }
             t => {
                 acc.push(t.clone());
                 acc
             }
         });
-        print!("tokens 1: [ ");
-        for token in &tokens {
-            print!("{token} ");
-        }
-        println!("]");
+        //print!("tokens 1: [ ");
+        //for token in &tokens {
+        //print!("{token} ");
+        //}
+        //println!("]");
 
         // Insert implicit multiplication operators.
         let tokens = tokens.iter().fold(vec![], |mut acc, x| {
@@ -71,7 +138,14 @@ impl Lexer {
                 acc
             } else {
                 match x {
-                    MathExpression::Mo(_) => {
+                    MathExpression::Mo(op) => {
+                        if let Operator::Lparen = op {
+                            // Check last element of acc
+                            if let Some(MathExpression::Mo(_)) = acc.last() {
+                            } else {
+                                acc.push(&MathExpression::Mo(Operator::Multiply));
+                            }
+                        }
                         acc.push(x);
                         acc
                     }
@@ -89,6 +163,12 @@ impl Lexer {
                 }
             }
         });
+
+        //print!("tokens 2: [ ");
+        //for token in &tokens {
+        //print!("{token} ");
+        //}
+        //println!("]");
 
         let mut tokens = tokens
             .into_iter()
@@ -180,45 +260,58 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Add | Operator::Subtract => (5, 6),
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
-        Operator::Other(op) => panic!("Unhandled operator!"),
+        Operator::Other(op) => panic!(format!("Unhandled operator: {op}!")),
         _ => return None,
     };
     Some(res)
 }
 #[test]
 fn test_conversion() {
-    let (_, elements) = many0(math_expression)("<mi>x</mi><mo>+</mo><mi>y</mi>".into()).unwrap();
+    let input = "<mi>x</mi><mo>+</mo><mi>y</mi>";
+    println!("Input: {input}");
+    let (_, elements) = many0(math_expression)(input.into()).unwrap();
     let s = expr(elements);
     assert_eq!(s.to_string(), "(+ x y)");
+    println!("Output: {s}\n");
 
-    let (_, elements) = many0(math_expression)(
-        "
-        <mi>a</mi>
-        <mo>=</mo>
-        <mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi>"
-            .into(),
-    )
-    .unwrap();
+    let input = "<mi>a</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi>";
+    println!("Input: {input}");
+    let (_, elements) = many0(math_expression)(input.into()).unwrap();
     let s = expr(elements);
     assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
+    println!("Output: {s}\n");
 
-    let (_, elements) = many0(math_expression)(
-        "
-        <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        "
-        .into(),
-    )
-    .unwrap();
+    let input =
+        "<mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>";
+    println!("Input: {input}");
+    let (_, elements) = many0(math_expression)(input.into()).unwrap();
     let s = expr(elements);
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
+    println!("Output: {s}\n");
 
-    let (_, elements) = many0(math_expression)(
-        "
-        <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        "
-        .into(),
-    )
-    .unwrap();
+    let input =
+        "<mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>";
+    println!("Input: {input}");
+    let (_, elements) = many0(math_expression)(input.into()).unwrap();
     let s = expr(elements);
     assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
+    println!("Output: {s}\n");
+
+    let input = "<mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo>";
+    println!("Input: {input}");
+    let (_, elements) = many0(math_expression)(input.into()).unwrap();
+    let s = expr(elements);
+    println!("Output: {s}\n");
+
+    let input = "<mn>2</mn><mi>a</mi><mo>(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>)</mo>";
+    println!("Input: {input}");
+    let (_, elements) = many0(math_expression)(input.into()).unwrap();
+    let s = expr(elements);
+    println!("Output: {s}\n");
+
+    let input = "<mfrac><mrow><mi>d</mi><mi>S</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>";
+    println!("Input: {input}");
+    let (_, elements) = many0(math_expression)(input.into()).unwrap();
+    let s = expr(elements);
+    println!("Output: {s}\n");
 }
