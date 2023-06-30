@@ -35,8 +35,29 @@ struct Lexer {
 
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
+        // Recognize derivatives whenever possible.
+        let tokens = input
+            .clone()
+            .into_iter()
+            .fold(vec![], |mut acc, x| match x {
+                MathExpression::Mover(base, overscript) => {
+                    acc.push(MathExpression::Mo(Operator::new_derivative(1, 1)));
+                    acc.push(*base);
+                    acc
+                }
+                t => {
+                    acc.push(t);
+                    acc
+                }
+            });
+        print!("tokens 1: [ ");
+        for token in &tokens {
+            print!("{token} ");
+        }
+        println!("]");
+
         // Insert implicit multiplication operators.
-        let tokens_with_inserted_mult_operators = input.iter().fold(vec![], |mut acc, x| {
+        let tokens = tokens.iter().fold(vec![], |mut acc, x| {
             if acc.len() == 0 {
                 acc.push(x);
                 acc
@@ -61,7 +82,7 @@ impl Lexer {
             }
         });
 
-        let mut tokens = tokens_with_inserted_mult_operators
+        let mut tokens = tokens
             .into_iter()
             .map(|c| match c {
                 MathExpression::Mo(op) => Token::Op(op.clone()),
@@ -132,6 +153,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> S {
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
+        Operator::Derivative { order, var_index } => ((), 15),
         _ => panic!("bad op: {:?}", op),
     }
 }

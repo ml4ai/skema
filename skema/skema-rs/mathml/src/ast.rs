@@ -1,6 +1,7 @@
+use derive_new::new;
 use std::fmt;
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash)]
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum Operator {
     Add,
     Multiply,
@@ -12,6 +13,11 @@ pub enum Operator {
     Rparen,
     Compose,
     Factorial,
+    /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+    Derivative {
+        order: u8,
+        var_index: u8,
+    },
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -29,6 +35,7 @@ impl fmt::Display for Operator {
             Operator::Rparen => write!(f, ")"),
             Operator::Compose => write!(f, "."),
             Operator::Factorial => write!(f, "!"),
+            Operator::Derivative { order, var_index } => write!(f, "D({order}, {var_index})"),
             Operator::Other(op) => write!(f, "{op}"),
         }
     }
@@ -71,6 +78,9 @@ impl fmt::Display for MathExpression {
             }
             MathExpression::Msub(base, subscript) => {
                 write!(f, "{base}_{{{subscript}}}")
+            }
+            MathExpression::Mo(op) => {
+                write!(f, "{}", op)
             }
             expression => write!(f, "{expression:?}"),
         }
