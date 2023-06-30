@@ -90,12 +90,23 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
 
     # finding the bucket
     # [width, hgt, resize_factor]
+    # buckets = [
+    #     [820, 86, 0.6],
+    #     [615, 65, 0.8],
+    #     [492, 52, 1],
+    #     [410, 43, 1.2],
+    #     [350, 37, 1.4],
+    # ]
     buckets = [
-        [820, 86, 0.6],
-        [615, 65, 0.8],
+        [878, 92, 0.56],
+        [780, 82, 0.63],
+        [683, 72, 0.72],
+        [592, 62, 0.83],
         [492, 52, 1],
-        [410, 43, 1.2],
-        [350, 37, 1.4],
+        [400, 42, 1.23],
+        [302, 32, 1.625],
+        [208, 22, 2.36],
+        [113, 12, 4.33],
     ]
     # current width, hgt
     crop_width, crop_hgt = image.size[0], image.size[1]
@@ -108,7 +119,7 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
             resize_factor = r
 
     # resizing the image
-    resize_factor = config["resizing_factor"]
+    # resize_factor = config["resizing_factor"]
     image = image.resize(
         (
             int(image.size[0] * resize_factor),
