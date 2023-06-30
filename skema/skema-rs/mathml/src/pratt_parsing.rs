@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{Math, MathExpression, Operator},
-    parsing::math_expression,
+    parsing::parse,
 };
 use nom::multi::many0;
 use std::fmt;
@@ -279,54 +279,55 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
 }
 #[test]
 fn test_conversion() {
-    let input = "<mi>x</mi><mo>+</mo><mi>y</mi>";
+    let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
     println!("Input: {input}");
-    let (_, elements) = many0(math_expression)(input.into()).unwrap();
-    let s = expr(elements);
+    let s = MathExpressionTree::from(parse(input).unwrap().1);
     assert_eq!(s.to_string(), "(+ x y)");
     println!("Output: {s}\n");
 
-    let input = "<mi>a</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi>";
+    let input = "<math><mi>a</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi></math>";
     println!("Input: {input}");
-    let (_, elements) = many0(math_expression)(input.into()).unwrap();
-    let s = expr(elements);
+    let s = MathExpressionTree::from(parse(input).unwrap().1);
     assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
     println!("Output: {s}\n");
 
-    let input =
-        "<mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>";
+    let input = "<math>
+        <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
+        </math>";
     println!("Input: {input}");
-    let (_, elements) = many0(math_expression)(input.into()).unwrap();
-    let s = expr(elements);
+    let s = MathExpressionTree::from(parse(input).unwrap().1);
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
-    let input =
-        "<mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>";
+    let input = "<math>
+        <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
+        </math>";
     println!("Input: {input}");
-    let (_, elements) = many0(math_expression)(input.into()).unwrap();
-    let s = expr(elements);
+    let s = MathExpressionTree::from(parse(input).unwrap().1);
     assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
-    let input = "<mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo>";
+    let input = "<math><mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo></math>";
     println!("Input: {input}");
-    let (_, elements) = many0(math_expression)(input.into()).unwrap();
-    let s = expr(elements);
+    let s = MathExpressionTree::from(parse(input).unwrap().1);
     assert_eq!(s.to_string(), "(+ a (- b))");
     println!("Output: {s}\n");
 
-    let input = "<mn>2</mn><mi>a</mi><mo>(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>)</mo>";
+    let input =
+        "<math><mn>2</mn><mi>a</mi><mo>(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>)</mo></math>";
     println!("Input: {input}");
-    let (_, elements) = many0(math_expression)(input.into()).unwrap();
-    let s = expr(elements);
+    let s = MathExpressionTree::from(parse(input).unwrap().1);
     assert_eq!(s.to_string(), "(* (* 2 a) (+ c d))");
     println!("Output: {s}\n");
 
-    let input = "<mfrac><mrow><mi>d</mi><mi>S</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>";
+    let input = "
+    <math>
+        <mfrac><mrow><mi>d</mi><mi>S</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
+        </math>
+        ";
     println!("Input: {input}");
-    let (_, elements) = many0(math_expression)(input.into()).unwrap();
-    let s = expr(elements);
+    let s = MathExpressionTree::from(parse(input).unwrap().1);
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 }
