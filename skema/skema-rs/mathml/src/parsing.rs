@@ -180,12 +180,12 @@ fn equals(input: Span) -> IResult<Operator> {
 }
 
 fn lparen(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Lparen, tag("("))(input)?;
+    let (s, op) = value(Operator::Lparen, ws(tag("(")))(input)?;
     Ok((s, op))
 }
 
 fn rparen(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Rparen, tag(")"))(input)?;
+    let (s, op) = value(Operator::Rparen, ws(tag(")")))(input)?;
     Ok((s, op))
 }
 
