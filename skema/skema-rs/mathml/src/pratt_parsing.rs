@@ -112,7 +112,6 @@ impl Lexer {
                 }
                 _ => todo!(),
             },
-            // TODO Implement detecting derivatives in Leibniz notation.
             MathExpression::Mfrac(numerator, denominator) => {
                 if let Ok((derivative, function)) =
                     recognize_leibniz_diff_op(numerator, denominator)
@@ -131,11 +130,6 @@ impl Lexer {
                 acc
             }
         });
-        //print!("tokens 1: [ ");
-        //for token in &tokens {
-        //print!("{token} ");
-        //}
-        //println!("]");
 
         // Insert implicit multiplication operators.
         let tokens = tokens.iter().fold(vec![], |mut acc, x| {
@@ -169,12 +163,6 @@ impl Lexer {
                 }
             }
         });
-
-        //print!("tokens 2: [ ");
-        //for token in &tokens {
-        //print!("{token} ");
-        //}
-        //println!("]");
 
         let mut tokens = tokens
             .into_iter()
