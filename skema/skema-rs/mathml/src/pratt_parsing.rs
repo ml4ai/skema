@@ -35,8 +35,34 @@ struct Lexer {
 
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
-        let mut tokens = input
-            .iter()
+        // Insert implicit multiplication operators.
+        let tokens_with_inserted_mult_operators = input.iter().fold(vec![], |mut acc, x| {
+            if acc.len() == 0 {
+                acc.push(x);
+                acc
+            } else {
+                match x {
+                    MathExpression::Mo(_) => {
+                        acc.push(x);
+                        acc
+                    }
+                    t => match acc.last().unwrap() {
+                        MathExpression::Mo(_) => {
+                            acc.push(t);
+                            acc
+                        }
+                        _ => {
+                            acc.push(&MathExpression::Mo(Operator::Multiply));
+                            acc.push(t);
+                            acc
+                        }
+                    },
+                }
+            }
+        });
+
+        let mut tokens = tokens_with_inserted_mult_operators
+            .into_iter()
             .map(|c| match c {
                 MathExpression::Mo(op) => Token::Op(op.clone()),
                 _ => Token::Atom(c.clone()),
@@ -135,7 +161,14 @@ fn test_conversion() {
     let s = expr(elements);
     println!("{s}");
 
-    let (_, elements) = many0(math_expression)("<mi>x</mi><mo>+</mo><mi>y</mi>".into()).unwrap();
+    let (_, elements) = many0(math_expression)(
+        "
+        <mi>a</mi>
+        <mo>=</mo>
+        <mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi>"
+            .into(),
+    )
+    .unwrap();
     let s = expr(elements);
     println!("{s}");
 }
