@@ -14,6 +14,7 @@ from typing import List
 import logging
 from logging import info
 import cv2
+import re
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -71,8 +72,9 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
         image = image.resize(
             (
                 int(image.size[0] * resize_factor),
-                int(image.size[1] * resize_factor, Image.LANCZOS),
-            )
+                int(image.size[1] * resize_factor),
+            ),
+            Image.Resampling.LANCZOS,
         )
 
     # converting to np array
@@ -90,6 +92,7 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
 
     # finding the bucket
     # [width, hgt, resize_factor]
+    # v1
     # buckets = [
     #     [820, 86, 0.6],
     #     [615, 65, 0.8],
@@ -97,17 +100,31 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     #     [410, 43, 1.2],
     #     [350, 37, 1.4],
     # ]
+    # v2 v3
     buckets = [
-        [878, 92, 0.56],
-        [780, 82, 0.63],
-        [683, 72, 0.72],
-        [592, 62, 0.83],
+        [820, 86, 0.6],
+        [703, 74, 0.7],
+        [615, 65, 0.8],
+        [547, 58, 0.9],
         [492, 52, 1],
-        [400, 42, 1.23],
-        [302, 32, 1.625],
-        [208, 22, 2.36],
-        [113, 12, 4.33],
+        [447, 47, 1.1],
+        [410, 43, 1.2],
+        [379, 40, 1.3],
+        [350, 37, 1.4],
+        [328, 35, 1.5],
     ]
+    # v4
+    # buckets = [
+    #     [878, 92, 0.56],
+    #     [780, 82, 0.63],
+    #     [683, 72, 0.72],
+    #     [592, 62, 0.83],
+    #     [492, 52, 1],
+    #     [400, 42, 1.23],
+    #     [302, 32, 1.625],
+    #     [208, 22, 2.36],
+    #     [113, 12, 4.33],
+    # ]
     # current width, hgt
     crop_width, crop_hgt = image.size[0], image.size[1]
 
@@ -214,6 +231,44 @@ def define_model(
     return model
 
 
+def add_semicolon_to_unicode(string: str) -> str:
+    """
+    Checks if the string contains Unicode starting with '&#x' and adds a semicolon ';' after it.
+    Args:
+        string: The input string to check.
+    Returns:
+        The modified string with semicolons added after Unicode.
+    """
+    # Define a regular expression pattern to match '&#x' followed by hexadecimal characters
+    pattern = r"&#x[0-9A-Fa-f]+"
+
+    # Find all matches in the string using the pattern
+    matches = re.findall(pattern, string)
+
+    # Iterate over the matches and add semicolon after each Unicode
+    for match in matches:
+        string = string.replace(match, match + ";")
+
+    return string
+
+
+def remove_spaces_between_tags(mathml_string: str) -> str:
+    """
+    Remove spaces between ">" and "<" in a MathML string.
+
+    Args:
+        mathml_string (str): The MathML string to process.
+
+    Returns:
+        str: The modified MathML string with spaces removed between tags.
+    """
+    pattern = r">(.*?)<"
+    replaced_string = re.sub(
+        pattern, lambda match: match.group(0).replace(" ", ""), mathml_string
+    )
+    return replaced_string
+
+
 def evaluate(
     model: Image2MathML_Xfmer,
     vocab_itos: dict,
@@ -243,7 +298,7 @@ def evaluate(
             pred.append(vocab_itos[str(p)])
 
         pred_seq = " ".join(pred[1:-1])
-        return pred_seq
+        return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
 
 
 def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
