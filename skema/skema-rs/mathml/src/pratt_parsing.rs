@@ -171,4 +171,14 @@ fn test_conversion() {
     .unwrap();
     let s = expr(elements);
     println!("{s}");
+
+    let (_, elements) = many0(math_expression)(
+        "
+        <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
+        "
+        .into(),
+    )
+    .unwrap();
+    let s = expr(elements);
+    println!("{s}");
 }
