@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
@@ -14,7 +14,9 @@ import skema.skema_py.petris
 
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
-from skema.utils.fold import dictionary_to_gromet_json, del_nulls
+from skema.program_analysis.fn_unifier import align_full_system
+from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
+from skema.program_analysis.comments import CodeComments
 
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
@@ -42,6 +44,9 @@ class System(BaseModel):
         default=None,
         decription="The name of the code system's root directory.",
         example="my-system",
+    )
+    comments: Optional[CodeComments] = Field(
+        default=None, description="A dictionary containing the ", example=""
     )
 
 
@@ -71,6 +76,10 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
+    # If comments are included in request, run the unifier to add them to the Gromet
+    if system.comments:
+        align_full_system(gromet_collection, system.comments)
+
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
 
@@ -86,6 +95,7 @@ def ping():
 @app.get(
     "/fn-supported-file-extensions",
     summary="Endpoint for checking which files extensions are currently supported by code2fn pipeline.",
+    response_model=List[str],
 )
 def fn_supported_file_extensions():
     """
