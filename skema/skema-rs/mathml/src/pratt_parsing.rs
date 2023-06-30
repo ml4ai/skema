@@ -3,7 +3,7 @@ use crate::{
     parsing::math_expression,
 };
 use nom::multi::many0;
-use std::{fmt, io::BufRead};
+use std::fmt;
 enum S {
     Atom(MathExpression),
     Cons(Operator, Vec<S>),
@@ -36,20 +36,28 @@ struct Lexer {
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
         // Recognize derivatives whenever possible.
-        let tokens = input
-            .clone()
-            .into_iter()
-            .fold(vec![], |mut acc, x| match x {
-                MathExpression::Mover(base, overscript) => {
-                    acc.push(MathExpression::Mo(Operator::new_derivative(1, 1)));
-                    acc.push(*base);
-                    acc
+        let tokens = input.clone().iter().fold(vec![], |mut acc, x| match x {
+            MathExpression::Mover(base, overscript) => match **overscript {
+                MathExpression::Mo(Operator::Other(ref os)) => {
+                    if os.chars().all(|c| c == '˙') {
+                        acc.push(MathExpression::Mo(Operator::new_derivative(
+                            os.chars().count() as u8,
+                            1,
+                        )));
+                        acc.push(*base.clone());
+                        acc
+                    } else {
+                        acc.push(x.clone());
+                        acc
+                    }
                 }
-                t => {
-                    acc.push(t);
-                    acc
-                }
-            });
+                _ => todo!(),
+            },
+            t => {
+                acc.push(t.clone());
+                acc
+            }
+        });
         print!("tokens 1: [ ");
         for token in &tokens {
             print!("{token} ");
@@ -153,8 +161,8 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> S {
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
-        Operator::Derivative { order, var_index } => ((), 15),
-        _ => panic!("bad op: {:?}", op),
+        Operator::Derivative { .. } => ((), 15),
+        _ => panic!("Bad operator: {:?}", op),
     }
 }
 
@@ -181,7 +189,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
 fn test_conversion() {
     let (_, elements) = many0(math_expression)("<mi>x</mi><mo>+</mo><mi>y</mi>".into()).unwrap();
     let s = expr(elements);
-    println!("{s}");
+    assert_eq!(s.to_string(), "(+ x y)");
 
     let (_, elements) = many0(math_expression)(
         "
@@ -192,7 +200,7 @@ fn test_conversion() {
     )
     .unwrap();
     let s = expr(elements);
-    println!("{s}");
+    assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
 
     let (_, elements) = many0(math_expression)(
         "
@@ -202,5 +210,15 @@ fn test_conversion() {
     )
     .unwrap();
     let s = expr(elements);
-    println!("{s}");
+    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
+
+    let (_, elements) = many0(math_expression)(
+        "
+        <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
+        "
+        .into(),
+    )
+    .unwrap();
+    let s = expr(elements);
+    assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
 }
