@@ -124,15 +124,18 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Add | Operator::Subtract => (5, 6),
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
+        Operator::Other(op) => panic!("Unhandled operator!"),
         _ => return None,
     };
     Some(res)
 }
 #[test]
 fn test_conversion() {
-    let elements = many0(math_expression)("<mi>x</mi><mo>+</mo><mi>y</mi>".into())
-        .unwrap()
-        .1;
+    let (_, elements) = many0(math_expression)("<mi>x</mi><mo>+</mo><mi>y</mi>".into()).unwrap();
+    let s = expr(elements);
+    println!("{s}");
+
+    let (_, elements) = many0(math_expression)("<mi>x</mi><mo>+</mo><mi>y</mi>".into()).unwrap();
     let s = expr(elements);
     println!("{s}");
 }
