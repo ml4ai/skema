@@ -6,7 +6,7 @@ use crate::petri_net::{
 };
 use crate::{
     ast::{
-        Math,
+        Math, MathExpression,
         MathExpression::{Mn, Mo, Mrow},
         Operator,
     },
@@ -71,50 +71,52 @@ pub fn group_by_operators(
     vars: &mut HashSet<Var>,
     eqns: &mut HashMap<Var, Vec<Term>>,
 ) {
-    // Check if there is exactly one element in the AST
-    if ast.content.len() != 1 {
-        panic!("We cannot handle expressions with more than one top-level MathExpression yet!");
-    }
+    let expressions = if ast.content.len() == 1 {
+        if let Mrow(exprs) = &ast.content[0] {
+            exprs
+        } else {
+            panic!("Exactly one top-level MathExpression found, but it is not an Mrow! We cannot handle this case.");
+        }
+    } else {
+        &ast.content
+    };
 
     let mut terms = Vec::<Term>::new();
     let mut current_term = Term::default();
     let mut lhs_specie: Option<Var> = None;
-
     let mut equals_index = 0;
-    // Check if the first element is an mrow
-    if let Mrow(expr_1) = &ast.content[0] {
-        // Get the index of the equals term
-        for (i, expr_2) in (*expr_1).iter().enumerate() {
-            if let Mo(Operator::Equals) = expr_2 {
-                equals_index = i;
-                let lhs = &expr_1[0];
-                lhs_specie = Some(get_specie_var(lhs));
-            }
-        }
 
-        // Iterate over MathExpressions in the RHS
-        for (_i, expr_2) in expr_1[equals_index + 1..].iter().enumerate() {
-            if is_add_or_subtract_operator(expr_2) {
-                if current_term.vars.is_empty() {
-                    current_term.polarity = get_polarity(expr_2);
-                } else {
-                    terms.push(current_term);
-                    current_term = Term {
-                        vars: vec![],
-                        polarity: get_polarity(expr_2),
-                        ..Default::default()
-                    };
-                }
-            } else if is_var_candidate(expr_2) {
-                current_term.vars.push(Var(expr_2.clone()));
-                vars.insert(Var(expr_2.clone()));
+    // Get the index of the equals term
+    for (i, expr) in (*expressions).iter().enumerate() {
+        if let Mo(Operator::Equals) = expr {
+            equals_index = i;
+            let lhs = &expressions[0];
+            lhs_specie = Some(get_specie_var(lhs));
+        }
+    }
+
+    // Iterate over MathExpressions in the RHS
+    for (_i, expr) in expressions[equals_index + 1..].iter().enumerate() {
+        if is_add_or_subtract_operator(expr) {
+            if current_term.vars.is_empty() {
+                current_term.polarity = get_polarity(expr);
             } else {
-                panic!("Unhandled rhs element {:?}", expr_2);
+                terms.push(current_term);
+                current_term = Term {
+                    vars: vec![],
+                    polarity: get_polarity(expr),
+                    ..Default::default()
+                };
             }
+        } else if is_var_candidate(expr) {
+            current_term.vars.push(Var(expr.clone()));
+            vars.insert(Var(expr.clone()));
+        } else {
+            panic!("Unhandled rhs element {:?}", expr);
         }
-        if !current_term.vars.is_empty() {
-            terms.push(current_term);
-        }
+    }
+    if !current_term.vars.is_empty() {
+        terms.push(current_term);
     }
 
     let lhs_specie = lhs_specie.expect("Unable to determine the specie on the LHS!");
