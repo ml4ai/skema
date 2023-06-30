@@ -1,9 +1,11 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::ast::Math;
-use crate::ast::MathExpression::Mi;
-use crate::mml2pn::{group_by_operators, Term};
+use crate::ast::{Math, MathExpression::Mi};
 use crate::petri_net::{Polarity, Var};
+use crate::{
+    mml2pn::{group_by_operators, Term},
+    parsing::parse,
+};
 use serde::{Deserialize, Serialize};
 
 use std::collections::{HashMap, HashSet};
@@ -382,6 +384,7 @@ impl From<ACSet> for PetriNet {
     }
     }
 }
+
 // This function takes in a mathml string and returns a Regnet
 impl From<Vec<Math>> for RegNet {
     fn from(mathml_asts: Vec<Math>) -> RegNet {
@@ -539,4 +542,26 @@ impl From<Vec<Math>> for RegNet {
         metadata: None,
         }
     }
+}
+
+#[test]
+fn test_lotka_volterra_mml_to_regnet() {
+    let input: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string("tests/mml2amr_input_1.json").unwrap())
+            .unwrap();
+
+    let elements: Vec<Math> = input["mathml"]
+        .as_array()
+        .unwrap()
+        .into_iter()
+        .map(|x| parse(x.as_str().unwrap()).unwrap().1)
+        .collect();
+
+    let regnet = RegNet::from(elements);
+
+    let desired_output: RegNet =
+        serde_json::from_str(&std::fs::read_to_string("tests/mml2amr_output_1.json").unwrap())
+            .unwrap();
+
+    assert_eq!(regnet, desired_output);
 }

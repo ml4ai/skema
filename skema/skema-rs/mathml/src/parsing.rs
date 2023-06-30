@@ -279,7 +279,7 @@ fn xml_declaration(input: Span) -> IResult<()> {
 //mspace
 fn mspace(input: Span) -> IResult<MathExpression> {
     let (s, element) = ws(delimited(tag("<mspace"), take_until("/>"), tag("/>")))(input)?;
-    Ok((s, Mspace(element.trim().to_string())))
+    Ok((s, Mspace(element.to_string())))
 }
 
 // Some xml have <mo .../>
