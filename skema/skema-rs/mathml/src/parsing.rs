@@ -111,7 +111,7 @@ macro_rules! tag_parser {
 macro_rules! elem0 {
     ($tag:expr) => {{
         let tag_end = concat!("</", $tag, ">");
-        tag_parser!($tag, take_until(tag_end))
+        tag_parser!($tag, ws(take_until(tag_end)))
     }};
 }
 
@@ -155,32 +155,32 @@ macro_rules! elem_many0 {
 /// Identifiers
 fn mi(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mi")(input)?;
-    Ok((s, Mi(element.to_string())))
+    Ok((s, Mi(element.trim().to_string())))
 }
 
 /// Numbers
 fn mn(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mn")(input)?;
-    Ok((s, Mn(element.to_string())))
+    Ok((s, Mn(element.trim().to_string())))
 }
 
 fn add(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Add, tag("+"))(input)?;
+    let (s, op) = value(Operator::Add, ws(tag("+")))(input)?;
     Ok((s, op))
 }
 
 fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, one_of("-−"))(input)?;
+    let (s, op) = value(Operator::Subtract, ws(one_of("-−")))(input)?;
     Ok((s, op))
 }
 
 fn equals(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Equals, tag("="))(input)?;
+    let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
     Ok((s, op))
 }
 
 fn operator_other(input: Span) -> IResult<Operator> {
-    let (s, consumed) = recognize(not_line_ending)(input)?;
+    let (s, consumed) = ws(recognize(not_line_ending))(input)?;
     let op = Operator::Other(consumed.to_string());
     Ok((s, op))
 }
@@ -261,7 +261,7 @@ fn msubsup(input: Span) -> IResult<MathExpression> {
 //Text
 fn mtext(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mtext")(input)?;
-    Ok((s, Mtext(element.to_string())))
+    Ok((s, Mtext(element.trim().to_string())))
 }
 
 //mstyle
