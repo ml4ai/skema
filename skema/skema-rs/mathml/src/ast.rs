@@ -8,6 +8,10 @@ pub enum Operator {
     Divide,
     Subtract,
     Sqrt,
+    Lparen,
+    Rparen,
+    Compose,
+    Factorial,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -21,6 +25,10 @@ impl fmt::Display for Operator {
             Operator::Divide => write!(f, "/"),
             Operator::Subtract => write!(f, "-"),
             Operator::Sqrt => write!(f, "√"),
+            Operator::Lparen => write!(f, "("),
+            Operator::Rparen => write!(f, ")"),
+            Operator::Compose => write!(f, "."),
+            Operator::Factorial => write!(f, "!"),
             Operator::Other(op) => write!(f, "{op}"),
         }
     }

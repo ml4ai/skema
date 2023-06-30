@@ -179,6 +179,16 @@ fn equals(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+fn lparen(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Lparen, tag("("))(input)?;
+    Ok((s, op))
+}
+
+fn rparen(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Rparen, tag(")"))(input)?;
+    Ok((s, op))
+}
+
 fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = recognize(not_line_ending)(input)?;
     let op = Operator::Other(consumed.to_string());
@@ -186,7 +196,7 @@ fn operator_other(input: Span) -> IResult<Operator> {
 }
 
 fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((add, subtract, equals, operator_other))(input)?;
+    let (s, op) = alt((add, subtract, equals, lparen, rparen, operator_other))(input)?;
     Ok((s, op))
 }
 
@@ -289,7 +299,7 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
 }
 
 /// Math expressions
-fn math_expression(input: Span) -> IResult<MathExpression> {
+pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         mi, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext, mstyle, mspace,
         mo_line, mo,
