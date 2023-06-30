@@ -433,6 +433,8 @@
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::acset;
 <span class="kw">pub use </span><span class="kw">crate</span>::acset::ACSet;
 <span class="kw">use </span><span class="kw">crate</span>::petri_net::{
@@ -506,50 +508,52 @@
     vars: <span class="kw-2">&amp;mut </span>HashSet&lt;Var&gt;,
     eqns: <span class="kw-2">&amp;mut </span>HashMap&lt;Var, Vec&lt;Term&gt;&gt;,
 ) {
-    <span class="comment">// Check if there is exactly one element in the AST
-    </span><span class="kw">if </span>ast.content.len() != <span class="number">1 </span>{
-        <span class="macro">panic!</span>(<span class="string">&quot;We cannot handle expressions with more than one top-level MathExpression yet!&quot;</span>);
-    }
+    <span class="kw">let </span>expressions = <span class="kw">if </span>ast.content.len() == <span class="number">1 </span>{
+        <span class="kw">if let </span>Mrow(exprs) = <span class="kw-2">&amp;</span>ast.content[<span class="number">0</span>] {
+            exprs
+        } <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">&quot;Exactly one top-level MathExpression found, but it is not an Mrow! We cannot handle this case.&quot;</span>);
+        }
+    } <span class="kw">else </span>{
+        <span class="kw-2">&amp;</span>ast.content
+    };
 
     <span class="kw">let </span><span class="kw-2">mut </span>terms = Vec::&lt;Term&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>current_term = Term::default();
     <span class="kw">let </span><span class="kw-2">mut </span>lhs_specie: <span class="prelude-ty">Option</span>&lt;Var&gt; = <span class="prelude-val">None</span>;
-
     <span class="kw">let </span><span class="kw-2">mut </span>equals_index = <span class="number">0</span>;
-    <span class="comment">// Check if the first element is an mrow
-    </span><span class="kw">if let </span>Mrow(expr_1) = <span class="kw-2">&amp;</span>ast.content[<span class="number">0</span>] {
-        <span class="comment">// Get the index of the equals term
-        </span><span class="kw">for </span>(i, expr_2) <span class="kw">in </span>(<span class="kw-2">*</span>expr_1).iter().enumerate() {
-            <span class="kw">if let </span>Mo(Operator::Equals) = expr_2 {
-                equals_index = i;
-                <span class="kw">let </span>lhs = <span class="kw-2">&amp;</span>expr_1[<span class="number">0</span>];
-                lhs_specie = <span class="prelude-val">Some</span>(get_specie_var(lhs));
-            }
-        }
 
-        <span class="comment">// Iterate over MathExpressions in the RHS
-        </span><span class="kw">for </span>(_i, expr_2) <span class="kw">in </span>expr_1[equals_index + <span class="number">1</span>..].iter().enumerate() {
-            <span class="kw">if </span>is_add_or_subtract_operator(expr_2) {
-                <span class="kw">if </span>current_term.vars.is_empty() {
-                    current_term.polarity = get_polarity(expr_2);
-                } <span class="kw">else </span>{
-                    terms.push(current_term);
-                    current_term = Term {
-                        vars: <span class="macro">vec!</span>[],
-                        polarity: get_polarity(expr_2),
-                        ..Default::default()
-                    };
-                }
-            } <span class="kw">else if </span>is_var_candidate(expr_2) {
-                current_term.vars.push(Var(expr_2.clone()));
-                vars.insert(Var(expr_2.clone()));
+    <span class="comment">// Get the index of the equals term
+    </span><span class="kw">for </span>(i, expr) <span class="kw">in </span>(<span class="kw-2">*</span>expressions).iter().enumerate() {
+        <span class="kw">if let </span>Mo(Operator::Equals) = expr {
+            equals_index = i;
+            <span class="kw">let </span>lhs = <span class="kw-2">&amp;</span>expressions[<span class="number">0</span>];
+            lhs_specie = <span class="prelude-val">Some</span>(get_specie_var(lhs));
+        }
+    }
+
+    <span class="comment">// Iterate over MathExpressions in the RHS
+    </span><span class="kw">for </span>(_i, expr) <span class="kw">in </span>expressions[equals_index + <span class="number">1</span>..].iter().enumerate() {
+        <span class="kw">if </span>is_add_or_subtract_operator(expr) {
+            <span class="kw">if </span>current_term.vars.is_empty() {
+                current_term.polarity = get_polarity(expr);
             } <span class="kw">else </span>{
-                <span class="macro">panic!</span>(<span class="string">&quot;Unhandled rhs element {:?}&quot;</span>, expr_2);
+                terms.push(current_term);
+                current_term = Term {
+                    vars: <span class="macro">vec!</span>[],
+                    polarity: get_polarity(expr),
+                    ..Default::default()
+                };
             }
+        } <span class="kw">else if </span>is_var_candidate(expr) {
+            current_term.vars.push(Var(expr.clone()));
+            vars.insert(Var(expr.clone()));
+        } <span class="kw">else </span>{
+            <span class="macro">panic!</span>(<span class="string">&quot;Unhandled rhs element {:?}&quot;</span>, expr);
         }
-        <span class="kw">if </span>!current_term.vars.is_empty() {
-            terms.push(current_term);
-        }
+    }
+    <span class="kw">if </span>!current_term.vars.is_empty() {
+        terms.push(current_term);
     }
 
     <span class="kw">let </span>lhs_specie = lhs_specie.expect(<span class="string">&quot;Unable to determine the specie on the LHS!&quot;</span>);

@@ -540,12 +540,39 @@
 <a href="#540" id="540">540</a>
 <a href="#541" id="541">541</a>
 <a href="#542" id="542">542</a>
+<a href="#543" id="543">543</a>
+<a href="#544" id="544">544</a>
+<a href="#545" id="545">545</a>
+<a href="#546" id="546">546</a>
+<a href="#547" id="547">547</a>
+<a href="#548" id="548">548</a>
+<a href="#549" id="549">549</a>
+<a href="#550" id="550">550</a>
+<a href="#551" id="551">551</a>
+<a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-</span><span class="kw">use </span><span class="kw">crate</span>::ast::Math;
-<span class="kw">use </span><span class="kw">crate</span>::ast::MathExpression::Mi;
-<span class="kw">use </span><span class="kw">crate</span>::mml2pn::{group_by_operators, Term};
+</span><span class="kw">use </span><span class="kw">crate</span>::ast::{Math, MathExpression::Mi};
 <span class="kw">use </span><span class="kw">crate</span>::petri_net::{Polarity, Var};
+<span class="kw">use crate</span>::{
+    mml2pn::{group_by_operators, Term},
+    parsing::parse,
+};
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
 <span class="kw">use </span>std::collections::{HashMap, HashSet};
@@ -924,6 +951,7 @@
     }
     }
 }
+
 <span class="comment">// This function takes in a mathml string and returns a Regnet
 </span><span class="kw">impl </span>From&lt;Vec&lt;Math&gt;&gt; <span class="kw">for </span>RegNet {
     <span class="kw">fn </span>from(mathml_asts: Vec&lt;Math&gt;) -&gt; RegNet {
@@ -1081,5 +1109,27 @@
         metadata: <span class="prelude-val">None</span>,
         }
     }
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_lotka_volterra_mml_to_regnet() {
+    <span class="kw">let </span>input: serde_json::Value =
+        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/mml2amr_input_1.json&quot;</span>).unwrap())
+            .unwrap();
+
+    <span class="kw">let </span>elements: Vec&lt;Math&gt; = input[<span class="string">&quot;mathml&quot;</span>]
+        .as_array()
+        .unwrap()
+        .into_iter()
+        .map(|x| parse(x.as_str().unwrap()).unwrap().<span class="number">1</span>)
+        .collect();
+
+    <span class="kw">let </span>regnet = RegNet::from(elements);
+
+    <span class="kw">let </span>desired_output: RegNet =
+        serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/mml2amr_output_1.json&quot;</span>).unwrap())
+            .unwrap();
+
+    <span class="macro">assert_eq!</span>(regnet, desired_output);
 }
 </code></pre></div></section></main></body></html>

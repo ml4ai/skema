@@ -622,7 +622,7 @@
 </span><span class="macro">macro_rules! </span>elem0 {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
         <span class="kw">let </span>tag_end = <span class="macro">concat!</span>(<span class="string">&quot;&lt;/&quot;</span>, <span class="macro-nonterminal">$tag</span>, <span class="string">&quot;&gt;&quot;</span>);
-        <span class="macro">tag_parser!</span>(<span class="macro-nonterminal">$tag</span>, take_until(tag_end))
+        <span class="macro">tag_parser!</span>(<span class="macro-nonterminal">$tag</span>, ws(take_until(tag_end)))
     }};
 }
 
@@ -666,32 +666,32 @@
 <span class="doccomment">/// Identifiers
 </span><span class="kw">fn </span>mi(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mi&quot;</span>)(input)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((s, Mi(element.to_string())))
+    <span class="prelude-val">Ok</span>((s, Mi(element.trim().to_string())))
 }
 
 <span class="doccomment">/// Numbers
 </span><span class="kw">fn </span>mn(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mn&quot;</span>)(input)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((s, Mn(element.to_string())))
+    <span class="prelude-val">Ok</span>((s, Mn(element.trim().to_string())))
 }
 
 <span class="kw">fn </span>add(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Add, tag(<span class="string">&quot;+&quot;</span>))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Add, ws(tag(<span class="string">&quot;+&quot;</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">fn </span>subtract(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Subtract, one_of(<span class="string">&quot;-−&quot;</span>))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Subtract, ws(one_of(<span class="string">&quot;-−&quot;</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">fn </span>equals(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Equals, tag(<span class="string">&quot;=&quot;</span>))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Equals, ws(tag(<span class="string">&quot;=&quot;</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">fn </span>operator_other(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, consumed) = recognize(not_line_ending)(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, consumed) = ws(recognize(not_line_ending))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>op = Operator::Other(consumed.to_string());
     <span class="prelude-val">Ok</span>((s, op))
 }
@@ -772,7 +772,7 @@
 <span class="comment">//Text
 </span><span class="kw">fn </span>mtext(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mtext&quot;</span>)(input)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((s, Mtext(element.to_string())))
+    <span class="prelude-val">Ok</span>((s, Mtext(element.trim().to_string())))
 }
 
 <span class="comment">//mstyle
