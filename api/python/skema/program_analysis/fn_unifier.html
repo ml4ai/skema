@@ -34,14 +34,18 @@
 # 3. Appending all comments from the comments JSON into the respective MetadataCollections for each FN
 
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
+from skema.program_analysis.comments import (
+    CodeComments,
+    SingleFileCodeComments,
+    MultiFileCodeComments,
+)
 from skema.gromet.metadata.source_code_comment import SourceCodeComment
 from skema.gromet.metadata.source_code_reference import SourceCodeReference
 from skema.gromet.metadata.comment_type import CommentType
 from skema.gromet.fn.gromet_fn_module_collection import GrometFNModuleCollection
-
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
-from typing import Dict, Text, Any 
+from typing import Dict, Text, Any
 import argparse
 import json
 import re
@@ -50,44 +54,48 @@ import re
 def normalize_module_path(path: str):
     # The module paths in the GroMEt FN are dotted
     # We need slashes for the comments dictionary
-    return path.replace(&#34;.&#34;,&#34;/&#34;)
+    return path.replace(&#34;.&#34;, &#34;/&#34;)
+
 
 def normalize_extraction_names(extraction: dict):
     # Removes extraneous characters and filename extensions
     # from the extraction dictionary
-    # Currently removes, &#34;.py&#34; extension 
+    # Currently removes, &#34;.py&#34; extension
     # and &#34;./&#34; from the keys
-    return { k.replace(&#34;.py&#34;,&#34;&#34;).replace(&#34;./&#34;, &#34;&#34;) : v for k,v in extraction.items() }
+    return {k.replace(&#34;.py&#34;, &#34;&#34;).replace(&#34;./&#34;, &#34;&#34;): v for k, v in extraction.items()}
+
 
 def strip_id(func_name):
     # Given a function name that ends with &#34;_id###&#34; where ### is a number
     # We remove that sequence of characters from the function name
     # The id is appended by the GroMEt generation, and so we can safely remove it
     # because we need the pure name of the function and not the identifier part
-    
+
     # Only strip the id if the func_name contains the pattern &#34;_id###...&#34; which
     # is appended by the Gromet generation
     if re.search(&#34;_id\d+&#34;, func_name):
         to_ret = list(func_name)
         to_ret.reverse()
         i = 0
-        while i &lt; len(to_ret) and to_ret[i] != &#39;_&#39;:
-            to_ret[i] = &#39;&#39;
+        while i &lt; len(to_ret) and to_ret[i] != &#34;_&#34;:
+            to_ret[i] = &#34;&#34;
             i += 1
-        to_ret[i] = &#39;&#39;
+        to_ret[i] = &#34;&#34;
         to_ret.reverse()
-        return &#39;&#39;.join(to_ret)
+        return &#34;&#34;.join(to_ret)
     else:
         return func_name
 
+
 def find_source_code_reference(metadatum):
-    # Find a SourceCodeReference metadata in the metadatum entry 
+    # Find a SourceCodeReference metadata in the metadatum entry
     # we&#39;re looking at
     for elem in metadatum:
         if isinstance(elem, SourceCodeReference):
             return elem
-    
+
     return None
+
 
 def find_comment(comments, line_num):
     # Given the comments for a file and a line number, we find
@@ -98,11 +106,13 @@ def find_comment(comments, line_num):
 
     return None
 
+
 def insert_metadata(gromet_metadata, new_metadata):
     # Appends a new metadata to the end of the gromet_metadata
     # NOTE: not used now but will be in the future
     gromet_metadata.append([new_metadata])
     return len(gromet_metadata)
+
 
 def align_gromet_elements(gromet_metadata, gromet_comments, gromet_elements):
     # Gromet elements are generic enough that we can use
@@ -111,7 +121,7 @@ def align_gromet_elements(gromet_metadata, gromet_comments, gromet_elements):
     # TODO: associate code_file_reference_uid
     if gromet_elements != None:
         for elem in gromet_elements:
-            if elem.metadata != None: 
+            if elem.metadata != None:
                 metadatum = gromet_metadata[elem.metadata - 1]
                 source_ref = find_source_code_reference(metadatum)
                 if source_ref != None:
@@ -120,24 +130,25 @@ def align_gromet_elements(gromet_metadata, gromet_comments, gromet_elements):
                     comment = find_comment(gromet_comments, line_start)
                     if comment != None:
                         source_comment = SourceCodeComment(
-                            comment = comment,
-                            comment_type = CommentType.OTHER,
+                            comment=comment,
+                            comment_type=CommentType.OTHER,
                             context_function_name=None,
                             code_file_reference_uid=None,
                             line_begin=source_ref.line_begin,
                             line_end=source_ref.line_end,
                             col_begin=source_ref.col_begin,
-                            col_end=source_ref.col_end
+                            col_end=source_ref.col_end,
                         )
 
                         metadatum.append(source_comment)
 
                         # Find a comment metadata associated with that
 
+
 def align_fn(gromet_metadata, gromet_comments, gromet_fn):
     # Align the GroMEt b table
-    # We might be able to use the generic aligner but for now we align 
-    # independently 
+    # We might be able to use the generic aligner but for now we align
+    # independently
     if gromet_fn.b != None:
         for box in gromet_fn.b:
             if box.metadata != None:
@@ -149,18 +160,17 @@ def align_fn(gromet_metadata, gromet_comments, gromet_fn):
                     comment = find_comment(gromet_comments, line_start)
                     if comment != None:
                         source_comment = SourceCodeComment(
-                            comment = comment,
-                            comment_type = CommentType.OTHER,
+                            comment=comment,
+                            comment_type=CommentType.OTHER,
                             context_function_name=None,
                             code_file_reference_uid=None,
                             line_begin=source_ref.line_begin,
                             line_end=source_ref.line_end,
                             col_begin=source_ref.col_begin,
-                            col_end=source_ref.col_end
+                            col_end=source_ref.col_end,
                         )
 
                         metadatum.append(source_comment)
-
 
     # All these GroMEt elements all have metadata stored in the same way
     # So we can align any comments for all these using a generic aligner
@@ -183,18 +193,18 @@ def align_fn(gromet_metadata, gromet_comments, gromet_fn):
                 docstring = &#34;&#34;.join(gromet_comments[&#34;docstrings&#34;][normalized_func_name])
 
                 source_comment = SourceCodeComment(
-                    comment = docstring,
-                    comment_type = CommentType.DOCSTRING,
+                    comment=docstring,
+                    comment_type=CommentType.DOCSTRING,
                     context_function_name=normalized_func_name,
                     code_file_reference_uid=None,
                     line_begin=source_ref.line_begin,
                     line_end=source_ref.line_end,
                     col_begin=source_ref.col_begin,
-                    col_end=source_ref.col_end
+                    col_end=source_ref.col_end,
                 )
 
-                gromet_metadata[metadata_idx-1].append(source_comment)
-    
+                gromet_metadata[metadata_idx - 1].append(source_comment)
+
 
 def find_fn(gromet_modules, fn_name):
     # Given the gromet_modules list of FNs, we find fn_name in it
@@ -207,24 +217,31 @@ def find_fn(gromet_modules, fn_name):
     return None
 
 
-def align_full_system(gromet_obj, extraction):
+def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComments):
     # Comments extraction file holds comments for all files in the system
 
     # The extracted comments json file can appear in two ways:
     #   - extractions for a single file:
-    #     A single file consists of one top level dictionary containing 
+    #     A single file consists of one top level dictionary containing
     #     the comments and docstrings for that file
     #   - extractions for a multi file
     #     A multi file consists of a top level dictionary that maps each file
     #     in the system to a dictionary containing the comments and docstrings for that file
     # We can check what kind of extracted comments file we have by checking the structure of the dictionary
-    if &#34;comments&#34; in extraction.keys() and &#34;docstrings&#34; in extraction.keys(): 
+    if isinstance(extraction, SingleFileCodeComments):
+        extraction = dict(extraction)
+    else:
+        extraction = dict(extraction.files)
+
+    if &#34;comments&#34; in extraction.keys() and &#34;docstrings&#34; in extraction.keys():
         # Single file system
         # NOTE: We assume for the moment that if we&#39;re aligning a single file that
         # The corresponding GroMEt has exactly one module
-        
+
         if len(gromet_obj.modules) != 1:
-            raise NotImplementedError(&#34;Single file alignment from a multi module GroMEt system not supported yet&#34;)
+            raise NotImplementedError(
+                &#34;Single file alignment from a multi module GroMEt system not supported yet&#34;
+            )
 
         module_FN = gromet_obj.modules[0]
         if module_FN != None:
@@ -245,16 +262,19 @@ def align_full_system(gromet_obj, extraction):
                 module_FN = find_fn(gromet_obj.modules, normalized_path)
                 if module_FN != None:
                     file_comments = extraction[normalized_path]
-                    
+
                     FN_metadata = module_FN.metadata_collection
                     align_fn(FN_metadata, file_comments, module_FN.fn)
 
                     if len(module_FN.fn_array) &gt; 0:
                         for FN in module_FN.fn_array:
                             align_fn(FN_metadata, file_comments, FN)
-        
-def process_alignment(gromet_json: Dict[Text, Any], comments_json: Dict[Text, Any]) -&gt; GrometFNModuleCollection:
-    # Given a GroMEt json and a comments json 
+
+
+def process_alignment(
+    gromet_json: Dict[Text, Any], comments_json: Dict[Text, Any]
+) -&gt; GrometFNModuleCollection:
+    # Given a GroMEt json and a comments json
     # We run the alignment on the GroMEt to unify the comments with
     # The gromet JSON
     gromet_object = json_to_gromet(gromet_json)
@@ -262,19 +282,16 @@ def process_alignment(gromet_json: Dict[Text, Any], comments_json: Dict[Text, An
 
     return gromet_object
 
+
 if __name__ == &#34;__main__&#34;:
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        &#34;--gromet&#34;, type=str, help=&#34;Path to a GroMEt JSON file&#34;
-    )
-    parser.add_argument(
-        &#34;--comments&#34;, type=str, help=&#34;Path to a Comments JSON file&#34;
-    )
+    parser.add_argument(&#34;--gromet&#34;, type=str, help=&#34;Path to a GroMEt JSON file&#34;)
+    parser.add_argument(&#34;--comments&#34;, type=str, help=&#34;Path to a Comments JSON file&#34;)
     args = parser.parse_args()
 
     # Get the GroMEt JSON and turn it back into an object
     gromet_object = json_to_gromet(args.gromet)
-    
+
     # Get the comments data from the JSON file
     comments_file = open(args.comments, &#34;r&#34;)
     comments_json = json.load(comments_file)
@@ -285,9 +302,7 @@ if __name__ == &#34;__main__&#34;:
     # Write out the gromet with the comments
     with open(args.gromet, &#34;w&#34;) as f:
         gromet_collection_dict = gromet_object.to_dict()
-        f.write(
-            dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
-        )</code></pre>
+        f.write(dictionary_to_gromet_json(del_nulls(gromet_collection_dict)))</code></pre>
 </details>
 </section>
 <section>
@@ -308,8 +323,8 @@ if __name__ == &#34;__main__&#34;:
 </summary>
 <pre><code class="python">def align_fn(gromet_metadata, gromet_comments, gromet_fn):
     # Align the GroMEt b table
-    # We might be able to use the generic aligner but for now we align 
-    # independently 
+    # We might be able to use the generic aligner but for now we align
+    # independently
     if gromet_fn.b != None:
         for box in gromet_fn.b:
             if box.metadata != None:
@@ -321,18 +336,17 @@ if __name__ == &#34;__main__&#34;:
                     comment = find_comment(gromet_comments, line_start)
                     if comment != None:
                         source_comment = SourceCodeComment(
-                            comment = comment,
-                            comment_type = CommentType.OTHER,
+                            comment=comment,
+                            comment_type=CommentType.OTHER,
                             context_function_name=None,
                             code_file_reference_uid=None,
                             line_begin=source_ref.line_begin,
                             line_end=source_ref.line_end,
                             col_begin=source_ref.col_begin,
-                            col_end=source_ref.col_end
+                            col_end=source_ref.col_end,
                         )
 
                         metadatum.append(source_comment)
-
 
     # All these GroMEt elements all have metadata stored in the same way
     # So we can align any comments for all these using a generic aligner
@@ -355,21 +369,21 @@ if __name__ == &#34;__main__&#34;:
                 docstring = &#34;&#34;.join(gromet_comments[&#34;docstrings&#34;][normalized_func_name])
 
                 source_comment = SourceCodeComment(
-                    comment = docstring,
-                    comment_type = CommentType.DOCSTRING,
+                    comment=docstring,
+                    comment_type=CommentType.DOCSTRING,
                     context_function_name=normalized_func_name,
                     code_file_reference_uid=None,
                     line_begin=source_ref.line_begin,
                     line_end=source_ref.line_end,
                     col_begin=source_ref.col_begin,
-                    col_end=source_ref.col_end
+                    col_end=source_ref.col_end,
                 )
 
-                gromet_metadata[metadata_idx-1].append(source_comment)</code></pre>
+                gromet_metadata[metadata_idx - 1].append(source_comment)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.fn_unifier.align_full_system"><code class="name flex">
-<span>def <span class="ident">align_full_system</span></span>(<span>gromet_obj, extraction)</span>
+<span>def <span class="ident">align_full_system</span></span>(<span>gromet_obj: skema.gromet.fn.gromet_fn_module_collection.GrometFNModuleCollection, extraction: Union[<a title="skema.program_analysis.comments.SingleFileCodeComments" href="comments.html#skema.program_analysis.comments.SingleFileCodeComments">SingleFileCodeComments</a>, <a title="skema.program_analysis.comments.MultiFileCodeComments" href="comments.html#skema.program_analysis.comments.MultiFileCodeComments">MultiFileCodeComments</a>])</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -377,24 +391,31 @@ if __name__ == &#34;__main__&#34;:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def align_full_system(gromet_obj, extraction):
+<pre><code class="python">def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComments):
     # Comments extraction file holds comments for all files in the system
 
     # The extracted comments json file can appear in two ways:
     #   - extractions for a single file:
-    #     A single file consists of one top level dictionary containing 
+    #     A single file consists of one top level dictionary containing
     #     the comments and docstrings for that file
     #   - extractions for a multi file
     #     A multi file consists of a top level dictionary that maps each file
     #     in the system to a dictionary containing the comments and docstrings for that file
     # We can check what kind of extracted comments file we have by checking the structure of the dictionary
-    if &#34;comments&#34; in extraction.keys() and &#34;docstrings&#34; in extraction.keys(): 
+    if isinstance(extraction, SingleFileCodeComments):
+        extraction = dict(extraction)
+    else:
+        extraction = dict(extraction.files)
+
+    if &#34;comments&#34; in extraction.keys() and &#34;docstrings&#34; in extraction.keys():
         # Single file system
         # NOTE: We assume for the moment that if we&#39;re aligning a single file that
         # The corresponding GroMEt has exactly one module
-        
+
         if len(gromet_obj.modules) != 1:
-            raise NotImplementedError(&#34;Single file alignment from a multi module GroMEt system not supported yet&#34;)
+            raise NotImplementedError(
+                &#34;Single file alignment from a multi module GroMEt system not supported yet&#34;
+            )
 
         module_FN = gromet_obj.modules[0]
         if module_FN != None:
@@ -415,7 +436,7 @@ if __name__ == &#34;__main__&#34;:
                 module_FN = find_fn(gromet_obj.modules, normalized_path)
                 if module_FN != None:
                     file_comments = extraction[normalized_path]
-                    
+
                     FN_metadata = module_FN.metadata_collection
                     align_fn(FN_metadata, file_comments, module_FN.fn)
 
@@ -440,7 +461,7 @@ if __name__ == &#34;__main__&#34;:
     # TODO: associate code_file_reference_uid
     if gromet_elements != None:
         for elem in gromet_elements:
-            if elem.metadata != None: 
+            if elem.metadata != None:
                 metadatum = gromet_metadata[elem.metadata - 1]
                 source_ref = find_source_code_reference(metadatum)
                 if source_ref != None:
@@ -449,14 +470,14 @@ if __name__ == &#34;__main__&#34;:
                     comment = find_comment(gromet_comments, line_start)
                     if comment != None:
                         source_comment = SourceCodeComment(
-                            comment = comment,
-                            comment_type = CommentType.OTHER,
+                            comment=comment,
+                            comment_type=CommentType.OTHER,
                             context_function_name=None,
                             code_file_reference_uid=None,
                             line_begin=source_ref.line_begin,
                             line_end=source_ref.line_end,
                             col_begin=source_ref.col_begin,
-                            col_end=source_ref.col_end
+                            col_end=source_ref.col_end,
                         )
 
                         metadatum.append(source_comment)
@@ -513,12 +534,12 @@ if __name__ == &#34;__main__&#34;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def find_source_code_reference(metadatum):
-    # Find a SourceCodeReference metadata in the metadatum entry 
+    # Find a SourceCodeReference metadata in the metadatum entry
     # we&#39;re looking at
     for elem in metadatum:
         if isinstance(elem, SourceCodeReference):
             return elem
-    
+
     return None</code></pre>
 </details>
 </dd>
@@ -550,9 +571,9 @@ if __name__ == &#34;__main__&#34;:
 <pre><code class="python">def normalize_extraction_names(extraction: dict):
     # Removes extraneous characters and filename extensions
     # from the extraction dictionary
-    # Currently removes, &#34;.py&#34; extension 
+    # Currently removes, &#34;.py&#34; extension
     # and &#34;./&#34; from the keys
-    return { k.replace(&#34;.py&#34;,&#34;&#34;).replace(&#34;./&#34;, &#34;&#34;) : v for k,v in extraction.items() }</code></pre>
+    return {k.replace(&#34;.py&#34;, &#34;&#34;).replace(&#34;./&#34;, &#34;&#34;): v for k, v in extraction.items()}</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.fn_unifier.normalize_module_path"><code class="name flex">
@@ -567,7 +588,7 @@ if __name__ == &#34;__main__&#34;:
 <pre><code class="python">def normalize_module_path(path: str):
     # The module paths in the GroMEt FN are dotted
     # We need slashes for the comments dictionary
-    return path.replace(&#34;.&#34;,&#34;/&#34;)</code></pre>
+    return path.replace(&#34;.&#34;, &#34;/&#34;)</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.fn_unifier.process_alignment"><code class="name flex">
@@ -579,8 +600,10 @@ if __name__ == &#34;__main__&#34;:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def process_alignment(gromet_json: Dict[Text, Any], comments_json: Dict[Text, Any]) -&gt; GrometFNModuleCollection:
-    # Given a GroMEt json and a comments json 
+<pre><code class="python">def process_alignment(
+    gromet_json: Dict[Text, Any], comments_json: Dict[Text, Any]
+) -&gt; GrometFNModuleCollection:
+    # Given a GroMEt json and a comments json
     # We run the alignment on the GroMEt to unify the comments with
     # The gromet JSON
     gromet_object = json_to_gromet(gromet_json)
@@ -603,19 +626,19 @@ if __name__ == &#34;__main__&#34;:
     # We remove that sequence of characters from the function name
     # The id is appended by the GroMEt generation, and so we can safely remove it
     # because we need the pure name of the function and not the identifier part
-    
+
     # Only strip the id if the func_name contains the pattern &#34;_id###...&#34; which
     # is appended by the Gromet generation
     if re.search(&#34;_id\d+&#34;, func_name):
         to_ret = list(func_name)
         to_ret.reverse()
         i = 0
-        while i &lt; len(to_ret) and to_ret[i] != &#39;_&#39;:
-            to_ret[i] = &#39;&#39;
+        while i &lt; len(to_ret) and to_ret[i] != &#34;_&#34;:
+            to_ret[i] = &#34;&#34;
             i += 1
-        to_ret[i] = &#39;&#39;
+        to_ret[i] = &#34;&#34;
         to_ret.reverse()
-        return &#39;&#39;.join(to_ret)
+        return &#34;&#34;.join(to_ret)
     else:
         return func_name</code></pre>
 </details>

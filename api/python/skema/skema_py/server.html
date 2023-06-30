@@ -31,7 +31,7 @@
 import os
 import tempfile
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
@@ -43,7 +43,11 @@ import skema.skema_py.petris
 
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
-from skema.utils.fold import dictionary_to_gromet_json, del_nulls
+from skema.program_analysis.fn_unifier import align_full_system
+from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
+from skema.program_analysis.comments import CodeComments
+
+FN_SUPPORTED_FILE_EXTENSIONS = [&#34;.py&#34;, &#34;.f95&#34;, &#34;.f&#34;]
 
 
 class Ports(BaseModel):
@@ -52,13 +56,29 @@ class Ports(BaseModel):
 
 
 class System(BaseModel):
-    files: List[str] = Field(description=&#34;The file name corresponding to each entry in `blobs`&#34;, example=[&#34;example.py&#34;])
-    blobs: List[str] = Field(decription=&#34;Contents of each file to be analyzed&#34;, example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;])
-    system_name: Optional[str] = Field(default=None, decription=&#34;A model name to associate with the provided code&#34;, example=&#34;my-system&#34;)
-    root_name: Optional[str] = Field(default=None, decription=&#34;????&#34;, example=None)
+    files: List[str] = Field(
+        description=&#34;The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`&#34;,
+        example=[&#34;example1.py&#34;, &#34;dir/example2.py&#34;],
+    )
+    blobs: List[str] = Field(
+        decription=&#34;Contents of each file to be analyzed&#34;,
+        example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;],
+    )
+    system_name: Optional[str] = Field(
+        default=None,
+        decription=&#34;A model name to associate with the provided code&#34;,
+        example=&#34;my-system&#34;,
+    )
+    root_name: Optional[str] = Field(
+        default=None,
+        decription=&#34;The name of the code system&#39;s root directory.&#34;,
+        example=&#34;my-system&#34;,
+    )
+    comments: Optional[CodeComments] = Field(
+        default=None, description=&#34;A dictionary containing the &#34;, example=&#34;&#34;
+    )
 
 
-# FIXME: why does this return a a string?
 def system_to_gromet(system: System):
     &#34;&#34;&#34;Convert a System to Gromet JSON&#34;&#34;&#34;
 
@@ -70,16 +90,12 @@ def system_to_gromet(system: System):
 
         # Create files and intermediate directories
         for index, file in enumerate(system.files):
-            file_path = Path(
-                tmp_path, system.root_name or &#34;&#34;, file
-            )
+            file_path = Path(tmp_path, system.root_name or &#34;&#34;, file)
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(system.blobs[index])
 
         # Create system_filepaths.txt
-        system_filepaths = Path(
-            tmp_path, &#34;system_filepaths.txt&#34;
-        )
+        system_filepaths = Path(tmp_path, &#34;system_filepaths.txt&#34;)
         system_filepaths.write_text(&#34;\n&#34;.join(system.files))
 
         ## Run pipeline
@@ -89,9 +105,12 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
-    # Convert gromet data-model to json
-    gromet_collection_dict = gromet_collection.to_dict()
-    return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))
+    # If comments are included in request, run the unifier to add them to the Gromet
+    if system.comments:
+        align_full_system(gromet_collection, system.comments)
+
+    # Convert Gromet data-model to dict for return
+    return gromet_collection.to_dict()
 
 
 app = FastAPI()
@@ -100,6 +119,26 @@ app = FastAPI()
 @app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
 def ping():
     return &#34;The skema-py service is running.&#34;
+
+
+@app.get(
+    &#34;/fn-supported-file-extensions&#34;,
+    summary=&#34;Endpoint for checking which files extensions are currently supported by code2fn pipeline.&#34;,
+    response_model=List[str],
+)
+def fn_supported_file_extensions():
+    &#34;&#34;&#34;
+    Returns a List[str] where each entry in the list represents a file extension.
+
+    ### Python example
+    ```
+    import requests
+
+    response = requests.get(&#34;http://0.0.0.0:8000/fn-supported-file-extensions&#34;)
+    supported_extensions = response.json()
+
+    &#34;&#34;&#34;
+    return FN_SUPPORTED_FILE_EXTENSIONS
 
 
 @app.post(
@@ -111,21 +150,32 @@ def ping():
 )
 async def fn_given_filepaths(system: System):
     &#34;&#34;&#34;
-    Endpoint for generating Gromet JSON from a .
-
+    Endpoint for generating Gromet JSON from a serialized code system.
     ### Python example
+
     ```
     import requests
 
+    # Single file
     system = {
       &#34;files&#34;: [&#34;exp1.py&#34;],
       &#34;blobs&#34;: [&#34;x=2&#34;]
     }
     response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
     gromet_json = response.json()
+
+    # Multi file
+    system = {
+      &#34;files&#34;: [&#34;exp1.py&#34;, &#34;exp1.f&#34;],
+      &#34;blobs&#34;: [&#34;x=2&#34;, &#34;program exp1\\ninteger::x=2\\nend program exp1&#34;],
+      &#34;system_name&#34;: &#34;exp1&#34;,
+      &#34;root_name&#34;: &#34;exp1&#34;
+    }
+    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
+    gromet_json = response.json()
     &#34;&#34;&#34;
-    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
-    return json.loads(system_to_gromet(system))
+
+    return system_to_gromet(system)
 
 
 @app.post(
@@ -135,23 +185,32 @@ async def fn_given_filepaths(system: System):
         &#34; get a GroMEt FN Module collection back.&#34;
     ),
 )
-async def root(zip_file: UploadFile = File()):
+async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     &#34;&#34;&#34;
-    Endpoint for generating Gromet JSON from a zip archive.
+    Endpoint for generating Gromet JSON from a zip archive of arbitrary depth and structure.
+    All source files with a supported file extension (/fn-supported-file-extensions) will be processed as a single GrometFNModuleCollection.
 
     ### Python example
     ```
     import requests
+    import shutil
+    from pathlib import Path
+
+    # Format input/output paths
+    input_name = &#34;system_test&#34;
+    output_name = &#34;system_test.zip&#34;
+    input_path = Path(&#34;/data&#34;) / &#34;skema&#34; / &#34;code&#34; / input_name
+    output_path = Path(&#34;/data&#34;) / &#34;skema&#34; / &#34;code&#34; / output_name
+
+    # Convert source directory to zip archive
+    shutil.make_archive(input_path, &#34;zip&#34;, input_path)
 
     files = {
-      &#34;zip_file&#34;: open(&#34;code_system.zip&#34;, &#34;rb&#34;),
+      &#34;zip_file&#34;: open(output_path, &#34;rb&#34;),
     }
     response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths-zip&#34;, files=files)
     gromet_json = response.json()
     &#34;&#34;&#34;
-
-    # Currently, we rely on the file extension to know which language front end to send the source code to.
-    supported_file_extensions = [&#34;.py&#34;, &#34;.f&#34;, &#34;.f95&#34;]
 
     # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
     files = []
@@ -159,7 +218,7 @@ async def root(zip_file: UploadFile = File()):
     with ZipFile(BytesIO(zip_file.file.read()), &#34;r&#34;) as zip:
         for file in zip.namelist():
             file_obj = Path(file)
-            if file_obj.suffix in supported_file_extensions:
+            if file_obj.suffix in FN_SUPPORTED_FILE_EXTENSIONS:
                 files.append(file)
                 blobs.append(zip.open(file).read())
 
@@ -170,8 +229,8 @@ async def root(zip_file: UploadFile = File()):
     system = System(
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
     )
-    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
-    return json.loads(system_to_gromet(system))
+
+    return system_to_gromet(system)
 
 
 @app.post(
@@ -205,13 +264,23 @@ async def get_pyacset(ports: Ports):
 <span>async def <span class="ident">fn_given_filepaths</span></span>(<span>system: <a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a>)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Endpoint for generating Gromet JSON from a .</p>
+<div class="desc"><p>Endpoint for generating Gromet JSON from a serialized code system.</p>
 <h3 id="python-example">Python example</h3>
 <p>```
 import requests</p>
+<h1 id="single-file">Single file</h1>
 <p>system = {
 "files": ["exp1.py"],
 "blobs": ["x=2"]
+}
+response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
+gromet_json = response.json()</p>
+<h1 id="multi-file">Multi file</h1>
+<p>system = {
+"files": ["exp1.py", "exp1.f"],
+"blobs": ["x=2", "program exp1\ninteger::x=2\nend program exp1"],
+"system_name": "exp1",
+"root_name": "exp1"
 }
 response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
 gromet_json = response.json()</p></div>
@@ -228,21 +297,148 @@ gromet_json = response.json()</p></div>
 )
 async def fn_given_filepaths(system: System):
     &#34;&#34;&#34;
-    Endpoint for generating Gromet JSON from a .
-
+    Endpoint for generating Gromet JSON from a serialized code system.
     ### Python example
+
     ```
     import requests
 
+    # Single file
     system = {
       &#34;files&#34;: [&#34;exp1.py&#34;],
       &#34;blobs&#34;: [&#34;x=2&#34;]
     }
     response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
     gromet_json = response.json()
+
+    # Multi file
+    system = {
+      &#34;files&#34;: [&#34;exp1.py&#34;, &#34;exp1.f&#34;],
+      &#34;blobs&#34;: [&#34;x=2&#34;, &#34;program exp1\\ninteger::x=2\\nend program exp1&#34;],
+      &#34;system_name&#34;: &#34;exp1&#34;,
+      &#34;root_name&#34;: &#34;exp1&#34;
+    }
+    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths&#34;, json=system)
+    gromet_json = response.json()
     &#34;&#34;&#34;
-    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
-    return json.loads(system_to_gromet(system))</code></pre>
+
+    return system_to_gromet(system)</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.server.fn_given_filepaths_zip"><code class="name flex">
+<span>async def <span class="ident">fn_given_filepaths_zip</span></span>(<span>zip_file: fastapi.datastructures.UploadFile = File(PydanticUndefined))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Endpoint for generating Gromet JSON from a zip archive of arbitrary depth and structure.
+All source files with a supported file extension (/fn-supported-file-extensions) will be processed as a single GrometFNModuleCollection.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests
+import shutil
+from pathlib import Path</p>
+<h1 id="format-inputoutput-paths">Format input/output paths</h1>
+<p>input_name = "system_test"
+output_name = "system_test.zip"
+input_path = Path("/data") / "skema" / "code" / input_name
+output_path = Path("/data") / "skema" / "code" / output_name</p>
+<h1 id="convert-source-directory-to-zip-archive">Convert source directory to zip archive</h1>
+<p>shutil.make_archive(input_path, "zip", input_path)</p>
+<p>files = {
+"zip_file": open(output_path, "rb"),
+}
+response = requests.post("http://0.0.0.0:8000/fn-given-filepaths-zip", files=files)
+gromet_json = response.json()</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.post(
+    &#34;/fn-given-filepaths-zip&#34;,
+    summary=(
+        &#34;Send a zip file containing a code system,&#34;
+        &#34; get a GroMEt FN Module collection back.&#34;
+    ),
+)
+async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
+    &#34;&#34;&#34;
+    Endpoint for generating Gromet JSON from a zip archive of arbitrary depth and structure.
+    All source files with a supported file extension (/fn-supported-file-extensions) will be processed as a single GrometFNModuleCollection.
+
+    ### Python example
+    ```
+    import requests
+    import shutil
+    from pathlib import Path
+
+    # Format input/output paths
+    input_name = &#34;system_test&#34;
+    output_name = &#34;system_test.zip&#34;
+    input_path = Path(&#34;/data&#34;) / &#34;skema&#34; / &#34;code&#34; / input_name
+    output_path = Path(&#34;/data&#34;) / &#34;skema&#34; / &#34;code&#34; / output_name
+
+    # Convert source directory to zip archive
+    shutil.make_archive(input_path, &#34;zip&#34;, input_path)
+
+    files = {
+      &#34;zip_file&#34;: open(output_path, &#34;rb&#34;),
+    }
+    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths-zip&#34;, files=files)
+    gromet_json = response.json()
+    &#34;&#34;&#34;
+
+    # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
+    files = []
+    blobs = []
+    with ZipFile(BytesIO(zip_file.file.read()), &#34;r&#34;) as zip:
+        for file in zip.namelist():
+            file_obj = Path(file)
+            if file_obj.suffix in FN_SUPPORTED_FILE_EXTENSIONS:
+                files.append(file)
+                blobs.append(zip.open(file).read())
+
+    zip_obj = Path(zip_file.filename)
+    system_name = zip_obj.name
+    root_name = zip_obj.name
+
+    system = System(
+        files=files, blobs=blobs, system_name=system_name, root_name=root_name
+    )
+
+    return system_to_gromet(system)</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.server.fn_supported_file_extensions"><code class="name flex">
+<span>def <span class="ident">fn_supported_file_extensions</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Returns a List[str] where each entry in the list represents a file extension.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>response = requests.get("http://0.0.0.0:8000/fn-supported-file-extensions")
+supported_extensions = response.json()</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@app.get(
+    &#34;/fn-supported-file-extensions&#34;,
+    summary=&#34;Endpoint for checking which files extensions are currently supported by code2fn pipeline.&#34;,
+    response_model=List[str],
+)
+def fn_supported_file_extensions():
+    &#34;&#34;&#34;
+    Returns a List[str] where each entry in the list represents a file extension.
+
+    ### Python example
+    ```
+    import requests
+
+    response = requests.get(&#34;http://0.0.0.0:8000/fn-supported-file-extensions&#34;)
+    supported_extensions = response.json()
+
+    &#34;&#34;&#34;
+    return FN_SUPPORTED_FILE_EXTENSIONS</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.get_pyacset"><code class="name flex">
@@ -288,69 +484,6 @@ def ping():
     return &#34;The skema-py service is running.&#34;</code></pre>
 </details>
 </dd>
-<dt id="skema.skema_py.server.root"><code class="name flex">
-<span>async def <span class="ident">root</span></span>(<span>zip_file: fastapi.datastructures.UploadFile = File(PydanticUndefined))</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Endpoint for generating Gromet JSON from a zip archive.</p>
-<h3 id="python-example">Python example</h3>
-<p>```
-import requests</p>
-<p>files = {
-"zip_file": open("code_system.zip", "rb"),
-}
-response = requests.post("http://0.0.0.0:8000/fn-given-filepaths-zip", files=files)
-gromet_json = response.json()</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@app.post(
-    &#34;/fn-given-filepaths-zip&#34;,
-    summary=(
-        &#34;Send a zip file containing a code system,&#34;
-        &#34; get a GroMEt FN Module collection back.&#34;
-    ),
-)
-async def root(zip_file: UploadFile = File()):
-    &#34;&#34;&#34;
-    Endpoint for generating Gromet JSON from a zip archive.
-
-    ### Python example
-    ```
-    import requests
-
-    files = {
-      &#34;zip_file&#34;: open(&#34;code_system.zip&#34;, &#34;rb&#34;),
-    }
-    response = requests.post(&#34;http://0.0.0.0:8000/fn-given-filepaths-zip&#34;, files=files)
-    gromet_json = response.json()
-    &#34;&#34;&#34;
-
-    # Currently, we rely on the file extension to know which language front end to send the source code to.
-    supported_file_extensions = [&#34;.py&#34;, &#34;.f&#34;, &#34;.f95&#34;]
-
-    # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
-    files = []
-    blobs = []
-    with ZipFile(BytesIO(zip_file.file.read()), &#34;r&#34;) as zip:
-        for file in zip.namelist():
-            file_obj = Path(file)
-            if file_obj.suffix in supported_file_extensions:
-                files.append(file)
-                blobs.append(zip.open(file).read())
-
-    zip_obj = Path(zip_file.filename)
-    system_name = zip_obj.name
-    root_name = zip_obj.name
-
-    system = System(
-        files=files, blobs=blobs, system_name=system_name, root_name=root_name
-    )
-    # FIXME: remove json.loads() wrapper after use of dictionary_to_gromet_json is addressed
-    return json.loads(system_to_gromet(system))</code></pre>
-</details>
-</dd>
 <dt id="skema.skema_py.server.system_to_gromet"><code class="name flex">
 <span>def <span class="ident">system_to_gromet</span></span>(<span>system: <a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a>)</span>
 </code></dt>
@@ -371,16 +504,12 @@ async def root(zip_file: UploadFile = File()):
 
         # Create files and intermediate directories
         for index, file in enumerate(system.files):
-            file_path = Path(
-                tmp_path, system.root_name or &#34;&#34;, file
-            )
+            file_path = Path(tmp_path, system.root_name or &#34;&#34;, file)
             file_path.parent.mkdir(parents=True, exist_ok=True)
             file_path.write_text(system.blobs[index])
 
         # Create system_filepaths.txt
-        system_filepaths = Path(
-            tmp_path, &#34;system_filepaths.txt&#34;
-        )
+        system_filepaths = Path(tmp_path, &#34;system_filepaths.txt&#34;)
         system_filepaths.write_text(&#34;\n&#34;.join(system.files))
 
         ## Run pipeline
@@ -390,9 +519,12 @@ async def root(zip_file: UploadFile = File()):
             str(system_filepaths),
         )
 
-    # Convert gromet data-model to json
-    gromet_collection_dict = gromet_collection.to_dict()
-    return dictionary_to_gromet_json(del_nulls(gromet_collection_dict))</code></pre>
+    # If comments are included in request, run the unifier to add them to the Gromet
+    if system.comments:
+        align_full_system(gromet_collection, system.comments)
+
+    # Convert Gromet data-model to dict for return
+    return gromet_collection.to_dict()</code></pre>
 </details>
 </dd>
 </dl>
@@ -444,10 +576,27 @@ async def root(zip_file: UploadFile = File()):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class System(BaseModel):
-    files: List[str] = Field(description=&#34;The file name corresponding to each entry in `blobs`&#34;, example=[&#34;example.py&#34;])
-    blobs: List[str] = Field(decription=&#34;Contents of each file to be analyzed&#34;, example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;])
-    system_name: Optional[str] = Field(default=None, decription=&#34;A model name to associate with the provided code&#34;, example=&#34;my-system&#34;)
-    root_name: Optional[str] = Field(default=None, decription=&#34;????&#34;, example=None)</code></pre>
+    files: List[str] = Field(
+        description=&#34;The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`&#34;,
+        example=[&#34;example1.py&#34;, &#34;dir/example2.py&#34;],
+    )
+    blobs: List[str] = Field(
+        decription=&#34;Contents of each file to be analyzed&#34;,
+        example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;],
+    )
+    system_name: Optional[str] = Field(
+        default=None,
+        decription=&#34;A model name to associate with the provided code&#34;,
+        example=&#34;my-system&#34;,
+    )
+    root_name: Optional[str] = Field(
+        default=None,
+        decription=&#34;The name of the code system&#39;s root directory.&#34;,
+        example=&#34;my-system&#34;,
+    )
+    comments: Optional[CodeComments] = Field(
+        default=None, description=&#34;A dictionary containing the &#34;, example=&#34;&#34;
+    )</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -457,6 +606,10 @@ async def root(zip_file: UploadFile = File()):
 <h3>Class variables</h3>
 <dl>
 <dt id="skema.skema_py.server.System.blobs"><code class="name">var <span class="ident">blobs</span> : List[str]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.skema_py.server.System.comments"><code class="name">var <span class="ident">comments</span> : Union[skema.program_analysis.comments.SingleFileCodeComments, skema.program_analysis.comments.MultiFileCodeComments, None]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -491,9 +644,10 @@ async def root(zip_file: UploadFile = File()):
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.skema_py.server.fn_given_filepaths" href="#skema.skema_py.server.fn_given_filepaths">fn_given_filepaths</a></code></li>
+<li><code><a title="skema.skema_py.server.fn_given_filepaths_zip" href="#skema.skema_py.server.fn_given_filepaths_zip">fn_given_filepaths_zip</a></code></li>
+<li><code><a title="skema.skema_py.server.fn_supported_file_extensions" href="#skema.skema_py.server.fn_supported_file_extensions">fn_supported_file_extensions</a></code></li>
 <li><code><a title="skema.skema_py.server.get_pyacset" href="#skema.skema_py.server.get_pyacset">get_pyacset</a></code></li>
 <li><code><a title="skema.skema_py.server.ping" href="#skema.skema_py.server.ping">ping</a></code></li>
-<li><code><a title="skema.skema_py.server.root" href="#skema.skema_py.server.root">root</a></code></li>
 <li><code><a title="skema.skema_py.server.system_to_gromet" href="#skema.skema_py.server.system_to_gromet">system_to_gromet</a></code></li>
 </ul>
 </li>
@@ -510,6 +664,7 @@ async def root(zip_file: UploadFile = File()):
 <h4><code><a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a></code></h4>
 <ul class="">
 <li><code><a title="skema.skema_py.server.System.blobs" href="#skema.skema_py.server.System.blobs">blobs</a></code></li>
+<li><code><a title="skema.skema_py.server.System.comments" href="#skema.skema_py.server.System.comments">comments</a></code></li>
 <li><code><a title="skema.skema_py.server.System.files" href="#skema.skema_py.server.System.files">files</a></code></li>
 <li><code><a title="skema.skema_py.server.System.root_name" href="#skema.skema_py.server.System.root_name">root_name</a></code></li>
 <li><code><a title="skema.skema_py.server.System.system_name" href="#skema.skema_py.server.System.system_name">system_name</a></code></li>
