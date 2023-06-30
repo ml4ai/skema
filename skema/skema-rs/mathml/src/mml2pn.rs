@@ -6,7 +6,7 @@ use crate::petri_net::{
 };
 use crate::{
     ast::{
-        Math, MathExpression,
+        Math,
         MathExpression::{Mn, Mo, Mrow},
         Operator,
     },
