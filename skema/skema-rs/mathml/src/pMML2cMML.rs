@@ -40,6 +40,32 @@ use std::{
     io::{self, BufRead, Write},
 };
 
+
+// Counts how many Mo operators (+, -) there are in a vector
+fn counting_operators(x: &Vec<MathExpression>) -> (String, usize) {
+    let mut count = 0;
+    let mut op_str = String::new();
+    x.iter().for_each(|j| {
+        if let Mo(operation) = j {
+            println!("operation={:?}", operation);
+            let op = format!("{operation}");
+            println!("operation in symbol is{}", op);
+            if op == "+" {
+                count += 1;
+                op_str.push_str(&"<apply><plus/>".to_string());
+            } else if op == "-" {
+                count += 1;
+                op_str.push_str(&"<apply><minus/>".to_string());
+            } else {
+                println!("Unhandled operation.");
+            }
+        } else {
+        }
+    });
+    (op_str, count)
+}
+
+// Takes parsed presentation MathML's Msup components and turns it into content MathML representation
 fn parsed_msup(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> String {
     let mut msup_str = String::new();
     msup_str.push_str(&"<apply><power/>".to_string());
@@ -56,6 +82,7 @@ fn parsed_msup(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
     msup_str
 }
 
+// Takes parsed  presentation MathML's Mfrac components and turns it into content MathML representation
 fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpression>) -> String {
     let mut mfrac_str = String::new();
     match (&**numerator, &**denominator) {
@@ -98,16 +125,16 @@ fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpressio
     mfrac_str
 }
 
+// Takes parsed  presentation MathML's Msub components and turns it into content MathML representation
 fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> String {
     let mut msub_str = String::new();
     msub_str.push_str(&"<apply><selector/>".to_string());
-    //match (&**comp1, &**comp2)
     match (&**comp1, &**comp2) {
         (Mi(id1), Mi(id2)) => msub_str.push_str(&format!("<ci>{}</ci><ci>{}</ci>", id1, id2)),
         (Mi(id), Mn(num)) => msub_str.push_str(&format!("<ci>{}</ci><cn>{}</cn>", id, num)),
         (Mn(num1), Mn(num2)) => msub_str.push_str(&format!("<cn>{}</cn><cn>{}</cn>", num1, num2)),
         (Mrow(row1), Mrow(row2)) => {
-            let mut count_row1_op = 0;
+            /*let mut count_row1_op = 0;
             let has_op_in_row1 = row1.iter().for_each(|j| {
                 //let has_op_in_row1 = row1.iter().any(|j| {
                 if let Mo(operation) = j {
@@ -129,7 +156,10 @@ fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
                 } else {
                     //false
                 }
-            });
+            });*/
+
+            let (r1_str, count_row1_op) = counting_operators(&row1);
+            msub_str.push_str(&r1_str.to_string());
             for r1 in row1.iter() {
                 match r1 {
                     Mi(id) => msub_str.push_str(&format!("<ci>{}</ci>", id)),
@@ -148,7 +178,7 @@ fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
             }
             let mut count_row2_op = 0;
             //for r2 in row2.iter() {
-            let has_op_in_row2 = row2.iter().for_each(|j| {
+            /*let has_op_in_row2 = row2.iter().for_each(|j| {
                 //let has_op_in_row2 = row2.iter().any(|j| {
                 if let Mo(operation) = j {
                     println!("oper={:?}", operation);
@@ -165,7 +195,10 @@ fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
                     }
                 } else {
                 }
-            });
+            });*/
+
+            let (r2_op_str, count_row2_op) = counting_operators(&row2);
+            msub_str.push_str(&r2_op_str.to_string());
             for r2 in row2.iter() {
                 match r2 {
                     Mi(id) => msub_str.push_str(&format!("<ci>{}</ci>", id)),
@@ -203,7 +236,7 @@ fn parenthesis_group(group: &Vec<MathExpression>) -> String {
     println!("count_groups={}", count_groups);
 
     if count_groups == 0 {
-        let mut count_op = 0;
+        /*let mut count_op = 0;
         let has_op = group.iter().for_each(|j| {
             //let has_op_in_row1 = row1.iter().any(|j| {
             if let Mo(operation) = j {
@@ -222,7 +255,10 @@ fn parenthesis_group(group: &Vec<MathExpression>) -> String {
                 }
             } else {
             }
-        });
+        });*/
+
+        let (op_str, count_op) = counting_operators(&group);
+        group_str.push_str(&op_str.to_string());
         match count_op {
             0 => {
                 let comp = vec_mathexp(&group);
@@ -236,20 +272,11 @@ fn parenthesis_group(group: &Vec<MathExpression>) -> String {
             2 => {
                 let comp = if_two_ops_after_equals((&group).to_vec());
                 group_str.push_str(&comp.to_string());
-                //group_str.push_str(&"</apply>".to_string());
             }
             _ => {
                 panic!("Unhandled  operations count in grouping parenthesis")
             }
         }
-        /*if count_op == 0 {
-            let comp = vec_mathexp(&group);
-            group_str.push_str(&comp.to_string());
-        } else if count_op == 1 {
-            let comp = vec_mathexp(&group);
-            group_str.push_str(&comp.to_string());
-
-        }*/
     } else {
         println!("Unhandles nested grouping with parenthesis");
     }
@@ -556,8 +583,8 @@ fn parsed_mrow(row: &Vec<MathExpression>) -> String {
         //for before_comp in before_equals.iter() {
         //println!("beofre_comp = {:?}", before_comp);
 
-        let mut count_before_op = 0;
-        let has_op_in_before = before_equals.iter().for_each(|j| {
+        //let mut count_before_op = 0;
+        /*let has_op_in_before = before_equals.iter().for_each(|j| {
             //let has_op_in_row1 = row1.iter().any(|j| {
             if let Mo(operation) = j {
                 println!("oper={:?}", operation);
@@ -574,7 +601,9 @@ fn parsed_mrow(row: &Vec<MathExpression>) -> String {
                 }
             } else {
             }
-        });
+        });*/
+        let (b_op_str, count_before_op) = counting_operators(&before_equals);
+        mrow_str.push_str(&b_op_str.to_string());
         let before_component = vec_mathexp(&before_equals);
         println!("before_component = {}", before_component);
         mrow_str.push_str(&before_component.to_string());
@@ -621,7 +650,7 @@ fn parsed_mrow(row: &Vec<MathExpression>) -> String {
 
         //let mut after_minus_exists = false;
 
-        let mut count_after_op = 0;
+        /*let mut count_after_op = 0;
         let has_op_in_after = after_equals.iter().for_each(|j| {
             //let has_op_in_row1 = row1.iter().any(|j| {
             if let Mo(operation) = j {
@@ -643,7 +672,10 @@ fn parsed_mrow(row: &Vec<MathExpression>) -> String {
             } else {
                 //false
             }
-        });
+        });*/
+
+        let (a_op_str, count_after_op) = counting_operators(&after_equals);
+        mrow_str.push_str(&a_op_str.to_string());
         println!("count_after_op={}", count_after_op);
         let mut before_minus: Vec<MathExpression> = Vec::new();
         let mut after_minus: Vec<MathExpression> = Vec::new();
@@ -818,7 +850,7 @@ fn parsed_mrow(row: &Vec<MathExpression>) -> String {
         }
         mrow_str.push_str(&"</apply>".to_string());
     } else {
-        let has_op = row.iter().for_each(|j| {
+        /*let has_op = row.iter().for_each(|j| {
             //let has_op_in_row1 = row1.iter().any(|j| {
             if let Mo(operation) = j {
                 println!("oper={:?}", operation);
@@ -835,7 +867,10 @@ fn parsed_mrow(row: &Vec<MathExpression>) -> String {
                 }
             } else {
             }
-        });
+        });*/
+
+        let (row_str, count_op) = counting_operators(&row);
+        mrow_str.push_str(&row_str.to_string());
         let row_comp = vec_mathexp(&row);
         mrow_str.push_str(&row_comp.to_string());
         /*
@@ -891,7 +926,7 @@ fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> Str
                     mover_str.push_str(&format!("<apply><conjugate/><ci>{}</ci></apply>", id))
                 }
                 Mrow(comp) => {
-                    mover_str.push_str(&"<apply>".to_string());
+                    /*mover_str.push_str(&"<apply>".to_string());
                     let has_op = comp.iter().any(|j| {
                         if let Mo(operation) = j {
                             println!("oper={:?}", operation);
@@ -913,7 +948,10 @@ fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> Str
                         } else {
                             false
                         }
-                    });
+                    });*/
+
+                    let (op_str, count_op) = counting_operators(&comp);
+                    mover_str.push_str(&op_str.to_string());
                     for c in comp.iter() {
                         match c {
                             Mi(id) => mover_str.push_str(&format!("<ci>{}</ci>", id)),
@@ -953,7 +991,7 @@ fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> Str
     mover_str
 }
 
-pub fn parsed_pmathml_2_cmathml(pmathml: Vec<Math>) -> String
+pub fn to_content_mathml(pmathml: Vec<Math>) -> String
 //fn parsed_pmathml_2_cmathml(pmathml: Vec<Math>)
 {
     let mut cmathml = String::new();
@@ -963,371 +1001,6 @@ pub fn parsed_pmathml_2_cmathml(pmathml: Vec<Math>) -> String
         let components = parsed_mrow(&comp);
         println!("components={:?}", components);
         cmathml.push_str(&components.to_string());
-        /*
-            let mut before_equals: Vec<MathExpression> = Vec::new();
-            let mut after_equals: Vec<MathExpression> = Vec::new();
-            let mut equals_exists = false;
-            for (index, components) in pmml.content.iter().enumerate() {
-                //println!("content={:?}", content);
-                println!("components={:?}", components);
-                let operations: HashSet<&str> = ["+", "-", "="].iter().copied().collect();
-                //if let Mrow(components) = content {
-                //let has_operation = components.iter().any(|i| {
-                //let mut before_equals: Vec<MathExpression> = Vec::new();
-                //let mut after_equals: Vec<MathExpression> = Vec::new();
-                //let mut equals_exists = false;
-                //for items in components.iter() {
-                if let Mo(oper) = components {
-                    let op = format!("{oper}");
-                    if op == "=" {
-                        equals_exists = true;
-                        continue;
-                    }
-                }
-                if equals_exists {
-                    after_equals.push(components.clone());
-                } else {
-                    before_equals.push(components.clone());
-                }
-                //println!("before_equals = {:?}", before_equals);
-                //println!("after_equals={:?}", after_equals);
-            }
-            println!("before_equals = {:?}", before_equals);
-            println!("after_equals={:?}", after_equals);
-
-            /////////////////////// INSERT CODE TO iter through before equals and after
-            // equals cases
-            if !before_equals.is_empty() && !after_equals.is_empty() {
-                println!("before_equals = {:?}", before_equals);
-                println!("after_equals={:?}", after_equals);
-                cmathml.push_str(&"<apply><eq/>".to_string());
-                //for before_comp in before_equals.iter() {
-                //println!("beofre_comp = {:?}", before_comp);
-
-                let mut count_before_op = 0;
-                let has_op_in_before = before_equals.iter().for_each(|j| {
-                    //let has_op_in_row1 = row1.iter().any(|j| {
-                    if let Mo(operation) = j {
-                        println!("oper={:?}", operation);
-                        let oper = format!("{operation}");
-                        println!("oper is{}", oper);
-                        if oper == "+" {
-                            count_before_op += 1;
-                            cmathml.push_str(&"<apply><plus/>".to_string());
-                        } else if oper == "-" {
-                            count_before_op += 1;
-                            cmathml.push_str(&"<apply><minus/>".to_string());
-                        } else {
-                            println!("Unhandled operation.");
-                        }
-                    } else {
-                    }
-                });
-                for before_component in before_equals.iter() {
-                    match before_component {
-                        Mi(id) => cmathml.push_str(&format!("<ci>{}</ci>", id)),
-                        Mn(num) => cmathml.push_str(&format!("<cn>{}</cn>", num)),
-                        Mo(op) => {}
-                        Msup(sup1, sup2) => {
-                            let msup_comp = parsed_msup(sup1, sup2);
-                            cmathml.push_str(&msup_comp.to_string());
-                        }
-                        Msub(sub1, sub2) => {
-                            let msub_comp = parsed_msub(sub1, sub2);
-                            println!("------------------------------");
-                            println!("msub_comp={:?}", msub_comp);
-                            cmathml.push_str(&msub_comp.to_string());
-                        }
-
-                        Mfrac(num, denom) => {
-                            let mfrac_comp = parsed_mfrac(num, denom);
-                            cmathml.push_str(&mfrac_comp.to_string());
-                        }
-                        Mover(over1, over2) => {
-                            let mover_comp = parsed_mover(over1, over2);
-                            cmathml.push_str(&mover_comp.to_string());
-                        }
-                        Mrow(row) => {
-                            let mrow_comp = parsed_mrow(row);
-                            cmathml.push_str(&mrow_comp.to_string());
-                        }
-                        _ => {
-                            panic!("Unhandled before equals components")
-                        }
-                    }
-                }
-                if count_before_op > 0 {
-                    for _ in 0..count_before_op {
-                        cmathml.push_str(&"</apply>".to_string());
-                    }
-                } else {
-                }
-
-                let mut count_after_op = 0;
-                let has_op_in_after = after_equals.iter().for_each(|j| {
-                    //let has_op_in_row1 = row1.iter().any(|j| {
-                    if let Mo(operation) = j {
-                        println!("oper={:?}", operation);
-                        let oper = format!("{operation}");
-                        println!("oper is{}", oper);
-                        if oper == "+" {
-                            count_after_op += 1;
-                            cmathml.push_str(&"<apply><plus/>".to_string());
-                            //true
-                        } else if oper == "-" {
-                            count_after_op += 1;
-                            cmathml.push_str(&"<apply><minus/>".to_string());
-                            //true
-                        } else {
-                            println!("Unhandled operation.");
-                            //false
-                        }
-                    } else {
-                        //false
-                    }
-                });
-
-                for after_component in after_equals.iter() {
-                    match after_component {
-                        Mi(id) => cmathml.push_str(&format!("<ci>{}</ci>", id)),
-                        Mn(num) => cmathml.push_str(&format!("<cn>{}</cn>", num)),
-                        Mo(op) => {}
-                        Msup(sup1, sup2) => {
-                            let msup_comp = parsed_msup(sup1, sup2);
-                            cmathml.push_str(&msup_comp.to_string());
-                        }
-                        Msub(sub1, sub2) => {
-                            let msub_comp = parsed_msub(sub1, sub2);
-                            println!("------------------------------");
-                            println!("msub_comp={:?}", msub_comp);
-                            cmathml.push_str(&msub_comp.to_string());
-                        }
-                        Mfrac(num, denom) => {
-                            let mfrac_comp = parsed_mfrac(num, denom);
-                            cmathml.push_str(&mfrac_comp.to_string());
-                        }
-
-                        Mover(over1, over2) => {
-                            let mover_comp = parsed_mover(over1, over2);
-                            cmathml.push_str(&mover_comp.to_string());
-                        }
-
-                        Mrow(row) => {
-                            let mrow_comp = parsed_mrow(row);
-                            cmathml.push_str(&mrow_comp.to_string());
-                        }
-                        _ => {
-                            panic!("Unhandled after equals components")
-                        }
-                    }
-                    //cmathml.push_str(&"<apply/>".to_string());
-                }
-                if count_after_op > 0 {
-                    for _ in 0..count_after_op {
-                        cmathml.push_str(&"</apply>".to_string());
-                    }
-                } else {
-                }
-                cmathml.push_str(&"<apply/>".to_string());
-            }
-            //for operator in components.iter() {
-            //if before_equals.is_empty() && after_equals.is_empty() {
-            else {
-                //cmathml.push_str(&"<apply>".to_string());
-
-                let mut count_op_components = 0;
-                let has_op_components = pmml.content.iter().for_each(|j| {
-                    //let has_op_in_row1 = row1.iter().any(|j| {
-                    if let Mo(operation) = j {
-                        println!("oper={:?}", operation);
-                        let oper = format!("{operation}");
-                        println!("oper is{}", oper);
-                        if oper == "+" {
-                            count_op_components += 1;
-                            cmathml.push_str(&"<apply><plus/>".to_string());
-                        } else if oper == "-" {
-                            count_op_components += 1;
-                            cmathml.push_str(&"<apply><minus/>".to_string());
-                        } else {
-                            println!("Unhandled operation.");
-                        }
-                    } else {
-                    }
-                });
-
-                for (comp_idx, component) in pmml.content.iter().enumerate() {
-                    match component {
-                        Mi(id) => cmathml.push_str(&format!("<ci>{}</ci>", id)),
-                        Mn(num) => cmathml.push_str(&format!("<cn>{}</cn>", num)),
-                        Mo(op) => {}
-                        Msup(sup1, sup2) => {
-                            let msup_comp = parsed_msup(sup1, sup2);
-                            cmathml.push_str(&msup_comp.to_string());
-                        }
-                        Msub(sub1, sub2) => {
-                            let msub_comp = parsed_msub(sub1, sub2);
-                            println!("------------------------------");
-                            println!("msub_comp={:?}", msub_comp);
-                            cmathml.push_str(&msub_comp.to_string());
-                        }
-                        Mfrac(num, denom) => {
-                            let mfrac_comp = parsed_mfrac(num, denom);
-                            cmathml.push_str(&mfrac_comp.to_string());
-                        }
-                        Mover(over1, over2) => {
-                            let mover_comp = parsed_mover(over1, over2);
-                            cmathml.push_str(&mover_comp.to_string());
-                        }
-                        Mrow(row) => {
-                            let mrow_comp = parsed_mrow(row);
-                            cmathml.push_str(&mrow_comp.to_string());
-                        }
-                        _ => {
-                            panic!("Unhandled after equals components")
-                        }
-                    }
-                }
-
-                if count_op_components > 0 {
-                    for _ in 0..count_op_components {
-                        cmathml.push_str(&"</apply>".to_string());
-                    }
-                } else {
-                }
-                //}
-                //}
-                /*
-                for (comp_idx, component) in components.iter().enumerate() {
-                    match component {
-                        Mi(id) => cmathml.push_str(&format!("<ci>{}</ci>", id)),
-                        Mn(num) => cmathml.push_str(&format!("<cn>{}</cn>", num)),
-                        Mo(op) => {}
-                        Msup(sup1, sup2) => {
-                            cmathml.push_str(&"<apply><power/>".to_string());
-                            match (&**sup1, &**sup2) {
-                                (Mi(id), Mn(num)) => {
-                                    cmathml.push_str(&format!("<ci>{}</ci><cn>{}</cn>", id, num))
-                                }
-                                (Mi(id1), Mi(id2)) => {
-                                    cmathml.push_str(&format!("<ci>{}</ci><ci>{}</ci>", id1, id2))
-                                }
-                                (Mn(num1), Mn(num2)) => {
-                                    cmathml.push_str(&format!("<cn>{}</cn><cn>{}</cn>", num1, num2))
-                                }
-                                (Mn(num), Mi(id)) => {
-                                    cmathml.push_str(&format!("<cn>{}</cn><ci>{}</ci>", num, id))
-                                }
-
-                                _ => {
-                                    panic!("Unhandled Msup")
-                                }
-                            }
-                            cmathml.push_str(&"</apply>".to_string());
-                        }
-                        Msub(sub1, sub2) => {
-                            let msub_comp = parsed_msub(sub1, sub2);
-                            println!("------------------------------");
-                            println!("msub_comp={:?}", msub_comp);
-                            cmathml.push_str(&msub_comp.to_string());
-                        }
-                        Mover(over1, over2) => {
-                            println!("over1={:?}, over2={:?}", over1, over2);
-                            if let Mo(over_op) = &**over2 {
-                                let over_term = format!("{over_op}");
-                                println!("over_term = {}", over_term);
-                                if over_term == "‾" {
-                                    cmathml.push_str(&"<apply><conjugate/>".to_string());
-                                    //for comps in &**over1{
-                                    match &**over1 {
-                                        Mi(id) => cmathml.push_str(&format!(
-                                            "<apply><conjugate/><ci>{}</ci></apply>",
-                                            id
-                                        )),
-                                        Mrow(comp) => {
-                                            cmathml.push_str(&"<apply>".to_string());
-                                            let has_op = comp.iter().any(|j| {
-                                                if let Mo(operation) = j {
-                                                    println!("oper={:?}", operation);
-                                                    let oper = format!("{operation}");
-                                                    println!("oper is{}", oper);
-                                                    if oper == "+" {
-                                                        cmathml.push_str(&"<plus/>".to_string());
-                                                        true
-                                                    } else if oper == "-" {
-                                                        cmathml.push_str(&"<minus/>".to_string());
-                                                        true
-                                                    } else if oper == "=" {
-                                                        cmathml.push_str(&"<eq/>".to_string());
-                                                        true
-                                                    } else {
-                                                        println!("Unhandled operation.");
-                                                        false
-                                                    }
-                                                } else {
-                                                    false
-                                                }
-                                            });
-                                            for c in comp.iter() {
-                                                match c {
-                                                    Mi(id) => cmathml
-                                                        .push_str(&format!("<ci>{}</ci>", id)),
-                                                    Mn(num) => cmathml
-                                                        .push_str(&format!("<cn>{}</cn>", num)),
-                                                    Mo(op) => {}
-                                                    _ => {
-                                                        panic!("Unhandled comp inside Mover")
-                                                    }
-                                                }
-                                            }
-                                            cmathml.push_str(&"</apply>".to_string());
-                                        }
-
-                                        _ => {
-                                            panic!("Unhandled comps inside Mover")
-                                        } //}
-                                          //}
-                                    }
-                                }
-                            }
-                            cmathml.push_str(&"</apply>".to_string());
-                        }
-                        Mfrac(numerator, denominator) => match (&**numerator, &**denominator) {
-                            (Mn(num1), Mn(num2)) => cmathml.push_str(&format!(
-                                "<apply><divide/><cn>{}</cn><cn>{}</cn></apply>",
-                                num1, num2
-                            )),
-                            (Mi(id), Mn(num)) => cmathml.push_str(&format!(
-                                "<apply><divide/><ci>{}</ci><cn>{}</cn></apply>",
-                                id, num
-                            )),
-                            (Mrow(num_exp), Mrow(denom_exp)) => {
-                                if let (Mi(num_id), Mi(denom_id)) = (&num_exp[0], &denom_exp[0]) {
-                                    if num_id == "d" && denom_id == "d" {
-                                        if let (Mi(id0), Mi(id1)) = (&num_exp[1], &denom_exp[1]) {
-                                            cmathml.push_str(&format!("<apply><diff/><bvar><ci>{}</ci></bvar><ci>{}</ci></apply>", id1, id0))
-                                        }
-                                    } else if num_id == "∂" && denom_id == "∂" {
-                                        if let (Mi(id0), Mi(id1)) = (&num_exp[1], &denom_exp[1]) {
-                                            cmathml.push_str(&format!("<apply><partialdiff/><bvar><ci>{}</ci></bvar><ci>{}</ci></apply>", id1, id0))
-                                        }
-                                    }
-                                }
-                                //else if let
-                            }
-                            _ => {
-                                panic!("Unhandled Mfrac")
-                            }
-                        },
-                        _ => {
-                            panic!("Unhandled mathml component")
-                        }
-                    }
-                }*/
-                //cmathml.push_str(&"</apply>".to_string());
-                //}
-            }
-        }
-        */
     }
     cmathml.push_str(&"</math>".to_string());
     cmathml
@@ -1342,7 +1015,7 @@ fn test_content_mml() {
     let (_, mut math) =
         parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     vector_mml.push(math);
-    let mml = parsed_pmathml_2_cmathml(vector_mml);
+    let mml = to_content_mathml(vector_mml);
     assert_eq!(mml, "<math><apply><minus/><ci>y</ci><apply><conjugate/><apply><plus/><ci>x</ci><cn>1</cn></apply></apply></apply></math>");
 }
 
@@ -1358,15 +1031,13 @@ fn main() {
     let mut vector_mml = Vec::<Math>::new();
     let (_, mut math) =
         parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
-
     //let parsed_mml = get_mathml_asts_from_file("../tests/test_c2p_mml/test6.xml");
-
     println!("math={:?}", math);
     //math.normalize();
     vector_mml.push(math);
 
     println!("vector_mml={:?}", vector_mml);
-    let mml = parsed_pmathml_2_cmathml(vector_mml);
+    let mml = to_content_mathml(vector_mml);
     println!("mml={:?}", mml);
     //assert_eq!(mml, "<math><apply><minus/><ci>y</ci><apply><conjugate/><apply><plus/><ci>x</ci><cn>1</cn></apply></apply></apply></math>");
 }
