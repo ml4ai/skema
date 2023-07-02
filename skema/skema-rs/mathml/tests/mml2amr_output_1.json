@@ -1,1 +1,53 @@
-{"name":"Regnet mathml model","schema":"https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json","schema_name":"regnet","description":"This is a Regnet model from mathml equations","model_version":"0.1","model":{"vertices":[{"id":"x","name":"x","rate_constant":"α","sign":true},{"id":"y","name":"y","rate_constant":"γ","sign":false}],"edges":[{"id":"β","source":["y"],"target":["x"],"sign":false,"grounding":null,"properties":{"rate_constant":"β"}},{"id":"δ","source":["x"],"target":["y"],"sign":true,"grounding":null,"properties":{"rate_constant":"δ"}}]}}
+{
+  "name": "Regnet mathml model",
+  "schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json",
+  "schema_name": "regnet",
+  "description": "This is a Regnet model from mathml equations",
+  "model_version": "0.1",
+  "model": {
+    "vertices": [
+      {
+        "id": "x",
+        "name": "x",
+        "rate_constant": "α",
+        "sign": true
+      },
+      {
+        "id": "y",
+        "name": "y",
+        "rate_constant": "γ",
+        "sign": false
+      }
+    ],
+    "edges": [
+      {
+        "id": "β",
+        "source": [
+          "y"
+        ],
+        "target": [
+          "x"
+        ],
+        "sign": false,
+        "grounding": null,
+        "properties": {
+          "rate_constant": "β"
+        }
+      },
+      {
+        "id": "δ",
+        "source": [
+          "x"
+        ],
+        "target": [
+          "y"
+        ],
+        "sign": true,
+        "grounding": null,
+        "properties": {
+          "rate_constant": "δ"
+        }
+      }
+    ]
+  }
+}
