@@ -18,6 +18,7 @@ from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 from skema.program_analysis.comments import CodeComments
 
+from skema.utils.fold import del_nulls, dictionary_to_gromet_json
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
 
@@ -50,10 +51,10 @@ class System(BaseModel):
     )
     comments: Optional[CodeComments] = Field(
         default=None,
-        description="A dictionary containing the ",
+        description="A CodeComments object representing the comments extracted from the source code in 'blobs'. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)",
         example={
             "files": {
-                "example2.py": {
+                "example-system/dir/example2.py": {
                     "comments": [
                         {"contents": "Variable declaration", "line_number": 0},
                         {"contents": "Function definition", "line_number": 2},
@@ -91,6 +92,7 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
+    
     # If comments are included in request, run the unifier to add them to the Gromet
     if system.comments:
         align_full_system(gromet_collection, system.comments)
