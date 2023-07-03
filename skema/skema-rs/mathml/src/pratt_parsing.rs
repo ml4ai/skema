@@ -46,20 +46,18 @@ impl Lexer {
         // Recognize derivatives whenever possible.
         let tokens = input.clone().iter().fold(vec![], |mut acc, x| match x {
             MathExpression::Mover(base, overscript) => match **overscript {
-                MathExpression::Mo(Operator::Other(ref os)) => {
-                    if os.chars().all(|c| c == '˙') {
-                        acc.push(MathExpression::Mo(Operator::new_derivative(
-                            os.chars().count() as u8,
-                            1,
-                        )));
-                        acc.push(*base.clone());
-                        acc
-                    } else {
-                        acc.push(x.clone());
-                        acc
-                    }
+                MathExpression::Mo(Operator::Other(ref os)) if os.chars().all(|c| c == '˙') => {
+                    acc.push(MathExpression::Mo(Operator::new_derivative(
+                        os.chars().count() as u8,
+                        1,
+                    )));
+                    acc.push(*base.clone());
+                    acc
                 }
-                _ => todo!(),
+                _ => {
+                    acc.push(x.clone());
+                    acc
+                }
             },
             MathExpression::Mfrac(numerator, denominator) => {
                 if let Ok((derivative, function)) =
