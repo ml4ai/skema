@@ -33,20 +33,35 @@ class System(BaseModel):
     )
     blobs: List[str] = Field(
         decription="Contents of each file to be analyzed",
-        example=["greet = lambda: print('howdy!')\ngreet()"],
+        example=[
+            "greet = lambda: print('howdy!')\ngreet()",
+            "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
+        ],
     )
     system_name: Optional[str] = Field(
         default=None,
         decription="A model name to associate with the provided code",
-        example="my-system",
+        example="example-system",
     )
     root_name: Optional[str] = Field(
         default=None,
         decription="The name of the code system's root directory.",
-        example="my-system",
+        example="example-system",
     )
     comments: Optional[CodeComments] = Field(
-        default=None, description="A dictionary containing the ", example=""
+        default=None,
+        description="A CodeComments object representing the comments extracted from the source code in 'blobs'. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)",
+        example={
+            "files": {
+                "example-system/dir/example2.py": {
+                    "comments": [
+                        {"contents": "Variable declaration", "line_number": 0},
+                        {"contents": "Function definition", "line_number": 2},
+                    ],
+                    "docstrings": {"foo": ["Increment the input variable"]},
+                }
+            }
+        },
     )
 
 
@@ -79,6 +94,15 @@ def system_to_gromet(system: System):
     # If comments are included in request, run the unifier to add them to the Gromet
     if system.comments:
         align_full_system(gromet_collection, system.comments)
+
+    # Explicitly call to_dict on any metadata object
+    # NOTE: Only required because of fault in swagger-codegen
+    for i, module in enumerate(gromet_collection.modules):
+        for j, metadata_list in enumerate(module.metadata_collection):
+            for k, metadata in enumerate(metadata_list):
+                gromet_collection.modules[i].metadata_collection[j][
+                    k
+                ] = metadata.to_dict()
 
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()

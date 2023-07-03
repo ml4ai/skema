@@ -199,11 +199,20 @@ def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComm
     #     A multi file consists of a top level dictionary that maps each file
     #     in the system to a dictionary containing the comments and docstrings for that file
     # We can check what kind of extracted comments file we have by checking the structure of the dictionary
+    
+    # First convert the incoming CodeComment object to a dictionary for processing
+    # TODO: Re-write dictionary logic to work on CodeComment object directly
     if isinstance(extraction, SingleFileCodeComments):
         extraction = dict(extraction)
+        for index, comment in enumerate(extraction["comments"]):
+            extraction["comments"][index] = dict(comment)
     else:
         extraction = dict(extraction.files)
-
+        for k,v in extraction.items():
+            extraction[k] = dict(v)
+            for index, comment in enumerate(extraction[k]["comments"]):
+                extraction[k]["comments"][index] = dict(comment)
+        
     if "comments" in extraction.keys() and "docstrings" in extraction.keys():
         # Single file system
         # NOTE: We assume for the moment that if we're aligning a single file that
@@ -228,7 +237,9 @@ def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComm
         for module in gromet_obj.module_index:
             # Go through each file in the GroMEt FN
             normalized_path = normalize_module_path(module)
+            
             if normalized_path in extraction.keys():
+                
                 # Find the current FN in the collection
                 module_FN = find_fn(gromet_obj.modules, normalized_path)
                 if module_FN != None:
