@@ -97,6 +97,13 @@ def system_to_gromet(system: System):
     if system.comments:
         align_full_system(gromet_collection, system.comments)
 
+    # Explicitly call to_dict on any metadata object
+    # NOTE: Only required because of fault in swagger-codegen
+    for i,module in enumerate(gromet_collection.modules):
+        for j, metadata_list in enumerate(module.metadata_collection):
+            for k, metadata in enumerate(metadata_list):
+                gromet_collection.modules[i].metadata_collection[j][k] = metadata.to_dict()
+
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
 
