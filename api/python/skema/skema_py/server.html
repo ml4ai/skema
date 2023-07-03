@@ -62,20 +62,35 @@ class System(BaseModel):
     )
     blobs: List[str] = Field(
         decription=&#34;Contents of each file to be analyzed&#34;,
-        example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;],
+        example=[
+            &#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;,
+            &#34;#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    &#39;&#39;&#39;Increment the input variable&#39;&#39;&#39;\n    return x+1&#34;,
+        ],
     )
     system_name: Optional[str] = Field(
         default=None,
         decription=&#34;A model name to associate with the provided code&#34;,
-        example=&#34;my-system&#34;,
+        example=&#34;example-system&#34;,
     )
     root_name: Optional[str] = Field(
         default=None,
         decription=&#34;The name of the code system&#39;s root directory.&#34;,
-        example=&#34;my-system&#34;,
+        example=&#34;example-system&#34;,
     )
     comments: Optional[CodeComments] = Field(
-        default=None, description=&#34;A dictionary containing the &#34;, example=&#34;&#34;
+        default=None,
+        description=&#34;A CodeComments object representing the comments extracted from the source code in &#39;blobs&#39;. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)&#34;,
+        example={
+            &#34;files&#34;: {
+                &#34;example-system/dir/example2.py&#34;: {
+                    &#34;comments&#34;: [
+                        {&#34;contents&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
+                        {&#34;contents&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
+                    ],
+                    &#34;docstrings&#34;: {&#34;foo&#34;: [&#34;Increment the input variable&#34;]},
+                }
+            }
+        },
     )
 
 
@@ -108,6 +123,15 @@ def system_to_gromet(system: System):
     # If comments are included in request, run the unifier to add them to the Gromet
     if system.comments:
         align_full_system(gromet_collection, system.comments)
+
+    # Explicitly call to_dict on any metadata object
+    # NOTE: Only required because of fault in swagger-codegen
+    for i, module in enumerate(gromet_collection.modules):
+        for j, metadata_list in enumerate(module.metadata_collection):
+            for k, metadata in enumerate(metadata_list):
+                gromet_collection.modules[i].metadata_collection[j][
+                    k
+                ] = metadata.to_dict()
 
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
@@ -523,6 +547,15 @@ def ping():
     if system.comments:
         align_full_system(gromet_collection, system.comments)
 
+    # Explicitly call to_dict on any metadata object
+    # NOTE: Only required because of fault in swagger-codegen
+    for i, module in enumerate(gromet_collection.modules):
+        for j, metadata_list in enumerate(module.metadata_collection):
+            for k, metadata in enumerate(metadata_list):
+                gromet_collection.modules[i].metadata_collection[j][
+                    k
+                ] = metadata.to_dict()
+
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()</code></pre>
 </details>
@@ -582,20 +615,35 @@ def ping():
     )
     blobs: List[str] = Field(
         decription=&#34;Contents of each file to be analyzed&#34;,
-        example=[&#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;],
+        example=[
+            &#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;,
+            &#34;#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    &#39;&#39;&#39;Increment the input variable&#39;&#39;&#39;\n    return x+1&#34;,
+        ],
     )
     system_name: Optional[str] = Field(
         default=None,
         decription=&#34;A model name to associate with the provided code&#34;,
-        example=&#34;my-system&#34;,
+        example=&#34;example-system&#34;,
     )
     root_name: Optional[str] = Field(
         default=None,
         decription=&#34;The name of the code system&#39;s root directory.&#34;,
-        example=&#34;my-system&#34;,
+        example=&#34;example-system&#34;,
     )
     comments: Optional[CodeComments] = Field(
-        default=None, description=&#34;A dictionary containing the &#34;, example=&#34;&#34;
+        default=None,
+        description=&#34;A CodeComments object representing the comments extracted from the source code in &#39;blobs&#39;. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)&#34;,
+        example={
+            &#34;files&#34;: {
+                &#34;example-system/dir/example2.py&#34;: {
+                    &#34;comments&#34;: [
+                        {&#34;contents&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
+                        {&#34;contents&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
+                    ],
+                    &#34;docstrings&#34;: {&#34;foo&#34;: [&#34;Increment the input variable&#34;]},
+                }
+            }
+        },
     )</code></pre>
 </details>
 <h3>Ancestors</h3>
