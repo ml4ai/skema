@@ -101,30 +101,30 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     #     [350, 37, 1.4],
     # ]
     # v2 v3
-    buckets = [
-        [820, 86, 0.6],
-        [703, 74, 0.7],
-        [615, 65, 0.8],
-        [547, 58, 0.9],
-        [492, 52, 1],
-        [447, 47, 1.1],
-        [410, 43, 1.2],
-        [379, 40, 1.3],
-        [350, 37, 1.4],
-        [328, 35, 1.5],
-    ]
-    # v4
     # buckets = [
-    #     [878, 92, 0.56],
-    #     [780, 82, 0.63],
-    #     [683, 72, 0.72],
-    #     [592, 62, 0.83],
+    #     [820, 86, 0.6],
+    #     [703, 74, 0.7],
+    #     [615, 65, 0.8],
+    #     [547, 58, 0.9],
     #     [492, 52, 1],
-    #     [400, 42, 1.23],
-    #     [302, 32, 1.625],
-    #     [208, 22, 2.36],
-    #     [113, 12, 4.33],
+    #     [447, 47, 1.1],
+    #     [410, 43, 1.2],
+    #     [379, 40, 1.3],
+    #     [350, 37, 1.4],
+    #     [328, 35, 1.5],
     # ]
+    # v4
+    buckets = [
+        [878, 92, 0.56],
+        [780, 82, 0.63],
+        [683, 72, 0.72],
+        [592, 62, 0.83],
+        [492, 52, 1],
+        [400, 42, 1.23],
+        [302, 32, 1.625],
+        [208, 22, 2.36],
+        [113, 12, 4.33],
+    ]
     # current width, hgt
     crop_width, crop_hgt = image.size[0], image.size[1]
 
@@ -233,23 +233,27 @@ def define_model(
 
 def add_semicolon_to_unicode(string: str) -> str:
     """
-    Checks if the string contains Unicode starting with '&#x' and adds a semicolon ';' after it.
+    Checks if the string contains Unicode starting with '&#x' and adds a semicolon ';' after each occurrence if missing.
+
     Args:
-        string: The input string to check.
+        string (str): The input string to check.
+
     Returns:
-        The modified string with semicolons added after Unicode.
+        str: The modified string with semicolons added after each Unicode occurrence if necessary.
     """
     # Define a regular expression pattern to match '&#x' followed by hexadecimal characters
     pattern = r"&#x[0-9A-Fa-f]+"
 
-    # Find all matches in the string using the pattern
-    matches = re.findall(pattern, string)
+    def add_semicolon(match):
+        unicode_value = match.group(0)
+        if not unicode_value.endswith(";"):
+            unicode_value += ";"
+        return unicode_value
 
-    # Iterate over the matches and add semicolon after each Unicode
-    for match in matches:
-        string = string.replace(match, match + ";")
+    # Find all matches in the string using the pattern and process each match individually
+    modified_string = re.sub(pattern, add_semicolon, string)
 
-    return string
+    return modified_string
 
 
 def remove_spaces_between_tags(mathml_string: str) -> str:
