@@ -6,4 +6,17 @@ eqn_src = [
     latex:
       "u\\left(t_{n}\\right)=K_{p} e\\left(t_{n}\\right)+K_{i}\\left(\\sum_{j=0}^{n} e\\left(t_{j}\\right) \\Delta t\\right)+K_{d}\\left(\\frac{e\\left(t_{n}\\right)-e\\left(t_{n-1}\\right)}{\\Delta t}\\right)",
   },
+  {
+    id: "186a42c3-c8e5-4902-bc8f-39e4759853a3",
+    mathml:
+      '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <mfrac>\n    <msubsup>\n      <mi>I</mi>\n      <mrow>\n        <mi>i</mi>\n        <mo>,</mo>\n        <mi>t</mi>\n      </mrow>\n      <mrow>\n        <mi>i</mi>\n        <mi>n</mi>\n        <mi>c</mi>\n      </mrow>\n    </msubsup>\n    <msub>\n      <mi>M</mi>\n      <mrow>\n        <mi>i</mi>\n        <mo>,</mo>\n        <mi>t</mi>\n      </mrow>\n    </msub>\n  </mfrac>\n  <mo>=</mo>\n  <mfrac>\n    <msub>\n      <mi>U</mi>\n      <mrow>\n        <mi>c</mi>\n        <mo>,</mo>\n        <mi>t</mi>\n      </mrow>\n    </msub>\n    <mrow>\n      <msub>\n        <mi>N</mi>\n        <mrow>\n          <mi>c</mi>\n        </mrow>\n      </msub>\n      <mo>\u2212</mo>\n      <msub>\n        <mrow>\n          <mover>\n            <mi>R</mi>\n            <mo stretchy="false">^</mo>\n          </mover>\n        </mrow>\n        <mrow>\n          <mi>c</mi>\n          <mo>,</mo>\n          <mi>t</mi>\n        </mrow>\n      </msub>\n    </mrow>\n  </mfrac>\n</math>',
+    latex:
+      "\\frac{I_{i, t}^{i n c}}{M_{i, t}}=\\frac{U_{c, t}}{N_{c}-\\hat{R}_{c, t}}",
+  },
+  {
+    id: "f8feb3d9-ea19-45c4-8d1c-bbbc93fe3f18",
+    mathml:
+      '<math xmlns="http://www.w3.org/1998/Math/MathML">\n  <mi>\u03b3</mi>\n  <mo stretchy="false">(</mo>\n  <mi>t</mi>\n  <mo stretchy="false">)</mo>\n  <mo>=</mo>\n  <mfrac>\n    <mn>1</mn>\n    <mrow>\n      <mi>\u03ba</mi>\n      <mo stretchy="false">(</mo>\n      <mi>t</mi>\n      <mo stretchy="false">)</mo>\n    </mrow>\n  </mfrac>\n  <mo>=</mo>\n  <mfrac>\n    <mi>d</mi>\n    <mrow>\n      <mi>d</mi>\n      <mi>t</mi>\n    </mrow>\n  </mfrac>\n  <mi>C</mi>\n  <mo stretchy="false">(</mo>\n  <mi>t</mi>\n  <mo stretchy="false">)</mo>\n</math>',
+    latex: "\\gamma(t)=\\frac{1}{\\kappa(t)}=\\frac{d}{d t} C(t)",
+  },
 ];

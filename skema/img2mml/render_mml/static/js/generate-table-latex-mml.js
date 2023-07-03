@@ -5,6 +5,26 @@
 
 const format_xml = require("xml-formatter");
 
+/**
+ * Using the Googl Charts API to render LaTeX
+ *
+ * Ref:
+ * https://stackoverflow.com/questions/33943355/js-script-to-convert-latex-formula-into-a-single-image
+ * https://ardoris.wordpress.com/2010/06/27/converting-inline-latex-to-images-with-javascript-and-google-chart-api/
+ */
+function process_latex() {
+  $("pre.latex").each(function (e) {
+    var tex = $(this).text();
+    var url =
+      "http://chart.apis.google.com/chart?cht=tx&chl=" +
+      encodeURIComponent(tex);
+    var cls = $(this).attr("class");
+    var img = '<img src="' + url + '" alt="' + tex + '" class="' + cls + '"/>';
+    $(img).insertBefore($(this));
+    $(this).hide();
+  });
+}
+
 function add_table_headers(table) {
   const headers = [
     "ID",
@@ -24,14 +44,13 @@ function add_table_headers(table) {
 }
 
 function add_table_rows(table) {
-  for ([i, element] of eqn_src.entries()) {
+  for (element of eqn_src) {
     let row = $("<tr/>", { class: "datum" });
 
     // Get info about the current entry
     const id = element["id"];
-    const source_img = `${images_path}/source_imgs/${id}.${images_ext}`;
+    const source_img_path = `${images_path}/source_imgs/${id}.${images_ext}`;
     const latex_text = element["latex"];
-    const latex_render = `${images_path}/${i}.${images_ext}`;
     const mml_text = `${element["mathml"]}`;
 
     // Create a cell for each piece of data we want to show
@@ -41,7 +60,7 @@ function add_table_rows(table) {
     });
 
     const source_img_cell = $("<td/>").append(
-      `<img src="${source_img}" width="auto" height="100%">`
+      `<img src="${source_img_path}" width="auto" height="100%">`
     );
 
     const latex_text_cell = $("<td/>", {
@@ -49,17 +68,17 @@ function add_table_rows(table) {
     });
 
     const latex_render_cell = $("<td/>").append(
-      `<img src="${latex_render}" width="auto" height="100%">`
+      `<pre class="latex">${latex_text}</pre>`
     );
 
-    const mml_text_cell = $("<td/>", { id: `mml_img_${i}` }).html(mml_text);
-    const mml_render = format_xml(mml_text, {
+    const mml_render_cell = $("<td/>").html(mml_text);
+    const mml_formatted_text = format_xml(mml_text, {
       indentation: "  ",
       collapseContent: true,
       lineSeparator: "\n",
     });
-    const mml_render_cell = $("<td>", { id: `mml_src_${i}` }).append(
-      $("<div>", { class: "pre" }).append($("<pre>").text(mml_render))
+    const mml_text_cell = $("<td>").append(
+      $("<div>", { class: "pre" }).append($("<pre>").text(mml_formatted_text))
     );
 
     // Add cells to the table
@@ -67,8 +86,8 @@ function add_table_rows(table) {
     row.append(source_img_cell);
     row.append(latex_text_cell);
     row.append(latex_render_cell);
-    row.append(mml_text_cell);
     row.append(mml_render_cell);
+    row.append(mml_text_cell);
     table.append(row);
   }
   return table;
@@ -82,5 +101,6 @@ function build_table() {
 
 // triggers when HTML document is ready for processing
 $(document).ready(function () {
-  build_table();
+  build_table(); // Build table into the HTML
+  process_latex(); // Render the Latex in the page (and the table) into an image
 });
