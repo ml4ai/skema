@@ -179,6 +179,16 @@ fn equals(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+fn lparen(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Lparen, ws(tag("(")))(input)?;
+    Ok((s, op))
+}
+
+fn rparen(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Rparen, ws(tag(")")))(input)?;
+    Ok((s, op))
+}
+
 fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = ws(recognize(not_line_ending))(input)?;
     let op = Operator::Other(consumed.to_string());
@@ -186,7 +196,7 @@ fn operator_other(input: Span) -> IResult<Operator> {
 }
 
 fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((add, subtract, equals, operator_other))(input)?;
+    let (s, op) = alt((add, subtract, equals, lparen, rparen, operator_other))(input)?;
     Ok((s, op))
 }
 
@@ -289,7 +299,7 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
 }
 
 /// Math expressions
-fn math_expression(input: Span) -> IResult<MathExpression> {
+pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         mi, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext, mstyle, mspace,
         mo_line, mo,
@@ -381,35 +391,6 @@ fn test_mover() {
         ),
     )
 }
-
-//#[test]
-//fn test_munder() {
-//let expr = Munder(vec![
-//Mo(Operator::Other("inf".to_string())),
-//Mn("0".to_string()),
-//Mo(Operator::Other("≤".to_string())),
-//Mi("t".to_string()),
-//Mo(Operator::Other("≤".to_string())),
-//]);
-//test_parser(
-//"<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
-//munder,
-//expr,
-//)
-//}
-
-//#[test]
-//fn test_msubsup() {
-//test_parser(
-//"<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
-//msubsup,
-//Msubsup(vec![
-//Mi("L".to_string()),
-//Mi("t".to_string()),
-//Mi("∞".to_string()),
-//]),
-//)
-//}
 
 #[test]
 fn test_mtext() {
