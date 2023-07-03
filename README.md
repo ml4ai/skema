@@ -20,7 +20,7 @@ coexist peacefully.
 
 At the top level, we have the following files and directories:
 
-- `Dockerfile.skema-py`: Dockerfile for the skema python library (includes program analysis, img2mml, isa, and MOVIZ components).
+- `Dockerfile.skema-py`: Dockerfile for the skema python library (includes program analysis, img2mml, and isa components).
 - `Dockerfile.skema-rs`: Dockerfile for the skema-rs service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
@@ -38,9 +38,8 @@ The `skema` directory contains two different types of directories:
     - `text_reading`
     - `skema_py`: Web service for converting code to GroMEt function networks and pyacsets.
     - `img2mml`: Web service for extracting equations from images.
-    - `moviz`: Visualization interface for GroMEt function networks.
 
-Of the Python subpackages, the last three (`skema_py`, `img2mml`, `moviz`) are
+Of the Python subpackages, the last two (`skema_py` and `img2mml`) are
 currently the most 'outward/user-facing' components. The `program_analysis`,
 `gromet`, and `model_assembly` directories are comprised primarily of library
 code that is used by the `skema-py` service.
