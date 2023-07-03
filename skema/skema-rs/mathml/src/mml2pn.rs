@@ -402,10 +402,10 @@ impl acset::ACSet {
 /// to be preserved in roundtrip serialization.
 #[cfg(test)]
 fn test_acset_equality(mut acset_1: ACSet, mut acset_2: ACSet) -> bool {
-    //acset_1.I.sort();
-    //acset_1.O.sort();
-    //acset_2.O.sort();
-    //acset_2.I.sort();
+    acset_1.I.sort();
+    acset_1.O.sort();
+    acset_2.O.sort();
+    acset_2.I.sort();
     acset_1 == acset_2
 }
 
