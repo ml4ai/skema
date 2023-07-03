@@ -276,4 +276,15 @@ fn test_conversion() {
     let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
+
+    let input = "
+    <math>
+        <mfrac><mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo><mi>I</mi>
+        </math>
+        ";
+    println!("Input: {input}");
+    let s = input.parse::<MathExpressionTree>().unwrap();
+    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
+    println!("Output: {s}\n");
 }
