@@ -199,7 +199,6 @@ def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComm
     #     A multi file consists of a top level dictionary that maps each file
     #     in the system to a dictionary containing the comments and docstrings for that file
     # We can check what kind of extracted comments file we have by checking the structure of the dictionary
-<<<<<<< HEAD
     
     # First convert the incoming CodeComment object to a dictionary for processing
     # TODO: Re-write dictionary logic to work on CodeComment object directly
@@ -214,13 +213,6 @@ def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComm
             for index, comment in enumerate(extraction[k]["comments"]):
                 extraction[k]["comments"][index] = dict(comment)
         
-=======
-    if isinstance(extraction, SingleFileCodeComments):
-        extraction = dict(extraction)
-    else:
-        extraction = dict(extraction.files)
-
->>>>>>> 1bed04acf115dd0886cfed03b8c66c2d9077b166
     if "comments" in extraction.keys() and "docstrings" in extraction.keys():
         # Single file system
         # NOTE: We assume for the moment that if we're aligning a single file that

@@ -18,11 +18,8 @@ from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 from skema.program_analysis.comments import CodeComments
 
-<<<<<<< HEAD
 from skema.utils.fold import del_nulls, dictionary_to_gromet_json
 
-=======
->>>>>>> 1bed04acf115dd0886cfed03b8c66c2d9077b166
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
 
@@ -38,28 +35,19 @@ class System(BaseModel):
     )
     blobs: List[str] = Field(
         decription="Contents of each file to be analyzed",
-<<<<<<< HEAD
         example=[
             "greet = lambda: print('howdy!')\ngreet()",
             "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
         ],
-=======
-        example=["greet = lambda: print('howdy!')\ngreet()"],
->>>>>>> 1bed04acf115dd0886cfed03b8c66c2d9077b166
     )
     system_name: Optional[str] = Field(
         default=None,
         decription="A model name to associate with the provided code",
-<<<<<<< HEAD
         example="example-system",
-=======
-        example="my-system",
->>>>>>> 1bed04acf115dd0886cfed03b8c66c2d9077b166
     )
     root_name: Optional[str] = Field(
         default=None,
         decription="The name of the code system's root directory.",
-<<<<<<< HEAD
         example="example-system",
     )
     comments: Optional[CodeComments] = Field(
@@ -76,12 +64,6 @@ class System(BaseModel):
                 }
             }
         },
-=======
-        example="my-system",
-    )
-    comments: Optional[CodeComments] = Field(
-        default=None, description="A dictionary containing the ", example=""
->>>>>>> 1bed04acf115dd0886cfed03b8c66c2d9077b166
     )
 
 
@@ -115,7 +97,6 @@ def system_to_gromet(system: System):
     if system.comments:
         align_full_system(gromet_collection, system.comments)
 
-<<<<<<< HEAD
     # Explicitly call to_dict on any metadata object
     # NOTE: Only required because of fault in swagger-codegen
     for i, module in enumerate(gromet_collection.modules):
@@ -125,8 +106,6 @@ def system_to_gromet(system: System):
                     k
                 ] = metadata.to_dict()
 
-=======
->>>>>>> 1bed04acf115dd0886cfed03b8c66c2d9077b166
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
 
