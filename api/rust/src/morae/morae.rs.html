@@ -102,10 +102,6 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
-<a href="#105" id="105">105</a>
-<a href="#106" id="106">106</a>
-<a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -181,10 +177,8 @@
     } <span class="kw">else if </span>new_args.arg == <span class="kw-2">*</span><span class="string">&quot;AMR_test&quot; </span>{
         <span class="kw">let </span>mathml_asts =
             get_mathml_asts_from_file(<span class="string">&quot;../../data/mml2pn_inputs/lotka_voltera/mml_list.txt&quot;</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>regnet = RegNet::from(mathml_asts);
+        <span class="kw">let </span>regnet = RegNet::from(mathml_asts);
         <span class="macro">println!</span>(<span class="string">&quot;\nRegnet AMR: {:?}\n&quot;</span>, regnet.clone());
-        regnet.model.vertices.sort();
-        regnet.model.edges.sort();
         <span class="kw">let </span>regnet_serial = serde_json::to_string(<span class="kw-2">&amp;</span>regnet).unwrap();
         <span class="macro">println!</span>(<span class="string">&quot;For serialization test:\n\n {}&quot;</span>, regnet_serial);
 
@@ -200,18 +194,16 @@
 }
 
 <span class="attr">#[test]
-</span><span class="kw">fn </span>test_lotka_voltera_RegNet() {
+</span><span class="kw">fn </span>test_lotka_volterra_RegNet() {
     <span class="kw">let </span>mathml_asts =
-        get_mathml_asts_from_file(<span class="string">&quot;../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt&quot;</span>);
-    <span class="kw">let </span><span class="kw-2">mut </span>regnet = RegNet::from(mathml_asts);
-    regnet.model.vertices.sort();
-    regnet.model.edges.sort();
-    <span class="kw">let </span>regnet_serial = serde_json::to_string(<span class="kw-2">&amp;</span>regnet).unwrap();
+        get_mathml_asts_from_file(<span class="string">&quot;../../../data/mml2pn_inputs/lotka_volterra/mml_list.txt&quot;</span>);
+    <span class="kw">let </span>regnet = RegNet::from(mathml_asts);
 
     <span class="kw">let </span>file_contents =
-        fs::read_to_string(<span class="string">&quot;../../../skema/skema-rs/mathml/tests/lotka_voltera_regnet.json&quot;</span>)
+        fs::read_to_string(<span class="string">&quot;../../../skema/skema-rs/mathml/tests/lotka_volterra_regnet.json&quot;</span>)
             .expect(<span class="string">&quot;Unable to read file&quot;</span>);
+    <span class="kw">let </span>regnet_output: RegNet = serde_json::from_str(<span class="kw-2">&amp;</span>file_contents).unwrap();
 
-    <span class="macro">assert_eq!</span>(file_contents, regnet_serial);
+    <span class="macro">assert_eq!</span>(regnet_output, regnet);
 }
 </code></pre></div></section></main></body></html>

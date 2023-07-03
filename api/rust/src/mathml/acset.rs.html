@@ -575,7 +575,7 @@
 };
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
-<span class="kw">use </span>std::collections::{HashMap, HashSet};
+<span class="kw">use </span>std::collections::{BTreeSet, HashMap, HashSet};
 <span class="kw">use </span>utoipa;
 <span class="kw">use </span>utoipa::ToSchema;
 
@@ -644,8 +644,8 @@
 
 <span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>ModelRegNet {
-    <span class="kw">pub </span>vertices: Vec&lt;RegState&gt;,
-    <span class="kw">pub </span>edges: Vec&lt;RegTransition&gt;,
+    <span class="kw">pub </span>vertices: BTreeSet&lt;RegState&gt;,
+    <span class="kw">pub </span>edges: BTreeSet&lt;RegTransition&gt;,
     <span class="doccomment">/// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -653,8 +653,8 @@
 }
 <span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>ModelPetriNet {
-    <span class="kw">pub </span>states: Vec&lt;State&gt;,
-    <span class="kw">pub </span>transitions: Vec&lt;Transition&gt;,
+    <span class="kw">pub </span>states: BTreeSet&lt;State&gt;,
+    <span class="kw">pub </span>transitions: BTreeSet&lt;Transition&gt;,
     <span class="doccomment">/// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -884,8 +884,8 @@
 // -------------------------------------------------------------------------------------------
 </span><span class="kw">impl </span>From&lt;ACSet&gt; <span class="kw">for </span>PetriNet {
     <span class="kw">fn </span>from(pn: ACSet) -&gt; PetriNet {
-        <span class="kw">let </span><span class="kw-2">mut </span>states_vec = Vec::&lt;State&gt;::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = Vec::&lt;Transition&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>states_vec = BTreeSet::&lt;State&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = BTreeSet::&lt;Transition&gt;::new();
 
         <span class="comment">// -----------------------------------------------------------
 
@@ -895,7 +895,7 @@
                 name: state.sname.clone(),
                 ..Default::default()
             };
-            states_vec.push(states.clone());
+            states_vec.insert(states.clone());
         }
 
         <span class="kw">for </span>(i, trans) <span class="kw">in </span>pn.T.iter().enumerate() {
@@ -928,7 +928,7 @@
                 ..Default::default()
             };
 
-            transitions_vec.push(transitions.clone());
+            transitions_vec.insert(transitions.clone());
         }
 
         <span class="comment">// -----------------------------------------------------------
@@ -971,8 +971,8 @@
         <span class="comment">// -----------------------------------------------------------
         // -----------------------------------------------------------
 
-        </span><span class="kw">let </span><span class="kw-2">mut </span>states_vec = Vec::&lt;RegState&gt;::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = Vec::&lt;RegTransition&gt;::new();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>states_vec = BTreeSet::&lt;RegState&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = BTreeSet::&lt;RegTransition&gt;::new();
 
         <span class="kw">for </span>state <span class="kw">in </span>specie_vars.clone().into_iter() {
             <span class="comment">// state bits
@@ -1028,7 +1028,7 @@
                 rate_constant: <span class="prelude-val">Some</span>(rate_const.clone()),
                 ..Default::default()
             };
-            states_vec.push(states.clone());
+            states_vec.insert(states.clone());
 
             <span class="comment">// now to make the transition part ----------------------------------
 
@@ -1088,7 +1088,7 @@
                 ..Default::default()
             };
 
-            transitions_vec.push(transitions.clone());
+            transitions_vec.insert(transitions.clone());
         }
 
         <span class="comment">// -----------------------------------------------------------
