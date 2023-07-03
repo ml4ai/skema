@@ -4,6 +4,7 @@
 use crate::{
     ast::{Math, MathExpression, Operator},
     parsing::parse,
+    petri_net::recognizers::recognize_leibniz_differential_operator,
 };
 use nom::multi::many0;
 use std::fmt;
@@ -39,59 +40,6 @@ struct Lexer {
     tokens: Vec<Token>,
 }
 
-/// Check if fraction is a derivative of a single-variable function expressed in Leibniz notation,
-/// and if so, return a derivative operator and the identifier of the function.
-pub fn recognize_leibniz_diff_op<'a>(
-    numerator: &Box<MathExpression>,
-    denominator: &Box<MathExpression>,
-) -> Result<(Operator, MathExpression), &'a str> {
-    let mut numerator_contains_d = false;
-    let mut denominator_contains_d = false;
-
-    let mut numerator_contains_partial = false;
-    let mut denominator_contains_partial = false;
-    let mut function_candidate: Option<MathExpression> = None;
-
-    // Check if numerator is an mrow
-    if let MathExpression::Mrow(num_expressions) = &**numerator {
-        // Check if first element of numerator is an mi
-        if let MathExpression::Mi(num_id) = &num_expressions[0] {
-            // Check if mi contains 'd'
-            if num_id == "d" {
-                numerator_contains_d = true;
-            }
-
-            if num_id == "∂" {
-                numerator_contains_partial = true;
-            }
-
-            // Gather the second identifier as a potential candidate function.
-            function_candidate = Some(num_expressions[1].clone());
-        }
-    }
-
-    if let MathExpression::Mrow(denom_expressions) = &**denominator {
-        // Check if first element of denominator is an mi
-        if let MathExpression::Mi(denom_id) = &denom_expressions[0] {
-            // Check if mi contains 'd'
-            if denom_id == "d" {
-                denominator_contains_d = true;
-            }
-            if denom_id == "∂" {
-                denominator_contains_partial = true;
-            }
-        }
-    }
-
-    if (numerator_contains_d && denominator_contains_d)
-        || (numerator_contains_partial && denominator_contains_partial)
-    {
-        Ok((Operator::new_derivative(1, 1), function_candidate.unwrap()))
-    } else {
-        Err("This Mfrac does not correspond to a derivative in Leibniz notation")
-    }
-}
-
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
         // Recognize derivatives whenever possible.
@@ -114,7 +62,7 @@ impl Lexer {
             },
             MathExpression::Mfrac(numerator, denominator) => {
                 if let Ok((derivative, function)) =
-                    recognize_leibniz_diff_op(numerator, denominator)
+                    recognize_leibniz_differential_operator(numerator, denominator)
                 {
                     acc.push(MathExpression::Mo(derivative));
                     acc.push(function);

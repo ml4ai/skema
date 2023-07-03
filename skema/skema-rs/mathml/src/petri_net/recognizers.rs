@@ -8,16 +8,18 @@ use crate::ast::{
 };
 use crate::petri_net::{Polarity, Var};
 
-/// Check if fraction is a derivative expressed in Leibniz notation
-pub fn is_leibniz_diff_operator(
+/// Check if fraction is a derivative of a single-variable function expressed in Leibniz notation,
+/// and if so, return a derivative operator and the identifier of the function.
+pub fn recognize_leibniz_differential_operator<'a>(
     numerator: &Box<MathExpression>,
     denominator: &Box<MathExpression>,
-) -> bool {
+) -> Result<(Operator, MathExpression), &'a str> {
     let mut numerator_contains_d = false;
     let mut denominator_contains_d = false;
 
     let mut numerator_contains_partial = false;
     let mut denominator_contains_partial = false;
+    let mut function_candidate: Option<MathExpression> = None;
 
     // Check if numerator is an mrow
     if let MathExpression::Mrow(num_expressions) = &**numerator {
@@ -31,6 +33,9 @@ pub fn is_leibniz_diff_operator(
             if num_id == "∂" {
                 numerator_contains_partial = true;
             }
+
+            // Gather the second identifier as a potential candidate function.
+            function_candidate = Some(num_expressions[1].clone());
         }
     }
 
@@ -47,9 +52,57 @@ pub fn is_leibniz_diff_operator(
         }
     }
 
-    (numerator_contains_d && denominator_contains_d)
+    if (numerator_contains_d && denominator_contains_d)
         || (numerator_contains_partial && denominator_contains_partial)
+    {
+        Ok((Operator::new_derivative(1, 1), function_candidate.unwrap()))
+    } else {
+        Err("This Mfrac does not correspond to a derivative in Leibniz notation")
+    }
 }
+
+/// Check if fraction is a derivative expressed in Leibniz notation
+//pub fn recognize_leibniz_differential_operatorerator(
+//numerator: &Box<MathExpression>,
+//denominator: &Box<MathExpression>,
+//) -> bool {
+//let mut numerator_contains_d = false;
+//let mut denominator_contains_d = false;
+
+//let mut numerator_contains_partial = false;
+//let mut denominator_contains_partial = false;
+
+//// Check if numerator is an mrow
+//if let MathExpression::Mrow(num_expressions) = &**numerator {
+//// Check if first element of numerator is an mi
+//if let MathExpression::Mi(num_id) = &num_expressions[0] {
+//// Check if mi contains 'd'
+//if num_id == "d" {
+//numerator_contains_d = true;
+//}
+
+//if num_id == "∂" {
+//numerator_contains_partial = true;
+//}
+//}
+//}
+
+//if let MathExpression::Mrow(denom_expressions) = &**denominator {
+//// Check if first element of denominator is an mi
+//if let MathExpression::Mi(denom_id) = &denom_expressions[0] {
+//// Check if mi contains 'd'
+//if denom_id == "d" {
+//denominator_contains_d = true;
+//}
+//if denom_id == "∂" {
+//denominator_contains_partial = true;
+//}
+//}
+//}
+
+//(numerator_contains_d && denominator_contains_d)
+//|| (numerator_contains_partial && denominator_contains_partial)
+//}
 
 /// Predicate testing whether a MathML operator (Mo) is a subtraction or addition.
 pub fn is_add_or_subtract_operator(element: &MathExpression) -> bool {
@@ -79,10 +132,10 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
     // Check if expression is an mfrac
     match expression {
         Mfrac(numerator, denominator) => {
-            if is_leibniz_diff_operator(numerator, denominator) {
+            if let Ok(_) = recognize_leibniz_differential_operator(numerator, denominator) {
                 mfrac_leibniz_to_specie(numerator, denominator)
             } else {
-                panic!("Expression is an mfrac but not a Leibniz diff operator!");
+                panic!("Expression is an mfrac but not a Leibniz differential operator!");
             }
         }
         // Translate MathML :mover as Newton dot notation
