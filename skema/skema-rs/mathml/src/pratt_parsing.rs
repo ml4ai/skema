@@ -6,8 +6,8 @@ use crate::{
     parsing::parse,
     petri_net::recognizers::recognize_leibniz_differential_operator,
 };
-use nom::multi::many0;
-use std::fmt;
+use nom::{error::Error, multi::many0};
+use std::{fmt, str::FromStr};
 
 /// An S-expression like structure.
 enum MathExpressionTree {
@@ -29,6 +29,7 @@ impl fmt::Display for MathExpressionTree {
         }
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Token {
     Atom(MathExpression),
@@ -141,6 +142,15 @@ impl From<Math> for MathExpressionTree {
     }
 }
 
+impl FromStr for MathExpressionTree {
+    type Err = Error<String>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let math = parse(s).unwrap().1;
+        Ok(MathExpressionTree::from(math))
+    }
+}
+
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     let mut lhs = match lexer.next() {
         Token::Atom(it) => MathExpressionTree::Atom(it),
@@ -217,13 +227,13 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
 fn test_conversion() {
     let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(+ x y)");
     println!("Output: {s}\n");
 
     let input = "<math><mi>a</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
     println!("Output: {s}\n");
 
@@ -231,7 +241,7 @@ fn test_conversion() {
         <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
         </math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
@@ -239,20 +249,20 @@ fn test_conversion() {
         <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
         </math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
     let input = "<math><mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(+ a (- b))");
     println!("Output: {s}\n");
 
     let input =
         "<math><mn>2</mn><mi>a</mi><mo>(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>)</mo></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(* (* 2 a) (+ c d))");
     println!("Output: {s}\n");
 
@@ -263,7 +273,7 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 }
