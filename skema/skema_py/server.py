@@ -33,20 +33,35 @@ class System(BaseModel):
     )
     blobs: List[str] = Field(
         decription="Contents of each file to be analyzed",
-        example=["greet = lambda: print('howdy!')\ngreet()"],
+        example=[
+            "greet = lambda: print('howdy!')\ngreet()",
+            "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
+        ],
     )
     system_name: Optional[str] = Field(
         default=None,
         decription="A model name to associate with the provided code",
-        example="my-system",
+        example="example-system",
     )
     root_name: Optional[str] = Field(
         default=None,
         decription="The name of the code system's root directory.",
-        example="my-system",
+        example="example-system",
     )
     comments: Optional[CodeComments] = Field(
-        default=None, description="A dictionary containing the ", example=""
+        default=None,
+        description="A dictionary containing the ",
+        example={
+            "files": {
+                "example2.py": {
+                    "comments": [
+                        {"contents": "Variable declaration", "line_number": 0},
+                        {"contents": "Function definition", "line_number": 2},
+                    ],
+                    "docstrings": {"foo": ["Increment the input variable"]},
+                }
+            }
+        },
     )
 
 
