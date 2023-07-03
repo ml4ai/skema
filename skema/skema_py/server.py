@@ -18,8 +18,6 @@ from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 from skema.program_analysis.comments import CodeComments
 
-from skema.utils.fold import del_nulls, dictionary_to_gromet_json
-
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
 
