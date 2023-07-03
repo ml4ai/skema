@@ -85,14 +85,16 @@ impl Lexer {
                 acc
             } else {
                 match x {
-                    MathExpression::Mo(op) => {
-                        if let Operator::Lparen = op {
-                            // Check last element of acc
-                            if let Some(MathExpression::Mo(_)) = acc.last() {
-                            } else {
-                                acc.push(&MathExpression::Mo(Operator::Multiply));
-                            }
+                    MathExpression::Mo(Operator::Lparen) => {
+                        // Check last element of acc
+                        if let Some(MathExpression::Mo(_)) = acc.last() {
+                        } else {
+                            acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
+                        acc.push(x);
+                        acc
+                    }
+                    MathExpression::Mo(_) => {
                         acc.push(x);
                         acc
                     }
