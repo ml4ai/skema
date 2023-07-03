@@ -73,10 +73,8 @@ fn main() {
     } else if new_args.arg == *"AMR_test" {
         let mathml_asts =
             get_mathml_asts_from_file("../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
-        let mut regnet = RegNet::from(mathml_asts);
+        let regnet = RegNet::from(mathml_asts);
         println!("\nRegnet AMR: {:?}\n", regnet.clone());
-        regnet.model.vertices.sort();
-        regnet.model.edges.sort();
         let regnet_serial = serde_json::to_string(&regnet).unwrap();
         println!("For serialization test:\n\n {}", regnet_serial);
 
@@ -92,17 +90,15 @@ fn main() {
 }
 
 #[test]
-fn test_lotka_voltera_RegNet() {
+fn test_lotka_volterra_RegNet() {
     let mathml_asts =
         get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
-    let mut regnet = RegNet::from(mathml_asts);
-    regnet.model.vertices.sort();
-    regnet.model.edges.sort();
-    let regnet_serial = serde_json::to_string(&regnet).unwrap();
+    let regnet = RegNet::from(mathml_asts);
+    let regnet_serialized = serde_json::to_string(&regnet).unwrap();
 
     let file_contents =
         fs::read_to_string("../../../skema/skema-rs/mathml/tests/lotka_voltera_regnet.json")
             .expect("Unable to read file");
 
-    assert_eq!(file_contents, regnet_serial);
+    assert_eq!(file_contents, regnet_serialized);
 }
