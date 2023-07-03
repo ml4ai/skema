@@ -7,11 +7,16 @@ node data_generation/mathjax_server.js
 
 from typing import Text, Union
 from typing_extensions import Annotated
-from fastapi import FastAPI, Body, File, Response, Request, Query
+from fastapi import APIRouter, FastAPI, Body, File, Response, Request, Query
+from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
 from skema.data.eq2mml import img_b64_bayes_white_bg
 from pydantic import BaseModel, Field
 import base64
+import requests
+
+
+router = APIRouter()
 
 EquationQueryParameter = Annotated[
   Text,
@@ -55,19 +60,23 @@ class LatexEquation(BaseModel):
         }
 
 
-app = FastAPI()
-
 def process_latex_equation(eqn: Text) -> Response:
     """Helper function used by both GET and POST LaTeX equation processing endpoints"""
     res = get_mathml_from_latex(eqn)
     return Response(content=res, media_type="application/xml")
 
-# FIXME: have this test the mathjax endpoint (and perhaps check the pt model loaded)
-@app.get("/healthcheck", summary="Ping endpoint to test health of service", response_model=Text, status_code=200)
-def healthcheck():
-    return "The eq2mml service is running."
+@router.get("/img2mml/healthcheck", summary="Check health of eqn2mml service", response_model=Text, status_code=200)
+def img2mml_healthcheck() -> int:
+    return 200
 
-@app.post("/image/mml", summary="Get MathML representation of an equation image")
+@router.get("/latex2mml/healthcheck", summary="Check health of mathjax service", response_model=Text, status_code=200)
+def latex2mml_healthcheck() -> int:
+    try:
+      return int(requests.get(f"{SKEMA_MATHJAX_ADDRESS}/healthcheck").status_code)
+    except:
+      return 500
+
+@router.post("/image/mml", summary="Get MathML representation of an equation image")
 async def post_image_to_mathml(data: ImageBytes) -> Response:
     """
     Endpoint for generating MathML from an input image.
@@ -88,7 +97,7 @@ async def post_image_to_mathml(data: ImageBytes) -> Response:
     print(type(res))
     return Response(content=res, media_type="application/xml")
 
-@app.post("/image/base64/mml", summary="Get MathML representation of an equation image")
+@router.post("/image/base64/mml", summary="Get MathML representation of an equation image")
 async def post_b64image_to_mathml(request: Request) -> Response:
     """
     Endpoint for generating MathML from an input image.
@@ -112,7 +121,7 @@ async def post_b64image_to_mathml(request: Request) -> Response:
     res =  get_mathml_from_bytes(img_bytes)
     return Response(content=res, media_type="application/xml")
 
-@app.get("/latex/mml", summary="Get MathML representation of a LaTeX equation")
+@router.get("/latex/mml", summary="Get MathML representation of a LaTeX equation")
 async def get_tex_to_mathml(tex_src: EquationQueryParameter) -> Response:
     """
     GET endpoint for generating MathML from an input LaTeX equation.
@@ -126,7 +135,7 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -> Response:
     """
     return process_latex_equation(tex_src)
 
-@app.post("/latex/mml", summary="Get MathML representation of a LaTeX equation")
+@router.post("/latex/mml", summary="Get MathML representation of a LaTeX equation")
 async def post_tex_to_mathml(eqn: LatexEquation) -> Response:
     """
     Endpoint for generating MathML from an input LaTeX equation.
@@ -140,3 +149,6 @@ async def post_tex_to_mathml(eqn: LatexEquation) -> Response:
     """
     # convert latex string to presentation mathml
     return process_latex_equation(eqn.tex_src)
+
+app = FastAPI()
+app.include_router(router)

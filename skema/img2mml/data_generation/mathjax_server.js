@@ -88,6 +88,11 @@ app.get('/restart', function (req, res) {
     res.send("MathJax service restarted");
 });
 
+// healthcheck
+app.get('/healthcheck', function (req, res) {
+  res.send(200);
+});
+
 function port() {
     try {
         var port = process.env.SKEMA_MATHJAX_PORT
