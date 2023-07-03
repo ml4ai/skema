@@ -41,6 +41,7 @@ var sourcesIndex = JSON.parse('{\
 "crc32fast":["",[["specialized",[],["mod.rs","pclmulqdq.rs"]]],["baseline.rs","combine.rs","lib.rs","table.rs"]],\
 "crypto_common":["",[],["lib.rs"]],\
 "derive_more":["",[],["add_assign_like.rs","add_helpers.rs","add_like.rs","as_mut.rs","as_ref.rs","constructor.rs","deref.rs","deref_mut.rs","display.rs","error.rs","from.rs","from_str.rs","index.rs","index_mut.rs","into.rs","into_iterator.rs","is_variant.rs","lib.rs","mul_assign_like.rs","mul_helpers.rs","mul_like.rs","not_like.rs","parsing.rs","sum_like.rs","try_into.rs","unwrap.rs","utils.rs"]],\
+"derive_new":["",[],["lib.rs"]],\
 "digest":["",[["core_api",[],["ct_variable.rs","rt_variable.rs","wrapper.rs","xof_reader.rs"]]],["core_api.rs","digest.rs","lib.rs","mac.rs"]],\
 "dirs":["",[],["lib.rs","lin.rs"]],\
 "dirs_sys":["",[],["lib.rs","xdg_user_dirs.rs"]],\
@@ -84,7 +85,7 @@ var sourcesIndex = JSON.parse('{\
 "lock_api":["",[],["lib.rs","mutex.rs","remutex.rs","rwlock.rs"]],\
 "log":["",[],["lib.rs","macros.rs"]],\
 "maplit":["",[],["lib.rs"]],\
-"mathml":["",[["petri_net",[],["recognizers.rs"]]],["acset.rs","ast.rs","expression.rs","graph.rs","lib.rs","mml2pn.rs","normalization.rs","parsing.rs","petri_net.rs"]],\
+"mathml":["",[["petri_net",[],["recognizers.rs"]]],["acset.rs","ast.rs","expression.rs","graph.rs","lib.rs","mml2pn.rs","normalization.rs","parsing.rs","petri_net.rs","pratt_parsing.rs"]],\
 "memchr":["",[["memchr",[["x86",[],["avx.rs","mod.rs","sse2.rs"]]],["fallback.rs","iter.rs","mod.rs","naive.rs"]],["memmem",[["prefilter",[["x86",[],["avx.rs","mod.rs","sse.rs"]]],["fallback.rs","genericsimd.rs","mod.rs"]],["x86",[],["avx.rs","mod.rs","sse.rs"]]],["byte_frequencies.rs","genericsimd.rs","mod.rs","rabinkarp.rs","rarebytes.rs","twoway.rs","util.rs","vector.rs"]]],["cow.rs","lib.rs"]],\
 "mime":["",[],["lib.rs","parse.rs"]],\
 "mime_guess":["",[],["impl_bin_search.rs","lib.rs"]],\

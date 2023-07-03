@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["parse"],"struct":["ParseError"]};
+window.SIDEBAR_ITEMS = {"fn":["math_expression","parse"],"struct":["ParseError"]};

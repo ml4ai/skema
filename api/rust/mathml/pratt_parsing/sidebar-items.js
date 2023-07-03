@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["recognize_leibniz_diff_op"]};
