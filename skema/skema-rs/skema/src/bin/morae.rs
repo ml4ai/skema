@@ -92,13 +92,13 @@ fn main() {
 #[test]
 fn test_lotka_volterra_RegNet() {
     let mathml_asts =
-        get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
+        get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_volterra/mml_list.txt");
     let regnet = RegNet::from(mathml_asts);
-    let regnet_serialized = serde_json::to_string(&regnet).unwrap();
 
     let file_contents =
-        fs::read_to_string("../../../skema/skema-rs/mathml/tests/lotka_voltera_regnet.json")
+        fs::read_to_string("../../../skema/skema-rs/mathml/tests/lotka_volterra_regnet.json")
             .expect("Unable to read file");
+    let regnet_output: RegNet = serde_json::from_str(&file_contents).unwrap();
 
-    assert_eq!(file_contents, regnet_serialized);
+    assert_eq!(regnet_output, regnet);
 }
