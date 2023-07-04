@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 import requests
 
 
-class SupportedLanguageForCommentExtraction(str, Enum):
+class SupportedLanguagesForCommentExtraction(str, Enum):
     python = "Python"
 
 
@@ -26,7 +26,7 @@ class CodeSnippet(BaseModel):
         description="snippet of code in referenced language",
         example={"# this is a comment\ngreet = lambda: print('howdy!')"},
     )
-    language: SupportedLanguageForCommentExtraction
+    language: SupportedLanguagesForCommentExtraction
 
 
 @router.post("/extract-comments", response_model=CodeComments)
