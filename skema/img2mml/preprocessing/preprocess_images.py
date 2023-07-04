@@ -80,11 +80,11 @@ def crop_image(image, reject=False):
     return image, reject
 
 
-def resize_image(image, resize_factor):
+def resize_image(image, scale_factor):
     image = image.resize(
         (
-            int(image.size[0] * resize_factor),
-            int(image.size[1] * resize_factor),
+            int(image.size[0] * scale_factor),
+            int(image.size[1] * scale_factor),
         ),
         Image.Resampling.LANCZOS,
     )
@@ -106,7 +106,7 @@ def bucket(image):
     of the image. This will provide us the appropriate
     resizing factor.
     """
-    # [width, hgt, resize_factor]
+    # [width, hgt, scale_factor]
     buckets = [
         [878, 92, 0.56],
         [780, 82, 0.63],
@@ -122,13 +122,13 @@ def bucket(image):
     crop_width, crop_hgt = image.size[0], image.size[1]
 
     # find correct bucket
-    resize_factor = config["resizing_factor"]
+    scale_factor = config["resizing_factor"]
     for b in buckets:
         w, h, r = b
         if crop_width <= w and crop_hgt <= h:
-            resize_factor = r
+            scale_factor = r
 
-    return resize_factor
+    return scale_factor
 
 
 def downsampling(image):
@@ -146,12 +146,12 @@ def downsampling(image):
     # from the buckets dimensions
     if h >= max_h:
         # need to calculate the ratio
-        resize_factor = max_h / h
+        scale_factor = max_h / h
 
     image = image.resize(
         (
-            int(image.size[0] * resize_factor),
-            int(image.size[1] * resize_factor),
+            int(image.size[0] * scale_factor),
+            int(image.size[1] * scale_factor),
         ),
         Image.Resampling.LANCZOS,
     )
@@ -196,6 +196,36 @@ def enhance_image(image: Image) -> Image:
     return image
 
 
+def calculate_scale_factor(
+    image: Image.Image, target_width: int, target_height: int
+) -> float:
+    """
+    Calculate the scale factor to normalize the input image to the target width and height while preserving the
+    original aspect ratio. If the original aspect ratio is larger than the target aspect ratio, the scale factor
+    will be calculated based on width. Otherwise, it will be calculated based on height.
+
+    Args:
+        image (PIL.Image.Image): The input image to be normalized.
+        target_width (int): The target width for normalization.
+        target_height (int): The target height for normalization.
+
+    Returns:
+        float: The scale factor to normalize the image.
+    """
+    original_width, original_height = image.size
+    original_aspect_ratio = original_width / original_height
+    target_aspect_ratio = target_width / target_height
+
+    if original_aspect_ratio > target_aspect_ratio:
+        # Calculate scale factor based on width
+        scale_factor = target_width / original_width
+    else:
+        # Calculate scale factor based on height
+        scale_factor = target_height / original_height
+
+    return scale_factor
+
+
 def preprocess_images(image):
     """
     RuntimeError: only Tensors of floating point dtype can require gradients
@@ -211,20 +241,26 @@ def preprocess_images(image):
 
     IMAGE = Image.open(f"{data_path}/images/{image}").convert("L")
 
-    # checking the size of the image
-    w, h = IMAGE.size
-    if h >= config["max_input_hgt"]:
-        IMAGE = downsampling(IMAGE)
+    # # checking the size of the image
+    # w, h = IMAGE.size
+    # if h >= config["max_input_hgt"]:
+    #     IMAGE = downsampling(IMAGE)
 
     # crop the image
     IMAGE, reject = crop_image(IMAGE)
 
     if not reject:
-        # bucketing
-        resize_factor = bucket(IMAGE)
+        # # bucketing
+        # scale_factor = bucket(IMAGE)
+
+        # calculate the target width and height
+        target_width = config["preprocessed_image_width"] - 2 * config["padding"]
+        target_height = config["preprocessed_image_height"] - 2 * config["padding"]
+        # calculate the scale factor
+        scale_factor = calculate_scale_factor(IMAGE, target_width, target_height)
 
         # resize
-        IMAGE = resize_image(IMAGE, resize_factor)
+        IMAGE = resize_image(IMAGE, scale_factor)
 
         # padding
         IMAGE = pad_image(IMAGE)
