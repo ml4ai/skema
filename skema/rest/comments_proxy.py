@@ -5,13 +5,11 @@ Proxies requests to skema_rs API to provide a unified API.
 
 from enum import Enum
 
-from typing import Text, Union
 from typing_extensions import Annotated
 from skema.program_analysis.comments import CodeComments
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from fastapi import APIRouter, FastAPI, Body, File, Response, Request, Query
 from pydantic import BaseModel, Field
-import os
 import requests
 
 
