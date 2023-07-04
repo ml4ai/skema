@@ -34,10 +34,13 @@ pub async fn ping() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    pretty_env_logger::init();
+
     #[derive(OpenApi)]
     #[openapi(
         paths(
             comment_extraction::get_comments,
+            comment_extraction::get_comments_from_zipfile,
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
@@ -52,6 +55,8 @@ async fn main() -> std::io::Result<()> {
             gromet::get_subgraph,
             gromet::get_model_PN,
             gromet::get_model_RN,
+            gromet::model2PN,
+            gromet::model2RN,
             ping
         ),
         components(
@@ -119,6 +124,7 @@ async fn main() -> std::io::Result<()> {
             }))
             .configure(gromet::configure())
             .service(comment_extraction::get_comments)
+            .service(comment_extraction::get_comments_from_zipfile)
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
             .service(skema::services::mathml::get_acset)
@@ -126,6 +132,8 @@ async fn main() -> std::io::Result<()> {
             .service(skema::services::mathml::get_amr)
             .service(gromet::get_model_PN)
             .service(gromet::get_model_RN)
+            .service(gromet::model2PN)
+            .service(gromet::model2RN)
             .service(ping)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })

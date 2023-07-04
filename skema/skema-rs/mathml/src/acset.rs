@@ -1,12 +1,14 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::ast::Math;
-use crate::ast::MathExpression::Mi;
-use crate::mml2pn::{group_by_operators, Term};
+use crate::ast::{Math, MathExpression::Mi};
 use crate::petri_net::{Polarity, Var};
+use crate::{
+    mml2pn::{group_by_operators, Term},
+    parsing::parse,
+};
 use serde::{Deserialize, Serialize};
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 use utoipa;
 use utoipa::ToSchema;
 
@@ -75,8 +77,8 @@ pub struct RegNet {
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ModelRegNet {
-    pub vertices: Vec<RegState>,
-    pub edges: Vec<RegTransition>,
+    pub vertices: BTreeSet<RegState>,
+    pub edges: BTreeSet<RegTransition>,
     /// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -84,8 +86,8 @@ pub struct ModelRegNet {
 }
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ModelPetriNet {
-    pub states: Vec<State>,
-    pub transitions: Vec<Transition>,
+    pub states: BTreeSet<State>,
+    pub transitions: BTreeSet<Transition>,
     /// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -315,8 +317,8 @@ pub struct AMRmathml {
 // -------------------------------------------------------------------------------------------
 impl From<ACSet> for PetriNet {
     fn from(pn: ACSet) -> PetriNet {
-        let mut states_vec = Vec::<State>::new();
-        let mut transitions_vec = Vec::<Transition>::new();
+        let mut states_vec = BTreeSet::<State>::new();
+        let mut transitions_vec = BTreeSet::<Transition>::new();
 
         // -----------------------------------------------------------
 
@@ -326,7 +328,7 @@ impl From<ACSet> for PetriNet {
                 name: state.sname.clone(),
                 ..Default::default()
             };
-            states_vec.push(states.clone());
+            states_vec.insert(states.clone());
         }
 
         for (i, trans) in pn.T.iter().enumerate() {
@@ -359,7 +361,7 @@ impl From<ACSet> for PetriNet {
                 ..Default::default()
             };
 
-            transitions_vec.push(transitions.clone());
+            transitions_vec.insert(transitions.clone());
         }
 
         // -----------------------------------------------------------
@@ -382,6 +384,7 @@ impl From<ACSet> for PetriNet {
     }
     }
 }
+
 // This function takes in a mathml string and returns a Regnet
 impl From<Vec<Math>> for RegNet {
     fn from(mathml_asts: Vec<Math>) -> RegNet {
@@ -401,8 +404,8 @@ impl From<Vec<Math>> for RegNet {
         // -----------------------------------------------------------
         // -----------------------------------------------------------
 
-        let mut states_vec = Vec::<RegState>::new();
-        let mut transitions_vec = Vec::<RegTransition>::new();
+        let mut states_vec = BTreeSet::<RegState>::new();
+        let mut transitions_vec = BTreeSet::<RegTransition>::new();
 
         for state in specie_vars.clone().into_iter() {
             // state bits
@@ -458,7 +461,7 @@ impl From<Vec<Math>> for RegNet {
                 rate_constant: Some(rate_const.clone()),
                 ..Default::default()
             };
-            states_vec.push(states.clone());
+            states_vec.insert(states.clone());
 
             // now to make the transition part ----------------------------------
 
@@ -518,7 +521,7 @@ impl From<Vec<Math>> for RegNet {
                 ..Default::default()
             };
 
-            transitions_vec.push(transitions.clone());
+            transitions_vec.insert(transitions.clone());
         }
 
         // -----------------------------------------------------------
@@ -539,4 +542,26 @@ impl From<Vec<Math>> for RegNet {
         metadata: None,
         }
     }
+}
+
+#[test]
+fn test_lotka_volterra_mml_to_regnet() {
+    let input: serde_json::Value =
+        serde_json::from_str(&std::fs::read_to_string("tests/mml2amr_input_1.json").unwrap())
+            .unwrap();
+
+    let elements: Vec<Math> = input["mathml"]
+        .as_array()
+        .unwrap()
+        .into_iter()
+        .map(|x| parse(x.as_str().unwrap()).unwrap().1)
+        .collect();
+
+    let regnet = RegNet::from(elements);
+
+    let desired_output: RegNet =
+        serde_json::from_str(&std::fs::read_to_string("tests/mml2amr_output_1.json").unwrap())
+            .unwrap();
+
+    assert_eq!(regnet, desired_output);
 }

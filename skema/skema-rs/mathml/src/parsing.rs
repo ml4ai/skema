@@ -111,7 +111,7 @@ macro_rules! tag_parser {
 macro_rules! elem0 {
     ($tag:expr) => {{
         let tag_end = concat!("</", $tag, ">");
-        tag_parser!($tag, take_until(tag_end))
+        tag_parser!($tag, ws(take_until(tag_end)))
     }};
 }
 
@@ -155,38 +155,48 @@ macro_rules! elem_many0 {
 /// Identifiers
 fn mi(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mi")(input)?;
-    Ok((s, Mi(element.to_string())))
+    Ok((s, Mi(element.trim().to_string())))
 }
 
 /// Numbers
 fn mn(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mn")(input)?;
-    Ok((s, Mn(element.to_string())))
+    Ok((s, Mn(element.trim().to_string())))
 }
 
 fn add(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Add, tag("+"))(input)?;
+    let (s, op) = value(Operator::Add, ws(tag("+")))(input)?;
     Ok((s, op))
 }
 
 fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, one_of("-−"))(input)?;
+    let (s, op) = value(Operator::Subtract, ws(one_of("-−")))(input)?;
     Ok((s, op))
 }
 
 fn equals(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Equals, tag("="))(input)?;
+    let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
+    Ok((s, op))
+}
+
+fn lparen(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Lparen, ws(tag("(")))(input)?;
+    Ok((s, op))
+}
+
+fn rparen(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Rparen, ws(tag(")")))(input)?;
     Ok((s, op))
 }
 
 fn operator_other(input: Span) -> IResult<Operator> {
-    let (s, consumed) = recognize(not_line_ending)(input)?;
+    let (s, consumed) = ws(recognize(not_line_ending))(input)?;
     let op = Operator::Other(consumed.to_string());
     Ok((s, op))
 }
 
 fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((add, subtract, equals, operator_other))(input)?;
+    let (s, op) = alt((add, subtract, equals, lparen, rparen, operator_other))(input)?;
     Ok((s, op))
 }
 
@@ -261,7 +271,7 @@ fn msubsup(input: Span) -> IResult<MathExpression> {
 //Text
 fn mtext(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mtext")(input)?;
-    Ok((s, Mtext(element.to_string())))
+    Ok((s, Mtext(element.trim().to_string())))
 }
 
 //mstyle
@@ -289,7 +299,7 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
 }
 
 /// Math expressions
-fn math_expression(input: Span) -> IResult<MathExpression> {
+pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         mi, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext, mstyle, mspace,
         mo_line, mo,
@@ -381,35 +391,6 @@ fn test_mover() {
         ),
     )
 }
-
-//#[test]
-//fn test_munder() {
-//let expr = Munder(vec![
-//Mo(Operator::Other("inf".to_string())),
-//Mn("0".to_string()),
-//Mo(Operator::Other("≤".to_string())),
-//Mi("t".to_string()),
-//Mo(Operator::Other("≤".to_string())),
-//]);
-//test_parser(
-//"<munder><mo>inf</mo><mn>0</mn><mo>≤</mo><mi>t</mi><mo>≤</mo></munder>",
-//munder,
-//expr,
-//)
-//}
-
-//#[test]
-//fn test_msubsup() {
-//test_parser(
-//"<msubsup><mi>L</mi><mi>t</mi><mi>∞</mi></msubsup>",
-//msubsup,
-//Msubsup(vec![
-//Mi("L".to_string()),
-//Mi("t".to_string()),
-//Mi("∞".to_string()),
-//]),
-//)
-//}
 
 #[test]
 fn test_mtext() {

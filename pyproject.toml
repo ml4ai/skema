@@ -11,12 +11,14 @@ authors = [
 description = "Scientific Knowledge Extraction and Model Analysis"
 version = "0.1.0"
 dependencies=[
-    "gensim",
     "dill",
     "networkx",
     "PyYAML",
     "tree-sitter",
     "requests",
+	"fastapi",
+	"uvicorn",
+	"python-multipart"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
@@ -26,47 +28,43 @@ dynamic = ["readme"]
 
 [project.optional-dependencies]
 # Dev dependencies.
-# - fastapi & uvicorn: For running the code2fn REST API server
-# - requests: For testing the code2fn example client
 # - pytest: for running tests
 # - black: Autoformatting
 # - pygraphviz: for creating function network visualizations for debugging.
 #   Pygraphviz is often tricky to install, so we reserve it for the dev extras
 #   list.
 # - six: Required by auto-generated Swagger models
-dev = ["fastapi", "requests", "uvicorn", "pytest", "pytest-cov", "pytest-xdist", "black", "mypy", "coverage", "pygraphviz", "six"]
+dev = ["pytest", "pytest-cov", "pytest-xdist", "black", "mypy", "coverage", "pygraphviz", "six"]
 
-# MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
-# the skema/moviz directory).
-moviz = ["flask", "graphviz"]
+demo = ["jupyter==1.0.0"]
 
 # ISA dependencies.
 isa = [
   "pydot", 
+  "graphviz",
   "graspologic", # NOTE: this depends on rust when installing on an M1/ARM64 machine
   "Levenshtein"
 ]
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
-img2mml = ["fastapi", "uvicorn", "torch", "torchvision", "python-multipart"]
+img2mml = ["torch", "torchvision"]
 
 # dependencies for text reading utilities.
-tr = ["transformers", "gensim", "SPARQLWrapper", "tqdm", "pandas"]
+tr = ["transformers", "SPARQLWrapper", "tqdm", "pandas", "askem_extractions[all]@git+https://github.com/ml4ai/ASKEM-TA1-DataModel"]
 
 # project documentation generation
 doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-git-revision-date-localized-plugin==0.11.1", "mkdocs-git-authors-plugin==0.6.3", "mkdocs-rtd-dropdown==1.0.2", "jinja2<3.1.0"]
 
-core = ["skema[moviz]", "skema[img2mml]", "skema[isa]", "skema[tr]"]
+core = ["skema[img2mml]", "skema[isa]", "skema[tr]"]
 
 # all extras
-all = ["skema[core]", "skema[dev]", "skema[doc]"]
+all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
 
 [tool.setuptools.package-dir]
 "skema.gromet" = "skema/gromet"
 "skema.img2mml" = "skema/img2mml"
 "skema.isa" = "skema/isa"
-"skema.moviz" = "skema/moviz"
 "skema.model_assembly" = "skema/model_assembly"
 "skema.program_analysis" = "skema/program_analysis"
 "skema.skema_py" = "skema/skema_py"
@@ -85,8 +83,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]"]
 readme = {file = ["README.md"], content-type = "text/markdown"}
 # runnables
 [project.scripts]
-skema-tr-cosmos-integration = "skema.text_reading.cosmos_integration:main"
-skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
+#skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
 
 # Minimum requirements for the build system to execute.
 [build-system]

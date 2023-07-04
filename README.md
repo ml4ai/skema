@@ -1,14 +1,16 @@
 ![](http://ci.kraken.sista.arizona.edu/api/badges/ml4ai/skema/status.svg)  
-![Docker lumai/askem-skema-py Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-py?sort=date&logo=docker&label=lumai%2Faskem-skema-py)  
-![Docker lumai/askem-skema-img2mml Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-img2mml?sort=date&logo=docker&label=lumai%2Faskem-skema-img2mml)  
-![Docker lumai/askem-skema-rs Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-rs?sort=date&logo=docker&label=lumai%2Faskem-skema-rs)  
-![Docker lumai/askem-skema-text-reading Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-text-reading?sort=date&logo=docker&label=lumai%2Faskem-skema-text-reading)
+[![Docker lumai/askem-skema-py Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-py?sort=date&logo=docker&label=lumai%2Faskem-skema-py)](https://hub.docker.com/r/lumai/askem-skema-py)  
+[![Docker lumai/askem-skema-img2mml Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-img2mml?sort=date&logo=docker&label=lumai%2Faskem-skema-img2mml)](https://hub.docker.com/r/lumai/askem-skema-img2mml)  
+[![Docker lumai/askem-skema-rs Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-rs?sort=date&logo=docker&label=lumai%2Faskem-skema-rs)](https://hub.docker.com/r/lumai/askem-skema-rs)  
+[![Docker lumai/askem-skema-text-reading Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-text-reading?sort=date&logo=docker&label=lumai%2Faskem-skema-text-reading)](https://hub.docker.com/r/lumai/askem-skema-text-reading)
 
 # SKEMA: Scientific Knowledge Extraction and Model Analysis
 
 This is the main code repository for the SKEMA project. It contains the source
 code and documentation for the text reading, structural alignment, and model
 role analysis components of SKEMA.
+
+[For details, see our project documentation](https://ml4ai.github.io/skema/)
 
 ## Directory structure
 
@@ -18,19 +20,11 @@ coexist peacefully.
 
 At the top level, we have the following files and directories:
 
-- `Dockerfile.skema-py`: Dockerfile for the skema python library (includes program analysis, img2mml, isa, and MOVIZ components).
+- `Dockerfile.skema-py`: Dockerfile for the skema python library (includes program analysis, img2mml, and isa components).
 - `Dockerfile.skema-rs`: Dockerfile for the skema-rs service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
 - `data`: Data for testing.
-- `docker-compose.skema-py.yml`: Docker Compose file for the skema-py service.
-- `docker-compose.skema-rs.yml`: Docker Compose file for the skema-rs service.
-- `docker-compose.yml`: Docker Compose file for multiple SKEMA services
-  (currently skema-py and skema-rs).
-- `docker-compose.memgraph.yml`: Docker Compose file for the memgraph database.
-- `docker-compose.img2mml.yml`: Docker Compose file for the img2mml service.
-- `docs`: Source code for the project website.
-- `notebooks`: Jupyter notebooks for demoing SKEMA functionality.
 - `scripts`: Miscellaneous scripts
 - `pyproject.toml`: This file declares and defines the `skema` Python package.
 - `skema`
@@ -44,9 +38,8 @@ The `skema` directory contains two different types of directories:
     - `text_reading`
     - `skema_py`: Web service for converting code to GroMEt function networks and pyacsets.
     - `img2mml`: Web service for extracting equations from images.
-    - `moviz`: Visualization interface for GroMEt function networks.
 
-Of the Python subpackages, the last three (`skema_py`, `img2mml`, `moviz`) are
+Of the Python subpackages, the last two (`skema_py` and `img2mml`) are
 currently the most 'outward/user-facing' components. The `program_analysis`,
 `gromet`, and `model_assembly` directories are comprised primarily of library
 code that is used by the `skema-py` service.
@@ -56,51 +49,14 @@ The `text_reading` directory contains three subdirectories:
 - `text_reading`: Scala project for rule-based extraction of mentions of scientific concepts.
 - `notebooks`: Jupyter notebooks for demoing text reading/mention linking functionality.
 
-Running the following command in this directory will install the `skema` Python
-package into your Python virtual environment (we assume you have one active),
-so that it is available for scripts running in that virtual environment.
+## Python
+[For instructions on installing our Python library, please see our developer documentation](https://ml4ai.github.io/skema/dev/env/).
 
-```bash
-pip install -e ".[core]"
-```
-
-The command above installs the minimum set packages required for the Code2FN
-pipeline. 
-
-To additionally install dev dependencies:
-
-```bash
-pip install -e ".[core,dev]"
-```
-
-To install **all** components (including dev dependencies for documentation generation):
-```bash
-pip install ".[all]"
-```
-
-For more details on the available extras, see the `pyproject.toml` file.
-
+## Other
 The `README.md` files in the `skema/skema-rs` and
 `skema/text_reading/text_reading` directories provide instructions on how to
 run the software components that are written in Rust and Scala respectively.
 
-## Dockerized services
+## Examples
 
-To run the `skema-py` and `skema-rs` services in conjunction, do:
-
-```
-docker-compose up --build
-```
-
-You can also launch the skema-py and skema-rs services individually by using
-their individual `docker-compose.*.yml` files.
-
-To run the img2mml Dockerized service, run
-
-```
-docker-compose -f docker-compose.img2mml.yml up --build
-```
-
-(if you're not using a published docker image with the default model, make sure that the appropriate img2mml model is in the
-`skema/img2mml/trained_models` directory before building - see the `README.md` file in
-`skema/img2mml` for details)
+We maintain several containerized examples demonstrating system capabilities at [https://github.com/ml4ai/ASKEM-TA1-DockerVM](https://github.com/ml4ai/ASKEM-TA1-DockerVM).
