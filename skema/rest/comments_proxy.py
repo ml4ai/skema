@@ -14,18 +14,22 @@ from pydantic import BaseModel, Field
 import os
 import requests
 
+
 class SupportedLanguageForCommentExtraction(str, Enum):
     python = "Python"
 
+
 router = APIRouter()
+
 
 class CodeSnippet(BaseModel):
     code: str = Field(
         title="code",
         description="snippet of code in referenced language",
         example={"# this is a comment\ngreet = lambda: print('howdy!')"},
-    )    
+    )
     language: SupportedLanguageForCommentExtraction
+
 
 @router.post("/extract-comments", response_model=CodeComments)
 async def proxy_extract_comments(code_snippet: CodeSnippet) -> CodeComments:
@@ -33,12 +37,19 @@ async def proxy_extract_comments(code_snippet: CodeSnippet) -> CodeComments:
     Endpoint for extracting CodeComments JSON from a code snippet.
     Snippet must be in a supported language.
     """
-    return requests.post(f"{SKEMA_RS_ADDESS}/extract-comments", json=code_snippet).json()
+    return requests.post(
+        f"{SKEMA_RS_ADDESS}/extract-comments", json=code_snippet
+    ).json()
 
-@router.post("/extract-comments-from-zipfile", summary=(
+
+@router.post(
+    "/extract-comments-from-zipfile",
+    summary=(
         "Send a zip file containing a code system comprised of supported languages,"
         " get comments for each file."
-    ), response_model=CodeComments)
+    ),
+    response_model=CodeComments,
+)
 async def proxy_extract_comments_from_zip(request: Request) -> CodeComments:
     """
     Endpoint for generating CodeComments JSON from a zip archive of arbitrary depth and structure.

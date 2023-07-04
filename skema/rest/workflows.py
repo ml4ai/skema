@@ -18,6 +18,7 @@ import requests
 
 router = APIRouter()
 
+
 # equation images -> mml -> amr
 @router.post("/images/equations-to-amr", summary="Equations (images) → MML → AMR")
 async def equations_to_amr(data: schema.EquationImagesToAMR):
@@ -35,7 +36,10 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
     r.json()
     """
     mml: List[str] = [eqn2mml.post_image_to_mathml(img).content for img in data.images]
-    return requests.post(f"{SKEMA_RS_ADDESS}/mathml/amr", json={"mathml": mml, "model": data.model}).json()
+    return requests.post(
+        f"{SKEMA_RS_ADDESS}/mathml/amr", json={"mathml": mml, "model": data.model}
+    ).json()
+
 
 # tex equations -> pmml -> amr
 @router.post("/latex/equations-to-amr", summary="Equations (LaTeX) → pMML → AMR")
@@ -53,8 +57,14 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
     r = requests.post(f"{url}/workflows/latex/equations-to-amr", json={"equations": equations, "model": "regnet"})
     r.json()
     """
-    mml: List[str] = [eqn2mml.post_tex_to_mathml(eqn2mml.LatexEquation(tex_src=tex)).content for tex in data.equations]
-    return requests.post(f"{SKEMA_RS_ADDESS}/mathml/amr", json={"mathml": mml, "model": data.model}).json()
+    mml: List[str] = [
+        eqn2mml.post_tex_to_mathml(eqn2mml.LatexEquation(tex_src=tex)).content
+        for tex in data.equations
+    ]
+    return requests.post(
+        f"{SKEMA_RS_ADDESS}/mathml/amr", json={"mathml": mml, "model": data.model}
+    ).json()
+
 
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
@@ -64,7 +74,8 @@ async def snippets_to_amr(system: code2fn.System):
         pass
     gromet = await code2fn.fn_given_filepaths(system)
     print(f"gromet:\t{gromet}")
-    return requests.post(f"{SKEMA_RS_ADDESS}/models/PN",json=gromet).json()
+    return requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet).json()
+
 
 # code snippets -> fn -> regnet amr
 @router.post("/code/snippets-to-rn-amr", summary="Code snippets → RegNet AMR")
@@ -73,18 +84,22 @@ async def snippets_to_amr(system: code2fn.System):
         # FIXME: get comments and produce another system
         pass
     gromet = await code2fn.fn_given_filepaths(system)
-    return requests.post(f"{SKEMA_RS_ADDESS}/models/RN",json=gromet).json()
+    return requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet).json()
+
 
 # zip archive -> fn -> petrinet amr
-@router.post("/code/codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR")
+@router.post(
+    "/code/codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR"
+)
 async def repo_to_amr(zip_file: UploadFile = File()):
     # FIXME: get comments
     gromet = code2fn.fn_given_filepaths_zip(zip_file)
-    return requests.post(f"{SKEMA_RS_ADDESS}/models/PN",json=gromet).json()
+    return requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet).json()
+
 
 # zip archive -> fn -> petrinet amr
 @router.post("/code/codebase-to-pn-amr", summary="Code repo (zip archive) → RegNet AMR")
 async def repo_to_amr(zip_file: UploadFile = File()):
     # FIXME: get comments
     gromet = code2fn.fn_given_filepaths_zip(zip_file)
-    return requests.post(f"{SKEMA_RS_ADDESS}/models/RN",json=gromet).json()
+    return requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet).json()
