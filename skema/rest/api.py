@@ -77,28 +77,24 @@ app.include_router(
     eqn2mml.router,
     prefix="/eqn2mml",
     tags=["eqn2mml"],
-    # responses={418: {"description": "I'm a teapot"}},
 )
 
 app.include_router(
     code2fn.router,
     prefix="/code2fn",
     tags=["code2fn"],
-    # responses={418: {"description": "I'm a teapot"}},
 )
 
 app.include_router(
     comments_proxy.router,
     prefix="/code2fn",
     tags=["code2fn", "skema-rs"],
-    # responses={418: {"description": "I'm a teapot"}},
 )
 
 app.include_router(
     morae_proxy.router,
     prefix="/morae",
     tags=["morae", "skema-rs"],
-    # responses={418: {"description": "I'm a teapot"}},
 )
 
 
