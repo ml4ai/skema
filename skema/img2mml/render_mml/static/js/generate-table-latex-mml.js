@@ -49,9 +49,11 @@ function add_table_rows(table) {
 
     // Get info about the current entry
     const id = element["id"];
-    const source_img_path = `${images_path}/source_imgs/${id}.${images_ext}`;
+    const source_img_path = `https://raw.githubusercontent.com/imzoc/mathpix-annotation/master/mathml-images/images_filtered/${id}.${images_ext}`;
     const latex_text = element["latex"];
-    const mml_text = `${element["mathml"]}`;
+    // Adding a <root> tag around the mathml so that only one root exists later for
+    // the XML formatting step instead of multiple <math> roots at the same level which does not work
+    const mml_text = `<root>${element["mathml"]}</root>`;
 
     // Create a cell for each piece of data we want to show
     const id_text_cell = $("<td/>", {
@@ -71,7 +73,7 @@ function add_table_rows(table) {
       `<pre class="latex">${latex_text}</pre>`
     );
 
-    const mml_render_cell = $("<td/>").html(mml_text);
+    const mml_render_cell = $("<td/>").append(mml_text);
     const mml_formatted_text = format_xml(mml_text, {
       indentation: "  ",
       collapseContent: true,
