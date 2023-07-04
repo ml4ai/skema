@@ -1,60 +1,119 @@
 [project]
-name="skema"
-authors=[
+name = "skema"
+authors = [
+    {name="Keith Alcock", email="keith@lum.ai"},
+    {name="Tito Ferra", email="tito@lum.ai"},
+    {name="Clayton Morrison", email="clayton@lum.ai"},
     {name="Enrique Noriega", email="enoriega@arizona.edu"},
     {name = "Adarsh Pyarelal", email="adarsh@arizona.edu"},
-    {name="Clayton Morrison", email="claytonm@lum.ai"},
-    {name="Tito Ferra", email="titofe16@gmail.com"},
-    {name="Vincent Raymond", email="vincent@lum.ai"}
+    {name="Vincent Raymond", email="vincent@lum.ai"},
 ]
-description="Scientific Knowledge Extraction and Model Analysis"
-version="0.1.0"
+description = "Scientific Knowledge Extraction and Model Analysis"
+version = "0.1.0"
 dependencies=[
-    "gensim",
     "dill",
     "networkx",
     "PyYAML",
-    "tree-sitter"
+    "tree-sitter",
+    "requests",
+	"fastapi",
+	"uvicorn",
+	"python-multipart"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
-requires-python="==3.8.*"
-license={text="MIT"}
+requires-python = "==3.8.*"
+license = {text="MIT"}
+dynamic = ["readme"]
 
 [project.optional-dependencies]
 # Dev dependencies.
-# - fastapi & uvicorn: For running the code2fn REST API server
-# - requests: For testing the code2fn example client
 # - pytest: for running tests
 # - black: Autoformatting
 # - pygraphviz: for creating function network visualizations for debugging.
 #   Pygraphviz is often tricky to install, so we reserve it for the dev extras
 #   list.
 # - six: Required by auto-generated Swagger models
-dev = ["fastapi", "requests", "uvicorn", "pytest", "black", "pygraphviz", "six"]
+dev = ["pytest", "pytest-cov", "pytest-xdist", "black", "mypy", "coverage", "pygraphviz", "six"]
 
-# MOVIZ dependencies. MOVIZ is a webapp for visualizing function networks (see
-# the skema/moviz directory).
-moviz = ["flask", "graphviz"]
+demo = ["jupyter==1.0.0"]
+
+# ISA dependencies.
+isa = [
+  "pydot", 
+  "graphviz",
+  "graspologic", # NOTE: this depends on rust when installing on an M1/ARM64 machine
+  "Levenshtein"
+]
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
-img2mml = [
-    "fastapi",
-    "requests",
-    "uvicorn",
-    "torch==1.12.*",
-    "torchvision",
-    "torchtext",
-    "python-multipart",
-    "tqdm",
-    "scikit-learn"
-]
+img2mml = ["torch", "torchvision"]
 
-[tool.setuptools.packages]
-find = {}  # Scan the project directory with the default parameters
+# dependencies for text reading utilities.
+tr = ["transformers", "SPARQLWrapper", "tqdm", "pandas", "askem_extractions[all]@git+https://github.com/ml4ai/ASKEM-TA1-DataModel"]
+
+# project documentation generation
+doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-git-revision-date-localized-plugin==0.11.1", "mkdocs-git-authors-plugin==0.6.3", "mkdocs-rtd-dropdown==1.0.2", "jinja2<3.1.0"]
+
+core = ["skema[img2mml]", "skema[isa]", "skema[tr]"]
+
+# all extras
+all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
+
+[tool.setuptools.package-dir]
+"skema.gromet" = "skema/gromet"
+"skema.img2mml" = "skema/img2mml"
+"skema.isa" = "skema/isa"
+"skema.model_assembly" = "skema/model_assembly"
+"skema.program_analysis" = "skema/program_analysis"
+"skema.skema_py" = "skema/skema_py"
+# re-map skema/text_reading/python to skema.text_reading
+"skema.text_reading.mention_linking" = "skema/text_reading/mention_linking"
+"skema.data" = "skema/data"
+
+# [tool.setuptools.packages]
+# find = {}  # Scan the project directory with the default parameters
+
+[tool.setuptools.package-data]
+# needed to ensure models are included in package/discoverable
+"*" = ["*.json", "vocab.txt", "*.pt", "*.png"]
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"], content-type = "text/markdown"}
+# runnables
+[project.scripts]
+#skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
 
 # Minimum requirements for the build system to execute.
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=67", "wheel"]
 build-backend = "setuptools.build_meta"
+
+# pytest
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "--cov=skema --cov-report html:docs/coverage/python"
+testpaths = [
+    "skema/program_analysis/tests",
+    "skema/img2mml/tests",
+]
+
+# Configuration for Black.
+
+# NOTE: you have to use single-quoted strings in TOML for regular expressions.
+# It's the equivalent of r-strings in Python.  Multiline strings are treated as
+# verbose regular expressions by Black.  Use [ ] to denote a significant space
+# character.
+[tool.black]
+line-length = 88
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # The following are specific to Black, you probably don't want those.
+  | blib2to3
+  | tests/data
+  | profiling
+)/
+'''

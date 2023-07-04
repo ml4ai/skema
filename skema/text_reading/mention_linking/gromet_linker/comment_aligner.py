@@ -1,5 +1,6 @@
 """ Aligns source code comments to Gromet function networks """
 
+from typing import List, Tuple
 from .comment_debugger import CommentDebugger
 from .comment_info import CommentInfo
 from .gromet_helper import GrometHelper
@@ -55,7 +56,7 @@ class CommentAligner:
 
     def get_aligned_comments(
         self, name: str, inner_line_range: range, outer_line_range: range
-    ) -> list[tuple[int, str]]:
+    ) -> List[Tuple[int, str]]:
         if name:
             leading_comments = self.get_leading_comments(outer_line_range)
             aligned_comments = self.variable_name_matcher.match_line_comment(
@@ -66,7 +67,7 @@ class CommentAligner:
             return []
 
     # Get the comments in contiguous lines above the function.
-    def get_leading_comments(self, line_range: range) -> list[tuple[int, str]]:
+    def get_leading_comments(self, line_range: range) -> List[Tuple[int, str]]:
         """Gets the block of comments adjacent to the function's definition"""
         line_comments = self.source_comments.line_comments
         comments = list()
@@ -82,7 +83,7 @@ class CommentAligner:
         comments.reverse()
         return comments
 
-    def get_comments(self, line_comments: list[tuple[int, str]]) -> list[str]:
+    def get_comments(self, line_comments: List[Tuple[int, str]]) -> List[str]:
         return [comment for _, comment in line_comments]
 
     # TODO pass in comments, all of them, maybe with line numbers?  Name would be an exception, so apart?
@@ -90,9 +91,9 @@ class CommentAligner:
         self,
         name: str,
         gromet_object,
-        aligned_docstrings: list[tuple[int, str]],
-        aligned_box_comments: list[tuple[int, str]],
-        aligned_comments: list[tuple[int, str]],
+        aligned_docstrings: List[Tuple[int, str]],
+        aligned_box_comments: List[Tuple[int, str]],
+        aligned_comments: List[Tuple[int, str]],
     ) -> None:
         # Build new metadata object and append it to the metadata list of each port.
         # TODO Enrique: Here will be a good place to introduce the fallback/default comments
@@ -180,7 +181,7 @@ class GrometBoxFunctionCommentAligner(CommentAligner):
 
     def get_aligned_box_comments(
         self, line_range: range
-    ) -> list[tuple[int, str]]:
+    ) -> List[Tuple[int, str]]:
         comments = list()
         if self.gromet_box_function.function_type not in {
             "PRIMITIVE",
@@ -206,7 +207,7 @@ class OuterGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
         super().__init__(gromet_box_function, comment_aligner_helper)
         self.line_docstrings = self.make_line_docstrings()
 
-    def make_line_docstrings(self) -> list[str]:
+    def make_line_docstrings(self) -> List[str]:
         # docstrings are within the function, just after the signature and before the body.
         condition = self.gromet_box_function.function_type == "FUNCTION"
         # This retrieves the docstrings based on the box function's name.  It gets all of them.
@@ -247,7 +248,7 @@ class InnerGrometBoxFunctionCommentAligner(GrometBoxFunctionCommentAligner):
         self,
         gromet_box_function: GrometBoxFunction,
         comment_aligner_helper: CommentAlignerHelper,
-        line_docstrings: list[tuple[int, str]],
+        line_docstrings: List[Tuple[int, str]],
         outer_line_range: range,
     ):
         super().__init__(gromet_box_function, comment_aligner_helper)
@@ -279,7 +280,7 @@ class GrometPortCommentAligner(CommentAligner):
         self,
         gromet_port: GrometPort,
         comment_aligner_helper: CommentAlignerHelper,
-        line_docstrings: list[tuple[int, str]],
+        line_docstrings: List[Tuple[int, str]],
         outer_line_range: range,
     ):
         super().__init__(comment_aligner_helper)
