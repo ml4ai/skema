@@ -1,14 +1,13 @@
-use crate::ast::{
-    Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msubsup, Msup},
-    Operator,
+use crate::{
+    ast::{
+        Math, MathExpression,
+        MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msubsup, Msup},
+        Operator,
+    },
+    petri_net::recognizers::recognize_leibniz_differential_operator,
 };
-use std::clone::Clone;
-
 use petgraph::{graph::NodeIndex, Graph};
-
-use crate::petri_net::recognizers::is_leibniz_diff_operator;
-use std::collections::VecDeque;
+use std::{clone::Clone, collections::VecDeque};
 
 /// Struct for representing mathematical expressions in order to align with source code.
 pub type MathExpressionGraph<'a> = Graph<String, String>;
@@ -53,7 +52,7 @@ pub fn is_derivative(
     numerator: &mut Box<MathExpression>,
     denominator: &mut Box<MathExpression>,
 ) -> bool {
-    if is_leibniz_diff_operator(numerator, denominator) {
+    if let Ok(_) = recognize_leibniz_differential_operator(numerator, denominator) {
         if let Mrow(x) = &mut **numerator {
             x.remove(0);
         }

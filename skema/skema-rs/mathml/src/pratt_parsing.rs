@@ -4,9 +4,10 @@
 use crate::{
     ast::{Math, MathExpression, Operator},
     parsing::parse,
+    petri_net::recognizers::recognize_leibniz_differential_operator,
 };
-use nom::multi::many0;
-use std::fmt;
+use nom::{error::Error, multi::many0};
+use std::{fmt, str::FromStr};
 
 /// An S-expression like structure.
 enum MathExpressionTree {
@@ -28,6 +29,7 @@ impl fmt::Display for MathExpressionTree {
         }
     }
 }
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum Token {
     Atom(MathExpression),
@@ -37,59 +39,6 @@ enum Token {
 
 struct Lexer {
     tokens: Vec<Token>,
-}
-
-/// Check if fraction is a derivative of a single-variable function expressed in Leibniz notation,
-/// and if so, return a derivative operator and the identifier of the function.
-pub fn recognize_leibniz_diff_op<'a>(
-    numerator: &Box<MathExpression>,
-    denominator: &Box<MathExpression>,
-) -> Result<(Operator, MathExpression), &'a str> {
-    let mut numerator_contains_d = false;
-    let mut denominator_contains_d = false;
-
-    let mut numerator_contains_partial = false;
-    let mut denominator_contains_partial = false;
-    let mut function_candidate: Option<MathExpression> = None;
-
-    // Check if numerator is an mrow
-    if let MathExpression::Mrow(num_expressions) = &**numerator {
-        // Check if first element of numerator is an mi
-        if let MathExpression::Mi(num_id) = &num_expressions[0] {
-            // Check if mi contains 'd'
-            if num_id == "d" {
-                numerator_contains_d = true;
-            }
-
-            if num_id == "∂" {
-                numerator_contains_partial = true;
-            }
-
-            // Gather the second identifier as a potential candidate function.
-            function_candidate = Some(num_expressions[1].clone());
-        }
-    }
-
-    if let MathExpression::Mrow(denom_expressions) = &**denominator {
-        // Check if first element of denominator is an mi
-        if let MathExpression::Mi(denom_id) = &denom_expressions[0] {
-            // Check if mi contains 'd'
-            if denom_id == "d" {
-                denominator_contains_d = true;
-            }
-            if denom_id == "∂" {
-                denominator_contains_partial = true;
-            }
-        }
-    }
-
-    if (numerator_contains_d && denominator_contains_d)
-        || (numerator_contains_partial && denominator_contains_partial)
-    {
-        Ok((Operator::new_derivative(1, 1), function_candidate.unwrap()))
-    } else {
-        Err("This Mfrac does not correspond to a derivative in Leibniz notation")
-    }
 }
 
 impl Lexer {
@@ -113,7 +62,7 @@ impl Lexer {
                 },
                 MathExpression::Mfrac(numerator, denominator) => {
                     if let Ok((derivative, function)) =
-                        recognize_leibniz_diff_op(numerator, denominator)
+                        recognize_leibniz_differential_operator(numerator, denominator)
                     {
                         acc.push(MathExpression::Mo(derivative));
                         acc.push(function);
@@ -136,14 +85,15 @@ impl Lexer {
                 acc.push(x);
             } else {
                 match x {
-                    MathExpression::Mo(op) => {
-                        if let Operator::Lparen = op {
-                            // Check last element of acc
-                            if let Some(MathExpression::Mo(_)) = acc.last() {
-                            } else {
-                                acc.push(&MathExpression::Mo(Operator::Multiply));
-                            }
+                    MathExpression::Mo(Operator::Lparen) => {
+                        // Check last element of acc
+                        if let Some(MathExpression::Mo(_)) = acc.last() {
+                        } else {
+                            acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
+                        acc.push(x);
+                    }
+                    MathExpression::Mo(_) => {
                         acc.push(x);
                     }
                     t => match acc.last().unwrap() {
@@ -186,6 +136,15 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
 impl From<Math> for MathExpressionTree {
     fn from(input: Math) -> Self {
         expr(input.content)
+    }
+}
+
+impl FromStr for MathExpressionTree {
+    type Err = Error<String>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let math = parse(s).unwrap().1;
+        Ok(MathExpressionTree::from(math))
     }
 }
 
@@ -265,13 +224,13 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
 fn test_conversion() {
     let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(+ x y)");
     println!("Output: {s}\n");
 
     let input = "<math><mi>a</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
     println!("Output: {s}\n");
 
@@ -279,7 +238,7 @@ fn test_conversion() {
         <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
         </math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
@@ -287,20 +246,20 @@ fn test_conversion() {
         <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
         </math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
     let input = "<math><mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(+ a (- b))");
     println!("Output: {s}\n");
 
     let input =
         "<math><mn>2</mn><mi>a</mi><mo>(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>)</mo></math>";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(* (* 2 a) (+ c d))");
     println!("Output: {s}\n");
 
@@ -311,7 +270,18 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(parse(input).unwrap().1);
+    let s = input.parse::<MathExpressionTree>().unwrap();
+    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
+    println!("Output: {s}\n");
+
+    let input = "
+    <math>
+        <mfrac><mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
+        </math>
+        ";
+    println!("Input: {input}");
+    let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 }
