@@ -1,6 +1,6 @@
 use crate::{
-    ast::{MathExpression, Mi, Operator},
-    parsing::{attribute, lparen, mi, mo, rparen, ws, IResult, ParseError, Span},
+    ast::{Derivative, MathExpression, Mi, Operator},
+    parsing::{attribute, lparen, mi, mo, mrow, rparen, ws, IResult, ParseError, Span},
 };
 use nom::{
     branch::alt,
@@ -83,6 +83,24 @@ fn univariate_func(input: Span) -> IResult<Ci> {
             input,
         )))
     }
+}
+
+fn d(input: Span) -> IResult<bool> {
+    let (s, Mi(x)) = mi(input)?;
+    if let "d" = x.as_ref() {
+        Ok((s, true))
+    } else {
+        Ok((s, false))
+    }
+}
+
+fn leibniz_derivative(input: Span) -> IResult<(Derivative, Ci)> {
+    let (s, (_, contents, _)) = ws(tuple((
+        stag!("mfrac"),
+        map_parser(recognize(take_until("</mfrac>")), pair(mrow, mrow)),
+        tag("</mfrac>"),
+    )))(input)?;
+    todo!()
 }
 
 #[test]
