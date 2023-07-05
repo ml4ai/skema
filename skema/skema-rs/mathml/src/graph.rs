@@ -1,9 +1,10 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
+        Mfrac, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
         Munder,
     },
+    Mi,
 };
 
 use petgraph::{graph::NodeIndex, Graph};
@@ -63,7 +64,7 @@ fn add_to_graph_many0<'a>(
 impl MathExpression {
     pub fn add_to_graph<'a>(&'a self, graph: &mut ASTGraph<'a>, parent_index: Option<NodeIndex>) {
         match self {
-            Mi(x) => add_to_graph_0(graph, parent_index, x),
+            MathExpression::Mi(Mi(x)) => add_to_graph_0(graph, parent_index, x),
             Mo(x) => add_to_graph_0(graph, parent_index, &x.to_string()),
             Mn(x) => add_to_graph_0(graph, parent_index, x),
             Msqrt(x) => add_to_graph_n!(graph, parent_index, "msqrt", x),

@@ -1,6 +1,6 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::ast::{Math, MathExpression::Mi};
+use crate::ast::{Math, MathExpression, Mi};
 use crate::petri_net::{Polarity, Var};
 use crate::{
     mml2pn::{group_by_operators, Term},
@@ -435,7 +435,7 @@ impl From<Vec<Math>> for RegNet {
             for variable in eqns[&state][term_idx].vars.iter() {
                 if state.clone() != variable.clone() {
                     match variable.clone() {
-                        Var(Mi(x)) => {
+                        Var(MathExpression::Mi(Mi(x))) => {
                             rate_const = x.clone();
                         }
                         _ => {
@@ -444,7 +444,7 @@ impl From<Vec<Math>> for RegNet {
                     };
                 } else {
                     match variable.clone() {
-                        Var(Mi(x)) => {
+                        Var(MathExpression::Mi(Mi(x))) => {
                             state_name = x.clone();
                         }
                         _ => {
@@ -486,7 +486,7 @@ impl From<Vec<Math>> for RegNet {
                     for (j, var) in term.vars.iter().enumerate() {
                         if j == other_state_indx {
                             match var.clone() {
-                                Var(Mi(x)) => {
+                                Var(MathExpression::Mi(Mi(x))) => {
                                     trans_src = x.clone();
                                 }
                                 _ => {
@@ -495,7 +495,7 @@ impl From<Vec<Math>> for RegNet {
                             };
                         } else if j != other_state_indx && j != state_indx {
                             match var.clone() {
-                                Var(Mi(x)) => {
+                                Var(MathExpression::Mi(Mi(x))) => {
                                     trans_name = x.clone();
                                 }
                                 _ => {

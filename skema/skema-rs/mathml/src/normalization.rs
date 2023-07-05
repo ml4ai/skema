@@ -1,7 +1,8 @@
 /// Functionality for normalizing MathExpression enums.
 use crate::ast::{
     Math, MathExpression,
-    MathExpression::{Mi, Mn, Mo, Mrow, Msub},
+    MathExpression::{Mn, Mo, Mrow, Msub},
+    Mi,
 };
 
 impl MathExpression {
@@ -13,7 +14,7 @@ impl MathExpression {
                 combined.push_str("_{");
                 combined.push_str(&subscript.get_string_repr());
                 combined.push('}');
-                *self = Mi(combined);
+                *self = MathExpression::Mi(Mi(combined));
             }
 
             Mrow(xs) => {
@@ -28,7 +29,7 @@ impl MathExpression {
     /// Get the string representation of a MathExpression
     pub fn get_string_repr(&self) -> String {
         match self {
-            Mi(x) => x.to_string(),
+            MathExpression::Mi(Mi(x)) => x.to_string(),
             Mo(x) => x.to_string(),
             Mn(x) => x.to_string(),
             Mrow(xs) => xs
@@ -56,10 +57,18 @@ impl Math {
 #[test]
 fn test_get_string_repr() {
     use crate::ast::Operator;
-    assert_eq!(Mi("t".to_string()).get_string_repr(), "t".to_string());
+    assert_eq!(
+        MathExpression::Mi(Mi("t".to_string())).get_string_repr(),
+        "t".to_string()
+    );
     assert_eq!(Mo(Operator::Add).get_string_repr(), "+");
     assert_eq!(
-        Mrow(vec![Mi("t".into()), Mo(Operator::Add), Mi("1".to_string())]).get_string_repr(),
+        Mrow(vec![
+            MathExpression::Mi(Mi("t".into())),
+            Mo(Operator::Add),
+            MathExpression::Mi(Mi("1".to_string()))
+        ])
+        .get_string_repr(),
         "t+1".to_string()
     );
 }
@@ -68,15 +77,15 @@ fn test_get_string_repr() {
 fn test_subscript_collapsing() {
     use crate::ast::Operator;
     let mut expr = Msub(
-        Box::new(Mi("S".to_string())),
+        Box::new(MathExpression::Mi(Mi("S".to_string()))),
         Box::new(Mrow(vec![
-            Mi("t".to_string()),
+            MathExpression::Mi(Mi("t".to_string())),
             Mo(Operator::Add),
-            Mi("1".to_string()),
+            MathExpression::Mi(Mi("1".to_string())),
         ])),
     );
     expr.collapse_subscripts();
-    assert_eq!(expr, Mi("S_{t+1}".to_string()));
+    assert_eq!(expr, MathExpression::Mi(Mi("S_{t+1}".to_string())));
 }
 
 #[test]
@@ -89,13 +98,13 @@ fn test_normalize() {
     assert_eq!(
         &math.content[0],
         &Mrow(vec![
-            Mi("S_{t+1}".to_string()),
+            MathExpression::Mi(Mi("S_{t+1}".to_string())),
             Mo(Operator::Equals),
-            Mi("S_{t}".to_string()),
+            MathExpression::Mi(Mi("S_{t}".to_string())),
             Mo(Operator::Subtract),
-            Mi("β".to_string()),
-            Mi("S_{t}".to_string()),
-            Mi("I_{t}".to_string()),
+            MathExpression::Mi(Mi("β".to_string())),
+            MathExpression::Mi(Mi("S_{t}".to_string())),
+            MathExpression::Mi(Mi("I_{t}".to_string())),
         ])
     );
 }

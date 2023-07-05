@@ -3,8 +3,8 @@
 
 use crate::ast::{
     MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub},
-    Operator,
+    MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msub},
+    Mi, Operator,
 };
 use crate::petri_net::{Polarity, Var};
 
@@ -24,7 +24,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
     // Check if numerator is an mrow
     if let MathExpression::Mrow(num_expressions) = &**numerator {
         // Check if first element of numerator is an mi
-        if let MathExpression::Mi(num_id) = &num_expressions[0] {
+        if let MathExpression::Mi(Mi(num_id)) = &num_expressions[0] {
             // Check if mi contains 'd'
             if num_id == "d" {
                 numerator_contains_d = true;
@@ -41,7 +41,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
 
     if let MathExpression::Mrow(denom_expressions) = &**denominator {
         // Check if first element of denominator is an mi
-        if let MathExpression::Mi(denom_id) = &denom_expressions[0] {
+        if let MathExpression::Mi(Mi(denom_id)) = &denom_expressions[0] {
             // Check if mi contains 'd'
             if denom_id == "d" {
                 denominator_contains_d = true;
@@ -60,49 +60,6 @@ pub fn recognize_leibniz_differential_operator<'a>(
         Err("This Mfrac does not correspond to a derivative in Leibniz notation")
     }
 }
-
-/// Check if fraction is a derivative expressed in Leibniz notation
-//pub fn recognize_leibniz_differential_operatorerator(
-//numerator: &Box<MathExpression>,
-//denominator: &Box<MathExpression>,
-//) -> bool {
-//let mut numerator_contains_d = false;
-//let mut denominator_contains_d = false;
-
-//let mut numerator_contains_partial = false;
-//let mut denominator_contains_partial = false;
-
-//// Check if numerator is an mrow
-//if let MathExpression::Mrow(num_expressions) = &**numerator {
-//// Check if first element of numerator is an mi
-//if let MathExpression::Mi(num_id) = &num_expressions[0] {
-//// Check if mi contains 'd'
-//if num_id == "d" {
-//numerator_contains_d = true;
-//}
-
-//if num_id == "∂" {
-//numerator_contains_partial = true;
-//}
-//}
-//}
-
-//if let MathExpression::Mrow(denom_expressions) = &**denominator {
-//// Check if first element of denominator is an mi
-//if let MathExpression::Mi(denom_id) = &denom_expressions[0] {
-//// Check if mi contains 'd'
-//if denom_id == "d" {
-//denominator_contains_d = true;
-//}
-//if denom_id == "∂" {
-//denominator_contains_partial = true;
-//}
-//}
-//}
-
-//(numerator_contains_d && denominator_contains_d)
-//|| (numerator_contains_partial && denominator_contains_partial)
-//}
 
 /// Predicate testing whether a MathML operator (Mo) is a subtraction or addition.
 pub fn is_add_or_subtract_operator(element: &MathExpression) -> bool {
@@ -161,7 +118,7 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
 ///     But should those be Vars?
 pub fn is_var_candidate(element: &MathExpression) -> bool {
     match element {
-        Mi(_x) => true,
+        MathExpression::Mi(_x) => true,
         Mn(_x) => true,
         Msub(_x1, _x2) => true,
         _ => false,

@@ -6,7 +6,7 @@ use crate::{
     parsing::parse,
     petri_net::recognizers::recognize_leibniz_differential_operator,
 };
-use nom::{error::Error, multi::many0};
+use nom::error::Error;
 use std::{fmt, str::FromStr};
 
 /// An S-expression like structure.

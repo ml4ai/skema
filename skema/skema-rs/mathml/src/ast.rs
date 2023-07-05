@@ -41,11 +41,14 @@ impl fmt::Display for Operator {
     }
 }
 
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Mi(pub String);
+
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
 pub enum MathExpression {
-    Mi(String),
+    Mi(Mi),
     Mo(Operator),
     Mn(String),
     Msqrt(Box<MathExpression>),
@@ -71,7 +74,7 @@ pub enum MathExpression {
 impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MathExpression::Mi(identifier) => write!(f, "{}", identifier),
+            MathExpression::Mi(Mi(identifier)) => write!(f, "{}", identifier),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
                 write!(f, "{base}^{{{superscript}}}")
