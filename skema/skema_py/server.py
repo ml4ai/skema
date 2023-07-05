@@ -6,7 +6,7 @@ from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
-from fastapi import FastAPI, Body, File, UploadFile
+from fastapi import APIRouter, FastAPI, Body, File, UploadFile
 from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
@@ -108,15 +108,14 @@ def system_to_gromet(system: System):
     return gromet_collection.to_dict()
 
 
-app = FastAPI()
+router = APIRouter()
+
+@router.get("/ping", summary="Ping endpoint to test health of service")
+def ping() -> int:
+    return 200
 
 
-@app.get("/ping", summary="Ping endpoint to test health of service")
-def ping():
-    return "The skema-py service is running."
-
-
-@app.get(
+@router.get(
     "/fn-supported-file-extensions",
     summary="Endpoint for checking which files extensions are currently supported by code2fn pipeline.",
     response_model=List[str],
@@ -136,7 +135,7 @@ def fn_supported_file_extensions():
     return FN_SUPPORTED_FILE_EXTENSIONS
 
 
-@app.post(
+@router.post(
     "/fn-given-filepaths",
     summary=(
         "Send a system of code and filepaths of interest,"
@@ -173,7 +172,7 @@ async def fn_given_filepaths(system: System):
     return system_to_gromet(system)
 
 
-@app.post(
+@router.post(
     "/fn-given-filepaths-zip",
     summary=(
         "Send a zip file containing a code system,"
@@ -228,7 +227,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     return system_to_gromet(system)
 
 
-@app.post(
+@router.post(
     "/get-pyacset",
     summary=("Get PyACSet for a given model"),
 )
@@ -246,3 +245,10 @@ async def get_pyacset(ports: Ports):
         petri.set_subpart(j, skema.skema_py.petris.attr_sname, opos[j])
 
     return petri.write_json()
+
+app = FastAPI()
+app.include_router(
+    router,
+    prefix="/code2fn",
+    tags=["code2fn"],
+)

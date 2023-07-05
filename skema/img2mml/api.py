@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import requests
 import re
+from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
 
@@ -42,11 +43,8 @@ def get_mathml_from_latex(eqn: str) -> str:
     """Read a LaTeX equation string and convert it to presentation MathML"""
 
     # Define the webservice address from the MathJAX service
-    protocol = os.environ.get('SKEMA_MATHJAX_PROTOCOL', 'http://')
-    host = os.environ.get('SKEMA_MATHJAX_HOST', '127.0.0.1')
-    port = str(os.environ.get('SKEMA_MATHJAX_PORT', 8031))
-    webservice = protocol + host + ':' + port
-    print('Connecting to ' + webservice)
+    webservice = SKEMA_MATHJAX_ADDRESS
+    print(f"Connecting to {webservice}")
 
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
