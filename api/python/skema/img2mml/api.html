@@ -32,6 +32,7 @@ import os
 from pathlib import Path
 import requests
 import re
+from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
 
@@ -71,11 +72,8 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
     &#34;&#34;&#34;Read a LaTeX equation string and convert it to presentation MathML&#34;&#34;&#34;
 
     # Define the webservice address from the MathJAX service
-    protocol = os.environ.get(&#39;SKEMA_MATHJAX_PROTOCOL&#39;, &#39;http://&#39;)
-    host = os.environ.get(&#39;SKEMA_MATHJAX_HOST&#39;, &#39;127.0.0.1&#39;)
-    port = str(os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031))
-    webservice = protocol + host + &#39;:&#39; + port
-    print(&#39;Connecting to &#39; + webservice)
+    webservice = SKEMA_MATHJAX_ADDRESS
+    print(f&#34;Connecting to {webservice}&#34;)
 
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
@@ -170,11 +168,8 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
     &#34;&#34;&#34;Read a LaTeX equation string and convert it to presentation MathML&#34;&#34;&#34;
 
     # Define the webservice address from the MathJAX service
-    protocol = os.environ.get(&#39;SKEMA_MATHJAX_PROTOCOL&#39;, &#39;http://&#39;)
-    host = os.environ.get(&#39;SKEMA_MATHJAX_HOST&#39;, &#39;127.0.0.1&#39;)
-    port = str(os.environ.get(&#39;SKEMA_MATHJAX_PORT&#39;, 8031))
-    webservice = protocol + host + &#39;:&#39; + port
-    print(&#39;Connecting to &#39; + webservice)
+    webservice = SKEMA_MATHJAX_ADDRESS
+    print(f&#34;Connecting to {webservice}&#34;)
 
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(

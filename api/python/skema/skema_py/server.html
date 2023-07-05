@@ -35,7 +35,7 @@ from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
-from fastapi import FastAPI, Body, File, UploadFile
+from fastapi import APIRouter, FastAPI, Body, File, UploadFile
 from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
@@ -137,15 +137,14 @@ def system_to_gromet(system: System):
     return gromet_collection.to_dict()
 
 
-app = FastAPI()
+router = APIRouter()
+
+@router.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
+def ping() -&gt; int:
+    return 200
 
 
-@app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping():
-    return &#34;The skema-py service is running.&#34;
-
-
-@app.get(
+@router.get(
     &#34;/fn-supported-file-extensions&#34;,
     summary=&#34;Endpoint for checking which files extensions are currently supported by code2fn pipeline.&#34;,
     response_model=List[str],
@@ -165,7 +164,7 @@ def fn_supported_file_extensions():
     return FN_SUPPORTED_FILE_EXTENSIONS
 
 
-@app.post(
+@router.post(
     &#34;/fn-given-filepaths&#34;,
     summary=(
         &#34;Send a system of code and filepaths of interest,&#34;
@@ -202,7 +201,7 @@ async def fn_given_filepaths(system: System):
     return system_to_gromet(system)
 
 
-@app.post(
+@router.post(
     &#34;/fn-given-filepaths-zip&#34;,
     summary=(
         &#34;Send a zip file containing a code system,&#34;
@@ -257,7 +256,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     return system_to_gromet(system)
 
 
-@app.post(
+@router.post(
     &#34;/get-pyacset&#34;,
     summary=(&#34;Get PyACSet for a given model&#34;),
 )
@@ -274,7 +273,14 @@ async def get_pyacset(ports: Ports):
     for j, spec in enumerate(opos):
         petri.set_subpart(j, skema.skema_py.petris.attr_sname, opos[j])
 
-    return petri.write_json()</code></pre>
+    return petri.write_json()
+
+app = FastAPI()
+app.include_router(
+    router,
+    prefix=&#34;/code2fn&#34;,
+    tags=[&#34;code2fn&#34;],
+)</code></pre>
 </details>
 </section>
 <section>
@@ -312,7 +318,7 @@ gromet_json = response.json()</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(
+<pre><code class="python">@router.post(
     &#34;/fn-given-filepaths&#34;,
     summary=(
         &#34;Send a system of code and filepaths of interest,&#34;
@@ -376,7 +382,7 @@ gromet_json = response.json()</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(
+<pre><code class="python">@router.post(
     &#34;/fn-given-filepaths-zip&#34;,
     summary=(
         &#34;Send a zip file containing a code system,&#34;
@@ -445,7 +451,7 @@ supported_extensions = response.json()</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(
+<pre><code class="python">@router.get(
     &#34;/fn-supported-file-extensions&#34;,
     summary=&#34;Endpoint for checking which files extensions are currently supported by code2fn pipeline.&#34;,
     response_model=List[str],
@@ -474,7 +480,7 @@ def fn_supported_file_extensions():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(
+<pre><code class="python">@router.post(
     &#34;/get-pyacset&#34;,
     summary=(&#34;Get PyACSet for a given model&#34;),
 )
@@ -495,7 +501,7 @@ async def get_pyacset(ports: Ports):
 </details>
 </dd>
 <dt id="skema.skema_py.server.ping"><code class="name flex">
-<span>def <span class="ident">ping</span></span>(<span>)</span>
+<span>def <span class="ident">ping</span></span>(<span>) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -503,9 +509,9 @@ async def get_pyacset(ports: Ports):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping():
-    return &#34;The skema-py service is running.&#34;</code></pre>
+<pre><code class="python">@router.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
+def ping() -&gt; int:
+    return 200</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.system_to_gromet"><code class="name flex">

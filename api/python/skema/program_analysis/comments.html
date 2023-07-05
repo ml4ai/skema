@@ -43,7 +43,7 @@ class SingleFileCodeComments(BaseModel):
     )
     comments: List[SingleLineComment] = Field(
         description=&#34;A list of comments, where each comment has a &#39;line_number&#39; (int) and &#39;contents&#39; (str) field&#34;,
-        example=[{&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0}],
+        example={&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0},
     )
 
 
@@ -124,7 +124,7 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
     )
     comments: List[SingleLineComment] = Field(
         description=&#34;A list of comments, where each comment has a &#39;line_number&#39; (int) and &#39;contents&#39; (str) field&#34;,
-        example=[{&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0}],
+        example={&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0},
     )</code></pre>
 </details>
 <h3>Ancestors</h3>

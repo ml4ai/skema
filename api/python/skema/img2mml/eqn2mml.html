@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>skema.img2mml.eq2mml API documentation</title>
+<title>skema.img2mml.eqn2mml API documentation</title>
 <meta name="description" content="Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
 Please run the following command to initialize the …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
@@ -21,7 +21,7 @@ Please run the following command to initialize the …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>skema.img2mml.eq2mml</code></h1>
+<h1 class="title">Module <code>skema.img2mml.eqn2mml</code></h1>
 </header>
 <section id="section-intro">
 <p>Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
@@ -40,11 +40,16 @@ node data_generation/mathjax_server.js
 
 from typing import Text, Union
 from typing_extensions import Annotated
-from fastapi import FastAPI, Body, File, Response, Request, Query
+from fastapi import APIRouter, FastAPI, Body, File, Response, Request, Query
+from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
 from skema.data.eq2mml import img_b64_bayes_white_bg
 from pydantic import BaseModel, Field
 import base64
+import requests
+
+
+router = APIRouter()
 
 EquationQueryParameter = Annotated[
   Text,
@@ -88,19 +93,23 @@ class LatexEquation(BaseModel):
         }
 
 
-app = FastAPI()
-
 def process_latex_equation(eqn: Text) -&gt; Response:
     &#34;&#34;&#34;Helper function used by both GET and POST LaTeX equation processing endpoints&#34;&#34;&#34;
     res = get_mathml_from_latex(eqn)
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
-# FIXME: have this test the mathjax endpoint (and perhaps check the pt model loaded)
-@app.get(&#34;/healthcheck&#34;, summary=&#34;Ping endpoint to test health of service&#34;, response_model=Text, status_code=200)
-def healthcheck():
-    return &#34;The eq2mml service is running.&#34;
+@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=Text, status_code=200)
+def img2mml_healthcheck() -&gt; int:
+    return 200
 
-@app.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=Text, status_code=200)
+def latex2mml_healthcheck() -&gt; int:
+    try:
+      return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
+    except:
+      return 500
+
+@router.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
 async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
@@ -121,7 +130,7 @@ async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
     print(type(res))
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
-@app.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+@router.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
 async def post_b64image_to_mathml(request: Request) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
@@ -145,7 +154,7 @@ async def post_b64image_to_mathml(request: Request) -&gt; Response:
     res =  get_mathml_from_bytes(img_bytes)
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
-@app.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+@router.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
 async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     &#34;&#34;&#34;
     GET endpoint for generating MathML from an input LaTeX equation.
@@ -159,7 +168,7 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     &#34;&#34;&#34;
     return process_latex_equation(tex_src)
 
-@app.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+@router.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
 async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input LaTeX equation.
@@ -172,7 +181,10 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
     print(r.text)
     &#34;&#34;&#34;
     # convert latex string to presentation mathml
-    return process_latex_equation(eqn.tex_src)</code></pre>
+    return process_latex_equation(eqn.tex_src)
+
+app = FastAPI()
+app.include_router(router)</code></pre>
 </details>
 </section>
 <section>
@@ -182,7 +194,7 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="skema.img2mml.eq2mml.get_tex_to_mathml"><code class="name flex">
+<dt id="skema.img2mml.eqn2mml.get_tex_to_mathml"><code class="name flex">
 <span>async def <span class="ident">get_tex_to_mathml</span></span>(<span>tex_src: typing_extensions.Annotated[str, Query(PydanticUndefined)]) ‑> starlette.responses.Response</span>
 </code></dt>
 <dd>
@@ -196,7 +208,7 @@ print(r.text)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+<pre><code class="python">@router.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
 async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     &#34;&#34;&#34;
     GET endpoint for generating MathML from an input LaTeX equation.
@@ -211,8 +223,8 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     return process_latex_equation(tex_src)</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.eq2mml.healthcheck"><code class="name flex">
-<span>def <span class="ident">healthcheck</span></span>(<span>)</span>
+<dt id="skema.img2mml.eqn2mml.img2mml_healthcheck"><code class="name flex">
+<span>def <span class="ident">img2mml_healthcheck</span></span>(<span>) ‑> int</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -220,12 +232,29 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(&#34;/healthcheck&#34;, summary=&#34;Ping endpoint to test health of service&#34;, response_model=Text, status_code=200)
-def healthcheck():
-    return &#34;The eq2mml service is running.&#34;</code></pre>
+<pre><code class="python">@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=Text, status_code=200)
+def img2mml_healthcheck() -&gt; int:
+    return 200</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.eq2mml.post_b64image_to_mathml"><code class="name flex">
+<dt id="skema.img2mml.eqn2mml.latex2mml_healthcheck"><code class="name flex">
+<span>def <span class="ident">latex2mml_healthcheck</span></span>(<span>) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=Text, status_code=200)
+def latex2mml_healthcheck() -&gt; int:
+    try:
+      return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
+    except:
+      return 500</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.eqn2mml.post_b64image_to_mathml"><code class="name flex">
 <span>async def <span class="ident">post_b64image_to_mathml</span></span>(<span>request: starlette.requests.Request) ‑> starlette.responses.Response</span>
 </code></dt>
 <dd>
@@ -245,7 +274,7 @@ print(r.text)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+<pre><code class="python">@router.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
 async def post_b64image_to_mathml(request: Request) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
@@ -270,7 +299,7 @@ async def post_b64image_to_mathml(request: Request) -&gt; Response:
     return Response(content=res, media_type=&#34;application/xml&#34;)</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.eq2mml.post_image_to_mathml"><code class="name flex">
+<dt id="skema.img2mml.eqn2mml.post_image_to_mathml"><code class="name flex">
 <span>async def <span class="ident">post_image_to_mathml</span></span>(<span>data: typing_extensions.Annotated[bytes, File(PydanticUndefined)]) ‑> starlette.responses.Response</span>
 </code></dt>
 <dd>
@@ -287,7 +316,7 @@ print(r.text)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+<pre><code class="python">@router.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
 async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
@@ -309,8 +338,8 @@ async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
     return Response(content=res, media_type=&#34;application/xml&#34;)</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.eq2mml.post_tex_to_mathml"><code class="name flex">
-<span>async def <span class="ident">post_tex_to_mathml</span></span>(<span>eqn: <a title="skema.img2mml.eq2mml.LatexEquation" href="#skema.img2mml.eq2mml.LatexEquation">LatexEquation</a>) ‑> starlette.responses.Response</span>
+<dt id="skema.img2mml.eqn2mml.post_tex_to_mathml"><code class="name flex">
+<span>async def <span class="ident">post_tex_to_mathml</span></span>(<span>eqn: <a title="skema.img2mml.eqn2mml.LatexEquation" href="#skema.img2mml.eqn2mml.LatexEquation">LatexEquation</a>) ‑> starlette.responses.Response</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Endpoint for generating MathML from an input LaTeX equation.</p>
@@ -323,7 +352,7 @@ print(r.text)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
+<pre><code class="python">@router.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
 async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input LaTeX equation.
@@ -339,7 +368,7 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
     return process_latex_equation(eqn.tex_src)</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.eq2mml.process_latex_equation"><code class="name flex">
+<dt id="skema.img2mml.eqn2mml.process_latex_equation"><code class="name flex">
 <span>def <span class="ident">process_latex_equation</span></span>(<span>eqn: str) ‑> starlette.responses.Response</span>
 </code></dt>
 <dd>
@@ -359,7 +388,7 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="skema.img2mml.eq2mml.LatexEquation"><code class="flex name class">
+<dt id="skema.img2mml.eqn2mml.LatexEquation"><code class="flex name class">
 <span>class <span class="ident">LatexEquation</span></span>
 <span>(</span><span>**data: Any)</span>
 </code></dt>
@@ -386,11 +415,11 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="skema.img2mml.eq2mml.LatexEquation.Config"><code class="name">var <span class="ident">Config</span></code></dt>
+<dt id="skema.img2mml.eqn2mml.LatexEquation.Config"><code class="name">var <span class="ident">Config</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="skema.img2mml.eq2mml.LatexEquation.tex_src"><code class="name">var <span class="ident">tex_src</span> : str</code></dt>
+<dt id="skema.img2mml.eqn2mml.LatexEquation.tex_src"><code class="name">var <span class="ident">tex_src</span> : str</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -412,21 +441,22 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="skema.img2mml.eq2mml.get_tex_to_mathml" href="#skema.img2mml.eq2mml.get_tex_to_mathml">get_tex_to_mathml</a></code></li>
-<li><code><a title="skema.img2mml.eq2mml.healthcheck" href="#skema.img2mml.eq2mml.healthcheck">healthcheck</a></code></li>
-<li><code><a title="skema.img2mml.eq2mml.post_b64image_to_mathml" href="#skema.img2mml.eq2mml.post_b64image_to_mathml">post_b64image_to_mathml</a></code></li>
-<li><code><a title="skema.img2mml.eq2mml.post_image_to_mathml" href="#skema.img2mml.eq2mml.post_image_to_mathml">post_image_to_mathml</a></code></li>
-<li><code><a title="skema.img2mml.eq2mml.post_tex_to_mathml" href="#skema.img2mml.eq2mml.post_tex_to_mathml">post_tex_to_mathml</a></code></li>
-<li><code><a title="skema.img2mml.eq2mml.process_latex_equation" href="#skema.img2mml.eq2mml.process_latex_equation">process_latex_equation</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.get_tex_to_mathml" href="#skema.img2mml.eqn2mml.get_tex_to_mathml">get_tex_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.img2mml_healthcheck" href="#skema.img2mml.eqn2mml.img2mml_healthcheck">img2mml_healthcheck</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.latex2mml_healthcheck" href="#skema.img2mml.eqn2mml.latex2mml_healthcheck">latex2mml_healthcheck</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.post_b64image_to_mathml" href="#skema.img2mml.eqn2mml.post_b64image_to_mathml">post_b64image_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.post_image_to_mathml" href="#skema.img2mml.eqn2mml.post_image_to_mathml">post_image_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.post_tex_to_mathml" href="#skema.img2mml.eqn2mml.post_tex_to_mathml">post_tex_to_mathml</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.process_latex_equation" href="#skema.img2mml.eqn2mml.process_latex_equation">process_latex_equation</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="skema.img2mml.eq2mml.LatexEquation" href="#skema.img2mml.eq2mml.LatexEquation">LatexEquation</a></code></h4>
+<h4><code><a title="skema.img2mml.eqn2mml.LatexEquation" href="#skema.img2mml.eqn2mml.LatexEquation">LatexEquation</a></code></h4>
 <ul class="">
-<li><code><a title="skema.img2mml.eq2mml.LatexEquation.Config" href="#skema.img2mml.eq2mml.LatexEquation.Config">Config</a></code></li>
-<li><code><a title="skema.img2mml.eq2mml.LatexEquation.tex_src" href="#skema.img2mml.eq2mml.LatexEquation.tex_src">tex_src</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.LatexEquation.Config" href="#skema.img2mml.eqn2mml.LatexEquation.Config">Config</a></code></li>
+<li><code><a title="skema.img2mml.eqn2mml.LatexEquation.tex_src" href="#skema.img2mml.eqn2mml.LatexEquation.tex_src">tex_src</a></code></li>
 </ul>
 </li>
 </ul>
