@@ -95,4 +95,12 @@ fn test_dsp() {
             MathExpression::Mi(Mi("S".to_string())),
         ),
     )
+
+    //test_parser(
+    //"<mfrac>
+    //<mrow><mi>d</mi><mi>S</mi></mrow>
+    //<mrow><mi>d</mi><mi>t</mi></mrow>
+    //</mfrac>"
+
+    //)
 }

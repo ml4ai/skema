@@ -2,7 +2,7 @@
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
 use crate::{
-    ast::{Math, MathExpression, Operator},
+    ast::{Derivative, Math, MathExpression, Operator},
     parsing::parse,
     petri_net::recognizers::recognize_leibniz_differential_operator,
 };
@@ -50,8 +50,7 @@ impl Lexer {
                     MathExpression::Mo(Operator::Other(ref os)) => {
                         if os.chars().all(|c| c == '˙') {
                             acc.push(MathExpression::Mo(Operator::new_derivative(
-                                os.chars().count() as u8,
-                                1,
+                                Derivative::new(os.chars().count() as u8, 1),
                             )));
                             acc.push(*base.clone());
                         } else {
@@ -196,7 +195,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
-        Operator::Derivative { .. } => ((), 15),
+        Operator::Derivative(Derivative { .. }) => ((), 15),
         _ => panic!("Bad operator: {:?}", op),
     }
 }

@@ -2,7 +2,7 @@
 //! semantically-meaningful objects from MathML expressions.
 
 use crate::ast::{
-    MathExpression,
+    Derivative, MathExpression,
     MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msub},
     Mi, Operator,
 };
@@ -55,7 +55,10 @@ pub fn recognize_leibniz_differential_operator<'a>(
     if (numerator_contains_d && denominator_contains_d)
         || (numerator_contains_partial && denominator_contains_partial)
     {
-        Ok((Operator::new_derivative(1, 1), function_candidate.unwrap()))
+        Ok((
+            Operator::new_derivative(Derivative::new(1, 1)),
+            function_candidate.unwrap(),
+        ))
     } else {
         Err("This Mfrac does not correspond to a derivative in Leibniz notation")
     }
