@@ -135,7 +135,6 @@ impl Lexer {
         let tokens = tokens.iter().fold(vec![], |mut acc, x| {
             if acc.len() == 0 {
                 acc.push(x);
-                acc
             } else {
                 match x {
                     MathExpression::Mo(op) => {
@@ -147,21 +146,19 @@ impl Lexer {
                             }
                         }
                         acc.push(x);
-                        acc
                     }
                     t => match acc.last().unwrap() {
                         MathExpression::Mo(_) => {
                             acc.push(t);
-                            acc
                         }
                         _ => {
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                             acc.push(t);
-                            acc
                         }
                     },
                 }
             }
+            acc
         });
 
         let mut tokens = tokens
