@@ -95,40 +95,39 @@ pub fn recognize_leibniz_diff_op<'a>(
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
         // Recognize derivatives whenever possible.
-        let tokens = input.clone().iter().fold(vec![], |mut acc, x| match x {
-            MathExpression::Mover(base, overscript) => match **overscript {
-                MathExpression::Mo(Operator::Other(ref os)) => {
-                    if os.chars().all(|c| c == '˙') {
-                        acc.push(MathExpression::Mo(Operator::new_derivative(
-                            os.chars().count() as u8,
-                            1,
-                        )));
-                        acc.push(*base.clone());
-                        acc
+        let tokens = input.clone().iter().fold(vec![], |mut acc, x| {
+            match x {
+                MathExpression::Mover(base, overscript) => match **overscript {
+                    MathExpression::Mo(Operator::Other(ref os)) => {
+                        if os.chars().all(|c| c == '˙') {
+                            acc.push(MathExpression::Mo(Operator::new_derivative(
+                                os.chars().count() as u8,
+                                1,
+                            )));
+                            acc.push(*base.clone());
+                        } else {
+                            acc.push(x.clone());
+                        }
+                    }
+                    _ => todo!(),
+                },
+                MathExpression::Mfrac(numerator, denominator) => {
+                    if let Ok((derivative, function)) =
+                        recognize_leibniz_diff_op(numerator, denominator)
+                    {
+                        acc.push(MathExpression::Mo(derivative));
+                        acc.push(function);
                     } else {
-                        acc.push(x.clone());
-                        acc
+                        acc.push(*numerator.clone());
+                        acc.push(MathExpression::Mo(Operator::Divide));
+                        acc.push(*denominator.clone());
                     }
                 }
-                _ => todo!(),
-            },
-            MathExpression::Mfrac(numerator, denominator) => {
-                if let Ok((derivative, function)) =
-                    recognize_leibniz_diff_op(numerator, denominator)
-                {
-                    acc.push(MathExpression::Mo(derivative));
-                    acc.push(function);
-                } else {
-                    acc.push(*numerator.clone());
-                    acc.push(MathExpression::Mo(Operator::Divide));
-                    acc.push(*denominator.clone());
+                t => {
+                    acc.push(t.clone());
                 }
-                acc
             }
-            t => {
-                acc.push(t.clone());
-                acc
-            }
+            acc
         });
 
         // Insert implicit multiplication operators.
