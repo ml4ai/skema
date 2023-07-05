@@ -8,7 +8,7 @@ from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 def get_mathml_from_bytes(data: bytes):
     # read config file
     cwd = Path(__file__).parents[0]
-    config_path = cwd / "configs/xfmer_mml_config.json"
+    config_path = cwd / "configs" / "xfmer_mml_config.json"
     with open(config_path, "r") as cfg:
         config = json.load(cfg)
     # convert png image to tensor
