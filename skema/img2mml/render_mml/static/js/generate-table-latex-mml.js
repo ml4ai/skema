@@ -97,8 +97,16 @@ function add_table_rows(table) {
 
 function build_table() {
   let table = $("#table");
+  table.hide();
   table = add_table_headers(table);
   table = add_table_rows(table);
+
+  // Show the table only after it has been built
+  // This speeds up rendering by leaving it out of the render
+  // tree until the last minute
+  // Ref: https://patdavid.net/2019/02/displaying-a-big-html-table/#:~:text=tl%3Bdr%20%2D%20To%20speed%20up,a%20table%20with%20~400%2C000%20cells.
+  $("#table-loading").hide();
+  table.show();
 }
 
 // triggers when HTML document is ready for processing
