@@ -15,8 +15,10 @@ Place the model file in the `trained_models` directory.
 The curl command below should do the trick.
 
 ```
-curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
+curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt > trained_models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
 ```
+
+If you have the checkpoint in the `trained_models` directory already and hope to update it, please run the above curl command that will replace the previous one.
 
 Then, run the invocation below to launch the Dockerized service:
 
