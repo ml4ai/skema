@@ -1768,6 +1768,75 @@ class ToGrometPass:
             # parent_gromet_fn.bf = insert_gromet_object(parent_gromet_fn.bf, GrometBoxFunction(name=func_name, function_type=FunctionType.FUNCTION, contents=idx, metadata=self.insert_metadata(metadata)))
             # func_call_idx = len(parent_gromet_fn.bf)
 
+
+    def handle_unary_op(
+        self, node: AnnCastOperator, parent_gromet_fn, parent_cast_node
+    ):
+        """
+            Handles an AnnCastOperator node that consists of one operand
+        """
+        metadata = self.create_source_code_reference(node.source_refs[0])
+        opd_ret_val = self.visit(node.operands[0], parent_gromet_fn, node)
+
+        opd_pof = -1
+        if parent_gromet_fn.pof != None:
+            opd_pof = len(parent_gromet_fn.pof)
+        if isinstance(node.operands[0], AnnCastName):
+            opd_pof = -1
+        elif isinstance(node.operands[0], AnnCastCall):
+            pass
+
+        parent_gromet_fn.bf = insert_gromet_object(
+            parent_gromet_fn.bf,
+            GrometBoxFunction(
+                name=node.op,
+                function_type=FunctionType.LANGUAGE_PRIMITIVE,
+                metadata=self.insert_metadata(metadata)
+            )
+        )
+        unop_idx = len(parent_gromet_fn.bf)
+
+        parent_gromet_fn.opi = insert_gromet_object(
+            parent_gromet_fn.opi, GrometPort(box=unop_idx)
+        )
+
+        parent_gromet_fn.pif = insert_gromet_object(
+            parent_gromet_fn.pif, GrometPort(box=unop_idx)
+        )
+        
+        if isinstance(node.operands[0], (AnnCastName, AnnCastVar)) and opd_pof == -1:
+            if isinstance(node.operands[0], AnnCastName):
+                name = node.operands[0].name
+            elif isinstance(node.operands[0], AnnCastVar):
+                name = node.operands[0].val.name
+
+            if parent_gromet_fn.b[0].function_type != FunctionType.FUNCTION:
+                found_opi, opi_idx = find_existing_opi(parent_gromet_fn, name)
+
+                parent_gromet_fn.wfopi = insert_gromet_object(
+                    parent_gromet_fn.wfopi,
+                    GrometWire(
+                        src=len(parent_gromet_fn.pif),
+                        tgt=len(parent_gromet_fn.opi) if parent_gromet_fn.opi != None else -1,
+                    ),
+                )
+            else:
+                # If we are in a function def then we retrieve where the variable is
+                # Whether it's in the local or the args environment
+
+                self.wire_from_var_env(name, parent_gromet_fn)
+        else:
+            parent_gromet_fn.wff = insert_gromet_object(
+                parent_gromet_fn.wff,
+                GrometWire(src=len(parent_gromet_fn.pif), tgt=opd_pof),
+            )
+        
+        
+        parent_gromet_fn.pof = insert_gromet_object(
+            parent_gromet_fn.pof, GrometPort(box=unop_idx)
+        )
+
+
     @_visit.register
     def visit_operator(
         self, node: AnnCastOperator, parent_gromet_fn, parent_cast_node
@@ -1782,81 +1851,35 @@ class ToGrometPass:
         # - Other
         #   - A list access (i.e. x[2]) translates to a function call (_list_set), same for other sequential types
 
-        # visit LHS first, storing the return value and used if necessary
-        # cases where it's used
-        # - Function call: function call returns its index which can be used for pof generation
-        opd_one_ret_val = self.visit(node.operands[0], parent_gromet_fn, node)
-
-        # Collect where the location of the left pof is
-        # If the left node is an AnnCastName then it
-        # automatically doesn't have a pof
-        # (This create an opi later)
-        opd_one_pof = -1
-        if parent_gromet_fn.pof != None:
-            opd_one_pof = len(parent_gromet_fn.pof)
-        if isinstance(
-            node.operands[0], AnnCastName
-        ):  # or isinstance(node.opd_one, AnnCastUnaryOp):
-            opd_one_pof = -1
-        elif isinstance(node.operands[0], AnnCastCall):
-            parent_gromet_fn.pof = insert_gromet_object(
-                parent_gromet_fn.pof, GrometPort(box=opd_one_ret_val)
-            )
-            opd_one_pof = len(parent_gromet_fn.pof)
-            for arg in node.operands[0].arguments:
-                if hasattr(arg, "name"):
-                    found_opi, opi_idx = find_existing_opi(
-                        parent_gromet_fn, arg.name
-                    )
-
-                    if found_opi:
-                        parent_gromet_fn.wfopi = insert_gromet_object(
-                            parent_gromet_fn.wfopi,
-                            GrometWire(
-                                src=len(parent_gromet_fn.pif),
-                                tgt=opi_idx,
-                            ),
-                        )
-                    else:
-                        parent_gromet_fn.opi = insert_gromet_object(
-                            parent_gromet_fn.opi,
-                            GrometPort(
-                                name=arg.name, box=len(parent_gromet_fn.b)
-                            ),
-                        )
-                        parent_gromet_fn.wfopi = insert_gromet_object(
-                            parent_gromet_fn.wfopi,
-                            GrometWire(
-                                src=len(parent_gromet_fn.pif),
-                                tgt=len(parent_gromet_fn.opi),
-                            ),
-                        )
-
-        opd_two_pof = None
-        if len(node.operands) > 1:
-            # visit RHS second, storing the return value and used if necessary
+        if len(node.operands) == 1:
+            self.handle_unary_op(node, parent_gromet_fn, parent_cast_node)
+        elif len(node.operands) == 2:
+            # visit LHS first, storing the return value and used if necessary
             # cases where it's used
             # - Function call: function call returns its index which can be used for pof generation
-            opd_two_ret_val = self.visit(node.operands[1], parent_gromet_fn, node)
+            opd_one_ret_val = self.visit(node.operands[0], parent_gromet_fn, node)
 
-            # Collect where the location of the right pof is
-            # If the right node is an AnnCastName then it
+            # Collect where the location of the left pof is
+            # If the left node is an AnnCastName then it
             # automatically doesn't have a pof
             # (This create an opi later)
-            opd_two_pof = -1
+            opd_one_pof = -1
+            print(node)
             if parent_gromet_fn.pof != None:
-                opd_two_pof = len(parent_gromet_fn.pof)
+                opd_one_pof = len(parent_gromet_fn.pof)
             if isinstance(
-                node.operands[1], AnnCastName
-            ):  # or isinstance(node.right, AnnCastUnaryOp):
-                opd_two_pof = -1
-            elif isinstance(node.operands[1], AnnCastCall):
+                node.operands[0], AnnCastName
+            ):  # or isinstance(node.opd_one, AnnCastUnaryOp):
+                opd_one_pof = -1
+            elif isinstance(node.operands[0], AnnCastCall):
                 parent_gromet_fn.pof = insert_gromet_object(
-                    parent_gromet_fn.pof, GrometPort(box=opd_two_ret_val)
+                    parent_gromet_fn.pof, GrometPort(box=opd_one_ret_val)
                 )
-                opd_two_pof = len(parent_gromet_fn.pof)
-                for arg in node.operands[1].arguments:
+                opd_one_pof = len(parent_gromet_fn.pof)
+                for arg in node.operands[0].arguments:
+                    print(arg)
                     if hasattr(arg, "name"):
+                        print(f"Trying to find{arg.name}")
                         found_opi, opi_idx = find_existing_opi(
                             parent_gromet_fn, arg.name
                         )
@@ -1884,120 +1907,102 @@ class ToGrometPass:
                                 ),
                             )
 
-        ref = node.source_refs[0]
-        metadata = self.create_source_code_reference(ref)
+            opd_two_pof = None
+            if len(node.operands) > 1:
+                # visit RHS second, storing the return value and used if necessary
+                # cases where it's used
+                # - Function call: function call returns its index which can be used for pof generation
+                opd_two_ret_val = self.visit(node.operands[1], parent_gromet_fn, node)
 
-        # NOTE/TODO Maintain a table of primitive operators that when queried give you back
-        # their signatures that can be used for generating
-        # A global mapping is maintained but it isnt being used for their signatures yet
-        parent_gromet_fn.bf = insert_gromet_object(
-            parent_gromet_fn.bf,
-            GrometBoxFunction(
-                # name=get_shorthand(node.op, "CAST"),
-                name=node.op,
-                function_type=FunctionType.LANGUAGE_PRIMITIVE,
-                metadata=self.insert_metadata(metadata),
-            ),
-        )
+                # Collect where the location of the right pof is
+                # If the right node is an AnnCastName then it
+                # automatically doesn't have a pof
+                # (This create an opi later)
+                opd_two_pof = -1
+                if parent_gromet_fn.pof != None:
+                    opd_two_pof = len(parent_gromet_fn.pof)
+                if isinstance(
+                    node.operands[1], AnnCastName
+                ):  # or isinstance(node.right, AnnCastUnaryOp):
+                    opd_two_pof = -1
+                elif isinstance(node.operands[1], AnnCastCall):
+                    parent_gromet_fn.pof = insert_gromet_object(
+                        parent_gromet_fn.pof, GrometPort(box=opd_two_ret_val)
+                    )
+                    opd_two_pof = len(parent_gromet_fn.pof)
+                    for arg in node.operands[1].arguments:
+                        if hasattr(arg, "name"):
+                            found_opi, opi_idx = find_existing_opi(
+                                parent_gromet_fn, arg.name
+                            )
 
-        # After we visit the left and right they (in all scenarios but one) append a POF
-        # The one case where it doesnt happen is when the left or right are variables in the expression
-        # In this case then they need an opi and the appropriate wiring for it
-        parent_gromet_fn.pif = insert_gromet_object(
-            parent_gromet_fn.pif, GrometPort(box=len(parent_gromet_fn.bf))
-        )
-        if (
-            isinstance(node.operands[0], AnnCastName)
-            or isinstance(node.operands[0], AnnCastVar)
-        ) and opd_one_pof == -1:
-            if isinstance(node.operands[0], AnnCastName):
-                name = node.operands[0].name
-            elif isinstance(node.operands[0], AnnCastVar):
-                name = node.operands[0].val.name
+                            if found_opi:
+                                parent_gromet_fn.wfopi = insert_gromet_object(
+                                    parent_gromet_fn.wfopi,
+                                    GrometWire(
+                                        src=len(parent_gromet_fn.pif),
+                                        tgt=opi_idx,
+                                    ),
+                                )
+                            else:
+                                parent_gromet_fn.opi = insert_gromet_object(
+                                    parent_gromet_fn.opi,
+                                    GrometPort(
+                                        name=arg.name, box=len(parent_gromet_fn.b)
+                                    ),
+                                )
+                                parent_gromet_fn.wfopi = insert_gromet_object(
+                                    parent_gromet_fn.wfopi,
+                                    GrometWire(
+                                        src=len(parent_gromet_fn.pif),
+                                        tgt=len(parent_gromet_fn.opi),
+                                    ),
+                                )
 
-            if parent_gromet_fn.b[0].function_type != FunctionType.FUNCTION:
-                # This check is used for when the binary operation is part of a Function and not an Expression
-                # In which case the Function Def handles creating opis
-                found_opi, opi_idx = find_existing_opi(parent_gromet_fn, name)
+            ref = node.source_refs[0]
+            metadata = self.create_source_code_reference(ref)
 
-                if (
-                    len(node.operands) > 1 and
-                    not comp_name_nodes(node.operands[0], node.operands[1])
-                    and not found_opi
-                ):
-                    parent_gromet_fn.opi = insert_gromet_object(
-                        parent_gromet_fn.opi,
-                        GrometPort(name=name, box=len(parent_gromet_fn.b)),
-                    )
-                    parent_gromet_fn.wfopi = insert_gromet_object(
-                        parent_gromet_fn.wfopi,
-                        GrometWire(
-                            src=len(parent_gromet_fn.pif),
-                            tgt=len(parent_gromet_fn.opi),
-                        ),
-                    )
-                elif (  # NOTE: Added for M7, handling operations like x * x
-                    len(node.operands) > 1 and comp_name_nodes(node.operands[0], node.operands[1]) and not found_opi
-                ):
-                    parent_gromet_fn.opi = insert_gromet_object(
-                        parent_gromet_fn.opi,
-                        GrometPort(name=name, box=len(parent_gromet_fn.b)),
-                    )
-                    parent_gromet_fn.wfopi = insert_gromet_object(
-                        parent_gromet_fn.wfopi,
-                        GrometWire(
-                            src=len(parent_gromet_fn.pif),
-                            tgt=len(parent_gromet_fn.opi),
-                        ),
-                    )
-                else:
-                    parent_gromet_fn.wfopi = insert_gromet_object(
-                        parent_gromet_fn.wfopi,
-                        GrometWire(
-                            src=len(parent_gromet_fn.pif),
-                            tgt=len(parent_gromet_fn.opi) if parent_gromet_fn.opi != None else -1,
-                        ),
-                    )
-                # parent_gromet_fn.opi = insert_gromet_object(parent_gromet_fn.opi, GrometPort(name=node.left.name,box=len(parent_gromet_fn.b)))
-                # parent_gromet_fn.wfopi = insert_gromet_object(parent_gromet_fn.wfopi, GrometWire(src=len(parent_gromet_fn.pif),tgt=len(parent_gromet_fn.opi)))
-            else:
-                # If we are in a function def then we retrieve where the variable is
-                # Whether it's in the local or the args environment
-
-                self.wire_from_var_env(name, parent_gromet_fn)
-        else:
-            # In this case, the left node gave us a pof, so we can wire it to the pif here
-            # if left_pof == -1:
-            # print(type(node.left))
-            parent_gromet_fn.wff = insert_gromet_object(
-                parent_gromet_fn.wff,
-                GrometWire(src=len(parent_gromet_fn.pif), tgt=opd_one_pof),
+            # NOTE/TODO Maintain a table of primitive operators that when queried give you back
+            # their signatures that can be used for generating
+            # A global mapping is maintained but it isnt being used for their signatures yet
+            parent_gromet_fn.bf = insert_gromet_object(
+                parent_gromet_fn.bf,
+                GrometBoxFunction(
+                    # name=get_shorthand(node.op, "CAST"),
+                    name=node.op,
+                    function_type=FunctionType.LANGUAGE_PRIMITIVE,
+                    metadata=self.insert_metadata(metadata),
+                ),
             )
 
-        if len(node.operands) > 1:
-            # Repeat the above but for the right node this time
-            # NOTE: In the case that the left and the right node both refer to the same function argument we only
-            # want one opi created and so we dont create one here
+            # After we visit the left and right they (in all scenarios but one) append a POF
+            # The one case where it doesnt happen is when the left or right are variables in the expression
+            # In this case then they need an opi and the appropriate wiring for it
             parent_gromet_fn.pif = insert_gromet_object(
                 parent_gromet_fn.pif, GrometPort(box=len(parent_gromet_fn.bf))
             )
-            if opd_two_pof != None and isinstance(node.operands[1], AnnCastName) and opd_two_pof == -1:
-                # This check is used for when the binary operation is part of a Function and not an Expression
-                # In which case the Function Def handles creating opis
+            if (
+                isinstance(node.operands[0], AnnCastName)
+                or isinstance(node.operands[0], AnnCastVar)
+            ) and opd_one_pof == -1:
+                if isinstance(node.operands[0], AnnCastName):
+                    name = node.operands[0].name
+                elif isinstance(node.operands[0], AnnCastVar):
+                    name = node.operands[0].val.name
+
                 if parent_gromet_fn.b[0].function_type != FunctionType.FUNCTION:
-                    found_opi, opi_idx = find_existing_opi(
-                        parent_gromet_fn, node.operands[1].name
-                    )
+                    # This check is used for when the binary operation is part of a Function and not an Expression
+                    # In which case the Function Def handles creating opis
+                    found_opi, opi_idx = find_existing_opi(parent_gromet_fn, name)
 
                     if (
+                        len(node.operands) > 1 and
                         not comp_name_nodes(node.operands[0], node.operands[1])
                         and not found_opi
                     ):
                         parent_gromet_fn.opi = insert_gromet_object(
                             parent_gromet_fn.opi,
-                            GrometPort(
-                                name=node.operands[1].name, box=len(parent_gromet_fn.b)
-                            ),
+                            GrometPort(name=name, box=len(parent_gromet_fn.b)),
                         )
                         parent_gromet_fn.wfopi = insert_gromet_object(
                             parent_gromet_fn.wfopi,
@@ -2007,7 +2012,7 @@ class ToGrometPass:
                             ),
                         )
                     elif (  # NOTE: Added for M7, handling operations like x * x
-                        comp_name_nodes(node.operands[0], node.operands[1]) and not found_opi
+                        len(node.operands) > 1 and comp_name_nodes(node.operands[0], node.operands[1]) and not found_opi
                     ):
                         parent_gromet_fn.opi = insert_gromet_object(
                             parent_gromet_fn.opi,
@@ -2023,23 +2028,93 @@ class ToGrometPass:
                     else:
                         parent_gromet_fn.wfopi = insert_gromet_object(
                             parent_gromet_fn.wfopi,
-                            GrometWire(src=len(parent_gromet_fn.pif), tgt=opi_idx),
+                            GrometWire(
+                                src=len(parent_gromet_fn.pif),
+                                tgt=len(parent_gromet_fn.opi) if parent_gromet_fn.opi != None else -1,
+                            ),
                         )
+                    # parent_gromet_fn.opi = insert_gromet_object(parent_gromet_fn.opi, GrometPort(name=node.left.name,box=len(parent_gromet_fn.b)))
+                    # parent_gromet_fn.wfopi = insert_gromet_object(parent_gromet_fn.wfopi, GrometWire(src=len(parent_gromet_fn.pif),tgt=len(parent_gromet_fn.opi)))
                 else:
                     # If we are in a function def then we retrieve where the variable is
                     # Whether it's in the local or the args environment
-                    self.wire_from_var_env(node.operands[1].name, parent_gromet_fn)
+
+                    self.wire_from_var_env(name, parent_gromet_fn)
             else:
-                # In this case, the right node gave us a pof, so we can wire it to the pif here
+                # In this case, the left node gave us a pof, so we can wire it to the pif here
+                # if left_pof == -1:
+                # print(type(node.left))
                 parent_gromet_fn.wff = insert_gromet_object(
                     parent_gromet_fn.wff,
-                    GrometWire(src=len(parent_gromet_fn.pif), tgt=opd_two_pof),
+                    GrometWire(src=len(parent_gromet_fn.pif), tgt=opd_one_pof),
                 )
 
-        # Add the pof that serves as the output of this operation
-        parent_gromet_fn.pof = insert_gromet_object(
-            parent_gromet_fn.pof, GrometPort(box=len(parent_gromet_fn.bf))
-        )
+            if len(node.operands) > 1:
+                # Repeat the above but for the right node this time
+                # NOTE: In the case that the left and the right node both refer to the same function argument we only
+                # want one opi created and so we dont create one here
+                parent_gromet_fn.pif = insert_gromet_object(
+                    parent_gromet_fn.pif, GrometPort(box=len(parent_gromet_fn.bf))
+                )
+                if opd_two_pof != None and isinstance(node.operands[1], AnnCastName) and opd_two_pof == -1:
+                    # This check is used for when the binary operation is part of a Function and not an Expression
+                    # In which case the Function Def handles creating opis
+                    if parent_gromet_fn.b[0].function_type != FunctionType.FUNCTION:
+                        found_opi, opi_idx = find_existing_opi(
+                            parent_gromet_fn, node.operands[1].name
+                        )
+
+                        if (
+                            not comp_name_nodes(node.operands[0], node.operands[1])
+                            and not found_opi
+                        ):
+                            parent_gromet_fn.opi = insert_gromet_object(
+                                parent_gromet_fn.opi,
+                                GrometPort(
+                                    name=node.operands[1].name, box=len(parent_gromet_fn.b)
+                                ),
+                            )
+                            parent_gromet_fn.wfopi = insert_gromet_object(
+                                parent_gromet_fn.wfopi,
+                                GrometWire(
+                                    src=len(parent_gromet_fn.pif),
+                                    tgt=len(parent_gromet_fn.opi),
+                                ),
+                            )
+                        elif (  # NOTE: Added for M7, handling operations like x * x
+                            comp_name_nodes(node.operands[0], node.operands[1]) and not found_opi
+                        ):
+                            parent_gromet_fn.opi = insert_gromet_object(
+                                parent_gromet_fn.opi,
+                                GrometPort(name=name, box=len(parent_gromet_fn.b)),
+                            )
+                            parent_gromet_fn.wfopi = insert_gromet_object(
+                                parent_gromet_fn.wfopi,
+                                GrometWire(
+                                    src=len(parent_gromet_fn.pif),
+                                    tgt=len(parent_gromet_fn.opi),
+                                ),
+                            )
+                        else:
+                            parent_gromet_fn.wfopi = insert_gromet_object(
+                                parent_gromet_fn.wfopi,
+                                GrometWire(src=len(parent_gromet_fn.pif), tgt=opi_idx),
+                            )
+                    else:
+                        # If we are in a function def then we retrieve where the variable is
+                        # Whether it's in the local or the args environment
+                        self.wire_from_var_env(node.operands[1].name, parent_gromet_fn)
+                else:
+                    # In this case, the right node gave us a pof, so we can wire it to the pif here
+                    parent_gromet_fn.wff = insert_gromet_object(
+                        parent_gromet_fn.wff,
+                        GrometWire(src=len(parent_gromet_fn.pif), tgt=opd_two_pof),
+                    )
+
+            # Add the pof that serves as the output of this operation
+            parent_gromet_fn.pof = insert_gromet_object(
+                parent_gromet_fn.pof, GrometPort(box=len(parent_gromet_fn.bf))
+            )
 
 
     def wire_binary_op_args(self, node, parent_gromet_fn):
