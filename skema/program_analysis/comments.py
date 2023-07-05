@@ -14,7 +14,7 @@ class SingleFileCodeComments(BaseModel):
     )
     comments: List[SingleLineComment] = Field(
         description="A list of comments, where each comment has a 'line_number' (int) and 'contents' (str) field",
-        example=[{"contents": "Hello World!", "line_number": 0}],
+        example={"contents": "Hello World!", "line_number": 0},
     )
 
 
