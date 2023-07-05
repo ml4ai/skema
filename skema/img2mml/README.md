@@ -3,19 +3,19 @@
 This directory contains the code for the img2mml service, which processes images
 of equations and returns presentation MathML corresponding to those equations.
 
-The model was developed by Gaurav Sharma and Clay Morrison, and this wrapper
-service was developed by Deepsana Shahi and Adarsh Pyarelal.
+The model was developed by Gaurav Sharma, Clay Morrison and Liang Zhang, and this wrapper
+service was developed by Deepsana Shahi, Adarsh Pyarelal and Liang Zhang.
 
 The model itself is not checked into the repository, but you can get it from
 here:
-https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt.
+https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
 
 Place the model file in the `trained_models` directory.
 
 The curl command below should do the trick.
 
 ```
-curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt
 ```
 
 Then, run the invocation below to launch the Dockerized service:
