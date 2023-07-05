@@ -4,6 +4,7 @@ use mathml::{
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsing::parse,
+    pMML2cMML::to_content_mathml,
 };
 use petgraph::dot::{Config, Dot};
 use serde::{Deserialize, Serialize};
@@ -53,6 +54,29 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     let g = new_math.clone().to_graph();
     let dot_representation = Dot::new(&g);
     dot_representation.to_string()
+}
+
+/// Parse presentation MathML and return a content MathML representation
+#[utoipa::path(
+    request_body = String,
+    responses(
+        (
+            status = 200,
+            body = String
+        )
+    )
+)]
+
+#[put("/mathml/content-mathml")]
+pub async fn get_content_mathml(payload: String) -> String {
+    let mut contents = payload.clone();
+    //contents = preprocess_content(contents);
+    let mut new_math = Vec::<Math>::new();
+    let (_, mut math) = parse(&contents).expect(format!("Unable to parse payload!").as_str());
+    //let new_math: Vec<Math> = payload.map(|x| parse(&x).unwrap().1).collect();
+    new_math.push(math);
+    let content_mathml = to_content_mathml(new_math);
+    content_mathml
 }
 
 /// Return a JSON representation of an ACSet constructed from an array of MathML strings.
