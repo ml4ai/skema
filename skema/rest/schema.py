@@ -4,7 +4,9 @@ Response models for API
 """
 
 from pydantic import BaseModel, Field
-from typing import List, Literal
+from typing import List
+# see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
+from typing_extensions import Literal
 from skema.img2mml import eqn2mml
 
 
