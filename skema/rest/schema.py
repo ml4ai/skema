@@ -34,3 +34,14 @@ class EquationImagesToAMR(BaseModel):
 class EquationLatexToAMR(BaseModel):
     equations: List[str] = Field(description="Equations in LaTeX")
     model: Literal["regnet", "petrinet"] = Field(description="The model type")
+
+class CodeSnippet(BaseModel):
+    code: str = Field(
+        title="code",
+        description="snippet of code in referenced language",
+        example="# this is a comment\ngreet = lambda: print('howdy!')",
+    )
+    language: Literal["Python", "Fortran", "CppOrC"] = Field(
+        title="language", 
+        description="Programming language corresponding to `code`"
+    )

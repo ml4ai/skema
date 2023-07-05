@@ -5,10 +5,8 @@ Proxies requests to skema_rs API to provide a unified API.
 
 
 from typing import Any, Dict, List, Text
-from typing_extensions import Annotated
 from skema.rest.proxies import SKEMA_RS_ADDESS
-from fastapi import APIRouter, FastAPI, Body, File, Response, Request, Query
-from pydantic import BaseModel, Field
+from fastapi import APIRouter
 import requests
 
 

@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Response, status
 import os
-import requests
 from skema.rest import schema, workflows
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn

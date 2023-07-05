@@ -5,13 +5,11 @@ End-to-end skema workflows
 
 
 from typing import List
-from typing_extensions import Annotated
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.rest import schema
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
 from fastapi import APIRouter, File, UploadFile
-from pydantic import BaseModel, Field
 import requests
 
 
@@ -67,18 +65,17 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
 
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
-async def snippets_to_amr(system: code2fn.System):
+async def code_snippets_to_pn_amr(system: code2fn.System):
     if system.comments == None:
         # FIXME: get comments
         pass
     gromet = await code2fn.fn_given_filepaths(system)
-    print(f"gromet:\t{gromet}")
     return requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet).json()
 
 
 # code snippets -> fn -> regnet amr
 @router.post("/code/snippets-to-rn-amr", summary="Code snippets → RegNet AMR")
-async def snippets_to_amr(system: code2fn.System):
+async def code_snippets_to_rn_amr(system: code2fn.System):
     if system.comments == None:
         # FIXME: get comments and produce another system
         pass
@@ -90,15 +87,15 @@ async def snippets_to_amr(system: code2fn.System):
 @router.post(
     "/code/codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR"
 )
-async def repo_to_amr(zip_file: UploadFile = File()):
+async def repo_to_pn_amr(zip_file: UploadFile = File()):
     # FIXME: get comments
     gromet = code2fn.fn_given_filepaths_zip(zip_file)
     return requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet).json()
 
 
-# zip archive -> fn -> petrinet amr
-@router.post("/code/codebase-to-pn-amr", summary="Code repo (zip archive) → RegNet AMR")
-async def repo_to_amr(zip_file: UploadFile = File()):
+# zip archive -> fn -> regnet amr
+@router.post("/code/codebase-to-rn-amr", summary="Code repo (zip archive) → RegNet AMR")
+async def repo_to_rn_amr(zip_file: UploadFile = File()):
     # FIXME: get comments
     gromet = code2fn.fn_given_filepaths_zip(zip_file)
     return requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet).json()

@@ -3,40 +3,26 @@
 Proxies requests to skema_rs API to provide a unified API.
 """
 
-from enum import Enum
-
-from typing_extensions import Annotated
 from skema.program_analysis.comments import CodeComments
 from skema.rest.proxies import SKEMA_RS_ADDESS
-from fastapi import APIRouter, FastAPI, Body, File, Response, Request, Query
-from pydantic import BaseModel, Field
+from skema.rest import schema
+from fastapi import APIRouter, Request
 import requests
-
-
-class SupportedLanguagesForCommentExtraction(str, Enum):
-    python = "Python"
 
 
 router = APIRouter()
 
 
-class CodeSnippet(BaseModel):
-    code: str = Field(
-        title="code",
-        description="snippet of code in referenced language",
-        example={"# this is a comment\ngreet = lambda: print('howdy!')"},
-    )
-    language: SupportedLanguagesForCommentExtraction
-
 
 @router.post("/extract-comments", response_model=CodeComments)
-async def proxy_extract_comments(code_snippet: CodeSnippet) -> CodeComments:
+async def proxy_extract_comments(code_snippet: schema.CodeSnippet) -> CodeComments:
     """
     Endpoint for extracting CodeComments JSON from a code snippet.
     Snippet must be in a supported language.
     """
     return requests.post(
-        f"{SKEMA_RS_ADDESS}/extract-comments", json=code_snippet
+        # NOTE: .dict() -> .model_dump() in Pydantic v2 (see also https://github.com/tiangolo/fastapi/issues/9710)
+        f"{SKEMA_RS_ADDESS}/extract-comments", json=code_snippet.dict()
     ).json()
 
 
