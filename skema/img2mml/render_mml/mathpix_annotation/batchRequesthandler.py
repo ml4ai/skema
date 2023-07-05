@@ -62,7 +62,7 @@ class BatchRequestHandler:
         reply_json = request.json()
         if "batch_id" not in reply_json:
             raise RuntimeError(
-                "Batch ID not returned. Check the retruned error message.", reply_json
+                "Batch ID not returned. Check the returned error message.", reply_json
             )
 
         print("Request Complete")
@@ -72,7 +72,7 @@ class BatchRequestHandler:
     def get_batch_results(self, batch_id):
         """
         Gets the results of the batch with the given batch ID. 5 images
-        take approximately 1 secoond to process, so results may be incomplete until
+        take approximately 1 second to process, so results may be incomplete until
         enough time has passed.
 
         API Reference: https://docs.mathpix.com/#process-a-batch

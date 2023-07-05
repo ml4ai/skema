@@ -14,10 +14,21 @@ td {
   table-layout: fixed;
 }
 
+pre {
+  white-space: pre-wrap; /* css-3 */
+  white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+}
+
 div.pre {
-  width: 500px;
-  height: 300px;
+  height: 8em;
+  width: auto;
   overflow: scroll;
+  font-family: monospace;
+}
+
+.mml-render {
+  text-align: center;
+  vertical-align: middle;
 }
 
 #table-loading {
