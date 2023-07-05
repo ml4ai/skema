@@ -20,13 +20,12 @@ def get_mathml_from_bytes(data: bytes):
 
     # read vocab.txt
     with open(
-        cwd / "trained_models/arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
+        cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
     ) as f:
         vocab = f.readlines()
 
-    model_path = (
-        cwd / "trained_models/cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
-    )
+    model_path = cwd / "trained_models" / "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
+
 
     return render_mml(config, model_path, vocab, imagetensor)
 
