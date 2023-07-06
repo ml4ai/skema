@@ -20,6 +20,15 @@ curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_im2m
 
 If you have the checkpoint in the `trained_models` directory already and hope to update it, please run the above curl command that will replace the previous one.
 
+To update the model name or path, please make the following modifications to support updating the img2mml service and the corresponding Docker operations:
+
+1. Modify the paths of the model_path variable in the get_mathml_from_bytes function in the skema/img2mml/api.py file.
+2. Update the path settings in the "retrieve latest model for img2mml component" section of skema/.github/workflows/docs.yml.
+3. Adjust the curl command in the test_equation_reading section of skema/.drone.yml to download the checkpoint.
+4. Update the download checkpoint path in skema/img2mml/README.md.
+
+These changes will ensure that the necessary files and paths are updated correctly.
+
 Then, run the invocation below to launch the Dockerized service:
 
 ```
