@@ -1832,12 +1832,12 @@ fn test_to_expr18() {
 
 #[test]
 fn test_to_expr19() {
-    use crate::parsing::parse;
     let input = "tests/sir.xml";
     let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let mut math = contents
+        .parse::<Math>()
+        .unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
     let _g = &mut math.content[0].clone().to_graph();
 }

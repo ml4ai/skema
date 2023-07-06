@@ -1,7 +1,9 @@
 use crate::{
     ast::{Ci, Derivative, MathExpression, Mi, Operator, Type},
+    parsers::generic_mathml::{
+        attribute, etag, math_expression, mi, mo, stag, ws, IResult, ParseError, Span,
+    },
     parsers::math_expression_tree::MathExpressionTree,
-    parsing::{attribute, etag, math_expression, mi, mo, stag, ws, IResult, ParseError, Span},
 };
 use derive_new::new;
 use nom::{
@@ -14,7 +16,7 @@ use nom::{
 };
 
 #[cfg(test)]
-use crate::parsing::test_parser;
+use crate::parsers::generic_mathml::test_parser;
 
 /// First order ordinary differential equation.
 /// This assumes that the left hand side of the equation consists solely of a derivative expressed
