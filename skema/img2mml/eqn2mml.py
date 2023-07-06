@@ -122,7 +122,7 @@ async def post_b64image_to_mathml(request: Request) -> Response:
     print(r.text)
     """
     img_b64 = await request.body()
-
+    res = b64_image_to_mml(img_b64)
     return Response(content=res, media_type="application/xml")
 
 @router.get("/latex/mml", summary="Get MathML representation of a LaTeX equation")
