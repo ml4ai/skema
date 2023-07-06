@@ -1,55 +1,47 @@
 use derive_new::new;
 use std::fmt;
 
+pub mod operator;
+
+use operator::Operator;
+
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
-pub enum Operator {
-    Add,
-    Multiply,
-    Equals,
-    Divide,
-    Subtract,
-    Sqrt,
-    Lparen,
-    Rparen,
-    Compose,
-    Factorial,
-    /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-    Derivative {
-        order: u8,
-        var_index: u8,
-    },
-    // Catchall for operators we haven't explicitly defined as enum variants yet.
-    Other(String),
+pub struct Mi(pub String);
+
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Mrow(pub Vec<MathExpression>);
+
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub enum Type {
+    Integer,
+    Rational,
+    Real,
+    Complex,
+    ComplexPolar,
+    ComplexCartesian,
+    Constant,
+    Function,
+    Vector,
+    List,
+    Set,
+    Matrix,
 }
 
-impl fmt::Display for Operator {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Operator::Add => write!(f, "+"),
-            Operator::Multiply => write!(f, "*"),
-            Operator::Equals => write!(f, "="),
-            Operator::Divide => write!(f, "/"),
-            Operator::Subtract => write!(f, "-"),
-            Operator::Sqrt => write!(f, "√"),
-            Operator::Lparen => write!(f, "("),
-            Operator::Rparen => write!(f, ")"),
-            Operator::Compose => write!(f, "."),
-            Operator::Factorial => write!(f, "!"),
-            Operator::Derivative { order, var_index } => write!(f, "D({order}, {var_index})"),
-            Operator::Other(op) => write!(f, "{op}"),
-        }
-    }
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Ci {
+    pub r#type: Option<Type>,
+    pub content: MathExpression,
 }
 
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
 pub enum MathExpression {
-    Mi(String),
+    Mi(Mi),
     Mo(Operator),
     Mn(String),
     Msqrt(Box<MathExpression>),
-    Mrow(Vec<MathExpression>),
+    Mrow(Mrow),
     Mfrac(Box<MathExpression>, Box<MathExpression>),
     Msup(Box<MathExpression>, Box<MathExpression>),
     Msub(Box<MathExpression>, Box<MathExpression>),
@@ -64,6 +56,7 @@ pub enum MathExpression {
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
+    Ci(Box<Ci>),
     #[default]
     None,
 }
@@ -71,7 +64,7 @@ pub enum MathExpression {
 impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MathExpression::Mi(identifier) => write!(f, "{}", identifier),
+            MathExpression::Mi(Mi(identifier)) => write!(f, "{}", identifier),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
                 write!(f, "{base}^{{{superscript}}}")
@@ -82,8 +75,20 @@ impl fmt::Display for MathExpression {
             MathExpression::Mo(op) => {
                 write!(f, "{}", op)
             }
+            MathExpression::Mrow(Mrow(elements)) => {
+                for e in elements {
+                    write!(f, "{}", e)?;
+                }
+                Ok(())
+            }
             expression => write!(f, "{expression:?}"),
         }
+    }
+}
+
+impl fmt::Display for Ci {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.content)
     }
 }
 

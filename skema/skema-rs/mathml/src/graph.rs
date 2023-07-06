@@ -1,9 +1,9 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
-        Munder,
+        Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
     },
+    Mi, Mrow,
 };
 
 use petgraph::{graph::NodeIndex, Graph};
@@ -63,14 +63,14 @@ fn add_to_graph_many0<'a>(
 impl MathExpression {
     pub fn add_to_graph<'a>(&'a self, graph: &mut ASTGraph<'a>, parent_index: Option<NodeIndex>) {
         match self {
-            Mi(x) => add_to_graph_0(graph, parent_index, x),
+            MathExpression::Mi(Mi(x)) => add_to_graph_0(graph, parent_index, x),
             Mo(x) => add_to_graph_0(graph, parent_index, &x.to_string()),
             Mn(x) => add_to_graph_0(graph, parent_index, x),
             Msqrt(x) => add_to_graph_n!(graph, parent_index, "msqrt", x),
             Msup(x1, x2) => add_to_graph_n!(graph, parent_index, "msup", x1, x2),
             Msub(x1, x2) => add_to_graph_n!(graph, parent_index, "msub", x1, x2),
             Mfrac(x1, x2) => add_to_graph_n!(graph, parent_index, "mfrac", x1, x2),
-            Mrow(xs) => add_to_graph_many0(graph, parent_index, "mrow", xs),
+            MathExpression::Mrow(Mrow(xs)) => add_to_graph_many0(graph, parent_index, "mrow", xs),
             Munder(x1, x2) => add_to_graph_n!(graph, parent_index, "munder", x1, x2),
             Mover(x1, x2) => add_to_graph_n!(graph, parent_index, "mover", x1, x2),
             Msubsup(x1, x2, x3) => add_to_graph_n!(graph, parent_index, "msubsup", x1, x2, x3),
