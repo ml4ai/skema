@@ -1,5 +1,4 @@
 # Dockerfile for the skema-py service
-
 FROM  python:3.8-bullseye
 
 # ======================
@@ -23,6 +22,13 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
 RUN apt-get clean &&\
     rm -rf /var/lib/apt/lists/*
 
+
+# =====================
+# ENV setup for app
+# =====================
+ARG APP_VERSION=unknown
+ENV APP_VERSION=$APP_VERSION
+
 # =====================
 # Setup the repository
 # =====================
@@ -38,7 +44,6 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install the skema package
 RUN pip install wheel
-RUN pip install fastapi uvicorn
 RUN pip install six
 # Download ML model (~150MB)
 # FIXME: consider publishing and retrieving this model from HF Hub
@@ -47,7 +52,7 @@ RUN curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_OMML-9
 RUN tree /app
 #RUN pip install ".[all]"
 # exclude dependencies for docs
-RUN pip install ".[core,dev]"
+RUN pip install ".[core,dev,demo]"
 # Build tree-sitter-fortran grammar required by Fortran code2fn
 RUN python /app/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
 

@@ -1,4 +1,4 @@
-use mathml::ast::{Math, Operator};
+use mathml::ast::{operator::Operator, Math};
 
 pub use mathml::mml2pn::{ACSet, Term};
 use petgraph::prelude::*;
@@ -9,9 +9,8 @@ use std::string::ToString;
 
 // new imports
 
-use mathml::ast::MathExpression;
 use mathml::ast::MathExpression::Mo;
-use mathml::ast::MathExpression::Mrow;
+use mathml::ast::{MathExpression, Mi, Mrow};
 use mathml::petri_net::recognizers::is_add_or_subtract_operator;
 
 // struct for returning line spans
@@ -85,7 +84,7 @@ pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
     let mut math_content = Vec::<Math>::new();
     for eq in core_dynamics_ast.iter() {
         let math_ast = Math {
-            content: [Mrow(eq.clone())].to_vec(),
+            content: vec![MathExpression::Mrow(Mrow(eq.clone()))],
         };
         math_content.push(math_ast.clone());
     }
@@ -245,39 +244,27 @@ fn tree_2_ast(
         // currently we convert to leibniz form
         if deriv_name[1..2].to_string() == "d" {
             let deriv = MathExpression::Mfrac(
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi(deriv_name[1..2].to_string()),
-                        MathExpression::Mi(deriv_name[2..3].to_string()),
-                    ]
-                    .to_vec(),
-                )),
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi(deriv_name[3..4].to_string()),
-                        MathExpression::Mi(deriv_name[4..5].to_string()),
-                    ]
-                    .to_vec(),
-                )),
+                Box::new(MathExpression::Mrow(Mrow(vec![
+                    MathExpression::Mi(Mi(deriv_name[1..2].to_string())),
+                    MathExpression::Mi(Mi(deriv_name[2..3].to_string())),
+                ]))),
+                Box::new(MathExpression::Mrow(Mrow(vec![
+                    MathExpression::Mi(Mi(deriv_name[3..4].to_string())),
+                    MathExpression::Mi(Mi(deriv_name[4..5].to_string())),
+                ]))),
             );
             math_vec.push(deriv);
         } else {
             step_impl = true;
             let deriv = MathExpression::Mfrac(
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi("d".to_string()),
-                        MathExpression::Mi(deriv_name[1..2].to_string()),
-                    ]
-                    .to_vec(),
-                )),
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi("d".to_string()),
-                        MathExpression::Mi("t".to_string()),
-                    ]
-                    .to_vec(),
-                )),
+                Box::new(MathExpression::Mrow(Mrow(vec![
+                    MathExpression::Mi(Mi("d".to_string())),
+                    MathExpression::Mi(Mi(deriv_name[1..2].to_string())),
+                ]))),
+                Box::new(MathExpression::Mrow(Mrow(vec![
+                    MathExpression::Mi(Mi("d".to_string())),
+                    MathExpression::Mi(Mi("t".to_string())),
+                ]))),
             );
             math_vec.push(deriv);
         }
@@ -364,12 +351,13 @@ fn tree_2_ast(
         }
 
         // we now need to handle the case where it's step implementation
-        // we find the Mi of the state variable that doesn't have a multiplication next to it (including only one, if at the end of the vec)
+        // we find the Mi of the state variable that doesn't have a multiplication next to it
+        // (including only one, if at the end of the vec)
         // we then remove it and the one of the addition operators next to it
         if step_impl {
             let ref_name = deriv_name[1..2].to_string();
             for (idx, obj) in math_vec.clone().iter().enumerate() {
-                if *obj == MathExpression::Mi(ref_name.clone()) {
+                if *obj == MathExpression::Mi(Mi(ref_name.clone())) {
                     // find each index of the state variable on the rhs
                     // check if there is a multiplication to the right or left
                     // if no multiplication then delete entry and all neighboring addition operators
@@ -667,22 +655,18 @@ fn get_args(
         {
             op.push(get_operator(graph.clone(), node));
             for node1 in graph.neighbors_directed(node, Outgoing) {
-                let temp_mi = MathExpression::Mi(
-                    graph.clone()[node1].properties["name"].to_string()
-                        [1..(graph.clone()[node1].properties["name"].to_string().len() - 1_usize)]
-                        .to_string()
-                        .clone(),
-                );
+                let temp_mi = MathExpression::Mi(Mi(graph.clone()[node1].properties["name"]
+                    .to_string()
+                    [1..(graph.clone()[node1].properties["name"].to_string().len() - 1_usize)]
+                    .to_string()));
                 args[i].push(op[0].clone());
                 args[i].push(temp_mi.clone());
             }
         } else if graph[node].labels == ["Opi"] || graph[node].labels == ["Literal"] {
-            let temp_mi = MathExpression::Mi(
-                graph.clone()[node].properties["name"].to_string()
-                    [1..(graph.clone()[node].properties["name"].to_string().len() - 1_usize)]
-                    .to_string()
-                    .clone(),
-            );
+            let temp_mi = MathExpression::Mi(Mi(graph.clone()[node].properties["name"]
+                .to_string()
+                [1..(graph.clone()[node].properties["name"].to_string().len() - 1_usize)]
+                .to_string()));
             args[i].push(temp_mi.clone());
         } else {
             let n_args = get_args(graph.clone(), node);
