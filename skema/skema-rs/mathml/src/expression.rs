@@ -1,8 +1,9 @@
 use crate::{
     ast::{
+        operator::Operator,
         Math, MathExpression,
         MathExpression::{Mfrac, Mn, Mo, Mover, Msqrt, Msubsup, Msup},
-        Mi, Mrow, Operator,
+        Mi, Mrow,
     },
     petri_net::recognizers::recognize_leibniz_differential_operator,
 };
@@ -210,7 +211,7 @@ impl MathExpression {
         self.to_expr(&mut pre_exp);
         pre_exp.group_expr();
         pre_exp.collapse_expr();
-        /// if need to convert to canonical form, please uncomment the following
+        // if need to convert to canonical form, please uncomment the following
         // pre_exp.distribute_expr();
         // pre_exp.group_expr();
         // pre_exp.collapse_expr();
@@ -499,8 +500,8 @@ impl Expr {
                 for i in 0..=ops.len() - 1 {
                     if i > 0 {
                         if ops[i] == Operator::Equals {
-                            let mut new_name: String = "".to_string();
-                            for n in name.as_bytes().clone() {
+                            let mut new_name = "".to_string();
+                            for n in name.as_bytes() {
                                 if *n == 40_u8 {
                                     new_name.push('(');
                                 }
@@ -528,12 +529,12 @@ impl Expr {
                             if ops[0] != Operator::Other("".to_string()) {
                                 string = ops[0].to_string();
                                 string.push('(');
-                                string.push_str(args[i].set_name().as_str().clone());
+                                string.push_str(args[i].set_name().as_str());
                                 string.push(')');
                             } else {
-                                string = args[i].set_name().as_str().to_string().clone();
+                                string = args[i].set_name().as_str().to_string();
                             }
-                            name.push_str(&string.clone());
+                            name.push_str(&string);
                         }
                     }
                 }
@@ -579,9 +580,9 @@ impl Expr {
                                 let mut unitary_name = ops[0].to_string();
                                 let mut name_copy = name.to_string();
                                 remove_redundant_parens(&mut name_copy);
-                                unitary_name.push_str("(".clone());
-                                unitary_name.push_str(&name_copy.clone());
-                                unitary_name.push_str(")".clone());
+                                unitary_name.push_str("(");
+                                unitary_name.push_str(&name_copy);
+                                unitary_name.push_str(")");
                                 left_eq_name.push_str(unitary_name.as_str());
                             } else {
                                 left_eq_name.push_str(name.as_str());
@@ -597,9 +598,9 @@ impl Expr {
                 let mut unitary_name = ops[0].to_string();
                 let mut name_copy = name.to_string();
                 remove_redundant_parens(&mut name_copy);
-                unitary_name.push_str("(".clone());
-                unitary_name.push_str(&name_copy.clone());
-                unitary_name.push_str(")".clone());
+                unitary_name.push_str("(");
+                unitary_name.push_str(&name_copy);
+                unitary_name.push_str(")");
                 let node_idx = get_node_idx(graph, &mut unitary_name);
                 if ops[0].to_string() == "derivative" {
                     return;
@@ -822,11 +823,11 @@ impl Expr {
                             }
                         } else {
                             let mut unitary_name = ops[0].to_string();
-                            let mut name_copy = name.to_string().clone();
+                            let mut name_copy = name.to_string();
                             remove_redundant_parens(&mut name_copy);
-                            unitary_name.push_str("(".clone());
-                            unitary_name.push_str(&name_copy.clone());
-                            unitary_name.push_str(")".clone());
+                            unitary_name.push_str("(");
+                            unitary_name.push_str(&name_copy);
+                            unitary_name.push_str(")");
                             let node_idx = get_node_idx(graph, &mut unitary_name);
                             if i == 0 {
                                 if ops_copy.len() > 1 {
@@ -2038,11 +2039,12 @@ fn test_to_expr29() {
     let _g = math_expression.to_graph();
 }
 
+#[cfg(test)]
 fn get_preprocessed_normalized_math_from_file(filename: &str) -> Math {
     let mut contents = std::fs::read_to_string(filename)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     contents = preprocess_content(contents);
-    let mut math = &mut contents
+    let math = &mut contents
         .parse::<Math>()
         .unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();

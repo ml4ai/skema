@@ -1,7 +1,10 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-use crate::ast::{Derivative, Math, MathExpression, Operator};
+use crate::ast::{
+    operator::{Derivative, Operator},
+    Math, MathExpression,
+};
 use derive_new::new;
 use nom::error::Error;
 use std::{fmt, str::FromStr};

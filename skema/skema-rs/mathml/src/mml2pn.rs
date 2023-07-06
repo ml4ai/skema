@@ -1,9 +1,10 @@
 use crate::acset;
 pub use crate::acset::ACSet;
 use crate::ast::{
+    operator::Operator,
     Math, MathExpression,
     MathExpression::{Mn, Mo},
-    Mrow, Operator,
+    Mrow,
 };
 use crate::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
@@ -160,11 +161,11 @@ impl fmt::Display for Exponent {
 
 impl fmt::Display for Monomial {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}(", self.0 .0);
+        write!(f, "{}(", self.0 .0)?;
         for (specie, exponent) in &self.0 .1 {
-            write!(f, " {}^{} ", specie, exponent);
+            write!(f, " {}^{} ", specie, exponent)?;
         }
-        write!(f, ")");
+        write!(f, ")")?;
         Ok(())
     }
 }

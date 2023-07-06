@@ -1,9 +1,10 @@
 use crate::ast::{
+    operator::Operator,
     Math, MathExpression,
     MathExpression::{
         Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
     },
-    Mi, Mrow, Operator,
+    Mi, Mrow,
 };
 use nom::{
     branch::alt,

@@ -1,3 +1,6 @@
+#[cfg(test)]
+use crate::ast::operator::Operator;
+
 /// Functionality for normalizing MathExpression enums.
 use crate::ast::{
     Math, MathExpression,
@@ -56,7 +59,6 @@ impl Math {
 
 #[test]
 fn test_get_string_repr() {
-    use crate::ast::Operator;
     assert_eq!(
         MathExpression::Mi(Mi("t".to_string())).get_string_repr(),
         "t".to_string()
@@ -75,7 +77,6 @@ fn test_get_string_repr() {
 
 #[test]
 fn test_subscript_collapsing() {
-    use crate::ast::Operator;
     let mut expr = Msub(
         Box::new(MathExpression::Mi(Mi("S".to_string()))),
         Box::new(MathExpression::Mrow(Mrow(vec![
@@ -90,7 +91,6 @@ fn test_subscript_collapsing() {
 
 #[test]
 fn test_normalize() {
-    use crate::ast::Operator;
     let contents = std::fs::read_to_string("tests/sir.xml").unwrap();
     let mut math = contents.parse::<Math>().unwrap();
     math.normalize();

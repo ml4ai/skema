@@ -2,9 +2,10 @@
 //! semantically-meaningful objects from MathML expressions.
 
 use crate::ast::{
-    Derivative, MathExpression,
+    operator::{Derivative, Operator},
+    MathExpression,
     MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msub},
-    Mi, Operator,
+    Mi,
 };
 use crate::petri_net::{Polarity, Var};
 

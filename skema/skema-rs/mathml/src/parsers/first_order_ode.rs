@@ -1,5 +1,8 @@
 use crate::{
-    ast::{Ci, Derivative, MathExpression, Mi, Operator, Type},
+    ast::{
+        operator::{Derivative, Operator},
+        Ci, MathExpression, Mi, Type,
+    },
     parsers::generic_mathml::{
         attribute, etag, math_expression, mi, mo, stag, ws, IResult, ParseError, Span,
     },
@@ -63,7 +66,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
 }
 
 fn ci_univariate_func(input: Span) -> IResult<Ci> {
-    let (s, (Mi(x), left, Mi(y), right)) = tuple((mi, mo, mi, mo))(input)?;
+    let (s, (Mi(x), left, Mi(_), right)) = tuple((mi, mo, mi, mo))(input)?;
     if let (MathExpression::Mo(Operator::Lparen), MathExpression::Mo(Operator::Rparen)) =
         (left, right)
     {
@@ -120,20 +123,20 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
     Ok((s, (Derivative::new(1, 1), func)))
 }
 
-fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
-    let (s, (_, _, _, _)) = tuple((stag!("mover"), mi, mo, etag!("mover")))(input)?;
-    todo!()
-    //let (s, func) = ws(alt((univariate_func, ci_func)))(s)?;
-    //let (s, _) = tuple((
-    //etag!("mrow"),
-    //stag!("mrow"),
-    //d,
-    //mi,
-    //etag!("mrow"),
-    //etag!("mfrac"),
-    //))(s)?;
-    //Ok((s, (Derivative::new(1, 1), func)))
-}
+//fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
+//let (s, (_, _, _, _)) = tuple((stag!("mover"), mi, mo, etag!("mover")))(input)?;
+//todo!()
+//let (s, func) = ws(alt((univariate_func, ci_func)))(s)?;
+//let (s, _) = tuple((
+//etag!("mrow"),
+//stag!("mrow"),
+//d,
+//mi,
+//etag!("mrow"),
+//etag!("mfrac"),
+//))(s)?;
+//Ok((s, (Derivative::new(1, 1), func)))
+//}
 
 /// First order ordinary differential equation.
 pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
@@ -235,5 +238,6 @@ fn test_first_order_ode() {
     )
     .unwrap();
 
-    println!("LHS specie: {lhs_var}, RHS: {rhs}");
+    assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
 }
