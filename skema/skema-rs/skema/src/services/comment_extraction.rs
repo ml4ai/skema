@@ -1,6 +1,6 @@
 //! Comment extraction services
 
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{post, web, HttpResponse};
 use comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
 use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
 use serde::{Deserialize, Serialize};
