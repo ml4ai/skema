@@ -938,34 +938,3 @@ fn test_content_hackathon2_scenario1_eq6() {
         mml,"<math><apply><eq/><apply><diff/><bvar><ci>t</ci></bvar><apply><ci>S</ci><ci>t</ci></apply></apply><apply><plus/><apply><minus/><apply><times/><ci>β</ci><apply><ci>I</ci><ci>t</ci></apply><apply><divide/><apply><ci>S</ci><ci>t</ci></apply><ci>N</ci></apply></apply></apply><apply><times/><ci>ϵ</ci><apply><ci>R</ci><ci>t</ci></apply></apply></apply></apply></math>")
 }
 
-//fn main() {
-////let input = "../tests/test_c2p_mml/test4.xml";
-////let input = "../tests/sir.xml";
-////let input = "../tests/seir_eq1.xml";
-////let input = "../tests/seir_eq2.xml";
-//let input = "../tests/seir_eq3.xml";
-////let input = "../tests/seir_eq4.xml";
-//let mut contents = std::fs::read_to_string(input)
-//.unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
-//let mut vector_mml = Vec::<Math>::new();
-//let (_, mut math) =
-//parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
-////let parsed_mml = get_mathml_asts_from_file("../tests/test_c2p_mml/test6.xml");
-//println!("math={:?}", math);
-////math.normalize();
-//vector_mml.push(math);
-
-//println!("vector_mml={:?}", vector_mml);
-//let mml = to_content_mathml(vector_mml);
-//println!("mml={:?}", mml);
-////assert_eq!(mml, "<math><apply><minus/><ci>y</ci><apply><conjugate/><apply><plus/><ci>x</ci><cn>1</cn></apply></apply></apply></math>");
-//}
-
-/*
-fn main() {
-    let mathml_exp = get_mathml_asts_from_file("../tests/test_c2p_mml/test6.xml");
-    println!("mathml_exp= {:?}", mathml_exp);
-    let cmml = parsed_pmathml_2_cmathml(mathml_exp);
-    println!("cmml={:}", cmml);
-}
-*/
