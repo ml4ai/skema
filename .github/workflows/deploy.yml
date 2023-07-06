@@ -26,7 +26,5 @@ jobs:
         run: |
           # update skema-py
           aws ecs update-service --cluster $SKEMA_ECS_CLUSTER_NAME_MAIN --service darpa-askem-main-ecs-skema-py --force-new-deployment --region $SKEMA_AWS_REGION
-          # update eqn2mml (+ mathjax)
-          aws ecs update-service --cluster $SKEMA_ECS_CLUSTER_NAME_MAIN --service darpa-askem-main-ecs-eqn2mml --force-new-deployment --region $SKEMA_AWS_REGION
           # update skema-rs
           aws ecs update-service --cluster $SKEMA_ECS_CLUSTER_NAME_MAIN --service darpa-askem-main-ecs-skema-rs --force-new-deployment --region $SKEMA_AWS_REGION
