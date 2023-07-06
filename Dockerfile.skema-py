@@ -1,5 +1,4 @@
 # Dockerfile for the skema-py service
-
 FROM  python:3.8-bullseye
 
 # ======================
@@ -23,6 +22,13 @@ apt-get install -y nodejs
 RUN apt-get clean &&\
     rm -rf /var/lib/apt/lists/*
 
+
+# =====================
+# ENV setup for app
+# =====================
+ARG APP_VERSION=unknown
+ENV APP_VERSION=$APP_VERSION
+
 # =====================
 # Setup the repository
 # =====================
@@ -38,7 +44,6 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install the skema package
 RUN pip install wheel
-RUN pip install fastapi uvicorn
 RUN pip install six
 # Download ML model (~150MB)
 # FIXME: consider publishing and retrieving this model from HF Hub
