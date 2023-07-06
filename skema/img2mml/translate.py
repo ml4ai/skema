@@ -58,24 +58,40 @@ def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -> Image.Image
     return Image.fromarray(image_arr)
 
 
+def calculate_scale_factor(
+    image: Image.Image, target_width: int, target_height: int
+) -> float:
+    """
+    Calculate the scale factor to normalize the input image to the target width and height while preserving the
+    original aspect ratio. If the original aspect ratio is larger than the target aspect ratio, the scale factor
+    will be calculated based on width. Otherwise, it will be calculated based on height.
+
+    Args:
+        image (PIL.Image.Image): The input image to be normalized.
+        target_width (int): The target width for normalization.
+        target_height (int): The target height for normalization.
+
+    Returns:
+        float: The scale factor to normalize the image.
+    """
+    original_width, original_height = image.size
+    original_aspect_ratio = original_width / original_height
+    target_aspect_ratio = target_width / target_height
+
+    if original_aspect_ratio > target_aspect_ratio:
+        # Calculate scale factor based on width
+        scale_factor = target_width / original_width
+    else:
+        # Calculate scale factor based on height
+        scale_factor = target_height / original_height
+
+    return scale_factor
+
+
 def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     """preprocessing image - cropping, resizing, and padding"""
     # remove equation number if having
     image = remove_eqn_number(image)
-    # checking if the image lies within permissible boundary
-    w, h = image.size
-    max_h = config["max_input_hgt"]
-    if h >= max_h:
-        resize_factor = max_h / h
-
-        # downsampling the image
-        image = image.resize(
-            (
-                int(image.size[0] * resize_factor),
-                int(image.size[1] * resize_factor),
-            ),
-            Image.Resampling.LANCZOS,
-        )
 
     # converting to np array
     image_arr = np.asarray(image, dtype=np.uint8)
@@ -90,53 +106,13 @@ def preprocess_img(image: Image.Image, config: dict) -> Image.Image:
     # cropping tha image
     image = image.crop((x_min, y_min, x_max, y_max))
 
-    # finding the bucket
-    # [width, hgt, resize_factor]
-    # v1
-    # buckets = [
-    #     [820, 86, 0.6],
-    #     [615, 65, 0.8],
-    #     [492, 52, 1],
-    #     [410, 43, 1.2],
-    #     [350, 37, 1.4],
-    # ]
-    # v2 v3
-    # buckets = [
-    #     [820, 86, 0.6],
-    #     [703, 74, 0.7],
-    #     [615, 65, 0.8],
-    #     [547, 58, 0.9],
-    #     [492, 52, 1],
-    #     [447, 47, 1.1],
-    #     [410, 43, 1.2],
-    #     [379, 40, 1.3],
-    #     [350, 37, 1.4],
-    #     [328, 35, 1.5],
-    # ]
-    # v4
-    buckets = [
-        [878, 92, 0.56],
-        [780, 82, 0.63],
-        [683, 72, 0.72],
-        [592, 62, 0.83],
-        [492, 52, 1],
-        [400, 42, 1.23],
-        [302, 32, 1.625],
-        [208, 22, 2.36],
-        [113, 12, 4.33],
-    ]
-    # current width, hgt
-    crop_width, crop_hgt = image.size[0], image.size[1]
-
-    # find correct bucket
-    resize_factor = config["resizing_factor"]
-    for b in buckets:
-        w, h, r = b
-        if crop_width <= w and crop_hgt <= h:
-            resize_factor = r
+    # calculate the target width and height
+    target_width = config["preprocessed_image_width"] - 2 * config["padding"]
+    target_height = config["preprocessed_image_height"] - 2 * config["padding"]
+    # calculate the scale factor
+    resize_factor = calculate_scale_factor(image, target_width, target_height)
 
     # resizing the image
-    # resize_factor = config["resizing_factor"]
     image = image.resize(
         (
             int(image.size[0] * resize_factor),
@@ -199,7 +175,7 @@ def define_model(
     n_heads = config["n_xfmer_heads"]
     n_xfmer_encoder_layers = config["n_xfmer_encoder_layers"]
     n_xfmer_decoder_layers = config["n_xfmer_decoder_layers"]
-    len_dim = 930
+    len_dim = 2500
 
     enc = {
         "CNN": CNN_Encoder(input_channels, dec_hid_dim, dropout, device),
