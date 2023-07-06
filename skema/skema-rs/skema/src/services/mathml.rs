@@ -24,7 +24,7 @@ pub async fn get_ast_graph(payload: String) -> String {
     let contents = &payload;
     let math = contents.parse::<Math>().unwrap();
     //let (_, math) =
-        //parse(contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
+    //parse(contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
 
     let g = math.to_graph();
     let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
@@ -99,7 +99,11 @@ pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/amr")]
 pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
-    let asts: Vec<Math> = payload.mathml.iter().map(|x| x.parse::<Math>().unwrap()).collect();
+    let asts: Vec<Math> = payload
+        .mathml
+        .iter()
+        .map(|x| x.parse::<Math>().unwrap())
+        .collect();
     let model_type = payload.model.clone();
     if model_type == *"regnet" {
         HttpResponse::Ok().json(web::Json(RegNet::from(asts)))

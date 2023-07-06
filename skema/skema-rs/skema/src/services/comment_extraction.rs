@@ -1,14 +1,14 @@
 //! Comment extraction services
 
 use actix_web::{post, web, HttpResponse};
-use comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
 use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
+use comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
+use log::debug;
 use serde::{Deserialize, Serialize};
+use std::{fs, io::Write};
+use tempdir::TempDir;
 use utoipa;
 use utoipa::ToSchema;
-use std::{fs, io::Write};
-use log::debug;
-use tempdir::TempDir;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub enum Language {
@@ -80,7 +80,6 @@ impl CommentExtractionRequest {
 pub async fn get_comments(payload: web::Json<CommentExtractionRequest>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(get_python_comments(&payload.code)))
 }
-
 
 /// Get comments for a zipfile containing a directory of code
 #[utoipa::path(
