@@ -1,6 +1,7 @@
 use crate::{
     ast::{Derivative, MathExpression, Mi, Operator},
-    parsing::{attribute, lparen, mi, mo, mrow, rparen, ws, IResult, ParseError, Span},
+    parsing::{attribute, lparen, mi, mo, mrow, operator, rparen, ws, IResult, ParseError, Span},
+    pratt_parsing::MathExpressionTree,
 };
 use nom::{
     branch::alt,
@@ -116,6 +117,16 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
     Ok((s, (Derivative::new(1, 1), func)))
 }
 
+fn ode(input: Span) -> IResult<MathExpressionTree> {
+    // Recognize LHS derivative
+    let (s, (derivative, ci)) = first_order_derivative_leibniz_notation(input)?;
+
+    // Recognize equals sign
+    let (s, _) = tuple((stag!("mo"), tag("="), etag!("mo")))(input)?;
+
+    todo!()
+}
+
 #[test]
 fn test_dsp() {
     test_parser(
@@ -129,9 +140,9 @@ fn test_dsp() {
 
     test_parser(
         "<mfrac>
-    <mrow><mi>d</mi><mi>S</mi></mrow>
-    <mrow><mi>d</mi><mi>t</mi></mrow>
-    </mfrac>",
+        <mrow><mi>d</mi><mi>S</mi></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>",
         first_order_derivative_leibniz_notation,
         (
             Derivative::new(1, 1),
@@ -147,7 +158,7 @@ fn test_dsp() {
         <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
         <mrow><mi>d</mi><mi>t</mi></mrow>
         </mfrac>",
-        leibniz_derivative,
+        first_order_derivative_leibniz_notation,
         (
             Derivative::new(1, 1),
             Ci::new(

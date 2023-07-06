@@ -10,7 +10,7 @@ use nom::error::Error;
 use std::{fmt, str::FromStr};
 
 /// An S-expression like structure.
-enum MathExpressionTree {
+pub enum MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec<MathExpressionTree>),
 }

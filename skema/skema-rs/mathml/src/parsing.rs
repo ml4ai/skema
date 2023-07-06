@@ -194,7 +194,7 @@ fn operator_other(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-fn operator(input: Span) -> IResult<Operator> {
+pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = alt((add, subtract, equals, lparen, rparen, operator_other))(input)?;
     Ok((s, op))
 }
