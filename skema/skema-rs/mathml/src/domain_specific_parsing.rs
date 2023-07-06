@@ -1,7 +1,7 @@
 use crate::{
     ast::{Ci, Derivative, MathExpression, Mi, Operator, Type},
     parsing::{attribute, etag, math_expression, mi, mo, stag, ws, IResult, ParseError, Span},
-    pratt_parsing::Token,
+    pratt_parsing::MathExpressionTree,
 };
 use nom::{
     branch::alt,
@@ -13,7 +13,7 @@ use nom::{
 };
 
 #[cfg(test)]
-use crate::{parsing::test_parser, pratt_parsing::MathExpressionTree};
+use crate::parsing::test_parser;
 
 // Operators, including surrounding tags.
 
@@ -103,7 +103,7 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
 }
 
 /// First order ordinary differential equation.
-pub fn ode(input: Span) -> IResult<Vec<MathExpression>> {
+pub fn ode(input: Span) -> IResult<MathExpressionTree> {
     let (s, _) = stag!("math")(input)?;
 
     // Recognize LHS derivative
@@ -130,7 +130,7 @@ pub fn ode(input: Span) -> IResult<Vec<MathExpression>> {
 
     tokens.extend(remaining_tokens);
 
-    Ok((s, tokens))
+    Ok((s, MathExpressionTree::from(tokens)))
 }
 
 #[test]
@@ -179,7 +179,7 @@ fn test_dsp() {
 #[test]
 fn test_ode() {
     // Test ODE
-    let (s, tokens) = ode("
+    let (s, tree) = ode("
     <math>
         <mfrac>
         <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
@@ -195,6 +195,5 @@ fn test_ode() {
     .into())
     .unwrap();
 
-    let s_expression = MathExpressionTree::from(tokens);
-    println!("{s_expression}");
+    println!("{tree}");
 }
