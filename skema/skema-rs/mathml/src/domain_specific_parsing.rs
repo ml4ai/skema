@@ -66,7 +66,7 @@ struct Ci {
 }
 
 fn univariate_func(input: Span) -> IResult<Ci> {
-    let (s, (Mi(x), left, y, right)) = tuple((mi, mo, mi, mo))(input)?;
+    let (s, (Mi(x), left, Mi(y), right)) = tuple((mi, mo, mi, mo))(input)?;
     if let (MathExpression::Mo(Operator::Lparen), MathExpression::Mo(Operator::Rparen)) =
         (left, right)
     {
@@ -85,22 +85,35 @@ fn univariate_func(input: Span) -> IResult<Ci> {
     }
 }
 
-fn d(input: Span) -> IResult<bool> {
+fn d(input: Span) -> IResult<()> {
     let (s, Mi(x)) = mi(input)?;
     if let "d" = x.as_ref() {
-        Ok((s, true))
+        Ok((s, ()))
     } else {
-        Ok((s, false))
+        Err(nom::Err::Error(ParseError::new(
+            "Unable to identify Mi('d')".to_string(),
+            input,
+        )))
     }
 }
 
-fn leibniz_derivative(input: Span) -> IResult<(Derivative, Ci)> {
-    let (s, (_, contents, _)) = ws(tuple((
-        stag!("mfrac"),
-        map_parser(recognize(take_until("</mfrac>")), pair(mrow, mrow)),
-        tag("</mfrac>"),
-    )))(input)?;
-    todo!()
+fn ci_func(input: Span) -> IResult<Ci> {
+    let (s, x) = mi(input)?;
+    Ok((s, Ci::new(Some(Type::Function), MathExpression::Mi(x))))
+}
+
+fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
+    let (s, _) = tuple((ws(stag!("mfrac")), ws(stag!("mrow")), ws(d)))(input)?;
+    let (s, func) = ws(alt((univariate_func, ci_func)))(s)?;
+    let (s, _) = tuple((
+        ws(etag!("mrow")),
+        ws(stag!("mrow")),
+        ws(d),
+        ws(mi),
+        ws(etag!("mrow")),
+        ws(etag!("mfrac")),
+    ))(s)?;
+    Ok((s, (Derivative::new(1, 1), func)))
 }
 
 #[test]
@@ -112,13 +125,35 @@ fn test_dsp() {
             Some(Type::Function),
             MathExpression::Mi(Mi("S".to_string())),
         ),
-    )
+    );
 
-    //test_parser(
-    //"<mfrac>
-    //<mrow><mi>d</mi><mi>S</mi></mrow>
-    //<mrow><mi>d</mi><mi>t</mi></mrow>
-    //</mfrac>"
+    test_parser(
+        "<mfrac>
+    <mrow><mi>d</mi><mi>S</mi></mrow>
+    <mrow><mi>d</mi><mi>t</mi></mrow>
+    </mfrac>",
+        first_order_derivative_leibniz_notation,
+        (
+            Derivative::new(1, 1),
+            Ci::new(
+                Some(Type::Function),
+                MathExpression::Mi(Mi("S".to_string())),
+            ),
+        ),
+    );
 
-    //)
+    test_parser(
+        "<mfrac>
+        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>",
+        leibniz_derivative,
+        (
+            Derivative::new(1, 1),
+            Ci::new(
+                Some(Type::Function),
+                MathExpression::Mi(Mi("S".to_string())),
+            ),
+        ),
+    );
 }
