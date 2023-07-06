@@ -83,7 +83,7 @@ jobs:
         # references `tags` step in steps for current job
         tags: ${{ steps.tags.outputs.tags }}
         build-args: |
-          APP_VERSION=${{GITHUB_SHA}}
+          APP_VERSION=${{github.sha}}
 
   rust:
     name: "docker image for rust components"

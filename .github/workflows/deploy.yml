@@ -25,6 +25,6 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           # update skema-py
-          aws ecs update-service --cluster $SKEMA_ECS_CLUSTER_NAME_MAIN --service darpa-askem-main-ecs-skema-py --force-new-deployment --region $SKEMA_AWS_REGION
+          aws ecs update-service --cluster $SKEMA_ECS_CLUSTER_NAME_MAIN --service darpa-askem-main-ecs-skema-py --force-new-deployment --region $SKEMA_AWS_REGION &>/dev/null
           # update skema-rs
-          aws ecs update-service --cluster $SKEMA_ECS_CLUSTER_NAME_MAIN --service darpa-askem-main-ecs-skema-rs --force-new-deployment --region $SKEMA_AWS_REGION
+          aws ecs update-service --cluster $SKEMA_ECS_CLUSTER_NAME_MAIN --service darpa-askem-main-ecs-skema-rs --force-new-deployment --region $SKEMA_AWS_REGION &>/dev/null
