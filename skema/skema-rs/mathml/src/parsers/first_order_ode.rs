@@ -4,7 +4,8 @@ use crate::{
         Ci, MathExpression, Mi, Type,
     },
     parsers::generic_mathml::{
-        attribute, etag, math_expression, mi, mo, stag, ws, IResult, ParseError, Span,
+        add, attribute, equals, etag, lparen, math_expression, mi, mo, rparen, stag, subtract, ws,
+        IResult, ParseError, Span,
     },
     parsers::math_expression_tree::MathExpressionTree,
 };
@@ -26,36 +27,17 @@ use crate::parsers::generic_mathml::test_parser;
 /// in Leibniz or Newtonian notation.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct FirstOrderODE {
+    /// The variable/univariate function) on the LHS of the equation that is being
+    /// differentiated. This variable may be referred to as a 'specie', 'state', or 'vertex' in the
+    /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
+
+    /// An expression tree corresponding to the RHS of the ODE.
     pub rhs: MathExpressionTree,
 }
 
-// Operators, including surrounding tags.
-fn add(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Add, ws(tag("+")))(input)?;
-    Ok((s, op))
-}
-
-fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, ws(one_of("-−")))(input)?;
-    Ok((s, op))
-}
-
-fn equals(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
-    Ok((s, op))
-}
-
-pub fn lparen(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Lparen, ws(tag("(")))(input)?;
-    Ok((s, op))
-}
-
-pub fn rparen(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Rparen, ws(tag(")")))(input)?;
-    Ok((s, op))
-}
-
+/// Function to parse operators. This function differs from the one in parsers::generic_mathml by
+/// disallowing operators besides +, -, =, (, and ).
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
@@ -65,6 +47,8 @@ pub fn operator(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+/// Parse content identifiers corresponding to univariate functions.
+/// Example: S(t)
 fn ci_univariate_func(input: Span) -> IResult<Ci> {
     let (s, (Mi(x), left, Mi(_), right)) = tuple((mi, mo, mi, mo))(input)?;
     if let (MathExpression::Mo(Operator::Lparen), MathExpression::Mo(Operator::Rparen)) =
@@ -85,6 +69,7 @@ fn ci_univariate_func(input: Span) -> IResult<Ci> {
     }
 }
 
+/// Parse the identifier 'd'
 fn d(input: Span) -> IResult<()> {
     let (s, Mi(x)) = mi(input)?;
     if let "d" = x.as_ref() {
@@ -97,12 +82,13 @@ fn d(input: Span) -> IResult<()> {
     }
 }
 
-// Parse an content identifier of unknown type.
+/// Parse a content identifier of unknown type.
 fn ci_unknown(input: Span) -> IResult<Ci> {
     let (s, x) = mi(input)?;
     Ok((s, Ci::new(None, MathExpression::Mi(x))))
 }
 
+/// Parse a first-order ordinary derivative written in Leibniz notation.
 fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), d))(input)?;
     let (s, func) = ws(alt((
@@ -138,7 +124,7 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
 //Ok((s, (Derivative::new(1, 1), func)))
 //}
 
-/// First order ordinary differential equation.
+/// Parse a first order ODE with a single derivative term on the LHS.
 pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     let (s, _) = stag!("math")(input)?;
 
@@ -220,8 +206,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
 
 #[test]
 fn test_first_order_ode() {
-    let (_, FirstOrderODE { lhs_var, rhs }) = first_order_ode(
-        "
+    let input = "
     <math>
         <mfrac>
         <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
@@ -233,11 +218,15 @@ fn test_first_order_ode() {
         <mi>S</mi>
         <mi>I</mi>
     </math>
-    "
-        .into(),
-    )
-    .unwrap();
+    ";
 
+    println!("Input: {input}");
+    let (_, FirstOrderODE { lhs_var, rhs }) = first_order_ode(input.into()).unwrap();
+
+    println!("Output:\n");
+    println!("\tLHS var: {lhs_var}");
     assert_eq!(lhs_var.to_string(), "S");
+    println!("\tRHS: {rhs}");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
+    println!()
 }

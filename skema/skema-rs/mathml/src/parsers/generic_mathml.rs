@@ -166,17 +166,17 @@ fn mn(input: Span) -> IResult<MathExpression> {
     Ok((s, Mn(element.trim().to_string())))
 }
 
-fn add(input: Span) -> IResult<Operator> {
+pub fn add(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Add, ws(tag("+")))(input)?;
     Ok((s, op))
 }
 
-fn subtract(input: Span) -> IResult<Operator> {
+pub fn subtract(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Subtract, ws(one_of("-−")))(input)?;
     Ok((s, op))
 }
 
-fn equals(input: Span) -> IResult<Operator> {
+pub fn equals(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
     Ok((s, op))
 }
