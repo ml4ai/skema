@@ -1,5 +1,4 @@
 # Dockerfile for the skema-py service
-
 FROM  python:3.8-bullseye
 
 # ======================
@@ -13,11 +12,22 @@ RUN apt-get update &&\
         build-essential \
         graphviz \
         libgraphviz-dev \
-        python3-venv  &&\
-    # The two commands below are to reduce the size of the Docker image
-    apt-get clean &&\
+        python3-venv 
+
+# Node needed for img2mml
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - &&\
+apt-get install -y nodejs
+
+# The two commands below are to reduce the size of the Docker image
+RUN apt-get clean &&\
     rm -rf /var/lib/apt/lists/*
 
+
+# =====================
+# ENV setup for app
+# =====================
+ARG APP_VERSION=unknown
+ENV APP_VERSION=$APP_VERSION
 
 # =====================
 # Setup the repository
@@ -28,25 +38,25 @@ RUN mkdir -p /app
 COPY . /app/
 WORKDIR /app/
 
-# Install rust (needed b/c of ISA's use of graspologic)
+# Install rust (needed b/c of ISA's use of graspologic; no wheels available for ARM64/M1)
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install the skema package
 RUN pip install wheel
-RUN pip install fastapi uvicorn
 RUN pip install six
 # Download ML model (~150MB)
 # FIXME: consider publishing and retrieving this model from HF Hub
-RUN curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+RUN curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
 # FIXME: remove later
 RUN tree /app
 #RUN pip install ".[all]"
 # exclude dependencies for docs
-RUN pip install ".[core,dev]"
-
+RUN pip install ".[core,dev,demo]"
 # Build tree-sitter-fortran grammar required by Fortran code2fn
-#RUN python /app/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
+RUN python /app/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
 
+# img2mml JS dependencies for MathJax server
+RUN (cd skema/img2mml/data_generation && npm install)
 
 #CMD ["uvicorn", "skema.skema_py.server:app", "--host", "0.0.0.0", "--port", "8000"]

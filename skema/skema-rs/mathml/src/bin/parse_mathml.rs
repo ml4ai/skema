@@ -1,7 +1,7 @@
 //! Program to parse MathML
 
 use clap::Parser;
-use mathml::parsing::parse;
+use mathml::ast::Math;
 use petgraph::dot::{Config, Dot};
 
 #[derive(Parser, Debug)]
@@ -19,8 +19,8 @@ fn main() {
     let input = &args.input;
     let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let mut math = contents.parse::<Math>().unwrap();
+    //parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     if args.normalize {
         math.normalize();
     }

@@ -11,7 +11,11 @@ RUN apt-get update && \
 
 # Use individual commands to prevent excess time usage when re-building
 RUN apt-get -y --no-install-recommends install curl wget gnupg2 git 
+# TODO: switch to Java 11
+# RUN apt-get -y --no-install-recommends install openjdk-11-jdk antlr4 doxygen
+# RUN update-alternatives --set java $(update-alternatives --list java | grep java-11)
 RUN apt-get -y --no-install-recommends install openjdk-8-jdk antlr4 doxygen
+RUN update-alternatives --set java $(update-alternatives --list java | grep java-8)
 RUN apt-get -y --no-install-recommends install gcc build-essential pkg-config
 RUN apt-get -y --no-install-recommends install python3-dev python3-pip python3-venv
 
@@ -27,7 +31,8 @@ RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 # =============================================================================
 # Add PACKAGES FOR TR PIPELINE
 # =============================================================================
-RUN update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
+
+
 RUN mkdir -p /TR_utils
 WORKDIR /TR_utils
 RUN git clone https://github.com/lum-ai/regextools.git
@@ -53,7 +58,8 @@ RUN mkdir -p /skema/text_reading
 COPY . /skema/text_reading
 WORKDIR /skema/text_reading
 # Compile the fat jar
-RUN sbt assembly
+# NOTE: we don't need a fat JAR
+#RUN sbt -J-Xmx6g assembly
 
 # =============================================================================
 

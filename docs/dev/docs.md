@@ -9,7 +9,7 @@ conda activate skema
 mkdocs serve
 ```
 
-Open your browser to [http://127.0.0.1:8000/skema](http://127.0.0.1:8000/skema).
+Open your browser to [http://127.0.0.1:8000/skema/](http://127.0.0.1:8000/skema/).
 
 !!! note
     `mkdocs serve` supports **live reloading**.  Any changes to the source will be reflected immediately. 

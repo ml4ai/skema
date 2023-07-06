@@ -5,9 +5,20 @@ Please run the following command to initialize the MathJAX service:
 node data_generation/mathjax_server.js
 """
 
-from fastapi import FastAPI, File
+from typing import Text
+from fastapi import FastAPI, File, Body
 from skema.img2mml.api import get_mathml_from_latex
+from pydantic import BaseModel, Field
 
+
+class LatexEquation(BaseModel):
+    tex_src: Text = Field(description="The LaTeX equation to process")
+    class Config:
+        schema_extra = {
+            "example": {
+                "tex_src": "E = mc^{c}",
+            }
+        }
 
 # Create a web app using FastAPI
 
@@ -19,10 +30,19 @@ def ping():
     return "The latex2mml service is running."
 
 
-@app.put("/get-mml", summary="Get MathML representation of a LaTeX equation")
-async def get_mathml(eqn: str):
+@app.get("/get-mml", summary="Get MathML representation of a LaTeX equation")
+async def get_mathml(tex_src: str):
+    """
+    GET endpoint for generating MathML from an input LaTeX equation.
+    """
+    # convert latex string to presentation mathml
+    print(tex_src)
+    return get_mathml_from_latex(tex_src)
+
+@app.post("/latex2mml", summary="Get MathML representation of a LaTeX equation")
+async def mathml(eqn: LatexEquation):
     """
     Endpoint for generating MathML from an input LaTeX equation.
     """
     # convert latex string to presentation mathml
-    return get_mathml_from_latex(eqn)
+    return get_mathml_from_latex(eqn.tex_src)

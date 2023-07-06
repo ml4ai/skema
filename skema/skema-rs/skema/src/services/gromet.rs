@@ -1,13 +1,14 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
-
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
-use crate::{Gromet, ModuleCollection};
+use crate::model_extraction::module_id2mathml_ast;
+use crate::ModuleCollection;
 use actix_web::web::ServiceConfig;
+use actix_web::{delete, get, post, put, web, HttpResponse};
+use mathml::acset::{PetriNet, RegNet};
+use mathml::mml2pn::ACSet;
 use rsmgclient::{ConnectParams, Connection, MgError, Value};
 use std::collections::HashMap;
-
-use actix_web::{delete, get, post, web, HttpResponse};
 use utoipa;
 
 pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
@@ -23,6 +24,24 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
     }
 }
 
+pub fn model_to_RN(gromet: ModuleCollection, host: &str) -> Result<RegNet, MgError> {
+    let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
+    let ref_module_id1 = module_id.as_ref();
+    let ref_module_id2 = module_id.as_ref();
+    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), host); // deletes model from db
+    Ok(RegNet::from(mathml_ast))
+}
+
+pub fn model_to_PN(gromet: ModuleCollection, host: &str) -> Result<PetriNet, MgError> {
+    let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
+    let ref_module_id1 = module_id.as_ref();
+    let ref_module_id2 = module_id.as_ref();
+    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
+    let _del_response = delete_module(*ref_module_id2.unwrap(), host); // deletes model from db
+    Ok(PetriNet::from(ACSet::from(mathml_ast)))
+}
+
 pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgError> {
     // parse gromet into vec of queries
     let queries = parse_gromet_queries(gromet);
@@ -30,9 +49,9 @@ pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgE
     // need to make the whole query list one line, individual executions are treated as different graphs for each execution.
     let mut full_query = queries[0].clone();
     for i in 1..(queries.len()) {
-        full_query.push_str("\n");
+        full_query.push('\n');
         let temp_str = &queries[i].clone();
-        full_query.push_str(&temp_str);
+        full_query.push_str(temp_str);
     }
     execute_query(&full_query, host)?;
     let model_ids = module_query(host)?;
@@ -186,7 +205,7 @@ pub fn module_query(host: &str) -> Result<Vec<i64>, MgError> {
         ids = xs
             .iter()
             .filter_map(|x| match x {
-                Value::Int(x) => Some(x.clone()),
+                Value::Int(x) => Some(*x),
                 _ => None,
             })
             .collect();
@@ -283,4 +302,72 @@ pub async fn get_named_opis(path: web::Path<i64>, config: web::Data<Config>) -> 
 pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
     let response = get_subgraph_query(path.into_inner(), &config.db_host).unwrap();
     HttpResponse::Ok().json(web::Json(response))
+}
+
+/// This retrieves a PetriNet AMR based on model id.
+#[utoipa::path(
+    responses(
+        (
+            status = 200, description = "Successfully retrieved PN AMR",
+            body = PetriNet
+        )
+    )
+)]
+#[get("/models/{id}/PN")]
+pub async fn get_model_PN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let mathml_ast = module_id2mathml_ast(path.into_inner(), &config.db_host);
+    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(mathml_ast))))
+}
+
+/// This retrieves a RegNet AMR based on model id.
+#[utoipa::path(
+    responses(
+        (
+            status = 200, description = "Successfully retrieved RN AMR",
+            body = RegNet
+        )
+    )
+)]
+#[get("/models/{id}/RN")]
+pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
+    let mathml_ast = module_id2mathml_ast(path.into_inner(), &config.db_host);
+    HttpResponse::Ok().json(web::Json(RegNet::from(mathml_ast)))
+}
+
+/// This returns a PetriNet AMR from a gromet.
+#[utoipa::path(
+    responses(
+        (
+            status = 200, description = "Successfully retrieved PN AMR",
+            body = ModuleCollection
+        )
+    )
+)]
+#[put("/models/PN")]
+pub async fn model2PN(
+    payload: web::Json<ModuleCollection>,
+    config: web::Data<Config>,
+) -> HttpResponse {
+    HttpResponse::Ok().json(web::Json(
+        model_to_PN(payload.into_inner(), &config.db_host).unwrap(),
+    ))
+}
+
+/// This returns a RegNet AMR from a gromet.
+#[utoipa::path(
+    responses(
+        (
+            status = 200, description = "Successfully retrieved RN AMR",
+            body = ModuleCollection
+        )
+    )
+)]
+#[put("/models/RN")]
+pub async fn model2RN(
+    payload: web::Json<ModuleCollection>,
+    config: web::Data<Config>,
+) -> HttpResponse {
+    HttpResponse::Ok().json(web::Json(
+        model_to_RN(payload.into_inner(), &config.db_host).unwrap(),
+    ))
 }

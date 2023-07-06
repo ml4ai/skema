@@ -14,6 +14,7 @@ steps:
     paths:
     - .drone.yml
     - skema/skema-rs/**
+    - data/gromet/**
 
 ---
 kind: pipeline
@@ -50,6 +51,7 @@ steps:
     - skema/program_analysis/**
     - skema/gromet/**
     - skema/model_assembly/**
+    - data/gromet/**
 
 ---
 kind: pipeline
@@ -61,7 +63,7 @@ steps:
   commands:
   - apt-get update
   - apt-get -y install build-essential graphviz libgraphviz-dev
-  - curl -L https://kraken.sista.arizona.edu/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+  - curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
   - pip install ".[core,dev]"
   - pytest -s --cov=skema skema/img2mml/tests
   when:

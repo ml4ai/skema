@@ -1,9 +1,12 @@
 //! Comment extraction services
 
-use actix_web::{get, web, HttpResponse};
+use actix_web::{post, web, HttpResponse};
 use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
-use comment_extraction::comments::Comments;
+use comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
+use log::debug;
 use serde::{Deserialize, Serialize};
+use std::{fs, io::Write};
+use tempdir::TempDir;
 use utoipa;
 use utoipa::ToSchema;
 
@@ -73,7 +76,33 @@ impl CommentExtractionRequest {
         (status = 200, description = "Get comments", body = CommentExtractionResponse)
     )
 )]
-#[get("/get_comments")]
+#[post("/extract-comments")]
 pub async fn get_comments(payload: web::Json<CommentExtractionRequest>) -> HttpResponse {
     HttpResponse::Ok().json(web::Json(get_python_comments(&payload.code)))
+}
+
+/// Get comments for a zipfile containing a directory of code
+#[utoipa::path(
+    responses(
+        (status = 200, description = "Get comments from zipfile")
+    )
+)]
+#[post("/extract-comments-from-zipfile")]
+pub async fn get_comments_from_zipfile(payload: web::Bytes) -> HttpResponse {
+    debug!("Zip file received. Size: {} bytes", payload.len());
+    let tmp_dir = TempDir::new("comment_extraction_input").unwrap();
+    let file_path = tmp_dir.path().join("directory.zip");
+    let mut f = fs::File::create(file_path.clone()).unwrap();
+    f.write_all(&payload).unwrap();
+    drop(f);
+
+    // Read zipfile
+    let file = fs::File::open(file_path).unwrap();
+    let mut archive = zip::ZipArchive::new(file).unwrap();
+    archive.extract(&tmp_dir).unwrap();
+    let comments = extract_comments_from_directory(&tmp_dir, &None);
+
+    tmp_dir.close().unwrap();
+
+    HttpResponse::Ok().json(web::Json(comments))
 }

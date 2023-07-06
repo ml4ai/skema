@@ -247,9 +247,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def cosmosJsonToMentions: Action[AnyContent] = Action { request =>
     val json = request.body.asJson.get.toString()
     val ujsonArray = ujson.read(json)
-    val ujsonValues = ujsonArray.arr.map { ujsonValue =>
+
+    val ujsonValues = ujsonArray.arr.par.map { ujsonValue =>
       cosmosPipeline.extractMentionsFromJsonAndSerialize(ujsonValue)
-    }
+    }.seq
+
     val ujsonResult = ujson.Arr.from(ujsonValues)
     val playJsonResult = ujsonToPlayJson(ujsonResult)
 
@@ -260,9 +262,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def textFileToMentions: Action[AnyContent] = Action { request =>
     val json = request.body.asJson.get.toString()
     val ujsonArray = ujson.read(json)
-    val ujsonValues = ujsonArray.arr.map { ujsonValue =>
+
+    val ujsonValues = ujsonArray.arr.par.map { ujsonValue =>
       SkemaJSONSerializer.serializeMentions(plainTextPipeline.extractMentionsWithContext(ujsonValue.toString(), contextWindowSize = 3))
-    }
+    }.seq
+
     val ujsonResult = ujson.Arr.from(ujsonValues)
     val playJsonResult = ujsonToPlayJson(ujsonResult)
 

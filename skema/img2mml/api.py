@@ -1,10 +1,11 @@
 import json
+import os
 from pathlib import Path
 import requests
 import re
+from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
-PORT = 8031
 
 def get_mathml_from_bytes(data: bytes):
     # convert png image to tensor
@@ -38,29 +39,21 @@ def get_mathml_from_file(filepath) -> str:
     return get_mathml_from_bytes(data)
 
 
-def get_mathml_from_latex(eqn) -> str:
+def get_mathml_from_latex(eqn: str) -> str:
     """Read a LaTeX equation string and convert it to presentation MathML"""
 
     # Define the webservice address from the MathJAX service
-    # FIXME: this should be set using an ENV variable
-    webservice = "http://localhost:" + str(PORT)
+    webservice = SKEMA_MATHJAX_ADDRESS
+    print(f"Connecting to {webservice}")
+
     # Translate and save each LaTeX string using the NodeJS service for MathJax
     res = requests.post(
         f"{webservice}/tex2mml",
         headers={"Content-type": "application/json"},
-        json={"tex_src": json.dumps(eqn)},
+        json={"tex_src": eqn},
     )
-
     if res.status_code == 200:
-        clean_res = (
-            res.content.decode("utf-8")[1:-1]
-            .replace("\\n", "")
-            .replace('\\"', '"')
-            .replace("\\\\", "\\")
-            .strip()
-        )
-        clean_res = re.sub(r"\s+", " ", clean_res)
-        return clean_res
+        return res.text
     else:
         try:
             res.raise_for_status()
