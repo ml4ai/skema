@@ -428,6 +428,7 @@ impl From<Vec<Math>> for RegNet {
                 }
             }
 
+            // Positive rate sign: source, negative => sink.
             if eqns[&state.clone()][term_idx].polarity == Polarity::Positive {
                 rate_sign = true;
             }

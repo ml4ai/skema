@@ -127,6 +127,12 @@ impl fmt::Display for MathExpression {
     }
 }
 
+impl fmt::Display for Ci {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.content)
+    }
+}
+
 /// The Math struct represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_math)
 #[derive(Debug, PartialEq, Clone)]

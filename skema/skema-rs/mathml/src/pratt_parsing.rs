@@ -3,7 +3,7 @@
 
 use crate::{
     ast::{Ci, Derivative, Math, MathExpression, Operator},
-    domain_specific_parsing::ode,
+    domain_specific_parsing::{first_order_ode, FirstOrderODE},
     petri_net::recognizers::recognize_leibniz_differential_operator,
 };
 
@@ -275,8 +275,9 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(ode(input.into()).unwrap().1);
-    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
+    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
+    assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
 
     let input = "
@@ -286,7 +287,8 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let s = MathExpressionTree::from(ode(input.into()).unwrap().1);
-    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
+    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
+    assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
 }
