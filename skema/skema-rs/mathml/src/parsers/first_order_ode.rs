@@ -15,9 +15,11 @@ use nom::{
     bytes::complete::tag,
     character::complete::one_of,
     combinator::{map, value},
+    error::Error,
     multi::{many0, many1},
     sequence::{delimited, tuple},
 };
+use std::str::FromStr;
 
 #[cfg(test)]
 use crate::parsers::generic_mathml::test_parser;
@@ -157,6 +159,15 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     Ok((s, ode))
 }
 
+impl FromStr for FirstOrderODE {
+    type Err = Error<String>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let ode = first_order_ode(s.into()).unwrap().1;
+        Ok(ode)
+    }
+}
+
 #[test]
 fn test_ci_univariate_func() {
     test_parser(
@@ -221,7 +232,7 @@ fn test_first_order_ode() {
     </math>
     ";
 
-    let (_, FirstOrderODE { lhs_var, rhs }) = first_order_ode(input.into()).unwrap();
+    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
 
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
