@@ -40,7 +40,7 @@ node data_generation/mathjax_server.js
 
 from typing import Text, Union
 from typing_extensions import Annotated
-from fastapi import APIRouter, FastAPI, Body, File, Response, Request, Query
+from fastapi import APIRouter, FastAPI, File, Response, Request, Query
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
 from skema.data.eq2mml import img_b64_bayes_white_bg
@@ -50,6 +50,12 @@ import requests
 
 
 router = APIRouter()
+
+def b64_image_to_mml(img_b64: str) -&gt; str:
+    &#34;&#34;&#34;Helper method to convert image (encoded as base64) to MML&#34;&#34;&#34;
+    img_bytes = base64.b64decode(img_b64)
+    # convert bytes of png image to tensor
+    return get_mathml_from_bytes(img_bytes)
 
 EquationQueryParameter = Annotated[
   Text,
@@ -149,9 +155,7 @@ async def post_b64image_to_mathml(request: Request) -&gt; Response:
     print(r.text)
     &#34;&#34;&#34;
     img_b64 = await request.body()
-    img_bytes = base64.b64decode(img_b64)
-    # convert bytes of png image to tensor
-    res =  get_mathml_from_bytes(img_bytes)
+    res = b64_image_to_mml(img_b64)
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
 @router.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
@@ -194,6 +198,22 @@ app.include_router(router)</code></pre>
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="skema.img2mml.eqn2mml.b64_image_to_mml"><code class="name flex">
+<span>def <span class="ident">b64_image_to_mml</span></span>(<span>img_b64: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Helper method to convert image (encoded as base64) to MML</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def b64_image_to_mml(img_b64: str) -&gt; str:
+    &#34;&#34;&#34;Helper method to convert image (encoded as base64) to MML&#34;&#34;&#34;
+    img_bytes = base64.b64decode(img_b64)
+    # convert bytes of png image to tensor
+    return get_mathml_from_bytes(img_bytes)</code></pre>
+</details>
+</dd>
 <dt id="skema.img2mml.eqn2mml.get_tex_to_mathml"><code class="name flex">
 <span>async def <span class="ident">get_tex_to_mathml</span></span>(<span>tex_src: typing_extensions.Annotated[str, Query(PydanticUndefined)]) ‑> starlette.responses.Response</span>
 </code></dt>
@@ -293,9 +313,7 @@ async def post_b64image_to_mathml(request: Request) -&gt; Response:
     print(r.text)
     &#34;&#34;&#34;
     img_b64 = await request.body()
-    img_bytes = base64.b64decode(img_b64)
-    # convert bytes of png image to tensor
-    res =  get_mathml_from_bytes(img_bytes)
+    res = b64_image_to_mml(img_b64)
     return Response(content=res, media_type=&#34;application/xml&#34;)</code></pre>
 </details>
 </dd>
@@ -441,6 +459,7 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.img2mml.eqn2mml.b64_image_to_mml" href="#skema.img2mml.eqn2mml.b64_image_to_mml">b64_image_to_mml</a></code></li>
 <li><code><a title="skema.img2mml.eqn2mml.get_tex_to_mathml" href="#skema.img2mml.eqn2mml.get_tex_to_mathml">get_tex_to_mathml</a></code></li>
 <li><code><a title="skema.img2mml.eqn2mml.img2mml_healthcheck" href="#skema.img2mml.eqn2mml.img2mml_healthcheck">img2mml_healthcheck</a></code></li>
 <li><code><a title="skema.img2mml.eqn2mml.latex2mml_healthcheck" href="#skema.img2mml.eqn2mml.latex2mml_healthcheck">latex2mml_healthcheck</a></code></li>
