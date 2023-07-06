@@ -7,7 +7,7 @@ node data_generation/mathjax_server.js
 
 from typing import Text, Union
 from typing_extensions import Annotated
-from fastapi import APIRouter, FastAPI, Body, File, Response, Request, Query
+from fastapi import APIRouter, FastAPI, File, Response, Request, Query
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
 from skema.data.eq2mml import img_b64_bayes_white_bg
@@ -17,6 +17,12 @@ import requests
 
 
 router = APIRouter()
+
+def b64_image_to_mml(img_b64: str) -> str:
+    """Helper method to convert image (encoded as base64) to MML"""
+    img_bytes = base64.b64decode(img_b64)
+    # convert bytes of png image to tensor
+    return get_mathml_from_bytes(img_bytes)
 
 EquationQueryParameter = Annotated[
   Text,
@@ -116,9 +122,7 @@ async def post_b64image_to_mathml(request: Request) -> Response:
     print(r.text)
     """
     img_b64 = await request.body()
-    img_bytes = base64.b64decode(img_b64)
-    # convert bytes of png image to tensor
-    res =  get_mathml_from_bytes(img_bytes)
+
     return Response(content=res, media_type="application/xml")
 
 @router.get("/latex/mml", summary="Get MathML representation of a LaTeX equation")
