@@ -221,13 +221,8 @@ fn test_first_order_ode() {
     </math>
     ";
 
-    println!("Input: {input}");
     let (_, FirstOrderODE { lhs_var, rhs }) = first_order_ode(input.into()).unwrap();
 
-    println!("Output:\n");
-    println!("\tLHS var: {lhs_var}");
     assert_eq!(lhs_var.to_string(), "S");
-    println!("\tRHS: {rhs}");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
-    println!()
 }
