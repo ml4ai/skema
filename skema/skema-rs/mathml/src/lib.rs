@@ -6,7 +6,6 @@ pub mod expression;
 pub mod graph;
 pub mod mml2pn;
 pub mod normalization;
+pub mod parsers;
 pub mod parsing;
 pub mod petri_net;
-pub mod pratt_parsing;
-pub mod domain_specific_parsing;

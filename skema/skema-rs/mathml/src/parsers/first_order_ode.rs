@@ -1,7 +1,7 @@
 use crate::{
     ast::{Ci, Derivative, MathExpression, Mi, Operator, Type},
+    parsers::math_expression_tree::MathExpressionTree,
     parsing::{attribute, etag, math_expression, mi, mo, stag, ws, IResult, ParseError, Span},
-    pratt_parsing::MathExpressionTree,
 };
 use derive_new::new;
 use nom::{
@@ -100,7 +100,13 @@ fn ci_unknown(input: Span) -> IResult<Ci> {
 
 fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), d))(input)?;
-    let (s, func) = ws(alt((ci_univariate_func, ci_unknown)))(s)?;
+    let (s, func) = ws(alt((
+        ci_univariate_func,
+        map(ci_unknown, |Ci { content, .. }| Ci {
+            r#type: Some(Type::Function),
+            content,
+        }),
+    )))(s)?;
     let (s, _) = tuple((
         etag!("mrow"),
         stag!("mrow"),
@@ -139,7 +145,12 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
-        map(ci_unknown, |x| MathExpression::new_ci(Box::new(x))),
+        map(ci_unknown, |Ci { content, .. }| {
+            MathExpression::new_ci(Box::new(Ci {
+                r#type: Some(Type::Function),
+                content,
+            }))
+        }),
         map(operator, MathExpression::Mo),
         math_expression,
     )))(s)?;
@@ -155,7 +166,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 }
 
 #[test]
-fn test_dsp() {
+fn test_ci_univariate_func() {
     test_parser(
         "<mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>",
         ci_univariate_func,
@@ -164,7 +175,10 @@ fn test_dsp() {
             MathExpression::Mi(Mi("S".to_string())),
         ),
     );
+}
 
+#[test]
+fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() {
     test_parser(
         "<mfrac>
         <mrow><mi>d</mi><mi>S</mi></mrow>
@@ -179,8 +193,10 @@ fn test_dsp() {
             ),
         ),
     );
+}
 
-    // Test derivative with explicit time dependence
+#[test]
+fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() {
     test_parser(
         "<mfrac>
         <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
@@ -198,9 +214,8 @@ fn test_dsp() {
 }
 
 #[test]
-fn test_ode() {
-    // Test ODE
-    let (s, FirstOrderODE { lhs_var, rhs }) = first_order_ode(
+fn test_first_order_ode() {
+    let (_, FirstOrderODE { lhs_var, rhs }) = first_order_ode(
         "
     <math>
         <mfrac>

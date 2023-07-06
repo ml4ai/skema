@@ -1,15 +1,13 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-use crate::{
-    ast::{Ci, Derivative, Math, MathExpression, Operator},
-    domain_specific_parsing::{first_order_ode, FirstOrderODE},
-    petri_net::recognizers::recognize_leibniz_differential_operator,
-};
-
+use crate::ast::{Derivative, Math, MathExpression, Operator};
 use derive_new::new;
 use nom::error::Error;
 use std::{fmt, str::FromStr};
+
+#[cfg(test)]
+use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
 
 /// An S-expression like structure.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
