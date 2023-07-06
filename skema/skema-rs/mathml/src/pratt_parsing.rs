@@ -2,14 +2,17 @@
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
 use crate::{
-    ast::{Derivative, Math, MathExpression, Operator},
-    parsing::parse,
+    ast::{Ci, Derivative, Math, MathExpression, Operator},
+    domain_specific_parsing::ode,
     petri_net::recognizers::recognize_leibniz_differential_operator,
 };
+
+use derive_new::new;
 use nom::error::Error;
 use std::{fmt, str::FromStr};
 
 /// An S-expression like structure.
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec<MathExpressionTree>),
@@ -18,6 +21,9 @@ pub enum MathExpressionTree {
 impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            MathExpressionTree::Atom(MathExpression::Ci(x)) => {
+                write!(f, "{}", x.content)
+            }
             MathExpressionTree::Atom(i) => write!(f, "{}", i),
             MathExpressionTree::Cons(head, rest) => {
                 write!(f, "({}", head)?;
@@ -30,8 +36,8 @@ impl fmt::Display for MathExpressionTree {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
-enum Token {
+#[derive(Debug, Clone, PartialEq, Eq, new)]
+pub enum Token {
     Atom(MathExpression),
     Op(Operator),
     Eof,
@@ -60,16 +66,9 @@ impl Lexer {
                     _ => todo!(),
                 },
                 MathExpression::Mfrac(numerator, denominator) => {
-                    if let Ok((derivative, function)) =
-                        recognize_leibniz_differential_operator(numerator, denominator)
-                    {
-                        acc.push(MathExpression::Mo(derivative));
-                        acc.push(function);
-                    } else {
-                        acc.push(*numerator.clone());
-                        acc.push(MathExpression::Mo(Operator::Divide));
-                        acc.push(*denominator.clone());
-                    }
+                    acc.push(*numerator.clone());
+                    acc.push(MathExpression::Mo(Operator::Divide));
+                    acc.push(*denominator.clone());
                 }
                 t => {
                     acc.push(t.clone());
@@ -116,6 +115,7 @@ impl Lexer {
                 _ => Token::Atom(c.clone()),
             })
             .collect::<Vec<_>>();
+
         tokens.reverse();
         Lexer { tokens }
     }
@@ -132,6 +132,12 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     expr_bp(&mut lexer, 0)
 }
 
+impl From<Vec<MathExpression>> for MathExpressionTree {
+    fn from(input: Vec<MathExpression>) -> Self {
+        expr(input)
+    }
+}
+
 impl From<Math> for MathExpressionTree {
     fn from(input: Math) -> Self {
         expr(input.content)
@@ -142,7 +148,7 @@ impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let math = parse(s).unwrap().1;
+        let math = s.parse::<Math>()?;
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -269,7 +275,7 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
+    let s = MathExpressionTree::from(ode(input.into()).unwrap().1);
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
@@ -280,7 +286,7 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
+    let s = MathExpressionTree::from(ode(input.into()).unwrap().1);
     assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 }

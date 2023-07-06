@@ -52,6 +52,28 @@ pub struct Mi(pub String);
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct Mrow(pub Vec<MathExpression>);
 
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub enum Type {
+    Integer,
+    Rational,
+    Real,
+    Complex,
+    ComplexPolar,
+    ComplexCartesian,
+    Constant,
+    Function,
+    Vector,
+    List,
+    Set,
+    Matrix,
+}
+
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Ci {
+    pub r#type: Option<Type>,
+    pub content: MathExpression,
+}
+
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
@@ -75,6 +97,7 @@ pub enum MathExpression {
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
+    Ci(Box<Ci>),
     #[default]
     None,
 }
@@ -92,6 +115,12 @@ impl fmt::Display for MathExpression {
             }
             MathExpression::Mo(op) => {
                 write!(f, "{}", op)
+            }
+            MathExpression::Mrow(Mrow(elements)) => {
+                for e in elements {
+                    write!(f, "{}", e)?;
+                }
+                Ok(())
             }
             expression => write!(f, "{expression:?}"),
         }

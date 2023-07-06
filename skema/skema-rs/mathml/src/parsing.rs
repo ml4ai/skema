@@ -1,3 +1,4 @@
+#[macro_use]
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
@@ -10,10 +11,12 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
     combinator::{map, map_parser, opt, recognize, value},
+    error::Error,
     multi::many0,
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
+use std::str::FromStr;
 
 pub type Span<'a> = LocatedSpan<&'a str>;
 
@@ -89,13 +92,13 @@ pub fn attribute(input: Span) -> IResult<(&str, &str)> {
 
 macro_rules! stag {
     ($tag:expr) => {{
-        tuple((tag("<"), tag($tag), many0(attribute), tag(">")))
+        ws(tuple((tag("<"), tag($tag), many0(attribute), tag(">"))))
     }};
 }
 
 macro_rules! etag {
     ($tag:expr) => {{
-        delimited(tag("</"), tag($tag), tag(">"))
+        ws(delimited(tag("</"), tag($tag), tag(">")))
     }};
 }
 
@@ -210,7 +213,7 @@ pub fn mo(input: Span) -> IResult<MathExpression> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         map_parser(recognize(take_until("</mo>")), operator),
-        tag("</mo>"),
+        etag!("mo"),
     ))(input)?;
     Ok((s, Mo(op)))
 }
@@ -280,7 +283,7 @@ fn mstyle(input: Span) -> IResult<MathExpression> {
 }
 
 // function for xml
-fn xml_declaration(input: Span) -> IResult<()> {
+pub fn xml_declaration(input: Span) -> IResult<()> {
     let (s, _contents) = ws(delimited(tag("<?"), take_until("?>"), tag("?>")))(input)?;
     Ok((s, ()))
 }
@@ -329,6 +332,15 @@ pub fn parse(input: &str) -> IResult<Math> {
     let span = Span::new(input);
     let (remaining, math) = math(span)?;
     Ok((remaining, math))
+}
+
+impl FromStr for Math {
+    type Err = Error<String>;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let (_, math) = math(s.into()).unwrap();
+        Ok(math)
+    }
 }
 
 /// A generic helper function for testing individual parsers.
@@ -522,3 +534,9 @@ fn test_mathml_parser() {
         },
     )
 }
+
+// Exporting macros
+pub(crate) use elem_many0;
+pub(crate) use etag;
+pub(crate) use stag;
+pub(crate) use tag_parser;
