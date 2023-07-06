@@ -94,7 +94,7 @@ class LatexEquation(BaseModel):
     class Config:
         schema_extra = {
             &#34;example&#34;: {
-                &#34;tex_src&#34;: &#34;E = mc^{c}&#34;,
+                &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
             }
         }
 
@@ -422,7 +422,7 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
     class Config:
         schema_extra = {
             &#34;example&#34;: {
-                &#34;tex_src&#34;: &#34;E = mc^{c}&#34;,
+                &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
             }
         }</code></pre>
 </details>
