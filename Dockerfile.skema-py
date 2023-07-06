@@ -44,7 +44,6 @@ ENV PATH="/root/.cargo/bin:${PATH}"
 
 # Install the skema package
 RUN pip install wheel
-RUN pip install fastapi uvicorn
 RUN pip install six
 # Download ML model (~150MB)
 # FIXME: consider publishing and retrieving this model from HF Hub

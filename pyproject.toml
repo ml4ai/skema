@@ -16,9 +16,11 @@ dependencies=[
     "PyYAML",
     "tree-sitter",
     "requests",
-	"fastapi",
-	"uvicorn",
-	"python-multipart"
+    "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
+    "typing_extensions==4.5.0", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
+    "fastapi",
+    "uvicorn",
+    "python-multipart"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
