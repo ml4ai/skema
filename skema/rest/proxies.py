@@ -17,3 +17,8 @@ SKEMA_MATHJAX_ADDRESS = os.environ.get(
     "SKEMA_MATHJAX_ADDRESS",
     f"{SKEMA_MATHJAX_PROTOCOL}{SKEMA_MATHJAX_HOST}:{SKEMA_MATHJAX_PORT}",
 )
+
+# Text Reading services
+MIT_TR_ADDRESS = os.environ.get("MIT_TR_ADDRESS", "https://mit-tr.askem.lum.ai")
+SKEMA_TR_ADDRESS = os.environ.get("SKEMA_TR_ADDRESS", "https://skema-tr.askem.lum.ai")
+OPENAI_KEY = os.environ.get("OPENAI_KEY", "<YOUR KEY WITH GPT-4 HERE>")

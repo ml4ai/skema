@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Response, status
 import os
-from skema.rest import schema, workflows
+from skema.rest import schema, workflows, integrated_text_reading_proxy
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
 from skema.rest import morae_proxy, comments_proxy
@@ -56,6 +56,10 @@ tags_metadata = [
             "url": "https://github.com/ml4ai/skema/issues?q=is%3Aopen+is%3Aissue+label%3AMORAE",
         },
     },
+    {
+        "name": "text reading",
+        "description": "Unified proxy and integration code for MIT and SKEMA TR pipelines",
+    }
 ]
 
 app = FastAPI(
@@ -96,6 +100,11 @@ app.include_router(
     tags=["morae", "skema-rs"],
 )
 
+app.include_router(
+    integrated_text_reading_proxy.router,
+    prefix="/text-reading",
+    tags=["text reading"]
+)
 
 @app.get("/version", tags=["core"], summary="API version")
 async def version() -> str:

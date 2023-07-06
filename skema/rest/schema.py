@@ -47,3 +47,7 @@ class CodeSnippet(BaseModel):
         title="language", 
         description="Programming language corresponding to `code`"
     )
+
+class TextReadingInputDocuments(BaseModel):
+    """ Model of text reading request body """
+    texts: List[str]
