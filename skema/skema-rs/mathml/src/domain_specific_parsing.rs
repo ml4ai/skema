@@ -102,6 +102,21 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
     Ok((s, (Derivative::new(1, 1), func)))
 }
 
+fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
+    let (s, (_, _, _, _)) = tuple((stag!("mover"), mi, mo, etag!("mover")))(input)?;
+    todo!()
+    //let (s, func) = ws(alt((univariate_func, ci_func)))(s)?;
+    //let (s, _) = tuple((
+    //etag!("mrow"),
+    //stag!("mrow"),
+    //d,
+    //mi,
+    //etag!("mrow"),
+    //etag!("mfrac"),
+    //))(s)?;
+    //Ok((s, (Derivative::new(1, 1), func)))
+}
+
 /// First order ordinary differential equation.
 pub fn ode(input: Span) -> IResult<MathExpressionTree> {
     let (s, _) = stag!("math")(input)?;
