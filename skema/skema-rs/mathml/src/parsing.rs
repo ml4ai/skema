@@ -1,10 +1,9 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
-        Munder,
+        Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
     },
-    Mi, Operator,
+    Mi, Mrow, Operator,
 };
 use nom::{
     branch::alt,
@@ -217,7 +216,7 @@ pub fn mo(input: Span) -> IResult<MathExpression> {
 }
 
 /// Rows
-fn mrow(input: Span) -> IResult<MathExpression> {
+pub fn mrow(input: Span) -> IResult<Mrow> {
     let (s, elements) = ws(delimited(
         tag("<mrow>"),
         many0(math_expression),
@@ -307,7 +306,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         msub,
         msqrt,
         mfrac,
-        mrow,
+        map(mrow, MathExpression::Mrow),
         munder,
         mover,
         msubsup,
@@ -394,10 +393,10 @@ fn test_math_expression() {
     test_parser(
         "<mrow><mo>-</mo><mi>b</mi></mrow>",
         math_expression,
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
+        ])),
     )
 }
 
@@ -459,10 +458,10 @@ fn test_math() {
         </math>",
         math,
         Math {
-            content: vec![Mrow(vec![
+            content: vec![MathExpression::Mrow(Mrow(vec![
                 Mo(Operator::Subtract),
                 MathExpression::Mi(Mi("b".to_string())),
-            ])],
+            ]))],
         },
     )
 }
@@ -477,7 +476,7 @@ fn test_mathml_parser() {
             content: vec![
                 Munder(
                     Box::new(Mo(Operator::Other("sup".to_string()))),
-                    Box::new(Mrow(vec![
+                    Box::new(MathExpression::Mrow(Mrow(vec![
                         Mn("0".to_string()),
                         Mo(Operator::Other("≤".to_string())),
                         MathExpression::Mi(Mi("t".to_string())),
@@ -486,26 +485,26 @@ fn test_mathml_parser() {
                             Box::new(MathExpression::Mi(Mi("T".to_string()))),
                             Box::new(Mn("0".to_string())),
                         ),
-                    ])),
+                    ]))),
                 ),
                 Mo(Operator::Other("‖".to_string())),
                 Msup(
-                    Box::new(Mrow(vec![Mover(
+                    Box::new(MathExpression::Mrow(Mrow(vec![Mover(
                         Box::new(MathExpression::Mi(Mi("ρ".to_string()))),
                         Box::new(Mo(Operator::Other("~".to_string()))),
-                    )])),
+                    )]))),
                     Box::new(MathExpression::Mi(Mi("R".to_string()))),
                 ),
                 Msup(
-                    Box::new(Mrow(vec![Mover(
+                    Box::new(MathExpression::Mrow(Mrow(vec![Mover(
                         Box::new(MathExpression::Mi(Mi("x".to_string()))),
                         Box::new(Mo(Operator::Other("¯".to_string()))),
-                    )])),
+                    )]))),
                     Box::new(MathExpression::Mi(Mi("a".to_string()))),
                 ),
                 Msub(
                     Box::new(Mo(Operator::Other("‖".to_string()))),
-                    Box::new(Mrow(vec![
+                    Box::new(MathExpression::Mrow(Mrow(vec![
                         Msup(
                             Box::new(MathExpression::Mi(Mi("L".to_string()))),
                             Box::new(Mn("1".to_string())),
@@ -515,7 +514,7 @@ fn test_mathml_parser() {
                             Box::new(MathExpression::Mi(Mi("L".to_string()))),
                             Box::new(MathExpression::Mi(Mi("∞".to_string()))),
                         ),
-                    ])),
+                    ]))),
                 ),
                 Mo(Operator::Other("≤".to_string())),
                 MathExpression::Mi(Mi("C".to_string())),

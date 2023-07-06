@@ -6,9 +6,9 @@ use crate::petri_net::{
 };
 use crate::{
     ast::{
-        Math,
-        MathExpression::{Mn, Mo, Mrow},
-        Operator,
+        Math, MathExpression,
+        MathExpression::{Mn, Mo},
+        Mrow, Operator,
     },
     parsing::parse,
 };
@@ -72,7 +72,7 @@ pub fn group_by_operators(
     eqns: &mut HashMap<Var, Vec<Term>>,
 ) {
     let expressions = if ast.content.len() == 1 {
-        if let Mrow(exprs) = &ast.content[0] {
+        if let MathExpression::Mrow(Mrow(exprs)) = &ast.content[0] {
             exprs
         } else {
             panic!("Exactly one top-level MathExpression found, but it is not an Mrow! We cannot handle this case.");

@@ -1,8 +1,8 @@
 use crate::{
     ast::{
         Math, MathExpression,
-        MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msqrt, Msubsup, Msup},
-        Mi, Operator,
+        MathExpression::{Mfrac, Mn, Mo, Mover, Msqrt, Msubsup, Msup},
+        Mi, Mrow, Operator,
     },
     petri_net::recognizers::recognize_leibniz_differential_operator,
 };
@@ -53,11 +53,11 @@ pub fn is_derivative(
     denominator: &mut Box<MathExpression>,
 ) -> bool {
     if let Ok(_) = recognize_leibniz_differential_operator(numerator, denominator) {
-        if let Mrow(x) = &mut **numerator {
+        if let MathExpression::Mrow(Mrow(x)) = &mut **numerator {
             x.remove(0);
         }
 
-        if let Mrow(x) = &mut **denominator {
+        if let MathExpression::Mrow(Mrow(x)) = &mut **denominator {
             x.remove(0);
         }
         return true;
@@ -112,7 +112,7 @@ impl MathExpression {
                     pre.ops.push(x);
                 }
             }
-            Mrow(xs) => {
+            MathExpression::Mrow(Mrow(xs)) => {
                 insert_explicit_multiplication_operator(pre);
                 let mut pre_exp = PreExp::default();
                 pre_exp.ops.push(Operator::Other("".to_string()));
@@ -1205,16 +1205,16 @@ pub fn wrap_math(math: Math) -> MathExpression {
         math_vec.push(con);
     }
 
-    Mrow(math_vec)
+    MathExpression::Mrow(Mrow(math_vec))
 }
 
 #[test]
 fn test_to_expr() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1233,17 +1233,17 @@ fn test_to_expr() {
 
 #[test]
 fn test_to_expr2() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Subtract),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             Mn("4".to_string()),
             MathExpression::Mi(Mi("c".to_string())),
             MathExpression::Mi(Mi("d".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1277,11 +1277,11 @@ fn test_to_expr2() {
 
 #[test]
 fn test_to_expr3() {
-    let math_expression = Msqrt(Box::from(Mrow(vec![
+    let math_expression = Msqrt(Box::from(MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
-    ])));
+    ]))));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1310,11 +1310,11 @@ fn test_to_expr3() {
 #[test]
 fn test_to_expr4() {
     let math_expression = Mfrac(
-        Box::from(Mrow(vec![
+        Box::from(MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ])),
+        ]))),
         Box::from(MathExpression::Mi(Mi("c".to_string()))),
     );
     let mut pre_exp = PreExp {
@@ -1351,13 +1351,13 @@ fn test_to_expr4() {
 
 #[test]
 fn test_to_expr5() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("c".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1388,7 +1388,7 @@ fn test_to_expr5() {
 
 #[test]
 fn test_to_expr6() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
@@ -1404,7 +1404,7 @@ fn test_to_expr6() {
         MathExpression::Mi(Mi("g".to_string())),
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("h".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1450,13 +1450,13 @@ fn test_to_expr6() {
 
 #[test]
 fn test_to_expr7() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("c".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1490,7 +1490,7 @@ fn test_to_expr7() {
 
 #[test]
 fn test_to_expr8() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
@@ -1506,7 +1506,7 @@ fn test_to_expr8() {
         MathExpression::Mi(Mi("g".to_string())),
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("h".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1556,17 +1556,17 @@ fn test_to_expr8() {
 
 #[test]
 fn test_to_expr9() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("c".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("d".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1609,17 +1609,17 @@ fn test_to_expr9() {
 
 #[test]
 fn test_to_expr10() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("c".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("a".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1634,17 +1634,17 @@ fn test_to_expr10() {
 
 #[test]
 fn test_to_expr11() {
-    let math_expression = Msqrt(Box::from(Mrow(vec![
+    let math_expression = Msqrt(Box::from(MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
-    ])));
+        ])),
+    ]))));
 
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
@@ -1660,7 +1660,7 @@ fn test_to_expr11() {
 
 #[test]
 fn test_to_expr12() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
@@ -1676,7 +1676,7 @@ fn test_to_expr12() {
         MathExpression::Mi(Mi("g".to_string())),
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("h".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1691,7 +1691,7 @@ fn test_to_expr12() {
 
 #[test]
 fn test_to_expr13() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
@@ -1707,7 +1707,7 @@ fn test_to_expr13() {
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("b".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1722,19 +1722,19 @@ fn test_to_expr13() {
 
 #[test]
 fn test_to_expr14() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("c".to_string())),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1749,19 +1749,19 @@ fn test_to_expr14() {
 
 #[test]
 fn test_to_expr15() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("c".to_string())),
         Mo(Operator::Subtract),
-        Msqrt(Box::from(Mrow(vec![
+        Msqrt(Box::from(MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ]))),
-    ]);
+        ])))),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -1776,57 +1776,57 @@ fn test_to_expr15() {
 
 #[test]
 fn test_to_expr16() {
-    let math_expression = Msqrt(Box::from(Mrow(vec![
+    let math_expression = Msqrt(Box::from(MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
-    ])));
+        ])),
+    ]))));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr17() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("s".to_string())),
         Mo(Operator::Equals),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr18() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("s".to_string())),
         Mo(Operator::Equals),
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Subtract),
-        Msqrt(Box::from(Mrow(vec![
+        Msqrt(Box::from(MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("b".to_string())),
             Mo(Operator::Multiply),
-            Mrow(vec![
+            MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("a".to_string())),
                 Mo(Operator::Subtract),
                 MathExpression::Mi(Mi("b".to_string())),
-            ]),
-        ]))),
-    ]);
+            ])),
+        ])))),
+    ]));
     let _g = math_expression.to_graph();
 }
 
@@ -1844,39 +1844,39 @@ fn test_to_expr19() {
 
 #[test]
 fn test_to_expr20() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("s".to_string())),
         Mo(Operator::Equals),
         Mfrac(
-            Box::from(Mrow(vec![
+            Box::from(MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("a".to_string())),
                 Mo(Operator::Add),
                 MathExpression::Mi(Mi("b".to_string())),
-            ])),
-            Box::from(Mrow(vec![
+            ]))),
+            Box::from(MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("a".to_string())),
                 Mo(Operator::Multiply),
                 MathExpression::Mi(Mi("c".to_string())),
                 MathExpression::Mi(Mi("d".to_string())),
-                Msqrt(Box::from(Mrow(vec![
+                Msqrt(Box::from(MathExpression::Mrow(Mrow(vec![
                     MathExpression::Mi(Mi("a".to_string())),
                     Mo(Operator::Add),
                     MathExpression::Mi(Mi("d".to_string())),
-                ]))),
-            ])),
+                ])))),
+            ]))),
         ),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr21() {
     let math_expression = Msup(
-        Box::from(Mrow(vec![
+        Box::from(MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ])),
+        ]))),
         Box::from(MathExpression::Mi(Mi("c".to_string()))),
     );
     let mut pre_exp = PreExp {
@@ -1913,74 +1913,74 @@ fn test_to_expr21() {
 
 #[test]
 fn test_to_expr22() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Subtract),
         Msup(
-            Box::from(Mrow(vec![
+            Box::from(MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("a".to_string())),
                 Mo(Operator::Add),
                 MathExpression::Mi(Mi("b".to_string())),
-            ])),
-            Box::from(Mrow(vec![
+            ]))),
+            Box::from(MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("c".to_string())),
                 Mo(Operator::Add),
                 MathExpression::Mi(Mi("d".to_string())),
-            ])),
+            ]))),
         ),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr23() {
-    let math_expression = Mrow(vec![Msubsup(
-        Box::from(Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![Msubsup(
+        Box::from(MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ])),
-        Box::from(Mrow(vec![
+        ]))),
+        Box::from(MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("c".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("d".to_string())),
-        ])),
+        ]))),
         Box::from(MathExpression::Mi(Mi("c".to_string()))),
-    )]);
+    )]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr24() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("b".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("c".to_string())),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr25() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         Mo(Operator::Subtract),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
+        ])),
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("c".to_string())),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr26() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Multiply),
@@ -1989,52 +1989,52 @@ fn test_to_expr26() {
         MathExpression::Mi(Mi("c".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("d".to_string())),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr27() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr28() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
 #[test]
 fn test_to_expr29() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Add),
         Msup(
-            Box::from(Mrow(vec![
+            Box::from(MathExpression::Mrow(Mrow(vec![
                 Mo(Operator::Subtract),
                 MathExpression::Mi(Mi("a".to_string())),
                 Mo(Operator::Add),
                 MathExpression::Mi(Mi("b".to_string())),
-            ])),
-            Box::from(Mrow(vec![
+            ]))),
+            Box::from(MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("c".to_string())),
                 Mo(Operator::Add),
                 MathExpression::Mi(Mi("d".to_string())),
-            ])),
+            ]))),
         ),
-    ]);
+    ]));
     let _g = math_expression.to_graph();
 }
 
@@ -2052,7 +2052,7 @@ fn test_to_expr30() {
     for con in math.content {
         math_vec.push(con);
     }
-    let new_math = Mrow(math_vec);
+    let new_math = MathExpression::Mrow(Mrow(math_vec));
     let _g = new_math.to_graph();
 }
 
@@ -2072,15 +2072,15 @@ fn test_to_expr32() {
 
 #[test]
 fn test_to_expr33() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("b".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("c".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2122,19 +2122,19 @@ fn test_to_expr33() {
 
 #[test]
 fn test_to_expr34() {
-    let math_expression = Mrow(vec![
-        Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
+        ])),
         Mo(Operator::Divide),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("c".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("d".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2180,15 +2180,15 @@ fn test_to_expr34() {
 
 #[test]
 fn test_to_expr35() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Subtract),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("b".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("c".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2216,15 +2216,15 @@ fn test_to_expr35() {
 
 #[test]
 fn test_to_expr36() {
-    let math_expression = Mrow(vec![
-        Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
+        ])),
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("c".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2252,21 +2252,21 @@ fn test_to_expr36() {
 
 #[test]
 fn test_to_expr37() {
-    let math_expression = Mrow(vec![
-        Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
+        ])),
         Mo(Operator::Subtract),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("c".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("d".to_string())),
-        ]),
+        ])),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("e".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2298,19 +2298,19 @@ fn test_to_expr37() {
 
 #[test]
 fn test_to_expr38() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Subtract),
-        Mrow(vec![
-            Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
+            MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("b".to_string())),
                 Mo(Operator::Subtract),
                 MathExpression::Mi(Mi("c".to_string())),
-            ]),
+            ])),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("d".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2340,19 +2340,19 @@ fn test_to_expr38() {
 
 #[test]
 fn test_to_expr39() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Divide),
-        Mrow(vec![
-            Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
+            MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("b".to_string())),
                 Mo(Operator::Divide),
                 MathExpression::Mi(Mi("c".to_string())),
-            ]),
+            ])),
             Mo(Operator::Multiply),
             MathExpression::Mi(Mi("d".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2382,21 +2382,21 @@ fn test_to_expr39() {
 
 #[test]
 fn test_to_expr40() {
-    let math_expression = Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
         MathExpression::Mi(Mi("a".to_string())),
         Mo(Operator::Divide),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("b".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("c".to_string())),
-        ]),
+        ])),
         Mo(Operator::Divide),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("d".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("e".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2466,19 +2466,19 @@ fn test_to_expr40() {
 
 #[test]
 fn test_to_expr41() {
-    let math_expression = Mrow(vec![
-        Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("b".to_string())),
-        ]),
+        ])),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("c".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("d".to_string())),
-        ]),
-    ]);
+        ])),
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
@@ -2540,43 +2540,43 @@ fn test_to_expr41() {
 
 #[test]
 fn test_to_expr42() {
-    let math_expression = Mrow(vec![
-        Mrow(vec![
+    let math_expression = MathExpression::Mrow(Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("a".to_string())),
             Mo(Operator::Subtract),
-            Mrow(vec![
+            MathExpression::Mrow(Mrow(vec![
                 MathExpression::Mi(Mi("b".to_string())),
                 Mo(Operator::Add),
                 MathExpression::Mi(Mi("c".to_string())),
-            ]),
-        ]),
+            ])),
+        ])),
         Mo(Operator::Divide),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("f".to_string())),
             Mo(Operator::Add),
             MathExpression::Mi(Mi("g".to_string())),
-        ]),
+        ])),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("d".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("e".to_string())),
-        ]),
+        ])),
         Mo(Operator::Divide),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("h".to_string())),
             Mo(Operator::Subtract),
             MathExpression::Mi(Mi("i".to_string())),
-        ]),
+        ])),
         Mo(Operator::Multiply),
-        Mrow(vec![
+        MathExpression::Mrow(Mrow(vec![
             MathExpression::Mi(Mi("j".to_string())),
             Mo(Operator::Divide),
             MathExpression::Mi(Mi("k".to_string())),
-        ]),
+        ])),
         Mo(Operator::Add),
         MathExpression::Mi(Mi("l".to_string())),
-    ]);
+    ]));
     let mut pre_exp = PreExp {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),

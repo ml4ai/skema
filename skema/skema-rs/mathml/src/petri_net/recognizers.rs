@@ -24,7 +24,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
     // Check if numerator is an mrow
     if let MathExpression::Mrow(num_expressions) = &**numerator {
         // Check if first element of numerator is an mi
-        if let MathExpression::Mi(Mi(num_id)) = &num_expressions[0] {
+        if let MathExpression::Mi(Mi(num_id)) = &num_expressions.0[0] {
             // Check if mi contains 'd'
             if num_id == "d" {
                 numerator_contains_d = true;
@@ -35,13 +35,13 @@ pub fn recognize_leibniz_differential_operator<'a>(
             }
 
             // Gather the second identifier as a potential candidate function.
-            function_candidate = Some(num_expressions[1].clone());
+            function_candidate = Some(num_expressions.0[1].clone());
         }
     }
 
     if let MathExpression::Mrow(denom_expressions) = &**denominator {
         // Check if first element of denominator is an mi
-        if let MathExpression::Mi(Mi(denom_id)) = &denom_expressions[0] {
+        if let MathExpression::Mi(Mi(denom_id)) = &denom_expressions.0[0] {
             // Check if mi contains 'd'
             if denom_id == "d" {
                 denominator_contains_d = true;
@@ -141,8 +141,8 @@ fn mfrac_leibniz_to_specie(
     // Check if numerator is an mrow
     if let Mrow(num_expressions) = &**numerator {
         // We assume here that the numerator is of the form dX where X is the variable of interest.
-        if num_expressions.len() == 2 {
-            let expression = &num_expressions[1];
+        if num_expressions.0.len() == 2 {
+            let expression = &num_expressions.0[1];
             Var(expression.clone())
         } else {
             panic!(

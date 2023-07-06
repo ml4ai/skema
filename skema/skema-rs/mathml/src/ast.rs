@@ -49,6 +49,9 @@ impl fmt::Display for Operator {
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct Mi(pub String);
 
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Mrow(pub Vec<MathExpression>);
+
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
@@ -57,7 +60,7 @@ pub enum MathExpression {
     Mo(Operator),
     Mn(String),
     Msqrt(Box<MathExpression>),
-    Mrow(Vec<MathExpression>),
+    Mrow(Mrow),
     Mfrac(Box<MathExpression>, Box<MathExpression>),
     Msup(Box<MathExpression>, Box<MathExpression>),
     Msub(Box<MathExpression>, Box<MathExpression>),
