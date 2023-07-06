@@ -153,6 +153,7 @@ fn test_dsp() {
         ),
     );
 
+    // Test derivative with explicit time dependence 
     test_parser(
         "<mfrac>
         <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
