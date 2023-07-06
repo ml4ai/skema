@@ -136,6 +136,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
+        map(ci_univariate_func, |x| MathExpression::new_ci(Box::new(x))),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::new_ci(Box::new(Ci {
                 r#type: Some(Type::Function),
@@ -215,8 +216,8 @@ fn test_first_order_ode() {
         <mo>=</mo>
         <mo>-</mo>
         <mi>β</mi>
-        <mi>S</mi>
-        <mi>I</mi>
+        <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
 
