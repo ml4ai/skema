@@ -2038,16 +2038,19 @@ fn test_to_expr29() {
     let _g = math_expression.to_graph();
 }
 
-#[test]
-fn test_to_expr30() {
-    use crate::parsing::parse;
-    let input = "tests/seir_eq1.xml";
-    let mut contents = std::fs::read_to_string(input)
+fn get_preprocessed_normalized_math_from_file(filename: &str) -> Math {
+    let mut contents = std::fs::read_to_string(filename)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     contents = preprocess_content(contents);
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let mut math = &mut contents
+        .parse::<Math>()
+        .unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
     math.normalize();
+    math.clone()
+}
+#[test]
+fn test_to_expr30() {
+    let math = get_preprocessed_normalized_math_from_file("tests/seir_eq1.xml");
     let mut math_vec = vec![];
     for con in math.content {
         math_vec.push(con);
@@ -2058,14 +2061,7 @@ fn test_to_expr30() {
 
 #[test]
 fn test_to_expr32() {
-    use crate::parsing::parse;
-    let input = "tests/seirdv_eq7.xml";
-    let mut contents = std::fs::read_to_string(input)
-        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
-    contents = preprocess_content(contents);
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
-    math.normalize();
+    let math = get_preprocessed_normalized_math_from_file("tests/seirdv_eq7.xml");
     let new_math = wrap_math(math);
     let _g = new_math.to_graph();
 }

@@ -342,6 +342,17 @@ impl FromStr for Math {
     }
 }
 
+pub trait FromFile<T: FromStr> {
+    fn from_file(&self, filepath: &str) -> T {
+        let file_contents = std::fs::read_to_string(filepath)
+            .unwrap_or_else(|_| panic!("{}", "Unable to read file {filepath}!"));
+        let t = file_contents
+            .parse::<T>()
+            .unwrap_or_else(|_| panic!("{}", "Unable to parse file {filepath}!"));
+        t
+    }
+}
+
 /// A generic helper function for testing individual parsers.
 #[cfg(test)]
 pub fn test_parser<'a, P, O>(input: &'a str, mut parser: P, output: O)

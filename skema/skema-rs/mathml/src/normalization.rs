@@ -92,7 +92,7 @@ fn test_subscript_collapsing() {
 fn test_normalize() {
     use crate::ast::Operator;
     let contents = std::fs::read_to_string("tests/sir.xml").unwrap();
-    let mut math = &contents.parse::<Math>().unwrap();
+    let mut math = contents.parse::<Math>().unwrap();
     math.normalize();
     assert_eq!(
         &math.content[0],

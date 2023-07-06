@@ -1,16 +1,13 @@
 use crate::acset;
 pub use crate::acset::ACSet;
+use crate::ast::{
+    Math, MathExpression,
+    MathExpression::{Mn, Mo},
+    Mrow, Operator,
+};
 use crate::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
     Polarity, Rate, Specie, Var,
-};
-use crate::{
-    ast::{
-        Math, MathExpression,
-        MathExpression::{Mn, Mo},
-        Mrow, Operator,
-    },
-    parsing::parse,
 };
 use petgraph::Graph;
 use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -32,7 +29,9 @@ pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
                 // Ignore lines starting with '#'
             } else {
                 // Parse MathML into AST
-                let (_, math) = parse(&l).unwrap_or_else(|_| panic!("Unable to parse line {}!", l));
+                let math = l
+                    .parse::<Math>()
+                    .unwrap_or_else(|_| panic!("Unable to parse line {}!", l));
                 mathml_asts.push(math);
             }
         }

@@ -1,10 +1,9 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::ast::{Math, MathExpression, Mi};
-use crate::petri_net::{Polarity, Var};
 use crate::{
+    ast::{Math, MathExpression, Mi},
     mml2pn::{group_by_operators, Term},
-    parsing::parse,
+    petri_net::{Polarity, Var},
 };
 use serde::{Deserialize, Serialize};
 
@@ -555,7 +554,7 @@ fn test_lotka_volterra_mml_to_regnet() {
         .as_array()
         .unwrap()
         .into_iter()
-        .map(|x| parse(x.as_str().unwrap()).unwrap().1)
+        .map(|x| x.as_str().unwrap().parse::<Math>().unwrap())
         .collect();
 
     let regnet = RegNet::from(elements);

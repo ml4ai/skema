@@ -7,5 +7,4 @@ pub mod graph;
 pub mod mml2pn;
 pub mod normalization;
 pub mod parsers;
-pub mod parsing;
 pub mod petri_net;
