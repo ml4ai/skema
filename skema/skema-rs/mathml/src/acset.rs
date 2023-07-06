@@ -509,7 +509,6 @@ impl From<Vec<Math>> for RegNet {
 
             let prop = Properties {
                 rate_constant: trans_name.clone(),
-                ..Default::default()
             };
 
             let transitions = RegTransition {

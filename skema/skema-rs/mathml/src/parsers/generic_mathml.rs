@@ -344,13 +344,12 @@ impl FromStr for Math {
 }
 
 pub trait FromFile<T: FromStr> {
-    fn from_file(&self, filepath: &str) -> T {
+    fn from_file(filepath: &str) -> T {
         let file_contents = std::fs::read_to_string(filepath)
             .unwrap_or_else(|_| panic!("{}", "Unable to read file {filepath}!"));
-        let t = file_contents
+        file_contents
             .parse::<T>()
-            .unwrap_or_else(|_| panic!("{}", "Unable to parse file {filepath}!"));
-        t
+            .unwrap_or_else(|_| panic!("{}", "Unable to parse file {filepath}!"))
     }
 }
 

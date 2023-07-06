@@ -53,7 +53,7 @@ pub fn is_derivative(
     numerator: &mut Box<MathExpression>,
     denominator: &mut Box<MathExpression>,
 ) -> bool {
-    if let Ok(_) = recognize_leibniz_differential_operator(numerator, denominator) {
+    if recognize_leibniz_differential_operator(numerator, denominator).is_ok() {
         if let MathExpression::Mrow(Mrow(x)) = &mut **numerator {
             x.remove(0);
         }
@@ -302,7 +302,7 @@ impl Expr {
         if let Expr::Expression { ops, args, .. } = self {
             let mut ops_copy = ops.clone();
             let mut args_copy = args.clone();
-            let mut shift = 0;
+            let mut shift;
             if all_ops_are_mult_or_div(ops.to_vec()) && ops.len() > 1 {
                 let mut changed = true;
                 while changed {
@@ -541,7 +541,6 @@ impl Expr {
                 if add_paren {
                     name.push(')');
                 }
-                add_paren = false;
 
                 name.to_string()
             }
@@ -564,8 +563,8 @@ impl Expr {
             if ops.contains(&Operator::Equals) {
                 eq_loc = ops.iter().position(|r| r == &(Operator::Equals)).unwrap();
                 let mut left_eq_name: String = "".to_string();
-                for i in 0..eq_loc {
-                    match &mut args[i] {
+                for arg in args.iter_mut().take(eq_loc) {
+                    match arg {
                         Expr::Atom(x) => match x {
                             Atom::Number(y) => {
                                 left_eq_name.push_str(y);
@@ -580,9 +579,9 @@ impl Expr {
                                 let mut unitary_name = ops[0].to_string();
                                 let mut name_copy = name.to_string();
                                 remove_redundant_parens(&mut name_copy);
-                                unitary_name.push_str("(");
+                                unitary_name.push('(');
                                 unitary_name.push_str(&name_copy);
-                                unitary_name.push_str(")");
+                                unitary_name.push(')');
                                 left_eq_name.push_str(unitary_name.as_str());
                             } else {
                                 left_eq_name.push_str(name.as_str());
@@ -598,9 +597,9 @@ impl Expr {
                 let mut unitary_name = ops[0].to_string();
                 let mut name_copy = name.to_string();
                 remove_redundant_parens(&mut name_copy);
-                unitary_name.push_str("(");
+                unitary_name.push('(');
                 unitary_name.push_str(&name_copy);
-                unitary_name.push_str(")");
+                unitary_name.push(')');
                 let node_idx = get_node_idx(graph, &mut unitary_name);
                 if ops[0].to_string() == "derivative" {
                     return;
@@ -825,9 +824,9 @@ impl Expr {
                             let mut unitary_name = ops[0].to_string();
                             let mut name_copy = name.to_string();
                             remove_redundant_parens(&mut name_copy);
-                            unitary_name.push_str("(");
+                            unitary_name.push('(');
                             unitary_name.push_str(&name_copy);
-                            unitary_name.push_str(")");
+                            unitary_name.push(')');
                             let node_idx = get_node_idx(graph, &mut unitary_name);
                             if i == 0 {
                                 if ops_copy.len() > 1 {
@@ -923,8 +922,8 @@ pub fn contains_redundant_parens(string: &str) -> bool {
 
 /// Check if the current term's operators are all multiply or divide.
 pub fn all_ops_are_mult_or_div(ops: Vec<Operator>) -> bool {
-    for o in 1..=ops.len() - 1 {
-        if ops[o] != Operator::Multiply && ops[o] != Operator::Divide {
+    for op in ops.iter().take((ops.len() - 1) + 1).skip(1) {
+        if op != &Operator::Multiply && op != &Operator::Divide {
             return false;
         }
     }
@@ -957,8 +956,8 @@ pub fn switch_add_subt(op: Operator) -> Operator {
 
 /// Check if the current term's operators are all add or subtract.
 pub fn all_ops_are_add_or_subt(ops: Vec<Operator>) -> bool {
-    for o in 1..=ops.len() - 1 {
-        if ops[o] != Operator::Add && ops[o] != Operator::Subtract {
+    for op in ops.iter().take((ops.len() - 1) + 1).skip(1) {
+        if op != &Operator::Add && op != &Operator::Subtract {
             return false;
         }
     }
@@ -967,8 +966,8 @@ pub fn all_ops_are_add_or_subt(ops: Vec<Operator>) -> bool {
 
 /// Check if the current term's operators contain multiply.
 pub fn ops_contain_mult(ops: Vec<Operator>) -> bool {
-    for o in 1..=ops.len() - 1 {
-        if ops[o] == Operator::Multiply {
+    for op in ops.iter().take((ops.len() - 1) + 1).skip(1) {
+        if op == &Operator::Multiply {
             return true;
         }
     }
@@ -1007,8 +1006,8 @@ pub fn need_to_distribute(ops: Vec<Operator>) -> bool {
     if ops[0] != Operator::Other("".to_string()) {
         return false;
     }
-    for o in 1..=ops.len() - 1 {
-        if ops[o] == Operator::Add || ops[o] == Operator::Subtract {
+    for op in ops.iter().take((ops.len() - 1) + 1).skip(1) {
+        if op == &Operator::Add || op == &Operator::Subtract {
             return true;
         }
     }

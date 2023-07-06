@@ -12,8 +12,8 @@ use crate::petri_net::{Polarity, Var};
 /// Check if fraction is a derivative of a single-variable function expressed in Leibniz notation,
 /// and if so, return a derivative operator and the identifier of the function.
 pub fn recognize_leibniz_differential_operator<'a>(
-    numerator: &Box<MathExpression>,
-    denominator: &Box<MathExpression>,
+    numerator: &MathExpression,
+    denominator: &MathExpression,
 ) -> Result<(Operator, MathExpression), &'a str> {
     let mut numerator_contains_d = false;
     let mut denominator_contains_d = false;
@@ -23,7 +23,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
     let mut function_candidate: Option<MathExpression> = None;
 
     // Check if numerator is an mrow
-    if let MathExpression::Mrow(num_expressions) = &**numerator {
+    if let MathExpression::Mrow(num_expressions) = numerator {
         // Check if first element of numerator is an mi
         if let MathExpression::Mi(Mi(num_id)) = &num_expressions.0[0] {
             // Check if mi contains 'd'
@@ -40,7 +40,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
         }
     }
 
-    if let MathExpression::Mrow(denom_expressions) = &**denominator {
+    if let MathExpression::Mrow(denom_expressions) = denominator {
         // Check if first element of denominator is an mi
         if let MathExpression::Mi(Mi(denom_id)) = &denom_expressions.0[0] {
             // Check if mi contains 'd'
@@ -93,7 +93,7 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
     // Check if expression is an mfrac
     match expression {
         Mfrac(numerator, denominator) => {
-            if let Ok(_) = recognize_leibniz_differential_operator(numerator, denominator) {
+            if recognize_leibniz_differential_operator(numerator, denominator).is_ok() {
                 mfrac_leibniz_to_specie(numerator, denominator)
             } else {
                 panic!("Expression is an mfrac but not a Leibniz differential operator!");
@@ -121,12 +121,7 @@ pub fn get_specie_var(expression: &MathExpression) -> Var {
 ///     Perhaps useful to represent constant coefficients?
 ///     But should those be Vars?
 pub fn is_var_candidate(element: &MathExpression) -> bool {
-    match element {
-        MathExpression::Mi(_x) => true,
-        Mn(_x) => true,
-        Msub(_x1, _x2) => true,
-        _ => false,
-    }
+    matches!(element, MathExpression::Mi(_) | Mn(_) | Msub(_, _))
 }
 
 /// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
@@ -135,12 +130,9 @@ pub fn is_var_candidate(element: &MathExpression) -> bool {
 /// TODO: possibly generalize to accommodate superscripts for higher order derivatives;
 ///       although likely that would be an msup, so still the "first" elm of the numerator,
 ///       with the second (and beyond) elm(s) being the Var.
-fn mfrac_leibniz_to_specie(
-    numerator: &Box<MathExpression>,
-    _denominator: &Box<MathExpression>,
-) -> Var {
+fn mfrac_leibniz_to_specie(numerator: &MathExpression, _denominator: &MathExpression) -> Var {
     // Check if numerator is an mrow
-    if let Mrow(num_expressions) = &**numerator {
+    if let Mrow(num_expressions) = numerator {
         // We assume here that the numerator is of the form dX where X is the variable of interest.
         if num_expressions.0.len() == 2 {
             let expression = &num_expressions.0[1];

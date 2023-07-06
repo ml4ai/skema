@@ -51,7 +51,7 @@ struct Lexer {
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
         // Recognize derivatives whenever possible.
-        let tokens = input.clone().iter().fold(vec![], |mut acc, x| {
+        let tokens = input.iter().fold(vec![], |mut acc, x| {
             match x {
                 MathExpression::Mover(base, overscript) => match **overscript {
                     MathExpression::Mo(Operator::Other(ref os)) => {
@@ -80,7 +80,7 @@ impl Lexer {
 
         // Insert implicit multiplication operators.
         let tokens = tokens.iter().fold(vec![], |mut acc, x| {
-            if acc.len() == 0 {
+            if acc.is_empty() {
                 acc.push(x);
             } else {
                 match x {
@@ -221,7 +221,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Add | Operator::Subtract => (5, 6),
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
-        Operator::Other(op) => panic!(format!("Unhandled operator: {op}!")),
+        Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
     Some(res)

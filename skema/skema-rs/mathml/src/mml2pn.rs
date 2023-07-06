@@ -24,17 +24,15 @@ pub fn get_mathml_asts_from_file(filepath: &str) -> Vec<Math> {
 
     let mut mathml_asts = Vec::<Math>::new();
 
-    for line in lines {
-        if let Ok(l) = line {
-            if let Some('#') = &l.chars().next() {
-                // Ignore lines starting with '#'
-            } else {
-                // Parse MathML into AST
-                let math = l
-                    .parse::<Math>()
-                    .unwrap_or_else(|_| panic!("Unable to parse line {}!", l));
-                mathml_asts.push(math);
-            }
+    for line in lines.flatten() {
+        if let Some('#') = &line.chars().next() {
+            // Ignore lines starting with '#'
+        } else {
+            // Parse MathML into AST
+            let math = line
+                .parse::<Math>()
+                .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
+            mathml_asts.push(math);
         }
     }
     mathml_asts
@@ -232,26 +230,29 @@ impl From<Vec<Math>> for acset::ACSet {
                     .0
                     .entry(specie.clone())
                     .and_modify(|e| {
-                        e.entry(monomial.clone()).or_insert(coefficient.clone());
+                        e.entry(monomial.clone())
+                            .or_insert_with(|| coefficient.clone());
                     })
-                    .or_insert(BTreeMap::from([(monomial.clone(), coefficient.clone())]));
+                    .or_insert_with(|| BTreeMap::from([(monomial.clone(), coefficient.clone())]));
             }
         }
 
         // Construct the ACSet for TA2
         // We increment indices by 1 wherever necessary in order to facilitate interoperability with Julia.
-        let mut acset = acset::ACSet::default();
 
-        // Collect the species for the ACSet
-        acset.S = species
-            .clone()
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| acset::Specie {
-                sname: x.to_string(),
-                uid: i,
-            })
-            .collect();
+        let mut acset = acset::ACSet {
+            // Collect the species for the ACSet.
+            S: species
+                .clone()
+                .into_iter()
+                .enumerate()
+                .map(|(i, x)| acset::Specie {
+                    sname: x.to_string(),
+                    uid: i,
+                })
+                .collect(),
+            ..Default::default()
+        };
 
         // Initialize exponents table e(i, y)
         let mut exponents = Exponents::default();
@@ -271,7 +272,7 @@ impl From<Vec<Math>> for acset::ACSet {
                 exponents
                     .0
                     .entry(specie)
-                    .or_insert(BTreeMap::from([(monomial.clone(), exponent.clone())]));
+                    .or_insert_with(|| BTreeMap::from([(monomial.clone(), exponent.clone())]));
             }
         }
 
