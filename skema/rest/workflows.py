@@ -6,7 +6,7 @@ End-to-end skema workflows
 
 from typing import List
 from skema.rest.proxies import SKEMA_RS_ADDESS
-from skema.rest import schema
+from skema.rest import schema, utils
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
 from fastapi import APIRouter, File, UploadFile
@@ -72,7 +72,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
     r.json()
     """
     mml: List[str] = [
-        eqn2mml.post_tex_to_mathml(eqn2mml.LatexEquation(tex_src=tex)).content
+        utils.clean_mml(eqn2mml.get_mathml_from_latex(eqn2mml.LatexEquation(tex_src=tex)))
         for tex in data.equations
     ]
     payload = {"mathml": mml, "model": data.model}
@@ -116,7 +116,7 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File()):
     # FIXME: get comments
-    gromet = code2fn.fn_given_filepaths_zip(zip_file)
+    gromet = await code2fn.fn_given_filepaths_zip(zip_file)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(status_code=400, content={"error": f"MORAE POST /models/PN failed to process payload", "payload": gromet})
@@ -127,7 +127,7 @@ async def repo_to_pn_amr(zip_file: UploadFile = File()):
 @router.post("/code/codebase-to-rn-amr", summary="Code repo (zip archive) → RegNet AMR")
 async def repo_to_rn_amr(zip_file: UploadFile = File()):
     # FIXME: get comments
-    gromet = code2fn.fn_given_filepaths_zip(zip_file)
+    gromet = await code2fn.fn_given_filepaths_zip(zip_file)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(status_code=400, content={"error": f"MORAE POST /models/RN failed to process payload", "payload": gromet})

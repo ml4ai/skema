@@ -90,7 +90,7 @@ app.get('/restart', function (req, res) {
 
 // healthcheck
 app.get('/healthcheck', function (req, res) {
-  res.send(200);
+  res.sendStatus(200);
 });
 
 function port() {

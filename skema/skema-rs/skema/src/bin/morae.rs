@@ -1,6 +1,8 @@
 use clap::Parser;
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
+
+#[cfg(test)]
 use std::fs;
 
 // new imports

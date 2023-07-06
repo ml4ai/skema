@@ -1,5 +1,4 @@
 # Dockerfile for the skema-py service
-
 FROM  python:3.8-bullseye
 
 # ======================
@@ -22,6 +21,13 @@ apt-get install -y nodejs
 # The two commands below are to reduce the size of the Docker image
 RUN apt-get clean &&\
     rm -rf /var/lib/apt/lists/*
+
+
+# =====================
+# ENV setup for app
+# =====================
+ARG APP_VERSION=unknown
+ENV APP_VERSION=$APP_VERSION
 
 # =====================
 # Setup the repository
