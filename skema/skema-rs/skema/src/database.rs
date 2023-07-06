@@ -1868,8 +1868,9 @@ pub fn create_function(
     }
 }
 
-// this creates the framework for conditionals, including the conditional node, the pic and poc nodes and the cond, body_if and body_else edges
-// The iterator through the conditionals will need to be outside this funtion
+// this creates the framework for conditionals, including the conditional node, the pic and poc
+// nodes and the cond, body_if and body_else edges
+// The iterator through the conditionals will need to be outside this function
 #[allow(unused_assignments)]
 pub fn create_conditional(
     gromet: &ModuleCollection,

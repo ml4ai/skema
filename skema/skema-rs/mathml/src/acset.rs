@@ -1,10 +1,9 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::ast::{Math, MathExpression::Mi};
-use crate::petri_net::{Polarity, Var};
 use crate::{
+    ast::{Math, MathExpression, Mi},
     mml2pn::{group_by_operators, Term},
-    parsing::parse,
+    petri_net::{Polarity, Var},
 };
 use serde::{Deserialize, Serialize};
 
@@ -428,6 +427,7 @@ impl From<Vec<Math>> for RegNet {
                 }
             }
 
+            // Positive rate sign: source, negative => sink.
             if eqns[&state.clone()][term_idx].polarity == Polarity::Positive {
                 rate_sign = true;
             }
@@ -435,7 +435,7 @@ impl From<Vec<Math>> for RegNet {
             for variable in eqns[&state][term_idx].vars.iter() {
                 if state.clone() != variable.clone() {
                     match variable.clone() {
-                        Var(Mi(x)) => {
+                        Var(MathExpression::Mi(Mi(x))) => {
                             rate_const = x.clone();
                         }
                         _ => {
@@ -444,7 +444,7 @@ impl From<Vec<Math>> for RegNet {
                     };
                 } else {
                     match variable.clone() {
-                        Var(Mi(x)) => {
+                        Var(MathExpression::Mi(Mi(x))) => {
                             state_name = x.clone();
                         }
                         _ => {
@@ -486,7 +486,7 @@ impl From<Vec<Math>> for RegNet {
                     for (j, var) in term.vars.iter().enumerate() {
                         if j == other_state_indx {
                             match var.clone() {
-                                Var(Mi(x)) => {
+                                Var(MathExpression::Mi(Mi(x))) => {
                                     trans_src = x.clone();
                                 }
                                 _ => {
@@ -495,7 +495,7 @@ impl From<Vec<Math>> for RegNet {
                             };
                         } else if j != other_state_indx && j != state_indx {
                             match var.clone() {
-                                Var(Mi(x)) => {
+                                Var(MathExpression::Mi(Mi(x))) => {
                                     trans_name = x.clone();
                                 }
                                 _ => {
@@ -509,7 +509,6 @@ impl From<Vec<Math>> for RegNet {
 
             let prop = Properties {
                 rate_constant: trans_name.clone(),
-                ..Default::default()
             };
 
             let transitions = RegTransition {
@@ -554,7 +553,7 @@ fn test_lotka_volterra_mml_to_regnet() {
         .as_array()
         .unwrap()
         .into_iter()
-        .map(|x| parse(x.as_str().unwrap()).unwrap().1)
+        .map(|x| x.as_str().unwrap().parse::<Math>().unwrap())
         .collect();
 
     let regnet = RegNet::from(elements);
