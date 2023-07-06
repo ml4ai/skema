@@ -12,13 +12,16 @@ use std::{fmt, str::FromStr};
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
 
-/// An S-expression like structure.
+/// An S-expression like structure to represent mathematical expressions.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum MathExpressionTree {
     Atom(MathExpression),
     Cons(Operator, Vec<MathExpressionTree>),
 }
 
+/// Implementation of Display for MathExpressionTree, in order to have a compact string
+/// representation to work with --- this is useful both for human inspection and writing unit
+/// tests.
 impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -37,6 +40,7 @@ impl fmt::Display for MathExpressionTree {
     }
 }
 
+/// Represents a token for the Pratt parsing algorithm.
 #[derive(Debug, Clone, PartialEq, Eq, new)]
 pub enum Token {
     Atom(MathExpression),
@@ -44,13 +48,15 @@ pub enum Token {
     Eof,
 }
 
+/// Lexer for the Pratt parsing algorithm.
 struct Lexer {
+    /// Vector of input tokens.
     tokens: Vec<Token>,
 }
 
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
-        // Recognize derivatives whenever possible.
+        // Recognize derivatives in Newtonian notation.
         let tokens = input.iter().fold(vec![], |mut acc, x| {
             match x {
                 MathExpression::Mover(base, overscript) => match **overscript {
@@ -66,6 +72,7 @@ impl Lexer {
                     }
                     _ => todo!(),
                 },
+                // Insert implicit division operators.
                 MathExpression::Mfrac(numerator, denominator) => {
                     acc.push(*numerator.clone());
                     acc.push(MathExpression::Mo(Operator::Divide));
@@ -84,22 +91,29 @@ impl Lexer {
                 acc.push(x);
             } else {
                 match x {
+                    // Handle left parenthesis operator '('
                     MathExpression::Mo(Operator::Lparen) => {
-                        // Check last element of acc
+                        // Check last element of the accumulator.
                         if let Some(MathExpression::Mo(_)) = acc.last() {
+                            // If the last element is an Mo, noop.
                         } else {
+                            // Otherwise, insert a multiplication operator.
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
                         acc.push(x);
                     }
+                    // Handle other types of operators.
                     MathExpression::Mo(_) => {
                         acc.push(x);
                     }
+                    // Handle other types of MathExpression objects.
                     t => match acc.last().unwrap() {
                         MathExpression::Mo(_) => {
+                            // If the last item in the accumulator is an Mo, add the current token.
                             acc.push(t);
                         }
                         _ => {
+                            // Otherwise, insert a multiplication operator followed by the token.
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                             acc.push(t);
                         }
@@ -109,6 +123,7 @@ impl Lexer {
             acc
         });
 
+        // Convert MathExpression structs into Token structs.
         let mut tokens = tokens
             .into_iter()
             .map(|c| match c {
@@ -117,17 +132,23 @@ impl Lexer {
             })
             .collect::<Vec<_>>();
 
+        // Reverse the tokens for the Pratt parsing algorithm.
         tokens.reverse();
         Lexer { tokens }
     }
+
+    /// Get the next Token and advance the iterator.
     fn next(&mut self) -> Token {
         self.tokens.pop().unwrap_or(Token::Eof)
     }
-    fn peek(&mut self) -> Token {
+
+    /// Get the next token without advancing the iterator.
+    fn peek(&self) -> Token {
         self.tokens.last().cloned().unwrap_or(Token::Eof)
     }
 }
 
+/// Construct a MathExpressionTree from a vector of MathExpression structs.
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
     expr_bp(&mut lexer, 0)
@@ -154,6 +175,7 @@ impl FromStr for MathExpressionTree {
     }
 }
 
+/// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     let mut lhs = match lexer.next() {
         Token::Atom(it) => MathExpressionTree::Atom(it),
@@ -199,6 +221,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     lhs
 }
 
+/// Table of binding powers for prefix operators.
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
@@ -207,6 +230,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
     }
 }
 
+/// Table of binding powers for postfix operators.
 fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
     let res = match op {
         Operator::Factorial => (11, ()),
@@ -215,6 +239,7 @@ fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
     Some(res)
 }
 
+/// Table of binding powers for infix operators.
 fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
     let res = match op {
         Operator::Equals => (2, 1),
@@ -226,6 +251,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
     };
     Some(res)
 }
+
 #[test]
 fn test_conversion() {
     let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
