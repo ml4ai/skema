@@ -93,58 +93,55 @@
 <a href="#93" id="93">93</a>
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
+<a href="#96" id="96">96</a>
+<a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
+<a href="#99" id="99">99</a>
+<a href="#100" id="100">100</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
 
+<span class="kw">pub mod </span>operator;
+
+<span class="kw">use </span>operator::Operator;
+
 <span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
-</span><span class="kw">pub enum </span>Operator {
-    Add,
-    Multiply,
-    Equals,
-    Divide,
-    Subtract,
-    Sqrt,
-    Lparen,
-    Rparen,
-    Compose,
-    Factorial,
-    <span class="doccomment">/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
-    </span>Derivative {
-        order: u8,
-        var_index: u8,
-    },
-    <span class="comment">// Catchall for operators we haven&#39;t explicitly defined as enum variants yet.
-    </span>Other(String),
+</span><span class="kw">pub struct </span>Mi(<span class="kw">pub </span>String);
+
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="kw">pub struct </span>Mrow(<span class="kw">pub </span>Vec&lt;MathExpression&gt;);
+
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="kw">pub enum </span>Type {
+    Integer,
+    Rational,
+    Real,
+    Complex,
+    ComplexPolar,
+    ComplexCartesian,
+    Constant,
+    Function,
+    Vector,
+    List,
+    Set,
+    Matrix,
 }
 
-<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Operator {
-    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="kw">match </span><span class="self">self </span>{
-            Operator::Add =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;+&quot;</span>),
-            Operator::Multiply =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;*&quot;</span>),
-            Operator::Equals =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;=&quot;</span>),
-            Operator::Divide =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;/&quot;</span>),
-            Operator::Subtract =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;-&quot;</span>),
-            Operator::Sqrt =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;√&quot;</span>),
-            Operator::Lparen =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;(&quot;</span>),
-            Operator::Rparen =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;)&quot;</span>),
-            Operator::Compose =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;.&quot;</span>),
-            Operator::Factorial =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;!&quot;</span>),
-            Operator::Derivative { order, var_index } =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;D({order}, {var_index})&quot;</span>),
-            Operator::Other(op) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{op}&quot;</span>),
-        }
-    }
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="kw">pub struct </span>Ci {
+    <span class="kw">pub </span>r#type: <span class="prelude-ty">Option</span>&lt;Type&gt;,
+    <span class="kw">pub </span>content: MathExpression,
 }
 
 <span class="doccomment">/// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
-</span><span class="attr">#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default)]
+</span><span class="attr">#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
 </span><span class="kw">pub enum </span>MathExpression {
-    Mi(String),
+    Mi(Mi),
     Mo(Operator),
     Mn(String),
     Msqrt(Box&lt;MathExpression&gt;),
-    Mrow(Vec&lt;MathExpression&gt;),
+    Mrow(Mrow),
     Mfrac(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     Msup(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
     Msub(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
@@ -159,6 +156,7 @@
     Mstyle(Vec&lt;MathExpression&gt;),
     Mspace(String),
     MoLine(String),
+    Ci(Box&lt;Ci&gt;),
     <span class="attr">#[default]
     </span><span class="prelude-val">None</span>,
 }
@@ -166,7 +164,7 @@
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>MathExpression {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
-            MathExpression::Mi(identifier) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, identifier),
+            MathExpression::Mi(Mi(identifier)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, identifier),
             MathExpression::Mn(number) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, number),
             MathExpression::Msup(base, superscript) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;{base}^{{{superscript}}}&quot;</span>)
@@ -177,8 +175,20 @@
             MathExpression::Mo(op) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, op)
             }
+            MathExpression::Mrow(Mrow(elements)) =&gt; {
+                <span class="kw">for </span>e <span class="kw">in </span>elements {
+                    <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, e)<span class="question-mark">?</span>;
+                }
+                <span class="prelude-val">Ok</span>(())
+            }
             expression =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{expression:?}&quot;</span>),
         }
+    }
+}
+
+<span class="kw">impl </span>fmt::Display <span class="kw">for </span>Ci {
+    <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.content)
     }
 }
 

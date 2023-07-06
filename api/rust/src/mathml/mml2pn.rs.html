@@ -435,19 +435,18 @@
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::acset;
 <span class="kw">pub use </span><span class="kw">crate</span>::acset::ACSet;
+<span class="kw">use </span><span class="kw">crate</span>::ast::{
+    operator::Operator,
+    Math, MathExpression,
+    MathExpression::{Mn, Mo},
+    Mrow,
+};
 <span class="kw">use </span><span class="kw">crate</span>::petri_net::{
     recognizers::{get_polarity, get_specie_var, is_add_or_subtract_operator, is_var_candidate},
     Polarity, Rate, Specie, Var,
-};
-<span class="kw">use crate</span>::{
-    ast::{
-        Math,
-        MathExpression::{Mn, Mo, Mrow},
-        Operator,
-    },
-    parsing::parse,
 };
 <span class="kw">use </span>petgraph::Graph;
 <span class="kw">use </span>std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
@@ -463,15 +462,15 @@
 
     <span class="kw">let </span><span class="kw-2">mut </span>mathml_asts = Vec::&lt;Math&gt;::new();
 
-    <span class="kw">for </span>line <span class="kw">in </span>lines {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(l) = line {
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="string">&#39;#&#39;</span>) = <span class="kw-2">&amp;</span>l.chars().next() {
-                <span class="comment">// Ignore lines starting with &#39;#&#39;
-            </span>} <span class="kw">else </span>{
-                <span class="comment">// Parse MathML into AST
-                </span><span class="kw">let </span>(<span class="kw">_</span>, math) = parse(<span class="kw-2">&amp;</span>l).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Unable to parse line {}!&quot;</span>, l));
-                mathml_asts.push(math);
-            }
+    <span class="kw">for </span>line <span class="kw">in </span>lines.flatten() {
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="string">&#39;#&#39;</span>) = <span class="kw-2">&amp;</span>line.chars().next() {
+            <span class="comment">// Ignore lines starting with &#39;#&#39;
+        </span>} <span class="kw">else </span>{
+            <span class="comment">// Parse MathML into AST
+            </span><span class="kw">let </span>math = line
+                .parse::&lt;Math&gt;()
+                .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Unable to parse line {}!&quot;</span>, line));
+            mathml_asts.push(math);
         }
     }
     mathml_asts
@@ -509,7 +508,7 @@
     eqns: <span class="kw-2">&amp;mut </span>HashMap&lt;Var, Vec&lt;Term&gt;&gt;,
 ) {
     <span class="kw">let </span>expressions = <span class="kw">if </span>ast.content.len() == <span class="number">1 </span>{
-        <span class="kw">if let </span>Mrow(exprs) = <span class="kw-2">&amp;</span>ast.content[<span class="number">0</span>] {
+        <span class="kw">if let </span>MathExpression::Mrow(Mrow(exprs)) = <span class="kw-2">&amp;</span>ast.content[<span class="number">0</span>] {
             exprs
         } <span class="kw">else </span>{
             <span class="macro">panic!</span>(<span class="string">&quot;Exactly one top-level MathExpression found, but it is not an Mrow! We cannot handle this case.&quot;</span>);
@@ -598,11 +597,11 @@
 
 <span class="kw">impl </span>fmt::Display <span class="kw">for </span>Monomial {
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
-        <span class="macro">write!</span>(f, <span class="string">&quot;{}(&quot;</span>, <span class="self">self</span>.<span class="number">0 </span>.<span class="number">0</span>);
+        <span class="macro">write!</span>(f, <span class="string">&quot;{}(&quot;</span>, <span class="self">self</span>.<span class="number">0 </span>.<span class="number">0</span>)<span class="question-mark">?</span>;
         <span class="kw">for </span>(specie, exponent) <span class="kw">in </span><span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0 </span>.<span class="number">1 </span>{
-            <span class="macro">write!</span>(f, <span class="string">&quot; {}^{} &quot;</span>, specie, exponent);
+            <span class="macro">write!</span>(f, <span class="string">&quot; {}^{} &quot;</span>, specie, exponent)<span class="question-mark">?</span>;
         }
-        <span class="macro">write!</span>(f, <span class="string">&quot;)&quot;</span>);
+        <span class="macro">write!</span>(f, <span class="string">&quot;)&quot;</span>)<span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(())
     }
 }
@@ -669,26 +668,29 @@
                     .<span class="number">0
                     </span>.entry(specie.clone())
                     .and_modify(|e| {
-                        e.entry(monomial.clone()).or_insert(coefficient.clone());
+                        e.entry(monomial.clone())
+                            .or_insert_with(|| coefficient.clone());
                     })
-                    .or_insert(BTreeMap::from([(monomial.clone(), coefficient.clone())]));
+                    .or_insert_with(|| BTreeMap::from([(monomial.clone(), coefficient.clone())]));
             }
         }
 
         <span class="comment">// Construct the ACSet for TA2
         // We increment indices by 1 wherever necessary in order to facilitate interoperability with Julia.
-        </span><span class="kw">let </span><span class="kw-2">mut </span>acset = acset::ACSet::default();
 
-        <span class="comment">// Collect the species for the ACSet
-        </span>acset.S = species
-            .clone()
-            .into_iter()
-            .enumerate()
-            .map(|(i, x)| acset::Specie {
-                sname: x.to_string(),
-                uid: i,
-            })
-            .collect();
+        </span><span class="kw">let </span><span class="kw-2">mut </span>acset = acset::ACSet {
+            <span class="comment">// Collect the species for the ACSet.
+            </span>S: species
+                .clone()
+                .into_iter()
+                .enumerate()
+                .map(|(i, x)| acset::Specie {
+                    sname: x.to_string(),
+                    uid: i,
+                })
+                .collect(),
+            ..Default::default()
+        };
 
         <span class="comment">// Initialize exponents table e(i, y)
         </span><span class="kw">let </span><span class="kw-2">mut </span>exponents = Exponents::default();
@@ -708,7 +710,7 @@
                 exponents
                     .<span class="number">0
                     </span>.entry(specie)
-                    .or_insert(BTreeMap::from([(monomial.clone(), exponent.clone())]));
+                    .or_insert_with(|| BTreeMap::from([(monomial.clone(), exponent.clone())]));
             }
         }
 

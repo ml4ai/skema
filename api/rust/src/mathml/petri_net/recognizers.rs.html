@@ -139,31 +139,40 @@
 <a href="#139" id="139">139</a>
 <a href="#140" id="140">140</a>
 <a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains functions for predicate testing of MathML elements, as well as extracting
 //! semantically-meaningful objects from MathML expressions.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::ast::{
+    operator::{Derivative, Operator},
     MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub},
-    Operator,
+    MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msub},
+    Mi,
 };
 <span class="kw">use </span><span class="kw">crate</span>::petri_net::{Polarity, Var};
 
-<span class="doccomment">/// Check if fraction is a derivative expressed in Leibniz notation
-</span><span class="kw">pub fn </span>is_leibniz_diff_operator(
-    numerator: <span class="kw-2">&amp;</span>Box&lt;MathExpression&gt;,
-    denominator: <span class="kw-2">&amp;</span>Box&lt;MathExpression&gt;,
-) -&gt; bool {
+<span class="doccomment">/// Check if fraction is a derivative of a single-variable function expressed in Leibniz notation,
+/// and if so, return a derivative operator and the identifier of the function.
+</span><span class="kw">pub fn </span>recognize_leibniz_differential_operator&lt;<span class="lifetime">&#39;a</span>&gt;(
+    numerator: <span class="kw-2">&amp;</span>MathExpression,
+    denominator: <span class="kw-2">&amp;</span>MathExpression,
+) -&gt; <span class="prelude-ty">Result</span>&lt;(Operator, MathExpression), <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>numerator_contains_d = <span class="bool-val">false</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>denominator_contains_d = <span class="bool-val">false</span>;
 
     <span class="kw">let </span><span class="kw-2">mut </span>numerator_contains_partial = <span class="bool-val">false</span>;
     <span class="kw">let </span><span class="kw-2">mut </span>denominator_contains_partial = <span class="bool-val">false</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>function_candidate: <span class="prelude-ty">Option</span>&lt;MathExpression&gt; = <span class="prelude-val">None</span>;
 
     <span class="comment">// Check if numerator is an mrow
-    </span><span class="kw">if let </span>MathExpression::Mrow(num_expressions) = <span class="kw-2">&amp;**</span>numerator {
+    </span><span class="kw">if let </span>MathExpression::Mrow(num_expressions) = numerator {
         <span class="comment">// Check if first element of numerator is an mi
-        </span><span class="kw">if let </span>MathExpression::Mi(num_id) = <span class="kw-2">&amp;</span>num_expressions[<span class="number">0</span>] {
+        </span><span class="kw">if let </span>MathExpression::Mi(Mi(num_id)) = <span class="kw-2">&amp;</span>num_expressions.<span class="number">0</span>[<span class="number">0</span>] {
             <span class="comment">// Check if mi contains &#39;d&#39;
             </span><span class="kw">if </span>num_id == <span class="string">&quot;d&quot; </span>{
                 numerator_contains_d = <span class="bool-val">true</span>;
@@ -172,12 +181,15 @@
             <span class="kw">if </span>num_id == <span class="string">&quot;∂&quot; </span>{
                 numerator_contains_partial = <span class="bool-val">true</span>;
             }
+
+            <span class="comment">// Gather the second identifier as a potential candidate function.
+            </span>function_candidate = <span class="prelude-val">Some</span>(num_expressions.<span class="number">0</span>[<span class="number">1</span>].clone());
         }
     }
 
-    <span class="kw">if let </span>MathExpression::Mrow(denom_expressions) = <span class="kw-2">&amp;**</span>denominator {
+    <span class="kw">if let </span>MathExpression::Mrow(denom_expressions) = denominator {
         <span class="comment">// Check if first element of denominator is an mi
-        </span><span class="kw">if let </span>MathExpression::Mi(denom_id) = <span class="kw-2">&amp;</span>denom_expressions[<span class="number">0</span>] {
+        </span><span class="kw">if let </span>MathExpression::Mi(Mi(denom_id)) = <span class="kw-2">&amp;</span>denom_expressions.<span class="number">0</span>[<span class="number">0</span>] {
             <span class="comment">// Check if mi contains &#39;d&#39;
             </span><span class="kw">if </span>denom_id == <span class="string">&quot;d&quot; </span>{
                 denominator_contains_d = <span class="bool-val">true</span>;
@@ -188,8 +200,16 @@
         }
     }
 
-    (numerator_contains_d &amp;&amp; denominator_contains_d)
+    <span class="kw">if </span>(numerator_contains_d &amp;&amp; denominator_contains_d)
         || (numerator_contains_partial &amp;&amp; denominator_contains_partial)
+    {
+        <span class="prelude-val">Ok</span>((
+            Operator::new_derivative(Derivative::new(<span class="number">1</span>, <span class="number">1</span>)),
+            function_candidate.unwrap(),
+        ))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(<span class="string">&quot;This Mfrac does not correspond to a derivative in Leibniz notation&quot;</span>)
+    }
 }
 
 <span class="doccomment">/// Predicate testing whether a MathML operator (Mo) is a subtraction or addition.
@@ -220,10 +240,10 @@
     <span class="comment">// Check if expression is an mfrac
     </span><span class="kw">match </span>expression {
         Mfrac(numerator, denominator) =&gt; {
-            <span class="kw">if </span>is_leibniz_diff_operator(numerator, denominator) {
+            <span class="kw">if </span>recognize_leibniz_differential_operator(numerator, denominator).is_ok() {
                 mfrac_leibniz_to_specie(numerator, denominator)
             } <span class="kw">else </span>{
-                <span class="macro">panic!</span>(<span class="string">&quot;Expression is an mfrac but not a Leibniz diff operator!&quot;</span>);
+                <span class="macro">panic!</span>(<span class="string">&quot;Expression is an mfrac but not a Leibniz differential operator!&quot;</span>);
             }
         }
         <span class="comment">// Translate MathML :mover as Newton dot notation
@@ -248,12 +268,7 @@
 ///     Perhaps useful to represent constant coefficients?
 ///     But should those be Vars?
 </span><span class="kw">pub fn </span>is_var_candidate(element: <span class="kw-2">&amp;</span>MathExpression) -&gt; bool {
-    <span class="kw">match </span>element {
-        Mi(_x) =&gt; <span class="bool-val">true</span>,
-        Mn(_x) =&gt; <span class="bool-val">true</span>,
-        Msub(_x1, _x2) =&gt; <span class="bool-val">true</span>,
-        <span class="kw">_ </span>=&gt; <span class="bool-val">false</span>,
-    }
+    <span class="macro">matches!</span>(element, MathExpression::Mi(<span class="kw">_</span>) | Mn(<span class="kw">_</span>) | Msub(<span class="kw">_</span>, <span class="kw">_</span>))
 }
 
 <span class="doccomment">/// Translate a MathML mfrac (fraction) as an expression of a Leibniz differential operator.
@@ -262,15 +277,12 @@
 /// TODO: possibly generalize to accommodate superscripts for higher order derivatives;
 ///       although likely that would be an msup, so still the &quot;first&quot; elm of the numerator,
 ///       with the second (and beyond) elm(s) being the Var.
-</span><span class="kw">fn </span>mfrac_leibniz_to_specie(
-    numerator: <span class="kw-2">&amp;</span>Box&lt;MathExpression&gt;,
-    _denominator: <span class="kw-2">&amp;</span>Box&lt;MathExpression&gt;,
-) -&gt; Var {
+</span><span class="kw">fn </span>mfrac_leibniz_to_specie(numerator: <span class="kw-2">&amp;</span>MathExpression, _denominator: <span class="kw-2">&amp;</span>MathExpression) -&gt; Var {
     <span class="comment">// Check if numerator is an mrow
-    </span><span class="kw">if let </span>Mrow(num_expressions) = <span class="kw-2">&amp;**</span>numerator {
+    </span><span class="kw">if let </span>Mrow(num_expressions) = numerator {
         <span class="comment">// We assume here that the numerator is of the form dX where X is the variable of interest.
-        </span><span class="kw">if </span>num_expressions.len() == <span class="number">2 </span>{
-            <span class="kw">let </span>expression = <span class="kw-2">&amp;</span>num_expressions[<span class="number">1</span>];
+        </span><span class="kw">if </span>num_expressions.<span class="number">0</span>.len() == <span class="number">2 </span>{
+            <span class="kw">let </span>expression = <span class="kw-2">&amp;</span>num_expressions.<span class="number">0</span>[<span class="number">1</span>];
             Var(expression.clone())
         } <span class="kw">else </span>{
             <span class="macro">panic!</span>(

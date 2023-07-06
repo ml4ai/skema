@@ -106,18 +106,17 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Comment extraction services
 
-</span><span class="kw">use </span>actix_web::{get, post, web, HttpResponse};
-<span class="kw">use </span>comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
+</span><span class="kw">use </span>actix_web::{post, web, HttpResponse};
 <span class="kw">use </span>comment_extraction::languages::python::get_comments_from_string <span class="kw">as </span>get_python_comments;
+<span class="kw">use </span>comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
+<span class="kw">use </span>log::debug;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
+<span class="kw">use </span>std::{fs, io::Write};
+<span class="kw">use </span>tempdir::TempDir;
 <span class="kw">use </span>utoipa;
 <span class="kw">use </span>utoipa::ToSchema;
-<span class="kw">use </span>std::{fs, io::Write};
-<span class="kw">use </span>log::debug;
-<span class="kw">use </span>tempdir::TempDir;
 
 <span class="attr">#[derive(Debug, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub enum </span>Language {
@@ -189,7 +188,6 @@
 </span><span class="kw">pub async fn </span>get_comments(payload: web::Json&lt;CommentExtractionRequest&gt;) -&gt; HttpResponse {
     HttpResponse::Ok().json(web::Json(get_python_comments(<span class="kw-2">&amp;</span>payload.code)))
 }
-
 
 <span class="doccomment">/// Get comments for a zipfile containing a directory of code
 </span><span class="attr">#[utoipa::path(

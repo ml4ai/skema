@@ -85,7 +85,7 @@ var sourcesIndex = JSON.parse('{\
 "lock_api":["",[],["lib.rs","mutex.rs","remutex.rs","rwlock.rs"]],\
 "log":["",[],["lib.rs","macros.rs"]],\
 "maplit":["",[],["lib.rs"]],\
-"mathml":["",[["petri_net",[],["recognizers.rs"]]],["acset.rs","ast.rs","expression.rs","graph.rs","lib.rs","mml2pn.rs","normalization.rs","parsing.rs","petri_net.rs","pratt_parsing.rs"]],\
+"mathml":["",[["ast",[],["operator.rs"]],["parsers",[],["first_order_ode.rs","generic_mathml.rs","math_expression_tree.rs"]],["petri_net",[],["recognizers.rs"]]],["acset.rs","ast.rs","expression.rs","graph.rs","lib.rs","mml2pn.rs","normalization.rs","parsers.rs","petri_net.rs"]],\
 "memchr":["",[["memchr",[["x86",[],["avx.rs","mod.rs","sse2.rs"]]],["fallback.rs","iter.rs","mod.rs","naive.rs"]],["memmem",[["prefilter",[["x86",[],["avx.rs","mod.rs","sse.rs"]]],["fallback.rs","genericsimd.rs","mod.rs"]],["x86",[],["avx.rs","mod.rs","sse.rs"]]],["byte_frequencies.rs","genericsimd.rs","mod.rs","rabinkarp.rs","rarebytes.rs","twoway.rs","util.rs","vector.rs"]]],["cow.rs","lib.rs"]],\
 "mime":["",[],["lib.rs","parse.rs"]],\
 "mime_guess":["",[],["impl_bin_search.rs","lib.rs"]],\

@@ -99,10 +99,22 @@
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
-</pre></div><pre class="rust"><code><span class="doccomment">/// Functionality for normalizing MathExpression enums.
+<a href="#102" id="102">102</a>
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+</pre></div><pre class="rust"><code><span class="attr">#[cfg(test)]
+</span><span class="kw">use </span><span class="kw">crate</span>::ast::operator::Operator;
+
+<span class="doccomment">/// Functionality for normalizing MathExpression enums.
 </span><span class="kw">use </span><span class="kw">crate</span>::ast::{
     Math, MathExpression,
-    MathExpression::{Mi, Mn, Mo, Mrow, Msub},
+    MathExpression::{Mn, Mo, Msub},
+    Mi, Mrow,
 };
 
 <span class="kw">impl </span>MathExpression {
@@ -114,10 +126,10 @@
                 combined.push_str(<span class="string">&quot;_{&quot;</span>);
                 combined.push_str(<span class="kw-2">&amp;</span>subscript.get_string_repr());
                 combined.push(<span class="string">&#39;}&#39;</span>);
-                <span class="kw-2">*</span><span class="self">self </span>= Mi(combined);
+                <span class="kw-2">*</span><span class="self">self </span>= MathExpression::Mi(Mi(combined));
             }
 
-            Mrow(xs) =&gt; {
+            MathExpression::Mrow(Mrow(xs)) =&gt; {
                 <span class="kw">for </span>x <span class="kw">in </span>xs {
                     x.collapse_subscripts();
                 }
@@ -129,10 +141,10 @@
     <span class="doccomment">/// Get the string representation of a MathExpression
     </span><span class="kw">pub fn </span>get_string_repr(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">match </span><span class="self">self </span>{
-            Mi(x) =&gt; x.to_string(),
+            MathExpression::Mi(Mi(x)) =&gt; x.to_string(),
             Mo(x) =&gt; x.to_string(),
             Mn(x) =&gt; x.to_string(),
-            Mrow(xs) =&gt; xs
+            MathExpression::Mrow(Mrow(xs)) =&gt; xs
                 .iter()
                 .map(|x| x.get_string_repr())
                 .collect::&lt;Vec&lt;String&gt;&gt;()
@@ -156,48 +168,52 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_get_string_repr() {
-    <span class="kw">use </span><span class="kw">crate</span>::ast::Operator;
-    <span class="macro">assert_eq!</span>(Mi(<span class="string">&quot;t&quot;</span>.to_string()).get_string_repr(), <span class="string">&quot;t&quot;</span>.to_string());
+    <span class="macro">assert_eq!</span>(
+        MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string())).get_string_repr(),
+        <span class="string">&quot;t&quot;</span>.to_string()
+    );
     <span class="macro">assert_eq!</span>(Mo(Operator::Add).get_string_repr(), <span class="string">&quot;+&quot;</span>);
     <span class="macro">assert_eq!</span>(
-        Mrow(<span class="macro">vec!</span>[Mi(<span class="string">&quot;t&quot;</span>.into()), Mo(Operator::Add), Mi(<span class="string">&quot;1&quot;</span>.to_string())]).get_string_repr(),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.into())),
+            Mo(Operator::Add),
+            MathExpression::Mi(Mi(<span class="string">&quot;1&quot;</span>.to_string()))
+        ]))
+        .get_string_repr(),
         <span class="string">&quot;t+1&quot;</span>.to_string()
     );
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_subscript_collapsing() {
-    <span class="kw">use </span><span class="kw">crate</span>::ast::Operator;
     <span class="kw">let </span><span class="kw-2">mut </span>expr = Msub(
-        Box::new(Mi(<span class="string">&quot;S&quot;</span>.to_string())),
-        Box::new(Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;t&quot;</span>.to_string()),
+        Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
+        Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;1&quot;</span>.to_string()),
-        ])),
+            MathExpression::Mi(Mi(<span class="string">&quot;1&quot;</span>.to_string())),
+        ]))),
     );
     expr.collapse_subscripts();
-    <span class="macro">assert_eq!</span>(expr, Mi(<span class="string">&quot;S_{t+1}&quot;</span>.to_string()));
+    <span class="macro">assert_eq!</span>(expr, MathExpression::Mi(Mi(<span class="string">&quot;S_{t+1}&quot;</span>.to_string())));
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_normalize() {
-    <span class="kw">use </span><span class="kw">crate</span>::ast::Operator;
-    <span class="kw">use </span><span class="kw">crate</span>::parsing::parse;
     <span class="kw">let </span>contents = std::fs::read_to_string(<span class="string">&quot;tests/sir.xml&quot;</span>).unwrap();
-    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) = parse(<span class="kw-2">&amp;</span>contents).unwrap();
+    <span class="kw">let </span><span class="kw-2">mut </span>math = contents.parse::&lt;Math&gt;().unwrap();
     math.normalize();
     <span class="macro">assert_eq!</span>(
         <span class="kw-2">&amp;</span>math.content[<span class="number">0</span>],
-        <span class="kw-2">&amp;</span>Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;S_{t+1}&quot;</span>.to_string()),
+        <span class="kw-2">&amp;</span>MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;S_{t+1}&quot;</span>.to_string())),
             Mo(Operator::Equals),
-            Mi(<span class="string">&quot;S_{t}&quot;</span>.to_string()),
+            MathExpression::Mi(Mi(<span class="string">&quot;S_{t}&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;β&quot;</span>.to_string()),
-            Mi(<span class="string">&quot;S_{t}&quot;</span>.to_string()),
-            Mi(<span class="string">&quot;I_{t}&quot;</span>.to_string()),
-        ])
+            MathExpression::Mi(Mi(<span class="string">&quot;β&quot;</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">&quot;S_{t}&quot;</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">&quot;I_{t}&quot;</span>.to_string())),
+        ]))
     );
 }
 </code></pre></div></section></main></body></html>

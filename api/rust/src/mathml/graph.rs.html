@@ -97,9 +97,9 @@
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
-        Munder,
+        Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
     },
+    Mi, Mrow,
 };
 
 <span class="kw">use </span>petgraph::{graph::NodeIndex, Graph};
@@ -159,14 +159,14 @@
 <span class="kw">impl </span>MathExpression {
     <span class="kw">pub fn </span>add_to_graph&lt;<span class="lifetime">&#39;a</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="self">self</span>, graph: <span class="kw-2">&amp;mut </span>ASTGraph&lt;<span class="lifetime">&#39;a</span>&gt;, parent_index: <span class="prelude-ty">Option</span>&lt;NodeIndex&gt;) {
         <span class="kw">match </span><span class="self">self </span>{
-            Mi(x) =&gt; add_to_graph_0(graph, parent_index, x),
+            MathExpression::Mi(Mi(x)) =&gt; add_to_graph_0(graph, parent_index, x),
             Mo(x) =&gt; add_to_graph_0(graph, parent_index, <span class="kw-2">&amp;</span>x.to_string()),
             Mn(x) =&gt; add_to_graph_0(graph, parent_index, x),
             Msqrt(x) =&gt; <span class="macro">add_to_graph_n!</span>(graph, parent_index, <span class="string">&quot;msqrt&quot;</span>, x),
             Msup(x1, x2) =&gt; <span class="macro">add_to_graph_n!</span>(graph, parent_index, <span class="string">&quot;msup&quot;</span>, x1, x2),
             Msub(x1, x2) =&gt; <span class="macro">add_to_graph_n!</span>(graph, parent_index, <span class="string">&quot;msub&quot;</span>, x1, x2),
             Mfrac(x1, x2) =&gt; <span class="macro">add_to_graph_n!</span>(graph, parent_index, <span class="string">&quot;mfrac&quot;</span>, x1, x2),
-            Mrow(xs) =&gt; add_to_graph_many0(graph, parent_index, <span class="string">&quot;mrow&quot;</span>, xs),
+            MathExpression::Mrow(Mrow(xs)) =&gt; add_to_graph_many0(graph, parent_index, <span class="string">&quot;mrow&quot;</span>, xs),
             Munder(x1, x2) =&gt; <span class="macro">add_to_graph_n!</span>(graph, parent_index, <span class="string">&quot;munder&quot;</span>, x1, x2),
             Mover(x1, x2) =&gt; <span class="macro">add_to_graph_n!</span>(graph, parent_index, <span class="string">&quot;mover&quot;</span>, x1, x2),
             Msubsup(x1, x2, x3) =&gt; <span class="macro">add_to_graph_n!</span>(graph, parent_index, <span class="string">&quot;msubsup&quot;</span>, x1, x2, x3),

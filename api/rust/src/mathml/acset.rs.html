@@ -564,14 +564,12 @@
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
-<a href="#567" id="567">567</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-</span><span class="kw">use </span><span class="kw">crate</span>::ast::{Math, MathExpression::Mi};
-<span class="kw">use </span><span class="kw">crate</span>::petri_net::{Polarity, Var};
-<span class="kw">use crate</span>::{
+</span><span class="kw">use crate</span>::{
+    ast::{Math, MathExpression, Mi},
     mml2pn::{group_by_operators, Term},
-    parsing::parse,
+    petri_net::{Polarity, Var},
 };
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 
@@ -995,14 +993,15 @@
                 }
             }
 
-            <span class="kw">if </span>eqns[<span class="kw-2">&amp;</span>state.clone()][term_idx].polarity == Polarity::Positive {
+            <span class="comment">// Positive rate sign: source, negative =&gt; sink.
+            </span><span class="kw">if </span>eqns[<span class="kw-2">&amp;</span>state.clone()][term_idx].polarity == Polarity::Positive {
                 rate_sign = <span class="bool-val">true</span>;
             }
 
             <span class="kw">for </span>variable <span class="kw">in </span>eqns[<span class="kw-2">&amp;</span>state][term_idx].vars.iter() {
                 <span class="kw">if </span>state.clone() != variable.clone() {
                     <span class="kw">match </span>variable.clone() {
-                        Var(Mi(x)) =&gt; {
+                        Var(MathExpression::Mi(Mi(x))) =&gt; {
                             rate_const = x.clone();
                         }
                         <span class="kw">_ </span>=&gt; {
@@ -1011,7 +1010,7 @@
                     };
                 } <span class="kw">else </span>{
                     <span class="kw">match </span>variable.clone() {
-                        Var(Mi(x)) =&gt; {
+                        Var(MathExpression::Mi(Mi(x))) =&gt; {
                             state_name = x.clone();
                         }
                         <span class="kw">_ </span>=&gt; {
@@ -1053,7 +1052,7 @@
                     <span class="kw">for </span>(j, var) <span class="kw">in </span>term.vars.iter().enumerate() {
                         <span class="kw">if </span>j == other_state_indx {
                             <span class="kw">match </span>var.clone() {
-                                Var(Mi(x)) =&gt; {
+                                Var(MathExpression::Mi(Mi(x))) =&gt; {
                                     trans_src = x.clone();
                                 }
                                 <span class="kw">_ </span>=&gt; {
@@ -1062,7 +1061,7 @@
                             };
                         } <span class="kw">else if </span>j != other_state_indx &amp;&amp; j != state_indx {
                             <span class="kw">match </span>var.clone() {
-                                Var(Mi(x)) =&gt; {
+                                Var(MathExpression::Mi(Mi(x))) =&gt; {
                                     trans_name = x.clone();
                                 }
                                 <span class="kw">_ </span>=&gt; {
@@ -1076,7 +1075,6 @@
 
             <span class="kw">let </span>prop = Properties {
                 rate_constant: trans_name.clone(),
-                ..Default::default()
             };
 
             <span class="kw">let </span>transitions = RegTransition {
@@ -1121,7 +1119,7 @@
         .as_array()
         .unwrap()
         .into_iter()
-        .map(|x| parse(x.as_str().unwrap()).unwrap().<span class="number">1</span>)
+        .map(|x| x.as_str().unwrap().parse::&lt;Math&gt;().unwrap())
         .collect();
 
     <span class="kw">let </span>regnet = RegNet::from(elements);

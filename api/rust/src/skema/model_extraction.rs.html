@@ -961,23 +961,7 @@
 <a href="#961" id="961">961</a>
 <a href="#962" id="962">962</a>
 <a href="#963" id="963">963</a>
-<a href="#964" id="964">964</a>
-<a href="#965" id="965">965</a>
-<a href="#966" id="966">966</a>
-<a href="#967" id="967">967</a>
-<a href="#968" id="968">968</a>
-<a href="#969" id="969">969</a>
-<a href="#970" id="970">970</a>
-<a href="#971" id="971">971</a>
-<a href="#972" id="972">972</a>
-<a href="#973" id="973">973</a>
-<a href="#974" id="974">974</a>
-<a href="#975" id="975">975</a>
-<a href="#976" id="976">976</a>
-<a href="#977" id="977">977</a>
-<a href="#978" id="978">978</a>
-<a href="#979" id="979">979</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{Math, Operator};
+</pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{operator::Operator, Math};
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
 <span class="kw">use </span>petgraph::prelude::<span class="kw-2">*</span>;
@@ -988,9 +972,8 @@
 
 <span class="comment">// new imports
 
-</span><span class="kw">use </span>mathml::ast::MathExpression;
-<span class="kw">use </span>mathml::ast::MathExpression::Mo;
-<span class="kw">use </span>mathml::ast::MathExpression::Mrow;
+</span><span class="kw">use </span>mathml::ast::MathExpression::Mo;
+<span class="kw">use </span>mathml::ast::{MathExpression, Mi, Mrow};
 <span class="kw">use </span>mathml::petri_net::recognizers::is_add_or_subtract_operator;
 
 <span class="comment">// struct for returning line spans
@@ -1064,7 +1047,7 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>math_content = Vec::&lt;Math&gt;::new();
     <span class="kw">for </span>eq <span class="kw">in </span>core_dynamics_ast.iter() {
         <span class="kw">let </span>math_ast = Math {
-            content: [Mrow(eq.clone())].to_vec(),
+            content: <span class="macro">vec!</span>[MathExpression::Mrow(Mrow(eq.clone()))],
         };
         math_content.push(math_ast.clone());
     }
@@ -1224,39 +1207,27 @@
         // currently we convert to leibniz form
         </span><span class="kw">if </span>deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string() == <span class="string">&quot;d&quot; </span>{
             <span class="kw">let </span>deriv = MathExpression::Mfrac(
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi(deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string()),
-                        MathExpression::Mi(deriv_name[<span class="number">2</span>..<span class="number">3</span>].to_string()),
-                    ]
-                    .to_vec(),
-                )),
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi(deriv_name[<span class="number">3</span>..<span class="number">4</span>].to_string()),
-                        MathExpression::Mi(deriv_name[<span class="number">4</span>..<span class="number">5</span>].to_string()),
-                    ]
-                    .to_vec(),
-                )),
+                Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                    MathExpression::Mi(Mi(deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string())),
+                    MathExpression::Mi(Mi(deriv_name[<span class="number">2</span>..<span class="number">3</span>].to_string())),
+                ]))),
+                Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                    MathExpression::Mi(Mi(deriv_name[<span class="number">3</span>..<span class="number">4</span>].to_string())),
+                    MathExpression::Mi(Mi(deriv_name[<span class="number">4</span>..<span class="number">5</span>].to_string())),
+                ]))),
             );
             math_vec.push(deriv);
         } <span class="kw">else </span>{
             step_impl = <span class="bool-val">true</span>;
             <span class="kw">let </span>deriv = MathExpression::Mfrac(
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-                        MathExpression::Mi(deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string()),
-                    ]
-                    .to_vec(),
-                )),
-                Box::new(Mrow(
-                    [
-                        MathExpression::Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-                        MathExpression::Mi(<span class="string">&quot;t&quot;</span>.to_string()),
-                    ]
-                    .to_vec(),
-                )),
+                Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                    MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+                    MathExpression::Mi(Mi(deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string())),
+                ]))),
+                Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                    MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+                    MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string())),
+                ]))),
             );
             math_vec.push(deriv);
         }
@@ -1343,12 +1314,13 @@
         }
 
         <span class="comment">// we now need to handle the case where it&#39;s step implementation
-        // we find the Mi of the state variable that doesn&#39;t have a multiplication next to it (including only one, if at the end of the vec)
+        // we find the Mi of the state variable that doesn&#39;t have a multiplication next to it
+        // (including only one, if at the end of the vec)
         // we then remove it and the one of the addition operators next to it
         </span><span class="kw">if </span>step_impl {
             <span class="kw">let </span>ref_name = deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string();
             <span class="kw">for </span>(idx, obj) <span class="kw">in </span>math_vec.clone().iter().enumerate() {
-                <span class="kw">if </span><span class="kw-2">*</span>obj == MathExpression::Mi(ref_name.clone()) {
+                <span class="kw">if </span><span class="kw-2">*</span>obj == MathExpression::Mi(Mi(ref_name.clone())) {
                     <span class="comment">// find each index of the state variable on the rhs
                     // check if there is a multiplication to the right or left
                     // if no multiplication then delete entry and all neighboring addition operators
@@ -1646,22 +1618,18 @@
         </span>{
             op.push(get_operator(graph.clone(), node));
             <span class="kw">for </span>node1 <span class="kw">in </span>graph.neighbors_directed(node, Outgoing) {
-                <span class="kw">let </span>temp_mi = MathExpression::Mi(
-                    graph.clone()[node1].properties[<span class="string">&quot;name&quot;</span>].to_string()
-                        [<span class="number">1</span>..(graph.clone()[node1].properties[<span class="string">&quot;name&quot;</span>].to_string().len() - <span class="number">1_usize</span>)]
-                        .to_string()
-                        .clone(),
-                );
+                <span class="kw">let </span>temp_mi = MathExpression::Mi(Mi(graph.clone()[node1].properties[<span class="string">&quot;name&quot;</span>]
+                    .to_string()
+                    [<span class="number">1</span>..(graph.clone()[node1].properties[<span class="string">&quot;name&quot;</span>].to_string().len() - <span class="number">1_usize</span>)]
+                    .to_string()));
                 args[i].push(op[<span class="number">0</span>].clone());
                 args[i].push(temp_mi.clone());
             }
         } <span class="kw">else if </span>graph[node].labels == [<span class="string">&quot;Opi&quot;</span>] || graph[node].labels == [<span class="string">&quot;Literal&quot;</span>] {
-            <span class="kw">let </span>temp_mi = MathExpression::Mi(
-                graph.clone()[node].properties[<span class="string">&quot;name&quot;</span>].to_string()
-                    [<span class="number">1</span>..(graph.clone()[node].properties[<span class="string">&quot;name&quot;</span>].to_string().len() - <span class="number">1_usize</span>)]
-                    .to_string()
-                    .clone(),
-            );
+            <span class="kw">let </span>temp_mi = MathExpression::Mi(Mi(graph.clone()[node].properties[<span class="string">&quot;name&quot;</span>]
+                .to_string()
+                [<span class="number">1</span>..(graph.clone()[node].properties[<span class="string">&quot;name&quot;</span>].to_string().len() - <span class="number">1_usize</span>)]
+                .to_string()));
             args[i].push(temp_mi.clone());
         } <span class="kw">else </span>{
             <span class="kw">let </span>n_args = get_args(graph.clone(), node);

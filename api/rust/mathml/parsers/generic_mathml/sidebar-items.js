@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["add","attribute","equals","lparen","math_expression","mi","mo","mrow","operator","parse","rparen","subtract","ws","xml_declaration"],"struct":["ParseError"],"trait":["FromFile"],"type":["IResult","Span"]};

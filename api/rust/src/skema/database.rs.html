@@ -4884,6 +4884,7 @@
 <a href="#4884" id="4884">4884</a>
 <a href="#4885" id="4885">4885</a>
 <a href="#4886" id="4886">4886</a>
+<a href="#4887" id="4887">4887</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -6754,8 +6755,9 @@ There being a second function call of the same function which contains an expres
     }
 }
 
-<span class="comment">// this creates the framework for conditionals, including the conditional node, the pic and poc nodes and the cond, body_if and body_else edges
-// The iterator through the conditionals will need to be outside this funtion
+<span class="comment">// this creates the framework for conditionals, including the conditional node, the pic and poc
+// nodes and the cond, body_if and body_else edges
+// The iterator through the conditionals will need to be outside this function
 </span><span class="attr">#[allow(unused_assignments)]
 </span><span class="kw">pub fn </span>create_conditional(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection,

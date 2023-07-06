@@ -102,10 +102,14 @@
 <a href="#102" id="102">102</a>
 <a href="#103" id="103">103</a>
 <a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
-<span class="kw">use </span>std::fs;
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">use </span>std::fs;
 
 <span class="comment">// new imports
 </span><span class="kw">use </span>mathml::acset::{PetriNet, RegNet};

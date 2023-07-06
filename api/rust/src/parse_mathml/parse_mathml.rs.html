@@ -30,7 +30,7 @@
 </pre></div><pre class="rust"><code><span class="doccomment">//! Program to parse MathML
 
 </span><span class="kw">use </span>clap::Parser;
-<span class="kw">use </span>mathml::parsing::parse;
+<span class="kw">use </span>mathml::ast::Math;
 <span class="kw">use </span>petgraph::dot::{Config, Dot};
 
 <span class="attr">#[derive(Parser, Debug)]
@@ -48,9 +48,9 @@
     <span class="kw">let </span>input = <span class="kw-2">&amp;</span>args.input;
     <span class="kw">let </span>contents = std::fs::read_to_string(input)
         .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to read file {input}!&quot;</span>));
-    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) =
-        parse(<span class="kw-2">&amp;</span>contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse file {input}!&quot;</span>));
-    <span class="kw">if </span>args.normalize {
+    <span class="kw">let </span><span class="kw-2">mut </span>math = contents.parse::&lt;Math&gt;().unwrap();
+    <span class="comment">//parse(&amp;contents).unwrap_or_else(|_| panic!(&quot;{}&quot;, &quot;Unable to parse file {input}!&quot;));
+    </span><span class="kw">if </span>args.normalize {
         math.normalize();
     }
     <span class="kw">let </span>g = math.to_graph();

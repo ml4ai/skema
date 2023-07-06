@@ -2724,21 +2724,17 @@
 <a href="#2724" id="2724">2724</a>
 <a href="#2725" id="2725">2725</a>
 <a href="#2726" id="2726">2726</a>
-<a href="#2727" id="2727">2727</a>
-<a href="#2728" id="2728">2728</a>
-<a href="#2729" id="2729">2729</a>
-<a href="#2730" id="2730">2730</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
-    Math, MathExpression,
-    MathExpression::{Mfrac, Mi, Mn, Mo, Mover, Mrow, Msqrt, Msubsup, Msup},
-    Operator,
+</pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
+    ast::{
+        operator::Operator,
+        Math, MathExpression,
+        MathExpression::{Mfrac, Mn, Mo, Mover, Msqrt, Msubsup, Msup},
+        Mi, Mrow,
+    },
+    petri_net::recognizers::recognize_leibniz_differential_operator,
 };
-<span class="kw">use </span>std::clone::Clone;
-
 <span class="kw">use </span>petgraph::{graph::NodeIndex, Graph};
-
-<span class="kw">use </span><span class="kw">crate</span>::petri_net::recognizers::is_leibniz_diff_operator;
-<span class="kw">use </span>std::collections::VecDeque;
+<span class="kw">use </span>std::{clone::Clone, collections::VecDeque};
 
 <span class="doccomment">/// Struct for representing mathematical expressions in order to align with source code.
 </span><span class="kw">pub type </span>MathExpressionGraph&lt;<span class="lifetime">&#39;a</span>&gt; = Graph&lt;String, String&gt;;
@@ -2783,12 +2779,12 @@
     numerator: <span class="kw-2">&amp;mut </span>Box&lt;MathExpression&gt;,
     denominator: <span class="kw-2">&amp;mut </span>Box&lt;MathExpression&gt;,
 ) -&gt; bool {
-    <span class="kw">if </span>is_leibniz_diff_operator(numerator, denominator) {
-        <span class="kw">if let </span>Mrow(x) = <span class="kw-2">&amp;mut **</span>numerator {
+    <span class="kw">if </span>recognize_leibniz_differential_operator(numerator, denominator).is_ok() {
+        <span class="kw">if let </span>MathExpression::Mrow(Mrow(x)) = <span class="kw-2">&amp;mut **</span>numerator {
             x.remove(<span class="number">0</span>);
         }
 
-        <span class="kw">if let </span>Mrow(x) = <span class="kw-2">&amp;mut **</span>denominator {
+        <span class="kw">if let </span>MathExpression::Mrow(Mrow(x)) = <span class="kw-2">&amp;mut **</span>denominator {
             x.remove(<span class="number">0</span>);
         }
         <span class="kw">return </span><span class="bool-val">true</span>;
@@ -2808,7 +2804,7 @@
     <span class="doccomment">/// Convert a MathExpression struct to a PreExp struct.
     </span><span class="kw">pub fn </span>to_expr(<span class="self">self</span>, pre: <span class="kw-2">&amp;mut </span>PreExp) {
         <span class="kw">match </span><span class="self">self </span>{
-            Mi(x) =&gt; {
+            MathExpression::Mi(Mi(x)) =&gt; {
                 <span class="comment">// Process unary minus operation.
                 </span><span class="kw">if </span>!pre.args.is_empty() {
                     <span class="comment">// Check the last arg
@@ -2843,7 +2839,7 @@
                     pre.ops.push(x);
                 }
             }
-            Mrow(xs) =&gt; {
+            MathExpression::Mrow(Mrow(xs)) =&gt; {
                 insert_explicit_multiplication_operator(pre);
                 <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp::default();
                 pre_exp.ops.push(Operator::Other(<span class="string">&quot;&quot;</span>.to_string()));
@@ -2941,8 +2937,8 @@
         <span class="self">self</span>.to_expr(<span class="kw-2">&amp;mut </span>pre_exp);
         pre_exp.group_expr();
         pre_exp.collapse_expr();
-        <span class="doccomment">/// if need to convert to canonical form, please uncomment the following
-        </span><span class="comment">// pre_exp.distribute_expr();
+        <span class="comment">// if need to convert to canonical form, please uncomment the following
+        // pre_exp.distribute_expr();
         // pre_exp.group_expr();
         // pre_exp.collapse_expr();
         </span>pre_exp.set_name();
@@ -3032,7 +3028,7 @@
         <span class="kw">if let </span>Expr::Expression { ops, args, .. } = <span class="self">self </span>{
             <span class="kw">let </span><span class="kw-2">mut </span>ops_copy = ops.clone();
             <span class="kw">let </span><span class="kw-2">mut </span>args_copy = args.clone();
-            <span class="kw">let </span><span class="kw-2">mut </span>shift = <span class="number">0</span>;
+            <span class="kw">let </span><span class="kw-2">mut </span>shift;
             <span class="kw">if </span>all_ops_are_mult_or_div(ops.to_vec()) &amp;&amp; ops.len() &gt; <span class="number">1 </span>{
                 <span class="kw">let </span><span class="kw-2">mut </span>changed = <span class="bool-val">true</span>;
                 <span class="kw">while </span>changed {
@@ -3230,8 +3226,8 @@
                 <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..=ops.len() - <span class="number">1 </span>{
                     <span class="kw">if </span>i &gt; <span class="number">0 </span>{
                         <span class="kw">if </span>ops[i] == Operator::Equals {
-                            <span class="kw">let </span><span class="kw-2">mut </span>new_name: String = <span class="string">&quot;&quot;</span>.to_string();
-                            <span class="kw">for </span>n <span class="kw">in </span>name.as_bytes().clone() {
+                            <span class="kw">let </span><span class="kw-2">mut </span>new_name = <span class="string">&quot;&quot;</span>.to_string();
+                            <span class="kw">for </span>n <span class="kw">in </span>name.as_bytes() {
                                 <span class="kw">if </span><span class="kw-2">*</span>n == <span class="number">40_u8 </span>{
                                     new_name.push(<span class="string">&#39;(&#39;</span>);
                                 }
@@ -3259,19 +3255,18 @@
                             <span class="kw">if </span>ops[<span class="number">0</span>] != Operator::Other(<span class="string">&quot;&quot;</span>.to_string()) {
                                 string = ops[<span class="number">0</span>].to_string();
                                 string.push(<span class="string">&#39;(&#39;</span>);
-                                string.push_str(args[i].set_name().as_str().clone());
+                                string.push_str(args[i].set_name().as_str());
                                 string.push(<span class="string">&#39;)&#39;</span>);
                             } <span class="kw">else </span>{
-                                string = args[i].set_name().as_str().to_string().clone();
+                                string = args[i].set_name().as_str().to_string();
                             }
-                            name.push_str(<span class="kw-2">&amp;</span>string.clone());
+                            name.push_str(<span class="kw-2">&amp;</span>string);
                         }
                     }
                 }
                 <span class="kw">if </span>add_paren {
                     name.push(<span class="string">&#39;)&#39;</span>);
                 }
-                add_paren = <span class="bool-val">false</span>;
 
                 name.to_string()
             }
@@ -3294,8 +3289,8 @@
             <span class="kw">if </span>ops.contains(<span class="kw-2">&amp;</span>Operator::Equals) {
                 eq_loc = ops.iter().position(|r| r == <span class="kw-2">&amp;</span>(Operator::Equals)).unwrap();
                 <span class="kw">let </span><span class="kw-2">mut </span>left_eq_name: String = <span class="string">&quot;&quot;</span>.to_string();
-                <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..eq_loc {
-                    <span class="kw">match </span><span class="kw-2">&amp;mut </span>args[i] {
+                <span class="kw">for </span>arg <span class="kw">in </span>args.iter_mut().take(eq_loc) {
+                    <span class="kw">match </span>arg {
                         Expr::Atom(x) =&gt; <span class="kw">match </span>x {
                             Atom::Number(y) =&gt; {
                                 left_eq_name.push_str(y);
@@ -3310,9 +3305,9 @@
                                 <span class="kw">let </span><span class="kw-2">mut </span>unitary_name = ops[<span class="number">0</span>].to_string();
                                 <span class="kw">let </span><span class="kw-2">mut </span>name_copy = name.to_string();
                                 remove_redundant_parens(<span class="kw-2">&amp;mut </span>name_copy);
-                                unitary_name.push_str(<span class="string">&quot;(&quot;</span>.clone());
-                                unitary_name.push_str(<span class="kw-2">&amp;</span>name_copy.clone());
-                                unitary_name.push_str(<span class="string">&quot;)&quot;</span>.clone());
+                                unitary_name.push(<span class="string">&#39;(&#39;</span>);
+                                unitary_name.push_str(<span class="kw-2">&amp;</span>name_copy);
+                                unitary_name.push(<span class="string">&#39;)&#39;</span>);
                                 left_eq_name.push_str(unitary_name.as_str());
                             } <span class="kw">else </span>{
                                 left_eq_name.push_str(name.as_str());
@@ -3328,9 +3323,9 @@
                 <span class="kw">let </span><span class="kw-2">mut </span>unitary_name = ops[<span class="number">0</span>].to_string();
                 <span class="kw">let </span><span class="kw-2">mut </span>name_copy = name.to_string();
                 remove_redundant_parens(<span class="kw-2">&amp;mut </span>name_copy);
-                unitary_name.push_str(<span class="string">&quot;(&quot;</span>.clone());
-                unitary_name.push_str(<span class="kw-2">&amp;</span>name_copy.clone());
-                unitary_name.push_str(<span class="string">&quot;)&quot;</span>.clone());
+                unitary_name.push(<span class="string">&#39;(&#39;</span>);
+                unitary_name.push_str(<span class="kw-2">&amp;</span>name_copy);
+                unitary_name.push(<span class="string">&#39;)&#39;</span>);
                 <span class="kw">let </span>node_idx = get_node_idx(graph, <span class="kw-2">&amp;mut </span>unitary_name);
                 <span class="kw">if </span>ops[<span class="number">0</span>].to_string() == <span class="string">&quot;derivative&quot; </span>{
                     <span class="kw">return</span>;
@@ -3553,11 +3548,11 @@
                             }
                         } <span class="kw">else </span>{
                             <span class="kw">let </span><span class="kw-2">mut </span>unitary_name = ops[<span class="number">0</span>].to_string();
-                            <span class="kw">let </span><span class="kw-2">mut </span>name_copy = name.to_string().clone();
+                            <span class="kw">let </span><span class="kw-2">mut </span>name_copy = name.to_string();
                             remove_redundant_parens(<span class="kw-2">&amp;mut </span>name_copy);
-                            unitary_name.push_str(<span class="string">&quot;(&quot;</span>.clone());
-                            unitary_name.push_str(<span class="kw-2">&amp;</span>name_copy.clone());
-                            unitary_name.push_str(<span class="string">&quot;)&quot;</span>.clone());
+                            unitary_name.push(<span class="string">&#39;(&#39;</span>);
+                            unitary_name.push_str(<span class="kw-2">&amp;</span>name_copy);
+                            unitary_name.push(<span class="string">&#39;)&#39;</span>);
                             <span class="kw">let </span>node_idx = get_node_idx(graph, <span class="kw-2">&amp;mut </span>unitary_name);
                             <span class="kw">if </span>i == <span class="number">0 </span>{
                                 <span class="kw">if </span>ops_copy.len() &gt; <span class="number">1 </span>{
@@ -3653,8 +3648,8 @@
 
 <span class="doccomment">/// Check if the current term&#39;s operators are all multiply or divide.
 </span><span class="kw">pub fn </span>all_ops_are_mult_or_div(ops: Vec&lt;Operator&gt;) -&gt; bool {
-    <span class="kw">for </span>o <span class="kw">in </span><span class="number">1</span>..=ops.len() - <span class="number">1 </span>{
-        <span class="kw">if </span>ops[o] != Operator::Multiply &amp;&amp; ops[o] != Operator::Divide {
+    <span class="kw">for </span>op <span class="kw">in </span>ops.iter().take((ops.len() - <span class="number">1</span>) + <span class="number">1</span>).skip(<span class="number">1</span>) {
+        <span class="kw">if </span>op != <span class="kw-2">&amp;</span>Operator::Multiply &amp;&amp; op != <span class="kw-2">&amp;</span>Operator::Divide {
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
     }
@@ -3687,8 +3682,8 @@
 
 <span class="doccomment">/// Check if the current term&#39;s operators are all add or subtract.
 </span><span class="kw">pub fn </span>all_ops_are_add_or_subt(ops: Vec&lt;Operator&gt;) -&gt; bool {
-    <span class="kw">for </span>o <span class="kw">in </span><span class="number">1</span>..=ops.len() - <span class="number">1 </span>{
-        <span class="kw">if </span>ops[o] != Operator::Add &amp;&amp; ops[o] != Operator::Subtract {
+    <span class="kw">for </span>op <span class="kw">in </span>ops.iter().take((ops.len() - <span class="number">1</span>) + <span class="number">1</span>).skip(<span class="number">1</span>) {
+        <span class="kw">if </span>op != <span class="kw-2">&amp;</span>Operator::Add &amp;&amp; op != <span class="kw-2">&amp;</span>Operator::Subtract {
             <span class="kw">return </span><span class="bool-val">false</span>;
         }
     }
@@ -3697,8 +3692,8 @@
 
 <span class="doccomment">/// Check if the current term&#39;s operators contain multiply.
 </span><span class="kw">pub fn </span>ops_contain_mult(ops: Vec&lt;Operator&gt;) -&gt; bool {
-    <span class="kw">for </span>o <span class="kw">in </span><span class="number">1</span>..=ops.len() - <span class="number">1 </span>{
-        <span class="kw">if </span>ops[o] == Operator::Multiply {
+    <span class="kw">for </span>op <span class="kw">in </span>ops.iter().take((ops.len() - <span class="number">1</span>) + <span class="number">1</span>).skip(<span class="number">1</span>) {
+        <span class="kw">if </span>op == <span class="kw-2">&amp;</span>Operator::Multiply {
             <span class="kw">return </span><span class="bool-val">true</span>;
         }
     }
@@ -3737,8 +3732,8 @@
     <span class="kw">if </span>ops[<span class="number">0</span>] != Operator::Other(<span class="string">&quot;&quot;</span>.to_string()) {
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
-    <span class="kw">for </span>o <span class="kw">in </span><span class="number">1</span>..=ops.len() - <span class="number">1 </span>{
-        <span class="kw">if </span>ops[o] == Operator::Add || ops[o] == Operator::Subtract {
+    <span class="kw">for </span>op <span class="kw">in </span>ops.iter().take((ops.len() - <span class="number">1</span>) + <span class="number">1</span>).skip(<span class="number">1</span>) {
+        <span class="kw">if </span>op == <span class="kw-2">&amp;</span>Operator::Add || op == <span class="kw-2">&amp;</span>Operator::Subtract {
             <span class="kw">return </span><span class="bool-val">true</span>;
         }
     }
@@ -3936,16 +3931,16 @@
         math_vec.push(con);
     }
 
-    Mrow(math_vec)
+    MathExpression::Mrow(Mrow(math_vec))
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -3964,17 +3959,17 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr2() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
             Mn(<span class="string">&quot;4&quot;</span>.to_string()),
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4008,11 +4003,11 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr3() {
-    <span class="kw">let </span>math_expression = Msqrt(Box::from(Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = Msqrt(Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-    ])));
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+    ]))));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4041,12 +4036,12 @@
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr4() {
     <span class="kw">let </span>math_expression = Mfrac(
-        Box::from(Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ])),
-        Box::from(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ]))),
+        Box::from(MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string()))),
     );
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
@@ -4082,13 +4077,13 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr5() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4119,23 +4114,23 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr6() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;d&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         Mo(Operator::Divide),
-        Mi(<span class="string">&quot;e&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;f&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;f&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;g&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;g&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;h&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;h&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4181,13 +4176,13 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr7() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4221,23 +4216,23 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr8() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;d&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         Mo(Operator::Divide),
-        Mi(<span class="string">&quot;e&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;f&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;f&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;g&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;g&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;h&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;h&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4287,17 +4282,17 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr9() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4340,17 +4335,17 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr10() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4365,17 +4360,17 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr11() {
-    <span class="kw">let </span>math_expression = Msqrt(Box::from(Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = Msqrt(Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
-    ])));
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
+    ]))));
 
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
@@ -4391,23 +4386,23 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr12() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;d&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         Mo(Operator::Divide),
-        Mi(<span class="string">&quot;e&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;f&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;f&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;g&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;g&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;h&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;h&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4422,23 +4417,23 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr13() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Divide),
-        Mi(<span class="string">&quot;d&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4453,19 +4448,19 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr14() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4480,19 +4475,19 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr15() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Msqrt(Box::from(Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        Msqrt(Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]))),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])))),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4507,108 +4502,108 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr16() {
-    <span class="kw">let </span>math_expression = Msqrt(Box::from(Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = Msqrt(Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
-    ])));
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
+    ]))));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr17() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;s&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;s&quot;</span>.to_string())),
         Mo(Operator::Equals),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr18() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;s&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;s&quot;</span>.to_string())),
         Mo(Operator::Equals),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Msqrt(Box::from(Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        Msqrt(Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
             Mo(Operator::Multiply),
-            Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+            MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
                 Mo(Operator::Subtract),
-                Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-            ]),
-        ]))),
-    ]);
+                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+            ])),
+        ])))),
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr19() {
-    <span class="kw">use </span><span class="kw">crate</span>::parsing::parse;
     <span class="kw">let </span>input = <span class="string">&quot;tests/sir.xml&quot;</span>;
     <span class="kw">let </span>contents = std::fs::read_to_string(input)
         .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to read file {input}!&quot;</span>));
-    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) =
-        parse(<span class="kw-2">&amp;</span>contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse file {input}!&quot;</span>));
+    <span class="kw">let </span><span class="kw-2">mut </span>math = contents
+        .parse::&lt;Math&gt;()
+        .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse file {input}!&quot;</span>));
     math.normalize();
     <span class="kw">let </span>_g = <span class="kw-2">&amp;mut </span>math.content[<span class="number">0</span>].clone().to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr20() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;s&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;s&quot;</span>.to_string())),
         Mo(Operator::Equals),
         Mfrac(
-            Box::from(Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+            Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
                 Mo(Operator::Add),
-                Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-            ])),
-            Box::from(Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+            ]))),
+            Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
                 Mo(Operator::Multiply),
-                Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-                Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-                Msqrt(Box::from(Mrow(<span class="macro">vec!</span>[
-                    Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+                MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+                MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+                Msqrt(Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                    MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
                     Mo(Operator::Add),
-                    Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-                ]))),
-            ])),
+                    MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+                ])))),
+            ]))),
         ),
-    ]);
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr21() {
     <span class="kw">let </span>math_expression = Msup(
-        Box::from(Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ])),
-        Box::from(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ]))),
+        Box::from(MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string()))),
     );
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
@@ -4644,174 +4639,171 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr22() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Subtract),
         Msup(
-            Box::from(Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+            Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
                 Mo(Operator::Add),
-                Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-            ])),
-            Box::from(Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+            ]))),
+            Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
                 Mo(Operator::Add),
-                Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-            ])),
+                MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+            ]))),
         ),
-    ]);
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr23() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[Msubsup(
-        Box::from(Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[Msubsup(
+        Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ])),
-        Box::from(Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ]))),
+        Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ])),
-        Box::from(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
-    )]);
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ]))),
+        Box::from(MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string()))),
+    )]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr24() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr25() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
         Mo(Operator::Subtract),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr26() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr27() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr28() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr29() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Add),
         Msup(
-            Box::from(Mrow(<span class="macro">vec!</span>[
+            Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
                 Mo(Operator::Subtract),
-                Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+                MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
                 Mo(Operator::Add),
-                Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-            ])),
-            Box::from(Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+            ]))),
+            Box::from(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
                 Mo(Operator::Add),
-                Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-            ])),
+                MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+            ]))),
         ),
-    ]);
+    ]));
     <span class="kw">let </span>_g = math_expression.to_graph();
 }
 
-<span class="attr">#[test]
-</span><span class="kw">fn </span>test_to_expr30() {
-    <span class="kw">use </span><span class="kw">crate</span>::parsing::parse;
-    <span class="kw">let </span>input = <span class="string">&quot;tests/seir_eq1.xml&quot;</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>contents = std::fs::read_to_string(input)
+<span class="attr">#[cfg(test)]
+</span><span class="kw">fn </span>get_preprocessed_normalized_math_from_file(filename: <span class="kw-2">&amp;</span>str) -&gt; Math {
+    <span class="kw">let </span><span class="kw-2">mut </span>contents = std::fs::read_to_string(filename)
         .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to read file {input}!&quot;</span>));
     contents = preprocess_content(contents);
-    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) =
-        parse(<span class="kw-2">&amp;</span>contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse file {input}!&quot;</span>));
+    <span class="kw">let </span>math = <span class="kw-2">&amp;mut </span>contents
+        .parse::&lt;Math&gt;()
+        .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse file {input}!&quot;</span>));
     math.normalize();
+    math.clone()
+}
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_to_expr30() {
+    <span class="kw">let </span>math = get_preprocessed_normalized_math_from_file(<span class="string">&quot;tests/seir_eq1.xml&quot;</span>);
     <span class="kw">let </span><span class="kw-2">mut </span>math_vec = <span class="macro">vec!</span>[];
     <span class="kw">for </span>con <span class="kw">in </span>math.content {
         math_vec.push(con);
     }
-    <span class="kw">let </span>new_math = Mrow(math_vec);
+    <span class="kw">let </span>new_math = MathExpression::Mrow(Mrow(math_vec));
     <span class="kw">let </span>_g = new_math.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr32() {
-    <span class="kw">use </span><span class="kw">crate</span>::parsing::parse;
-    <span class="kw">let </span>input = <span class="string">&quot;tests/seirdv_eq7.xml&quot;</span>;
-    <span class="kw">let </span><span class="kw-2">mut </span>contents = std::fs::read_to_string(input)
-        .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to read file {input}!&quot;</span>));
-    contents = preprocess_content(contents);
-    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) =
-        parse(<span class="kw-2">&amp;</span>contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse file {input}!&quot;</span>));
-    math.normalize();
+    <span class="kw">let </span>math = get_preprocessed_normalized_math_from_file(<span class="string">&quot;tests/seirdv_eq7.xml&quot;</span>);
     <span class="kw">let </span>new_math = wrap_math(math);
     <span class="kw">let </span>_g = new_math.to_graph();
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr33() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4853,19 +4845,19 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr34() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Divide),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4911,15 +4903,15 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr35() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4947,15 +4939,15 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr36() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Subtract),
-        Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -4983,21 +4975,21 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr37() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Subtract),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;e&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -5029,19 +5021,19 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr38() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Subtract),
-        Mrow(<span class="macro">vec!</span>[
-            Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
                 Mo(Operator::Subtract),
-                Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-            ]),
+                MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+            ])),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -5071,19 +5063,19 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr39() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Divide),
-        Mrow(<span class="macro">vec!</span>[
-            Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
                 Mo(Operator::Divide),
-                Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-            ]),
+                MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+            ])),
             Mo(Operator::Multiply),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -5113,21 +5105,21 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr40() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
         Mo(Operator::Divide),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Divide),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;e&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -5197,19 +5189,19 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr41() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;b&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;c&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
-        ]),
-    ]);
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
+        ])),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),
@@ -5271,43 +5263,43 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_to_expr42() {
-    <span class="kw">let </span>math_expression = Mrow(<span class="macro">vec!</span>[
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;a&quot;</span>.to_string()),
+    <span class="kw">let </span>math_expression = MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mrow(<span class="macro">vec!</span>[
-                Mi(<span class="string">&quot;b&quot;</span>.to_string()),
+            MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+                MathExpression::Mi(Mi(<span class="string">&quot;b&quot;</span>.to_string())),
                 Mo(Operator::Add),
-                Mi(<span class="string">&quot;c&quot;</span>.to_string()),
-            ]),
-        ]),
+                MathExpression::Mi(Mi(<span class="string">&quot;c&quot;</span>.to_string())),
+            ])),
+        ])),
         Mo(Operator::Divide),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;f&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;f&quot;</span>.to_string())),
             Mo(Operator::Add),
-            Mi(<span class="string">&quot;g&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;g&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;d&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;d&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;e&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;e&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Divide),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;h&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;h&quot;</span>.to_string())),
             Mo(Operator::Subtract),
-            Mi(<span class="string">&quot;i&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;i&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Multiply),
-        Mrow(<span class="macro">vec!</span>[
-            Mi(<span class="string">&quot;j&quot;</span>.to_string()),
+        MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[
+            MathExpression::Mi(Mi(<span class="string">&quot;j&quot;</span>.to_string())),
             Mo(Operator::Divide),
-            Mi(<span class="string">&quot;k&quot;</span>.to_string()),
-        ]),
+            MathExpression::Mi(Mi(<span class="string">&quot;k&quot;</span>.to_string())),
+        ])),
         Mo(Operator::Add),
-        Mi(<span class="string">&quot;l&quot;</span>.to_string()),
-    ]);
+        MathExpression::Mi(Mi(<span class="string">&quot;l&quot;</span>.to_string())),
+    ]));
     <span class="kw">let </span><span class="kw-2">mut </span>pre_exp = PreExp {
         ops: Vec::&lt;Operator&gt;::new(),
         args: Vec::&lt;Expr&gt;::new(),

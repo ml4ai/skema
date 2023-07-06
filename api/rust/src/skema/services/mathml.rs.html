@@ -111,18 +111,18 @@
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
 <a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{put, web, HttpResponse};
 <span class="kw">use </span>mathml::{
     acset::{ACSet, AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
-    parsing::parse,
 };
 <span class="kw">use </span>petgraph::dot::{Config, Dot};
 
 <span class="kw">use </span>std::string::String;
 <span class="kw">use </span>utoipa;
-<span class="kw">use </span>utoipa::ToSchema;
 
 <span class="doccomment">/// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 </span><span class="attr">#[utoipa::path(
@@ -137,10 +137,11 @@
 #[put(<span class="string">&quot;/mathml/ast-graph&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_ast_graph(payload: String) -&gt; String {
     <span class="kw">let </span>contents = <span class="kw-2">&amp;</span>payload;
-    <span class="kw">let </span>(<span class="kw">_</span>, math) =
-        parse(contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse payload!&quot;</span>.to_string()));
+    <span class="kw">let </span>math = contents.parse::&lt;Math&gt;().unwrap();
+    <span class="comment">//let (_, math) =
+    //parse(contents).unwrap_or_else(|_| panic!(&quot;{}&quot;, &quot;Unable to parse payload!&quot;.to_string()));
 
-    <span class="kw">let </span>g = math.to_graph();
+    </span><span class="kw">let </span>g = math.to_graph();
     <span class="kw">let </span>dot_representation = Dot::with_config(<span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>[Config::EdgeNoLabel]);
     dot_representation.to_string()
 }
@@ -161,8 +162,7 @@
 </span><span class="kw">pub async fn </span>get_math_exp_graph(payload: String) -&gt; String {
     <span class="kw">let </span><span class="kw-2">mut </span>contents = payload;
     contents = preprocess_content(contents);
-    <span class="kw">let </span>(<span class="kw">_</span>, <span class="kw-2">mut </span>math) =
-        parse(<span class="kw-2">&amp;</span>contents).unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;{}&quot;</span>, <span class="string">&quot;Unable to parse payload!&quot;</span>.to_string()));
+    <span class="kw">let </span><span class="kw-2">mut </span>math = contents.parse::&lt;Math&gt;().unwrap();
     math.normalize();
     <span class="kw">let </span>new_math = wrap_math(math);
     <span class="kw">let </span>g = new_math.to_graph();
@@ -182,7 +182,7 @@
 )]
 #[put(<span class="string">&quot;/mathml/petrinet&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_acset(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| parse(x).unwrap().<span class="number">1</span>).collect();
+    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| x.parse::&lt;Math&gt;().unwrap()).collect();
     HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
 }
 
@@ -198,7 +198,7 @@
 )]
 #[put(<span class="string">&quot;/mathml/regnet&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_regnet(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| parse(x).unwrap().<span class="number">1</span>).collect();
+    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| x.parse::&lt;Math&gt;().unwrap()).collect();
     HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
 }
 
@@ -214,7 +214,11 @@
 )]
 #[put(<span class="string">&quot;/mathml/amr&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_amr(payload: web::Json&lt;AMRmathml&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.mathml.iter().map(|x| parse(x).unwrap().<span class="number">1</span>).collect();
+    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload
+        .mathml
+        .iter()
+        .map(|x| x.parse::&lt;Math&gt;().unwrap())
+        .collect();
     <span class="kw">let </span>model_type = payload.model.clone();
     <span class="kw">if </span>model_type == <span class="kw-2">*</span><span class="string">&quot;regnet&quot; </span>{
         HttpResponse::Ok().json(web::Json(RegNet::from(asts)))

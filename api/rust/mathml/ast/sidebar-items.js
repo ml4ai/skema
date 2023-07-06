@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":["MathExpression","Operator"],"struct":["Math"]};
+window.SIDEBAR_ITEMS = {"enum":["MathExpression","Type"],"mod":["operator"],"struct":["Ci","Math","Mi","Mrow"]};
