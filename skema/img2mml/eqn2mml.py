@@ -61,7 +61,7 @@ class LatexEquation(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "tex_src": "E = mc^{c}",
+                "tex_src": "E = mc^{2}",
             }
         }
 
