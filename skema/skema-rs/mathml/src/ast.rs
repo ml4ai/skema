@@ -58,7 +58,6 @@ pub enum MathExpression {
     None,
 }
 
-
 impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

@@ -1,7 +1,7 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        GroupPcomp, GroupTuple, Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle,
+         GroupTuple, Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle,
         Msub, Msubsup, Msup, Mtext, Munder,
     },
     Operator,
