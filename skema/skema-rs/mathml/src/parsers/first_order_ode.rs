@@ -13,8 +13,7 @@ use derive_new::new;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::one_of,
-    combinator::{map, value},
+    combinator::{map},
     error::Error,
     multi::{many0, many1},
     sequence::{delimited, tuple},
