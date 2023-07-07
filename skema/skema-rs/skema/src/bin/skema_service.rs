@@ -34,14 +34,19 @@ pub async fn ping() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    pretty_env_logger::init();
+
     #[derive(OpenApi)]
     #[openapi(
         paths(
             comment_extraction::get_comments,
+            comment_extraction::get_comments_from_zipfile,
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
             skema::services::mathml::get_content_mathml,
+            skema::services::mathml::get_regnet,
+            skema::services::mathml::get_amr,
             gromet::get_model_ids,
             gromet::post_model,
             gromet::delete_model,
@@ -49,6 +54,10 @@ async fn main() -> std::io::Result<()> {
             gromet::get_named_opis,
             gromet::get_named_ports,
             gromet::get_subgraph,
+            gromet::get_model_PN,
+            gromet::get_model_RN,
+            gromet::model2PN,
+            gromet::model2RN,
             ping
         ),
         components(
@@ -58,11 +67,27 @@ async fn main() -> std::io::Result<()> {
                 comment_extraction::SingleLineComment,
                 comment_extraction::Docstring,
                 comment_extraction::CommentExtractionResponse,
-                mathml::acset::ACSet,
-                mathml::acset::Specie,
+                mathml::acset::AMRmathml,
+                mathml::acset::RegNet,
+                mathml::acset::ModelRegNet,
+                mathml::acset::ModelPetriNet,
+                mathml::acset::PetriNet,
+                mathml::acset::State,
                 mathml::acset::Transition,
-                mathml::acset::InputArc,
-                mathml::acset::OutputArc,
+                mathml::acset::Grounding,
+                mathml::acset::Initial,
+                mathml::acset::Rate,
+                mathml::acset::Properties,
+                mathml::acset::Parameter,
+                mathml::acset::Distribution,
+                mathml::acset::RegState,
+                mathml::acset::RegTransition,
+                mathml::acset::Units,
+                mathml::acset::Metadata,
+                mathml::acset::Semantics,
+                mathml::acset::Ode,
+                mathml::acset::Observable,
+                mathml::acset::Time,
                 skema::Attribute,
                 skema::FunctionNet,
                 skema::FunctionType,
@@ -100,10 +125,17 @@ async fn main() -> std::io::Result<()> {
             }))
             .configure(gromet::configure())
             .service(comment_extraction::get_comments)
+            .service(comment_extraction::get_comments_from_zipfile)
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
             .service(skema::services::mathml::get_content_mathml)
             .service(skema::services::mathml::get_acset)
+            .service(skema::services::mathml::get_regnet)
+            .service(skema::services::mathml::get_amr)
+            .service(gromet::get_model_PN)
+            .service(gromet::get_model_RN)
+            .service(gromet::model2PN)
+            .service(gromet::model2RN)
             .service(ping)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })

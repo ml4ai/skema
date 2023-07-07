@@ -4,12 +4,14 @@ import glob
 import sys
 import os.path
 
+from skema.gromet import GROMET_VERSION
 from skema.gromet.fn import (
     GrometFNModuleCollection,
 )
 
 from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
 from skema.program_analysis.python2cast import python_to_cast
+from skema.program_analysis.fortran2cast import fortran_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
@@ -43,7 +45,7 @@ def process_file_system(
     file_list = open(files, "r").readlines()
 
     module_collection = GrometFNModuleCollection(
-        schema_version="0.1.5",
+        schema_version=GROMET_VERSION,
         name=system_name,
         modules=[],
         module_index=[],
@@ -52,9 +54,16 @@ def process_file_system(
 
     for f in file_list:
         full_file = os.path.join(os.path.normpath(root_dir), f.strip("\n"))
+        
         try:
-            cast = python_to_cast(full_file, cast_obj=True)
-
+            # To maintain backwards compatibility for the process_file_system function, for now we will determine the language by file extension
+            if full_file.endswith(".py"):
+                cast = python_to_cast(full_file, cast_obj=True)
+            elif full_file.endswith(".F") or full_file.endswith(".f95"):
+                cast = fortran_to_cast(full_file, cast_obj=True)
+            else:
+                print(f"File extension not supported for {full_file}")
+            
             cur_dir = os.getcwd()
             os.chdir(os.path.join(os.getcwd(), path))
             generated_gromet = ann_cast_pipeline(
@@ -72,18 +81,19 @@ def process_file_system(
                 os.path.normpath(root_dir)
             )  # We just need the last directory of the path, not the complete path
             os_module_path = os.path.join(source_directory, f)
-            python_module_path = os_module_path.replace("/", ".").replace(
-                ".py", ""
-            )
+                       
+            # Normalize the path across os and then convert to module dot notation
+            python_module_path = ".".join(os.path.normpath(os_module_path).split(os.path.sep))
+            python_module_path = python_module_path.replace(".py", "").strip()
+            
             module_collection.module_index.append(python_module_path)
 
             # Done: Determine how we know a gromet goes in the 'executable' field
             # We do this by finding all user_defined top level functions in the Gromet
             # and check if the name 'main' is among them
             function_networks = [
-                fn.value
-                for fn in generated_gromet.attributes
-                if fn.type == "FN"
+                fn
+                for fn in generated_gromet.fn_array
             ]
             defined_functions = [
                 fn.b[0].name

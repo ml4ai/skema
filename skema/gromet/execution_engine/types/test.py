@@ -2,7 +2,7 @@ import numpy
 from typing import Union, List, Tuple, Any
 import itertools
 
-from defined_types import Field, Sequence
+from skema.gromet.execution_engine.types.defined_types import Field, Sequence
 
 
 class Sequence_concatenate(object):  # TODO: Check implementation of *args
@@ -33,6 +33,6 @@ class Sequence_concatenate(object):  # TODO: Check implementation of *args
         return sum(tuple_inputs, ())
 
 
-a = [1, 2, 3]
-b = [2, 3, 4]
-print(Sequence_concatenate.exec(a, b))
+# a = [1, 2, 3]
+# b = [2, 3, 4]
+# print(Sequence_concatenate.exec(a, b))
