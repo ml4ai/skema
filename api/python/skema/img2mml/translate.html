@@ -35,40 +35,141 @@ import torch
 from torchvision import transforms
 from PIL import Image
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.img2mml.models.image2mml_xfmer_for_inference import (
-    Image2MathML_Xfmer,
-)
+from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
-from typing import List
+from typing import List, Optional
 import logging
 from logging import info
+import cv2
+import re
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
 
 
-def pad_image(image: Image.Image) -&gt; Image.Image:
-    &#34;&#34;&#34;Pad image.&#34;&#34;&#34;
-    right, left, top, bottom = 8, 8, 8, 8
-    width, height = image.size
-    new_width = width + right + left
-    new_height = height + top + bottom
-    result = Image.new(image.mode, (new_width, new_height))
-    result.paste(image, (left, top))
-    return result
+def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -&gt; Image.Image:
+    &#34;&#34;&#34;
+    Remove equation number from an image of an equation.
 
-def convert_to_torch_tensor(image: bytes) -&gt; torch.Tensor:
+    Args:
+        image (Image.Image): The input image.
+        threshold (float, optional): The threshold to determine the size of the equation number.
+            A smaller threshold will consider larger areas as equation numbers.
+            Defaults to 0.1.
+
+    Returns:
+        Image.Image: The modified image with the equation number removed.
+    &#34;&#34;&#34;
+    image_arr = np.asarray(image, dtype=np.uint8)
+    # Invert the image to make the blank regions black
+    inverted = cv2.bitwise_not(image_arr)
+
+    # Get the width and height of the image
+    height, width = inverted.shape[:2]
+
+    # Start scanning from the right side
+    column_sum = np.sum(inverted, axis=0)
+    rightmost_column = width - 1
+    leftmost_column = rightmost_column
+    while leftmost_column &gt;= 0:
+        if column_sum[leftmost_column] != 0:
+            if rightmost_column - leftmost_column &gt; threshold * width:
+                image_arr = image_arr[:, 0:leftmost_column]
+                return Image.fromarray(image_arr)
+
+            leftmost_column -= 1
+            rightmost_column = leftmost_column
+        else:
+            leftmost_column -= 1
+
+    return Image.fromarray(image_arr)
+
+
+def calculate_scale_factor(
+    image: Image.Image, target_width: int, target_height: int
+) -&gt; float:
+    &#34;&#34;&#34;
+    Calculate the scale factor to normalize the input image to the target width and height while preserving the
+    original aspect ratio. If the original aspect ratio is larger than the target aspect ratio, the scale factor
+    will be calculated based on width. Otherwise, it will be calculated based on height.
+
+    Args:
+        image (PIL.Image.Image): The input image to be normalized.
+        target_width (int): The target width for normalization.
+        target_height (int): The target height for normalization.
+
+    Returns:
+        float: The scale factor to normalize the image.
+    &#34;&#34;&#34;
+    original_width, original_height = image.size
+    original_aspect_ratio = original_width / original_height
+    target_aspect_ratio = target_width / target_height
+
+    if original_aspect_ratio &gt; target_aspect_ratio:
+        # Calculate scale factor based on width
+        scale_factor = target_width / original_width
+    else:
+        # Calculate scale factor based on height
+        scale_factor = target_height / original_height
+
+    return scale_factor
+
+
+def preprocess_img(image: Image.Image, config: dict) -&gt; Image.Image:
+    &#34;&#34;&#34;preprocessing image - cropping, resizing, and padding&#34;&#34;&#34;
+    # remove equation number if having
+    image = remove_eqn_number(image)
+
+    # converting to np array
+    image_arr = np.asarray(image, dtype=np.uint8)
+    # find where the data lies
+    indices = np.where(image_arr != 255)
+    # get the boundaries
+    x_min = np.min(indices[1])
+    x_max = np.max(indices[1])
+    y_min = np.min(indices[0])
+    y_max = np.max(indices[0])
+
+    # cropping tha image
+    image = image.crop((x_min, y_min, x_max, y_max))
+
+    # calculate the target width and height
+    target_width = config[&#34;preprocessed_image_width&#34;] - 2 * config[&#34;padding&#34;]
+    target_height = config[&#34;preprocessed_image_height&#34;] - 2 * config[&#34;padding&#34;]
+    # calculate the scale factor
+    resize_factor = calculate_scale_factor(image, target_width, target_height)
+
+    # resizing the image
+    image = image.resize(
+        (
+            int(image.size[0] * resize_factor),
+            int(image.size[1] * resize_factor),
+        ),
+        Image.LANCZOS,
+    )
+
+    # padding
+    pad = config[&#34;padding&#34;]
+    width = config[&#34;preprocessed_image_width&#34;]
+    height = config[&#34;preprocessed_image_height&#34;]
+    new_image = Image.new(&#34;RGB&#34;, (width, height), (255, 255, 255))
+    new_image.paste(image, (pad, pad))
+
+    return new_image
+
+
+def convert_to_torch_tensor(image: bytes, config: dict) -&gt; torch.Tensor:
     &#34;&#34;&#34;Convert image to torch tensor.&#34;&#34;&#34;
     image = Image.open(io.BytesIO(image)).convert(&#34;L&#34;)
-    image = image.resize((500, 50))
-    image = pad_image(image)
+    image = preprocess_img(image, config)
 
     # convert to tensor
     image = transforms.ToTensor()(image)
 
     return image
+
 
 def set_random_seed(seed: int) -&gt; None:
     &#34;&#34;&#34;Set up seed.&#34;&#34;&#34;
@@ -103,6 +204,7 @@ def define_model(
     n_heads = config[&#34;n_xfmer_heads&#34;]
     n_xfmer_encoder_layers = config[&#34;n_xfmer_encoder_layers&#34;]
     n_xfmer_decoder_layers = config[&#34;n_xfmer_decoder_layers&#34;]
+    len_dim = 2500
 
     enc = {
         &#34;CNN&#34;: CNN_Encoder(input_channels, dec_hid_dim, dropout, device),
@@ -115,6 +217,7 @@ def define_model(
             max_len,
             n_xfmer_encoder_layers,
             dim_feedfwd,
+            len_dim,
         ),
     }
     dec = Transformer_Decoder(
@@ -128,18 +231,60 @@ def define_model(
         dim_feedfwd,
         device,
     )
-    model = Image2MathML_Xfmer(enc, dec, vocab)
+    model = Image2MathML_Xfmer(enc, dec, vocab, device)
 
     return model
 
 
+def add_semicolon_to_unicode(string: str) -&gt; str:
+    &#34;&#34;&#34;
+    Checks if the string contains Unicode starting with &#39;&amp;#x&#39; and adds a semicolon &#39;;&#39; after each occurrence if missing.
+
+    Args:
+        string (str): The input string to check.
+
+    Returns:
+        str: The modified string with semicolons added after each Unicode occurrence if necessary.
+    &#34;&#34;&#34;
+    # Define a regular expression pattern to match &#39;&amp;#x&#39; followed by hexadecimal characters
+    pattern = r&#34;&amp;#x[0-9A-Fa-f]+&#34;
+
+    def add_semicolon(match):
+        unicode_value = match.group(0)
+        if not unicode_value.endswith(&#34;;&#34;):
+            unicode_value += &#34;;&#34;
+        return unicode_value
+
+    # Find all matches in the string using the pattern and process each match individually
+    modified_string = re.sub(pattern, add_semicolon, string)
+
+    return modified_string
+
+
+def remove_spaces_between_tags(mathml_string: str) -&gt; str:
+    &#34;&#34;&#34;
+    Remove spaces between &#34;&gt;&#34; and &#34;&lt;&#34; in a MathML string.
+
+    Args:
+        mathml_string (str): The MathML string to process.
+
+    Returns:
+        str: The modified MathML string with spaces removed between tags.
+    &#34;&#34;&#34;
+    pattern = r&#34;&gt;(.*?)&lt;&#34;
+    replaced_string = re.sub(
+        pattern, lambda match: match.group(0).replace(&#34; &#34;, &#34;&#34;), mathml_string
+    )
+    return replaced_string
+
+
 def evaluate(
     model: Image2MathML_Xfmer,
-    vocab: List[str],
+    vocab_itos: dict,
+    vocab_stoi: dict,
     img: torch.Tensor,
     device: torch.device,
 ) -&gt; str:
-
     &#34;&#34;&#34;
     It predicts the sequence for the image to translate it into MathML contents
     &#34;&#34;&#34;
@@ -147,25 +292,82 @@ def evaluate(
     model.eval()
     with torch.no_grad():
         img = img.to(device)
-        output = model(
-            img, device, is_train=False, is_test=False
-        )  # O: (B, max_len, output_dim), preds: (B, max_len)
 
-        vocab_dict = {}
-        for v in vocab:
-            k, v = v.split()
-            vocab_dict[v.strip()] = k.strip()
+        output = model(
+            img,
+            device,
+            is_inference=True,
+            SOS_token=int(vocab_stoi[&#34;&lt;sos&gt;&#34;]),
+            EOS_token=int(vocab_stoi[&#34;&lt;eos&gt;&#34;]),
+            PAD_token=int(vocab_stoi[&#34;&lt;pad&gt;&#34;]),
+        )  # O: (1, max_len, output_dim), preds: (1, max_len)
 
         pred = list()
         for p in output:
-            pred.append(vocab_dict[str(p)])
+            pred.append(vocab_itos[str(p)])
 
         pred_seq = &#34; &#34;.join(pred[1:-1])
-        return pred_seq
+        return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
+
+
+def load_model(
+    model: Image2MathML_Xfmer, model_path: str, clean_state_dict: Optional[bool] = True
+) -&gt; Image2MathML_Xfmer:
+    &#34;&#34;&#34;
+    Load the model&#39;s state dictionary from a file.
+
+    Args:
+        model: The model to load the state dictionary into.
+        model_path: The path to the model state dictionary file.
+        clean_state_dict: Whether to clean the state dictionary keys.
+
+    Returns:
+        The model with loaded state dictionary.
+
+    Raises:
+        FileNotFoundError: If the model state dictionary file does not exist.
+        RuntimeError: If there is an error during loading the state dictionary.
+
+    Note:
+        If `clean_state_dict` is True, the function removes the &#34;module.&#34; prefix from the state_dict keys
+        if present.
+
+        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
+    &#34;&#34;&#34;
+    if not torch.cuda.is_available():
+        print(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+        device = torch.device(&#34;cpu&#34;)
+    else:
+        device = torch.device(&#34;cuda&#34;)
+
+    try:
+        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
+        # we need to remove the &#34;module.&#34; from key_names
+        if clean_state_dict:
+            new_model = dict()
+            for key, value in torch.load(model_path, map_location=device).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
+        else:
+            if not torch.cuda.is_available():
+                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+                new_model = dict()
+                for key, value in torch.load(model_path, map_location=device).items():
+                    new_model[key[7:]] = value
+                    model.load_state_dict(new_model, strict=False)
+            else:
+                model.load_state_dict(torch.load(model_path))
+    except FileNotFoundError:
+        raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
+    except Exception as e:
+        raise RuntimeError(
+            f&#34;Error loading state dictionary from file: {model_path}\n{e}&#34;
+        )
+
+    return model
 
 
 def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; str:
-
     &#34;&#34;&#34;
     It allows us to obtain mathML for an image
     &#34;&#34;&#34;
@@ -176,18 +378,19 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; st
     device = torch.device(&#34;cuda:0&#34; if torch.cuda.is_available() else &#34;cpu&#34;)
     model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
 
+    # creating a dictionary from vocab list
+    vocab_itos = dict()
+    vocab_stoi = dict()
+    for v in vocab:
+        k, v = v.split()
+        vocab_itos[v.strip()] = k.strip()
+        vocab_stoi[k.strip()] = v.strip()
+
     # generating equation
     print(&#34;loading trained model...&#34;)
+    model = load_model(model, model_path, config[&#34;clean_state_dict&#34;])
 
-    if not torch.cuda.is_available():
-        info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-        model.load_state_dict(
-            torch.load(model_path, map_location=torch.device(&#34;cpu&#34;))
-        )
-    else:
-        model.load_state_dict(torch.load(model_path))
-
-    return evaluate(model, vocab, imagetensor, device)</code></pre>
+    return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)</code></pre>
 </details>
 </section>
 <section>
@@ -197,8 +400,107 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; st
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="skema.img2mml.translate.add_semicolon_to_unicode"><code class="name flex">
+<span>def <span class="ident">add_semicolon_to_unicode</span></span>(<span>string: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks if the string contains Unicode starting with '&amp;#x' and adds a semicolon ';' after each occurrence if missing.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>string</code></strong> :&ensp;<code>str</code></dt>
+<dd>The input string to check.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The modified string with semicolons added after each Unicode occurrence if necessary.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_semicolon_to_unicode(string: str) -&gt; str:
+    &#34;&#34;&#34;
+    Checks if the string contains Unicode starting with &#39;&amp;#x&#39; and adds a semicolon &#39;;&#39; after each occurrence if missing.
+
+    Args:
+        string (str): The input string to check.
+
+    Returns:
+        str: The modified string with semicolons added after each Unicode occurrence if necessary.
+    &#34;&#34;&#34;
+    # Define a regular expression pattern to match &#39;&amp;#x&#39; followed by hexadecimal characters
+    pattern = r&#34;&amp;#x[0-9A-Fa-f]+&#34;
+
+    def add_semicolon(match):
+        unicode_value = match.group(0)
+        if not unicode_value.endswith(&#34;;&#34;):
+            unicode_value += &#34;;&#34;
+        return unicode_value
+
+    # Find all matches in the string using the pattern and process each match individually
+    modified_string = re.sub(pattern, add_semicolon, string)
+
+    return modified_string</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.translate.calculate_scale_factor"><code class="name flex">
+<span>def <span class="ident">calculate_scale_factor</span></span>(<span>image: PIL.Image.Image, target_width: int, target_height: int) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Calculate the scale factor to normalize the input image to the target width and height while preserving the
+original aspect ratio. If the original aspect ratio is larger than the target aspect ratio, the scale factor
+will be calculated based on width. Otherwise, it will be calculated based on height.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>image</code></strong> :&ensp;<code>PIL.Image.Image</code></dt>
+<dd>The input image to be normalized.</dd>
+<dt><strong><code>target_width</code></strong> :&ensp;<code>int</code></dt>
+<dd>The target width for normalization.</dd>
+<dt><strong><code>target_height</code></strong> :&ensp;<code>int</code></dt>
+<dd>The target height for normalization.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>float</code></dt>
+<dd>The scale factor to normalize the image.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calculate_scale_factor(
+    image: Image.Image, target_width: int, target_height: int
+) -&gt; float:
+    &#34;&#34;&#34;
+    Calculate the scale factor to normalize the input image to the target width and height while preserving the
+    original aspect ratio. If the original aspect ratio is larger than the target aspect ratio, the scale factor
+    will be calculated based on width. Otherwise, it will be calculated based on height.
+
+    Args:
+        image (PIL.Image.Image): The input image to be normalized.
+        target_width (int): The target width for normalization.
+        target_height (int): The target height for normalization.
+
+    Returns:
+        float: The scale factor to normalize the image.
+    &#34;&#34;&#34;
+    original_width, original_height = image.size
+    original_aspect_ratio = original_width / original_height
+    target_aspect_ratio = target_width / target_height
+
+    if original_aspect_ratio &gt; target_aspect_ratio:
+        # Calculate scale factor based on width
+        scale_factor = target_width / original_width
+    else:
+        # Calculate scale factor based on height
+        scale_factor = target_height / original_height
+
+    return scale_factor</code></pre>
+</details>
+</dd>
 <dt id="skema.img2mml.translate.convert_to_torch_tensor"><code class="name flex">
-<span>def <span class="ident">convert_to_torch_tensor</span></span>(<span>image: bytes) ‑> torch.Tensor</span>
+<span>def <span class="ident">convert_to_torch_tensor</span></span>(<span>image: bytes, config: dict) ‑> torch.Tensor</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Convert image to torch tensor.</p></div>
@@ -206,11 +508,10 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; st
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def convert_to_torch_tensor(image: bytes) -&gt; torch.Tensor:
+<pre><code class="python">def convert_to_torch_tensor(image: bytes, config: dict) -&gt; torch.Tensor:
     &#34;&#34;&#34;Convert image to torch tensor.&#34;&#34;&#34;
     image = Image.open(io.BytesIO(image)).convert(&#34;L&#34;)
-    image = image.resize((500, 50))
-    image = pad_image(image)
+    image = preprocess_img(image, config)
 
     # convert to tensor
     image = transforms.ToTensor()(image)
@@ -219,7 +520,7 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; st
 </details>
 </dd>
 <dt id="skema.img2mml.translate.define_model"><code class="name flex">
-<span>def <span class="ident">define_model</span></span>(<span>config: dict, vocab: List[str], device: torch.device, model_type='xfmer') ‑> <a title="skema.img2mml.models.image2mml_xfmer_for_inference.Image2MathML_Xfmer" href="models/image2mml_xfmer_for_inference.html#skema.img2mml.models.image2mml_xfmer_for_inference.Image2MathML_Xfmer">Image2MathML_Xfmer</a></span>
+<span>def <span class="ident">define_model</span></span>(<span>config: dict, vocab: List[str], device: torch.device, model_type='xfmer') ‑> <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Defining the model
@@ -252,6 +553,7 @@ initializing encoder, decoder, and model</p></div>
     n_heads = config[&#34;n_xfmer_heads&#34;]
     n_xfmer_encoder_layers = config[&#34;n_xfmer_encoder_layers&#34;]
     n_xfmer_decoder_layers = config[&#34;n_xfmer_decoder_layers&#34;]
+    len_dim = 2500
 
     enc = {
         &#34;CNN&#34;: CNN_Encoder(input_channels, dec_hid_dim, dropout, device),
@@ -264,6 +566,7 @@ initializing encoder, decoder, and model</p></div>
             max_len,
             n_xfmer_encoder_layers,
             dim_feedfwd,
+            len_dim,
         ),
     }
     dec = Transformer_Decoder(
@@ -277,13 +580,13 @@ initializing encoder, decoder, and model</p></div>
         dim_feedfwd,
         device,
     )
-    model = Image2MathML_Xfmer(enc, dec, vocab)
+    model = Image2MathML_Xfmer(enc, dec, vocab, device)
 
     return model</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.translate.evaluate"><code class="name flex">
-<span>def <span class="ident">evaluate</span></span>(<span>model: <a title="skema.img2mml.models.image2mml_xfmer_for_inference.Image2MathML_Xfmer" href="models/image2mml_xfmer_for_inference.html#skema.img2mml.models.image2mml_xfmer_for_inference.Image2MathML_Xfmer">Image2MathML_Xfmer</a>, vocab: List[str], img: torch.Tensor, device: torch.device) ‑> str</span>
+<span>def <span class="ident">evaluate</span></span>(<span>model: <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a>, vocab_itos: dict, vocab_stoi: dict, img: torch.Tensor, device: torch.device) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>It predicts the sequence for the image to translate it into MathML contents</p></div>
@@ -293,11 +596,11 @@ initializing encoder, decoder, and model</p></div>
 </summary>
 <pre><code class="python">def evaluate(
     model: Image2MathML_Xfmer,
-    vocab: List[str],
+    vocab_itos: dict,
+    vocab_stoi: dict,
     img: torch.Tensor,
     device: torch.device,
 ) -&gt; str:
-
     &#34;&#34;&#34;
     It predicts the sequence for the image to translate it into MathML contents
     &#34;&#34;&#34;
@@ -305,41 +608,259 @@ initializing encoder, decoder, and model</p></div>
     model.eval()
     with torch.no_grad():
         img = img.to(device)
-        output = model(
-            img, device, is_train=False, is_test=False
-        )  # O: (B, max_len, output_dim), preds: (B, max_len)
 
-        vocab_dict = {}
-        for v in vocab:
-            k, v = v.split()
-            vocab_dict[v.strip()] = k.strip()
+        output = model(
+            img,
+            device,
+            is_inference=True,
+            SOS_token=int(vocab_stoi[&#34;&lt;sos&gt;&#34;]),
+            EOS_token=int(vocab_stoi[&#34;&lt;eos&gt;&#34;]),
+            PAD_token=int(vocab_stoi[&#34;&lt;pad&gt;&#34;]),
+        )  # O: (1, max_len, output_dim), preds: (1, max_len)
 
         pred = list()
         for p in output:
-            pred.append(vocab_dict[str(p)])
+            pred.append(vocab_itos[str(p)])
 
         pred_seq = &#34; &#34;.join(pred[1:-1])
-        return pred_seq</code></pre>
+        return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.translate.pad_image"><code class="name flex">
-<span>def <span class="ident">pad_image</span></span>(<span>image: PIL.Image.Image) ‑> PIL.Image.Image</span>
+<dt id="skema.img2mml.translate.load_model"><code class="name flex">
+<span>def <span class="ident">load_model</span></span>(<span>model: <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a>, model_path: str, clean_state_dict: Optional[bool] = True) ‑> <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Pad image.</p></div>
+<div class="desc"><p>Load the model's state dictionary from a file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>model</code></strong></dt>
+<dd>The model to load the state dictionary into.</dd>
+<dt><strong><code>model_path</code></strong></dt>
+<dd>The path to the model state dictionary file.</dd>
+<dt><strong><code>clean_state_dict</code></strong></dt>
+<dd>Whether to clean the state dictionary keys.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The model with loaded state dictionary.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If the model state dictionary file does not exist.</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If there is an error during loading the state dictionary.</dd>
+</dl>
+<h2 id="note">Note</h2>
+<p>If <code>clean_state_dict</code> is True, the function removes the "module." prefix from the state_dict keys
+if present.</p>
+<p>If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def pad_image(image: Image.Image) -&gt; Image.Image:
-    &#34;&#34;&#34;Pad image.&#34;&#34;&#34;
-    right, left, top, bottom = 8, 8, 8, 8
-    width, height = image.size
-    new_width = width + right + left
-    new_height = height + top + bottom
-    result = Image.new(image.mode, (new_width, new_height))
-    result.paste(image, (left, top))
-    return result</code></pre>
+<pre><code class="python">def load_model(
+    model: Image2MathML_Xfmer, model_path: str, clean_state_dict: Optional[bool] = True
+) -&gt; Image2MathML_Xfmer:
+    &#34;&#34;&#34;
+    Load the model&#39;s state dictionary from a file.
+
+    Args:
+        model: The model to load the state dictionary into.
+        model_path: The path to the model state dictionary file.
+        clean_state_dict: Whether to clean the state dictionary keys.
+
+    Returns:
+        The model with loaded state dictionary.
+
+    Raises:
+        FileNotFoundError: If the model state dictionary file does not exist.
+        RuntimeError: If there is an error during loading the state dictionary.
+
+    Note:
+        If `clean_state_dict` is True, the function removes the &#34;module.&#34; prefix from the state_dict keys
+        if present.
+
+        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
+    &#34;&#34;&#34;
+    if not torch.cuda.is_available():
+        print(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+        device = torch.device(&#34;cpu&#34;)
+    else:
+        device = torch.device(&#34;cuda&#34;)
+
+    try:
+        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
+        # we need to remove the &#34;module.&#34; from key_names
+        if clean_state_dict:
+            new_model = dict()
+            for key, value in torch.load(model_path, map_location=device).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
+        else:
+            if not torch.cuda.is_available():
+                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+                new_model = dict()
+                for key, value in torch.load(model_path, map_location=device).items():
+                    new_model[key[7:]] = value
+                    model.load_state_dict(new_model, strict=False)
+            else:
+                model.load_state_dict(torch.load(model_path))
+    except FileNotFoundError:
+        raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
+    except Exception as e:
+        raise RuntimeError(
+            f&#34;Error loading state dictionary from file: {model_path}\n{e}&#34;
+        )
+
+    return model</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.translate.preprocess_img"><code class="name flex">
+<span>def <span class="ident">preprocess_img</span></span>(<span>image: PIL.Image.Image, config: dict) ‑> PIL.Image.Image</span>
+</code></dt>
+<dd>
+<div class="desc"><p>preprocessing image - cropping, resizing, and padding</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preprocess_img(image: Image.Image, config: dict) -&gt; Image.Image:
+    &#34;&#34;&#34;preprocessing image - cropping, resizing, and padding&#34;&#34;&#34;
+    # remove equation number if having
+    image = remove_eqn_number(image)
+
+    # converting to np array
+    image_arr = np.asarray(image, dtype=np.uint8)
+    # find where the data lies
+    indices = np.where(image_arr != 255)
+    # get the boundaries
+    x_min = np.min(indices[1])
+    x_max = np.max(indices[1])
+    y_min = np.min(indices[0])
+    y_max = np.max(indices[0])
+
+    # cropping tha image
+    image = image.crop((x_min, y_min, x_max, y_max))
+
+    # calculate the target width and height
+    target_width = config[&#34;preprocessed_image_width&#34;] - 2 * config[&#34;padding&#34;]
+    target_height = config[&#34;preprocessed_image_height&#34;] - 2 * config[&#34;padding&#34;]
+    # calculate the scale factor
+    resize_factor = calculate_scale_factor(image, target_width, target_height)
+
+    # resizing the image
+    image = image.resize(
+        (
+            int(image.size[0] * resize_factor),
+            int(image.size[1] * resize_factor),
+        ),
+        Image.LANCZOS,
+    )
+
+    # padding
+    pad = config[&#34;padding&#34;]
+    width = config[&#34;preprocessed_image_width&#34;]
+    height = config[&#34;preprocessed_image_height&#34;]
+    new_image = Image.new(&#34;RGB&#34;, (width, height), (255, 255, 255))
+    new_image.paste(image, (pad, pad))
+
+    return new_image</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.translate.remove_eqn_number"><code class="name flex">
+<span>def <span class="ident">remove_eqn_number</span></span>(<span>image: PIL.Image.Image, threshold: float = 0.1) ‑> PIL.Image.Image</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove equation number from an image of an equation.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>image</code></strong> :&ensp;<code>Image.Image</code></dt>
+<dd>The input image.</dd>
+<dt><strong><code>threshold</code></strong> :&ensp;<code>float</code>, optional</dt>
+<dd>The threshold to determine the size of the equation number.
+A smaller threshold will consider larger areas as equation numbers.
+Defaults to 0.1.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Image.Image</code></dt>
+<dd>The modified image with the equation number removed.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -&gt; Image.Image:
+    &#34;&#34;&#34;
+    Remove equation number from an image of an equation.
+
+    Args:
+        image (Image.Image): The input image.
+        threshold (float, optional): The threshold to determine the size of the equation number.
+            A smaller threshold will consider larger areas as equation numbers.
+            Defaults to 0.1.
+
+    Returns:
+        Image.Image: The modified image with the equation number removed.
+    &#34;&#34;&#34;
+    image_arr = np.asarray(image, dtype=np.uint8)
+    # Invert the image to make the blank regions black
+    inverted = cv2.bitwise_not(image_arr)
+
+    # Get the width and height of the image
+    height, width = inverted.shape[:2]
+
+    # Start scanning from the right side
+    column_sum = np.sum(inverted, axis=0)
+    rightmost_column = width - 1
+    leftmost_column = rightmost_column
+    while leftmost_column &gt;= 0:
+        if column_sum[leftmost_column] != 0:
+            if rightmost_column - leftmost_column &gt; threshold * width:
+                image_arr = image_arr[:, 0:leftmost_column]
+                return Image.fromarray(image_arr)
+
+            leftmost_column -= 1
+            rightmost_column = leftmost_column
+        else:
+            leftmost_column -= 1
+
+    return Image.fromarray(image_arr)</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.translate.remove_spaces_between_tags"><code class="name flex">
+<span>def <span class="ident">remove_spaces_between_tags</span></span>(<span>mathml_string: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove spaces between "&gt;" and "&lt;" in a MathML string.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>mathml_string</code></strong> :&ensp;<code>str</code></dt>
+<dd>The MathML string to process.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The modified MathML string with spaces removed between tags.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_spaces_between_tags(mathml_string: str) -&gt; str:
+    &#34;&#34;&#34;
+    Remove spaces between &#34;&gt;&#34; and &#34;&lt;&#34; in a MathML string.
+
+    Args:
+        mathml_string (str): The MathML string to process.
+
+    Returns:
+        str: The modified MathML string with spaces removed between tags.
+    &#34;&#34;&#34;
+    pattern = r&#34;&gt;(.*?)&lt;&#34;
+    replaced_string = re.sub(
+        pattern, lambda match: match.group(0).replace(&#34; &#34;, &#34;&#34;), mathml_string
+    )
+    return replaced_string</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.translate.render_mml"><code class="name flex">
@@ -352,7 +873,6 @@ initializing encoder, decoder, and model</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; str:
-
     &#34;&#34;&#34;
     It allows us to obtain mathML for an image
     &#34;&#34;&#34;
@@ -363,18 +883,19 @@ initializing encoder, decoder, and model</p></div>
     device = torch.device(&#34;cuda:0&#34; if torch.cuda.is_available() else &#34;cpu&#34;)
     model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
 
+    # creating a dictionary from vocab list
+    vocab_itos = dict()
+    vocab_stoi = dict()
+    for v in vocab:
+        k, v = v.split()
+        vocab_itos[v.strip()] = k.strip()
+        vocab_stoi[k.strip()] = v.strip()
+
     # generating equation
     print(&#34;loading trained model...&#34;)
+    model = load_model(model, model_path, config[&#34;clean_state_dict&#34;])
 
-    if not torch.cuda.is_available():
-        info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-        model.load_state_dict(
-            torch.load(model_path, map_location=torch.device(&#34;cpu&#34;))
-        )
-    else:
-        model.load_state_dict(torch.load(model_path))
-
-    return evaluate(model, vocab, imagetensor, device)</code></pre>
+    return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.translate.set_random_seed"><code class="name flex">
@@ -413,10 +934,15 @@ initializing encoder, decoder, and model</p></div>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.img2mml.translate.add_semicolon_to_unicode" href="#skema.img2mml.translate.add_semicolon_to_unicode">add_semicolon_to_unicode</a></code></li>
+<li><code><a title="skema.img2mml.translate.calculate_scale_factor" href="#skema.img2mml.translate.calculate_scale_factor">calculate_scale_factor</a></code></li>
 <li><code><a title="skema.img2mml.translate.convert_to_torch_tensor" href="#skema.img2mml.translate.convert_to_torch_tensor">convert_to_torch_tensor</a></code></li>
 <li><code><a title="skema.img2mml.translate.define_model" href="#skema.img2mml.translate.define_model">define_model</a></code></li>
 <li><code><a title="skema.img2mml.translate.evaluate" href="#skema.img2mml.translate.evaluate">evaluate</a></code></li>
-<li><code><a title="skema.img2mml.translate.pad_image" href="#skema.img2mml.translate.pad_image">pad_image</a></code></li>
+<li><code><a title="skema.img2mml.translate.load_model" href="#skema.img2mml.translate.load_model">load_model</a></code></li>
+<li><code><a title="skema.img2mml.translate.preprocess_img" href="#skema.img2mml.translate.preprocess_img">preprocess_img</a></code></li>
+<li><code><a title="skema.img2mml.translate.remove_eqn_number" href="#skema.img2mml.translate.remove_eqn_number">remove_eqn_number</a></code></li>
+<li><code><a title="skema.img2mml.translate.remove_spaces_between_tags" href="#skema.img2mml.translate.remove_spaces_between_tags">remove_spaces_between_tags</a></code></li>
 <li><code><a title="skema.img2mml.translate.render_mml" href="#skema.img2mml.translate.render_mml">render_mml</a></code></li>
 <li><code><a title="skema.img2mml.translate.set_random_seed" href="#skema.img2mml.translate.set_random_seed">set_random_seed</a></code></li>
 </ul>

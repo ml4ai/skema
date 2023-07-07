@@ -75,6 +75,7 @@ class CreateVocab(object):
     def __len__(self):
         return len(self.tok2ind)
 
+
 def garbage2pad(preds, vocab, is_test=False):
     &#34;&#34;&#34;
     all garbage tokens will be converted to &lt;pad&gt; token
@@ -87,12 +88,15 @@ def garbage2pad(preds, vocab, is_test=False):
     pred: cleaned pred eqn
     &#34;&#34;&#34;
 
-    vocab.stoi[&#34;&lt;pad&gt;&#34;]
+    pad_idx = vocab.stoi[&#34;&lt;pad&gt;&#34;]
     eos_idx = vocab.stoi[&#34;&lt;eos&gt;&#34;]
     for b in range(preds.shape[0]):
-        # cleaning pred
-        eos_pos = (preds[b, :] == eos_idx).nonzero(as_tuple=False)[0]
-        preds[b, :] = preds[b, : eos_pos + 1]  # pad_idx
+        try:
+            # cleaning pred
+            eos_pos = (preds[b, :] == eos_idx).nonzero(as_tuple=False)[0]
+            preds[b, :] = preds[b, : eos_pos + 1]  # pad_idx
+        except:
+            pass
 
     return preds
 
@@ -105,15 +109,6 @@ def generate_square_subsequent_mask(sz: int) -&gt; torch.Tensor:
         .masked_fill(mask == 1, float(0.0))
     )
     return mask
-
-
-def calculate_loss(output, mml, vocab):
-    &#34;&#34;&#34;
-    calculate Cross Entropy loss
-    &#34;&#34;&#34;
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi[&#34;&lt;pad&gt;&#34;])
-    loss = criterion(output, mml)
-    return loss
 
 
 def calculating_accuracy(pred, mml):
@@ -216,24 +211,6 @@ min_length: param for length_normalization</p></div>
     return sequences</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.utils.calculate_loss"><code class="name flex">
-<span>def <span class="ident">calculate_loss</span></span>(<span>output, mml, vocab)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>calculate Cross Entropy loss</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def calculate_loss(output, mml, vocab):
-    &#34;&#34;&#34;
-    calculate Cross Entropy loss
-    &#34;&#34;&#34;
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi[&#34;&lt;pad&gt;&#34;])
-    loss = criterion(output, mml)
-    return loss</code></pre>
-</details>
-</dd>
 <dt id="skema.img2mml.utils.calculating_accuracy"><code class="name flex">
 <span>def <span class="ident">calculating_accuracy</span></span>(<span>pred, mml)</span>
 </code></dt>
@@ -282,12 +259,15 @@ pred: cleaned pred eqn</p></div>
     pred: cleaned pred eqn
     &#34;&#34;&#34;
 
-    vocab.stoi[&#34;&lt;pad&gt;&#34;]
+    pad_idx = vocab.stoi[&#34;&lt;pad&gt;&#34;]
     eos_idx = vocab.stoi[&#34;&lt;eos&gt;&#34;]
     for b in range(preds.shape[0]):
-        # cleaning pred
-        eos_pos = (preds[b, :] == eos_idx).nonzero(as_tuple=False)[0]
-        preds[b, :] = preds[b, : eos_pos + 1]  # pad_idx
+        try:
+            # cleaning pred
+            eos_pos = (preds[b, :] == eos_idx).nonzero(as_tuple=False)[0]
+            preds[b, :] = preds[b, : eos_pos + 1]  # pad_idx
+        except:
+            pass
 
     return preds</code></pre>
 </details>
@@ -425,7 +405,6 @@ itos: index to string dictionary</p></div>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.img2mml.utils.beam_search" href="#skema.img2mml.utils.beam_search">beam_search</a></code></li>
-<li><code><a title="skema.img2mml.utils.calculate_loss" href="#skema.img2mml.utils.calculate_loss">calculate_loss</a></code></li>
 <li><code><a title="skema.img2mml.utils.calculating_accuracy" href="#skema.img2mml.utils.calculating_accuracy">calculating_accuracy</a></code></li>
 <li><code><a title="skema.img2mml.utils.garbage2pad" href="#skema.img2mml.utils.garbage2pad">garbage2pad</a></code></li>
 <li><code><a title="skema.img2mml.utils.generate_square_subsequent_mask" href="#skema.img2mml.utils.generate_square_subsequent_mask">generate_square_subsequent_mask</a></code></li>
