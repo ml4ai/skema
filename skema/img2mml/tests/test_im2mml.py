@@ -1,6 +1,7 @@
 from pathlib import Path
 from skema.img2mml.api import get_mathml_from_file, retrieve_model
 import requests
+import os
 
 
 def test_model_retrieval():
@@ -36,9 +37,14 @@ def get_mml(image_path: str, url: str) -> str:
 def test_img2mml_service():
     cwd = Path(__file__).parents[0]
     image_path = cwd / "data" / "261.png"
-    url = "http://eq2mml:8001/image/mml"
+    SKEMA_EQ2MML_SERVICE = os.environ.get("SKEMA_EQMML_ADDRESS", "http://eq2mml:8001")
+
+    files = {
+        "data": open(str(image_path), "rb"),
+    }
     try:
-        mathml = get_mml(str(image_path), url)
+        r = requests.post("{}/image/mml".format(SKEMA_EQ2MML_SERVICE), files=files)
+        mathml = r.text
     except Exception as e:
         raise Exception(f"Error calling the img2mml service: {e}")
     assert mathml is not None
