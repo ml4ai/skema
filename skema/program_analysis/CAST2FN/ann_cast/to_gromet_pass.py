@@ -916,6 +916,7 @@ class ToGrometPass:
         (FunctionType, ImportType, ImportVersion, ImportSource, SourceLanguage, SourceLanguageVersion)
         """
         func_name, _ = retrieve_name_id_pair(node)
+        PYTHON_VERSION = "3.8"
 
         # print(f"Checking {func_name}...")
         if is_primitive(func_name, "Python"):
@@ -935,7 +936,7 @@ class ToGrometPass:
                             None,
                             None,
                             "Python",
-                            "3.10",
+                            PYTHON_VERSION,
                         )
 
                 return (
@@ -944,7 +945,7 @@ class ToGrometPass:
                     None,
                     None,
                     "Python",
-                    "3.10",
+                    PYTHON_VERSION,
                 )
             if isinstance(node.func, AnnCastAttribute):
                 attr_node = node.func
@@ -958,7 +959,7 @@ class ToGrometPass:
                         None,
                         None,
                         "Python",
-                        "3.10",
+                        PYTHON_VERSION,
                     )
             else:
                 return (
@@ -967,7 +968,7 @@ class ToGrometPass:
                     None,
                     None,
                     "Python",
-                    "3.10",
+                    PYTHON_VERSION,
                 )
         elif isinstance(node, AnnCastAttribute):
             if func_name in BUILTINS or check_builtin(func_name):
@@ -980,7 +981,7 @@ class ToGrometPass:
                         None,
                         None,
                         "Python",
-                        "3.10",
+                        PYTHON_VERSION,
                     )
 
                 return (
@@ -989,7 +990,7 @@ class ToGrometPass:
                     None,
                     None,
                     "Python",
-                    "3.10",
+                    PYTHON_VERSION,
                 )
             elif func_name in self.import_collection:
                 # print(f"Module {func_name} has imported function {node.attr.name}")
@@ -1001,7 +1002,7 @@ class ToGrometPass:
                     None,
                     None,
                     "Python",
-                    "3.10",
+                    PYTHON_VERSION,
                 )
             # Attribute of a class we don't have access to
             else:
@@ -1012,7 +1013,7 @@ class ToGrometPass:
                     None,
                     None,
                     "Python",
-                    "3.10",
+                    PYTHON_VERSION,
                 )
 
     @_visit.register
