@@ -230,7 +230,7 @@ pub fn mo(input: Span) -> IResult<MathExpression> {
 fn mo_l(input: Span) -> IResult<MathExpression> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        map_parser(recognize(take_until("</mo>")), l_parenthesis),
+        map_parser(recognize(take_until("</mo>")), lparen),
         tag("</mo>"),
     ))(input)?;
     Ok((s, Mo(op)))
@@ -240,7 +240,7 @@ fn mo_l(input: Span) -> IResult<MathExpression> {
 fn mo_r(input: Span) -> IResult<MathExpression> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        map_parser(recognize(take_until("</mo>")), r_parenthesis),
+        map_parser(recognize(take_until("</mo>")), rparen),
         tag("</mo>"),
     ))(input)?;
     Ok((s, Mo(op)))
@@ -534,11 +534,11 @@ fn test_groupparen() {
         "<mo>(</mo><mi>z</mi><mo>+</mo><mn>1</mn><mo>)</mo>",
         group_paren,
         GroupTuple(vec![
-            Mo(Operator::Lparenthesis),
-            Mi("z".to_string()),
+            Mo(Operator::Lparen),
+            MathExpression::Mi(Mi("z".to_string())),
             Mo(Operator::Add),
             Mn("1".to_string()),
-            Mo(Operator::Rparenthesis),
+            Mo(Operator::Rparen),
         ]),
     );
 }
