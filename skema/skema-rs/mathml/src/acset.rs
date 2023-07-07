@@ -397,7 +397,7 @@ impl From<ACSet> for PetriNet {
             ..Default::default()
         };
 
-        let semantics = Semantics { ode: ode };
+        let semantics = Semantics { ode };
 
         let model = ModelPetriNet {
             states: states_vec,
@@ -586,7 +586,7 @@ fn test_lotka_volterra_mml_to_regnet() {
     let elements: Vec<Math> = input["mathml"]
         .as_array()
         .unwrap()
-        .into_iter()
+        .iter()
         .map(|x| x.as_str().unwrap().parse::<Math>().unwrap())
         .collect();
 
