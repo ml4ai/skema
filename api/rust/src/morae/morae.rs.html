@@ -104,6 +104,7 @@
 <a href="#104" id="104">104</a>
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -147,24 +148,25 @@
 
         <span class="kw">let </span>math_content = module_id2mathml_ast(module_id, host);
 
-        <span class="kw">let </span>mathml_ast =
-            get_mathml_asts_from_file(<span class="string">&quot;../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt&quot;</span>);
+        <span class="comment">// This does get a panic with a message, so need to figure out how to forward it
+        //let mathml_ast =
+        </span>get_mathml_asts_from_file(<span class="string">&quot;../../data/mml2pn_inputs/ta4_sir_v1/mml_list.txt&quot;</span>);
 
         <span class="macro">println!</span>(<span class="string">&quot;\nmath_content: {:?}&quot;</span>, math_content);
-        <span class="macro">println!</span>(<span class="string">&quot;\nmathml_ast: {:?}&quot;</span>, mathml_ast);
+        <span class="comment">//println!(&quot;\nmathml_ast: {:?}&quot;, mathml_ast);
 
-        <span class="macro">println!</span>(<span class="string">&quot;\nPN from code: {:?}&quot;</span>, ACSet::from(math_content.clone()));
-        <span class="macro">println!</span>(<span class="string">&quot;\nPN from mathml: {:?}\n&quot;</span>, ACSet::from(mathml_ast.clone()));
+        </span><span class="macro">println!</span>(<span class="string">&quot;\nPN from code: {:?}&quot;</span>, ACSet::from(math_content.clone()));
+        <span class="comment">//println!(&quot;\nPN from mathml: {:?}\n&quot;, ACSet::from(mathml_ast.clone()));
 
-        <span class="macro">println!</span>(
+        </span><span class="macro">println!</span>(
             <span class="string">&quot;\nAMR from code: {:?}&quot;</span>,
             PetriNet::from(ACSet::from(math_content))
         );
-        <span class="macro">println!</span>(
-            <span class="string">&quot;\nAMR from mathml: {:?}\n&quot;</span>,
+        <span class="comment">/*println!(
+            &quot;\nAMR from mathml: {:?}\n&quot;,
             PetriNet::from(ACSet::from(mathml_ast))
-        );
-    }
+        );*/
+    </span>}
     <span class="comment">// This is the graph id for the top level function for the core dynamics for our test case.
     </span><span class="kw">else if </span>new_args.arg == <span class="kw-2">*</span><span class="string">&quot;manual&quot; </span>{
         <span class="comment">// still need to grab the module id

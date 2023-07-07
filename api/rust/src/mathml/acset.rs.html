@@ -564,6 +564,40 @@
 <a href="#564" id="564">564</a>
 <a href="#565" id="565">565</a>
 <a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use crate</span>::{
@@ -884,6 +918,8 @@
     <span class="kw">fn </span>from(pn: ACSet) -&gt; PetriNet {
         <span class="kw">let </span><span class="kw-2">mut </span>states_vec = BTreeSet::&lt;State&gt;::new();
         <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = BTreeSet::&lt;Transition&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>initial_vec = Vec::&lt;Initial&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>parameter_vec = Vec::&lt;Parameter&gt;::new();
 
         <span class="comment">// -----------------------------------------------------------
 
@@ -893,6 +929,22 @@
                 name: state.sname.clone(),
                 ..Default::default()
             };
+            <span class="kw">let </span>initials = Initial {
+                target: state.sname.clone(),
+                expression: <span class="macro">format!</span>(<span class="string">&quot;{}0&quot;</span>, state.sname.clone()),
+                ..Default::default()
+            };
+            <span class="kw">let </span>parameters = Parameter {
+                id: initials.expression.clone(),
+                name: <span class="prelude-val">Some</span>(initials.expression.clone()),
+                description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
+                    <span class="string">&quot;The total {} population at timestep 0&quot;</span>,
+                    state.sname.clone()
+                )),
+                ..Default::default()
+            };
+            parameter_vec.push(parameters.clone());
+            initial_vec.push(initials.clone());
             states_vec.insert(states.clone());
         }
 
@@ -925,22 +977,38 @@
                 output: <span class="prelude-val">Some</span>(string_vec2.clone()),
                 ..Default::default()
             };
+            <span class="kw">let </span>parameters = Parameter {
+                id: trans.tname.clone(),
+                name: <span class="prelude-val">Some</span>(trans.tname.clone()),
+                description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{} rate&quot;</span>, trans.tname.clone())),
+                ..Default::default()
+            };
 
+            parameter_vec.push(parameters.clone());
             transitions_vec.insert(transitions.clone());
         }
 
         <span class="comment">// -----------------------------------------------------------
 
-        </span><span class="kw">let </span>model = ModelPetriNet {
+        </span><span class="kw">let </span>ode = Ode {
+            rates: <span class="prelude-val">None</span>,
+            initials: <span class="prelude-val">Some</span>(initial_vec),
+            parameters: <span class="prelude-val">Some</span>(parameter_vec),
+            ..Default::default()
+        };
+
+        <span class="kw">let </span>semantics = Semantics { ode };
+
+        <span class="kw">let </span>model = ModelPetriNet {
             states: states_vec,
             transitions: transitions_vec,
-            semantics: <span class="prelude-val">None</span>,
+            semantics: <span class="prelude-val">Some</span>(semantics),
             metadata: <span class="prelude-val">None</span>,
         };
 
         PetriNet {
         name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
-        schema: <span class="string">&quot;https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json&quot;</span>.to_string(),
+        schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
         schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
         description: <span class="string">&quot;This is a model from mathml equations&quot;</span>.to_string(),
         model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
@@ -1118,7 +1186,7 @@
     <span class="kw">let </span>elements: Vec&lt;Math&gt; = input[<span class="string">&quot;mathml&quot;</span>]
         .as_array()
         .unwrap()
-        .into_iter()
+        .iter()
         .map(|x| x.as_str().unwrap().parse::&lt;Math&gt;().unwrap())
         .collect();
 

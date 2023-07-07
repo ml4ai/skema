@@ -58,6 +58,7 @@
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
+<a href="#61" id="61">61</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Program to get comments from a source code file.
 
 </span><span class="kw">use </span>clap::Parser;
@@ -68,7 +69,8 @@
 };
 <span class="kw">use </span>std::{collections::HashSet, fs::read_to_string};
 
-<span class="kw">use </span>serde_json <span class="kw">as </span>json;
+<span class="attr">#[cfg(test)]
+</span><span class="kw">use </span>serde_json <span class="kw">as </span>json;
 
 <span class="doccomment">/// Command line arguments
 </span><span class="attr">#[derive(Parser)]

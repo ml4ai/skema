@@ -371,6 +371,8 @@
 <a href="#371" id="371">371</a>
 <a href="#372" id="372">372</a>
 <a href="#373" id="373">373</a>
+<a href="#374" id="374">374</a>
+<a href="#375" id="375">375</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{execute_query, parse_gromet_queries};
@@ -709,10 +711,11 @@
 
 <span class="doccomment">/// This returns a PetriNet AMR from a gromet.
 </span><span class="attr">#[utoipa::path(
+    request_body = ModuleCollection,
     responses(
         (
             status = <span class="number">200</span>, description = <span class="string">&quot;Successfully retrieved PN AMR&quot;</span>,
-            body = ModuleCollection
+            body = ModelPetriNet
         )
     )
 )]
@@ -728,10 +731,11 @@
 
 <span class="doccomment">/// This returns a RegNet AMR from a gromet.
 </span><span class="attr">#[utoipa::path(
+    request_body = ModuleCollection,
     responses(
         (
             status = <span class="number">200</span>, description = <span class="string">&quot;Successfully retrieved RN AMR&quot;</span>,
-            body = ModuleCollection
+            body = ModelRegNet
         )
     )
 )]
