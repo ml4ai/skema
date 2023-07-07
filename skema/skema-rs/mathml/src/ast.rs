@@ -8,6 +8,8 @@ pub enum Operator {
     Divide,
     Subtract,
     Sqrt,
+    Lparenthesis,
+    Rparenthesis,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -21,6 +23,8 @@ impl fmt::Display for Operator {
             Operator::Divide => write!(f, "/"),
             Operator::Subtract => write!(f, "-"),
             Operator::Sqrt => write!(f, "√"),
+            Operator::Lparenthesis => write!(f, "("),
+            Operator::Rparenthesis => write!(f, ")"),
             Operator::Other(op) => write!(f, "{op}"),
         }
     }
@@ -49,9 +53,11 @@ pub enum MathExpression {
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
+    GroupTuple(Vec<MathExpression>),
     #[default]
     None,
 }
+
 
 impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
