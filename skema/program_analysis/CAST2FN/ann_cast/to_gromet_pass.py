@@ -1784,7 +1784,39 @@ class ToGrometPass:
         if isinstance(node.operands[0], AnnCastName):
             opd_pof = -1
         elif isinstance(node.operands[0], AnnCastCall):
-            pass
+            parent_gromet_fn.pof = insert_gromet_object(
+                parent_gromet_fn.pof, GrometPort(box=opd_ret_val)
+            )
+            opd_pof = len(parent_gromet_fn.pof)
+            for arg in node.operands[0].arguments:
+                if hasattr(arg, "name"):
+                    print(f"Trying to find{arg.name}")
+                    found_opi, opi_idx = find_existing_opi(
+                        parent_gromet_fn, arg.name
+                    )
+
+                    if found_opi:
+                        parent_gromet_fn.wfopi = insert_gromet_object(
+                            parent_gromet_fn.wfopi,
+                            GrometWire(
+                                src=len(parent_gromet_fn.pif),
+                                tgt=opi_idx,
+                            ),
+                        )
+                    else:
+                        parent_gromet_fn.opi = insert_gromet_object(
+                            parent_gromet_fn.opi,
+                            GrometPort(
+                                name=arg.name, box=len(parent_gromet_fn.b)
+                            ),
+                        )
+                        parent_gromet_fn.wfopi = insert_gromet_object(
+                            parent_gromet_fn.wfopi,
+                            GrometWire(
+                                src=len(parent_gromet_fn.pif),
+                                tgt=len(parent_gromet_fn.opi),
+                            ),
+                        )
 
         parent_gromet_fn.bf = insert_gromet_object(
             parent_gromet_fn.bf,
@@ -1795,10 +1827,6 @@ class ToGrometPass:
             )
         )
         unop_idx = len(parent_gromet_fn.bf)
-
-        parent_gromet_fn.opi = insert_gromet_object(
-            parent_gromet_fn.opi, GrometPort(box=unop_idx)
-        )
 
         parent_gromet_fn.pif = insert_gromet_object(
             parent_gromet_fn.pif, GrometPort(box=unop_idx)
@@ -1813,13 +1841,28 @@ class ToGrometPass:
             if parent_gromet_fn.b[0].function_type != FunctionType.FUNCTION:
                 found_opi, opi_idx = find_existing_opi(parent_gromet_fn, name)
 
-                parent_gromet_fn.wfopi = insert_gromet_object(
-                    parent_gromet_fn.wfopi,
-                    GrometWire(
-                        src=len(parent_gromet_fn.pif),
-                        tgt=len(parent_gromet_fn.opi) if parent_gromet_fn.opi != None else -1,
-                    ),
-                )
+                if not found_opi:
+                    parent_gromet_fn.opi = insert_gromet_object(
+                        parent_gromet_fn.opi,
+                        GrometPort(
+                            name=name, box=len(parent_gromet_fn.b)
+                        ),
+                    )
+                    parent_gromet_fn.wfopi = insert_gromet_object(
+                        parent_gromet_fn.wfopi,
+                        GrometWire(
+                            src=len(parent_gromet_fn.pif),
+                            tgt=len(parent_gromet_fn.opi),
+                        ),
+                    )
+                else:
+                    parent_gromet_fn.wfopi = insert_gromet_object(
+                        parent_gromet_fn.wfopi,
+                        GrometWire(
+                            src=len(parent_gromet_fn.pif),
+                            tgt=opi_idx,
+                        ),
+                    )
             else:
                 # If we are in a function def then we retrieve where the variable is
                 # Whether it's in the local or the args environment
@@ -1864,7 +1907,6 @@ class ToGrometPass:
             # automatically doesn't have a pof
             # (This create an opi later)
             opd_one_pof = -1
-            print(node)
             if parent_gromet_fn.pof != None:
                 opd_one_pof = len(parent_gromet_fn.pof)
             if isinstance(
@@ -1877,7 +1919,6 @@ class ToGrometPass:
                 )
                 opd_one_pof = len(parent_gromet_fn.pof)
                 for arg in node.operands[0].arguments:
-                    print(arg)
                     if hasattr(arg, "name"):
                         print(f"Trying to find{arg.name}")
                         found_opi, opi_idx = find_existing_opi(
@@ -2026,6 +2067,7 @@ class ToGrometPass:
                             ),
                         )
                     else:
+                        print("AAA")
                         parent_gromet_fn.wfopi = insert_gromet_object(
                             parent_gromet_fn.wfopi,
                             GrometWire(
