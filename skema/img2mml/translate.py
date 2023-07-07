@@ -10,7 +10,7 @@ from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
-from typing import List
+from typing import List, Optional
 import logging
 from logging import info
 import cv2
@@ -281,6 +281,63 @@ def evaluate(
         return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
 
 
+def load_model(
+    model: Image2MathML_Xfmer, model_path: str, clean_state_dict: Optional[bool] = True
+) -> Image2MathML_Xfmer:
+    """
+    Load the model's state dictionary from a file.
+
+    Args:
+        model: The model to load the state dictionary into.
+        model_path: The path to the model state dictionary file.
+        clean_state_dict: Whether to clean the state dictionary keys.
+
+    Returns:
+        The model with loaded state dictionary.
+
+    Raises:
+        FileNotFoundError: If the model state dictionary file does not exist.
+        RuntimeError: If there is an error during loading the state dictionary.
+
+    Note:
+        If `clean_state_dict` is True, the function removes the "module." prefix from the state_dict keys
+        if present.
+
+        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
+    """
+    if not torch.cuda.is_available():
+        print("CUDA is not available, falling back to using the CPU.")
+        device = torch.device("cpu")
+    else:
+        device = torch.device("cuda")
+
+    try:
+        # if state_dict keys has "module.<key_name>"
+        # we need to remove the "module." from key_names
+        if clean_state_dict:
+            new_model = dict()
+            for key, value in torch.load(model_path, map_location=device).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
+        else:
+            if not torch.cuda.is_available():
+                info("CUDA is not available, falling back to using the CPU.")
+                new_model = dict()
+                for key, value in torch.load(model_path, map_location=device).items():
+                    new_model[key[7:]] = value
+                    model.load_state_dict(new_model, strict=False)
+            else:
+                model.load_state_dict(torch.load(model_path))
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Model state dictionary file not found: {model_path}")
+    except Exception as e:
+        raise RuntimeError(
+            f"Error loading state dictionary from file: {model_path}\n{e}"
+        )
+
+    return model
+
+
 def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
     """
     It allows us to obtain mathML for an image
@@ -302,27 +359,6 @@ def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -> str:
 
     # generating equation
     print("loading trained model...")
-
-    # if state_dict keys has "module.<key_name>"
-    # we need to remove the "module." from key_names
-    if config["clean_state_dict"]:
-        new_model = dict()
-        for key, value in torch.load(
-            model_path, map_location=torch.device("cpu")
-        ).items():
-            new_model[key[7:]] = value
-            model.load_state_dict(new_model, strict=False)
-
-    else:
-        if not torch.cuda.is_available():
-            info("CUDA is not available, falling back to using the CPU.")
-            new_model = dict()
-            for key, value in torch.load(
-                model_path, map_location=torch.device("cpu")
-            ).items():
-                new_model[key[7:]] = value
-                model.load_state_dict(new_model, strict=False)
-        else:
-            model.load_state_dict(torch.load(model_path))
+    model = load_model(model, model_path, config["clean_state_dict"])
 
     return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)
