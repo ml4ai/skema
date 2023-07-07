@@ -1,8 +1,8 @@
 use crate::ast::{
     Math, MathExpression,
     MathExpression::{
-        Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext,
-        Munder,
+        GroupPcomp, GroupTuple, Mfrac, Mi, Mn, Mo, MoLine, Mover, Mrow, Mspace, Msqrt, Mstyle,
+        Msub, Msubsup, Msup, Mtext, Munder,
     },
     Operator,
 };
@@ -11,7 +11,7 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
     combinator::{map, map_parser, opt, recognize, value},
-    multi::many0,
+    multi::{many0, many_till},
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
@@ -71,7 +71,7 @@ type IResult<'a, O> = nom::IResult<Span<'a>, O, ParseError<'a>>;
 
 /// A combinator that takes a parser `inner` and produces a parser that also consumes both leading
 /// and trailing whitespace, returning the output of `inner`.
-fn ws<'a, F: 'a, O>(inner: F) -> impl FnMut(Span<'a>) -> IResult<O>
+pub fn ws<'a, F: 'a, O>(inner: F) -> impl FnMut(Span<'a>) -> IResult<O>
 where
     F: FnMut(Span<'a>) -> IResult<O>,
 {
@@ -79,21 +79,23 @@ where
 }
 
 ///Quoted string
-fn quoted_string(input: Span) -> IResult<Span> {
+pub fn quoted_string(input: Span) -> IResult<Span> {
     delimited(tag("\""), take_until("\""), tag("\""))(input)
 }
 
-fn attribute(input: Span) -> IResult<(&str, &str)> {
+pub fn attribute(input: Span) -> IResult<(&str, &str)> {
     let (s, (key, value)) = ws(separated_pair(alphanumeric1, ws(tag("=")), quoted_string))(input)?;
     Ok((s, (&key, &value)))
 }
 
+#[macro_export]
 macro_rules! stag {
     ($tag:expr) => {{
         tuple((tag("<"), tag($tag), many0(attribute), tag(">")))
     }};
 }
 
+#[macro_export]
 macro_rules! etag {
     ($tag:expr) => {{
         delimited(tag("</"), tag($tag), tag(">"))
@@ -101,6 +103,7 @@ macro_rules! etag {
 }
 
 /// A macro to help build tag parsers
+#[macro_export]
 macro_rules! tag_parser {
     ($tag:expr, $parser:expr) => {{
         ws(delimited(stag!($tag), $parser, etag!($tag)))
@@ -108,6 +111,7 @@ macro_rules! tag_parser {
 }
 
 /// A macro to help build parsers for simple MathML elements (i.e., without further nesting).
+#[macro_export]
 macro_rules! elem0 {
     ($tag:expr) => {{
         let tag_end = concat!("</", $tag, ">");
@@ -116,6 +120,7 @@ macro_rules! elem0 {
 }
 
 /// A macro to help build parsers for MathML elements with 1 argument.
+#[macro_export]
 macro_rules! elem1 {
     ($tag:expr, $t:ident) => {{
         map(tag_parser!($tag, math_expression), |x| $t(Box::new(x)))
@@ -123,6 +128,7 @@ macro_rules! elem1 {
 }
 
 /// A macro to help build parsers for MathML elements with 2 arguments.
+#[macro_export]
 macro_rules! elem2 {
     ($tag:expr, $t:ident) => {{
         map(
@@ -133,6 +139,7 @@ macro_rules! elem2 {
 }
 
 /// A macro to help build parsers for MathML elements with 3 arguments.
+#[macro_export]
 macro_rules! elem3 {
     ($tag:expr, $t:ident) => {{
         map(
@@ -146,6 +153,7 @@ macro_rules! elem3 {
 }
 
 /// A macro to help build parsers for MathML elements with zero or more arguments.
+#[macro_export]
 macro_rules! elem_many0 {
     ($tag:expr) => {{
         tag_parser!($tag, many0(math_expression))
@@ -179,6 +187,16 @@ fn equals(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+fn l_parenthesis(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Lparenthesis, one_of("(("))(input)?;
+    Ok((s, op))
+}
+
+fn r_parenthesis(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Rparenthesis, one_of("))"))(input)?;
+    Ok((s, op))
+}
+
 fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = recognize(not_line_ending)(input)?;
     let op = Operator::Other(consumed.to_string());
@@ -186,7 +204,14 @@ fn operator_other(input: Span) -> IResult<Operator> {
 }
 
 fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((add, subtract, equals, operator_other))(input)?;
+    let (s, op) = alt((
+        add,
+        subtract,
+        equals,
+        l_parenthesis,
+        r_parenthesis,
+        operator_other,
+    ))(input)?;
     Ok((s, op))
 }
 
@@ -201,6 +226,26 @@ fn mo(input: Span) -> IResult<MathExpression> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         map_parser(recognize(take_until("</mo>")), operator),
+        tag("</mo>"),
+    ))(input)?;
+    Ok((s, Mo(op)))
+}
+
+/// function for identifying left parenthesis only
+fn mo_l(input: Span) -> IResult<MathExpression> {
+    let (s, op) = ws(delimited(
+        stag!("mo"),
+        map_parser(recognize(take_until("</mo>")), l_parenthesis),
+        tag("</mo>"),
+    ))(input)?;
+    Ok((s, Mo(op)))
+}
+
+/// function for identifying right parenthesis only
+fn mo_r(input: Span) -> IResult<MathExpression> {
+    let (s, op) = ws(delimited(
+        stag!("mo"),
+        map_parser(recognize(take_until("</mo>")), r_parenthesis),
         tag("</mo>"),
     ))(input)?;
     Ok((s, Mo(op)))
@@ -288,11 +333,36 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
     Ok((s, MoLine(element.to_string())))
 }
 
+/// Grouping parenthesis with Math expressions
+fn group_paren(input: Span) -> IResult<MathExpression> {
+    let (s, lp) = mo_l(input)?;
+    let (s, elements) = many_till(math_expression, mo_r)(s)?;
+    let mut group_vec = vec![];
+    group_vec.push(lp);
+    group_vec.extend(elements.0);
+    group_vec.push(elements.1);
+    Ok((s, GroupTuple(group_vec)))
+}
+
 /// Math expressions
 fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        mi, mn, msup, msub, msqrt, mfrac, mrow, munder, mover, msubsup, mtext, mstyle, mspace,
-        mo_line, mo,
+        group_paren,
+        mi,
+        mn,
+        msup,
+        msub,
+        msqrt,
+        mfrac,
+        mrow,
+        munder,
+        mover,
+        msubsup,
+        mtext,
+        mstyle,
+        mspace,
+        mo_line,
+        mo,
     )))(input)
 }
 
@@ -460,6 +530,21 @@ fn test_math() {
             content: vec![Mrow(vec![Mo(Operator::Subtract), Mi("b".to_string())])],
         },
     )
+}
+
+#[test]
+fn test_groupparen() {
+    test_parser(
+        "<mo>(</mo><mi>z</mi><mo>+</mo><mn>1</mn><mo>)</mo>",
+        group_paren,
+        GroupTuple(vec![
+            Mo(Operator::Lparenthesis),
+            Mi("z".to_string()),
+            Mo(Operator::Add),
+            Mn("1".to_string()),
+            Mo(Operator::Rparenthesis),
+        ]),
+    );
 }
 
 #[test]
