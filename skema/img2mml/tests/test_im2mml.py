@@ -25,19 +25,10 @@ def test_local_loading_and_prediction():
     print("The img2mml model is running well locally.")
 
 
-def get_mml(image_path: str, url: str) -> str:
-    """
-    It sends the http requests to put in an image to translate it into MathML.
-    """
-    with open(image_path, "rb") as f:
-        r = requests.put(url, files={"file": f})
-    return r.text
-
-
 def test_img2mml_service():
     cwd = Path(__file__).parents[0]
     image_path = cwd / "data" / "261.png"
-    SKEMA_EQ2MML_SERVICE = os.environ.get("SKEMA_EQMML_ADDRESS", "http://eq2mml:8001")
+    SKEMA_EQ2MML_SERVICE = os.environ.get("SKEMA_EQMML_ADDRESS", "http://eqn2mml:8001")
 
     files = {
         "data": open(str(image_path), "rb"),
