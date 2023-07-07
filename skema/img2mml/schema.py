@@ -27,14 +27,14 @@ class LatexEquation(BaseModel):
     class Config:
         schema_extra = {
             "example": {
-                "tex_src": "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}",
+                "tex_src": "\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}",
             },
             "examples": [
                 {
-                  "tex_src": "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}"
+                  "tex_src": "\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}"
                 },
                 {
-                  "tex_src": "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"
+                  "tex_src": "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"
                 },
                 {
                   "tex_src": "E = mc^{2}",

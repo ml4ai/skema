@@ -34,7 +34,7 @@ class EquationImagesToAMR(BaseModel):
 
 
 class EquationLatexToAMR(BaseModel):
-    equations: List[str] = Field(description="Equations in LaTeX", example=["\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}", "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"])
+    equations: List[str] = Field(description="Equations in LaTeX", example=["\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}", "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"])
     model: Literal["regnet", "petrinet"] = Field(description="The model type", example="regnet")
 
 class CodeSnippet(BaseModel):
