@@ -336,7 +336,7 @@ fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> Str
                     panic!("Unhandled comps inside Mover when over term is ˙")
                 }
             }
-            mover_str.push_str(&"</apply>");
+            //mover_str.push_str(&"</apply>");
         } else {
             println!("Unhandled over term in Mover");
         }
@@ -864,19 +864,25 @@ pub fn to_content_mathml(pmathml: Vec<Math>) -> String {
 }
 
 #[test]
-fn test_content_mml() {
-    let input = "tests/seir_eq2.xml";
-    let mut contents = std::fs::read_to_string(input)
-        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
-    let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
-    println!("math={:?}", math);
-    vector_mml.push(math);
-    let mml = to_content_mathml(vector_mml);
-    println!("mml={:?}", mml);
-    assert_eq!(mml, "<math><apply><minus/><ci>y</ci><apply><conjugate/><apply><plus/><ci>x</ci><cn>1</cn></apply></apply></apply></math>");
+fn test_content_mfrac() {
+    let frac = vec![Mfrac(
+        Box::new(Mn("1".to_string())),
+        Box::new(Mn("2".to_string())),
+    )];
+    let cmml = vec_mathexp(&frac);
+    assert_eq!(cmml, "<apply><divide/><cn>1</cn><cn>2</cn></apply>")
 }
+
+#[test]
+fn test_content_msub() {
+    let sub = vec![Msub(
+        Box::new(Mi("a".to_string())),
+        Box::new(Mn("2".to_string())),
+    )];
+    let cmml = vec_mathexp(&sub);
+    assert_eq!(cmml, "<apply><selector/><ci>a</ci><cn>2</cn></apply>")
+}
+
 #[test]
 fn test_content_mml_seir_eq2() {
     let input = "tests/seir_eq2.xml";
