@@ -19,7 +19,6 @@ dependencies=[
     "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
     "typing_extensions==4.5.0", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
     "fastapi",
-    "httpx", # Used by fastapi.testclient
     "uvicorn",
     "python-multipart"
 ]
@@ -37,7 +36,7 @@ dynamic = ["readme"]
 #   Pygraphviz is often tricky to install, so we reserve it for the dev extras
 #   list.
 # - six: Required by auto-generated Swagger models
-dev = ["pytest", "pytest-cov", "pytest-xdist", "black", "mypy", "coverage", "pygraphviz", "six"]
+dev = ["pytest", "pytest-cov", "pytest-xdist", "httpx", "black", "mypy", "coverage", "pygraphviz", "six"]
 
 demo = ["jupyter==1.0.0"]
 
