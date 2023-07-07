@@ -1,35 +1,15 @@
-use crate::ast::Operator::Other;
 use crate::{
     ast::{
         Math, MathExpression,
-        MathExpression::{GroupTuple, Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub, Msubsup, Msup},
-        Operator,
+        MathExpression::{GroupTuple, Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub, Msup},
     },
-    parsing::{parse, ParseError},
+    parsing::parse,
 };
-use nom::{
-    branch::alt,
-    bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
-    combinator::{complete, map, map_parser, opt, recognize, value},
-    multi::many0,
-    sequence::{delimited, pair, preceded, separated_pair, tuple},
-};
-
-use nom_locate::LocatedSpan;
-
-use serde::{Deserialize, Serialize};
-use serde_json::json;
+use std;
 use std::collections::HashSet;
-use std::fmt;
-use std::fs::read_to_string;
-use std::{
-    fs::File,
-    io::{self, BufRead, Write},
-};
 
 /// Counts how many Mo operators (+, -) there are in a vector
-fn counting_operators(x: &Vec<MathExpression>) -> (String, usize) {
+fn counting_operators(x: &[MathExpression]) -> (String, usize) {
     let mut count = 0;
     let mut op_str = String::new();
 
@@ -38,10 +18,10 @@ fn counting_operators(x: &Vec<MathExpression>) -> (String, usize) {
             let op = format!("{operation}");
             if op == "+" {
                 count += 1;
-                op_str.push_str(&"<apply><plus/>".to_string());
+                op_str.push_str("<apply><plus/>");
             } else if op == "-" {
                 count += 1;
-                op_str.push_str(&"<apply><minus/>".to_string());
+                op_str.push_str("<apply><minus/>");
             } else if op == ")" || op == "(" {
             } else {
                 println!("Unhandled operation.");
@@ -55,22 +35,22 @@ fn counting_operators(x: &Vec<MathExpression>) -> (String, usize) {
 
 /// Translate presentation mathml Mi to content mathml Ci
 fn mi2ci(x: String) -> String {
-    return format!("<ci>{}</ci>", x);
+    format!("<ci>{}</ci>", x)
 }
 
 /// Translate presentation mathml Mn to content mathml Cn
 fn mn2cn(x: String) -> String {
-    return format!("<cn>{}</cn>", x);
+    format!("<cn>{}</cn>", x)
 }
 
 /// Handles matching of presentation MathML components to content MathML by calling other functions
-fn vec_mathexp(exp: &Vec<MathExpression>) -> String {
+fn vec_mathexp(exp: &[MathExpression]) -> String {
     let mut exp_str = String::new();
     for comp in exp.iter() {
         match comp {
             Mi(id) => exp_str.push_str(&mi2ci(id.to_string())),
             Mn(num) => exp_str.push_str(&mn2cn(num.to_string())),
-            Mo(op) => {}
+            Mo(_op) => {}
             Msup(sup1, sup2) => {
                 let msup_comp = parsed_msup(sup1, sup2);
                 exp_str.push_str(&msup_comp.to_string());
@@ -104,9 +84,9 @@ fn vec_mathexp(exp: &Vec<MathExpression>) -> String {
 }
 
 /// Takes parsed presentation MathML's Msup components and translates it into content MathML representation
-fn parsed_msup(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> String {
+fn parsed_msup(comp1: &MathExpression, comp2: &MathExpression) -> String {
     let mut msup_str = String::new();
-    match (&**comp1, &**comp2) {
+    match (&comp1, &comp2) {
         (Mi(id), Mn(num)) => {
             let ci_str = mi2ci(id.to_string());
             let cn_str = mn2cn(num.to_string());
@@ -129,10 +109,10 @@ fn parsed_msup(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
         }
         (Mi(id), Mrow(row)) => {
             if id == "e" {
-                msup_str.push_str(&"<apply><exp/>".to_string());
+                msup_str.push_str("<apply><exp/>");
                 let row_comp = minus_at_vector_position0(&mut row.to_vec());
-                msup_str.push_str(&row_comp.to_string());
-                msup_str.push_str(&"</apply>".to_string());
+                msup_str.push_str(&row_comp);
+                msup_str.push_str("</apply>");
             }
         }
         _ => {
@@ -143,9 +123,9 @@ fn parsed_msup(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
 }
 
 /// Takes parsed  presentation MathML's Mfrac components and translates it into content MathML representation
-fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpression>) -> String {
+fn parsed_mfrac(numerator: &MathExpression, denominator: &MathExpression) -> String {
     let mut mfrac_str = String::new();
-    match (&**numerator, &**denominator) {
+    match (&numerator, &denominator) {
         (Mn(num1), Mn(num2)) => {
             let cn_str = mn2cn(num1.to_string());
             let cn2_str = mn2cn(num2.to_string());
@@ -165,12 +145,12 @@ fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpressio
             if num_exp.len() == 2 {
                 if let (Mi(num_id), Mi(denom_id)) = (&num_exp[0], &denom_exp[0]) {
                     if num_id == "d" && denom_id == "d" {
-                        if let (Mi(id0), Mi(id1)) = (&num_exp[1], &denom_exp[1]) {
+                        if let (Mi(id0), Mi(_id1)) = (&num_exp[1], &denom_exp[1]) {
                             let ci0_str = mi2ci(id0.to_string());
                             mfrac_str.push_str(&format!("<apply><diff/>{}</apply>", ci0_str))
                         }
                     } else if num_id == "∂" && denom_id == "∂" {
-                        if let (Mi(id0), Mi(id1)) = (&num_exp[1], &denom_exp[1]) {
+                        if let (Mi(id0), Mi(_id1)) = (&num_exp[1], &denom_exp[1]) {
                             let ci0_str = mi2ci(id0.to_string());
                             mfrac_str.push_str(&format!("<apply><partialdiff/>{}</apply>", ci0_str))
                         }
@@ -179,14 +159,14 @@ fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpressio
             } else if num_exp.len() == 3 && denom_exp.len() == 2 {
                 if let (Mi(num_id), Mi(denom_id)) = (&num_exp[0], &denom_exp[0]) {
                     if num_id == "d" && denom_id == "d" {
-                        if let (Mi(id0), GroupTuple(group), Mi(id1)) =
+                        if let (Mi(id0), GroupTuple(_group), Mi(_id1)) =
                             (&num_exp[1], &num_exp[2], &denom_exp[1])
                         {
                             let ci0_str = mi2ci(id0.to_string());
                             mfrac_str.push_str(&format!("<apply><diff/>{}</apply>", ci0_str))
                         }
                     } else if num_id == "∂" && denom_id == "∂" {
-                        if let (Mi(id0), GroupTuple(group), Mi(id1)) =
+                        if let (Mi(id0), GroupTuple(_group), Mi(_id1)) =
                             (&num_exp[1], &num_exp[2], &denom_exp[1])
                         {
                             let ci0_str = mi2ci(id0.to_string());
@@ -195,14 +175,14 @@ fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpressio
                     }
                 }
             } else {
-                let (num_str, count_num_op) = counting_operators(&num_exp);
-                let (denom_str, count_denom_op) = counting_operators(&denom_exp);
+                let (num_str, count_num_op) = counting_operators(num_exp);
+                let (denom_str, count_denom_op) = counting_operators(denom_exp);
                 if count_num_op == 1 && count_denom_op == 1 {
-                    mfrac_str.push_str(&"<apply><divide/>");
-                    mfrac_str.push_str(&num_str.to_string());
+                    mfrac_str.push_str("<apply><divide/>");
+                    mfrac_str.push_str(&num_str);
                     let (n_before_op, n_after_op) = if_one_operation_exists(num_exp.to_vec());
                     mfrac_str.push_str(&format!("{}{}", n_before_op, n_after_op));
-                    mfrac_str.push_str(&denom_str.to_string());
+                    mfrac_str.push_str(&denom_str);
                     let (d_before_op, d_after_op) = if_one_operation_exists(denom_exp.to_vec());
                     mfrac_str.push_str(&format!("{}{}", d_before_op, d_after_op));
                 } else {
@@ -211,7 +191,7 @@ fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpressio
             }
         }
         (Mrow(num_exp), Mi(id)) => {
-            let frac_num = content_for_times((&num_exp).to_vec());
+            let frac_num = content_for_times((num_exp).to_vec());
             let ci_str = mi2ci(id.to_string());
             mfrac_str.push_str(&format!("<apply><divide/>{}{}</apply>", frac_num, ci_str));
         }
@@ -223,10 +203,10 @@ fn parsed_mfrac(numerator: &Box<MathExpression>, denominator: &Box<MathExpressio
 }
 
 /// Takes parsed  presentation MathML's Msub components and translates it into content MathML representation
-fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> String {
+fn parsed_msub(comp1: &MathExpression, comp2: &MathExpression) -> String {
     let mut msub_str = String::new();
-    msub_str.push_str(&"<apply><selector/>".to_string());
-    match (&**comp1, &**comp2) {
+    msub_str.push_str("<apply><selector/>");
+    match (&comp1, &comp2) {
         (Mi(id1), Mi(id2)) => {
             let ci1_str = mi2ci(id1.to_string());
             let ci2_str = mi2ci(id2.to_string());
@@ -243,13 +223,13 @@ fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
             msub_str.push_str(&format!("{}{}", cn1_str, cn2_str))
         }
         (Mrow(row1), Mrow(row2)) => {
-            let (r1_str, count_row1_op) = counting_operators(&row1);
-            msub_str.push_str(&r1_str.to_string());
+            let (r1_str, count_row1_op) = counting_operators(row1);
+            msub_str.push_str(&r1_str);
             for r1 in row1.iter() {
                 match r1 {
                     Mi(id) => msub_str.push_str(&mi2ci(id.to_string())),
                     Mn(num) => msub_str.push_str(&mn2cn(num.to_string())),
-                    Mo(op) => {}
+                    Mo(_op) => {}
                     _ => {
                         panic!("Unhandled component inside Mover")
                     }
@@ -257,18 +237,18 @@ fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
             }
             if count_row1_op > 0 {
                 for _ in 0..count_row1_op {
-                    msub_str.push_str(&"</apply>".to_string());
+                    msub_str.push_str("</apply>");
                 }
             } else {
             }
 
-            let (r2_op_str, count_row2_op) = counting_operators(&row2);
-            msub_str.push_str(&r2_op_str.to_string());
+            let (r2_op_str, count_row2_op) = counting_operators(row2);
+            msub_str.push_str(&r2_op_str);
             for r2 in row2.iter() {
                 match r2 {
                     Mi(id) => msub_str.push_str(&mi2ci(id.to_string())),
                     Mn(num) => msub_str.push_str(&mn2cn(num.to_string())),
-                    Mo(op) => {}
+                    Mo(_op) => {}
                     _ => {
                         panic!("Unhandled comp inside Mover")
                     }
@@ -276,7 +256,7 @@ fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
             }
             if count_row2_op > 0 {
                 for _ in 0..count_row2_op {
-                    msub_str.push_str(&"</apply>".to_string());
+                    msub_str.push_str("</apply>");
                 }
             } else {
             }
@@ -285,29 +265,29 @@ fn parsed_msub(comp1: &Box<MathExpression>, comp2: &Box<MathExpression>) -> Stri
             panic!("Unhandled Msub")
         }
     }
-    msub_str.push_str(&"</apply>".to_string());
+    msub_str.push_str("</apply>");
     msub_str
 }
 
 /// Takes parsed presentation MathML's Mover components and translates it into content MathML representation
 /// Currently only handles "\bar" (<conjugate/> only, does not handles mean yet) and "\dot"
-fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> String {
+fn parsed_mover(over1: &MathExpression, over2: &MathExpression) -> String {
     let mut mover_str = String::new();
 
-    if let Mo(over_op) = &**over2 {
+    if let Mo(over_op) = &over2 {
         let over_term = format!("{over_op}");
         if over_term == "‾" {
-            mover_str.push_str(&"<apply><conjugate/>".to_string());
-            match &**over1 {
+            mover_str.push_str("<apply><conjugate/>");
+            match &over1 {
                 Mi(id) => mover_str.push_str(&mi2ci(id.to_string())),
                 Mrow(comp) => {
-                    let (op_str, count_op) = counting_operators(&comp);
-                    mover_str.push_str(&op_str.to_string());
+                    let (op_str, count_op) = counting_operators(comp);
+                    mover_str.push_str(&op_str);
                     for c in comp.iter() {
                         match c {
                             Mi(id) => mover_str.push_str(&mi2ci(id.to_string())),
                             Mn(num) => mover_str.push_str(&mn2cn(num.to_string())),
-                            Mo(op) => {}
+                            Mo(_op) => {}
                             _ => {
                                 panic!("Unhandled comp inside Mover")
                             }
@@ -315,7 +295,7 @@ fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> Str
                     }
                     if count_op > 0 {
                         for _ in 0..count_op {
-                            mover_str.push_str(&"</apply>".to_string());
+                            mover_str.push_str("</apply>");
                         }
                     } else {
                     }
@@ -325,10 +305,10 @@ fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> Str
                 }
             }
 
-            mover_str.push_str(&"</apply>".to_string());
+            mover_str.push_str("</apply>");
         } else if over_term == "˙" {
-            mover_str.push_str(&"<apply><diff/>");
-            match &**over1 {
+            mover_str.push_str("<apply><diff/>");
+            match &over1 {
                 Mi(id) => {
                     mover_str.push_str(&format!("<ci>{}</ci>", id));
                 }
@@ -345,18 +325,18 @@ fn parsed_mover(over1: &Box<MathExpression>, over2: &Box<MathExpression>) -> Str
 }
 /// Takes parsed presentation MathML's grouped parenthesis components and translates it into content MathML representation.
 /// Currently cannot handles nested parenthesis.
-fn parenthesis_group(group: &mut Vec<MathExpression>) -> String {
+fn parenthesis_group(group: &mut [MathExpression]) -> String {
     let mut group_str = String::new();
     let mut count_groups = 0;
-    let grouping = group.iter().for_each(|i| {
-        if let GroupTuple(expression) = i {
+    group.iter().for_each(|i| {
+        if let GroupTuple(_expression) = i {
             count_groups += 1;
         }
     });
 
     if count_groups == 0 {
         let group_comp = minus_at_vector_position0(&mut group.to_vec());
-        group_str.push_str(&group_comp.to_string());
+        group_str.push_str(&group_comp);
     } else {
         println!("Unhandled nested grouping with parenthesis");
     }
@@ -388,18 +368,18 @@ fn if_one_operation_exists(after_equals: Vec<MathExpression>) -> (String, String
     }
     if !before_op.is_empty() && !after_op.is_empty() {
         let before_components = content_for_times(before_op);
-        before_str.push_str(&before_components.to_string());
+        before_str.push_str(&before_components);
         let after_components = content_for_times(after_op);
-        after_str.push_str(&after_components.to_string());
-        after_str.push_str(&"</apply>".to_string());
+        after_str.push_str(&after_components);
+        after_str.push_str("</apply>");
     } else if before_op.is_empty() && !after_op.is_empty() {
         let after_components = content_for_times(after_op);
-        after_str.push_str(&after_components.to_string());
-        after_str.push_str(&"</apply>".to_string());
+        after_str.push_str(&after_components);
+        after_str.push_str("</apply>");
     } else if !before_op.is_empty() && after_op.is_empty() {
         let before_components = content_for_times(before_op);
-        before_str.push_str(&before_components.to_string());
-        before_str.push_str(&"</apply>".to_string());
+        before_str.push_str(&before_components);
+        before_str.push_str("</apply>");
     }
     (before_str, after_str)
 }
@@ -434,7 +414,7 @@ fn if_two_operation_exists(after_equals: Vec<MathExpression>) -> (String, String
     let mut after_new_op: Vec<MathExpression> = Vec::new();
     if !before_op.is_empty() && !after_op.is_empty() {
         let b_op = content_for_times(before_op);
-        before_str.push_str(&b_op.to_string());
+        before_str.push_str(&b_op);
 
         let mut another_op_exists = false;
         for a_comps in after_op.iter() {
@@ -457,12 +437,12 @@ fn if_two_operation_exists(after_equals: Vec<MathExpression>) -> (String, String
             }
         }
         let new_before_components = content_for_times(before_new_op);
-        mrow_str.push_str(&new_before_components.to_string());
-        mrow_str.push_str(&"</apply>".to_string());
+        mrow_str.push_str(&new_before_components);
+        mrow_str.push_str("</apply>");
 
         let new_after_components = content_for_times(after_new_op);
-        mrow_str.push_str(&new_after_components.to_string());
-        mrow_str.push_str(&"</apply>".to_string());
+        mrow_str.push_str(&new_after_components);
+        mrow_str.push_str("</apply>");
     } else if before_op.is_empty() && !after_op.is_empty() {
         let mut another_op_exists = false;
         for a_comps in after_op.iter() {
@@ -486,12 +466,12 @@ fn if_two_operation_exists(after_equals: Vec<MathExpression>) -> (String, String
         }
 
         let new_before_components = content_for_times(before_new_op);
-        mrow_str.push_str(&new_before_components.to_string());
-        mrow_str.push_str(&"</apply>".to_string());
+        mrow_str.push_str(&new_before_components);
+        mrow_str.push_str("</apply>");
 
         let new_after_components = content_for_times(after_new_op);
-        mrow_str.push_str(&new_after_components.to_string());
-        mrow_str.push_str(&"</apply>".to_string());
+        mrow_str.push_str(&new_after_components);
+        mrow_str.push_str("</apply>");
     }
     (before_str, mrow_str)
 }
@@ -502,10 +482,10 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
     match x.len() {
         1 => {
             let comp = vec_mathexp(&x);
-            str_component.push_str(&comp.to_string());
+            str_component.push_str(&comp);
         }
         2 => {
-            for (i, comp) in x.iter().enumerate() {
+            for (i, _comp) in x.iter().enumerate() {
                 if i > 0 {
                     if let (Mi(id1), Mi(id2)) = (&x[i - 1], &x[i]) {
                         let ci1 = mi2ci(id1.to_string());
@@ -516,24 +496,24 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                         let ci = mi2ci(id.to_string());
                         str_component
                             .push_str(&format!("<apply><times/>{}{}</apply>", group_comp, ci));
-                    } else if let (Mi(id), Mo(Rparenthesis)) = (&x[i - 1], &x[i]) {
+                    } else if let (Mi(id), Mo(_rp)) = (&x[i - 1], &x[i]) {
                         str_component.push_str(&mi2ci(id.to_string()));
-                    } else if let (Mo(Lparenthesis), Mn(num)) = (&x[i - 1], &x[i]) {
+                    } else if let (Mo(_lp), Mn(num)) = (&x[i - 1], &x[i]) {
                         str_component.push_str(&mn2cn(num.to_string()));
-                    } else if let (Mo(Lparenthesis), Mi(id)) = (&x[i - 1], &x[i]) {
+                    } else if let (Mo(_lp), Mi(id)) = (&x[i - 1], &x[i]) {
                         str_component.push_str(&mi2ci(id.to_string()));
-                    } else if let (Msub(s1, s2), Mo(Rparenthesis)) = (&x[i - 1], &x[i]) {
-                        let sub1_comp = parsed_msub(&s1, &s2);
+                    } else if let (Msub(s1, s2), Mo(_rp)) = (&x[i - 1], &x[i]) {
+                        let sub1_comp = parsed_msub(s1, s2);
                         str_component.push_str(&sub1_comp.to_string());
                     } else if let (Msub(s1, s2), Msub(s3, s4)) = (&x[i - 1], &x[i]) {
-                        let sub1_comp = parsed_msub(&s1, &s2);
-                        let sub2_comp = parsed_msub(&s3, &s4);
+                        let sub1_comp = parsed_msub(s1, s2);
+                        let sub2_comp = parsed_msub(s3, s4);
                         str_component.push_str(&format!(
                             "<apply><times/>{}{}</apply>",
                             sub1_comp, sub2_comp
                         ));
                     } else if let (Mfrac(num, denom), Mi(id)) = (&x[i - 1], &x[i]) {
-                        let mfrac_comp = parsed_mfrac(&num, &denom);
+                        let mfrac_comp = parsed_mfrac(num, denom);
                         let ci = mi2ci(id.to_string());
                         str_component
                             .push_str(&format!("<apply><times/>{}{}</apply>", mfrac_comp, ci));
@@ -551,7 +531,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                     } else if let (Mi(id), Mrow(row)) = (&x[i - 1], &x[i]) {
                         let ci = mi2ci(id.to_string());
 
-                        let exp = vec_mathexp(&row);
+                        let exp = vec_mathexp(row);
                         str_component.push_str(&format!("<apply><times/>{}{}</apply>", ci, exp));
                     } else {
                         println!("Unhandled MathExpression combination of length 2.");
@@ -560,12 +540,12 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
             }
         }
         3 => {
-            for (i, comp) in x.iter().enumerate() {
+            for (i, _comp) in x.iter().enumerate() {
                 if i > 1 {
                     if let (Mi(id1), Mi(id2), Mfrac(num, denom)) = (&x[i - 2], &x[i - 1], &x[i]) {
                         let ci1 = mi2ci(id1.to_string());
                         let ci2 = mi2ci(id2.to_string());
-                        let mfrac_comp = parsed_mfrac(&num, &denom);
+                        let mfrac_comp = parsed_mfrac(num, denom);
                         str_component.push_str(&format!(
                             "<apply><times/>{}{}{}</apply>",
                             ci1, ci2, mfrac_comp
@@ -583,7 +563,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                         let ci2 = mi2ci(id2.to_string());
                         let group_comp = parenthesis_group(&mut group.to_vec());
 
-                        let (_, count_op) = counting_operators(&group);
+                        let (_, count_op) = counting_operators(group);
                         if count_op == 0 {
                             str_component
                                 .push_str(&format!("<apply><times/>{}{}</apply>", ci1, ci2));
@@ -600,7 +580,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
             }
         }
         4 => {
-            for (i, comp) in x.iter().enumerate() {
+            for (i, _comp) in x.iter().enumerate() {
                 if i > 2 {
                     if let (Mi(id1), Mi(id2), GroupTuple(group), Mfrac(num, denom)) =
                         (&x[i - 3], &x[i - 2], &x[i - 1], &x[i])
@@ -608,9 +588,9 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                         let ci1 = mi2ci(id1.to_string());
                         let ci2 = mi2ci(id2.to_string());
                         let group_comp = parenthesis_group(&mut group.to_vec());
-                        let mfrac_comp = parsed_mfrac(&num, &denom);
+                        let mfrac_comp = parsed_mfrac(num, denom);
 
-                        let (_, count_op) = counting_operators(&group);
+                        let (_, count_op) = counting_operators(group);
                         if count_op == 0 {
                             str_component.push_str(&format!(
                                 "<apply><times/>{}{}{}</apply>",
@@ -630,7 +610,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                         let ci2 = mi2ci(id2.to_string());
                         let group2_comp = parenthesis_group(&mut group2.to_vec());
 
-                        let (_, count_op) = counting_operators(&group2);
+                        let (_, count_op) = counting_operators(group2);
                         if count_op == 0 {
                             str_component.push_str(&format!(
                                 "<apply><times/>{}{}{}</apply>",
@@ -650,7 +630,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                         let ci3 = mi2ci(id3.to_string());
                         let group_comp = parenthesis_group(&mut group.to_vec());
 
-                        let (_, count_op) = counting_operators(&group);
+                        let (_, count_op) = counting_operators(group);
                         if count_op == 0 {
                             str_component
                                 .push_str(&format!("<apply><times/>{}{}{}</apply>", ci1, ci2, ci3));
@@ -682,55 +662,55 @@ fn minus_at_vector_position0(component: &mut Vec<MathExpression>) -> String {
         if op == "-" {
             component.remove(0);
 
-            let (a_op_str, count_after_op) = counting_operators(&component);
-            mrow_str.push_str(&a_op_str.to_string());
-            mrow_str.push_str(&"<apply><minus/>".to_string());
+            let (a_op_str, count_after_op) = counting_operators(component);
+            mrow_str.push_str(&a_op_str);
+            mrow_str.push_str("<apply><minus/>");
             match count_after_op {
                 0 => {
                     let (before_ops, _) = if_one_operation_exists(component.to_vec());
-                    mrow_str.push_str(&before_ops.to_string());
+                    mrow_str.push_str(&before_ops);
                 }
                 1 => {
                     let (before_ops, after_ops) = if_one_operation_exists(component.to_vec());
-                    mrow_str.push_str(&before_ops.to_string());
-                    mrow_str.push_str(&"</apply>".to_string());
-                    mrow_str.push_str(&after_ops.to_string());
+                    mrow_str.push_str(&before_ops);
+                    mrow_str.push_str("</apply>");
+                    mrow_str.push_str(&after_ops);
                 }
                 2 => {
                     let (before_ops, after_ops) = if_two_operation_exists(component.to_vec());
-                    mrow_str.push_str(&before_ops.to_string());
-                    mrow_str.push_str(&"</apply>".to_string());
-                    mrow_str.push_str(&after_ops.to_string());
+                    mrow_str.push_str(&before_ops);
+                    mrow_str.push_str("</apply>");
+                    mrow_str.push_str(&after_ops);
                 }
                 _ => {
                     println!("Unhandled number of operations when <minus/> exists.");
                 }
             }
-            mrow_str.push_str(&"</apply>".to_string());
+            mrow_str.push_str("</apply>");
         } else if op == "(" {
             if let Mo(another_operation) = &component[1] {
                 let op = format!("{another_operation}");
                 if op == "-" {
                     component.remove(1);
 
-                    let (a_op_str, count_after_op) = counting_operators(&component);
-                    mrow_str.push_str(&a_op_str.to_string());
-                    mrow_str.push_str(&"<apply><minus/>".to_string());
+                    let (a_op_str, count_after_op) = counting_operators(component);
+                    mrow_str.push_str(&a_op_str);
+                    mrow_str.push_str("<apply><minus/>");
                     match count_after_op {
                         0 => {}
                         1 => {
                             let (before_ops, after_ops) =
                                 if_one_operation_exists(component.to_vec());
-                            mrow_str.push_str(&before_ops.to_string());
-                            mrow_str.push_str(&"</apply>".to_string());
-                            mrow_str.push_str(&after_ops.to_string());
+                            mrow_str.push_str(&before_ops);
+                            mrow_str.push_str("</apply>");
+                            mrow_str.push_str(&after_ops);
                         }
                         2 => {
                             let (before_ops, after_ops) =
                                 if_two_operation_exists(component.to_vec());
-                            mrow_str.push_str(&before_ops.to_string());
-                            mrow_str.push_str(&"</apply>".to_string());
-                            mrow_str.push_str(&after_ops.to_string());
+                            mrow_str.push_str(&before_ops);
+                            mrow_str.push_str("</apply>");
+                            mrow_str.push_str(&after_ops);
                         }
                         _ => {
                             println!("Unhandled number of operations when <minus/> exists.");
@@ -738,81 +718,80 @@ fn minus_at_vector_position0(component: &mut Vec<MathExpression>) -> String {
                     }
                 }
             } else {
-                let (a_op_str, count_after_op) = counting_operators(&component);
-                mrow_str.push_str(&a_op_str.to_string());
+                let (a_op_str, count_after_op) = counting_operators(component);
+                mrow_str.push_str(&a_op_str);
                 match count_after_op {
                     0 => {}
                     1 => {
                         let (before_ops, after_ops) = if_one_operation_exists(component.to_vec());
-                        mrow_str.push_str(&before_ops.to_string());
-                        mrow_str.push_str(&after_ops.to_string());
+                        mrow_str.push_str(&before_ops);
+                        mrow_str.push_str(&after_ops);
                     }
                     2 => {
                         let (before_ops, after_ops) = if_two_operation_exists(component.to_vec());
-                        mrow_str.push_str(&before_ops.to_string());
-                        mrow_str.push_str(&after_ops.to_string());
+                        mrow_str.push_str(&before_ops);
+                        mrow_str.push_str(&after_ops);
                     }
                     _ => {
                         let after_component = content_for_times(component.to_vec());
-                        mrow_str.push_str(&after_component.to_string());
+                        mrow_str.push_str(&after_component);
                     }
                 }
             }
         } else {
-            let (a_op_str, count_after_op) = counting_operators(&component);
-            mrow_str.push_str(&a_op_str.to_string());
+            let (a_op_str, count_after_op) = counting_operators(component);
+            mrow_str.push_str(&a_op_str);
             match count_after_op {
                 0 => {}
                 1 => {
                     let (before_ops, after_ops) = if_one_operation_exists(component.to_vec());
-                    mrow_str.push_str(&before_ops.to_string());
-                    mrow_str.push_str(&after_ops.to_string());
+                    mrow_str.push_str(&before_ops);
+                    mrow_str.push_str(&after_ops);
                 }
                 2 => {
                     let (before_ops, after_ops) = if_two_operation_exists(component.to_vec());
-                    mrow_str.push_str(&before_ops.to_string());
-                    mrow_str.push_str(&after_ops.to_string());
+                    mrow_str.push_str(&before_ops);
+                    mrow_str.push_str(&after_ops);
                 }
                 _ => {
                     let after_component = content_for_times(component.to_vec());
-                    mrow_str.push_str(&after_component.to_string());
+                    mrow_str.push_str(&after_component);
                 }
             }
         }
     } else {
-        let (a_op_str, count_after_op) = counting_operators(&component);
-        mrow_str.push_str(&a_op_str.to_string());
+        let (a_op_str, count_after_op) = counting_operators(component);
+        mrow_str.push_str(&a_op_str);
         match count_after_op {
             0 => {
                 let row_comp = content_for_times(component.to_vec());
-                mrow_str.push_str(&row_comp.to_string());
+                mrow_str.push_str(&row_comp);
             }
             1 => {
                 let (before_ops, after_ops) = if_one_operation_exists(component.to_vec());
-                mrow_str.push_str(&before_ops.to_string());
-                mrow_str.push_str(&after_ops.to_string());
+                mrow_str.push_str(&before_ops);
+                mrow_str.push_str(&after_ops);
             }
             2 => {
                 let (before_ops, after_ops) = if_two_operation_exists(component.to_vec());
-                mrow_str.push_str(&before_ops.to_string());
-                mrow_str.push_str(&after_ops.to_string());
+                mrow_str.push_str(&before_ops);
+                mrow_str.push_str(&after_ops);
             }
             _ => {
                 let after_component = content_for_times(component.to_vec());
-                mrow_str.push_str(&after_component.to_string());
+                mrow_str.push_str(&after_component);
             }
         }
 
-        mrow_str.push_str(&"</apply>".to_string());
+        mrow_str.push_str("</apply>");
     }
     mrow_str
 }
 
 /// Handles parsed nested operation components as well as nested MathExpression and translates to content
 /// mathml
-fn parse_nested_operations(row: &Vec<MathExpression>) -> String {
+fn parse_nested_operations(row: &[MathExpression]) -> String {
     let mut mrow_str = String::new();
-    let mut count_op = 0;
     let mut before_equals: Vec<MathExpression> = Vec::new();
     let mut after_equals: Vec<MathExpression> = Vec::new();
     let mut equals_exists = false;
@@ -832,20 +811,20 @@ fn parse_nested_operations(row: &Vec<MathExpression>) -> String {
     }
 
     if !before_equals.is_empty() && !after_equals.is_empty() {
-        mrow_str.push_str(&"<apply><eq/>".to_string());
+        mrow_str.push_str("<apply><eq/>");
 
-        let (b_op_str, count_before_op) = counting_operators(&before_equals);
-        mrow_str.push_str(&b_op_str.to_string());
+        let (b_op_str, _count_before_op) = counting_operators(&before_equals);
+        mrow_str.push_str(&b_op_str);
 
         let before_component = content_for_times(before_equals);
-        mrow_str.push_str(&before_component.to_string());
+        mrow_str.push_str(&before_component);
 
         let comp = minus_at_vector_position0(&mut after_equals.to_vec());
 
-        mrow_str.push_str(&comp.to_string());
+        mrow_str.push_str(&comp);
     } else {
         let comp = minus_at_vector_position0(&mut row.to_vec());
-        mrow_str.push_str(&comp.to_string());
+        mrow_str.push_str(&comp);
     }
     mrow_str
 }
@@ -854,12 +833,12 @@ fn parse_nested_operations(row: &Vec<MathExpression>) -> String {
 pub fn to_content_mathml(pmathml: Vec<Math>) -> String {
     let mut cmathml = String::new();
     for pmml in pmathml.iter() {
-        cmathml.push_str(&"<math>".to_string());
+        cmathml.push_str("<math>");
         let comp = &pmml.content;
-        let components = parse_nested_operations(&comp);
+        let components = parse_nested_operations(comp);
         cmathml.push_str(&components.to_string());
     }
-    cmathml.push_str(&"</math>".to_string());
+    cmathml.push_str("</math>");
     cmathml
 }
 
