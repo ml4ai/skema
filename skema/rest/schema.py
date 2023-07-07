@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from typing import List
 # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
 from typing_extensions import Literal
-from skema.img2mml import eqn2mml
+from skema.img2mml import schema as eqn2mml_schema
 
 
 class HealthStatus(BaseModel):
@@ -29,13 +29,13 @@ class HealthStatus(BaseModel):
 
 class EquationImagesToAMR(BaseModel):
     # FIXME: will this work or do we need base64?
-    images: List[eqn2mml.ImageBytes]
+    images: List[eqn2mml_schema.ImageBytes]
     model: Literal["regnet", "petrinet"] = Field(description="The model type")
 
 
 class EquationLatexToAMR(BaseModel):
-    equations: List[str] = Field(description="Equations in LaTeX")
-    model: Literal["regnet", "petrinet"] = Field(description="The model type")
+    equations: List[str] = Field(description="Equations in LaTeX", example=["\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}", "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"])
+    model: Literal["regnet", "petrinet"] = Field(description="The model type", example="regnet")
 
 class CodeSnippet(BaseModel):
     code: str = Field(
