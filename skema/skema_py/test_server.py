@@ -11,6 +11,7 @@ client = TestClient(app)
 
 
 def test_ping():
+    '''Test case for /code2fn/ping endpoint.'''
     response = client.get("/code2fn/ping")
     assert response.status_code == 200
 
