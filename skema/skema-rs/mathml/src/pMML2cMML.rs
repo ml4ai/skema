@@ -1,9 +1,9 @@
 use crate::{
     ast::{
         Math, MathExpression,
-        MathExpression::{GroupTuple, Mfrac, Mi, Mn, Mo, Mover, Mrow, Msub, Msup},
+        MathExpression::{GroupTuple, Mfrac, Mn, Mo, Mover, Msub, Msup},
+        Mi, Mrow,
     },
-    parsing::parse,
 };
 use std;
 use std::collections::HashSet;
@@ -48,7 +48,7 @@ fn vec_mathexp(exp: &[MathExpression]) -> String {
     let mut exp_str = String::new();
     for comp in exp.iter() {
         match comp {
-            Mi(id) => exp_str.push_str(&mi2ci(id.to_string())),
+            MathExpression::Mi(Mi(id)) => exp_str.push_str(&mi2ci(id.to_string())),
             Mn(num) => exp_str.push_str(&mn2cn(num.to_string())),
             Mo(_op) => {}
             Msup(sup1, sup2) => {
@@ -67,7 +67,7 @@ fn vec_mathexp(exp: &[MathExpression]) -> String {
                 let mover_comp = parsed_mover(over1, over2);
                 exp_str.push_str(&mover_comp.to_string());
             }
-            Mrow(row) => {
+            MathExpression::Mrow(Mrow(row)) => {
                 let mrow_comp = parse_nested_operations(row);
                 exp_str.push_str(&mrow_comp.to_string());
             }
@@ -87,12 +87,12 @@ fn vec_mathexp(exp: &[MathExpression]) -> String {
 fn parsed_msup(comp1: &MathExpression, comp2: &MathExpression) -> String {
     let mut msup_str = String::new();
     match (&comp1, &comp2) {
-        (Mi(id), Mn(num)) => {
+        (MathExpression::Mi(Mi(id)), Mn(num)) => {
             let ci_str = mi2ci(id.to_string());
             let cn_str = mn2cn(num.to_string());
             msup_str.push_str(&format!("<apply><power/>{}{}</apply>", ci_str, cn_str));
         }
-        (Mi(id1), Mi(id2)) => {
+        (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2))) => {
             let ci_str = mi2ci(id1.to_string());
             let ci2_str = mi2ci(id2.to_string());
             msup_str.push_str(&format!("<apply><power/>{}{}</apply>", ci_str, ci2_str));
@@ -102,12 +102,12 @@ fn parsed_msup(comp1: &MathExpression, comp2: &MathExpression) -> String {
             let cn2_str = mn2cn(num2.to_string());
             msup_str.push_str(&format!("<apply><power/>{}{}</apply>", cn_str, cn2_str));
         }
-        (Mn(num), Mi(id)) => {
+        (Mn(num), MathExpression::Mi(Mi(id))) => {
             let ci_str = mi2ci(id.to_string());
             let cn_str = mn2cn(num.to_string());
             msup_str.push_str(&format!("<apply><power/>{}{}</apply>", cn_str, ci_str));
         }
-        (Mi(id), Mrow(row)) => {
+        (MathExpression::Mi(Mi(id)), MathExpression::Mrow(Mrow(row))) => {
             if id == "e" {
                 msup_str.push_str("<apply><exp/>");
                 let row_comp = minus_at_vector_position0(&mut row.to_vec());
@@ -131,42 +131,42 @@ fn parsed_mfrac(numerator: &MathExpression, denominator: &MathExpression) -> Str
             let cn2_str = mn2cn(num2.to_string());
             mfrac_str.push_str(&format!("<apply><divide/>{}{}</apply>", cn_str, cn2_str));
         }
-        (Mi(id), Mn(num)) => {
+        (MathExpression::Mi(Mi(id)), Mn(num)) => {
             let ci_str = mi2ci(id.to_string());
             let cn_str = mn2cn(num.to_string());
             mfrac_str.push_str(&format!("<apply><divide/>{}{}</apply>", ci_str, cn_str));
         }
-        (Mi(id1), Mi(id2)) => {
+        (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2))) => {
             let ci_str = mi2ci(id1.to_string());
             let ci2_str = mi2ci(id2.to_string());
             mfrac_str.push_str(&format!("<apply><divide/>{}{}</apply>", ci_str, ci2_str));
         }
-        (Mrow(num_exp), Mrow(denom_exp)) => {
+        (MathExpression::Mrow(Mrow(num_exp)), MathExpression::Mrow(Mrow(denom_exp))) => {
             if num_exp.len() == 2 {
-                if let (Mi(num_id), Mi(denom_id)) = (&num_exp[0], &denom_exp[0]) {
+                if let (MathExpression::Mi(Mi(num_id)), MathExpression::Mi(Mi(denom_id))) = (&num_exp[0], &denom_exp[0]) {
                     if num_id == "d" && denom_id == "d" {
-                        if let (Mi(id0), Mi(_id1)) = (&num_exp[1], &denom_exp[1]) {
+                        if let (MathExpression::Mi(Mi(id0)), MathExpression::Mi(Mi(_id1))) = (&num_exp[1], &denom_exp[1]) {
                             let ci0_str = mi2ci(id0.to_string());
                             mfrac_str.push_str(&format!("<apply><diff/>{}</apply>", ci0_str))
                         }
                     } else if num_id == "∂" && denom_id == "∂" {
-                        if let (Mi(id0), Mi(_id1)) = (&num_exp[1], &denom_exp[1]) {
+                        if let (MathExpression::Mi(Mi(id0)), MathExpression::Mi(Mi(_id1))) = (&num_exp[1], &denom_exp[1]) {
                             let ci0_str = mi2ci(id0.to_string());
                             mfrac_str.push_str(&format!("<apply><partialdiff/>{}</apply>", ci0_str))
                         }
                     }
                 }
             } else if num_exp.len() == 3 && denom_exp.len() == 2 {
-                if let (Mi(num_id), Mi(denom_id)) = (&num_exp[0], &denom_exp[0]) {
+                if let (MathExpression::Mi(Mi(num_id)), MathExpression::Mi(Mi(denom_id))) = (&num_exp[0], &denom_exp[0]) {
                     if num_id == "d" && denom_id == "d" {
-                        if let (Mi(id0), GroupTuple(_group), Mi(_id1)) =
+                        if let (MathExpression::Mi(Mi(id0)), GroupTuple(_group), MathExpression::Mi(Mi(_id1))) =
                             (&num_exp[1], &num_exp[2], &denom_exp[1])
                         {
                             let ci0_str = mi2ci(id0.to_string());
                             mfrac_str.push_str(&format!("<apply><diff/>{}</apply>", ci0_str))
                         }
                     } else if num_id == "∂" && denom_id == "∂" {
-                        if let (Mi(id0), GroupTuple(_group), Mi(_id1)) =
+                        if let (MathExpression::Mi(Mi(id0)), GroupTuple(_group), MathExpression::Mi(Mi(_id1))) =
                             (&num_exp[1], &num_exp[2], &denom_exp[1])
                         {
                             let ci0_str = mi2ci(id0.to_string());
@@ -190,7 +190,7 @@ fn parsed_mfrac(numerator: &MathExpression, denominator: &MathExpression) -> Str
                 }
             }
         }
-        (Mrow(num_exp), Mi(id)) => {
+        (MathExpression::Mrow(Mrow(num_exp)), MathExpression::Mi(Mi(id))) => {
             let frac_num = content_for_times((num_exp).to_vec());
             let ci_str = mi2ci(id.to_string());
             mfrac_str.push_str(&format!("<apply><divide/>{}{}</apply>", frac_num, ci_str));
@@ -207,12 +207,12 @@ fn parsed_msub(comp1: &MathExpression, comp2: &MathExpression) -> String {
     let mut msub_str = String::new();
     msub_str.push_str("<apply><selector/>");
     match (&comp1, &comp2) {
-        (Mi(id1), Mi(id2)) => {
+        (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2))) => {
             let ci1_str = mi2ci(id1.to_string());
             let ci2_str = mi2ci(id2.to_string());
             msub_str.push_str(&format!("{}{}", ci1_str, ci2_str))
         }
-        (Mi(id), Mn(num)) => {
+        (MathExpression::Mi(Mi(id)), Mn(num)) => {
             let ci_str = mi2ci(id.to_string());
             let cn_str = mn2cn(num.to_string());
             msub_str.push_str(&format!("{}{}", ci_str, cn_str))
@@ -222,12 +222,12 @@ fn parsed_msub(comp1: &MathExpression, comp2: &MathExpression) -> String {
             let cn2_str = mn2cn(num2.to_string());
             msub_str.push_str(&format!("{}{}", cn1_str, cn2_str))
         }
-        (Mrow(row1), Mrow(row2)) => {
+        (MathExpression::Mrow(Mrow(row1)), MathExpression::Mrow(Mrow(row2))) => {
             let (r1_str, count_row1_op) = counting_operators(row1);
             msub_str.push_str(&r1_str);
             for r1 in row1.iter() {
                 match r1 {
-                    Mi(id) => msub_str.push_str(&mi2ci(id.to_string())),
+                    MathExpression::Mi(Mi(id)) => msub_str.push_str(&mi2ci(id.to_string())),
                     Mn(num) => msub_str.push_str(&mn2cn(num.to_string())),
                     Mo(_op) => {}
                     _ => {
@@ -246,7 +246,7 @@ fn parsed_msub(comp1: &MathExpression, comp2: &MathExpression) -> String {
             msub_str.push_str(&r2_op_str);
             for r2 in row2.iter() {
                 match r2 {
-                    Mi(id) => msub_str.push_str(&mi2ci(id.to_string())),
+                    MathExpression::Mi(Mi(id)) => msub_str.push_str(&mi2ci(id.to_string())),
                     Mn(num) => msub_str.push_str(&mn2cn(num.to_string())),
                     Mo(_op) => {}
                     _ => {
@@ -279,13 +279,13 @@ fn parsed_mover(over1: &MathExpression, over2: &MathExpression) -> String {
         if over_term == "‾" {
             mover_str.push_str("<apply><conjugate/>");
             match &over1 {
-                Mi(id) => mover_str.push_str(&mi2ci(id.to_string())),
-                Mrow(comp) => {
+                MathExpression::Mi(Mi(id)) => mover_str.push_str(&mi2ci(id.to_string())),
+                MathExpression::Mrow(Mrow(comp)) => {
                     let (op_str, count_op) = counting_operators(comp);
                     mover_str.push_str(&op_str);
                     for c in comp.iter() {
                         match c {
-                            Mi(id) => mover_str.push_str(&mi2ci(id.to_string())),
+                            MathExpression::Mi(Mi(id)) => mover_str.push_str(&mi2ci(id.to_string())),
                             Mn(num) => mover_str.push_str(&mn2cn(num.to_string())),
                             Mo(_op) => {}
                             _ => {
@@ -309,7 +309,7 @@ fn parsed_mover(over1: &MathExpression, over2: &MathExpression) -> String {
         } else if over_term == "˙" {
             mover_str.push_str("<apply><diff/>");
             match &over1 {
-                Mi(id) => {
+                MathExpression::Mi(Mi(id)) => {
                     mover_str.push_str(&format!("<ci>{}</ci>", id));
                 }
                 _ => {
@@ -487,20 +487,20 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
         2 => {
             for (i, _comp) in x.iter().enumerate() {
                 if i > 0 {
-                    if let (Mi(id1), Mi(id2)) = (&x[i - 1], &x[i]) {
+                    if let (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2))) = (&x[i - 1], &x[i]) {
                         let ci1 = mi2ci(id1.to_string());
                         let ci2 = mi2ci(id2.to_string());
                         str_component.push_str(&format!("<apply><times/>{}{}</apply>", ci1, ci2));
-                    } else if let (GroupTuple(group), Mi(id)) = (&x[i - 1], &x[i]) {
+                    } else if let (GroupTuple(group), MathExpression::Mi(Mi(id))) = (&x[i - 1], &x[i]) {
                         let group_comp = parenthesis_group(&mut group.to_vec());
                         let ci = mi2ci(id.to_string());
                         str_component
                             .push_str(&format!("<apply><times/>{}{}</apply>", group_comp, ci));
-                    } else if let (Mi(id), Mo(_rp)) = (&x[i - 1], &x[i]) {
+                    } else if let (MathExpression::Mi(Mi(id)), Mo(_rp)) = (&x[i - 1], &x[i]) {
                         str_component.push_str(&mi2ci(id.to_string()));
                     } else if let (Mo(_lp), Mn(num)) = (&x[i - 1], &x[i]) {
                         str_component.push_str(&mn2cn(num.to_string()));
-                    } else if let (Mo(_lp), Mi(id)) = (&x[i - 1], &x[i]) {
+                    } else if let (Mo(_lp), MathExpression::Mi(Mi(id))) = (&x[i - 1], &x[i]) {
                         str_component.push_str(&mi2ci(id.to_string()));
                     } else if let (Msub(s1, s2), Mo(_rp)) = (&x[i - 1], &x[i]) {
                         let sub1_comp = parsed_msub(s1, s2);
@@ -512,12 +512,12 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                             "<apply><times/>{}{}</apply>",
                             sub1_comp, sub2_comp
                         ));
-                    } else if let (Mfrac(num, denom), Mi(id)) = (&x[i - 1], &x[i]) {
+                    } else if let (Mfrac(num, denom), MathExpression::Mi(Mi(id))) = (&x[i - 1], &x[i]) {
                         let mfrac_comp = parsed_mfrac(num, denom);
                         let ci = mi2ci(id.to_string());
                         str_component
                             .push_str(&format!("<apply><times/>{}{}</apply>", mfrac_comp, ci));
-                    } else if let (Mi(id), GroupTuple(group)) = (&x[i - 1], &x[i]) {
+                    } else if let (MathExpression::Mi(Mi(id)), GroupTuple(group)) = (&x[i - 1], &x[i]) {
                         let ci = mi2ci(id.to_string());
                         let group_comp = parenthesis_group(&mut group.to_vec());
 
@@ -528,7 +528,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                             str_component
                                 .push_str(&format!("<apply><times/>{}{}</apply>", ci, group_comp));
                         }
-                    } else if let (Mi(id), Mrow(row)) = (&x[i - 1], &x[i]) {
+                    } else if let (MathExpression::Mi(Mi(id)), MathExpression::Mrow(Mrow(row))) = (&x[i - 1], &x[i]) {
                         let ci = mi2ci(id.to_string());
 
                         let exp = vec_mathexp(row);
@@ -542,7 +542,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
         3 => {
             for (i, _comp) in x.iter().enumerate() {
                 if i > 1 {
-                    if let (Mi(id1), Mi(id2), Mfrac(num, denom)) = (&x[i - 2], &x[i - 1], &x[i]) {
+                    if let (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2)), Mfrac(num, denom)) = (&x[i - 2], &x[i - 1], &x[i]) {
                         let ci1 = mi2ci(id1.to_string());
                         let ci2 = mi2ci(id2.to_string());
                         let mfrac_comp = parsed_mfrac(num, denom);
@@ -550,13 +550,13 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                             "<apply><times/>{}{}{}</apply>",
                             ci1, ci2, mfrac_comp
                         ));
-                    } else if let (Mi(id1), Mi(id2), Mi(id3)) = (&x[i - 2], &x[i - 1], &x[i]) {
+                    } else if let (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2)), MathExpression::Mi(Mi(id3))) = (&x[i - 2], &x[i - 1], &x[i]) {
                         let ci1 = mi2ci(id1.to_string());
                         let ci2 = mi2ci(id2.to_string());
                         let ci3 = mi2ci(id3.to_string());
                         str_component
                             .push_str(&format!("<apply><times/>{}{}{}</apply>", ci1, ci2, ci3));
-                    } else if let (Mi(id1), Mi(id2), GroupTuple(group)) =
+                    } else if let (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2)), GroupTuple(group)) =
                         (&x[i - 2], &x[i - 1], &x[i])
                     {
                         let ci1 = mi2ci(id1.to_string());
@@ -582,7 +582,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
         4 => {
             for (i, _comp) in x.iter().enumerate() {
                 if i > 2 {
-                    if let (Mi(id1), Mi(id2), GroupTuple(group), Mfrac(num, denom)) =
+                    if let (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2)), GroupTuple(group), Mfrac(num, denom)) =
                         (&x[i - 3], &x[i - 2], &x[i - 1], &x[i])
                     {
                         let ci1 = mi2ci(id1.to_string());
@@ -602,7 +602,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                                 ci1, ci2, group_comp, mfrac_comp
                             ));
                         }
-                    } else if let (GroupTuple(group1), Mi(id1), Mi(id2), GroupTuple(group2)) =
+                    } else if let (GroupTuple(group1), MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2)), GroupTuple(group2)) =
                         (&x[i - 3], &x[i - 2], &x[i - 1], &x[i])
                     {
                         let group1_comp = parenthesis_group(&mut group1.to_vec());
@@ -622,7 +622,7 @@ fn content_for_times(x: Vec<MathExpression>) -> String {
                                 group1_comp, ci1, ci2, group2_comp
                             ));
                         }
-                    } else if let (Mi(id1), Mi(id2), Mi(id3), GroupTuple(group)) =
+                    } else if let (MathExpression::Mi(Mi(id1)), MathExpression::Mi(Mi(id2)), MathExpression::Mi(Mi(id3)), GroupTuple(group)) =
                         (&x[i - 3], &x[i - 2], &x[i - 1], &x[i])
                     {
                         let ci1 = mi2ci(id1.to_string());
@@ -855,7 +855,7 @@ fn test_content_mfrac() {
 #[test]
 fn test_content_msub() {
     let sub = vec![Msub(
-        Box::new(Mi("a".to_string())),
+        Box::new(MathExpression::Mi(Mi("a".to_string()))),
         Box::new(Mn("2".to_string())),
     )];
     let cmml = vec_mathexp(&sub);
@@ -865,11 +865,10 @@ fn test_content_msub() {
 #[test]
 fn test_content_mml_seir_eq2() {
     let input = "tests/seir_eq2.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -880,11 +879,11 @@ fn test_content_mml_seir_eq2() {
 #[test]
 fn test_content_mml_seirdv_eq2() {
     let input = "tests/seirdv_eq2.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -894,11 +893,11 @@ fn test_content_mml_seirdv_eq2() {
 #[test]
 fn test_content_hackathon2_scenario1_eq1() {
     let input = "tests/h2_scenario1_eq1.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+   
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -909,11 +908,10 @@ fn test_content_hackathon2_scenario1_eq1() {
 #[test]
 fn test_content_hackathon2_scenario1_eq2() {
     let input = "tests/h2_scenario1_eq2.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -924,11 +922,10 @@ fn test_content_hackathon2_scenario1_eq2() {
 #[test]
 fn test_content_hackathon2_scenario1_eq3() {
     let input = "tests/h2_scenario1_eq3.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -939,11 +936,10 @@ fn test_content_hackathon2_scenario1_eq3() {
 #[test]
 fn test_content_hackathon2_scenario1_eq4() {
     let input = "tests/h2_scenario1_eq4.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -954,11 +950,10 @@ fn test_content_hackathon2_scenario1_eq4() {
 #[test]
 fn test_content_hackathon2_scenario1_eq5() {
     let input = "tests/h2_scenario1_eq5.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -969,11 +964,10 @@ fn test_content_hackathon2_scenario1_eq5() {
 #[test]
 fn test_content_hackathon2_scenario1_eq6() {
     let input = "tests/h2_scenario1_eq6.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -985,11 +979,10 @@ fn test_content_hackathon2_scenario1_eq6() {
 #[test]
 fn test_content_hackathon2_scenario1_eq7() {
     let input = "tests/h2_scenario1_eq7.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -1001,11 +994,10 @@ fn test_content_hackathon2_scenario1_eq7() {
 #[test]
 fn test_content_hackathon2_scenario1_eq8() {
     let input = "tests/h2_scenario1_eq8.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
@@ -1019,11 +1011,10 @@ fn test_content_hackathon2_scenario1_eq8() {
 #[test]
 fn test_content_hackathon2_scenario1_eq9() {
     let input = "tests/h2_scenario1_eq9.xml";
-    let mut contents = std::fs::read_to_string(input)
+    let contents = std::fs::read_to_string(input)
         .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
     let mut vector_mml = Vec::<Math>::new();
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    let math = contents.parse::<Math>().unwrap();
     println!("math={:?}", math);
     vector_mml.push(math);
     let mml = to_content_mathml(vector_mml);
