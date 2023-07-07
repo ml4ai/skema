@@ -5,6 +5,7 @@ from typing import Optional
 
 import fire.fire_test
 from askem_extractions.data_model import AttributeCollection
+from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
 
 from .linkers import GrometLinker
 
@@ -20,18 +21,18 @@ def link_gromet(
     """ Links a Gromet model to an attribute collections from ASKEM text reading pipelines """
 
 
-    with open(gromet_path) as f:
-        amr = json.load(f)
+    gromet = json_to_gromet(gromet_path)
+    print(gromet)
 
     extractions = AttributeCollection.from_json(attribute_collection)
 
     linker = GrometLinker(model_name=similarity_model, device=device, sim_threshold=similarity_threshold)
 
-    linked_model = linker.link_model_to_text_extractions(amr, extractions)
+    linked_model = linker.link_model_to_text_extractions(gromet, extractions)
 
     if not output_path:
-        input_amr_name = str(Path(gromet_path).name)
-        output_path = f'linked_{input_amr_name}'
+        input_gromet_name = str(Path(gromet_path).name)
+        output_path = f'linked_{input_gromet_name}'
 
     with open(output_path, 'w') as f:
         json.dump(linked_model, f, default=str, indent=2)
