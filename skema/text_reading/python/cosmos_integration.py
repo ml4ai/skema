@@ -18,7 +18,7 @@ from pathlib import Path
 from tqdm import tqdm
 
 
-def main(parquet_file_folder: str, output_dir:str):
+def process_parquet(parquet_file_folder: str, output_dir:str):
 
     parquet_files = os.listdir(parquet_file_folder)
 
@@ -130,7 +130,7 @@ def main(parquet_file_folder: str, output_dir:str):
                     )
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -147,4 +147,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    main(args.input, args.output)
+    process_parquet(args.input, args.output)
+
+if __name__ == "__main__":
+    main()
