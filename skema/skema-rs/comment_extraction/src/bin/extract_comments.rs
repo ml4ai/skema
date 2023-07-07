@@ -8,6 +8,7 @@ use comment_extraction::{
 };
 use std::{collections::HashSet, fs::read_to_string};
 
+#[cfg(test)]
 use serde_json as json;
 
 /// Command line arguments
