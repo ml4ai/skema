@@ -55,6 +55,24 @@ steps:
 
 ---
 kind: pipeline
+name: skema-py
+
+steps:
+- name: test_skema_py
+  image: python:3.8-bullseye
+  commands:
+  - apt-get update
+  - apt-get -y install build-essential graphviz libgraphviz-dev
+  - pip install ".[core,dev]"
+  - pytest --cov=skema skema/skema_py/tests
+  when:
+    paths:
+    - pyproject.toml
+    - .drone.yml
+    - skema/skema_py/**
+
+---
+kind: pipeline
 name: skema-er
 
 steps:
