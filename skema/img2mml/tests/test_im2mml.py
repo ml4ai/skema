@@ -36,7 +36,7 @@ def get_mml(image_path: str, url: str) -> str:
 def test_img2mml_service():
     cwd = Path(__file__).parents[0]
     image_path = cwd / "data" / "261.png"
-    url = "http://localhost:8000/get-mml"
+    url = "http://eq2mml:8001/image/mml"
     try:
         mathml = get_mml(str(image_path), url)
     except Exception as e:
