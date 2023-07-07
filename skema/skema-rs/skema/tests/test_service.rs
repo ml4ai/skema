@@ -8,8 +8,8 @@ async fn test_get_comments() {
         Language::Python,
         std::fs::read_to_string("../comment_extraction/tests/data/CHIME_SIR.py").unwrap(),
     );
-    let request = test::TestRequest::get()
-        .uri("/get_comments")
+    let request = test::TestRequest::post()
+        .uri("/extract-comments")
         .set_json(&payload)
         .to_request();
     let response = test::call_service(&app, request).await;

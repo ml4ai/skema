@@ -1,9 +1,10 @@
 import itertools
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Dict, Optional
 from collections import defaultdict
 from gensim.models import KeyedVectors
+from typing import List, Union
 import numpy as np
 import itertools as it
 from transformers import *
@@ -91,7 +92,7 @@ class TextReadingLinker:
         # TODO Remove after this is fixed in TR
         self._fix_groundings()
 
-    def _preprocess(self, text: str | list[str]) -> list[str]:
+    def _preprocess(self, text: Union[str, List[str]]) -> List[str]:
         """Prepares the text for before fetching embeddings"""
         if type(text) == str:
             text = [text]
@@ -104,7 +105,7 @@ class TextReadingLinker:
             if word in self._model
         ]
 
-    def _read_text_mentions(self, input_path: str) -> dict[str, Any]:
+    def _read_text_mentions(self, input_path: str) -> Dict[str, Any]:
 
         # TODO Filter out irrelevant extractions
         relevant_labels = {
@@ -175,7 +176,7 @@ class TextReadingLinker:
 
         return relevant_mentions, text_bound_mentions, docs
 
-    def _contextualized_vector(self, input_text:list[str] | str, start:int = 0, end:int = - 1):
+    def _contextualized_vector(self, input_text: Union[List[str], str], start: int = 0, end: int = - 1):
         """Computes the contextualized vector using a bert model for cosine similarity"""
 
         # Tokenize the input
@@ -198,7 +199,7 @@ class TextReadingLinker:
 
         return emb
 
-    def _average_vector(self, words: list[str]):
+    def _average_vector(self, words: List[str]):
         """Precomputes and l2 normalizes the average vector of the requested word embeddings"""
 
         vectors = self._model[words]

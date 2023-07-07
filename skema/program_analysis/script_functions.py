@@ -5,7 +5,7 @@ import os.path
 import json
 
 # import astpp
-
+from skema.gromet import GROMET_VERSION
 from skema.gromet.fn import (
     GrometFNModuleCollection,
 )
@@ -50,7 +50,7 @@ def process_file_system(system_name, path, files, write_to_file=False):
     file_list = open(files, "r").readlines()
 
     module_collection = GrometFNModuleCollection(
-        schema_version="0.1.5",
+        schema_version=GROMET_VERSION,
         name=system_name,
         modules=[],
         module_index=[],

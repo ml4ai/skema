@@ -7,76 +7,110 @@ on:
     branches: [main]
 
 jobs:
-  site:
-    name: "Build static site"
+  docs:
+    name: "Generate project documenation"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [ubuntu-latest] #, macos-latest, windows-latest]
+        python-version: [ '3.8' ] #[ '3.8', '3.9' ]
+        # TODO: add rust-version 1.62
+        # exclude:
+        #   - os: macos-latest
+        #     python-version: '3.8'
+        #   - os: windows-latest
+        #     python-version: '3.6'
     steps:
     # Checkout code
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - name: Set up Haskell
-      id: setup
-      # see https://github.com/haskell/actions/tree/87b3442d9877a4ab61f04a4e3d0da2e14be5d51e/setup#basic-with-stack
-      uses: haskell/actions/setup@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        ghc-version: "9.2.7"
-        cabal-version: "3.6.2.0"
-        enable-stack: true
-        stack-version: "2.9.3" # "latest"
-
-    # Load cache
-    - uses: actions/cache/restore@v3
-      name: "Load cache of ~/.stack"
-      id: cache_load_stack
-      with:
-        path: ~/.stack
-        # FIXME: how use use env variable to reference /home/runner/work/skema/skema ?
-        key: ${{ runner.os }}-stack-global-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
-
-    - uses: actions/cache/restore@v3
-      name: "Load cache of ~/docs/.stack-work"
-      id: cache_load_stack_work
-      with:
-        path: $GITHUB_WORKSPACE/docs/.stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
-
-    # Install necessary dependencies
-    # docs (API)
-    - name: "Create documentation (descriptions, API docs, etc)"
-      working-directory: ./docs
+        python-version: ${{ matrix.python-version }}
+        #architecture: x64
+    - name: Display Python version
       run: |
-        stack build
-        stack exec generator rebuild
-        # store versions used in case we need to reference in our cache key, etc.
-        GHC_VERSION=$(ghc --numeric-version)
-        CABAL_VERSION=$(cabal --numeric-version)
-        echo "GHC_VERSION=${GHC_VERSION}"     >> "${GITHUB_ENV}"
-        echo "CABAL_VERSION=${CABAL_VERSION}" >> "${GITHUB_ENV}"
+        python -c "import sys; print(sys.version)"
+    - name: Set up Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+    - name: Display Rust version
+      run: |
+        rustc --version
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: temurin
+        java-version: 11
+    # Install dependencies
+    - name: System-wide deps
+      run: |
+        sudo apt-get install -y graphviz \
+        libgraphviz-dev
+    # Install packages (for API doc gen)
+    - name: Install askem (Python)
+      working-directory: .
+      run: |
+        # retrieve latest model for img2mml component
+        curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_OMML-90K_best_model_RPimage.pt > skema/img2mml/trained_models/cnn_xfmer_OMML-90K_best_model_RPimage.pt
+        pip install ".[all]"
 
-    # save cache
-    - uses: actions/cache/save@v3
-      name: "Cache ~/.stack"
-      id: cache_save_stack
-      with:
-        path: ~/.stack
-        key: ${{ runner.os }}-stack-global-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
-    - uses: actions/cache/save@v3
-      name: "Cache ~/docs/.stack-work"
-      id: cache_save_stack_work
-      with:
-        path: /home/runner/work/skema/skema/docs/.stack-work
-        key: ${{ runner.os }}-stack-work-${{ hashFiles('/home/runner/work/skema/skema/docs/stack.yaml') }}
-        
-    - name: "Deploy docs"
+    # docs (API)
+    # generate python docs using pdoc
+    - name: "Create documentation for Python components (API docs)"
+      run: |
+        # FIXME: once issues with text reading submodule resolved, top command will be sufficient
+        #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.img2mml
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.isa
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.skema_py
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
+        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.text_reading.mention_linking
+    # generate Rust docs using cargo doc
+    - name: "Create documentation for Rust components (API docs)"
+      working-directory: ./skema/skema-rs
+      run: |
+        cargo doc
+        mkdir -p $GITHUB_WORKSPACE/docs/api/rust
+        mv target/doc/* $GITHUB_WORKSPACE/docs/api/rust/
+
+    # generate Scala docs using sbt doc
+    # FIXME: downloading project deps is far too slow and too large to cache (3+ GB) to include this step in our CI
+    # - name: "Create documentation for Scala components (API docs)"
+    #   working-directory: ./skema/text_reading/scala
+    #   run: |
+    #     sbt doc
+    #     mkdir -p $GITHUB_WORKSPACE/docs/api/scala
+    #     mv target/doc/* $GITHUB_WORKSPACE/docs/api/scala/
+
+    # code coverage (Scala)
+    # FIXME: downloading project deps is far too slow to include this step
+    # - name: "Code coverage reports for Scala components"
+    #   working-directory: ./skema/text_reading/scala
+    #   run: |
+    #     sbt clean coverage test
+    #     sbt coverageReport
+    #     sbt coverageAggregate
+    # code coverage (Python)
+    - name: "Code coverage reports for Python components"
+      run: |
+        pytest
+
+    # docs (other)
+    - name: "Create documentation (other)"
+      run: |
+        docker run -i -v "$GITHUB_WORKSPACE:/app" parsertongue/mkdocs:latest mkdocs build -c
+    - name: Deploy docs
       if: github.ref == 'refs/heads/main'
-      uses: peaceiris/actions-gh-pages@v3    
+      uses: peaceiris/actions-gh-pages@v3
       with:
+        # see https://docs.github.com/en/free-pro-team@latest/actions/reference/authentication-in-a-workflow#about-the-github_token-secret
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs/_site
+        publish_dir: ./site
         user_name: 'github-actions[bot]'
         user_email: 'github-actions[bot]@users.noreply.github.com'
         commit_message: ${{ github.event.head_commit.message }}
