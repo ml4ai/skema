@@ -136,12 +136,19 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
     mathjax_status = eqn2mml.latex2mml_healthcheck()
     eqn2mml_status = eqn2mml.img2mml_healthcheck()
     code2fn_status = code2fn.ping()
+    text_reading_status = integrated_text_reading_proxy.healthcheck()
     # check if any services failing and alter response status code accordingly
     status_code = (
         status.HTTP_200_OK
         if all(
             code == 200
-            for code in [morae_status, mathjax_status, eqn2mml_status, code2fn_status]
+            for code in [
+                morae_status,
+                mathjax_status,
+                eqn2mml_status,
+                code2fn_status,
+                text_reading_status,
+            ]
         )
         else status.HTTP_500_INTERNAL_SERVER_ERROR
     )

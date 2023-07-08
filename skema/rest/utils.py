@@ -6,4 +6,4 @@ def clean_mml(mml: str) -> str:
     soup = BeautifulSoup(mml, "html.parser")
     for comment in soup(text=lambda text: isinstance(text, Comment)):
         comment.extract()
-    return str(soup).replace("\n","")
+    return str(soup).replace("\n", "")

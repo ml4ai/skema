@@ -26,6 +26,11 @@ class HealthStatus(BaseModel):
     code2fn: int = Field(
         description="HTTP status code for code2fn service", ge=100, le=599
     )
+    integrated_text_reading: int = Field(
+        description="HTTP status code for the integrated text reading service",
+        ge=100,
+        le=599,
+    )
 
 
 class EquationImagesToAMR(BaseModel):

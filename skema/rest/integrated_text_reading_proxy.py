@@ -4,7 +4,7 @@ import json
 import os
 import tempfile
 from pathlib import Path
-from typing import List, Union
+from typing import List, Union, Text
 from typing import Optional, Dict, Any
 
 import requests
@@ -154,3 +154,13 @@ async def integrated_text_extractions(
         )
         results.append(normalized)
     return results
+
+
+@router.get(
+    "/healthcheck",
+    summary="Check health of integrated text reading service",
+    response_model=Text,
+    status_code=200,
+)
+def healthcheck() -> int:
+    return 200
