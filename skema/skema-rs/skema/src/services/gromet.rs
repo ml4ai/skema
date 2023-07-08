@@ -336,10 +336,11 @@ pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 
 /// This returns a PetriNet AMR from a gromet.
 #[utoipa::path(
+    request_body = ModuleCollection,
     responses(
         (
             status = 200, description = "Successfully retrieved PN AMR",
-            body = ModuleCollection
+            body = ModelPetriNet
         )
     )
 )]
@@ -355,10 +356,11 @@ pub async fn model2PN(
 
 /// This returns a RegNet AMR from a gromet.
 #[utoipa::path(
+    request_body = ModuleCollection,
     responses(
         (
             status = 200, description = "Successfully retrieved RN AMR",
-            body = ModuleCollection
+            body = ModelRegNet
         )
     )
 )]
