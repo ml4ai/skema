@@ -13,7 +13,6 @@ import io
 from typing import List, Optional
 import logging
 from logging import info
-import cv2
 import re
 
 # Set logging level to INFO
@@ -34,8 +33,9 @@ def remove_eqn_number(image: Image.Image, threshold: float = 0.1) -> Image.Image
         Image.Image: The modified image with the equation number removed.
     """
     image_arr = np.asarray(image, dtype=np.uint8)
-    # Invert the image to make the blank regions black
-    inverted = cv2.bitwise_not(image_arr)
+
+    # Invert the image by subtracting it from the maximum pixel value
+    inverted = np.max(image_arr) - image_arr
 
     # Get the width and height of the image
     height, width = inverted.shape[:2]
