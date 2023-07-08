@@ -20,9 +20,7 @@ def link_gromet(
 ):
     """ Links a Gromet model to an attribute collections from ASKEM text reading pipelines """
 
-
     gromet = json_to_gromet(gromet_path)
-    print(gromet)
 
     extractions = AttributeCollection.from_json(attribute_collection)
 
