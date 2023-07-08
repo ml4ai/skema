@@ -71,8 +71,10 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
     ```
     import requests
 
-    equations = ["x = 2", "y = 3"]
-    }
+    equations = [
+      "\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}",
+      "\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}"
+    ]
     url = "0.0.0.0"
     r = requests.post(f"{url}/workflows/latex/equations-to-amr", json={"equations": equations, "model": "regnet"})
     r.json()

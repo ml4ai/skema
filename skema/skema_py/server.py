@@ -32,7 +32,7 @@ class System(BaseModel):
         example=["example1.py", "dir/example2.py"],
     )
     blobs: List[str] = Field(
-        decription="Contents of each file to be analyzed",
+        description="Contents of each file to be analyzed",
         example=[
             "greet = lambda: print('howdy!')\ngreet()",
             "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
@@ -40,12 +40,12 @@ class System(BaseModel):
     )
     system_name: Optional[str] = Field(
         default=None,
-        decription="A model name to associate with the provided code",
+        description="A model name to associate with the provided code",
         example="example-system",
     )
     root_name: Optional[str] = Field(
         default=None,
-        decription="The name of the code system's root directory.",
+        description="The name of the code system's root directory.",
         example="example-system",
     )
     comments: Optional[CodeComments] = Field(

@@ -318,6 +318,8 @@ impl From<ACSet> for PetriNet {
     fn from(pn: ACSet) -> PetriNet {
         let mut states_vec = BTreeSet::<State>::new();
         let mut transitions_vec = BTreeSet::<Transition>::new();
+        let mut initial_vec = Vec::<Initial>::new();
+        let mut parameter_vec = Vec::<Parameter>::new();
 
         // -----------------------------------------------------------
 
@@ -327,6 +329,22 @@ impl From<ACSet> for PetriNet {
                 name: state.sname.clone(),
                 ..Default::default()
             };
+            let initials = Initial {
+                target: state.sname.clone(),
+                expression: format!("{}0", state.sname.clone()),
+                ..Default::default()
+            };
+            let parameters = Parameter {
+                id: initials.expression.clone(),
+                name: Some(initials.expression.clone()),
+                description: Some(format!(
+                    "The total {} population at timestep 0",
+                    state.sname.clone()
+                )),
+                ..Default::default()
+            };
+            parameter_vec.push(parameters.clone());
+            initial_vec.push(initials.clone());
             states_vec.insert(states.clone());
         }
 
@@ -359,22 +377,38 @@ impl From<ACSet> for PetriNet {
                 output: Some(string_vec2.clone()),
                 ..Default::default()
             };
+            let parameters = Parameter {
+                id: trans.tname.clone(),
+                name: Some(trans.tname.clone()),
+                description: Some(format!("{} rate", trans.tname.clone())),
+                ..Default::default()
+            };
 
+            parameter_vec.push(parameters.clone());
             transitions_vec.insert(transitions.clone());
         }
 
         // -----------------------------------------------------------
 
+        let ode = Ode {
+            rates: None,
+            initials: Some(initial_vec),
+            parameters: Some(parameter_vec),
+            ..Default::default()
+        };
+
+        let semantics = Semantics { ode };
+
         let model = ModelPetriNet {
             states: states_vec,
             transitions: transitions_vec,
-            semantics: None,
+            semantics: Some(semantics),
             metadata: None,
         };
 
         PetriNet {
         name: "mathml model".to_string(),
-        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
+        schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
         schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
@@ -552,7 +586,7 @@ fn test_lotka_volterra_mml_to_regnet() {
     let elements: Vec<Math> = input["mathml"]
         .as_array()
         .unwrap()
-        .into_iter()
+        .iter()
         .map(|x| x.as_str().unwrap().parse::<Math>().unwrap())
         .collect();
 
