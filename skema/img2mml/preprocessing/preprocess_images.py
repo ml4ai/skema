@@ -183,6 +183,11 @@ def enhance_image(image: Image) -> Image:
     enhancer = ImageEnhance.Sharpness(image)
     image = enhancer.enhance(sharpness_factor)
 
+    # Simulate resolution changes
+    resolution_factor = random.uniform(0.8, 1.2)
+    new_size = (int(image.size[0] * resolution_factor), int(image.size[1] * resolution_factor))
+    image = image.resize(new_size, Image.Resampling.LANCZOS)
+
     # # Image rotation
     # rotation_angle = random.randint(-10, 10)
     # image = image.rotate(rotation_angle)
