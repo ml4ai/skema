@@ -56,5 +56,5 @@ class TextReadingInputDocuments(BaseModel):
     texts: List[str] = Field(
         title="texts",
         description="List of input plain texts to be annotated by the text reading pipelines",
-        example="x = 0, y = 1, I: Infected population",
+        example=["x = 0", "y = 1", "I: Infected population"],
     )

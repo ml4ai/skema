@@ -122,7 +122,7 @@ def normalize_extractions(
 
 
 @router.post(
-    "/integrated_text_extractions",
+    "/integrated-text-extractions",
     summary="Posts one or more plain text documents and annotates with SKEMA and/or MIT text reading pipelines",
 )
 async def integrated_text_extractions(
