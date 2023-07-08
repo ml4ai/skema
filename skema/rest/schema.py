@@ -5,6 +5,7 @@ Response models for API
 
 from pydantic import BaseModel, Field
 from typing import List
+
 # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
 from typing_extensions import Literal
 from skema.img2mml import eqn2mml
@@ -37,6 +38,7 @@ class EquationLatexToAMR(BaseModel):
     equations: List[str] = Field(description="Equations in LaTeX")
     model: Literal["regnet", "petrinet"] = Field(description="The model type")
 
+
 class CodeSnippet(BaseModel):
     code: str = Field(
         title="code",
@@ -44,10 +46,15 @@ class CodeSnippet(BaseModel):
         example="# this is a comment\ngreet = lambda: print('howdy!')",
     )
     language: Literal["Python", "Fortran", "CppOrC"] = Field(
-        title="language", 
-        description="Programming language corresponding to `code`"
+        title="language", description="Programming language corresponding to `code`"
     )
 
+
 class TextReadingInputDocuments(BaseModel):
-    """ Model of text reading request body """
-    texts: List[str]
+    """Model of text reading request body"""
+
+    texts: List[str] = Field(
+        title="texts",
+        description="List of input plain texts to be annotated by the text reading pipelines",
+        example="x = 0, y = 1, I: Infected population",
+    )

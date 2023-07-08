@@ -1,9 +1,14 @@
 from fastapi import FastAPI, Response, status
 import os
-from skema.rest import schema, workflows, integrated_text_reading_proxy
+from skema.rest import (
+    schema,
+    workflows,
+    integrated_text_reading_proxy,
+    morae_proxy,
+    comments_proxy,
+)
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
-from skema.rest import morae_proxy, comments_proxy
 
 
 VERSION: str = os.environ.get("APP_VERSION", "????")
@@ -59,7 +64,7 @@ tags_metadata = [
     {
         "name": "text reading",
         "description": "Unified proxy and integration code for MIT and SKEMA TR pipelines",
-    }
+    },
 ]
 
 app = FastAPI(
@@ -101,10 +106,9 @@ app.include_router(
 )
 
 app.include_router(
-    integrated_text_reading_proxy.router,
-    prefix="/text-reading",
-    tags=["text reading"]
+    integrated_text_reading_proxy.router, prefix="/text-reading", tags=["text reading"]
 )
+
 
 @app.get("/version", tags=["core"], summary="API version")
 async def version() -> str:
