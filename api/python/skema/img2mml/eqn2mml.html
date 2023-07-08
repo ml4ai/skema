@@ -43,8 +43,8 @@ from typing_extensions import Annotated
 from fastapi import APIRouter, FastAPI, File, Response, Request, Query
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
+from skema.img2mml import schema
 from skema.data.eq2mml import img_b64_bayes_white_bg
-from pydantic import BaseModel, Field
 import base64
 import requests
 
@@ -61,6 +61,16 @@ EquationQueryParameter = Annotated[
   Text,
   Query(
       examples={
+          &#34;lotka eq1&#34;: {
+              &#34;summary&#34;: &#34;Lotka-Volterra (eq1)&#34;,
+              &#34;description&#34;: &#34;Lotka-Volterra (eq1)&#34;,
+              &#34;value&#34;: &#34;\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}&#34;
+          },
+          &#34;lotka eq2&#34;: {
+              &#34;summary&#34;: &#34;Lotka-Volterra (eq2)&#34;,
+              &#34;description&#34;: &#34;Lotka-Volterra (eq2)&#34;,
+              &#34;value&#34;: &#34;\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}&#34;
+          },
           &#34;simple&#34;: {
               &#34;summary&#34;: &#34;A familiar equation&#34;,
               &#34;description&#34;: &#34;A simple equation (mass-energy equivalence)&#34;,
@@ -75,28 +85,6 @@ EquationQueryParameter = Annotated[
   ),
 ]
 
-ImageBytes = Annotated[
-  bytes,
-  File(
-      description=&#34;bytes of a PNG of an equation&#34;,
-      # examples={
-      #     &#34;bayes-rule&#34;: {
-      #         &#34;summary&#34;: &#34;PNG of Bayes&#39; rule&#34;,
-      #         &#34;description&#34;: &#34;PNG of Bayes&#39; rule&#34;,
-      #         &#34;value&#34;: str(img_path_bayes_rule_eqn),
-      #     }
-      # },
-  ),
-]
-
-class LatexEquation(BaseModel):
-    tex_src: Text = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
-    class Config:
-        schema_extra = {
-            &#34;example&#34;: {
-                &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
-            }
-        }
 
 
 def process_latex_equation(eqn: Text) -&gt; Response:
@@ -104,11 +92,11 @@ def process_latex_equation(eqn: Text) -&gt; Response:
     res = get_mathml_from_latex(eqn)
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
-@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=Text, status_code=200)
+@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=int, status_code=200)
 def img2mml_healthcheck() -&gt; int:
     return 200
 
-@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=Text, status_code=200)
+@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=int, status_code=200)
 def latex2mml_healthcheck() -&gt; int:
     try:
       return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
@@ -116,7 +104,7 @@ def latex2mml_healthcheck() -&gt; int:
       return 500
 
 @router.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
-async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
+async def post_image_to_mathml(data: schema.ImageBytes) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
 
@@ -173,7 +161,7 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     return process_latex_equation(tex_src)
 
 @router.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
-async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
+async def post_tex_to_mathml(eqn: schema.LatexEquation) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input LaTeX equation.
 
@@ -181,7 +169,7 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
     ```
     import requests
 
-    r = requests.post(&#34;http://0.0.0.0:8000/latex/mml&#34;, json={&#34;tex_src&#34;:&#34;E = mc^{c}&#34;})
+    r = requests.post(&#34;http://0.0.0.0:8000/latex/mml&#34;, json={&#34;tex_src&#34;:&#34;E = mc^{2}&#34;})
     print(r.text)
     &#34;&#34;&#34;
     # convert latex string to presentation mathml
@@ -252,7 +240,7 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=Text, status_code=200)
+<pre><code class="python">@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=int, status_code=200)
 def img2mml_healthcheck() -&gt; int:
     return 200</code></pre>
 </details>
@@ -266,7 +254,7 @@ def img2mml_healthcheck() -&gt; int:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=Text, status_code=200)
+<pre><code class="python">@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=int, status_code=200)
 def latex2mml_healthcheck() -&gt; int:
     try:
       return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
@@ -335,7 +323,7 @@ print(r.text)</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@router.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
-async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
+async def post_image_to_mathml(data: schema.ImageBytes) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
 
@@ -357,21 +345,21 @@ async def post_image_to_mathml(data: ImageBytes) -&gt; Response:
 </details>
 </dd>
 <dt id="skema.img2mml.eqn2mml.post_tex_to_mathml"><code class="name flex">
-<span>async def <span class="ident">post_tex_to_mathml</span></span>(<span>eqn: <a title="skema.img2mml.eqn2mml.LatexEquation" href="#skema.img2mml.eqn2mml.LatexEquation">LatexEquation</a>) ‑> starlette.responses.Response</span>
+<span>async def <span class="ident">post_tex_to_mathml</span></span>(<span>eqn: <a title="skema.img2mml.schema.LatexEquation" href="schema.html#skema.img2mml.schema.LatexEquation">LatexEquation</a>) ‑> starlette.responses.Response</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Endpoint for generating MathML from an input LaTeX equation.</p>
 <h3 id="python-example">Python example</h3>
 <p>```
 import requests</p>
-<p>r = requests.post("http://0.0.0.0:8000/latex/mml", json={"tex_src":"E = mc^{c}"})
+<p>r = requests.post("http://0.0.0.0:8000/latex/mml", json={"tex_src":"E = mc^{2}"})
 print(r.text)</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@router.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
-async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
+async def post_tex_to_mathml(eqn: schema.LatexEquation) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input LaTeX equation.
 
@@ -379,7 +367,7 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
     ```
     import requests
 
-    r = requests.post(&#34;http://0.0.0.0:8000/latex/mml&#34;, json={&#34;tex_src&#34;:&#34;E = mc^{c}&#34;})
+    r = requests.post(&#34;http://0.0.0.0:8000/latex/mml&#34;, json={&#34;tex_src&#34;:&#34;E = mc^{2}&#34;})
     print(r.text)
     &#34;&#34;&#34;
     # convert latex string to presentation mathml
@@ -404,46 +392,6 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
 </dl>
 </section>
 <section>
-<h2 class="section-title" id="header-classes">Classes</h2>
-<dl>
-<dt id="skema.img2mml.eqn2mml.LatexEquation"><code class="flex name class">
-<span>class <span class="ident">LatexEquation</span></span>
-<span>(</span><span>**data: Any)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Create a new model by parsing and validating input data from keyword arguments.</p>
-<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">class LatexEquation(BaseModel):
-    tex_src: Text = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
-    class Config:
-        schema_extra = {
-            &#34;example&#34;: {
-                &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
-            }
-        }</code></pre>
-</details>
-<h3>Ancestors</h3>
-<ul class="hlist">
-<li>pydantic.main.BaseModel</li>
-<li>pydantic.utils.Representation</li>
-</ul>
-<h3>Class variables</h3>
-<dl>
-<dt id="skema.img2mml.eqn2mml.LatexEquation.Config"><code class="name">var <span class="ident">Config</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt id="skema.img2mml.eqn2mml.LatexEquation.tex_src"><code class="name">var <span class="ident">tex_src</span> : str</code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-</dl>
-</dd>
-</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -467,17 +415,6 @@ async def post_tex_to_mathml(eqn: LatexEquation) -&gt; Response:
 <li><code><a title="skema.img2mml.eqn2mml.post_image_to_mathml" href="#skema.img2mml.eqn2mml.post_image_to_mathml">post_image_to_mathml</a></code></li>
 <li><code><a title="skema.img2mml.eqn2mml.post_tex_to_mathml" href="#skema.img2mml.eqn2mml.post_tex_to_mathml">post_tex_to_mathml</a></code></li>
 <li><code><a title="skema.img2mml.eqn2mml.process_latex_equation" href="#skema.img2mml.eqn2mml.process_latex_equation">process_latex_equation</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-classes">Classes</a></h3>
-<ul>
-<li>
-<h4><code><a title="skema.img2mml.eqn2mml.LatexEquation" href="#skema.img2mml.eqn2mml.LatexEquation">LatexEquation</a></code></h4>
-<ul class="">
-<li><code><a title="skema.img2mml.eqn2mml.LatexEquation.Config" href="#skema.img2mml.eqn2mml.LatexEquation.Config">Config</a></code></li>
-<li><code><a title="skema.img2mml.eqn2mml.LatexEquation.tex_src" href="#skema.img2mml.eqn2mml.LatexEquation.tex_src">tex_src</a></code></li>
-</ul>
-</li>
 </ul>
 </li>
 </ul>

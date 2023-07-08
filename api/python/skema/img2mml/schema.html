@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>skema.img2mml.latex2mml API documentation</title>
-<meta name="description" content="Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
-Please run the following command to initialize the …" />
+<title>skema.img2mml.schema API documentation</title>
+<meta name="description" content="Data models used by REST endpoints for eqn2mml, img2mml, and latex2mml" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -21,54 +20,60 @@ Please run the following command to initialize the …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>skema.img2mml.latex2mml</code></h1>
+<h1 class="title">Module <code>skema.img2mml.schema</code></h1>
 </header>
 <section id="section-intro">
-<p>Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
-Please run the following command to initialize the MathJAX service:
-node data_generation/mathjax_server.js</p>
+<p>Data models used by REST endpoints for eqn2mml, img2mml, and latex2mml</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python"># -*- coding: utf-8 -*-
 &#34;&#34;&#34;
-Convert the LaTeX equation to the corresponding presentation MathML using the MathJAX service.
-Please run the following command to initialize the MathJAX service:
-node data_generation/mathjax_server.js
+Data models used by REST endpoints for eqn2mml, img2mml, and latex2mml
 &#34;&#34;&#34;
 
-from typing import Text
-from fastapi import FastAPI
-from skema.img2mml.api import get_mathml_from_latex
-from skema.img2mml import schema
-
-# Create a web app using FastAPI
-
-app = FastAPI()
+from typing_extensions import Annotated
+from pydantic import BaseModel, Field
+from fastapi import File
 
 
-@app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping():
-    return &#34;The latex2mml service is running.&#34;
+ImageBytes = Annotated[
+  bytes,
+  File(
+      description=&#34;bytes of a PNG of an equation&#34;,
+      # examples={
+      #     &#34;bayes-rule&#34;: {
+      #         &#34;summary&#34;: &#34;PNG of Bayes&#39; rule&#34;,
+      #         &#34;description&#34;: &#34;PNG of Bayes&#39; rule&#34;,
+      #         &#34;value&#34;: str(img_path_bayes_rule_eqn),
+      #     }
+      # },
+  ),
+]
 
-
-@app.get(&#34;/get-mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
-async def get_mathml(tex_src: str):
-    &#34;&#34;&#34;
-    GET endpoint for generating MathML from an input LaTeX equation.
-    &#34;&#34;&#34;
-    # convert latex string to presentation mathml
-    print(tex_src)
-    return get_mathml_from_latex(tex_src)
-
-@app.post(&#34;/latex2mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
-async def mathml(eqn: schema.LatexEquation):
-    &#34;&#34;&#34;
-    Endpoint for generating MathML from an input LaTeX equation.
-    &#34;&#34;&#34;
-    # convert latex string to presentation mathml
-    return get_mathml_from_latex(eqn.tex_src)</code></pre>
+class LatexEquation(BaseModel):
+    tex_src: str = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
+    class Config:
+        schema_extra = {
+            &#34;example&#34;: {
+                &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;,
+            },
+            &#34;examples&#34;: [
+                {
+                  &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;
+                },
+                {
+                  &#34;tex_src&#34;: &#34;\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}&#34;
+                },
+                {
+                  &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
+                },
+                {
+                  &#34;tex_src&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
+                }
+            ]
+        }</code></pre>
 </details>
 </section>
 <section>
@@ -76,62 +81,62 @@ async def mathml(eqn: schema.LatexEquation):
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="skema.img2mml.latex2mml.get_mathml"><code class="name flex">
-<span>async def <span class="ident">get_mathml</span></span>(<span>tex_src: str)</span>
+<dt id="skema.img2mml.schema.LatexEquation"><code class="flex name class">
+<span>class <span class="ident">LatexEquation</span></span>
+<span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>GET endpoint for generating MathML from an input LaTeX equation.</p></div>
+<div class="desc"><p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(&#34;/get-mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
-async def get_mathml(tex_src: str):
-    &#34;&#34;&#34;
-    GET endpoint for generating MathML from an input LaTeX equation.
-    &#34;&#34;&#34;
-    # convert latex string to presentation mathml
-    print(tex_src)
-    return get_mathml_from_latex(tex_src)</code></pre>
+<pre><code class="python">class LatexEquation(BaseModel):
+    tex_src: str = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
+    class Config:
+        schema_extra = {
+            &#34;example&#34;: {
+                &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;,
+            },
+            &#34;examples&#34;: [
+                {
+                  &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;
+                },
+                {
+                  &#34;tex_src&#34;: &#34;\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}&#34;
+                },
+                {
+                  &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
+                },
+                {
+                  &#34;tex_src&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
+                }
+            ]
+        }</code></pre>
 </details>
-</dd>
-<dt id="skema.img2mml.latex2mml.mathml"><code class="name flex">
-<span>async def <span class="ident">mathml</span></span>(<span>eqn: <a title="skema.img2mml.schema.LatexEquation" href="schema.html#skema.img2mml.schema.LatexEquation">LatexEquation</a>)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Endpoint for generating MathML from an input LaTeX equation.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@app.post(&#34;/latex2mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
-async def mathml(eqn: schema.LatexEquation):
-    &#34;&#34;&#34;
-    Endpoint for generating MathML from an input LaTeX equation.
-    &#34;&#34;&#34;
-    # convert latex string to presentation mathml
-    return get_mathml_from_latex(eqn.tex_src)</code></pre>
-</details>
-</dd>
-<dt id="skema.img2mml.latex2mml.ping"><code class="name flex">
-<span>def <span class="ident">ping</span></span>(<span>)</span>
-</code></dt>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>pydantic.main.BaseModel</li>
+<li>pydantic.utils.Representation</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="skema.img2mml.schema.LatexEquation.Config"><code class="name">var <span class="ident">Config</span></code></dt>
 <dd>
 <div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">@app.get(&#34;/ping&#34;, summary=&#34;Ping endpoint to test health of service&#34;)
-def ping():
-    return &#34;The latex2mml service is running.&#34;</code></pre>
-</details>
+</dd>
+<dt id="skema.img2mml.schema.LatexEquation.tex_src"><code class="name">var <span class="ident">tex_src</span> : str</code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 </dl>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -145,11 +150,15 @@ def ping():
 <li><code><a title="skema.img2mml" href="index.html">skema.img2mml</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-functions">Functions</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.img2mml.schema.LatexEquation" href="#skema.img2mml.schema.LatexEquation">LatexEquation</a></code></h4>
 <ul class="">
-<li><code><a title="skema.img2mml.latex2mml.get_mathml" href="#skema.img2mml.latex2mml.get_mathml">get_mathml</a></code></li>
-<li><code><a title="skema.img2mml.latex2mml.mathml" href="#skema.img2mml.latex2mml.mathml">mathml</a></code></li>
-<li><code><a title="skema.img2mml.latex2mml.ping" href="#skema.img2mml.latex2mml.ping">ping</a></code></li>
+<li><code><a title="skema.img2mml.schema.LatexEquation.Config" href="#skema.img2mml.schema.LatexEquation.Config">Config</a></code></li>
+<li><code><a title="skema.img2mml.schema.LatexEquation.tex_src" href="#skema.img2mml.schema.LatexEquation.tex_src">tex_src</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
