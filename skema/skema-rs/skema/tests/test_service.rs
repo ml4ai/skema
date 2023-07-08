@@ -29,6 +29,5 @@ async fn test_get_amr() {
         .insert_header(ContentType::json())
         .set_payload(payload).to_request();
     let response = test::call_service(&app, request).await;
-    println!("{:?}", response);
     assert!(response.status().is_success());
 }
