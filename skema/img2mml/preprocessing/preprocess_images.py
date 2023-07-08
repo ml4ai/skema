@@ -185,7 +185,10 @@ def enhance_image(image: Image) -> Image:
 
     # Simulate resolution changes
     resolution_factor = random.uniform(0.8, 1.2)
-    new_size = (int(image.size[0] * resolution_factor), int(image.size[1] * resolution_factor))
+    new_size = (
+        int(image.size[0] * resolution_factor),
+        int(image.size[1] * resolution_factor),
+    )
     image = image.resize(new_size, Image.Resampling.LANCZOS)
 
     # # Image rotation
@@ -257,7 +260,9 @@ def preprocess_images(image):
     if not reject:
         # # bucketing
         # scale_factor = bucket(IMAGE)
-
+        # if enhancing images
+        if args.enhance_images:
+            IMAGE = enhance_image(IMAGE)
         # calculate the target width and height
         target_width = config["preprocessed_image_width"] - 2 * config["padding"]
         target_height = config["preprocessed_image_height"] - 2 * config["padding"]
@@ -269,10 +274,6 @@ def preprocess_images(image):
 
         # padding
         IMAGE = pad_image(IMAGE)
-
-        # if enhancing images
-        if args.enhance_images:
-            IMAGE = enhance_image(IMAGE)
 
         # convert to tensor
         convert = transforms.ToTensor()
