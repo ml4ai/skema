@@ -159,7 +159,7 @@ async def integrated_text_extractions(
 @router.get(
     "/healthcheck",
     summary="Check health of integrated text reading service",
-    response_model=Text,
+    response_model=int,
     status_code=200,
 )
 def healthcheck() -> int:
