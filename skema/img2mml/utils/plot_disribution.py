@@ -2,8 +2,8 @@ f = open("mml.txt").readlines()
 
 d = dict()
 
-for l in f:
-    tokens = l.split()
+for line in f:
+    tokens = line.split()
     for t in tokens:
         if t not in d.keys():
             d[t] = 1

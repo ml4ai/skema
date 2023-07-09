@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import torch
-import torch.nn as nn
 from skema.img2mml.utils.utils import *
 
 
@@ -25,7 +24,7 @@ def evaluate(
 
     if is_test:
         mml_seqs = open("logs/test_targets_100K.txt", "w")
-        pred_seqs = open(f"logs/test_predicted_100K.txt", "w")
+        pred_seqs = open("logs/test_predicted_100K.txt", "w")
 
     with torch.no_grad():
         torch.set_printoptions(profile="full")
@@ -36,9 +35,7 @@ def evaluate(
             imgs = list()
             for im in img:
                 imgs.append(
-                    torch.load(
-                        f"{img_tnsr_path}/{int(im.item())}.txt"
-                    )
+                    torch.load(f"{img_tnsr_path}/{int(im.item())}.txt")
                 )
             img = torch.stack(imgs).to(device)
 

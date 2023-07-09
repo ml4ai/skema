@@ -235,7 +235,7 @@ def remove_unecc_tokens(eqn):
         "mstyle",
     ]
 
-    keep = ["mo", "mi", "mfrac", "mn", "mrow", "mtr","mtd"]
+    keep = ["mo", "mi", "mfrac", "mn", "mrow", "mtr", "mtd"]
 
     for e in eliminate:
         if e in eqn:

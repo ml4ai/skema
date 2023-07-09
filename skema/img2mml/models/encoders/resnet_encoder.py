@@ -9,6 +9,7 @@ from skema.img2mml.models.encoding.positional_features_for_cnn_encoder import (
     add_positional_features,
 )
 
+
 class ResNetBlock(nn.Module):  # res_block
     def __init__(self, in_channels, out_channels, stride, downsampling=False):
         super(ResNetBlock, self).__init__()

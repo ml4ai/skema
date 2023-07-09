@@ -1,4 +1,4 @@
-import torch, math
+import torch
 from collections import Counter
 
 
@@ -59,7 +59,7 @@ def garbage2pad(preds, vocab, is_test=False):
     pred: cleaned pred eqn
     """
 
-    pad_idx = vocab.stoi["<pad>"]
+    vocab.stoi["<pad>"]
     eos_idx = vocab.stoi["<eos>"]
     for b in range(preds.shape[0]):
         try:

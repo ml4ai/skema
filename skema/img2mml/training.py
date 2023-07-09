@@ -2,20 +2,15 @@
 "Main script to train the model."
 
 import os, random
-import subprocess
 import numpy as np
 import time
 import json
 import math
 import argparse
-import logging
-import itertools
 import torch
-import torchvision
 import torch.nn as nn
 import torch.distributed as dist
 import torch.multiprocessing as mp
-from tqdm import tqdm
 from torch.nn.parallel import DistributedDataParallel as DDP
 from skema.img2mml.preprocessing.preprocess import preprocess_dataset
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
@@ -136,7 +131,7 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
-        LEN_DIM = 128#32
+        LEN_DIM = 128  # 32
 
         ENC = {
             "CNN": ResNet18_Encoder(
@@ -201,9 +196,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(
-    rank=None,
-):
+def train_model(rank=None,):
     # parameters
     EPOCHS = config["epochs"]
     batch_size = config["batch_size"]
@@ -252,13 +245,15 @@ def train_model(
     json.dump(config, config_log)
 
     # defining model using DataParallel
-    if torch.cuda.is_available() and config["device"]=="cuda":
+    if torch.cuda.is_available() and config["device"] == "cuda":
         if use_single_gpu:
             print(f"using single gpu:{config['gpu_id']}...")
 
-            # os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
             device = torch.device(
-                f"cuda:{config['gpu_id']}" if torch.cuda.is_available() else "cpu"
+                f"cuda:{config['gpu_id']}"
+                if torch.cuda.is_available()
+                else "cpu"
             )
             (
                 train_dataloader,
@@ -269,9 +264,11 @@ def train_model(
             model = define_model(config, vocab, device).to(device)
 
         elif dataparallel:
-            # os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
+            os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
             device = torch.device(
-                f"cuda:{config['gpu_id']}" if torch.cuda.is_available() else "cpu"
+                f"cuda:{config['gpu_id']}"
+                if torch.cuda.is_available()
+                else "cpu"
             )
             (
                 train_dataloader,
@@ -349,10 +346,11 @@ def train_model(
         )
 
     best_valid_loss = float("inf")
-    trg_pad_idx = vocab.stoi["<pad>"]
 
     # raw data paths
-    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
+    img_tnsr_path = (
+        f"{config['data_path']}/{config['dataset_type']}/image_tensors"
+    )
 
     if not load_trained_model_for_testing:
         count_es = 0
@@ -418,7 +416,6 @@ def train_model(
                             f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
                         )
 
-
                 elif early_stopping:
                     count_es += 1
 
@@ -467,7 +464,9 @@ def train_model(
     try:
         # loading pre_tained_model
         model.load_state_dict(
-            torch.load(f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt")
+            torch.load(
+                f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt"
+            )
         )
     except:
         try:
@@ -497,7 +496,10 @@ def train_model(
     if config["bin_comparison"]:
         print("comparing bin...")
         from bin_testing import bin_test_dataloader
-        test_dataloader = bin_test_dataloader(config, vocab, device, start=350, end=1000)
+
+        test_dataloader = bin_test_dataloader(
+            config, vocab, device, start=350, end=1000
+        )
 
     test_loss = evaluate(
         model,
@@ -530,7 +532,7 @@ def train_model(
 # for DDP
 def ddp_main():
     world_size = config["world_size"]
-    # os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+    os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
     mp.spawn(train_model, args=(), nprocs=world_size, join=True)
 
 

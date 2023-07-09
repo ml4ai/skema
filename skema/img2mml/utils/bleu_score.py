@@ -1,4 +1,3 @@
-import os
 from torchtext.data.metrics import bleu_score
 
 

@@ -203,25 +203,30 @@ def epoch_time(start_time, end_time):
     elapsed_secs = int(elapsed_time - (elapsed_mins * 60))
     return elapsed_mins, elapsed_secs
 
-def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, rank=None):
+
+def objective(
+    trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank=None
+):
 
     # parameters
     optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
     learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-1)
     weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-4)
     DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
-    EMB_DIM = 256#trial.suggest_int("EMB_DIM", low=128, high=1024, step=128)
-    ENC_DIM = 512#trial.suggest_int("ENC_DIM", low=128, high=1024, step=128)
-    DEC_HID_DIM = 512#trial.suggest_int("DEC_HID_DIM", low=256, high=1024, step=256)
-    if optimizer_type=="Adam":
-        beta_1 = trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1 )
-        beta_2 = trial.suggest_float("beta2", low=0.5, high=0.99, step=0.1 )
+    EMB_DIM = 256  # trial.suggest_int("EMB_DIM", low=128, high=1024, step=128)
+    ENC_DIM = 512  # trial.suggest_int("ENC_DIM", low=128, high=1024, step=128)
+    DEC_HID_DIM = (
+        512  # trial.suggest_int("DEC_HID_DIM", low=256, high=1024, step=256)
+    )
+    if optimizer_type == "Adam":
+        beta_1 = trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
+        beta_2 = trial.suggest_float("beta2", low=0.5, high=0.99, step=0.1)
 
     # transformers params
-    DIM_FEEDFWD = 1024#trial.suggest_int("dim_ff_xfmer", low=512, high=2048, step=512)#config["dim_feedforward_for_xfmer"]
-    N_HEADS = 4#trial.suggest_int("n_heads", low=4, high=8, step=4)#config["n_xfmer_heads"]
-    N_XFMER_ENCODER_LAYERS = 8#trial.suggest_int("n_enc_layer", low=4, high=10, step=2)#config["n_xfmer_encoder_layers"]
-    N_XFMER_DECODER_LAYERS = 4#trial.suggest_int("n_dec_layer", low=4, high=10, step=2)#config["n_xfmer_decoder_layers"]
+    DIM_FEEDFWD = 1024  # trial.suggest_int("dim_ff_xfmer", low=512, high=2048, step=512)#config["dim_feedforward_for_xfmer"]
+    N_HEADS = 4  # trial.suggest_int("n_heads", low=4, high=8, step=4)#config["n_xfmer_heads"]
+    N_XFMER_ENCODER_LAYERS = 8  # trial.suggest_int("n_enc_layer", low=4, high=10, step=2)#config["n_xfmer_encoder_layers"]
+    N_XFMER_DECODER_LAYERS = 4  # trial.suggest_int("n_dec_layer", low=4, high=10, step=2)#config["n_xfmer_decoder_layers"]
 
     EPOCHS = config["epochs"]
     batch_size = config["batch_size"]
@@ -272,7 +277,9 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
 
             # os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
             device = torch.device(
-                f"cuda:{config['gpu_id']}" if torch.cuda.is_available() else "cpu"
+                f"cuda:{config['gpu_id']}"
+                if torch.cuda.is_available()
+                else "cpu"
             )
 
             model = define_model(config, vocab, device).to(device)
@@ -280,7 +287,9 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
         elif dataparallel:
             # os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
             device = torch.device(
-                f"cuda:{config['gpu_id']}" if torch.cuda.is_available() else "cpu"
+                f"cuda:{config['gpu_id']}"
+                if torch.cuda.is_available()
+                else "cpu"
             )
 
             model = define_model(config, vocab, device)
@@ -351,7 +360,9 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
     trg_pad_idx = vocab.stoi["<pad>"]
 
     # raw data paths
-    img_tnsr_path = f"{config['data_path']}/{config['dataset_type']}/image_tensors"
+    img_tnsr_path = (
+        f"{config['data_path']}/{config['dataset_type']}/image_tensors"
+    )
 
     for epoch in range(EPOCHS):
 
@@ -402,23 +413,32 @@ def objective(trial,train_dataloader, test_dataloader, val_dataloader, vocab, ra
 
     return bs
 
+
 def tune(rank=None,):
 
     os.environ["NCCL_DEBUG"] = "INFO"
 
-    config["rank"]=rank
-    train_dataloader, test_dataloader, val_dataloader, vocab = preprocess_dataset(config)
+    config["rank"] = rank
+    (
+        train_dataloader,
+        test_dataloader,
+        val_dataloader,
+        vocab,
+    ) = preprocess_dataset(config)
 
-    func = lambda trial: objective(trial, train_dataloader,
-                                        test_dataloader,
-                                        val_dataloader,
-                                        vocab, rank)
+    func = lambda trial: objective(
+        trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
+    )
 
     study = optuna.create_study(direction="maximize")
     study.optimize(func, n_trials=15)
 
-    pruned_trials = study.get_trials(deepcopy=False, states=[TrialState.PRUNED])
-    complete_trials = study.get_trials(deepcopy=False, states=[TrialState.COMPLETE])
+    pruned_trials = study.get_trials(
+        deepcopy=False, states=[TrialState.PRUNED]
+    )
+    complete_trials = study.get_trials(
+        deepcopy=False, states=[TrialState.COMPLETE]
+    )
 
     print("Study statistics: ")
     print("  Number of finished trials: ", len(study.trials))
@@ -433,6 +453,7 @@ def tune(rank=None,):
     print("  Params: ")
     for key, value in trial.params.items():
         print("    {}: {}".format(key, value))
+
 
 # for DDP
 def ddp_main():
