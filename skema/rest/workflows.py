@@ -80,9 +80,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
     r.json()
     """
     mml: List[str] = [
-        utils.clean_mml(
-            eqn2mml.get_mathml_from_latex(eqn2mml.LatexEquation(tex_src=tex))
-        )
+        utils.clean_mml(eqn2mml.get_mathml_from_latex(tex))
         for tex in data.equations
     ]
     payload = {"mathml": mml, "model": data.model}
