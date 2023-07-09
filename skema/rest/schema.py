@@ -2,9 +2,9 @@
 """
 Response models for API
 """
-
-from pydantic import BaseModel, Field
-from typing import List
+from askem_extractions.data_model import AttributeCollection
+from pydantic import BaseModel, Field, Json
+from typing import List, Optional
 
 # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
 from typing_extensions import Literal
@@ -62,4 +62,46 @@ class TextReadingInputDocuments(BaseModel):
         title="texts",
         description="List of input plain texts to be annotated by the text reading pipelines",
         example=["x = 0", "y = 1", "I: Infected population"],
+    )
+
+
+class TextReadingError(BaseModel):
+    pipeline: str = Field(
+        name="pipeline",
+        description="TextReading pipeline that originated the error",
+        example="SKEMA",
+    )
+    message: str = Field(
+        name="message",
+        description="Error message describing the problem. For debugging purposes",
+        example="Out of memory error",
+    )
+
+
+class TextReadingDocumentResults(BaseModel):
+    data: Optional[AttributeCollection] = Field(
+        title="data",
+        description="AttributeCollection instance with the results of text reading. None if there was an error",
+        example=AttributeCollection(attributes=[]),  # Too verbose to add a value here
+    )
+    errors: Optional[List[TextReadingError]] = Field(
+        name="errors",
+        description="A list of errors reported by the text reading pipelines. None if all pipelines ran successfully",
+        example=[TextReadingError(pipeline="MIT", message="Unauthorized API key")],
+    )
+
+
+class TextReadingAnnotationsOutput(BaseModel):
+    """Contains the TR document results for all the documents submitted for annotation"""
+
+    outputs: List[TextReadingDocumentResults] = Field(
+        name="outputs",
+        description="Contains the results of TR annotations for each input document. There is one entry per input and "
+                    "inputs and outputs are matched by the same index in the list",
+        example=[
+            TextReadingDocumentResults(data=AttributeCollection(attributes=[])),
+            TextReadingDocumentResults(
+                errors=[TextReadingError(pipeline="SKEMA", message="Dummy error")]
+            ),
+        ],
     )
