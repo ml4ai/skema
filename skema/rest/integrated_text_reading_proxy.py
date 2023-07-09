@@ -11,7 +11,7 @@ import requests
 from askem_extractions.data_model import AttributeCollection
 from askem_extractions.importers import import_arizona, import_mit
 from askem_extractions.importers.mit import merge_collections
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY
 from skema.rest.schema import TextReadingInputDocuments, TextReadingAnnotationsOutput, TextReadingDocumentResults, \
@@ -182,3 +182,6 @@ async def integrated_text_extractions(
 )
 def healthcheck() -> int:
     return 200
+
+app = FastAPI()
+app.include_router(router)
