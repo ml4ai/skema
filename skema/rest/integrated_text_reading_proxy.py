@@ -12,6 +12,7 @@ from askem_extractions.data_model import AttributeCollection
 from askem_extractions.importers import import_arizona, import_mit
 from askem_extractions.importers.mit import merge_collections
 from fastapi import APIRouter, FastAPI
+from starlette import status
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY
 from skema.rest.schema import TextReadingInputDocuments, TextReadingAnnotationsOutput, TextReadingDocumentResults, \
@@ -181,7 +182,25 @@ async def integrated_text_extractions(
     status_code=200,
 )
 def healthcheck() -> int:
-    return 200
+    # SKEMA health check
+    skema_endpoint = f"{SKEMA_TR_ADDRESS}/api/skema"
+    skema_response = requests.get(skema_endpoint, timeout=10)
+
+    # TODO replace this with a proper healthcheck endpoint
+    mit_endpoint = f"{MIT_TR_ADDRESS}/annotation/find_text_vars/"
+    mit_params = {"gpt_key": OPENAI_KEY, "text": "x = 0"}
+    mit_response = requests.post(mit_endpoint, params=mit_params, timeout=10)
+    ######################################################
+
+    status_code = (
+        status.HTTP_200_OK
+        if all(
+            code == 200
+            for code in [skema_response, mit_response]
+        )
+        else status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
+    return status_code
 
 app = FastAPI()
 app.include_router(router)
