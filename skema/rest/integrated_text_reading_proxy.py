@@ -14,7 +14,8 @@ from askem_extractions.importers.mit import merge_collections
 from fastapi import APIRouter
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY
-from skema.rest.schema import TextReadingInputDocuments
+from skema.rest.schema import TextReadingInputDocuments, TextReadingAnnotationsOutput, TextReadingDocumentResults, \
+    TextReadingError
 
 router = APIRouter()
 
@@ -40,7 +41,7 @@ def annotate_text_with_skema(text: Union[str, List[str]]) -> List[Dict[str, Any]
 # Client code for MIT TR
 
 
-def annotate_text_with_mit(texts: Union[str, List[str]]) -> List[Dict[str, Any]]:
+def annotate_text_with_mit(texts: Union[str, List[str]]) -> Union[List[Dict[str, Any]], str]:
     endpoint = f"{MIT_TR_ADDRESS}/annotation/find_text_vars/"
     if isinstance(texts, str):
         texts = [
@@ -55,7 +56,7 @@ def annotate_text_with_mit(texts: Union[str, List[str]]) -> List[Dict[str, Any]]
         if response.status_code == 200:
             return_values.append(response.json())
         else:
-            raise RuntimeError(
+            return_values.append(
                 f"Calling {endpoint} on the {ix}th input failed with HTTP code {response.status_code}"
             )
     return return_values
@@ -91,8 +92,8 @@ def normalize_extractions(
             params = {"gpt_key": OPENAI_KEY}
 
             data = {
-                "mit_file": open(mit_path).read(),
-                "arizona_file": open(skema_path).read(),
+                "mit_file": json.dumps(AttributeCollection(attributes=canonical_mit).json()),
+                "arizona_file": json.dumps(AttributeCollection(attributes=canonical_arizona).json()),
             }
             response = requests.post(
                 f"{MIT_TR_ADDRESS}/integration/get_mapping", params=params, data=data
@@ -112,7 +113,7 @@ def normalize_extractions(
                 # Return the merged collection here
                 return merged_collection
 
-    # Merge the colletions into a attribute collection
+    # Merge the collections into a attribute collection
     attributes = list(it.chain.from_iterable(c.attributes for c in collections))
 
     return AttributeCollection(attributes=attributes)
@@ -129,7 +130,7 @@ async def integrated_text_extractions(
     texts: TextReadingInputDocuments,
     annotate_skema: bool = True,
     annotate_mit: bool = True,
-) -> List[AttributeCollection]:
+) -> TextReadingAnnotationsOutput:
     texts = texts.texts
     skema_extractions = [[] for t in texts]
 
@@ -142,18 +143,35 @@ async def integrated_text_extractions(
     mit_extractions = [[] for t in texts]
 
     if annotate_mit:
-        try:
-            mit_extractions = annotate_text_with_mit(texts)
-        except Exception as ex:
-            print(f"Problem annotating with MIT: {ex}")
+        mit_extractions = annotate_text_with_mit(texts)
+
 
     results = list()
+    errors = list()
+    assert len(skema_extractions) == len(mit_extractions), "Both pipeline results lists should have the same length"
     for skema, mit in zip(skema_extractions, mit_extractions):
+        if annotate_skema and isinstance(skema, str):
+            errors.append(TextReadingError(
+                pipeline="SKEMA",
+                message=skema
+            ))
+
+        if annotate_mit and isinstance(mit, str):
+            errors.append(TextReadingError(
+                pipeline="MIT",
+                message=mit
+            ))
+
         normalized = normalize_extractions(
             arizona_extractions=skema, mit_extractions=mit
         )
-        results.append(normalized)
-    return results
+        results.append(
+            TextReadingDocumentResults(
+                data = normalized if normalized.attributes else None,
+                errors = errors if errors else None
+            )
+        )
+    return TextReadingAnnotationsOutput(outputs=results)
 
 
 @router.get(
