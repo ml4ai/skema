@@ -18,7 +18,11 @@ from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
 from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from skema.program_analysis.comments import CodeComments, SingleFileCodeComments, MultiFileCodeComments
+from skema.program_analysis.comments import (
+    CodeComments,
+    SingleFileCodeComments,
+    MultiFileCodeComments,
+)
 
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
@@ -66,32 +70,46 @@ class System(BaseModel):
         },
     )
 
+
 def system_to_enriched_system(system: System) -> System:
-    '''Take a System as input and enriches it with extracted comments.'''
-   
+    """Takes a System as input and enriches it with comments by running the Rust comment extractor."""
+
+    # The skema_rs_path is the path to the Rust comment extractor.
+    # It is used to set the cwd when running subprocess to simplify the execution process.
+    skema_rs_path = Path(__file__).parent.parent / "skema-rs" / "comment_extraction"
+
     # Check if Rust is installed on the system. If not, then return the system as is.
     if which("cargo") is None:
         return system
-    skema_rs_path = Path(__file__).parent.parent / "skema-rs" / "comment_extraction"
-    
-    comments = {"files": {}}
+
+    # Create a temporary directory to store the input source files.
+    # The Rust comment_extractor requires that the input exists on disk.
     tmp = tempfile.TemporaryDirectory()
     tmp_path = Path(tmp.name)
+    
+    comments = {"files": {}}
     for file, blob in zip(system.files, system.blobs):
-        # The Rust comment_extractor requires for the input to exist on disk as a path.
         file_path = Path(tmp_path, system.root_name or "", file)
         file_path.parent.mkdir(parents=True, exist_ok=True)
         file_path.write_text(blob)
 
-        result = subprocess.run(["cargo", "run", "--", str(file_path)], cwd=skema_rs_path, stdout=subprocess.PIPE)
+        result = subprocess.run(
+            ["cargo", "run", "--", str(file_path)],
+            cwd=skema_rs_path,
+            stdout=subprocess.PIPE,
+        )
         comment_path = Path(system.root_name or "") / file
-        comments["files"][str(comment_path)] = json.loads(str(result.stdout, encoding="UTF-8"))
-    
-    tmp.cleanup()
-
+        comments["files"][str(comment_path)] = json.loads(
+            str(result.stdout, encoding="UTF-8")
+        )
     # Build the MultiFileCodeComments model from the comments dict
     system.comments = MultiFileCodeComments.model_validate(comments)
+
+    # Cleanup the temporary directory
+    tmp.cleanup()
+
     return system
+
 
 def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
@@ -119,7 +137,7 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
-    # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.  
+    # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.
     if not system.comments:
         system = system_to_enriched_system(system)
 
@@ -141,6 +159,7 @@ def system_to_gromet(system: System):
 
 
 router = APIRouter()
+
 
 @router.get("/ping", summary="Ping endpoint to test health of service")
 def ping() -> int:
@@ -277,6 +296,7 @@ async def get_pyacset(ports: Ports):
         petri.set_subpart(j, skema.skema_py.petris.attr_sname, opos[j])
 
     return petri.write_json()
+
 
 app = FastAPI()
 app.include_router(
