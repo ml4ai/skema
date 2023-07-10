@@ -80,7 +80,6 @@ def system_to_enriched_system(system: System) -> System:
 
     # Check if Rust is installed on the system. If not, then return the system as is.
     if not which("cargo"):
-        print("HERE")
         return system
 
     # Create a temporary directory to store the input source files.
