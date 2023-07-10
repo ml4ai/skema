@@ -46,22 +46,22 @@ impl MathExpressionTree {
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
                 println!("x.content={:?}", x.content);
-                 content_mathml.push_str(&format!(
+                content_mathml.push_str(&format!(
                     "<apply><diff/><mi>{}</mi></apply>",
                     x.content.to_string()
                 ));
             }
             MathExpressionTree::Atom(i) => {
                 println!("i={:?}", i);
-                /*match i {
-                MathExpression::Mi(Mi(id)) => {
-                    content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
+                match i {
+                    MathExpression::Mi(Mi(id)) => {
+                        content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
+                    }
+                    MathExpression::Mn(number) => {
+                        content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
+                    }
+                    _ => panic!("Unhandled MathExpressionTree in Atom matching"),
                 }
-                MathExpression::Mn(number) => {
-                    content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
-                }
-                _ => panic!("Unhandled MathExpressionTree in Atom matching"),
-                */
             }
             MathExpressionTree::Cons(head, rest) => {
                 content_mathml.push_str("<apply>");
