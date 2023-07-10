@@ -269,8 +269,8 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
                 blobs.append(zip.open(file).read())
 
     zip_obj = Path(zip_file.filename)
-    system_name = zip_obj.name
-    root_name = zip_obj.name
+    system_name = zip_obj.stem
+    root_name = zip_obj.stem
 
     system = System(
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
