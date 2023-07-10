@@ -6,19 +6,9 @@ node data_generation/mathjax_server.js
 """
 
 from typing import Text
-from fastapi import FastAPI, File, Body
+from fastapi import FastAPI
 from skema.img2mml.api import get_mathml_from_latex
-from pydantic import BaseModel, Field
-
-
-class LatexEquation(BaseModel):
-    tex_src: Text = Field(description="The LaTeX equation to process")
-    class Config:
-        schema_extra = {
-            "example": {
-                "tex_src": "E = mc^{c}",
-            }
-        }
+from skema.img2mml import schema
 
 # Create a web app using FastAPI
 
@@ -40,7 +30,7 @@ async def get_mathml(tex_src: str):
     return get_mathml_from_latex(tex_src)
 
 @app.post("/latex2mml", summary="Get MathML representation of a LaTeX equation")
-async def mathml(eqn: LatexEquation):
+async def mathml(eqn: schema.LatexEquation):
     """
     Endpoint for generating MathML from an input LaTeX equation.
     """
