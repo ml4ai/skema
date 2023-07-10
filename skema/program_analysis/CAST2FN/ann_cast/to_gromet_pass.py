@@ -2049,6 +2049,7 @@ class ToGrometPass:
                             )
 
                             if found_opi:
+                                print(opi_idx)
                                 parent_gromet_fn.wfopi = insert_gromet_object(
                                     parent_gromet_fn.wfopi,
                                     GrometWire(
@@ -3554,7 +3555,7 @@ class ToGrometPass:
 
         gromet_predicate_fn.b = insert_gromet_object(
             gromet_predicate_fn.b,
-            GrometBoxFunction(function_type=FunctionType.PREDICATE),
+            GrometBoxFunction(function_type=FunctionType.PREDICATE + "AAA"),
         )
 
         # Create all opis and opos for conditionals
@@ -3572,9 +3573,7 @@ class ToGrometPass:
         # Create wopios
         if gromet_predicate_fn.opi != None and gromet_predicate_fn.opo != None:
             i = 1
-            while i < len(gromet_predicate_fn.opi) and i < len(
-                gromet_predicate_fn.opo
-            ):
+            while i-1 < len(gromet_predicate_fn.opi) and i-1 < len(gromet_predicate_fn.opo):
                 gromet_predicate_fn.wopio = insert_gromet_object(
                     gromet_predicate_fn.wopio, GrometWire(src=i, tgt=i)
                 )
@@ -3915,6 +3914,18 @@ class ToGrometPass:
                         tgt=len(parent_gromet_fn.opi),
                     ),
                 )
+
+        if isinstance(parent_cast_node, AnnCastModule):
+            for i,poc in enumerate(parent_gromet_fn.poc,1):
+                port = self.retrieve_var_port(poc.name)
+                if port != -1:
+                    parent_gromet_fn.wfc = insert_gromet_object(
+                        parent_gromet_fn.wfc,
+                        GrometWire(
+                            src=i,
+                            tgt=port
+                        )
+                    )
 
             # parent_gromet_fn.wcopi = insert_gromet_object(parent_gromet_fn.wcopi, GrometWire(src=len(parent_gromet_fn.pic), tgt=len(parent_gromet_fn.opi)))
 
