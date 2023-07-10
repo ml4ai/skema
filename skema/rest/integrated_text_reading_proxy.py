@@ -15,8 +15,12 @@ from fastapi import APIRouter, FastAPI
 from starlette import status
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY
-from skema.rest.schema import TextReadingInputDocuments, TextReadingAnnotationsOutput, TextReadingDocumentResults, \
-    TextReadingError
+from skema.rest.schema import (
+    TextReadingInputDocuments,
+    TextReadingAnnotationsOutput,
+    TextReadingDocumentResults,
+    TextReadingError,
+)
 
 router = APIRouter()
 
@@ -42,7 +46,9 @@ def annotate_text_with_skema(text: Union[str, List[str]]) -> List[Dict[str, Any]
 # Client code for MIT TR
 
 
-def annotate_text_with_mit(texts: Union[str, List[str]]) -> Union[List[Dict[str, Any]], str]:
+def annotate_text_with_mit(
+    texts: Union[str, List[str]]
+) -> Union[List[Dict[str, Any]], str]:
     endpoint = f"{MIT_TR_ADDRESS}/annotation/find_text_vars/"
     if isinstance(texts, str):
         texts = [
@@ -93,8 +99,12 @@ def normalize_extractions(
             params = {"gpt_key": OPENAI_KEY}
 
             data = {
-                "mit_file": json.dumps(AttributeCollection(attributes=canonical_mit).json()),
-                "arizona_file": json.dumps(AttributeCollection(attributes=canonical_arizona).json()),
+                "mit_file": json.dumps(
+                    AttributeCollection(attributes=canonical_mit).json()
+                ),
+                "arizona_file": json.dumps(
+                    AttributeCollection(attributes=canonical_arizona).json()
+                ),
             }
             response = requests.post(
                 f"{MIT_TR_ADDRESS}/integration/get_mapping", params=params, data=data
@@ -146,30 +156,25 @@ async def integrated_text_extractions(
     if annotate_mit:
         mit_extractions = annotate_text_with_mit(texts)
 
-
     results = list()
     errors = list()
-    assert len(skema_extractions) == len(mit_extractions), "Both pipeline results lists should have the same length"
+    assert len(skema_extractions) == len(
+        mit_extractions
+    ), "Both pipeline results lists should have the same length"
     for skema, mit in zip(skema_extractions, mit_extractions):
         if annotate_skema and isinstance(skema, str):
-            errors.append(TextReadingError(
-                pipeline="SKEMA",
-                message=skema
-            ))
+            errors.append(TextReadingError(pipeline="SKEMA", message=skema))
 
         if annotate_mit and isinstance(mit, str):
-            errors.append(TextReadingError(
-                pipeline="MIT",
-                message=mit
-            ))
+            errors.append(TextReadingError(pipeline="MIT", message=mit))
 
         normalized = normalize_extractions(
             arizona_extractions=skema, mit_extractions=mit
         )
         results.append(
             TextReadingDocumentResults(
-                data = normalized if normalized.attributes else None,
-                errors = errors if errors else None
+                data=normalized if normalized.attributes else None,
+                errors=errors if errors else None,
             )
         )
     return TextReadingAnnotationsOutput(outputs=results)
@@ -194,13 +199,11 @@ def healthcheck() -> int:
 
     status_code = (
         status.HTTP_200_OK
-        if all(
-            code == 200
-            for code in [skema_response, mit_response]
-        )
+        if all(code == 200 for code in [skema_response, mit_response])
         else status.HTTP_500_INTERNAL_SERVER_ERROR
     )
     return status_code
+
 
 app = FastAPI()
 app.include_router(router)
