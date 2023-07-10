@@ -79,7 +79,8 @@ def system_to_enriched_system(system: System) -> System:
     skema_rs_path = Path(__file__).parent.parent / "skema-rs" / "comment_extraction"
 
     # Check if Rust is installed on the system. If not, then return the system as is.
-    if which("cargo") is None:
+    if not which("cargo"):
+        print("HERE")
         return system
 
     # Create a temporary directory to store the input source files.
