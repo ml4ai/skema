@@ -42,14 +42,14 @@ fn main() {
         let math_content = module_id2mathml_ast(module_id, host);
 
         // This does get a panic with a message, so need to figure out how to forward it
-        //let mathml_ast =
-        get_mathml_asts_from_file("../../data/mml2pn_inputs/ta4_sir_v1/mml_list.txt");
+        let mathml_ast =
+            get_mathml_asts_from_file("../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
 
         println!("\nmath_content: {:?}", math_content);
-        //println!("\nmathml_ast: {:?}", mathml_ast);
+        println!("\nmathml_ast: {:?}", mathml_ast);
 
         println!("\nPN from code: {:?}", ACSet::from(math_content.clone()));
-        //println!("\nPN from mathml: {:?}\n", ACSet::from(mathml_ast.clone()));
+        println!("\nPN from mathml: {:?}\n", RegNet::from(mathml_ast.clone()));
 
         println!(
             "\nAMR from code: {:?}",
