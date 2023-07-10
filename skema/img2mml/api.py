@@ -1,31 +1,58 @@
 import json
 import os
-from pathlib import Path
 import requests
-import re
+from pathlib import Path
+import urllib.request
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 
 
+def retrieve_model(model_path=None):
+    """
+    Retrieve the img2mml model from the specified path or download it if not found.
+
+    Args:
+        model_path (str, optional): Path to the img2mml model file. Defaults to None.
+
+    Returns:
+        str: Path to the loaded model file.
+    """
+    cwd = Path(__file__).parents[0]
+    MODEL_BASE_ADDRESS = "https://artifacts.askem.lum.ai/skema/img2mml/models"
+    MODEL_NAME = "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
+
+    if model_path is None:
+        model_path = cwd / "trained_models" / MODEL_NAME
+
+        # Check if the model file already exists
+        if not os.path.exists(model_path):
+            # If the file doesn't exist, download it from the specified URL
+            url = f"{MODEL_BASE_ADDRESS}/{MODEL_NAME}"
+            print(f"Downloading the model checkpoint from {url}...")
+            urllib.request.urlretrieve(url, model_path)
+
+    return str(model_path)
+
+
 def get_mathml_from_bytes(data: bytes):
+    # read config file
+    cwd = Path(__file__).parents[0]
+    config_path = cwd / "configs" / "xfmer_mml_config.json"
+    with open(config_path, "r") as cfg:
+        config = json.load(cfg)
     # convert png image to tensor
-    imagetensor = convert_to_torch_tensor(data)
+    imagetensor = convert_to_torch_tensor(data, config)
 
     # change the shape of tensor from (C_in, H, W)
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
-
-    # read config file
-    cwd = Path(__file__).parents[0]
-    config_path = cwd / "configs" / "ourmml_xfmer_config.json"
-    with open(config_path, "r") as cfg:
-        config = json.load(cfg)
+    VOCAB_NAME = "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
 
     # read vocab.txt
-    with open(cwd / "vocab.txt") as f:
+    with open(cwd / "trained_models" / VOCAB_NAME) as f:
         vocab = f.readlines()
 
-    model_path = cwd / "trained_models" / "cnn_xfmer_OMML-90K_best_model_RPimage.pt"
+    model_path = retrieve_model()
 
     return render_mml(config, model_path, vocab, imagetensor)
 
