@@ -1,6 +1,8 @@
 import json
 import os
 import tempfile
+import subprocess
+from shutil import which
 from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
@@ -16,7 +18,7 @@ from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
 from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from skema.program_analysis.comments import CodeComments
+from skema.program_analysis.comments import CodeComments, SingleFileCodeComments, MultiFileCodeComments
 
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
@@ -64,6 +66,32 @@ class System(BaseModel):
         },
     )
 
+def system_to_enriched_system(system: System) -> System:
+    '''Take a System as input and enriches it with extracted comments.'''
+   
+    # Check if Rust is installed on the system. If not, then return the system as is.
+    if which("cargo") is None:
+        return system
+    skema_rs_path = Path(__file__).parent.parent / "skema-rs" / "comment_extraction"
+    
+    comments = {"files": {}}
+    tmp = tempfile.TemporaryDirectory()
+    tmp_path = Path(tmp.name)
+    for file, blob in zip(system.files, system.blobs):
+        # The Rust comment_extractor requires for the input to exist on disk as a path.
+        file_path = Path(tmp_path, system.root_name or "", file)
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.write_text(blob)
+
+        result = subprocess.run(["cargo", "run", "--", str(file_path)], cwd=skema_rs_path, stdout=subprocess.PIPE)
+        comment_path = Path(system.root_name or "") / file
+        comments["files"][str(comment_path)] = json.loads(str(result.stdout, encoding="UTF-8"))
+    
+    tmp.cleanup()
+
+    # Build the MultiFileCodeComments model from the comments dict
+    system.comments = MultiFileCodeComments.model_validate(comments)
+    return system
 
 def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
@@ -91,7 +119,11 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
-    # If comments are included in request, run the unifier to add them to the Gromet
+    # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.  
+    if not system.comments:
+        system = system_to_enriched_system(system)
+
+    # If comments are included in request or added in the enriching process, run the unifier to add them to the Gromet
     if system.comments:
         align_full_system(gromet_collection, system.comments)
 
