@@ -10,24 +10,43 @@ from sentence_transformers import SentenceTransformer, util
 from ..walkers import JsonNode, JsonDictWalker
 
 
-class AMRLinker(ABC):
-
+class Linker(ABC):
     def __init__(self, model_name: str, sim_threshold: float = 0.7, device: Optional[str] = None):
-        self.__model_name = model_name
-        self.__model = SentenceTransformer(model_name)
-        self.__threshold = sim_threshold
+        self._model_name = model_name
+        self._model = SentenceTransformer(model_name)
+        self._threshold = sim_threshold
 
         if device:
-            self.__model.to(device)
+            self._model.to(device)
 
-        self.__model.eval()
+        self._model.eval()
 
     @abc.abstractmethod
-    def _build_walker(self, amr_data:Dict[str, Any]) -> JsonDictWalker:
+    def _build_walker(self, amr_data: Dict[str, Any]) -> JsonDictWalker:
         pass
 
+    @abc.abstractmethod
+    def _generate_linking_sources(self, elements: Iterable[JsonNode]) -> Dict[str, List[Any]]:
+        """" Will generate candidate texts to link to text extractions """
+        pass
 
-    def __generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredExtraction]]:
+    def _align_texts(self, sources: List[str], targets: List[str], threshold: float) -> List[Tuple[str, str]]:
+
+        with torch.no_grad():
+            s_embs = self._model.encode(sources)
+            t_embs = self._model.encode(targets)
+
+        similarities = util.pytorch_cos_sim(s_embs, t_embs)
+
+        indices = (similarities >= threshold).nonzero()
+
+        ret = list()
+        for ix in indices:
+            ret.append((sources[ix[0]], targets[ix[1]]))
+
+        return ret
+
+    def _generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredExtraction]]:
         """ Will generate candidate texts to link to model elements """
         ret = defaultdict(list)
         for ex in extractions:
@@ -41,33 +60,15 @@ class AMRLinker(ABC):
                     ret[candidate_text].append(ex)
         return ret
 
-    @abc.abstractmethod
-    def _generate_linking_sources(self, elements: Iterable[JsonNode]) -> Dict[str, List[Any]]:
-        """" Will generate candidate texts to link to text extractions """
-        pass
 
-    def __align_texts(self, sources: List[str], targets: List[str], threshold: float) -> List[Tuple[str, str]]:
-
-        with torch.no_grad():
-            s_embs = self.__model.encode(sources)
-            t_embs = self.__model.encode(targets)
-
-        similarities = util.pytorch_cos_sim(s_embs, t_embs)
-
-        indices = (similarities >= threshold).nonzero()
-
-        ret = list()
-        for ix in indices:
-            ret.append((sources[ix[0]], targets[ix[1]]))
-
-        return ret
+class AMRLinker(Linker, ABC):
 
     def link_model_to_text_extractions(self, amr_data: Dict[str, Any], extractions: AttributeCollection) -> Dict[str, Any]:
 
         # Make a copy of the amr to avoid mutating the original model
         amr_data = {**amr_data}
 
-        targets = self.__generate_linking_targets(
+        targets = self._generate_linking_targets(
             e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
 
         walker = self._build_walker(amr_data)
@@ -75,7 +76,7 @@ class AMRLinker(ABC):
         to_link = list(walker.walk())
         sources = self._generate_linking_sources(to_link)
 
-        pairs = self.__align_texts(list(sources.keys()), list(targets.keys()), threshold=self.__threshold)
+        pairs = self._align_texts(list(sources.keys()), list(targets.keys()), threshold=self._threshold)
 
         for s_key, t_key in pairs:
             source = sources[s_key]
