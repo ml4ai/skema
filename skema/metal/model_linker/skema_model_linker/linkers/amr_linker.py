@@ -1,7 +1,7 @@
 import abc
 from abc import ABC
 from collections import defaultdict
-from typing import Iterable, Dict, List, Any, Tuple, Optional
+from typing import Iterable, Dict, List, Any, Tuple, Optional, Union
 
 import torch
 from askem_extractions.data_model import Attribute, AnchoredExtraction, AttributeCollection, AttributeType
@@ -59,19 +59,22 @@ class Linker(ABC):
                     candidate_text = f"{name.name.strip()}"
                     ret[candidate_text].append(ex)
         return ret
+    @abc.abstractmethod
+    def link_model_to_text_extractions(self, data: Union[Any,Dict[str, Any]], extractions: AttributeCollection) -> Dict[str, Any]:
+        pass
 
 
 class AMRLinker(Linker, ABC):
 
-    def link_model_to_text_extractions(self, amr_data: Dict[str, Any], extractions: AttributeCollection) -> Dict[str, Any]:
+    def link_model_to_text_extractions(self, data: Dict[str, Any], extractions: AttributeCollection) -> Dict[str, Any]:
 
         # Make a copy of the amr to avoid mutating the original model
-        amr_data = {**amr_data}
+        data = {**data}
 
         targets = self._generate_linking_targets(
             e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
 
-        walker = self._build_walker(amr_data)
+        walker = self._build_walker(data)
 
         to_link = list(walker.walk())
         sources = self._generate_linking_sources(to_link)
@@ -88,8 +91,8 @@ class AMRLinker(Linker, ABC):
 
         # Serialize the attribute collection to json, after alignment
         attribute_dict = extractions.dict(exclude_unset=True)
-        amr_data["metadata"] = attribute_dict
+        data["metadata"] = attribute_dict
 
-        return amr_data
+        return data
 
 
