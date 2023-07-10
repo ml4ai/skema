@@ -1,15 +1,13 @@
-use actix_web::{put, web, HttpResponse};
+use actix_web::{put, web, HttpResponse, test};
 use mathml::{
     acset::{ACSet, AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
-    parsing::parse,
 };
 use petgraph::dot::{Config, Dot};
 
 use std::string::String;
 use utoipa;
-use utoipa::ToSchema;
 
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 #[utoipa::path(
@@ -24,8 +22,9 @@ use utoipa::ToSchema;
 #[put("/mathml/ast-graph")]
 pub async fn get_ast_graph(payload: String) -> String {
     let contents = &payload;
-    let (_, math) =
-        parse(contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
+    let math = contents.parse::<Math>().unwrap();
+    //let (_, math) =
+    //parse(contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
 
     let g = math.to_graph();
     let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
@@ -48,8 +47,7 @@ pub async fn get_ast_graph(payload: String) -> String {
 pub async fn get_math_exp_graph(payload: String) -> String {
     let mut contents = payload;
     contents = preprocess_content(contents);
-    let (_, mut math) =
-        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
+    let mut math = contents.parse::<Math>().unwrap();
     math.normalize();
     let new_math = wrap_math(math);
     let g = new_math.to_graph();
@@ -69,7 +67,7 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 )]
 #[put("/mathml/petrinet")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<Math> = payload.iter().map(|x| parse(x).unwrap().1).collect();
+    let asts: Vec<Math> = payload.iter().map(|x| x.parse::<Math>().unwrap()).collect();
     HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
 }
 
@@ -85,11 +83,12 @@ pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/regnet")]
 pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<Math> = payload.iter().map(|x| parse(x).unwrap().1).collect();
+    let asts: Vec<Math> = payload.iter().map(|x| x.parse::<Math>().unwrap()).collect();
     HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
 }
 
-/// Return a JSON representation of an AMR constructed from an array of MathML strings and a string for the AMR subtype
+/// Return a JSON representation of an AMR constructed from an array of MathML strings and a string
+/// for the AMR subtype.
 #[utoipa::path(
     request_body = AMRmathml,
     responses(
@@ -101,7 +100,11 @@ pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/amr")]
 pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
-    let asts: Vec<Math> = payload.mathml.iter().map(|x| parse(x).unwrap().1).collect();
+    let asts: Vec<Math> = payload
+        .mathml
+        .iter()
+        .map(|x| x.parse::<Math>().unwrap())
+        .collect();
     let model_type = payload.model.clone();
     if model_type == *"regnet" {
         HttpResponse::Ok().json(web::Json(RegNet::from(asts)))

@@ -1,10 +1,9 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::ast::{Math, MathExpression::Mi};
-use crate::petri_net::{Polarity, Var};
 use crate::{
+    ast::{Math, MathExpression, Mi},
     mml2pn::{group_by_operators, Term},
-    parsing::parse,
+    petri_net::{Polarity, Var},
 };
 use serde::{Deserialize, Serialize};
 
@@ -319,6 +318,8 @@ impl From<ACSet> for PetriNet {
     fn from(pn: ACSet) -> PetriNet {
         let mut states_vec = BTreeSet::<State>::new();
         let mut transitions_vec = BTreeSet::<Transition>::new();
+        let mut initial_vec = Vec::<Initial>::new();
+        let mut parameter_vec = Vec::<Parameter>::new();
 
         // -----------------------------------------------------------
 
@@ -328,6 +329,22 @@ impl From<ACSet> for PetriNet {
                 name: state.sname.clone(),
                 ..Default::default()
             };
+            let initials = Initial {
+                target: state.sname.clone(),
+                expression: format!("{}0", state.sname.clone()),
+                ..Default::default()
+            };
+            let parameters = Parameter {
+                id: initials.expression.clone(),
+                name: Some(initials.expression.clone()),
+                description: Some(format!(
+                    "The total {} population at timestep 0",
+                    state.sname.clone()
+                )),
+                ..Default::default()
+            };
+            parameter_vec.push(parameters.clone());
+            initial_vec.push(initials.clone());
             states_vec.insert(states.clone());
         }
 
@@ -360,22 +377,38 @@ impl From<ACSet> for PetriNet {
                 output: Some(string_vec2.clone()),
                 ..Default::default()
             };
+            let parameters = Parameter {
+                id: trans.tname.clone(),
+                name: Some(trans.tname.clone()),
+                description: Some(format!("{} rate", trans.tname.clone())),
+                ..Default::default()
+            };
 
+            parameter_vec.push(parameters.clone());
             transitions_vec.insert(transitions.clone());
         }
 
         // -----------------------------------------------------------
 
+        let ode = Ode {
+            rates: None,
+            initials: Some(initial_vec),
+            parameters: Some(parameter_vec),
+            ..Default::default()
+        };
+
+        let semantics = Semantics { ode };
+
         let model = ModelPetriNet {
             states: states_vec,
             transitions: transitions_vec,
-            semantics: None,
+            semantics: Some(semantics),
             metadata: None,
         };
 
         PetriNet {
         name: "mathml model".to_string(),
-        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json".to_string(),
+        schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
         schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
@@ -428,6 +461,7 @@ impl From<Vec<Math>> for RegNet {
                 }
             }
 
+            // Positive rate sign: source, negative => sink.
             if eqns[&state.clone()][term_idx].polarity == Polarity::Positive {
                 rate_sign = true;
             }
@@ -435,7 +469,7 @@ impl From<Vec<Math>> for RegNet {
             for variable in eqns[&state][term_idx].vars.iter() {
                 if state.clone() != variable.clone() {
                     match variable.clone() {
-                        Var(Mi(x)) => {
+                        Var(MathExpression::Mi(Mi(x))) => {
                             rate_const = x.clone();
                         }
                         _ => {
@@ -444,7 +478,7 @@ impl From<Vec<Math>> for RegNet {
                     };
                 } else {
                     match variable.clone() {
-                        Var(Mi(x)) => {
+                        Var(MathExpression::Mi(Mi(x))) => {
                             state_name = x.clone();
                         }
                         _ => {
@@ -486,7 +520,7 @@ impl From<Vec<Math>> for RegNet {
                     for (j, var) in term.vars.iter().enumerate() {
                         if j == other_state_indx {
                             match var.clone() {
-                                Var(Mi(x)) => {
+                                Var(MathExpression::Mi(Mi(x))) => {
                                     trans_src = x.clone();
                                 }
                                 _ => {
@@ -495,7 +529,7 @@ impl From<Vec<Math>> for RegNet {
                             };
                         } else if j != other_state_indx && j != state_indx {
                             match var.clone() {
-                                Var(Mi(x)) => {
+                                Var(MathExpression::Mi(Mi(x))) => {
                                     trans_name = x.clone();
                                 }
                                 _ => {
@@ -509,7 +543,6 @@ impl From<Vec<Math>> for RegNet {
 
             let prop = Properties {
                 rate_constant: trans_name.clone(),
-                ..Default::default()
             };
 
             let transitions = RegTransition {
@@ -553,8 +586,8 @@ fn test_lotka_volterra_mml_to_regnet() {
     let elements: Vec<Math> = input["mathml"]
         .as_array()
         .unwrap()
-        .into_iter()
-        .map(|x| parse(x.as_str().unwrap()).unwrap().1)
+        .iter()
+        .map(|x| x.as_str().unwrap().parse::<Math>().unwrap())
         .collect();
 
     let regnet = RegNet::from(elements);
