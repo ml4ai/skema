@@ -23,7 +23,7 @@ class BatchRequestHandler:
             "app_key": config.MATHPIX_API_KEY,
         }
 
-        with open("../image_ids.json", "r") as f:
+        with open("./image_ids.json", "r") as f:
             image_ids = json.load(f)
 
         self.json = {

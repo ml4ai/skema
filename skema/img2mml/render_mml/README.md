@@ -1,6 +1,6 @@
 # MathML and LaTeX Comparison Visualization
 
-This folder contains code to visualize the differences between MathML and LaTeX representations of mathematical equations. 
+This folder contains code to visualize the differences between MathML and LaTeX representations of mathematical equations.
 
 ## Files Included
 
@@ -15,3 +15,23 @@ This folder contains code to visualize the differences between MathML and LaTeX 
 ## Usage
 
 To use this code, simply run `json_to_js.py` on your desired JSON file, and then open either `render_latex_mml.html` or `render_mathml.html` in your browser.
+
+## Text Tweak-er
+
+### Usage
+
+Use this webapp locally to individually view and edit the image annotations returned by Mathpix.
+
+```[bash]
+cd text_tweaker
+pip install -r requirements.txt # Installs FastAPI
+uvicorn main:app
+```
+
+The app should now be running. View it on [localhost:8000](http://127.0.0.1:8000/).
+
+### Files in Text Tweaker
+
+- `static/` - Contains the HTML, JS and CSS for th site
+- `main.py` - Contains the backend api
+- `text_tweaker_annotation_data.json` - The data store that is read and modified by the webapp

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Tweak-er</title>
+    <link rel="stylesheet" href="/static/css/text_tweaker.css" />
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+      async
+    ></script>
+    <!-- MathJaX for LaTeX parsing -->
+    <!-- Only using the text-svg component -->
+    <script>
+      MathJax = {
+        svg: {
+          fontCache: "global",
+        },
+      };
+    </script>
+    <script
+      type="text/javascript"
+      id="MathJax-script"
+      async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"
+    ></script>
+  </head>
+  <body>
+    <div class="m-auto d-block text-center mt-5">
+      <!-- Image ID Search -->
+      <form id="image-search" class="pb-4">
+        <span class="p-1">
+          <label for="image-id">Image ID</label>
+          <input id="image-id" type="text" />
+        </span>
+        <i>OR</i>
+        <span class="p-1">
+          <label for="image-no">Image #</label>
+          <input id="image-no" type="number" />
+        </span>
+        <button class="btn btn-dark" type="submit">Search</button>
+      </form>
+      <!-- Image Render Section -->
+      <h4>Original Image <span id="img-count"></span></h4>
+      <button id="prev-btn" class="btn btn-primary nav-btn">Previous</button>
+      <img
+        id="original-image-from-paper"
+        class="border border-secondary"
+        alt="original-image-from-paper"
+      />
+      <button id="next-btn" class="btn btn-primary nav-btn">Next</button>
+      <p id="image-info"></p>
+    </div>
+    <div class="d-flex flex-row justify-content-center">
+      <div class="p-2">
+        <h4>Latex Render</h4>
+        <div id="latex-render" class="border border-secondary p-3"></div>
+      </div>
+      <div class="p-2">
+        <h4>MathML Render</h4>
+        <div id="mathml-render" class="border border-secondary p-3"></div>
+      </div>
+    </div>
+
+    <!-- Code Edit Section -->
+    <div class="d-flex flex-row justify-content-center">
+      <div class="p-2">
+        <h6>Edit LaTeX</h6>
+        <form id="edit-latex-form">
+          <textarea
+            name="latex-code"
+            id="latex-code"
+            cols="40"
+            rows="10"
+          ></textarea>
+          <button class="btn btn-success btn-save" type="submit">Save</button>
+        </form>
+      </div>
+      <div class="p-2">
+        <h6>Edit MathML</h6>
+        <form id="edit-mathml-form">
+          <textarea
+            name="mathml-code"
+            id="mathml-code"
+            cols="40"
+            rows="10"
+          ></textarea>
+          <button class="btn btn-success btn-save" type="submit">Save</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- jquery -->
+    <script
+      src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+      defer
+    ></script>
+
+    <!-- Generate the table -->
+    <script src="/static/js/text_tweaker.js" defer></script>
+  </body>
+</html>
