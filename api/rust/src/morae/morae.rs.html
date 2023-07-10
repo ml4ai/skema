@@ -149,16 +149,16 @@
         <span class="kw">let </span>math_content = module_id2mathml_ast(module_id, host);
 
         <span class="comment">// This does get a panic with a message, so need to figure out how to forward it
-        //let mathml_ast =
-        </span>get_mathml_asts_from_file(<span class="string">&quot;../../data/mml2pn_inputs/ta4_sir_v1/mml_list.txt&quot;</span>);
+        </span><span class="kw">let </span>mathml_ast =
+            get_mathml_asts_from_file(<span class="string">&quot;../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt&quot;</span>);
 
         <span class="macro">println!</span>(<span class="string">&quot;\nmath_content: {:?}&quot;</span>, math_content);
-        <span class="comment">//println!(&quot;\nmathml_ast: {:?}&quot;, mathml_ast);
+        <span class="macro">println!</span>(<span class="string">&quot;\nmathml_ast: {:?}&quot;</span>, mathml_ast);
 
-        </span><span class="macro">println!</span>(<span class="string">&quot;\nPN from code: {:?}&quot;</span>, ACSet::from(math_content.clone()));
-        <span class="comment">//println!(&quot;\nPN from mathml: {:?}\n&quot;, ACSet::from(mathml_ast.clone()));
+        <span class="macro">println!</span>(<span class="string">&quot;\nPN from code: {:?}&quot;</span>, ACSet::from(math_content.clone()));
+        <span class="macro">println!</span>(<span class="string">&quot;\nPN from mathml: {:?}\n&quot;</span>, RegNet::from(mathml_ast.clone()));
 
-        </span><span class="macro">println!</span>(
+        <span class="macro">println!</span>(
             <span class="string">&quot;\nAMR from code: {:?}&quot;</span>,
             PetriNet::from(ACSet::from(math_content))
         );

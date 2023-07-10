@@ -598,6 +598,20 @@
 <a href="#598" id="598">598</a>
 <a href="#599" id="599">599</a>
 <a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use crate</span>::{
@@ -805,7 +819,7 @@
 </span><span class="kw">pub struct </span>Rate {
     <span class="kw">pub </span>target: String,
     <span class="kw">pub </span>expression: String,
-    <span class="kw">pub </span>expression_mathml: String,
+    <span class="kw">pub </span>expression_mathml: <span class="prelude-ty">Option</span>&lt;String&gt;,
 }
 
 <span class="attr">#[derive(
@@ -920,6 +934,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = BTreeSet::&lt;Transition&gt;::new();
         <span class="kw">let </span><span class="kw-2">mut </span>initial_vec = Vec::&lt;Initial&gt;::new();
         <span class="kw">let </span><span class="kw-2">mut </span>parameter_vec = Vec::&lt;Parameter&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>rate_vec = Vec::&lt;Rate&gt;::new();
 
         <span class="comment">// -----------------------------------------------------------
 
@@ -984,6 +999,19 @@
                 ..Default::default()
             };
 
+            <span class="kw">let </span><span class="kw-2">mut </span>terms = String::new();
+            <span class="kw">for </span>term <span class="kw">in </span>transitions.input.clone().unwrap() {
+                <span class="kw">let </span>terms_temp = terms.clone();
+                terms = <span class="macro">format!</span>(<span class="string">&quot;{}*{}&quot;</span>, terms_temp.clone(), term.clone());
+            }
+
+            <span class="kw">let </span>rate = Rate {
+                target: trans.tname.clone(),
+                expression: <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, trans.tname.clone(), terms.clone()), <span class="comment">// the second term needs to be the product of the inputs
+                </span>..Default::default()
+            };
+
+            rate_vec.push(rate.clone());
             parameter_vec.push(parameters.clone());
             transitions_vec.insert(transitions.clone());
         }
@@ -991,7 +1019,7 @@
         <span class="comment">// -----------------------------------------------------------
 
         </span><span class="kw">let </span>ode = Ode {
-            rates: <span class="prelude-val">None</span>,
+            rates: <span class="prelude-val">Some</span>(rate_vec),
             initials: <span class="prelude-val">Some</span>(initial_vec),
             parameters: <span class="prelude-val">Some</span>(parameter_vec),
             ..Default::default()
