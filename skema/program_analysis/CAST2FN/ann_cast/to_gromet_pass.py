@@ -2049,7 +2049,6 @@ class ToGrometPass:
                             )
 
                             if found_opi:
-                                print(opi_idx)
                                 parent_gromet_fn.wfopi = insert_gromet_object(
                                     parent_gromet_fn.wfopi,
                                     GrometWire(
@@ -3555,7 +3554,7 @@ class ToGrometPass:
 
         gromet_predicate_fn.b = insert_gromet_object(
             gromet_predicate_fn.b,
-            GrometBoxFunction(function_type=FunctionType.PREDICATE + "AAA"),
+            GrometBoxFunction(function_type=FunctionType.PREDICATE),
         )
 
         # Create all opis and opos for conditionals
