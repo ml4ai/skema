@@ -3,7 +3,7 @@
 
 use crate::ast::{
     operator::{Derivative, Operator},
-    Math, MathExpression,
+    Math, MathExpression, Mi,
 };
 use derive_new::new;
 use nom::error::Error;
@@ -37,6 +37,63 @@ impl fmt::Display for MathExpressionTree {
                 write!(f, ")")
             }
         }
+    }
+}
+
+impl MathExpressionTree {
+    fn to_cmml(&self) -> String {
+        let mut content_mathml = String::new();
+        match self {
+            MathExpressionTree::Atom(MathExpression::Ci(x)) => {
+                println!("x.content={:?}", x.content);
+                 content_mathml.push_str(&format!(
+                    "<apply><diff/><mi>{}</mi></apply>",
+                    x.content.to_string()
+                ));
+            }
+            MathExpressionTree::Atom(i) => {
+                println!("i={:?}", i);
+                /*match i {
+                MathExpression::Mi(Mi(id)) => {
+                    content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
+                }
+                MathExpression::Mn(number) => {
+                    content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
+                }
+                _ => panic!("Unhandled MathExpressionTree in Atom matching"),
+                */
+            }
+            MathExpressionTree::Cons(head, rest) => {
+                content_mathml.push_str("<apply>");
+                println!("head = {:?}", head);
+                println!("rest = {:?}", rest);
+                match head {
+                    Add => content_mathml.push_str("<plus/>"),
+                    Subtract => content_mathml.push_str("<minus/>"),
+                    Multiply => content_mathml.push_str("<times/>"),
+                    _ => {}
+                }
+                if let Operator::Add = head {
+                    println!("++++++++++++++");
+                }
+                for s in rest {
+                    match s {
+                        MathExpressionTree::Atom(MathExpression::Mi(Mi(id))) => {
+                            content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
+                        }
+                        MathExpressionTree::Atom(MathExpression::Mn(number)) => {
+                            content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
+                        }
+                        _ => panic!("Unhandled MathExpressionTree in Cons matching"),
+                    }
+                    println!("s={:?}", s);
+                }
+                content_mathml.push_str("</apply>");
+            }
+
+            _ => todo!(),
+        }
+        content_mathml
     }
 }
 
@@ -318,4 +375,15 @@ fn test_conversion() {
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
+}
+
+#[test]
+fn test_to_content_mathml() {
+    let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
+    println!("Input: {input}");
+    let s = input.parse::<MathExpressionTree>().unwrap();
+    println!("Output: {s}\n");
+    let content = s.to_cmml();
+    println!("content = {:?}", content);
+    assert_eq!(content, "<apply><plus/><ci>x</ci><ci>y</ci></apply>");
 }
