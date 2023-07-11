@@ -129,7 +129,7 @@ impl MathExpression {
 
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
-        // Recognize derivatives in Newtonian notation.
+        // Flatten mrows and mfracs
         let tokens = input.iter().fold(vec![], |mut acc, x| {
             x.flatten(&mut acc);
             acc
