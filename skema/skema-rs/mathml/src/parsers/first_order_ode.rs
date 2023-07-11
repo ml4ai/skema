@@ -292,43 +292,6 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
 
 #[test]
 fn test_first_order_ode() {
-    // Derivative in Leibniz notation.
-    let input = "
-    <math>
-        <mfrac>
-        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
-        <mrow><mi>d</mi><mi>t</mi></mrow>
-        </mfrac>
-        <mo>=</mo>
-        <mo>-</mo>
-        <mi>β</mi>
-        <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-    </math>
-    ";
-
-    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
-
-    assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
-
-    // Derivative in Newtonian notation
-    let input = "
-    <math>
-        <mover><mi>S</mi><mo>˙</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mo>=</mo>
-        <mo>-</mo>
-        <mi>β</mi>
-        <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-    </math>
-    ";
-
-    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
-
-    assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
-
     // ASKEM Hackathon 2, scenario 1, equation 1.
     let input = "
     <math>
@@ -336,6 +299,23 @@ fn test_first_order_ode() {
         <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
         <mrow><mi>d</mi><mi>t</mi></mrow>
         </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+    </math>
+    ";
+
+    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
+
+    assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
+
+    // ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
+    let input = "
+    <math>
+        <mover><mi>S</mi><mo>˙</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo>
         <mo>=</mo>
         <mo>-</mo>
         <mi>β</mi>
