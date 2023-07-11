@@ -7,6 +7,7 @@ import tempfile
 import time
 from pathlib import Path
 from typing import List, Union, Text, BinaryIO, Callable
+from typing_extensions import Literal
 from typing import Optional, Dict, Any
 from zipfile import ZipFile
 import pandas as pd
@@ -458,7 +459,7 @@ async def integrated_pdf_extractions(
     response_model=int,
     status_code=200,
 )
-def healthcheck() -> int:
+def healthcheck() -> Literal[status.HTTP_200_OK, status.HTTP_502_BAD_GATEWAY, status.HTTP_500_INTERNAL_SERVER_ERROR]:
     # SKEMA health check
     skema_endpoint = f"{SKEMA_TR_ADDRESS}/api/skema"
     try:
