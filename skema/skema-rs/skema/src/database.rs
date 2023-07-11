@@ -1628,7 +1628,7 @@ pub fn create_function(
 
     // now we add a check for if this is an imported function
     match eboxf.b.clone().unwrap()[0].function_type.clone() {
-        FunctionType::Import => {
+        FunctionType::Imported => {
             (nodes, edges, start, meta_nodes) = create_import(
                 &gromet.clone(),
                 function_net,

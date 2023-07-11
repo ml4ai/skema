@@ -32,7 +32,9 @@ pub enum FunctionType {
     Module,
     Expression,
     Literal,
-    Import,
+    Imported,
+    #[serde(rename = "IMPORTED_METHOD")]
+    ImportedMethod,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]

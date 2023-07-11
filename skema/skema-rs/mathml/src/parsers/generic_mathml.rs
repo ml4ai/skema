@@ -172,7 +172,7 @@ pub fn add(input: Span) -> IResult<Operator> {
 }
 
 pub fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, ws(one_of("-−")))(input)?;
+    let (s, op) = value(Operator::Subtract, ws(one_of("-−&#x2212;")))(input)?;
     Ok((s, op))
 }
 

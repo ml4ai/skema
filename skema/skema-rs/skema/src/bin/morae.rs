@@ -43,7 +43,7 @@ fn main() {
 
         // This does get a panic with a message, so need to figure out how to forward it
         let mathml_ast =
-            get_mathml_asts_from_file("../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+            get_mathml_asts_from_file("../../data/mml2pn_inputs/testing_eqns/mml_list.txt");
 
         println!("\nmath_content: {:?}", math_content);
         println!("\nmathml_ast: {:?}", mathml_ast);
