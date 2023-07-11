@@ -1,15 +1,12 @@
 import json
 import os
 import tempfile
-import subprocess
-import requests
-from shutil import which
 from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
-from fastapi import APIRouter, FastAPI, Body, File, Form, UploadFile
+from fastapi import APIRouter, FastAPI, Body, File, UploadFile
 from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
