@@ -117,7 +117,6 @@ impl MathExpressionTree {
                 for s in rest {
                     content_mathml.push_str(&s.to_cmml());
                 }
-
                 content_mathml.push_str("</apply>");
             }
             _ => todo!(),
