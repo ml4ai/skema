@@ -3,7 +3,7 @@
 
 use crate::ast::{
     operator::{Derivative, Operator},
-    Ci, Math, MathExpression, Mi,
+    Ci, Math, MathExpression, Mi, Mrow,
 };
 use derive_new::new;
 use nom::error::Error;
@@ -41,36 +41,74 @@ impl fmt::Display for MathExpressionTree {
 }
 
 impl MathExpressionTree {
+    // Translates math expression tree to content mathml
     pub fn to_cmml(&self) -> String {
         let mut content_mathml = String::new();
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
-                println!("x.content={:?}", x.content);
                 content_mathml.push_str(&format!("<ci>{}</ci>", x.content.to_string()));
             }
             MathExpressionTree::Atom(i) => {
-                println!("i={:?}", i);
                 match i {
                     MathExpression::Mi(Mi(id)) => {
                         content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
-                        println!("id={}", id);
                     }
                     MathExpression::Mn(number) => {
                         content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
                     }
+                    MathExpression::Mrow(Mrow(components)) => {
+                        let mut before_parenthesis_starts: Vec<MathExpressionTree> = Vec::new();
+                        let mut after_parenthesis_starts: Vec<MathExpressionTree> = Vec::new();
+                        let mut parenthesis_exists = false;
+                        //Handling parenthesis for case when it can be <times/> MathExpression or function of component
+                        for items in components.iter() {
+                            if let MathExpression::Mo(Lparen) = items {
+                                parenthesis_exists = true;
+                                continue;
+                            }
+                            if parenthesis_exists {
+                                after_parenthesis_starts
+                                    .push(MathExpressionTree::Atom(items.clone()));
+                            } else {
+                                before_parenthesis_starts
+                                    .push(MathExpressionTree::Atom(items.clone()));
+                            }
+                        }
+                        if !before_parenthesis_starts.is_empty()
+                            && !after_parenthesis_starts.is_empty()
+                        {
+                            for b in before_parenthesis_starts {
+                                content_mathml.push_str(&b.to_cmml());
+                            }
+                            //Ignores the function of component (e.g. (t) gets ignored)
+                            if after_parenthesis_starts.len() == 1 {
+                                println!("after_parenthesis_starts={:?}", after_parenthesis_starts);
+                            } else {
+                                for a in after_parenthesis_starts {
+                                    content_mathml.push_str(&a.to_cmml());
+                                }
+                            }
+                        } else if before_parenthesis_starts.is_empty()
+                            && !after_parenthesis_starts.is_empty()
+                        {
+                            for a in after_parenthesis_starts {
+                                content_mathml.push_str(&a.to_cmml());
+                            }
+                        }
+                    }
+
                     _ => panic!("Unhandled MathExpressionTree in Atom matching"),
                 }
             }
             MathExpressionTree::Cons(head, rest) => {
                 content_mathml.push_str("<apply>");
-                println!("head = {:?}", head);
-                println!("rest = {:?}", rest);
 
                 match head {
                     Operator::Add => content_mathml.push_str("<plus/>"),
                     Operator::Subtract => content_mathml.push_str("<minus/>"),
                     Operator::Multiply => content_mathml.push_str("<times/>"),
                     Operator::Equals => content_mathml.push_str("<eq/>"),
+                    Operator::Divide => content_mathml.push_str("<divide/>"),
                     Operator::Derivative(Derivative { order, var_index })
                         if (*order, *var_index) == (1 as u8, 1 as u8) =>
                     {
@@ -79,10 +117,7 @@ impl MathExpressionTree {
                     _ => {}
                 }
                 for s in rest {
-                    println!("==================");
-                    println!("s={:?}", s);
-                    let comp = s.to_cmml();
-                    content_mathml.push_str(&comp);
+                    content_mathml.push_str(&s.to_cmml());
                 }
 
                 content_mathml.push_str("</apply>");
@@ -377,11 +412,8 @@ fn test_conversion() {
 #[test]
 fn test_to_content_mathml_example1() {
     let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
-    println!("Input: {input}");
     let s = input.parse::<MathExpressionTree>().unwrap();
-    println!("Output: {s}\n");
     let content = s.to_cmml();
-    println!("content = {:?}", content);
     assert_eq!(content, "<apply><plus/><ci>x</ci><ci>y</ci></apply>");
 }
 #[test]
@@ -391,23 +423,27 @@ fn test_to_content_mathml_example2() {
         <mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
         </math>
         ";
-    /*println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
-    println!("Output: {s}\n");
-    let content = s.to_cmml();
-    println!("content = {:?}", content);
-    assert_eq!(content, "<apply><eq/><apply><diff/><ci>S</ci><ci>y</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>S</ci></apply><ci>I</ci></apply></apply>");
-    */
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    println!("cmml= {cmml}");
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>S</ci></apply><ci>I</ci></apply></apply>");
-    //println!("lhs_var: {lhs_var}\n");
-    //println!("rhs: {:?}", rhs);
-    //let content_lhs = format!("<apply><diff/><ci>{lhs_var}</ci></apply>");
-    //println!("content_lhs: {content_lhs}\n");
-    //let content_rhs = rhs.to_cmml();
-    //println!("content_rhs = {:?}", content_rhs);
-    //assert_eq!(content_lhs, "<apply><diff/><ci>S</ci><ci>y</ci></apply>");
-    //assert_eq!(content_rhs, "<apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>S</ci></apply><ci>I</ci></apply>")
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq1() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
 }
