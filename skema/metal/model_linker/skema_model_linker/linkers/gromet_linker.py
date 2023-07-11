@@ -30,6 +30,6 @@ class GrometLinker(Linker):
 					ret[val['id'].strip()] = val
 		return ret
 
-	def _build_walker(self, amr_data) -> JsonDictWalker:
+	def _build_walker(self, gromet) -> JsonDictWalker:
 		""" Walk and select the linkable elements of the Gromet """
-		return PetriNetWalker(amr_data)
+		return GrometWalker(gromet)

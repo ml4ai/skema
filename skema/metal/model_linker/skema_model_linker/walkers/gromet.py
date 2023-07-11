@@ -1,7 +1,9 @@
 from typing import Any, Optional
 
-from skema.gromet.fn import GrometFNModuleCollection
+from skema.gromet.fn import GrometFNModuleCollection, GrometFNModule, GrometFN
 from . import ModelWalker
+
+import itertools as it
 
 
 class GrometWalker(ModelWalker):
@@ -40,6 +42,13 @@ class GrometWalker(ModelWalker):
 
         return ret
 
+    def _walk_fn(self, fn:GrometFN, callback=None, **kwargs):
+        fn.
+    def _walk_module(self, module_name: Optional[str], module: GrometFNModule, callback=None, **kwargs):
+
+        return []
+
     def walk(self, callback=None, *args, **kwargs):
         """ Start the walk from the root of the json object """
-        return reversed(self.__step(obj_name=None, obj=self.__gfn, callback=callback, **kwargs))
+        return list(it.chain.from_iterable(self._walk_module(module) for module in self.__gfn.modules))
+        # return reversed(self.__step(obj_name=None, obj=self.__gfn, callback=callback, **kwargs))
