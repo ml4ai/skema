@@ -15,7 +15,7 @@ client = TestClient(app)
 # Test the cosmos endpoint
 def test_cosmos():
     """Test that we are able to fetch COSMOS data correctly"""
-    path = Path("data") / "CHIME_SVIIvR_model.pdf"
+    path = Path(__file__).parent / "data" / "CHIME_SVIIvR_model.pdf"
     with path.open("rb") as pdf:
         ret = cosmos_client(path.name, pdf)
     assert ret is not None and len(ret) > 0

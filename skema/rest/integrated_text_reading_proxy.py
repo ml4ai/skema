@@ -458,8 +458,24 @@ async def integrated_pdf_extractions(
     summary="Check health of integrated text reading service",
     response_model=int,
     status_code=200,
+    responses={
+        200: {
+            "model": int,
+            "description": "All component services are healthy (200 status)",
+        },
+        500: {
+            "model": int,
+            "description": "Internal error occurred",
+            "example_value": 500
+        },
+        502: {
+            "model": int,
+            "description": "Either text reading service is not available"
+        }
+
+    },
 )
-def healthcheck() -> Literal[status.HTTP_200_OK, status.HTTP_502_BAD_GATEWAY, status.HTTP_500_INTERNAL_SERVER_ERROR]:
+def healthcheck() -> int:
     # SKEMA health check
     skema_endpoint = f"{SKEMA_TR_ADDRESS}/api/skema"
     try:
