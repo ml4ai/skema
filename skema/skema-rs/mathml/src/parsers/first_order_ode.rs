@@ -4,7 +4,7 @@ use crate::{
         Ci, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, elem2, equals, etag, lparen, mi, mn, mo, mover, msqrt, msub, msubsup, msup,
+        add, attribute, elem2, equals, etag, lparen, mi, mn, mo, msqrt, msub, msubsup, msup,
         rparen, stag, subtract, tag_parser, ws, IResult, ParseError, Span,
     },
     parsers::math_expression_tree::MathExpressionTree,
@@ -13,10 +13,10 @@ use derive_new::new;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::map,
+    combinator::{map, opt},
     error::Error,
     multi::{many0, many1},
-    sequence::{delimited, pair, tuple},
+    sequence::{delimited, pair, terminated, tuple},
 };
 use std::str::FromStr;
 
@@ -64,26 +64,24 @@ pub fn operator(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+fn parenthesized_identifier(input: Span) -> IResult<()> {
+    let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
+    let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
+    let (s, _) = delimited(mo_lparen, mi, mo_rparen)(input)?;
+    Ok((s, ()))
+}
+
 /// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
 fn ci_univariate_func(input: Span) -> IResult<Ci> {
-    let (s, (Mi(x), left, Mi(_), right)) = tuple((mi, mo, mi, mo))(input)?;
-    if let (MathExpression::Mo(Operator::Lparen), MathExpression::Mo(Operator::Rparen)) =
-        (left, right)
-    {
-        Ok((
-            s,
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
-            ),
-        ))
-    } else {
-        Err(nom::Err::Error(ParseError::new(
-            "Unable to identify univariate function".to_string(),
-            input,
-        )))
-    }
+    let (s, (Mi(x), pi)) = tuple((mi, parenthesized_identifier))(input)?;
+    Ok((
+        s,
+        Ci::new(
+            Some(Type::Function),
+            Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
+        ),
+    ))
 }
 
 /// Parse the identifier 'd'
@@ -126,6 +124,36 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
     Ok((s, (Derivative::new(1, 1), func)))
 }
 
+fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
+    // Get number of dots to recognize the order of the derivative
+    println!("FLAG1");
+    let n_dots = delimited(
+        stag!("mo"),
+        map(many1(nom::character::complete::char('˙')), |x| {
+            x.len() as u8
+        }),
+        etag!("mo"),
+    );
+
+    let (s, (x, order)) = terminated(
+        delimited(
+            stag!("mover"),
+            pair(
+                map(ci_unknown, |Ci { content, .. }| Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                }),
+                n_dots,
+            ),
+            etag!("mover"),
+        ),
+        opt(parenthesized_identifier),
+    )(input)?;
+    println!("FLAG2, {x:?}");
+
+    Ok((s, (Derivative::new(order, 1), x)))
+}
+
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
 // the generic_mathml module) to work with the specialized version of the math_expression parser
 // (also in this file).
@@ -165,7 +193,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         msqrt,
         mfrac,
         map(mrow, MathExpression::Mrow),
-        mover,
         msubsup,
     )))(input)
 }
@@ -175,7 +202,10 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     let (s, _) = stag!("math")(input)?;
 
     // Recognize LHS derivative
-    let (s, (_, ci)) = first_order_derivative_leibniz_notation(s)?;
+    let (s, (_, ci)) = alt((
+        first_order_derivative_leibniz_notation,
+        newtonian_derivative,
+    ))(s)?;
 
     // Recognize equals sign
     let (s, _) = delimited(stag!("mo"), equals, etag!("mo"))(s)?;
@@ -262,12 +292,30 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
 
 #[test]
 fn test_first_order_ode() {
+    // Derivative in Leibniz notation.
     let input = "
     <math>
         <mfrac>
         <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
         <mrow><mi>d</mi><mi>t</mi></mrow>
         </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+
+    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
+
+    assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
+
+    // Derivative in Newtonian notation
+    let input = "
+    <math>
+        <mover><mi>S</mi><mo>˙</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo>
         <mo>=</mo>
         <mo>-</mo>
         <mi>β</mi>

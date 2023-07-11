@@ -131,24 +131,7 @@ impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
         // Recognize derivatives in Newtonian notation.
         let tokens = input.iter().fold(vec![], |mut acc, x| {
-            match x {
-                MathExpression::Mover(base, overscript) => match **overscript {
-                    MathExpression::Mo(Operator::Other(ref os)) => {
-                        if os.chars().all(|c| c == '˙') {
-                            acc.push(MathExpression::Mo(Operator::new_derivative(
-                                Derivative::new(os.chars().count() as u8, 1),
-                            )));
-                            acc.push(*base.clone());
-                        } else {
-                            acc.push(x.clone());
-                        }
-                    }
-                    _ => todo!(),
-                },
-                t => {
-                    t.flatten(&mut acc);
-                }
-            }
+            x.flatten(&mut acc);
             acc
         });
 
@@ -331,22 +314,6 @@ fn test_conversion() {
     println!("Input: {input}");
     let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
-    println!("Output: {s}\n");
-
-    let input = "<math>
-        <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        </math>";
-    println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
-    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
-    println!("Output: {s}\n");
-
-    let input = "<math>
-        <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        </math>";
-    println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
-    assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
     let input = "<math><mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo></math>";
