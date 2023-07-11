@@ -6,7 +6,7 @@ import os
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Union, Text, BinaryIO
+from typing import List, Union, Text, BinaryIO, Callable
 from typing import Optional, Dict, Any
 from zipfile import ZipFile
 import pandas as pd
@@ -15,8 +15,7 @@ import requests
 from askem_extractions.data_model import AttributeCollection
 from askem_extractions.importers import import_arizona, import_mit
 from askem_extractions.importers.mit import merge_collections
-from fastapi import APIRouter, FastAPI, UploadFile
-from starlette import status
+from fastapi import APIRouter, FastAPI, UploadFile, Response, status
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY, COSMOS_ADDRESS
 from skema.rest.schema import (
@@ -30,14 +29,19 @@ router = APIRouter()
 
 
 # Utility code for the endpoints
-def annotate_text_with_skema(text: Union[str, List[str]]) -> List[Dict[str, Any]]:
-    endpoint = f"{SKEMA_TR_ADDRESS}/textFileToMentions"
-    if isinstance(text, str):
+
+def annotate_with_skema(
+        endpoint: str,
+        input_: Union[str, List[str], List[Dict], List[List[Dict]]]) -> List[Dict[str, Any]]:
+    """ Blueprint for calling the SKEMA-TR API """
+
+    if isinstance(input_, (str, dict)):
         payload = [
-            text
-        ]  # If the text to annotate is a single string representing the contents of a document, make it a list with a single element
+            input_
+        ]  # If the text to annotate is a single string representing the contents of a document, make it a list with
+        # a single element
     else:
-        payload = text  # if the text to annotate is already a list of documents to annotate, it is the payload itself
+        payload = input_  # if the text to annotate is already a list of documents to annotate, it is the payload itself
     response = requests.post(endpoint, json=payload, timeout=600)
     if response.status_code == 200:
         return response.json()
@@ -46,39 +50,33 @@ def annotate_text_with_skema(text: Union[str, List[str]]) -> List[Dict[str, Any]
             f"Calling {endpoint} failed with HTTP code {response.status_code}"
         )
 
-def annotate_pdfs_with_skema(pdfs:Union[List[List[Dict]], List[Dict]]) -> List[Dict[str, Any]]:
-    endpoint = f"{SKEMA_TR_ADDRESS}/cosmosJsonToMentions"
-    if isinstance(pdfs, dict):
-        payload = [
-            pdfs
-        ]  # If the text to annotate is a single string representing the contents of a document, make it a list with a single element
-    else:
-        payload = pdfs  # if the text to annotate is already a list of documents to annotate, it is the payload itself
-    response = requests.post(endpoint, json=payload, timeout=600)
-    if response.status_code == 200:
-        return response.json()
-    else:
-        raise RuntimeError(
-            f"Calling {endpoint} failed with HTTP code {response.status_code}"
-        )
+
+def annotate_text_with_skema(text: Union[str, List[str]]) -> List[Dict[str, Any]]:
+    return annotate_with_skema(f"{SKEMA_TR_ADDRESS}/textFileToMentions", text)
+
+
+def annotate_pdfs_with_skema(
+        pdfs: Union[List[List[Dict]], List[Dict]]) -> List[Dict[str, Any]]:
+    return annotate_with_skema(f"{SKEMA_TR_ADDRESS}/cosmosJsonToMentions", pdfs)
+
 
 # Client code for MIT TR
-
-
 def annotate_text_with_mit(
         texts: Union[str, List[str]]
 ) -> Union[List[Dict[str, Any]], str]:
-    endpoint = f"{MIT_TR_ADDRESS}/annotation/find_text_vars/"
+    endpoint = f"{MIT_TR_ADDRESS}/annotation/upload_file_extract"
     if isinstance(texts, str):
         texts = [
             texts
-        ]  # If the text to annotate is a single string representing the contents of a document, make it a list with a single element
+        ]  # If the text to annotate is a single string representing the contents of a document, make it a list with
+        # a single element
 
-    # TODO paralelize this
+    # TODO parallelize this
     return_values = list()
     for ix, text in enumerate(texts):
-        params = {"gpt_key": OPENAI_KEY, "text": text}
-        response = requests.post(endpoint, params=params)
+        params = {"gpt_key": OPENAI_KEY}
+        files = {"file": io.StringIO(text)}
+        response = requests.post(endpoint, params=params, files=files)
         try:
             if response.status_code == 200:
                 return_values.append(response.json())
@@ -119,7 +117,6 @@ def normalize_extractions(
                 collections.append(canonical_mit)
             except Exception as ex:
                 print(ex)
-
 
         if arizona_extractions and mit_extractions:
             # Merge both with some de de-duplications
@@ -250,7 +247,7 @@ def parquet_to_json(path):
 def cosmos_client(name: str, data: BinaryIO):
     """ Posts a pdf to COSMOS and returns the JSON representation of the parquet file """
 
-    ## Create POST request to COSMOS server
+    # Create POST request to COSMOS server
     # Prep the pdf data for upload
     files = [
         ("pdf", (name, data, 'application/pdf')),
@@ -283,7 +280,7 @@ def cosmos_client(name: str, data: BinaryIO):
                                     with z.open(file) as zf:
                                         json_data = parquet_to_json(zf)
                                         return json_data
-                        #Shouldn't reach this point
+                        # Shouldn't reach this point
                         raise RuntimeError("COSMOS data doesn't include document file for annotation")
 
                     else:
@@ -299,8 +296,34 @@ def cosmos_client(name: str, data: BinaryIO):
     else:
         raise RuntimeError(f"COSMOS Error - STATUS CODE: {response.status_code} - {COSMOS_ADDRESS}")
 
-def merge_pipelines_results(skema_extractions, mit_extractions, annotate_skema, annotate_mit):
+
+def merge_pipelines_results(
+        skema_extractions,
+        mit_extractions,
+        general_skema_error,
+        general_mit_error,
+        annotate_skema,
+        annotate_mit):
     """ Merges and de-duplicates text extractions from pipelines"""
+
+    # Build the generalized errors list
+    generalized_errors = list()
+    if general_skema_error:
+        generalized_errors.append(
+            TextReadingError(
+                pipeline="SKEMA",
+                message=general_skema_error
+            )
+        )
+    if general_mit_error:
+        generalized_errors.append(
+            TextReadingError(
+                pipeline="MIT",
+                message=general_mit_error
+            )
+        )
+
+    # Build the results and input-specific errors
     results = list()
     errors = list()
     assert len(skema_extractions) == len(
@@ -323,7 +346,57 @@ def merge_pipelines_results(skema_extractions, mit_extractions, annotate_skema, 
             )
         )
 
-    return TextReadingAnnotationsOutput(outputs=results)
+    return TextReadingAnnotationsOutput(
+        outputs=results,
+        generalized_errors=generalized_errors if generalized_errors else None
+    )
+
+
+def integrated_extractions(
+        response: Response,
+        skema_annotator: Callable,
+        skema_inputs: List[Union[str, List[Dict]]],
+        mit_inputs: List[str],
+        annotate_skema: bool = True,
+        annotate_mit: bool = True,
+) -> TextReadingAnnotationsOutput:
+    """
+    Run both text extractors and merge the results.
+    This is the annotation logic shared between different input formats
+    """
+
+    # Initialize the extractions to an empty list of arrays
+    skema_extractions = [[] for t in skema_inputs]
+    mit_extractions = [[] for t in mit_inputs]
+    skema_error = None
+    mit_error = None
+
+    if annotate_skema:
+        try:
+            skema_extractions = skema_annotator(skema_inputs)
+        except Exception as ex:
+            skema_error = f"Problem annotating with SKEMA: {ex}"
+
+    if annotate_mit:
+        try:
+            mit_extractions = annotate_text_with_mit(mit_inputs)
+        except Exception as ex:
+            mit_error = f"Problem annotating with MIT: {ex}"
+
+    return_val = merge_pipelines_results(
+        skema_extractions,
+        mit_extractions,
+        skema_error,
+        mit_error,
+        annotate_skema,
+        annotate_mit
+    )
+
+    # If there is any error, set the response's status code to 207
+    if skema_error or mit_error or (o.errors is not None for o in return_val.outputs):
+        response.status_code = status.HTTP_207_MULTI_STATUS
+
+    return return_val
 
 
 # End utility code for the endpoints
@@ -332,60 +405,58 @@ def merge_pipelines_results(skema_extractions, mit_extractions, annotate_skema, 
 @router.post(
     "/integrated-text-extractions",
     summary="Posts one or more plain text documents and annotates with SKEMA and/or MIT text reading pipelines",
+    status_code=200
 )
 async def integrated_text_extractions(
+        response: Response,
         texts: TextReadingInputDocuments,
         annotate_skema: bool = True,
         annotate_mit: bool = True,
 ) -> TextReadingAnnotationsOutput:
+    # Get the input plain texts
     texts = texts.texts
-    skema_extractions = [[] for t in texts]
 
-    if annotate_skema:
-        try:
-            skema_extractions = annotate_text_with_skema(texts)
-        except Exception as ex:
-            print(f"Problem annotating with Skema: {ex}")
+    # Run the text extractors
+    return integrated_extractions(
+        response,
+        annotate_text_with_skema,
+        texts,
+        texts,
+        annotate_skema,
+        annotate_mit
+    )
 
-    mit_extractions = [[] for t in texts]
-
-    if annotate_mit:
-        mit_extractions = annotate_text_with_mit(texts)
-
-    return merge_pipelines_results(skema_extractions, mit_extractions, annotate_skema, annotate_mit)
 
 @router.post(
     "/integrated-pdf-extractions",
     summary="Posts one or more pdf documents and annotates with SKEMA and/or MIT text reading pipelines",
+    status_code=200
 )
 async def integrated_pdf_extractions(
+        response: Response,
         pdfs: List[UploadFile],
         annotate_skema: bool = True,
         annotate_mit: bool = True
 ) -> TextReadingAnnotationsOutput:
-
     # TODO: Make this handle multiple pdf files in parallel
     # Call COSMOS on the pdfs
     cosmos_data = list()
     for pdf in pdfs:
         cosmos_data.append(cosmos_client(pdf.filename, pdf.file))
 
+    # Get the plain text version from cosmos, passed through to MIT pipeline
     plain_texts = ['\n'.join(block['content'] for block in c) for c in cosmos_data]
 
-    skema_extractions = [[] for _ in pdfs]
+    # Run the text extractors
+    return integrated_extractions(
+        response,
+        annotate_pdfs_with_skema,
+        cosmos_data,
+        plain_texts,
+        annotate_skema,
+        annotate_mit
+    )
 
-    if annotate_skema:
-        try:
-            skema_extractions = annotate_pdfs_with_skema(cosmos_data)
-        except Exception as ex:
-            print(f"Problem annotating with Skema: {ex}")
-
-    mit_extractions = [[] for _ in pdfs]
-
-    if annotate_mit:
-        mit_extractions = annotate_text_with_mit(plain_texts)
-
-    return merge_pipelines_results(skema_extractions, mit_extractions, annotate_skema, annotate_mit)
 
 @router.get(
     "/healthcheck",
