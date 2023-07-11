@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+import asyncio
 from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
@@ -87,18 +88,25 @@ async def system_to_enriched_system(system: System) -> System:
         }
         return extension_map.get(extension, "")
 
-    comments = {"files": {}}
+    # Instead of making each proxy call seperatly, we will gather them
+    coroutines = []
+    file_paths = []
     for file, blob in zip(system.files, system.blobs):
         file_path = Path(system.root_name or "") / file
-
         snippet = CodeSnippet(
             code=blob, language=get_language_from_extension(file_path.suffix)
         )
-        result = await comments_proxy.proxy_extract_comments(snippet)
-        comments["files"][str(file_path)] = result
+        coroutines.append(comments_proxy.proxy_extract_comments(snippet))
+        file_paths.append(file_path)
+    results = await asyncio.gather(*coroutines)
 
-    # Build the MultiFileCodeComments model from the comments dict
+    # Due to the nested structure of MultiFileCodeComments, it easier to work with a Dict.
+    # Then, we can convert it using MutliFileCodeComments.model_validate()
+    comments = {"files": {}}
+    for file_path, result in zip(file_paths, results):
+        comments["files"][str(file_path)] = result
     system.comments = MultiFileCodeComments.model_validate(comments)
+
     return system
 
 
