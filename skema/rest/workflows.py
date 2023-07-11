@@ -13,7 +13,6 @@ from skema.skema_py import server as code2fn
 from fastapi import APIRouter, File, UploadFile
 from starlette.responses import JSONResponse
 import requests
-import json
 
 
 router = APIRouter()
