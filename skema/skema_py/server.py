@@ -73,9 +73,10 @@ class System(BaseModel):
         },
     )
 
+
 async def system_to_enriched_system(system: System) -> System:
     """Takes a System as input and enriches it with comments by running the Rust comment extractor."""
-    
+
     def get_language_from_extension(extension: str) -> str:
         """Function for converting file extension to language enum used by CodeSnippet"""
         extension = extension.lower()
@@ -85,15 +86,17 @@ async def system_to_enriched_system(system: System) -> System:
             ".for": "Fortran",
             ".py": "Python",
             ".cpp": "CppOrC",
-            ".c": "CppOrC"
+            ".c": "CppOrC",
         }
         return extension_map.get(extension, "")
-    
+
     comments = {"files": {}}
     for file, blob in zip(system.files, system.blobs):
         file_path = Path(system.root_name or "") / file
-        
-        snippet = CodeSnippet(code=blob, language=get_language_from_extension(file_path.suffix))
+
+        snippet = CodeSnippet(
+            code=blob, language=get_language_from_extension(file_path.suffix)
+        )
         result = await comments_proxy.proxy_extract_comments(snippet)
         comments["files"][str(file_path)] = result
 
@@ -101,7 +104,8 @@ async def system_to_enriched_system(system: System) -> System:
     system.comments = MultiFileCodeComments.model_validate(comments)
     return system
 
-def system_to_gromet(system: System):
+
+async def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
     # The CODE2FN Pipeline requires a file path as input.
@@ -127,8 +131,11 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
+    # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.
+    if not system.comments:
+        system = await system_to_enriched_system(system)
 
-    # If comments are included in request, run the unifier to add them to the Gromet
+    # If comments are included in request or added in the enriching process, run the unifier to add them to the Gromet
     if system.comments:
         align_full_system(gromet_collection, system.comments)
 
@@ -207,7 +214,7 @@ async def fn_given_filepaths(system: System):
     gromet_json = response.json()
     """
 
-    return system_to_gromet(system)
+    return await system_to_gromet(system)
 
 
 @router.post(
@@ -243,7 +250,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths-zip", files=files)
     gromet_json = response.json()
     """
-        
+
     # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
     files = []
     blobs = []
@@ -262,7 +269,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
     )
 
-    return system_to_gromet(system)
+    return await system_to_gromet(system)
 
 
 @router.post(

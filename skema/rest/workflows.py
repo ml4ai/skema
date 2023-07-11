@@ -91,8 +91,6 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System):
-    if system.comments == None:
-        system = await code2fn.system_to_enriched_system(system)
     gromet = await code2fn.fn_given_filepaths(system)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
@@ -103,8 +101,6 @@ async def code_snippets_to_pn_amr(system: code2fn.System):
 # code snippets -> fn -> regnet amr
 @router.post("/code/snippets-to-rn-amr", summary="Code snippets → RegNet AMR")
 async def code_snippets_to_rn_amr(system: code2fn.System):
-    if system.comments == None:
-        system = await code2fn.system_to_enriched_system(system)
     gromet = await code2fn.fn_given_filepaths(system)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
