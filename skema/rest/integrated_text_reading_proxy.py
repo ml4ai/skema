@@ -461,12 +461,18 @@ async def integrated_pdf_extractions(
 def healthcheck() -> int:
     # SKEMA health check
     skema_endpoint = f"{SKEMA_TR_ADDRESS}/api/skema"
-    skema_response = requests.get(skema_endpoint, timeout=10)
+    try:
+        skema_response = requests.get(skema_endpoint, timeout=10)
+    except Exception:
+        return status.HTTP_500_INTERNAL_SERVER_ERROR
 
     # TODO replace this with a proper healthcheck endpoint
     mit_endpoint = f"{MIT_TR_ADDRESS}/annotation/find_text_vars/"
     mit_params = {"gpt_key": OPENAI_KEY, "text": "x = 0"}
-    mit_response = requests.post(mit_endpoint, params=mit_params, timeout=10)
+    try:
+        mit_response = requests.post(mit_endpoint, params=mit_params, timeout=10)
+    except Exception:
+        return status.HTTP_502_BAD_GATEWAY
     ######################################################
 
     status_code = (

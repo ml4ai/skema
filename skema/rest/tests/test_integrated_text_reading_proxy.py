@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
+from fastapi import status
 
 from skema.rest.integrated_text_reading_proxy import app, cosmos_client
 
@@ -23,7 +24,11 @@ def test_cosmos():
 def test_healthcheck():
     """Test case for /healthcheck endpoint."""
     response = client.get("/healthcheck")
-    assert response.status_code is not None
+    assert response.status_code in {
+        status.HTTP_200_OK,
+        status.HTTP_502_BAD_GATEWAY,
+        status.HTTP_500_INTERNAL_SERVER_ERROR
+    }
 
 
 if __name__ == "__main__":
