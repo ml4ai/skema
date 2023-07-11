@@ -2,13 +2,14 @@ import json
 import os
 import tempfile
 import subprocess
+import requests
 from shutil import which
 from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
-from fastapi import APIRouter, FastAPI, Body, File, UploadFile
+from fastapi import APIRouter, FastAPI, Body, File, Form, UploadFile
 from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
@@ -23,6 +24,8 @@ from skema.program_analysis.comments import (
     SingleFileCodeComments,
     MultiFileCodeComments,
 )
+from skema.rest import comments_proxy
+from skema.rest.schema import CodeSnippet
 
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
@@ -70,46 +73,33 @@ class System(BaseModel):
         },
     )
 
-
-def system_to_enriched_system(system: System) -> System:
+async def system_to_enriched_system(system: System) -> System:
     """Takes a System as input and enriches it with comments by running the Rust comment extractor."""
-
-    # The skema_rs_path is the path to the Rust comment extractor.
-    # It is used to set the cwd when running subprocess to simplify the execution process.
-    skema_rs_path = Path(__file__).parent.parent / "skema-rs" / "comment_extraction"
-
-    # Check if Rust is installed on the system. If not, then return the system as is.
-    if not which("cargo"):
-        return system
-
-    # Create a temporary directory to store the input source files.
-    # The Rust comment_extractor requires that the input exists on disk.
-    tmp = tempfile.TemporaryDirectory()
-    tmp_path = Path(tmp.name)
+    
+    def get_language_from_extension(extension: str) -> str:
+        """Function for converting file extension to language enum used by CodeSnippet"""
+        extension = extension.lower()
+        extension_map = {
+            ".f": "Fortran",
+            ".f95": "Fortran",
+            ".for": "Fortran",
+            ".py": "Python",
+            ".cpp": "CppOrC",
+            ".c": "CppOrC"
+        }
+        return extension_map.get(extension, "")
     
     comments = {"files": {}}
     for file, blob in zip(system.files, system.blobs):
-        file_path = Path(tmp_path, system.root_name or "", file)
-        file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text(blob)
+        file_path = Path(system.root_name or "") / file
+        
+        snippet = CodeSnippet(code=blob, language=get_language_from_extension(file_path.suffix))
+        result = await comments_proxy.proxy_extract_comments(snippet)
+        comments["files"][str(file_path)] = result
 
-        result = subprocess.run(
-            ["cargo", "run", "--", str(file_path)],
-            cwd=skema_rs_path,
-            stdout=subprocess.PIPE,
-        )
-        comment_path = Path(system.root_name or "") / file
-        comments["files"][str(comment_path)] = json.loads(
-            str(result.stdout, encoding="UTF-8")
-        )
     # Build the MultiFileCodeComments model from the comments dict
     system.comments = MultiFileCodeComments.model_validate(comments)
-
-    # Cleanup the temporary directory
-    tmp.cleanup()
-
     return system
-
 
 def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
@@ -137,11 +127,8 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
-    # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.
-    if not system.comments:
-        system = system_to_enriched_system(system)
 
-    # If comments are included in request or added in the enriching process, run the unifier to add them to the Gromet
+    # If comments are included in request, run the unifier to add them to the Gromet
     if system.comments:
         align_full_system(gromet_collection, system.comments)
 
@@ -256,7 +243,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths-zip", files=files)
     gromet_json = response.json()
     """
-
+        
     # To process a zip file, we first convert it to a System object, and then pass it to system_to_gromet.
     files = []
     blobs = []
