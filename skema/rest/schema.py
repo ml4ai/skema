@@ -105,3 +105,9 @@ class TextReadingAnnotationsOutput(BaseModel):
             ),
         ],
     )
+
+    generalized_errors: Optional[List[TextReadingError]] = Field(
+        name="generalized_errors",
+        description="Any pipeline-wide errors, not specific to a particular input",
+        example=[TextReadingError(pipeline="MIT", message="API quota exceeded")]
+    )
