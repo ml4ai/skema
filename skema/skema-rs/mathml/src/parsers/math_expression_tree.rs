@@ -170,6 +170,8 @@ impl Lexer {
             acc
         });
 
+        println!("{:?}", &tokens);
+
         // Insert implicit multiplication operators.
         let tokens = tokens.iter().fold(vec![], |mut acc, x| {
             if acc.is_empty() {

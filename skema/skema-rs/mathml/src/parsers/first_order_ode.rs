@@ -1,11 +1,11 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, MathExpression, Mi, Type,
+        Ci, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, equals, etag, lparen, math_expression, mi, mo, rparen, stag, subtract, ws,
-        IResult, ParseError, Span,
+        add, attribute, elem2, equals, etag, lparen, mi, mn, mo, mover, msqrt, msub, msubsup, msup,
+        rparen, stag, subtract, tag_parser, ws, IResult, ParseError, Span,
     },
     parsers::math_expression_tree::MathExpressionTree,
 };
@@ -16,7 +16,7 @@ use nom::{
     combinator::map,
     error::Error,
     multi::{many0, many1},
-    sequence::{delimited, tuple},
+    sequence::{delimited, pair, tuple},
 };
 use std::str::FromStr;
 
@@ -141,6 +141,51 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
 //Ok((s, (Derivative::new(1, 1), func)))
 //}
 
+/// Fractions
+pub fn mfrac(input: Span) -> IResult<MathExpression> {
+    let (s, frac) = ws(map(
+        tag_parser!("mfrac", pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Mfrac(Box::new(x), Box::new(y)),
+    ))(input)?;
+
+    //let (s, frac) = elem2!("mfrac", Mfrac)(input)?;
+    Ok((s, frac))
+}
+
+/// Rows
+pub fn mrow(input: Span) -> IResult<Mrow> {
+    let (s, elements) = ws(delimited(
+        stag!("mrow"),
+        many0(math_expression),
+        etag!("mrow"),
+    ))(input)?;
+    Ok((s, Mrow(elements)))
+}
+
+/// Parser for math expressions. This varies from the one in the generic_mathml module, since it
+/// assumes that expressions such as S(t) are actually univariate functions.
+pub fn math_expression(input: Span) -> IResult<MathExpression> {
+    ws(alt((
+        map(ci_univariate_func, |x| MathExpression::new_ci(Box::new(x))),
+        map(ci_unknown, |Ci { content, .. }| {
+            MathExpression::new_ci(Box::new(Ci {
+                r#type: Some(Type::Function),
+                content,
+            }))
+        }),
+        map(operator, MathExpression::Mo),
+        //map(mi, MathExpression::Mi),
+        mn,
+        msup,
+        msub,
+        msqrt,
+        mfrac,
+        map(mrow, MathExpression::Mrow),
+        mover,
+        msubsup,
+    )))(input)
+}
+
 /// Parse a first order ODE with a single derivative term on the LHS.
 pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     let (s, _) = stag!("math")(input)?;
@@ -244,6 +289,26 @@ fn test_first_order_ode() {
         <mi>β</mi>
         <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
         <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+
+    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
+
+    assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
+
+    // ASKEM Hackathon 2, scenario 1, equation 1.
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
     </math>
     ";
 
