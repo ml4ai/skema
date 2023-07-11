@@ -96,14 +96,14 @@ def normalize_extractions(
 ) -> AttributeCollection:
     collections = list()
     with tempfile.TemporaryDirectory() as tmpdirname:
-        skema_path = os.path.join(tmpdirname, "skema.json")
-        mit_path = os.path.join(tmpdirname, "mit.json")
+        tmp_dir = Path(tmpdirname)
+        skema_path = tmp_dir / "skema.json"
 
         canonical_mit, canonical_arizona = None, None
 
         if arizona_extractions:
             try:
-                with open(skema_path, "w") as f:
+                with skema_path.open("w") as f:
                     json.dump(arizona_extractions, f)
                 canonical_arizona = import_arizona(Path(skema_path))
                 collections.append(canonical_arizona)
@@ -111,9 +111,8 @@ def normalize_extractions(
                 print(ex)
         if mit_extractions:
             try:
-                with open(mit_path, "w") as f:
-                    json.dump(mit_extractions, f)
-                canonical_mit = import_mit(Path(mit_path))
+                # MIT extractions already come normalized
+                canonical_mit = mit_extractions
                 collections.append(canonical_mit)
             except Exception as ex:
                 print(ex)
@@ -122,29 +121,24 @@ def normalize_extractions(
             # Merge both with some de de-duplications
             params = {"gpt_key": OPENAI_KEY}
 
+            skema_path = tmp_dir / "canonical_skema.json"
+            mit_path = tmp_dir / "canonical_mit.json"
+
+            canonical_arizona.save_json(skema_path)
+            with mit_path.open("w") as f:
+                json.dump(canonical_mit, f)
+
             data = {
-                "mit_file": json.dumps(
-                    canonical_mit.json() if canonical_mit else {}
-                ),
-                "arizona_file": json.dumps(
-                    canonical_arizona.json() if canonical_arizona else {}
-                ),
+                "mit_file": mit_path.open(),
+                "arizona_file": skema_path.open(),
             }
             response = requests.post(
                 f"{MIT_TR_ADDRESS}/integration/get_mapping", params=params, files=data
             )
 
+            # MIT merges the collection for us
             if response.status_code == 200:
-                map_data = response.text
-                map_path = os.path.join(tmpdirname, "mapping.txt")
-                with open(map_path, "w") as f:
-                    f.write(map_data)
-                merged_collection = merge_collections(
-                    a_collection=collections[0],
-                    m_collection=collections[1],
-                    map_path=Path(map_path),
-                )
-
+                merged_collection = AttributeCollection(**response.json())
                 # Return the merged collection here
                 return merged_collection
 
@@ -258,7 +252,7 @@ def cosmos_client(name: str, data: BinaryIO):
 
         callback_endpoints = response.json()
 
-        for retry_num in range(30):
+        for retry_num in range(200):
             time.sleep(3)  # Retry in ten seconds
             poll = requests.get(f"{COSMOS_ADDRESS}{callback_endpoints['status_endpoint']}")
             if poll.status_code == status.HTTP_200_OK:
@@ -393,7 +387,7 @@ def integrated_extractions(
     )
 
     # If there is any error, set the response's status code to 207
-    if skema_error or mit_error or (o.errors is not None for o in return_val.outputs):
+    if skema_error or mit_error or any(o.errors is not None for o in return_val.outputs):
         response.status_code = status.HTTP_207_MULTI_STATUS
 
     return return_val
