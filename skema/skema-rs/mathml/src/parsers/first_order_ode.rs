@@ -39,13 +39,13 @@ pub struct FirstOrderODE {
 
 impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
-        let lhs_expression_tree = MathExpressionTree::new_cons(
+        let lhs_expression_tree = MathExpressionTree::Cons(
             Operator::Derivative(Derivative::new(1, 1)),
-            vec![MathExpressionTree::new_atom(MathExpression::new_ci(
-                Box::new(self.lhs_var.clone()),
+            vec![MathExpressionTree::Atom(MathExpression::Ci(
+                self.lhs_var.clone(),
             ))],
         );
-        let combined = MathExpressionTree::new_cons(
+        let combined = MathExpressionTree::Cons(
             Operator::Equals,
             vec![lhs_expression_tree, self.rhs.clone()],
         );
@@ -75,7 +75,7 @@ fn ci_univariate_func(input: Span) -> IResult<Ci> {
             s,
             Ci::new(
                 Some(Type::Function),
-                MathExpression::Mi(Mi(x.trim().to_string())),
+                Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
             ),
         ))
     } else {
@@ -102,7 +102,7 @@ fn d(input: Span) -> IResult<()> {
 /// Parse a content identifier of unknown type.
 fn ci_unknown(input: Span) -> IResult<Ci> {
     let (s, x) = mi(input)?;
-    Ok((s, Ci::new(None, MathExpression::Mi(x))))
+    Ok((s, Ci::new(None, Box::new(MathExpression::Mi(x)))))
 }
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
@@ -126,33 +126,18 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
     Ok((s, (Derivative::new(1, 1), func)))
 }
 
-//fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
-//let (s, (_, _, _, _)) = tuple((stag!("mover"), mi, mo, etag!("mover")))(input)?;
-//todo!()
-//let (s, func) = ws(alt((univariate_func, ci_func)))(s)?;
-//let (s, _) = tuple((
-//etag!("mrow"),
-//stag!("mrow"),
-//d,
-//mi,
-//etag!("mrow"),
-//etag!("mfrac"),
-//))(s)?;
-//Ok((s, (Derivative::new(1, 1), func)))
-//}
-
-/// Fractions
+// We reimplement the mfrac and mrow parsers in this file (instead of importing them from
+// the generic_mathml module) to work with the specialized version of the math_expression parser
+// (also in this file).
 pub fn mfrac(input: Span) -> IResult<MathExpression> {
     let (s, frac) = ws(map(
         tag_parser!("mfrac", pair(math_expression, math_expression)),
         |(x, y)| MathExpression::Mfrac(Box::new(x), Box::new(y)),
     ))(input)?;
 
-    //let (s, frac) = elem2!("mfrac", Mfrac)(input)?;
     Ok((s, frac))
 }
 
-/// Rows
 pub fn mrow(input: Span) -> IResult<Mrow> {
     let (s, elements) = ws(delimited(
         stag!("mrow"),
@@ -166,15 +151,14 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        map(ci_univariate_func, |x| MathExpression::new_ci(Box::new(x))),
+        map(ci_univariate_func, |x| MathExpression::Ci(x)),
         map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::new_ci(Box::new(Ci {
+            MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
                 content,
-            }))
+            })
         }),
         map(operator, MathExpression::Mo),
-        //map(mi, MathExpression::Mi),
         mn,
         msup,
         msub,
@@ -198,12 +182,12 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, |x| MathExpression::new_ci(Box::new(x))),
+        map(ci_univariate_func, |x| MathExpression::Ci(x)),
         map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::new_ci(Box::new(Ci {
+            MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
                 content,
-            }))
+            })
         }),
         map(operator, MathExpression::Mo),
         math_expression,
@@ -235,7 +219,7 @@ fn test_ci_univariate_func() {
         ci_univariate_func,
         Ci::new(
             Some(Type::Function),
-            MathExpression::Mi(Mi("S".to_string())),
+            Box::new(MathExpression::Mi(Mi("S".to_string()))),
         ),
     );
 }
@@ -252,7 +236,7 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
             Derivative::new(1, 1),
             Ci::new(
                 Some(Type::Function),
-                MathExpression::Mi(Mi("S".to_string())),
+                Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
         ),
     );
@@ -270,7 +254,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
             Derivative::new(1, 1),
             Ci::new(
                 Some(Type::Function),
-                MathExpression::Mi(Mi("S".to_string())),
+                Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
         ),
     );
@@ -315,5 +299,5 @@ fn test_first_order_ode() {
     let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
 
     assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
+    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
 }
