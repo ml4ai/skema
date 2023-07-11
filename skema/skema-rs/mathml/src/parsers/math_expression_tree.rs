@@ -96,13 +96,11 @@ impl MathExpressionTree {
                             }
                         }
                     }
-
                     _ => panic!("Unhandled MathExpressionTree in Atom matching"),
                 }
             }
             MathExpressionTree::Cons(head, rest) => {
                 content_mathml.push_str("<apply>");
-
                 match head {
                     Operator::Add => content_mathml.push_str("<plus/>"),
                     Operator::Subtract => content_mathml.push_str("<minus/>"),
@@ -122,7 +120,6 @@ impl MathExpressionTree {
 
                 content_mathml.push_str("</apply>");
             }
-
             _ => todo!(),
         }
         content_mathml
