@@ -1,6 +1,7 @@
 import json
 import os
 import tempfile
+import asyncio
 from pathlib import Path
 from typing import List, Dict, Optional
 from io import BytesIO
@@ -16,7 +17,13 @@ from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
 from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from skema.program_analysis.comments import CodeComments
+from skema.program_analysis.comments import (
+    CodeComments,
+    SingleFileCodeComments,
+    MultiFileCodeComments,
+)
+from skema.rest import comments_proxy
+from skema.rest.schema import CodeSnippet
 
 FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
 
@@ -65,7 +72,45 @@ class System(BaseModel):
     )
 
 
-def system_to_gromet(system: System):
+async def system_to_enriched_system(system: System) -> System:
+    """Takes a System as input and enriches it with comments by running the Rust comment extractor."""
+
+    def get_language_from_extension(extension: str) -> str:
+        """Function for converting file extension to language enum used by CodeSnippet"""
+        extension = extension.lower()
+        extension_map = {
+            ".f": "Fortran",
+            ".f95": "Fortran",
+            ".for": "Fortran",
+            ".py": "Python",
+            ".cpp": "CppOrC",
+            ".c": "CppOrC",
+        }
+        return extension_map.get(extension, "")
+
+    # Instead of making each proxy call seperatly, we will gather them
+    coroutines = []
+    file_paths = []
+    for file, blob in zip(system.files, system.blobs):
+        file_path = Path(system.root_name or "") / file
+        snippet = CodeSnippet(
+            code=blob, language=get_language_from_extension(file_path.suffix)
+        )
+        coroutines.append(comments_proxy.proxy_extract_comments(snippet))
+        file_paths.append(file_path)
+    results = await asyncio.gather(*coroutines)
+
+    # Due to the nested structure of MultiFileCodeComments, it easier to work with a Dict.
+    # Then, we can convert it using MutliFileCodeComments.model_validate()
+    comments = {"files": {}}
+    for file_path, result in zip(file_paths, results):
+        comments["files"][str(file_path)] = result
+    system.comments = MultiFileCodeComments.model_validate(comments)
+
+    return system
+
+
+async def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
     # The CODE2FN Pipeline requires a file path as input.
@@ -91,7 +136,11 @@ def system_to_gromet(system: System):
             str(system_filepaths),
         )
 
-    # If comments are included in request, run the unifier to add them to the Gromet
+    # Attempt to enrich the system with comments. May return the same system if Rust isn't insalled.
+    if not system.comments:
+        system = await system_to_enriched_system(system)
+
+    # If comments are included in request or added in the enriching process, run the unifier to add them to the Gromet
     if system.comments:
         align_full_system(gromet_collection, system.comments)
 
@@ -109,6 +158,7 @@ def system_to_gromet(system: System):
 
 
 router = APIRouter()
+
 
 @router.get("/ping", summary="Ping endpoint to test health of service")
 def ping() -> int:
@@ -169,7 +219,7 @@ async def fn_given_filepaths(system: System):
     gromet_json = response.json()
     """
 
-    return system_to_gromet(system)
+    return await system_to_gromet(system)
 
 
 @router.post(
@@ -217,14 +267,14 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
                 blobs.append(zip.open(file).read())
 
     zip_obj = Path(zip_file.filename)
-    system_name = zip_obj.name
-    root_name = zip_obj.name
+    system_name = zip_obj.stem
+    root_name = zip_obj.stem
 
     system = System(
         files=files, blobs=blobs, system_name=system_name, root_name=root_name
     )
 
-    return system_to_gromet(system)
+    return await system_to_gromet(system)
 
 
 @router.post(
@@ -245,6 +295,7 @@ async def get_pyacset(ports: Ports):
         petri.set_subpart(j, skema.skema_py.petris.attr_sname, opos[j])
 
     return petri.write_json()
+
 
 app = FastAPI()
 app.include_router(

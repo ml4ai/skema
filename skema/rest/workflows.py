@@ -6,7 +6,8 @@ End-to-end skema workflows
 
 from typing import List
 from skema.rest.proxies import SKEMA_RS_ADDESS
-from skema.rest import schema, utils
+from skema.rest import schema, utils, comments_proxy
+from skema.program_analysis.comments import MultiFileCodeComments
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
 from fastapi import APIRouter, File, UploadFile
@@ -89,9 +90,6 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System):
-    if system.comments == None:
-        # FIXME: get comments
-        pass
     gromet = await code2fn.fn_given_filepaths(system)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
@@ -99,13 +97,9 @@ async def code_snippets_to_pn_amr(system: code2fn.System):
     return res.json()
 
 
-
 # code snippets -> fn -> regnet amr
 @router.post("/code/snippets-to-rn-amr", summary="Code snippets → RegNet AMR")
 async def code_snippets_to_rn_amr(system: code2fn.System):
-    if system.comments == None:
-        # FIXME: get comments and produce another system
-        pass
     gromet = await code2fn.fn_given_filepaths(system)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
@@ -117,7 +111,6 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
     "/code/codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR"
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File()):
-    # FIXME: get comments
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
@@ -128,7 +121,6 @@ async def repo_to_pn_amr(zip_file: UploadFile = File()):
 # zip archive -> fn -> regnet amr
 @router.post("/code/codebase-to-rn-amr", summary="Code repo (zip archive) → RegNet AMR")
 async def repo_to_rn_amr(zip_file: UploadFile = File()):
-    # FIXME: get comments
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
     res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
