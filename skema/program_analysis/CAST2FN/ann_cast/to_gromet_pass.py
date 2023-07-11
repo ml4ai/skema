@@ -1602,7 +1602,7 @@ class ToGrometPass:
                     if (
                         parent_gromet_fn.pof != None
                     ):  # TODO: come back and fix this guard later
-                        pof_idx = len(parent_gromet_fn.pof)
+                        pof_idx = len(parent_gromet_fn.pof)-1
                     else:
                         pof_idx = -1
                     if (
