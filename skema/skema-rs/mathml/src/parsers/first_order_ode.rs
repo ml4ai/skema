@@ -13,7 +13,7 @@ use derive_new::new;
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::{map},
+    combinator::map,
     error::Error,
     multi::{many0, many1},
     sequence::{delimited, tuple},
@@ -35,6 +35,22 @@ pub struct FirstOrderODE {
 
     /// An expression tree corresponding to the RHS of the ODE.
     pub rhs: MathExpressionTree,
+}
+
+impl FirstOrderODE {
+    pub fn to_cmml(&self) -> String {
+        let lhs_expression_tree = MathExpressionTree::new_cons(
+            Operator::Derivative(Derivative::new(1, 1)),
+            vec![MathExpressionTree::new_atom(MathExpression::new_ci(
+                Box::new(self.lhs_var.clone()),
+            ))],
+        );
+        let combined = MathExpressionTree::new_cons(
+            Operator::Equals,
+            vec![lhs_expression_tree, self.rhs.clone()],
+        );
+        combined.to_cmml()
+    }
 }
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
