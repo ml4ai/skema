@@ -56,7 +56,7 @@ pub enum MathExpression {
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
-    GroupTuple(Vec<MathExpression>),
+    //GroupTuple(Vec<MathExpression>),
     Ci(Box<Ci>),
     #[default]
     None,
