@@ -8,6 +8,10 @@ use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
 
+use mathml::ast::operator::Operator::Multiply;
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use mathml::parsers::math_expression_tree::MathExpressionTree::{Atom, Cons};
+
 // new imports
 use mathml::acset::{PetriNet, RegNet};
 
@@ -109,15 +113,82 @@ pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
             // Ignore lines starting with '#'
         } else {
             // Parse MathML into FirstOrderODE
-            let ode = line
+            let mut ode = line
                 .parse::<FirstOrderODE>()
                 .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
-            println!("ode_line rhs: {:?}\n", ode.rhs.to_string().clone());
-            println!("ode_line state: {:?}\n", ode.lhs_var.to_string().clone());
+            println!(
+                "ode_line rhs string before: {:?}\n",
+                ode.rhs.to_string().clone()
+            );
+            //println!("ode_line rhs data struct: {:?}\n", ode.rhs.clone());
+            //println!("ode_line state: {:?}\n", ode.lhs_var.to_string().clone());
+            ode.rhs = flatten_mults(ode.rhs.clone());
+            println!(
+                "ode_line rhs string after: {:?}\n",
+                ode.rhs.to_string().clone()
+            );
             ode_vec.push(ode);
         }
     }
     ode_vec
+}
+
+pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
+    match equation {
+        Cons(ref x, ref mut y) => match x {
+            Multiply => {
+                match y[1].clone() {
+                    Cons(x1, y1) => match x1 {
+                        Multiply => {
+                            let mut temp1 = flatten_mults(y1[0].clone());
+                            let mut temp2 = flatten_mults(y1[1].clone());
+                            y.remove(1);
+                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec())
+                        }
+                        _ => {
+                            let mut temp1 = y1[0].clone();
+                            let mut temp2 = y1[1].clone();
+                            y.remove(1);
+                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec())
+                        }
+                    },
+                    Atom(x1) => {}
+                }
+                match y[0].clone() {
+                    Cons(x0, y0) => match x0 {
+                        Multiply => {
+                            let mut temp1 = flatten_mults(y0[0].clone());
+                            let mut temp2 = flatten_mults(y0[1].clone());
+                            y.remove(0);
+                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec());
+                        }
+                        _ => {
+                            let mut temp1 = y0[0].clone();
+                            let mut temp2 = y0[1].clone();
+                            y.remove(0);
+                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec())
+                        }
+                    },
+                    Atom(x0) => {}
+                }
+            }
+            _ => {
+                if y.len() > 1 {
+                    let temp1 = flatten_mults(y[1].clone());
+                    let temp0 = flatten_mults(y[0].clone());
+                    y.remove(1);
+                    y.remove(0);
+                    y.append(&mut [temp0.clone(), temp1.clone()].to_vec())
+                } else {
+                    let temp0 = flatten_mults(y[0].clone());
+                    y.remove(0);
+                    y.append(&mut [temp0.clone()].to_vec())
+                }
+            }
+        },
+        Atom(ref x) => {}
+    }
+    equation
 }
 
 #[test]
