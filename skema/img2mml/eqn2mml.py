@@ -9,7 +9,7 @@ from typing import Text
 from typing_extensions import Annotated
 from fastapi import APIRouter, FastAPI, Response, Request, Query
 
-# from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
+from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (
     get_mathml_from_bytes,
     get_mathml_from_latex,
