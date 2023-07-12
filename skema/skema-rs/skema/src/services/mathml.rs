@@ -1,4 +1,4 @@
-use actix_web::{put, test, web, HttpResponse};
+use actix_web::{put, web, HttpResponse};
 use mathml::{
     acset::{ACSet, AMRmathml, PetriNet, RegNet},
     ast::Math,
@@ -6,9 +6,8 @@ use mathml::{
     parsers::first_order_ode::FirstOrderODE,
 };
 use petgraph::dot::{Config, Dot};
-
-use std::string::String;
 use utoipa;
+
 
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 #[utoipa::path(
@@ -68,8 +67,7 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 )]
 #[put("/mathml/content-mathml")]
 pub async fn get_content_mathml(payload: String) -> String {
-    let mut contents = payload;
-    let ode = contents.parse::<FirstOrderODE>().unwrap();
+    let ode = payload.parse::<FirstOrderODE>().unwrap();
     let content_mathml = ode.to_cmml();
     content_mathml
 }

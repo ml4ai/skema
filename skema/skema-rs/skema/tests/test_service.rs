@@ -1,4 +1,4 @@
-use actix_web::{test, App, http::{self, header::ContentType}};
+use actix_web::{test, App, http::header::ContentType};
 use skema::services::{
     comment_extraction::{get_comments, CommentExtractionRequest, Language},
     mathml::get_amr

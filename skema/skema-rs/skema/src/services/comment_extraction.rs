@@ -1,14 +1,19 @@
 //! Comment extraction services
 
 use actix_web::{post, web, HttpResponse};
-use comment_extraction::languages::python::get_comments_from_string as get_python_comments;
-use comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
+use comment_extraction::{
+    languages::python::get_comments_from_string as get_python_comments,
+    extraction::extract_comments_from_directory
+};
 use log::debug;
 use serde::{Deserialize, Serialize};
 use std::{fs, io::Write};
 use tempdir::TempDir;
 use utoipa;
 use utoipa::ToSchema;
+
+#[cfg(test)]
+use comment_extraction::comments::Comments;
 
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub enum Language {
@@ -41,6 +46,7 @@ pub struct CommentExtractionResponse {
 }
 
 impl CommentExtractionResponse {
+    #[cfg(test)]
     fn new(comments: Comments) -> Self {
         let mut single_line_comments = Vec::new();
         for comment in comments.comments.iter() {
