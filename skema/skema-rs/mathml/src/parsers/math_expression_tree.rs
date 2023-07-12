@@ -1,12 +1,16 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-use crate::ast::{
-    operator::{Derivative, Operator},
-    Math, MathExpression, Mi, Mrow,
+use crate::{
+    ast::{
+        operator::{Derivative, Operator},
+        Math, MathExpression, Mi, Mrow,
+    },
+    parsers::interpreted_mathml::interpreted_math,
 };
 use derive_new::new;
 use nom::error::Error;
+
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
@@ -229,8 +233,8 @@ impl From<Math> for MathExpressionTree {
 impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let math = s.parse::<Math>()?;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let (_, math) = interpreted_math(input.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -538,7 +542,9 @@ fn test_content_hackathon2_scenario1_eq8() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={}", exp);
     let cmml = exp.to_cmml();
-    println!("cmml={cmml}");
+    assert_eq!(
+        cmml,
+        "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
+    );
 }
