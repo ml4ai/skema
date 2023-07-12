@@ -9,6 +9,7 @@ def clean_mml(mml: str) -> str:
     # remove comments
     for comment in soup(text=lambda text: isinstance(text, Comment)):
         comment.extract()
+
     # prune attributes
     for attr in to_remove:
       for tag in soup.find_all(attrs={attr: True}):

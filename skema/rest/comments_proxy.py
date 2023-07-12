@@ -13,7 +13,6 @@ import requests
 router = APIRouter()
 
 
-
 @router.post("/extract-comments", response_model=CodeComments)
 async def proxy_extract_comments(code_snippet: schema.CodeSnippet) -> CodeComments:
     """
@@ -22,7 +21,8 @@ async def proxy_extract_comments(code_snippet: schema.CodeSnippet) -> CodeCommen
     """
     return requests.post(
         # NOTE: .dict() -> .model_dump() in Pydantic v2 (see also https://github.com/tiangolo/fastapi/issues/9710)
-        f"{SKEMA_RS_ADDESS}/extract-comments", json=code_snippet.dict()
+        f"{SKEMA_RS_ADDESS}/extract-comments",
+        json=code_snippet.dict(),
     ).json()
 
 

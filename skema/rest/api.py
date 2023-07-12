@@ -1,9 +1,14 @@
 from fastapi import FastAPI, Response, status
 import os
-from skema.rest import schema, workflows
+from skema.rest import (
+    schema,
+    workflows,
+    integrated_text_reading_proxy,
+    morae_proxy,
+    comments_proxy,
+)
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
-from skema.rest import morae_proxy, comments_proxy
 
 
 VERSION: str = os.environ.get("APP_VERSION", "????")
@@ -56,6 +61,10 @@ tags_metadata = [
             "url": "https://github.com/ml4ai/skema/issues?q=is%3Aopen+is%3Aissue+label%3AMORAE",
         },
     },
+    {
+        "name": "text reading",
+        "description": "Unified proxy and integration code for MIT and SKEMA TR pipelines",
+    },
 ]
 
 app = FastAPI(
@@ -96,6 +105,10 @@ app.include_router(
     tags=["morae", "skema-rs"],
 )
 
+app.include_router(
+    integrated_text_reading_proxy.router, prefix="/text-reading", tags=["text reading"]
+)
+
 
 @app.get("/version", tags=["core"], summary="API version")
 async def version() -> str:
@@ -123,12 +136,19 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
     mathjax_status = eqn2mml.latex2mml_healthcheck()
     eqn2mml_status = eqn2mml.img2mml_healthcheck()
     code2fn_status = code2fn.ping()
+    text_reading_status = integrated_text_reading_proxy.healthcheck()
     # check if any services failing and alter response status code accordingly
     status_code = (
         status.HTTP_200_OK
         if all(
             code == 200
-            for code in [morae_status, mathjax_status, eqn2mml_status, code2fn_status]
+            for code in [
+                morae_status,
+                mathjax_status,
+                eqn2mml_status,
+                code2fn_status,
+                text_reading_status,
+            ]
         )
         else status.HTTP_500_INTERNAL_SERVER_ERROR
     )
