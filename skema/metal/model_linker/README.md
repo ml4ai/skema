@@ -4,11 +4,6 @@ Link ASKEM models, such as `AMR` and `GrometFN` with text extractions in their [
 Currently, we support linking only to `AMR` representations, such as _PetriNets_ and _RegNets_.
 Soon, we will support linking to Gromet function networks.
 
-## Installation
-
-Clone this repository, and run:
-```shell
-pip install .
 ```
 
 ## Usage
