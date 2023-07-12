@@ -205,7 +205,7 @@ pub struct Initial {
 pub struct Rate {
     pub target: String,
     pub expression: String,
-    pub expression_mathml: String,
+    pub expression_mathml: Option<String>,
 }
 
 #[derive(
@@ -320,6 +320,7 @@ impl From<ACSet> for PetriNet {
         let mut transitions_vec = BTreeSet::<Transition>::new();
         let mut initial_vec = Vec::<Initial>::new();
         let mut parameter_vec = Vec::<Parameter>::new();
+        let mut rate_vec = Vec::<Rate>::new();
 
         // -----------------------------------------------------------
 
@@ -384,6 +385,19 @@ impl From<ACSet> for PetriNet {
                 ..Default::default()
             };
 
+            let mut terms = String::new();
+            for term in transitions.input.clone().unwrap() {
+                let terms_temp = terms.clone();
+                terms = format!("{}*{}", terms_temp.clone(), term.clone());
+            }
+
+            let rate = Rate {
+                target: trans.tname.clone(),
+                expression: format!("{}{}", trans.tname.clone(), terms.clone()), // the second term needs to be the product of the inputs
+                ..Default::default()
+            };
+
+            rate_vec.push(rate.clone());
             parameter_vec.push(parameters.clone());
             transitions_vec.insert(transitions.clone());
         }
@@ -391,7 +405,7 @@ impl From<ACSet> for PetriNet {
         // -----------------------------------------------------------
 
         let ode = Ode {
-            rates: None,
+            rates: Some(rate_vec),
             initials: Some(initial_vec),
             parameters: Some(parameter_vec),
             ..Default::default()
