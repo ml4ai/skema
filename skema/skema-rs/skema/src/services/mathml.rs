@@ -54,7 +54,8 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     dot_representation.to_string()
 }
 
-/// Parse presentation MathML and return a content MathML representation
+/// Parse presentation MathML and return a content MathML representation. Currently limited to
+/// first-order ODEs.
 #[utoipa::path(
     request_body = String,
     responses(
