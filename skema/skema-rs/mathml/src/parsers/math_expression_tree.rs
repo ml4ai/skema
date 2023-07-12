@@ -156,22 +156,32 @@ impl Lexer {
                         }
                         acc.push(x);
                     }
+
                     // Handle other types of operators.
                     MathExpression::Mo(_) => {
                         acc.push(x);
                     }
                     // Handle other types of MathExpression objects.
-                    t => match acc.last().unwrap() {
-                        MathExpression::Mo(_) => {
-                            // If the last item in the accumulator is an Mo, add the current token.
-                            acc.push(t);
+                    t => {
+                        let last_token = acc.last().unwrap();
+                        match last_token {
+                            MathExpression::Mo(Operator::Rparen) => {
+                                // If the last item in the accumulator is a right parenthesis ')',
+                                // insert a multiplication operator
+                                acc.push(&MathExpression::Mo(Operator::Multiply));
+                            }
+                            MathExpression::Mo(_) => {
+                                // If the last item in the accumulator is an Mo (but not a right
+                                // parenthesis), noop
+                            }
+                            _ => {
+                                // Otherwise, insert a multiplication operator
+                                acc.push(&MathExpression::Mo(Operator::Multiply));
+                            }
                         }
-                        _ => {
-                            // Otherwise, insert a multiplication operator followed by the token.
-                            acc.push(&MathExpression::Mo(Operator::Multiply));
-                            acc.push(t);
-                        }
-                    },
+                        // Insert the token
+                        acc.push(t);
+                    }
                 }
             }
             acc
