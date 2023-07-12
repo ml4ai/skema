@@ -40,9 +40,15 @@ pub enum FunctionType {
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct ValueL {
     pub value_type: String, // could be enum?
+
+    // This is the generic problem. floats are exported as ints but rust exports
+    // as floats, making full generic isn't feasible since we don't know the
+    // number of instances before hand. So we import as a string to capture the
+    // data regardless of type.
     #[serde(deserialize_with = "de_value")]
     #[serde(serialize_with = "se_value")]
-    pub value: String, // This is the generic problem. floats are exported as ints but rust exports as floats, making full generic isn't feasible since we don't know the number of instances before hand. So we import as a string to capture the data regardless of type.
+    pub value: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gromet_type: Option<String>,
 }

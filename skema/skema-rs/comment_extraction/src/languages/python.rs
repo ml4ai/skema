@@ -120,7 +120,7 @@ fn comments(input: Span) -> IResult<Span, Comments> {
                 contents,
             } => {
                 acc.comments.push(Comment {
-                    line_number: line_number.try_into().unwrap(),
+                    line_number,
                     contents,
                 });
             }
