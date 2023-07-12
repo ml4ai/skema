@@ -4,8 +4,8 @@ use crate::{
         Ci, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, elem2, equals, etag, lparen, mi, mn, mo, msqrt, msub, msubsup, msup,
-        rparen, stag, subtract, tag_parser, ws, IResult, ParseError, Span,
+        add, attribute, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup, rparen, stag,
+        subtract, tag_parser, ws, IResult, ParseError, Span,
     },
     parsers::math_expression_tree::MathExpressionTree,
 };
@@ -74,7 +74,7 @@ fn parenthesized_identifier(input: Span) -> IResult<()> {
 /// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
 fn ci_univariate_func(input: Span) -> IResult<Ci> {
-    let (s, (Mi(x), pi)) = tuple((mi, parenthesized_identifier))(input)?;
+    let (s, (Mi(x), _pi)) = tuple((mi, parenthesized_identifier))(input)?;
     Ok((
         s,
         Ci::new(
@@ -179,7 +179,7 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        map(ci_univariate_func, |x| MathExpression::Ci(x)),
+        map(ci_univariate_func, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
@@ -212,7 +212,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, |x| MathExpression::Ci(x)),
+        map(ci_univariate_func, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
