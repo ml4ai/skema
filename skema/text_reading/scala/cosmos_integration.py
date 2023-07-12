@@ -17,7 +17,6 @@ from pathlib import Path
 
 from tqdm import tqdm
 
-
 def main(parquet_file_folder: str, output_dir:str):
 
     parquet_files = os.listdir(parquet_file_folder)
