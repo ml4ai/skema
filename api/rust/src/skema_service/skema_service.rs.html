@@ -141,6 +141,8 @@
 <a href="#141" id="141">141</a>
 <a href="#142" id="142">142</a>
 <a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, web::Data, App, HttpResponse, HttpServer};
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::services::{comment_extraction, gromet};
@@ -187,6 +189,7 @@
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
+            skema::services::mathml::get_content_mathml,
             skema::services::mathml::get_regnet,
             skema::services::mathml::get_amr,
             gromet::get_model_ids,
@@ -270,6 +273,7 @@
             .service(comment_extraction::get_comments_from_zipfile)
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_content_mathml)
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)

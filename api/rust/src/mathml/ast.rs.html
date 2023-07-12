@@ -98,6 +98,8 @@
 <a href="#98" id="98">98</a>
 <a href="#99" id="99">99</a>
 <a href="#100" id="100">100</a>
+<a href="#101" id="101">101</a>
+<a href="#102" id="102">102</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
 
@@ -130,7 +132,7 @@
 <span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 </span><span class="kw">pub struct </span>Ci {
     <span class="kw">pub </span>r#type: <span class="prelude-ty">Option</span>&lt;Type&gt;,
-    <span class="kw">pub </span>content: MathExpression,
+    <span class="kw">pub </span>content: Box&lt;MathExpression&gt;,
 }
 
 <span class="doccomment">/// The MathExpression enum represents the corresponding element type in MathML 3
@@ -156,7 +158,8 @@
     Mstyle(Vec&lt;MathExpression&gt;),
     Mspace(String),
     MoLine(String),
-    Ci(Box&lt;Ci&gt;),
+    <span class="comment">//GroupTuple(Vec&lt;MathExpression&gt;),
+    </span>Ci(Ci),
     <span class="attr">#[default]
     </span><span class="prelude-val">None</span>,
 }
@@ -165,6 +168,7 @@
     <span class="kw">fn </span>fmt(<span class="kw-2">&amp;</span><span class="self">self</span>, f: <span class="kw-2">&amp;mut </span>fmt::Formatter&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; fmt::Result {
         <span class="kw">match </span><span class="self">self </span>{
             MathExpression::Mi(Mi(identifier)) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, identifier),
+            MathExpression::Ci(Ci { r#type: <span class="kw">_</span>, content }) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, content),
             MathExpression::Mn(number) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, number),
             MathExpression::Msup(base, superscript) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;{base}^{{{superscript}}}&quot;</span>)
@@ -194,7 +198,7 @@
 
 <span class="doccomment">/// The Math struct represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_math)
-</span><span class="attr">#[derive(Debug, PartialEq, Clone)]
+</span><span class="attr">#[derive(Debug, PartialEq, Eq, Clone)]
 </span><span class="kw">pub struct </span>Math {
     <span class="kw">pub </span>content: Vec&lt;MathExpression&gt;,
 }

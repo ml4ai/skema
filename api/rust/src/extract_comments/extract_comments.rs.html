@@ -57,20 +57,13 @@
 <a href="#57" id="57">57</a>
 <a href="#58" id="58">58</a>
 <a href="#59" id="59">59</a>
-<a href="#60" id="60">60</a>
-<a href="#61" id="61">61</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Program to get comments from a source code file.
 
 </span><span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>comment_extraction::{
-    conventions,
     conventions::Convention,
     extraction::{extract_comments_from_directory, extract_comments_from_file},
 };
-<span class="kw">use </span>std::{collections::HashSet, fs::read_to_string};
-
-<span class="attr">#[cfg(test)]
-</span><span class="kw">use </span>serde_json <span class="kw">as </span>json;
 
 <span class="doccomment">/// Command line arguments
 </span><span class="attr">#[derive(Parser)]
@@ -106,6 +99,9 @@
 <span class="doccomment">/// Test DSSAT-style comment extraction
 </span><span class="attr">#[test]
 </span><span class="kw">fn </span>test_dssat_style_extraction() {
+    <span class="kw">use </span>comment_extraction::conventions;
+    <span class="kw">use </span>serde_json <span class="kw">as </span>json;
+    <span class="kw">use </span>std::fs::read_to_string;
     <span class="kw">let </span>output: json::Value =
         json::from_str(<span class="kw-2">&amp;</span>read_to_string(<span class="string">&quot;tests/data/chime_sir_output.json&quot;</span>).unwrap()).unwrap();
     <span class="kw">let </span>comments: json::Value = json::from_str(

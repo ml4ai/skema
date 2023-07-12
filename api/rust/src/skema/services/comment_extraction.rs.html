@@ -106,17 +106,28 @@
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Comment extraction services
 
 </span><span class="kw">use </span>actix_web::{post, web, HttpResponse};
-<span class="kw">use </span>comment_extraction::languages::python::get_comments_from_string <span class="kw">as </span>get_python_comments;
-<span class="kw">use </span>comment_extraction::{comments::Comments, extraction::extract_comments_from_directory};
+<span class="kw">use </span>comment_extraction::{
+    extraction::extract_comments_from_directory,
+    languages::python::get_comments_from_string <span class="kw">as </span>get_python_comments,
+};
 <span class="kw">use </span>log::debug;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::{fs, io::Write};
 <span class="kw">use </span>tempdir::TempDir;
 <span class="kw">use </span>utoipa;
 <span class="kw">use </span>utoipa::ToSchema;
+
+<span class="attr">#[cfg(test)]
+</span><span class="kw">use </span>comment_extraction::comments::Comments;
 
 <span class="attr">#[derive(Debug, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub enum </span>Language {
@@ -149,7 +160,8 @@
 }
 
 <span class="kw">impl </span>CommentExtractionResponse {
-    <span class="kw">fn </span>new(comments: Comments) -&gt; <span class="self">Self </span>{
+    <span class="attr">#[cfg(test)]
+    </span><span class="kw">fn </span>new(comments: Comments) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span><span class="kw-2">mut </span>single_line_comments = Vec::new();
         <span class="kw">for </span>comment <span class="kw">in </span>comments.comments.iter() {
             single_line_comments.push(SingleLineComment {

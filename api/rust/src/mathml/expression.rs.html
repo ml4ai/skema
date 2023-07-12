@@ -2741,7 +2741,7 @@
 
 <span class="kw">use </span>std::string::ToString;
 
-<span class="attr">#[derive(Debug, PartialEq, Clone)]
+<span class="attr">#[derive(Debug, PartialEq, Eq, Clone)]
 </span><span class="kw">pub enum </span>Atom {
     Number(String),
     Identifier(String),

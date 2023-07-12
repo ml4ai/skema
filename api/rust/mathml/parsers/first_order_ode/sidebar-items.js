@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["first_order_ode","operator"],"struct":["FirstOrderODE"]};
+window.SIDEBAR_ITEMS = {"fn":["first_order_ode","math_expression","mfrac","mrow","operator"],"struct":["FirstOrderODE"]};

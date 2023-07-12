@@ -236,14 +236,105 @@
 <a href="#236" id="236">236</a>
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
+<a href="#242" id="242">242</a>
+<a href="#243" id="243">243</a>
+<a href="#244" id="244">244</a>
+<a href="#245" id="245">245</a>
+<a href="#246" id="246">246</a>
+<a href="#247" id="247">247</a>
+<a href="#248" id="248">248</a>
+<a href="#249" id="249">249</a>
+<a href="#250" id="250">250</a>
+<a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+<a href="#284" id="284">284</a>
+<a href="#285" id="285">285</a>
+<a href="#286" id="286">286</a>
+<a href="#287" id="287">287</a>
+<a href="#288" id="288">288</a>
+<a href="#289" id="289">289</a>
+<a href="#290" id="290">290</a>
+<a href="#291" id="291">291</a>
+<a href="#292" id="292">292</a>
+<a href="#293" id="293">293</a>
+<a href="#294" id="294">294</a>
+<a href="#295" id="295">295</a>
+<a href="#296" id="296">296</a>
+<a href="#297" id="297">297</a>
+<a href="#298" id="298">298</a>
+<a href="#299" id="299">299</a>
+<a href="#300" id="300">300</a>
+<a href="#301" id="301">301</a>
+<a href="#302" id="302">302</a>
+<a href="#303" id="303">303</a>
+<a href="#304" id="304">304</a>
+<a href="#305" id="305">305</a>
+<a href="#306" id="306">306</a>
+<a href="#307" id="307">307</a>
+<a href="#308" id="308">308</a>
+<a href="#309" id="309">309</a>
+<a href="#310" id="310">310</a>
+<a href="#311" id="311">311</a>
+<a href="#312" id="312">312</a>
+<a href="#313" id="313">313</a>
+<a href="#314" id="314">314</a>
+<a href="#315" id="315">315</a>
+<a href="#316" id="316">316</a>
+<a href="#317" id="317">317</a>
+<a href="#318" id="318">318</a>
+<a href="#319" id="319">319</a>
+<a href="#320" id="320">320</a>
+<a href="#321" id="321">321</a>
+<a href="#322" id="322">322</a>
+<a href="#323" id="323">323</a>
+<a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
+<a href="#329" id="329">329</a>
 </pre></div><pre class="rust"><code><span class="kw">use crate</span>::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, MathExpression, Mi, Type,
+        Ci, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, equals, etag, lparen, math_expression, mi, mo, rparen, stag, subtract, ws,
-        IResult, ParseError, Span,
+        add, attribute, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup, rparen, stag,
+        subtract, tag_parser, ws, IResult, ParseError, Span,
     },
     parsers::math_expression_tree::MathExpressionTree,
 };
@@ -251,10 +342,10 @@
 <span class="kw">use </span>nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::{map},
+    combinator::{map, opt},
     error::Error,
     multi::{many0, many1},
-    sequence::{delimited, tuple},
+    sequence::{delimited, pair, terminated, tuple},
 };
 <span class="kw">use </span>std::str::FromStr;
 
@@ -275,6 +366,22 @@
     </span><span class="kw">pub </span>rhs: MathExpressionTree,
 }
 
+<span class="kw">impl </span>FirstOrderODE {
+    <span class="kw">pub fn </span>to_cmml(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
+        <span class="kw">let </span>lhs_expression_tree = MathExpressionTree::Cons(
+            Operator::Derivative(Derivative::new(<span class="number">1</span>, <span class="number">1</span>)),
+            <span class="macro">vec!</span>[MathExpressionTree::Atom(MathExpression::Ci(
+                <span class="self">self</span>.lhs_var.clone(),
+            ))],
+        );
+        <span class="kw">let </span>combined = MathExpressionTree::Cons(
+            Operator::Equals,
+            <span class="macro">vec!</span>[lhs_expression_tree, <span class="self">self</span>.rhs.clone()],
+        );
+        combined.to_cmml()
+    }
+}
+
 <span class="doccomment">/// Function to parse operators. This function differs from the one in parsers::generic_mathml by
 /// disallowing operators besides +, -, =, (, and ).
 </span><span class="kw">pub fn </span>operator(input: Span) -&gt; IResult&lt;Operator&gt; {
@@ -286,26 +393,24 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
+<span class="kw">fn </span>parenthesized_identifier(input: Span) -&gt; IResult&lt;()&gt; {
+    <span class="kw">let </span>mo_lparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), lparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
+    <span class="kw">let </span>mo_rparen = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), rparen, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>));
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = delimited(mo_lparen, mi, mo_rparen)(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, ()))
+}
+
 <span class="doccomment">/// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
 </span><span class="kw">fn </span>ci_univariate_func(input: Span) -&gt; IResult&lt;Ci&gt; {
-    <span class="kw">let </span>(s, (Mi(x), left, Mi(<span class="kw">_</span>), right)) = tuple((mi, mo, mi, mo))(input)<span class="question-mark">?</span>;
-    <span class="kw">if let </span>(MathExpression::Mo(Operator::Lparen), MathExpression::Mo(Operator::Rparen)) =
-        (left, right)
-    {
-        <span class="prelude-val">Ok</span>((
-            s,
-            Ci::new(
-                <span class="prelude-val">Some</span>(Type::Function),
-                MathExpression::Mi(Mi(x.trim().to_string())),
-            ),
-        ))
-    } <span class="kw">else </span>{
-        <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
-            <span class="string">&quot;Unable to identify univariate function&quot;</span>.to_string(),
-            input,
-        )))
-    }
+    <span class="kw">let </span>(s, (Mi(x), _pi)) = tuple((mi, parenthesized_identifier))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((
+        s,
+        Ci::new(
+            <span class="prelude-val">Some</span>(Type::Function),
+            Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
+        ),
+    ))
 }
 
 <span class="doccomment">/// Parse the identifier &#39;d&#39;
@@ -324,7 +429,7 @@
 <span class="doccomment">/// Parse a content identifier of unknown type.
 </span><span class="kw">fn </span>ci_unknown(input: Span) -&gt; IResult&lt;Ci&gt; {
     <span class="kw">let </span>(s, x) = mi(input)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((s, Ci::new(<span class="prelude-val">None</span>, MathExpression::Mi(x))))
+    <span class="prelude-val">Ok</span>((s, Ci::new(<span class="prelude-val">None</span>, Box::new(MathExpression::Mi(x)))))
 }
 
 <span class="doccomment">/// Parse a first-order ordinary derivative written in Leibniz notation.
@@ -348,39 +453,98 @@
     <span class="prelude-val">Ok</span>((s, (Derivative::new(<span class="number">1</span>, <span class="number">1</span>), func)))
 }
 
-<span class="comment">//fn newtonian_derivative(input: Span) -&gt; IResult&lt;(Derivative, Ci)&gt; {
-//let (s, (_, _, _, _)) = tuple((stag!(&quot;mover&quot;), mi, mo, etag!(&quot;mover&quot;)))(input)?;
-//todo!()
-//let (s, func) = ws(alt((univariate_func, ci_func)))(s)?;
-//let (s, _) = tuple((
-//etag!(&quot;mrow&quot;),
-//stag!(&quot;mrow&quot;),
-//d,
-//mi,
-//etag!(&quot;mrow&quot;),
-//etag!(&quot;mfrac&quot;),
-//))(s)?;
-//Ok((s, (Derivative::new(1, 1), func)))
-//}
+<span class="kw">fn </span>newtonian_derivative(input: Span) -&gt; IResult&lt;(Derivative, Ci)&gt; {
+    <span class="comment">// Get number of dots to recognize the order of the derivative
+    </span><span class="kw">let </span>n_dots = delimited(
+        <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
+        map(many1(nom::character::complete::char(<span class="string">&#39;˙&#39;</span>)), |x| {
+            x.len() <span class="kw">as </span>u8
+        }),
+        <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
+    );
 
-</span><span class="doccomment">/// Parse a first order ODE with a single derivative term on the LHS.
+    <span class="kw">let </span>(s, (x, order)) = terminated(
+        delimited(
+            <span class="macro">stag!</span>(<span class="string">&quot;mover&quot;</span>),
+            pair(
+                map(ci_unknown, |Ci { content, .. }| Ci {
+                    r#type: <span class="prelude-val">Some</span>(Type::Function),
+                    content,
+                }),
+                n_dots,
+            ),
+            <span class="macro">etag!</span>(<span class="string">&quot;mover&quot;</span>),
+        ),
+        opt(parenthesized_identifier),
+    )(input)<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>((s, (Derivative::new(order, <span class="number">1</span>), x)))
+}
+
+<span class="comment">// We reimplement the mfrac and mrow parsers in this file (instead of importing them from
+// the generic_mathml module) to work with the specialized version of the math_expression parser
+// (also in this file).
+</span><span class="kw">pub fn </span>mfrac(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+    <span class="kw">let </span>(s, frac) = ws(map(
+        <span class="macro">tag_parser!</span>(<span class="string">&quot;mfrac&quot;</span>, pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Mfrac(Box::new(x), Box::new(y)),
+    ))(input)<span class="question-mark">?</span>;
+
+    <span class="prelude-val">Ok</span>((s, frac))
+}
+
+<span class="kw">pub fn </span>mrow(input: Span) -&gt; IResult&lt;Mrow&gt; {
+    <span class="kw">let </span>(s, elements) = ws(delimited(
+        <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>),
+        many0(math_expression),
+        <span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>),
+    ))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, Mrow(elements)))
+}
+
+<span class="doccomment">/// Parser for math expressions. This varies from the one in the generic_mathml module, since it
+/// assumes that expressions such as S(t) are actually univariate functions.
+</span><span class="kw">pub fn </span>math_expression(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+    ws(alt((
+        map(ci_univariate_func, MathExpression::Ci),
+        map(ci_unknown, |Ci { content, .. }| {
+            MathExpression::Ci(Ci {
+                r#type: <span class="prelude-val">Some</span>(Type::Function),
+                content,
+            })
+        }),
+        map(operator, MathExpression::Mo),
+        mn,
+        msup,
+        msub,
+        msqrt,
+        mfrac,
+        map(mrow, MathExpression::Mrow),
+        msubsup,
+    )))(input)
+}
+
+<span class="doccomment">/// Parse a first order ODE with a single derivative term on the LHS.
 </span><span class="kw">pub fn </span>first_order_ode(input: Span) -&gt; IResult&lt;FirstOrderODE&gt; {
     <span class="kw">let </span>(s, <span class="kw">_</span>) = <span class="macro">stag!</span>(<span class="string">&quot;math&quot;</span>)(input)<span class="question-mark">?</span>;
 
     <span class="comment">// Recognize LHS derivative
-    </span><span class="kw">let </span>(s, (<span class="kw">_</span>, ci)) = first_order_derivative_leibniz_notation(s)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>(s, (<span class="kw">_</span>, ci)) = alt((
+        first_order_derivative_leibniz_notation,
+        newtonian_derivative,
+    ))(s)<span class="question-mark">?</span>;
 
     <span class="comment">// Recognize equals sign
     </span><span class="kw">let </span>(s, <span class="kw">_</span>) = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), equals, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>))(s)<span class="question-mark">?</span>;
 
     <span class="comment">// Recognize other tokens
     </span><span class="kw">let </span>(s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, |x| MathExpression::new_ci(Box::new(x))),
+        map(ci_univariate_func, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::new_ci(Box::new(Ci {
+            MathExpression::Ci(Ci {
                 r#type: <span class="prelude-val">Some</span>(Type::Function),
                 content,
-            }))
+            })
         }),
         map(operator, MathExpression::Mo),
         math_expression,
@@ -412,7 +576,7 @@
         ci_univariate_func,
         Ci::new(
             <span class="prelude-val">Some</span>(Type::Function),
-            MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string())),
+            Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
         ),
     );
 }
@@ -429,7 +593,7 @@
             Derivative::new(<span class="number">1</span>, <span class="number">1</span>),
             Ci::new(
                 <span class="prelude-val">Some</span>(Type::Function),
-                MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string())),
+                Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
             ),
         ),
     );
@@ -447,7 +611,7 @@
             Derivative::new(<span class="number">1</span>, <span class="number">1</span>),
             Ci::new(
                 <span class="prelude-val">Some</span>(Type::Function),
-                MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string())),
+                Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
             ),
         ),
     );
@@ -455,7 +619,8 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_first_order_ode() {
-    <span class="kw">let </span>input = <span class="string">&quot;
+    <span class="comment">// ASKEM Hackathon 2, scenario 1, equation 1.
+    </span><span class="kw">let </span>input = <span class="string">&quot;
     &lt;math&gt;
         &lt;mfrac&gt;
         &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;
@@ -464,14 +629,31 @@
         &lt;mo&gt;=&lt;/mo&gt;
         &lt;mo&gt;-&lt;/mo&gt;
         &lt;mi&gt;β&lt;/mi&gt;
-        &lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
         &lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
+        &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;/mfrac&gt;
     &lt;/math&gt;
     &quot;</span>;
 
     <span class="kw">let </span>FirstOrderODE { lhs_var, rhs } = input.parse::&lt;FirstOrderODE&gt;().unwrap();
 
     <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">&quot;S&quot;</span>);
-    <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(* (* (- β) S) I)&quot;</span>);
+    <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(/ (* (* (- β) I) S) N)&quot;</span>);
+
+    <span class="comment">// ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
+    </span><span class="kw">let </span>input = <span class="string">&quot;
+    &lt;math&gt;
+        &lt;mover&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;˙&lt;/mo&gt;&lt;/mover&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mo&gt;-&lt;/mo&gt;
+        &lt;mi&gt;β&lt;/mi&gt;
+        &lt;mi&gt;I&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
+        &lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&lt;/mrow&gt;&lt;mi&gt;N&lt;/mi&gt;&lt;/mfrac&gt;
+    &lt;/math&gt;
+    &quot;</span>;
+
+    <span class="kw">let </span>FirstOrderODE { lhs_var, rhs } = input.parse::&lt;FirstOrderODE&gt;().unwrap();
+
+    <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">&quot;S&quot;</span>);
+    <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(/ (* (* (- β) I) S) N)&quot;</span>);
 }
 </code></pre></div></section></main></body></html>

@@ -107,8 +107,6 @@
 <a href="#107" id="107">107</a>
 <a href="#108" id="108">108</a>
 <a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>log::warn;
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>std::collections::HashMap;
@@ -153,48 +151,46 @@
     <span class="kw">let </span>f = File::open(src_file_name)<span class="question-mark">?</span>;
     <span class="kw">let </span>lines = io::BufReader::new(f).lines();
 
-    <span class="kw">for </span>line <span class="kw">in </span>lines {
-        <span class="kw">if let </span><span class="prelude-val">Ok</span>(l) = line {
-            <span class="kw">if </span>line_is_comment(<span class="kw-2">&amp;</span>l) {
-                curr_comment.push(l)
-            } <span class="kw">else </span>{
-                <span class="kw">if </span>comments.file_head.is_empty() {
-                    comments.file_head = curr_comment.clone()
+    <span class="kw">for </span>l <span class="kw">in </span>lines.flatten() {
+        <span class="kw">if </span>line_is_comment(<span class="kw-2">&amp;</span>l) {
+            curr_comment.push(l)
+        } <span class="kw">else </span>{
+            <span class="kw">if </span>comments.file_head.is_empty() {
+                comments.file_head = curr_comment.clone()
+            }
+            <span class="kw">let </span>(f_start, f_name) = line_starts_subpgm(<span class="kw-2">&amp;</span>l);
+
+            <span class="kw">if </span>f_start {
+                prev_fn = curr_fn.clone();
+                curr_fn = f_name;
+
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = <span class="kw-2">&amp;</span>prev_fn {
+                    comments.subprograms.get_mut(x).unwrap().foot = curr_comment.clone();
                 }
-                <span class="kw">let </span>(f_start, f_name) = line_starts_subpgm(<span class="kw-2">&amp;</span>l);
 
-                <span class="kw">if </span>f_start {
-                    prev_fn = curr_fn.clone();
-                    curr_fn = f_name;
+                comments.subprograms.insert(
+                    curr_fn.as_ref().unwrap().to_string(),
+                    SubprogramComments {
+                        head: curr_comment.clone(),
+                        neck: Vec::new(),
+                        foot: Vec::new(),
+                    },
+                );
 
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(x) = <span class="kw-2">&amp;</span>prev_fn {
-                        comments.subprograms.get_mut(x).unwrap().foot = curr_comment.clone();
-                    }
-
-                    comments.subprograms.insert(
-                        curr_fn.as_ref().unwrap().to_string(),
-                        SubprogramComments {
-                            head: curr_comment.clone(),
-                            neck: Vec::new(),
-                            foot: Vec::new(),
-                        },
-                    );
-
-                    curr_comment.clear();
-                    in_neck = <span class="bool-val">true</span>;
-                } <span class="kw">else if </span>line_ends_subpgm(<span class="kw-2">&amp;</span>l) {
-                    curr_comment.clear();
-                } <span class="kw">else if </span>line_is_continuation(<span class="kw-2">&amp;</span>l, extension) {
-                    <span class="kw">continue</span>;
-                } <span class="kw">else if </span>in_neck {
-                    comments
-                        .subprograms
-                        .get_mut(<span class="kw-2">&amp;</span>curr_fn.clone().unwrap())
-                        .unwrap()
-                        .neck = curr_comment.clone();
-                    in_neck = <span class="bool-val">false</span>;
-                    curr_comment.clear();
-                }
+                curr_comment.clear();
+                in_neck = <span class="bool-val">true</span>;
+            } <span class="kw">else if </span>line_ends_subpgm(<span class="kw-2">&amp;</span>l) {
+                curr_comment.clear();
+            } <span class="kw">else if </span>line_is_continuation(<span class="kw-2">&amp;</span>l, extension) {
+                <span class="kw">continue</span>;
+            } <span class="kw">else if </span>in_neck {
+                comments
+                    .subprograms
+                    .get_mut(<span class="kw-2">&amp;</span>curr_fn.clone().unwrap())
+                    .unwrap()
+                    .neck = curr_comment.clone();
+                in_neck = <span class="bool-val">false</span>;
+                curr_comment.clear();
             }
         }
     }

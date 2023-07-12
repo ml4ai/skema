@@ -550,6 +550,14 @@
 <a href="#550" id="550">550</a>
 <a href="#551" id="551">551</a>
 <a href="#552" id="552">552</a>
+<a href="#553" id="553">553</a>
+<a href="#554" id="554">554</a>
+<a href="#555" id="555">555</a>
+<a href="#556" id="556">556</a>
+<a href="#557" id="557">557</a>
+<a href="#558" id="558">558</a>
+<a href="#559" id="559">559</a>
+<a href="#560" id="560">560</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -633,7 +641,7 @@
 }
 
 <span class="doccomment">///Quoted string
-</span><span class="kw">fn </span>quoted_string(input: Span) -&gt; IResult&lt;Span&gt; {
+</span><span class="kw">pub fn </span>quoted_string(input: Span) -&gt; IResult&lt;Span&gt; {
     delimited(tag(<span class="string">&quot;\&quot;&quot;</span>), take_until(<span class="string">&quot;\&quot;&quot;</span>), tag(<span class="string">&quot;\&quot;&quot;</span>))(input)
 }
 
@@ -642,19 +650,22 @@
     <span class="prelude-val">Ok</span>((s, (<span class="kw-2">&amp;</span>key, <span class="kw-2">&amp;</span>value)))
 }
 
-<span class="macro">macro_rules! </span>stag {
+<span class="attr">#[macro_export]
+</span><span class="macro">macro_rules! </span>stag {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
         ws(tuple((tag(<span class="string">&quot;&lt;&quot;</span>), tag(<span class="macro-nonterminal">$tag</span>), many0(attribute), tag(<span class="string">&quot;&gt;&quot;</span>))))
     }};
 }
 
-<span class="macro">macro_rules! </span>etag {
+<span class="attr">#[macro_export]
+</span><span class="macro">macro_rules! </span>etag {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
         ws(delimited(tag(<span class="string">&quot;&lt;/&quot;</span>), tag(<span class="macro-nonterminal">$tag</span>), tag(<span class="string">&quot;&gt;&quot;</span>)))
     }};
 }
 
 <span class="doccomment">/// A macro to help build tag parsers
+</span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>tag_parser {
     (<span class="macro-nonterminal">$tag</span>:expr, <span class="macro-nonterminal">$parser</span>:expr) =&gt; {{
         ws(delimited(<span class="macro">stag!</span>(<span class="macro-nonterminal">$tag</span>), <span class="macro-nonterminal">$parser</span>, <span class="macro">etag!</span>(<span class="macro-nonterminal">$tag</span>)))
@@ -662,6 +673,7 @@
 }
 
 <span class="doccomment">/// A macro to help build parsers for simple MathML elements (i.e., without further nesting).
+</span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>elem0 {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
         <span class="kw">let </span>tag_end = <span class="macro">concat!</span>(<span class="string">&quot;&lt;/&quot;</span>, <span class="macro-nonterminal">$tag</span>, <span class="string">&quot;&gt;&quot;</span>);
@@ -670,6 +682,7 @@
 }
 
 <span class="doccomment">/// A macro to help build parsers for MathML elements with 1 argument.
+</span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>elem1 {
     (<span class="macro-nonterminal">$tag</span>:expr, <span class="macro-nonterminal">$t</span>:ident) =&gt; {{
         map(<span class="macro">tag_parser!</span>(<span class="macro-nonterminal">$tag</span>, math_expression), |x| <span class="macro-nonterminal">$t</span>(Box::new(x)))
@@ -677,6 +690,7 @@
 }
 
 <span class="doccomment">/// A macro to help build parsers for MathML elements with 2 arguments.
+</span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>elem2 {
     (<span class="macro-nonterminal">$tag</span>:expr, <span class="macro-nonterminal">$t</span>:ident) =&gt; {{
         map(
@@ -687,6 +701,7 @@
 }
 
 <span class="doccomment">/// A macro to help build parsers for MathML elements with 3 arguments.
+</span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>elem3 {
     (<span class="macro-nonterminal">$tag</span>:expr, <span class="macro-nonterminal">$t</span>:ident) =&gt; {{
         map(
@@ -700,6 +715,7 @@
 }
 
 <span class="doccomment">/// A macro to help build parsers for MathML elements with zero or more arguments.
+</span><span class="attr">#[macro_export]
 </span><span class="macro">macro_rules! </span>elem_many0 {
     (<span class="macro-nonterminal">$tag</span>:expr) =&gt; {{
         <span class="macro">tag_parser!</span>(<span class="macro-nonterminal">$tag</span>, many0(math_expression))
@@ -713,7 +729,7 @@
 }
 
 <span class="doccomment">/// Numbers
-</span><span class="kw">fn </span>mn(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>mn(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, element) = <span class="macro">elem0!</span>(<span class="string">&quot;mn&quot;</span>)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mn(element.trim().to_string())))
 }
@@ -773,33 +789,33 @@
 <span class="doccomment">/// Rows
 </span><span class="kw">pub fn </span>mrow(input: Span) -&gt; IResult&lt;Mrow&gt; {
     <span class="kw">let </span>(s, elements) = ws(delimited(
-        tag(<span class="string">&quot;&lt;mrow&gt;&quot;</span>),
+        <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>),
         many0(math_expression),
-        tag(<span class="string">&quot;&lt;/mrow&gt;&quot;</span>),
+        <span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Mrow(elements)))
 }
 
 <span class="doccomment">/// Fractions
-</span><span class="kw">fn </span>mfrac(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>mfrac(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, frac) = <span class="macro">elem2!</span>(<span class="string">&quot;mfrac&quot;</span>, Mfrac)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, frac))
 }
 
 <span class="doccomment">/// Superscripts
-</span><span class="kw">fn </span>msup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>msup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, expression) = <span class="macro">elem2!</span>(<span class="string">&quot;msup&quot;</span>, Msup)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, expression))
 }
 
 <span class="doccomment">/// Subscripts
-</span><span class="kw">fn </span>msub(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>msub(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, expression) = <span class="macro">elem2!</span>(<span class="string">&quot;msub&quot;</span>, Msub)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, expression))
 }
 
 <span class="doccomment">/// Square roots
-</span><span class="kw">fn </span>msqrt(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>msqrt(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, expression) = <span class="macro">elem1!</span>(<span class="string">&quot;msqrt&quot;</span>, Msqrt)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, expression))
 }
@@ -811,13 +827,13 @@
 }
 
 <span class="comment">// Overscripts
-</span><span class="kw">fn </span>mover(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>mover(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, overscript) = <span class="macro">elem2!</span>(<span class="string">&quot;mover&quot;</span>, Mover)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, overscript))
 }
 
 <span class="comment">// Subscript-superscript Pair
-</span><span class="kw">fn </span>msubsup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+</span><span class="kw">pub fn </span>msubsup(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     <span class="kw">let </span>(s, subsup) = <span class="macro">elem3!</span>(<span class="string">&quot;msubsup&quot;</span>, Msubsup)(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, subsup))
 }
@@ -1039,7 +1055,6 @@
         },
     )
 }
-
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_mathml_parser() {
     <span class="kw">let </span>eqn = std::fs::read_to_string(<span class="string">&quot;tests/test01.xml&quot;</span>).unwrap();
@@ -1098,7 +1113,8 @@
 }
 
 <span class="comment">// Exporting macros
-</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>elem_many0;
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>elem2;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>elem_many0;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>etag;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>stag;
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use </span>tag_parser;
