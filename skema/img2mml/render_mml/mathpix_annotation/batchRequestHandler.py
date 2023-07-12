@@ -13,6 +13,8 @@ import requests
 import config
 import json
 
+BASE_IMG_URL = "https://raw.githubusercontent.com/imzoc/mathpix-annotation/master/mathml-images/images_filtered/"
+
 
 class BatchRequestHandler:
     def __init__(self):
@@ -28,8 +30,7 @@ class BatchRequestHandler:
 
         self.json = {
             "urls": {
-                image_id: f"https://raw.githubusercontent.com/imzoc/mathpix-annotation/master/mathml-images/images_filtered/{image_id}.png"
-                for image_id in image_ids
+                image_id: f"{BASE_IMG_URL}{image_id}.png" for image_id in image_ids
             },
             "ocr_behavior": "text",
             "formats": ["data", "html", "text"],

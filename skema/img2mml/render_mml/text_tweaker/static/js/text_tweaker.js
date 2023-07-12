@@ -122,6 +122,7 @@ $("#image-search").submit(async (e) => {
   let searched_no = $("#image-no").val();
 
   if (searched_id !== "") {
+    searched_id = searched_id.trim();
     // Search by ID if it was input
     for (const [i, e] of eqn_src.entries()) {
       if (e["id"] === searched_id) {
@@ -134,7 +135,7 @@ $("#image-search").submit(async (e) => {
     }
   } else {
     // Search by number if it was input
-    if (searched_no > 0 && searched_no < eqn_src.length) {
+    if (searched_no > 0 && searched_no <= eqn_src.length) {
       IDX = searched_no - 1;
       show_data(IDX);
       update_btn_visibility();
