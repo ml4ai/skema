@@ -3,7 +3,7 @@
 
 use crate::ast::{
     operator::{Derivative, Operator},
-    Math, MathExpression, Mi, Mrow,
+    Ci, Math, MathExpression, Mi, Mrow,
 };
 use derive_new::new;
 use nom::error::Error;
@@ -47,7 +47,9 @@ impl MathExpressionTree {
         match self {
             MathExpressionTree::Atom(i) => match i {
                 MathExpression::Ci(x) => {
+                    println!("x={:?}", x);
                     content_mathml.push_str(&format!("<ci>{}</ci>", x.content.to_string()));
+                    println!("x.content= {:?}", x.content);
                 }
                 MathExpression::Mi(Mi(id)) => {
                     content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
@@ -62,6 +64,8 @@ impl MathExpressionTree {
             },
             MathExpressionTree::Cons(head, rest) => {
                 content_mathml.push_str("<apply>");
+                println!("head={:?}", head);
+                println!("rest={:?}", rest);
                 match head {
                     Operator::Add => content_mathml.push_str("<plus/>"),
                     Operator::Subtract => content_mathml.push_str("<minus/>"),
@@ -391,4 +395,49 @@ fn test_content_hackathon2_scenario1_eq1() {
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq2() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mo>−</mo>
+        <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    println!("ode={:?}", ode);
+    let cmml = ode.to_cmml();
+    println!("cmml={cmml}");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq3() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>−</mo>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>−</mo>
+        <mi>α</mi><mi>ρ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    println!("ode={:?}", ode);
+    //let cmml = ode.to_cmml();
+    //println!("cmml={cmml}");
 }
