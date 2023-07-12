@@ -62,10 +62,10 @@
         <p class="text">
             <a id="prevFileLink" class="nav" href="d_c15069ffeed03932_api_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_morae_proxy_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_integrated_text_reading_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-11 19:26 +0000
+            created at 2023-07-12 06:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -95,16 +95,16 @@
     <p class="mis show_mis"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="nam">router</span> <span class="op">=</span> <span class="nam">APIRouter</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/extract-comments"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">CodeComments</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">proxy_extract_comments</span><span class="op">(</span><span class="nam">code_snippet</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">CodeSnippet</span><span class="op">)</span> <span class="op">-></span> <span class="nam">CodeComments</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="str">    Endpoint for extracting CodeComments JSON from a code snippet.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="str">    Snippet must be in a supported language.</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">    <span class="key">return</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">        <span class="com"># NOTE: .dict() -> .model_dump() in Pydantic v2 (see also https://github.com/tiangolo/fastapi/issues/9710)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">        <span class="str">f"{SKEMA_RS_ADDESS}/extract-comments"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">code_snippet</span><span class="op">.</span><span class="nam">dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t"><span class="op">@</span><span class="nam">router</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">"/extract-comments"</span><span class="op">,</span> <span class="nam">response_model</span><span class="op">=</span><span class="nam">CodeComments</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t"><span class="key">async</span> <span class="key">def</span> <span class="nam">proxy_extract_comments</span><span class="op">(</span><span class="nam">code_snippet</span><span class="op">:</span> <span class="nam">schema</span><span class="op">.</span><span class="nam">CodeSnippet</span><span class="op">)</span> <span class="op">-></span> <span class="nam">CodeComments</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t18" href="#t18">18</a></span><span class="t">    <span class="str">"""</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t19" href="#t19">19</a></span><span class="t"><span class="str">    Endpoint for extracting CodeComments JSON from a code snippet.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t20" href="#t20">20</a></span><span class="t"><span class="str">    Snippet must be in a supported language.</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t21" href="#t21">21</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t22" href="#t22">22</a></span><span class="t">    <span class="key">return</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t23" href="#t23">23</a></span><span class="t">        <span class="com"># NOTE: .dict() -> .model_dump() in Pydantic v2 (see also https://github.com/tiangolo/fastapi/issues/9710)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t24" href="#t24">24</a></span><span class="t">        <span class="str">f"{SKEMA_RS_ADDESS}/extract-comments"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t25" href="#t25">25</a></span><span class="t">        <span class="nam">json</span><span class="op">=</span><span class="nam">code_snippet</span><span class="op">.</span><span class="nam">dict</span><span class="op">(</span><span class="op">)</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t26" href="#t26">26</a></span><span class="t">    <span class="op">)</span><span class="op">.</span><span class="nam">json</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t27" href="#t27">27</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t28" href="#t28">28</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -130,10 +130,10 @@
         <p>
             <a id="prevFileLink" class="nav" href="d_c15069ffeed03932_api_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_morae_proxy_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_integrated_text_reading_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-11 19:26 +0000
+            created at 2023-07-12 06:52 +0000
         </p>
     </div>
 </footer>

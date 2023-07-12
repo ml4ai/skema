@@ -60,12 +60,12 @@
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
-            <a id="prevFileLink" class="nav" href="d_c15069ffeed03932_schema_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_829eeccf4d41aca6_test_integrated_text_reading_proxy_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_workflows_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-11 19:26 +0000
+            created at 2023-07-12 06:52 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -91,21 +91,22 @@
     <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">    <span class="com"># remove comments</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t">    <span class="key">for</span> <span class="nam">comment</span> <span class="key">in</span> <span class="nam">soup</span><span class="op">(</span><span class="nam">text</span><span class="op">=</span><span class="key">lambda</span> <span class="nam">text</span><span class="op">:</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">text</span><span class="op">,</span> <span class="nam">Comment</span><span class="op">)</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t">        <span class="nam">comment</span><span class="op">.</span><span class="nam">extract</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">    <span class="com"># prune attributes</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">    <span class="key">for</span> <span class="nam">attr</span> <span class="key">in</span> <span class="nam">to_remove</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">      <span class="key">for</span> <span class="nam">tag</span> <span class="key">in</span> <span class="nam">soup</span><span class="op">.</span><span class="nam">find_all</span><span class="op">(</span><span class="nam">attrs</span><span class="op">=</span><span class="op">{</span><span class="nam">attr</span><span class="op">:</span> <span class="key">True</span><span class="op">}</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">          <span class="key">del</span> <span class="nam">tag</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">    <span class="key">return</span> <span class="nam">str</span><span class="op">(</span><span class="nam">soup</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"\n"</span><span class="op">,</span><span class="str">""</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">    <span class="com"># prune attributes</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">    <span class="key">for</span> <span class="nam">attr</span> <span class="key">in</span> <span class="nam">to_remove</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t">      <span class="key">for</span> <span class="nam">tag</span> <span class="key">in</span> <span class="nam">soup</span><span class="op">.</span><span class="nam">find_all</span><span class="op">(</span><span class="nam">attrs</span><span class="op">=</span><span class="op">{</span><span class="nam">attr</span><span class="op">:</span> <span class="key">True</span><span class="op">}</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">          <span class="key">del</span> <span class="nam">tag</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t17" href="#t17">17</a></span><span class="t">    <span class="key">return</span> <span class="nam">str</span><span class="op">(</span><span class="nam">soup</span><span class="op">)</span><span class="op">.</span><span class="nam">replace</span><span class="op">(</span><span class="str">"\n"</span><span class="op">,</span><span class="str">""</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
 </main>
 <footer>
     <div class="content">
         <p>
-            <a id="prevFileLink" class="nav" href="d_c15069ffeed03932_schema_py.html">&#xab; prev</a> &nbsp; &nbsp;
+            <a id="prevFileLink" class="nav" href="d_829eeccf4d41aca6_test_integrated_text_reading_proxy_py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_workflows_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-11 19:26 +0000
+            created at 2023-07-12 06:52 +0000
         </p>
     </div>
 </footer>
