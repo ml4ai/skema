@@ -82,7 +82,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
 "skema.program_analysis" = "skema/program_analysis"
 "skema.skema_py" = "skema/skema_py"
 # re-map skema/text_reading/python to skema.text_reading
-#"skema.text_reading" = "skema/text_reading/python"
+"skema.text_reading" = "skema/text_reading/python"
 "skema.metal.model_linker" = "skema/metal/model_linker/skema_model_linker"
 "skema.data" = "skema/data"
 
@@ -99,7 +99,7 @@ readme = {file = ["README.md"], content-type = "text/markdown"}
 [project.scripts]
 #skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
 link_amr = "skema.metal.model_linker.link_amr:main"
-#parquet2json = "skema.text_reading.cosmos_integration:main"
+parquet2json = "skema.text_reading.cosmos_integration:main"
 
 # Minimum requirements for the build system to execute.
 [build-system]
