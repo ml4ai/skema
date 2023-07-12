@@ -5,8 +5,7 @@ from typing import Optional
 import fire.fire_test
 from askem_extractions.data_model import AttributeCollection
 
-from skema.metal.model_linker.skema_model_linker.linkers import PetriNetLinker, RegNetLinker
-
+from .linkers import PetriNetLinker, RegNetLinker
 
 
 def link_amr(
