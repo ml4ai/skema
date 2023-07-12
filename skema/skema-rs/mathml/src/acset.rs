@@ -1,12 +1,12 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
+use crate::parsers::first_order_ode::FirstOrderODE;
 use crate::{
     ast::{Math, MathExpression, Mi},
     mml2pn::{group_by_operators, Term},
     petri_net::{Polarity, Var},
 };
 use serde::{Deserialize, Serialize};
-
 use std::collections::{BTreeSet, HashMap, HashSet};
 use utoipa;
 use utoipa::ToSchema;
@@ -404,6 +404,44 @@ impl From<ACSet> for PetriNet {
 
         // -----------------------------------------------------------
 
+        let ode = Ode {
+            rates: Some(rate_vec),
+            initials: Some(initial_vec),
+            parameters: Some(parameter_vec),
+            ..Default::default()
+        };
+
+        let semantics = Semantics { ode };
+
+        let model = ModelPetriNet {
+            states: states_vec,
+            transitions: transitions_vec,
+            semantics: Some(semantics),
+            metadata: None,
+        };
+
+        PetriNet {
+        name: "mathml model".to_string(),
+        schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
+        schema_name: "PetriNet".to_string(),
+        description: "This is a model from mathml equations".to_string(),
+        model_version: "0.1".to_string(),
+        model,
+        metadata: None,
+    }
+    }
+}
+
+impl From<Vec<FirstOrderODE>> for PetriNet {
+    fn from(ode_vec: Vec<FirstOrderODE>) -> PetriNet {
+        // initialize vecs
+        let mut states_vec = BTreeSet::<State>::new();
+        let mut transitions_vec = BTreeSet::<Transition>::new();
+        let mut initial_vec = Vec::<Initial>::new();
+        let mut parameter_vec = Vec::<Parameter>::new();
+        let mut rate_vec = Vec::<Rate>::new();
+
+        // construct the PetriNet
         let ode = Ode {
             rates: Some(rate_vec),
             initials: Some(initial_vec),

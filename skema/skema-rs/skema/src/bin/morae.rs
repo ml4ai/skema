@@ -1,9 +1,12 @@
 use clap::Parser;
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
-
+use mathml::parsers::first_order_ode::FirstOrderODE;
 #[cfg(test)]
 use std::fs;
+use std::fs::File;
+use std::io::BufRead;
+use std::io::BufReader;
 
 // new imports
 use mathml::acset::{PetriNet, RegNet};
@@ -41,9 +44,12 @@ fn main() {
 
         let math_content = module_id2mathml_ast(module_id, host);
 
+        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list2.txt";
+
         // This does get a panic with a message, so need to figure out how to forward it
-        let mathml_ast =
-            get_mathml_asts_from_file("../../data/mml2pn_inputs/testing_eqns/mml_list.txt");
+        let mathml_ast = get_mathml_asts_from_file(input_src.clone());
+
+        let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
         println!("\nmath_content: {:?}", math_content);
         println!("\nmathml_ast: {:?}", mathml_ast);
@@ -90,6 +96,28 @@ fn main() {
     } else {
         println!("Unknown Command!");
     }
+}
+
+pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
+    let f = File::open(filepath).unwrap();
+    let lines = BufReader::new(f).lines();
+
+    let mut ode_vec = Vec::<FirstOrderODE>::new();
+
+    for line in lines.flatten() {
+        if let Some('#') = &line.chars().next() {
+            // Ignore lines starting with '#'
+        } else {
+            // Parse MathML into FirstOrderODE
+            let ode = line
+                .parse::<FirstOrderODE>()
+                .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
+            println!("ode_line rhs: {:?}\n", ode.rhs.to_string().clone());
+            println!("ode_line state: {:?}\n", ode.lhs_var.to_string().clone());
+            ode_vec.push(ode);
+        }
+    }
+    ode_vec
 }
 
 #[test]
