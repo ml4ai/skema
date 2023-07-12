@@ -2,12 +2,13 @@
 """
 Response models for API
 """
-from askem_extractions.data_model import AttributeCollection
-from pydantic import BaseModel, Field, Json
 from typing import List, Optional
 
+from askem_extractions.data_model import AttributeCollection
+from pydantic import BaseModel, Field
 # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
 from typing_extensions import Literal
+
 from skema.img2mml import schema as eqn2mml_schema
 
 
