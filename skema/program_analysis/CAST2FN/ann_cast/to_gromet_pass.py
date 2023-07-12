@@ -707,6 +707,7 @@ class ToGrometPass:
 
         # Construct the pifs for the pack and wire them
         for port in tuple_values:
+            print(port)
             parent_gromet_fn.pif = insert_gromet_object(
                 parent_gromet_fn.pif, GrometPort(box=pack_index)
             )
@@ -1385,13 +1386,49 @@ class ToGrometPass:
 
                         var_pof = len(parent_gromet_fn.pof)
 
+                    elif isinstance(val, AnnCastOperator):
+                        new_gromet = GrometFN()
+                        new_gromet.b = insert_gromet_object(
+                            new_gromet.b,
+                            GrometBoxFunction(
+                                function_type=FunctionType.EXPRESSION
+                            ),
+                        )
+                        self.visit(val, new_gromet, parent_cast_node)
+
+                        self.gromet_module.fn_array = insert_gromet_object(
+                            self.gromet_module.fn_array,
+                            new_gromet,
+                        )
+                        self.set_index()
+                        
+                        # Make the 'call' box function that connects the expression to the parent and creates its output port
+                        # print(node.source_refs)
+                        parent_gromet_fn.bf = insert_gromet_object(
+                            parent_gromet_fn.bf,
+                            GrometBoxFunction(
+                                function_type=FunctionType.EXPRESSION,
+                                body=len(self.gromet_module.fn_array),
+                                metadata=self.insert_metadata(metadata),
+                            ),
+                        )
+
+                        parent_gromet_fn.pof = insert_gromet_object(
+                            parent_gromet_fn.pof,
+                            GrometPort(
+                                name=None,
+                                box=len(parent_gromet_fn.bf),
+                            ),
+                        )
+
+                        var_pof = len(parent_gromet_fn.pof)
                     elif isinstance(val, AnnCastName):
                         var_pof = self.retrieve_var_port(val.name)
                     else:
                         var_pof = -1
-                        # print(type(val))
+                        print(type(val))
 
-                    tuple_indices.append(var_pof - 1)
+                    tuple_indices.append(var_pof)
 
                 # Determine if the left hand side is
                 # - A tuple of variables
@@ -1400,17 +1437,18 @@ class ToGrometPass:
                 # - One variable
                 #   - We need to add a pack primitive if that's the case
                 # NOTE: This is subject to change
-                # if isinstance(node.left, AnnCastTuple):
                 if is_tuple(node.left):
+                    # tuple_indices stores 1-index pofs, so we have to offset by one
+                    # to index with them
                     for i, val in enumerate(node.left.value, 0):
                         parent_gromet_fn.pof[
-                            tuple_indices[i]
+                            tuple_indices[i]-1
                         ].name = get_left_side_name(node.left.value[i])
 
                         self.add_var_to_env(
                             get_left_side_name(node.left.value[i]),
                             node.left.value[i],
-                            parent_gromet_fn.pof[tuple_indices[i]],
+                            parent_gromet_fn.pof[tuple_indices[i]-1],
                             tuple_indices[i],
                             parent_cast_node,
                         )
@@ -1657,6 +1695,7 @@ class ToGrometPass:
                         parent_gromet_fn.pof != None
                     ):  # TODO: come back and fix this guard later
                         pof_idx = len(parent_gromet_fn.pof) - i
+                        # pof_idx = len(parent_gromet_fn.pof) - 1
                     else:
                         pof_idx = -1
                     if (
@@ -2761,7 +2800,10 @@ class ToGrometPass:
         """
         metadata = self.create_source_code_reference(node.source_refs[0])
 
-        ret_vals = list(node.values)
+        if isinstance(node, AnnCastLiteralValue):
+            ret_vals = list(node.value)
+        else:
+            ret_vals = list(node.values)
 
         # Create the pack primitive
         gromet_fn.bf = insert_gromet_object(
@@ -2848,6 +2890,8 @@ class ToGrometPass:
         # NOTE: Thinking of adding an index parameter that is set to 1 when originally called, and then
         # if we have a tuple of returns then we can change the index then
         if isinstance(node, AnnCastLiteralValue):
+            if is_tuple(node):
+                self.pack_return_tuple(node, gromet_fn)
             return
         elif isinstance(node, AnnCastVar):
             var_name = node.val.name
@@ -2855,9 +2899,6 @@ class ToGrometPass:
         elif isinstance(node, AnnCastName):
             name = node.name
             self.wire_return_name(name, gromet_fn)
-        # elif isinstance(node, AnnCastTuple):
-        elif is_tuple(node):
-            self.pack_return_tuple(node, gromet_fn)
         elif (
             isinstance(node, AnnCastLiteralValue)
             and node.val.value_type == StructureType.LIST
