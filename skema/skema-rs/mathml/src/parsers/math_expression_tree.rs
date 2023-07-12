@@ -459,7 +459,6 @@ fn test_content_hackathon2_scenario1_eq4() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    println!("cmml={cmml}");
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply>");
 }
 
@@ -502,7 +501,6 @@ fn test_content_hackathon2_scenario1_eq6() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    println!("cmml={cmml}");
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><plus/><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
 }
 
@@ -523,22 +521,5 @@ fn test_content_hackathon2_scenario1_eq7() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    println!("cmml={cmml}");
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><minus/><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
-}
-
-#[test]
-fn test_content_hackathon2_scenario1_eq8() {
-    let input = "
-    <math>
-        <mi>β</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mo>=</mo>
-        <mi>κ</mi>
-        <mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-    </math>
-    ";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={}", exp);
-    let cmml = exp.to_cmml();
-    println!("cmml={cmml}");
 }
