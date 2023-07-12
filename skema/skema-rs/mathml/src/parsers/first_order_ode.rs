@@ -126,7 +126,6 @@ fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, 
 
 fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     // Get number of dots to recognize the order of the derivative
-    println!("FLAG1");
     let n_dots = delimited(
         stag!("mo"),
         map(many1(nom::character::complete::char('˙')), |x| {
@@ -149,7 +148,6 @@ fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         ),
         opt(parenthesized_identifier),
     )(input)?;
-    println!("FLAG2, {x:?}");
 
     Ok((s, (Derivative::new(order, 1), x)))
 }
