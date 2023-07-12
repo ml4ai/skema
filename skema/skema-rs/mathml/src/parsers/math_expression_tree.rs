@@ -47,15 +47,13 @@ impl MathExpressionTree {
         match self {
             MathExpressionTree::Atom(i) => match i {
                 MathExpression::Ci(x) => {
-                    println!("x={:?}", x);
-                    content_mathml.push_str(&format!("<ci>{}</ci>", x.content.to_string()));
-                    println!("x.content= {:?}", x.content);
+                    content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
                 }
                 MathExpression::Mi(Mi(id)) => {
-                    content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
+                    content_mathml.push_str(&format!("<ci>{}</ci>", id));
                 }
                 MathExpression::Mn(number) => {
-                    content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
+                    content_mathml.push_str(&format!("<cn>{}</cn>", number));
                 }
                 MathExpression::Mrow(_) => {
                     panic!("All Mrows should have been removed by now!");
@@ -64,8 +62,6 @@ impl MathExpressionTree {
             },
             MathExpressionTree::Cons(head, rest) => {
                 content_mathml.push_str("<apply>");
-                println!("head={:?}", head);
-                println!("rest={:?}", rest);
                 match head {
                     Operator::Add => content_mathml.push_str("<plus/>"),
                     Operator::Subtract => content_mathml.push_str("<minus/>"),
@@ -73,7 +69,7 @@ impl MathExpressionTree {
                     Operator::Equals => content_mathml.push_str("<eq/>"),
                     Operator::Divide => content_mathml.push_str("<divide/>"),
                     Operator::Derivative(Derivative { order, var_index })
-                        if (*order, *var_index) == (1 as u8, 1 as u8) =>
+                        if (*order, *var_index) == (1_u8, 1_u8) =>
                     {
                         content_mathml.push_str("<diff/>")
                     }
@@ -437,7 +433,6 @@ fn test_content_hackathon2_scenario1_eq3() {
         <mrow><mi>d</mi><mi>t</mi></mrow>
         </mfrac>
         <mo>=</mo>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
         <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
         <mo>−</mo>
         <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
@@ -446,7 +441,6 @@ fn test_content_hackathon2_scenario1_eq3() {
     </math>
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
-    println!("ode={:?}", ode);
-    //let cmml = ode.to_cmml();
-    //println!("cmml={cmml}");
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
 }

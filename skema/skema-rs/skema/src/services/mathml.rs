@@ -1,9 +1,9 @@
-use actix_web::{put, web, HttpResponse, test};
+use actix_web::{put, test, web, HttpResponse};
 use mathml::{
     acset::{ACSet, AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
-    pMML2cMML::to_content_mathml,
+    parsers::first_order_ode::FirstOrderODE,
 };
 use petgraph::dot::{Config, Dot};
 
@@ -69,10 +69,8 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 #[put("/mathml/content-mathml")]
 pub async fn get_content_mathml(payload: String) -> String {
     let mut contents = payload;
-    let mut new_math = Vec::<Math>::new();
-    let math = contents.parse::<Math>().unwrap();
-    new_math.push(math);
-    let content_mathml = to_content_mathml(new_math);
+    let ode = contents.parse::<FirstOrderODE>().unwrap();
+    let content_mathml = ode.to_cmml();
     content_mathml
 }
 

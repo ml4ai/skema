@@ -12,7 +12,7 @@ use nom::{
     character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
     combinator::{map, map_parser, opt, recognize, value},
     error::Error,
-    multi::{many0, many_till},
+    multi::many0,
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
@@ -222,26 +222,6 @@ pub fn mo(input: Span) -> IResult<MathExpression> {
         stag!("mo"),
         map_parser(recognize(take_until("</mo>")), operator),
         etag!("mo"),
-    ))(input)?;
-    Ok((s, Mo(op)))
-}
-
-/// function for identifying left parenthesis only
-fn mo_l(input: Span) -> IResult<MathExpression> {
-    let (s, op) = ws(delimited(
-        stag!("mo"),
-        map_parser(recognize(take_until("</mo>")), lparen),
-        tag("</mo>"),
-    ))(input)?;
-    Ok((s, Mo(op)))
-}
-
-/// function for identifying right parenthesis only
-fn mo_r(input: Span) -> IResult<MathExpression> {
-    let (s, op) = ws(delimited(
-        stag!("mo"),
-        map_parser(recognize(take_until("</mo>")), rparen),
-        tag("</mo>"),
     ))(input)?;
     Ok((s, Mo(op)))
 }
