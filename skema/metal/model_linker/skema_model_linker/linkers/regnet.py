@@ -1,4 +1,3 @@
-import html
 from collections import defaultdict
 from typing import Iterable, Dict, List, Any
 
@@ -40,8 +39,7 @@ class RegNetLinker(AMRLinker):
                         ret[id_] = val
                 else:
                     ret[id_] = val
-        # Handle XML special characters
-        ret = {html.unescape(k) if k.startswith("&#") else k: v for k, v in ret.items()}
+
         return ret
 
     def _build_walker(self, amr_data) -> JsonDictWalker:

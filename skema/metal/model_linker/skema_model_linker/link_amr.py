@@ -1,4 +1,4 @@
-import json
+import json, html
 from pathlib import Path
 from typing import Optional
 
@@ -7,12 +7,26 @@ from askem_extractions.data_model import AttributeCollection
 
 from .linkers import PetriNetLinker, RegNetLinker
 
+def replace_xml_codepoints(json):
+    """ Looks for xml special characters and substitutes them with their unicode character """
+    def clean(text):
+        return html.unescape(text) if text.startswith("&#") else text
+
+    if isinstance(json, list):
+        return [replace_xml_codepoints(elem) for elem in json]
+    elif isinstance(json, dict):
+        return {clean(k):replace_xml_codepoints(v) for k, v in json.items()}
+    elif isinstance(json, str):
+        return clean(json)
+    else:
+        return json
 
 def link_amr(
         amr_path: str,  # Path of the AMR model
         attribute_collection: str,  # Path to the attribute collection
         amr_type: str,  # AMR model type. I.e. "petrinet" or "regnet"
         output_path: Optional[str] = None,  # Output file path
+        clean_xml_codepoints: Optional[bool] = False, # Replaces html codepoints with the unicode character
         similarity_model: str = "sentence-transformers/all-MiniLM-L6-v2",  # Transformer model to compute similarities
         similarity_threshold: float = 0.7,  # Cosine similarity threshold for linking
         device: Optional[str] = None  # PyTorch device to run the model on
@@ -28,6 +42,8 @@ def link_amr(
 
     with open(amr_path) as f:
         amr = json.load(f)
+        if clean_xml_codepoints:
+            amr = replace_xml_codepoints(amr)
 
     extractions = AttributeCollection.from_json(attribute_collection)
 
@@ -40,7 +56,7 @@ def link_amr(
         output_path = f'linked_{input_amr_name}'
 
     with open(output_path, 'w') as f:
-        json.dump(linked_model, f, default=str, indent=2)
+        json.dump(linked_model, f, default=str, indent=2, ensure_ascii=False)
 
 
 def main():
