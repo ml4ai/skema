@@ -527,22 +527,24 @@ pub fn group_parencomp(
         //println!("----variable2 = {:?}", variable2);
         //println!("----variable2[0] = {:?}", variable2[0]);
         let vb = variable2[0].clone();
-        (
-            result_wo_paren,
-            result,
-            Some(vb),
-            var_count,
-            count,
-        )
+        (result_wo_paren, result, Some(vb), var_count, count)
     }
     //println!("!!!!!!!!!!!!!!!!v1 = {:?}", variable1);
 }
 fn main() {
     //let mathml_exp = get_mathml_asts_from_file("../tests/easyexample.txt");
     //let mathml_exp = get_mathml_asts_from_file("../tests/hydrostatic_3_6.xml");
-    let mathml_exp = get_mathml_asts_from_file("../tests/model_descrip_3_2.xml");
+    //let mathml_exp = get_mathml_asts_from_file("../tests/model_descrip_3_2.xml");
+    //let mathml_exp = get_mathml_asts_from_file("../tests/sir.xml");
     //let mathml_exp = get_mathml_asts_from_file("../tests/continuity_eq.xml");
     //let mathml_exp = get_mathml_asts_from_file("../tests/molecular_viscosity.xml");
+    let input = "../tests/sir.xml";
+    let mut contents = std::fs::read_to_string(input)
+        .unwrap_or_else(|_| panic!("{}", "Unable to read file {input}!"));
+    let mut mathml_exp = Vec::<Math>::new();
+    let (_, mut math) =
+        parse(&contents).unwrap_or_else(|_| panic!("{}", "Unable to parse file {input}!"));
+    mathml_exp.push(math);
     let mut diagram: WiringDiagram;
     //let mut var: Vec<Variable> = Vec::new();
     //let mut un_op: Vec<UnaryOperator> = Vec::new();
@@ -561,7 +563,7 @@ fn main() {
         let mut exp_count = 0;
         for (index, content) in mathml.content.iter().enumerate() {
             //let mml = mathml.content[0].clone();
-            //println!("{:?}", mathml.clone());
+            println!("{:?}", mathml.clone());
             //println!("index={:?}, content={:?}", index, content);
             //let mut count = 0;
             //let mut var_count = 0;

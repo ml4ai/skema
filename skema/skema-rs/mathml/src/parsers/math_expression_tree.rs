@@ -3,7 +3,7 @@
 
 use crate::ast::{
     operator::{Derivative, Operator},
-    Ci, Math, MathExpression, Mi, Mrow,
+    Math, MathExpression, Mi, Mrow,
 };
 use derive_new::new;
 use nom::error::Error;
@@ -41,64 +41,25 @@ impl fmt::Display for MathExpressionTree {
 }
 
 impl MathExpressionTree {
-    // Translates math expression tree to content mathml
+    /// Translates a MathExpressionTree struct to a content MathML string.
     pub fn to_cmml(&self) -> String {
         let mut content_mathml = String::new();
         match self {
-            MathExpressionTree::Atom(MathExpression::Ci(x)) => {
-                content_mathml.push_str(&format!("<ci>{}</ci>", x.content.to_string()));
-            }
-            MathExpressionTree::Atom(i) => {
-                match i {
-                    MathExpression::Mi(Mi(id)) => {
-                        content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
-                    }
-                    MathExpression::Mn(number) => {
-                        content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
-                    }
-                    MathExpression::Mrow(Mrow(components)) => {
-                        let mut before_parenthesis_starts: Vec<MathExpressionTree> = Vec::new();
-                        let mut after_parenthesis_starts: Vec<MathExpressionTree> = Vec::new();
-                        let mut parenthesis_exists = false;
-                        //Handling parenthesis for case when it can be <times/> MathExpression or function of component
-                        for items in components.iter() {
-                            if let MathExpression::Mo(Lparen) = items {
-                                parenthesis_exists = true;
-                                continue;
-                            }
-                            if parenthesis_exists {
-                                after_parenthesis_starts
-                                    .push(MathExpressionTree::Atom(items.clone()));
-                            } else {
-                                before_parenthesis_starts
-                                    .push(MathExpressionTree::Atom(items.clone()));
-                            }
-                        }
-                        if !before_parenthesis_starts.is_empty()
-                            && !after_parenthesis_starts.is_empty()
-                        {
-                            for b in before_parenthesis_starts {
-                                content_mathml.push_str(&b.to_cmml());
-                            }
-                            //Ignores the function of component (e.g. (t) gets ignored)
-                            if after_parenthesis_starts.len() == 1 {
-                                println!("after_parenthesis_starts={:?}", after_parenthesis_starts);
-                            } else {
-                                for a in after_parenthesis_starts {
-                                    content_mathml.push_str(&a.to_cmml());
-                                }
-                            }
-                        } else if before_parenthesis_starts.is_empty()
-                            && !after_parenthesis_starts.is_empty()
-                        {
-                            for a in after_parenthesis_starts {
-                                content_mathml.push_str(&a.to_cmml());
-                            }
-                        }
-                    }
-                    _ => panic!("Unhandled MathExpressionTree in Atom matching"),
+            MathExpressionTree::Atom(i) => match i {
+                MathExpression::Ci(x) => {
+                    content_mathml.push_str(&format!("<ci>{}</ci>", x.content.to_string()));
                 }
-            }
+                MathExpression::Mi(Mi(id)) => {
+                    content_mathml.push_str(&format!("<ci>{}</ci>", id.to_string()));
+                }
+                MathExpression::Mn(number) => {
+                    content_mathml.push_str(&format!("<cn>{}</cn>", number.to_string()));
+                }
+                MathExpression::Mrow(_) => {
+                    panic!("All Mrows should have been removed by now!");
+                }
+                t => panic!("Unhandled MathExpression: {:?}", t),
+            },
             MathExpressionTree::Cons(head, rest) => {
                 content_mathml.push_str("<apply>");
                 match head {
@@ -119,7 +80,6 @@ impl MathExpressionTree {
                 }
                 content_mathml.push_str("</apply>");
             }
-            _ => todo!(),
         }
         content_mathml
     }
@@ -139,34 +99,39 @@ struct Lexer {
     tokens: Vec<Token>,
 }
 
+impl MathExpression {
+    /// Flatten Mfrac and Mrow elements.
+    fn flatten(&self, tokens: &mut Vec<MathExpression>) {
+        match self {
+            // Flatten/unwrap Mrows
+            MathExpression::Mrow(Mrow(elements)) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                for element in elements {
+                    element.flatten(tokens);
+                }
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Insert implicit division operators, and wrap numerators and denominators in
+            // parentheses for the Pratt parsing algorithm.
+            MathExpression::Mfrac(numerator, denominator) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                numerator.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+                tokens.push(MathExpression::Mo(Operator::Divide));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                denominator.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            t => tokens.push(t.clone()),
+        }
+    }
+}
+
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
-        // Recognize derivatives in Newtonian notation.
+        // Flatten mrows and mfracs
         let tokens = input.iter().fold(vec![], |mut acc, x| {
-            match x {
-                MathExpression::Mover(base, overscript) => match **overscript {
-                    MathExpression::Mo(Operator::Other(ref os)) => {
-                        if os.chars().all(|c| c == '˙') {
-                            acc.push(MathExpression::Mo(Operator::new_derivative(
-                                Derivative::new(os.chars().count() as u8, 1),
-                            )));
-                            acc.push(*base.clone());
-                        } else {
-                            acc.push(x.clone());
-                        }
-                    }
-                    _ => todo!(),
-                },
-                // Insert implicit division operators.
-                MathExpression::Mfrac(numerator, denominator) => {
-                    acc.push(*numerator.clone());
-                    acc.push(MathExpression::Mo(Operator::Divide));
-                    acc.push(*denominator.clone());
-                }
-                t => {
-                    acc.push(t.clone());
-                }
-            }
+            x.flatten(&mut acc);
             acc
         });
 
@@ -349,22 +314,6 @@ fn test_conversion() {
     println!("Input: {input}");
     let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
-    println!("Output: {s}\n");
-
-    let input = "<math>
-        <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        </math>";
-    println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
-    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
-    println!("Output: {s}\n");
-
-    let input = "<math>
-        <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        </math>";
-    println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
-    assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
     println!("Output: {s}\n");
 
     let input = "<math><mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo></math>";

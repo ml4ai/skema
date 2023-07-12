@@ -169,7 +169,7 @@ pub fn mi(input: Span) -> IResult<Mi> {
 }
 
 /// Numbers
-fn mn(input: Span) -> IResult<MathExpression> {
+pub fn mn(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mn")(input)?;
     Ok((s, Mn(element.trim().to_string())))
 }
@@ -249,33 +249,33 @@ fn mo_r(input: Span) -> IResult<MathExpression> {
 /// Rows
 pub fn mrow(input: Span) -> IResult<Mrow> {
     let (s, elements) = ws(delimited(
-        tag("<mrow>"),
+        stag!("mrow"),
         many0(math_expression),
-        tag("</mrow>"),
+        etag!("mrow"),
     ))(input)?;
     Ok((s, Mrow(elements)))
 }
 
 /// Fractions
-fn mfrac(input: Span) -> IResult<MathExpression> {
+pub fn mfrac(input: Span) -> IResult<MathExpression> {
     let (s, frac) = elem2!("mfrac", Mfrac)(input)?;
     Ok((s, frac))
 }
 
 /// Superscripts
-fn msup(input: Span) -> IResult<MathExpression> {
+pub fn msup(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem2!("msup", Msup)(input)?;
     Ok((s, expression))
 }
 
 /// Subscripts
-fn msub(input: Span) -> IResult<MathExpression> {
+pub fn msub(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem2!("msub", Msub)(input)?;
     Ok((s, expression))
 }
 
 /// Square roots
-fn msqrt(input: Span) -> IResult<MathExpression> {
+pub fn msqrt(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem1!("msqrt", Msqrt)(input)?;
     Ok((s, expression))
 }
@@ -287,13 +287,13 @@ fn munder(input: Span) -> IResult<MathExpression> {
 }
 
 // Overscripts
-fn mover(input: Span) -> IResult<MathExpression> {
+pub fn mover(input: Span) -> IResult<MathExpression> {
     let (s, overscript) = elem2!("mover", Mover)(input)?;
     Ok((s, overscript))
 }
 
 // Subscript-superscript Pair
-fn msubsup(input: Span) -> IResult<MathExpression> {
+pub fn msubsup(input: Span) -> IResult<MathExpression> {
     let (s, subsup) = elem3!("msubsup", Msubsup)(input)?;
     Ok((s, subsup))
 }
@@ -327,23 +327,10 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
     let (s, element) = ws(delimited(tag("<mo"), take_until("/>"), tag("/>")))(input)?;
     Ok((s, MoLine(element.to_string())))
 }
-/*
-/// Grouping parenthesis with Math expressions
-fn group_paren(input: Span) -> IResult<MathExpression> {
-    let (s, lp) = mo_l(input)?;
-    let (s, elements) = many_till(math_expression, mo_r)(s)?;
-    let mut group_vec = vec![];
-    group_vec.push(lp);
-    group_vec.extend(elements.0);
-    group_vec.push(elements.1);
-    Ok((s, GroupTuple(group_vec)))
-}
-*/
 
 /// Math expressions
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        //group_paren,
         map(mi, MathExpression::Mi),
         mn,
         msup,
@@ -528,22 +515,6 @@ fn test_math() {
         },
     )
 }
-/*
-#[test]
-fn test_groupparen() {
-    test_parser(
-        "<mo>(</mo><mi>z</mi><mo>+</mo><mn>1</mn><mo>)</mo>",
-        group_paren,
-        GroupTuple(vec![
-            Mo(Operator::Lparen),
-            MathExpression::Mi(Mi("z".to_string())),
-            Mo(Operator::Add),
-            Mn("1".to_string()),
-            Mo(Operator::Rparen),
-        ]),
-    );
-}
-*/
 #[test]
 fn test_mathml_parser() {
     let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
@@ -602,6 +573,7 @@ fn test_mathml_parser() {
 }
 
 // Exporting macros
+pub(crate) use elem2;
 pub(crate) use elem_many0;
 pub(crate) use etag;
 pub(crate) use stag;
