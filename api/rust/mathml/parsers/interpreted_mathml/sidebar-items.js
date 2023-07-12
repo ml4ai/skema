@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["ci_univariate_func","ci_unknown","first_order_derivative_leibniz_notation","interpreted_math","math_expression","mfrac","mrow","newtonian_derivative","operator"]};

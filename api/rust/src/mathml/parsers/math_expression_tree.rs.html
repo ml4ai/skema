@@ -444,15 +444,41 @@
 <a href="#444" id="444">444</a>
 <a href="#445" id="445">445</a>
 <a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-</span><span class="kw">use </span><span class="kw">crate</span>::ast::{
-    operator::{Derivative, Operator},
-    Math, MathExpression, Mi, Mrow,
+</span><span class="kw">use crate</span>::{
+    ast::{
+        operator::{Derivative, Operator},
+        Math, MathExpression, Mi, Mrow,
+    },
+    parsers::interpreted_mathml::interpreted_math,
 };
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>nom::error::Error;
+
 <span class="kw">use </span>std::{fmt, str::FromStr};
 
 <span class="attr">#[cfg(test)]
@@ -675,8 +701,8 @@
 <span class="kw">impl </span>FromStr <span class="kw">for </span>MathExpressionTree {
     <span class="kw">type </span><span class="prelude-val">Err </span>= Error&lt;String&gt;;
 
-    <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
-        <span class="kw">let </span>math = s.parse::&lt;Math&gt;()<span class="question-mark">?</span>;
+    <span class="kw">fn </span>from_str(input: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
+        <span class="kw">let </span>(<span class="kw">_</span>, math) = interpreted_math(input.into()).unwrap();
         <span class="prelude-val">Ok</span>(MathExpressionTree::from(math))
     }
 }
@@ -889,5 +915,23 @@
     <span class="kw">let </span>ode = input.parse::&lt;FirstOrderODE&gt;().unwrap();
     <span class="kw">let </span>cmml = ode.to_cmml();
     <span class="macro">assert_eq!</span>(cmml, <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;apply&gt;&lt;diff/&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;δ&lt;/ci&gt;&lt;ci&gt;E&lt;/ci&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;minus/&gt;&lt;cn&gt;1&lt;/cn&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;γ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;apply&gt;&lt;times/&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;α&lt;/ci&gt;&lt;ci&gt;ρ&lt;/ci&gt;&lt;/apply&gt;&lt;ci&gt;I&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;</span>);
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_content_hackathon2_scenario1_eq8() {
+    <span class="kw">let </span>input = <span class="string">&quot;
+    &lt;math&gt;
+        &lt;mi&gt;β&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
+        &lt;mo&gt;=&lt;/mo&gt;
+        &lt;mi&gt;κ&lt;/mi&gt;
+        &lt;mi&gt;m&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
+    &lt;/math&gt;
+    &quot;</span>;
+    <span class="kw">let </span>exp = input.parse::&lt;MathExpressionTree&gt;().unwrap();
+    <span class="kw">let </span>cmml = exp.to_cmml();
+    <span class="macro">assert_eq!</span>(
+        cmml,
+        <span class="string">&quot;&lt;apply&gt;&lt;eq/&gt;&lt;ci&gt;β&lt;/ci&gt;&lt;apply&gt;&lt;times/&gt;&lt;ci&gt;κ&lt;/ci&gt;&lt;ci&gt;m&lt;/ci&gt;&lt;/apply&gt;&lt;/apply&gt;&quot;
+    </span>);
 }
 </code></pre></div></section></main></body></html>

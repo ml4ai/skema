@@ -127,10 +127,6 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
-<a href="#130" id="130">130</a>
-<a href="#131" id="131">131</a>
-<a href="#132" id="132">132</a>
-<a href="#133" id="133">133</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{put, web, HttpResponse};
 <span class="kw">use </span>mathml::{
     acset::{ACSet, AMRmathml, PetriNet, RegNet},
@@ -155,10 +151,7 @@
 </span><span class="kw">pub async fn </span>get_ast_graph(payload: String) -&gt; String {
     <span class="kw">let </span>contents = <span class="kw-2">&amp;</span>payload;
     <span class="kw">let </span>math = contents.parse::&lt;Math&gt;().unwrap();
-    <span class="comment">//let (_, math) =
-    //parse(contents).unwrap_or_else(|_| panic!(&quot;{}&quot;, &quot;Unable to parse payload!&quot;.to_string()));
-
-    </span><span class="kw">let </span>g = math.to_graph();
+    <span class="kw">let </span>g = math.to_graph();
     <span class="kw">let </span>dot_representation = Dot::with_config(<span class="kw-2">&amp;</span>g, <span class="kw-2">&amp;</span>[Config::EdgeNoLabel]);
     dot_representation.to_string()
 }
@@ -201,8 +194,7 @@
 #[put(<span class="string">&quot;/mathml/content-mathml&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_content_mathml(payload: String) -&gt; String {
     <span class="kw">let </span>ode = payload.parse::&lt;FirstOrderODE&gt;().unwrap();
-    <span class="kw">let </span>content_mathml = ode.to_cmml();
-    content_mathml
+    ode.to_cmml()
 }
 
 <span class="doccomment">/// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.
