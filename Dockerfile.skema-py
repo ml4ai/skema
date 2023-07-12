@@ -50,7 +50,7 @@ RUN curl -L https://artifacts.askem.lum.ai/skema/img2mml/models/cnn_xfmer_arxiv_
 RUN tree /app
 #RUN pip install ".[all]"
 # exclude dependencies for docs
-RUN pip install ".[core]"
+RUN pip install ".[core,dev,demo]"
 # Build tree-sitter-fortran grammar required by Fortran code2fn
 RUN python /app/skema/program_analysis/TS2CAST/build_tree_sitter_fortran.py
 
