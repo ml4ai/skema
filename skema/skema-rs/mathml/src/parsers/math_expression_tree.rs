@@ -3,7 +3,7 @@
 
 use crate::ast::{
     operator::{Derivative, Operator},
-    Ci, Math, MathExpression, Mi, Mrow,
+    Math, MathExpression, Mi, Mrow,
 };
 use derive_new::new;
 use nom::error::Error;
