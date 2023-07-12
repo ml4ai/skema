@@ -118,7 +118,7 @@ def calculate_tree_edit_distance(mathml_pred: str, mathml_label: str) -> int:
          as a tree structure.
     """
     # If the token length difference is larger than 10, it returns -1
-    if abs(mathml_pred.count(" ") - mathml_label.count(" ")) >= 10:
+    if abs(mathml_pred.count(" ") - mathml_label.count(" ")) >= 5:
         return -1
 
     # If the prediction cannot make a tree structure, it returns -1.
@@ -133,7 +133,7 @@ def calculate_tree_edit_distance(mathml_pred: str, mathml_label: str) -> int:
         return 0
 
     # If the node number difference of two trees is larger than 10, it returns -1
-    if abs(mathml_tree1.count_nodes() - mathml_tree2.count_nodes()) >= 10:
+    if abs(mathml_tree1.count_nodes() - mathml_tree2.count_nodes()) >= 5:
         return -1
 
     def get_label(node: MathMLNode) -> str:
@@ -176,7 +176,7 @@ def calculate_tree_edit_distance(mathml_pred: str, mathml_label: str) -> int:
     return zss.simple_distance(zss_tree1, zss_tree2)
 
 
-def get_ted_loss(ted: float, sensitivity: float = 0.25) -> float:
+def get_ted_loss(ted: float, sensitivity: float = 0.5) -> float:
     """
     Calculates the tree edit distance (TED) loss based on the given TED value and sensitivity.
 
