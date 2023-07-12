@@ -414,9 +414,8 @@ fn test_content_hackathon2_scenario1_eq2() {
     </math>
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
-    println!("ode={:?}", ode);
     let cmml = ode.to_cmml();
-    println!("cmml={cmml}");
+    assert_eq!(cmml,"<apply><eq/><apply><diff/><ci>E</ci></apply><apply><minus/><apply><divide/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
 }
 
 #[test]
