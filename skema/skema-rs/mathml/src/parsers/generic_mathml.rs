@@ -6,6 +6,7 @@ use crate::ast::{
     },
     Mi, Mrow,
 };
+
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
@@ -180,7 +181,10 @@ pub fn add(input: Span) -> IResult<Operator> {
 }
 
 pub fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, ws(one_of("-−&#x2212;")))(input)?;
+    let (s, op) = alt((
+        value(Operator::Subtract, one_of("-−")),
+        value(Operator::Subtract, tag("&#x2212;")),
+    ))(input)?;
     Ok((s, op))
 }
 

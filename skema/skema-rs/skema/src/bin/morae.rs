@@ -48,7 +48,7 @@ fn main() {
 
         let math_content = module_id2mathml_ast(module_id, host);
 
-        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list3.txt";
+        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list2.txt";
 
         // This does get a panic with a message, so need to figure out how to forward it
         let mathml_ast = get_mathml_asts_from_file(input_src.clone());
