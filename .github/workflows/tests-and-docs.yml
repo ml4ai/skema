@@ -8,7 +8,7 @@ on:
 
 jobs:
   docs:
-    name: "Generate project documenation"
+    name: "Run tests and generate project documenation"
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -99,6 +99,11 @@ jobs:
     - name: "Code coverage reports for Python components"
       run: |
         pytest
+
+    - name: "Unit tests for Rust components"
+      working-directory: ./skema/skema-rs
+      run: |
+        cargo test --verbose --all
 
     # docs (other)
     - name: "Create documentation (other)"
