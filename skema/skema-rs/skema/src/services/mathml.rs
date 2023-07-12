@@ -8,7 +8,6 @@ use mathml::{
 use petgraph::dot::{Config, Dot};
 use utoipa;
 
-
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
 #[utoipa::path(
     request_body = String,

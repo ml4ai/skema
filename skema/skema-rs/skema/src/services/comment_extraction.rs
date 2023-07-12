@@ -2,8 +2,8 @@
 
 use actix_web::{post, web, HttpResponse};
 use comment_extraction::{
+    extraction::extract_comments_from_directory,
     languages::python::get_comments_from_string as get_python_comments,
-    extraction::extract_comments_from_directory
 };
 use log::debug;
 use serde::{Deserialize, Serialize};
