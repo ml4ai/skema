@@ -1,12 +1,16 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-use crate::ast::{
-    operator::{Derivative, Operator},
-    Math, MathExpression, Mi, Mrow,
+use crate::{
+    ast::{
+        operator::{Derivative, Operator},
+        Math, MathExpression, Mi, Mrow,
+    },
+    parsers::interpreted_mathml::interpreted_math,
 };
 use derive_new::new;
 use nom::error::Error;
+
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
@@ -229,8 +233,8 @@ impl From<Math> for MathExpressionTree {
 impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let math = s.parse::<Math>()?;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let (_, math) = interpreted_math(input.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -443,4 +447,22 @@ fn test_content_hackathon2_scenario1_eq3() {
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq8() {
+    let input = "
+    <math>
+        <mi>β</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>=</mo>
+        <mi>κ</mi>
+        <mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let cmml = exp.to_cmml();
+    assert_eq!(
+        cmml,
+        "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
+    );
 }
