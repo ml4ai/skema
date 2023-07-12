@@ -2,7 +2,7 @@ use crate::ast::{
     operator::Operator,
     Math, MathExpression,
     MathExpression::{
-        GroupTuple,Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
+        Mfrac, Mn, Mo, MoLine, Mover, Mspace, Msqrt, Mstyle, Msub, Msubsup, Msup, Mtext, Munder,
     },
     Mi, Mrow,
 };
@@ -11,8 +11,8 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
     combinator::{map, map_parser, opt, recognize, value},
-    multi::{many0, many_till},
     error::Error,
+    multi::{many0, many_till},
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
@@ -327,7 +327,7 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
     let (s, element) = ws(delimited(tag("<mo"), take_until("/>"), tag("/>")))(input)?;
     Ok((s, MoLine(element.to_string())))
 }
-
+/*
 /// Grouping parenthesis with Math expressions
 fn group_paren(input: Span) -> IResult<MathExpression> {
     let (s, lp) = mo_l(input)?;
@@ -338,11 +338,12 @@ fn group_paren(input: Span) -> IResult<MathExpression> {
     group_vec.push(elements.1);
     Ok((s, GroupTuple(group_vec)))
 }
+*/
 
 /// Math expressions
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        group_paren,
+        //group_paren,
         map(mi, MathExpression::Mi),
         mn,
         msup,
@@ -527,7 +528,7 @@ fn test_math() {
         },
     )
 }
-
+/*
 #[test]
 fn test_groupparen() {
     test_parser(
@@ -542,7 +543,7 @@ fn test_groupparen() {
         ]),
     );
 }
-
+*/
 #[test]
 fn test_mathml_parser() {
     let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
