@@ -23,11 +23,13 @@ class PetriNetLinker(AMRLinker):
                         for desc in descs:
                             ret[f"{val['name'].strip()}: {desc}"] = val
                     ret[val['name'].strip()] = val
-            elif name == "transitions":
-                if "description" in val:
-                    ret[f"{val['id'].strip()}: {val['description']}"] = val
-                else:
-                    ret[val['id'].strip()] = val
+            elif name == "parameters":
+                ret[val['id'].strip()] = val
+            # elif name == "transitions":
+            #     if "description" in val:
+            #         ret[f"{val['id'].strip()}: {val['description']}"] = val
+            #     else:
+            #         ret[val['id'].strip()] = val
 
         # Handle XML special characters
         ret = {html.unescape(k) if k.startswith("&#") else k: v for k, v in ret.items()}
