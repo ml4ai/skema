@@ -30,7 +30,7 @@ pub enum Type {
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct Ci {
     pub r#type: Option<Type>,
-    pub content: MathExpression,
+    pub content: Box<MathExpression>,
 }
 
 /// The MathExpression enum represents the corresponding element type in MathML 3
@@ -56,7 +56,8 @@ pub enum MathExpression {
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
-    Ci(Box<Ci>),
+    //GroupTuple(Vec<MathExpression>),
+    Ci(Ci),
     #[default]
     None,
 }
@@ -65,6 +66,7 @@ impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             MathExpression::Mi(Mi(identifier)) => write!(f, "{}", identifier),
+            MathExpression::Ci(Ci { r#type: _, content }) => write!(f, "{}", content),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
                 write!(f, "{base}^{{{superscript}}}")
@@ -94,7 +96,7 @@ impl fmt::Display for Ci {
 
 /// The Math struct represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_math)
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Math {
     pub content: Vec<MathExpression>,
 }

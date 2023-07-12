@@ -44,6 +44,7 @@ async fn main() -> std::io::Result<()> {
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
+            skema::services::mathml::get_content_mathml,
             skema::services::mathml::get_regnet,
             skema::services::mathml::get_amr,
             gromet::get_model_ids,
@@ -127,6 +128,7 @@ async fn main() -> std::io::Result<()> {
             .service(comment_extraction::get_comments_from_zipfile)
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
+            .service(skema::services::mathml::get_content_mathml)
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)

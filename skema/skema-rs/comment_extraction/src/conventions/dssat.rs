@@ -42,48 +42,46 @@ pub fn get_comments(src_file_name: &str) -> Result<DSSATComments, Box<dyn Error 
     let f = File::open(src_file_name)?;
     let lines = io::BufReader::new(f).lines();
 
-    for line in lines {
-        if let Ok(l) = line {
-            if line_is_comment(&l) {
-                curr_comment.push(l)
-            } else {
-                if comments.file_head.is_empty() {
-                    comments.file_head = curr_comment.clone()
+    for l in lines.flatten() {
+        if line_is_comment(&l) {
+            curr_comment.push(l)
+        } else {
+            if comments.file_head.is_empty() {
+                comments.file_head = curr_comment.clone()
+            }
+            let (f_start, f_name) = line_starts_subpgm(&l);
+
+            if f_start {
+                prev_fn = curr_fn.clone();
+                curr_fn = f_name;
+
+                if let Some(x) = &prev_fn {
+                    comments.subprograms.get_mut(x).unwrap().foot = curr_comment.clone();
                 }
-                let (f_start, f_name) = line_starts_subpgm(&l);
 
-                if f_start {
-                    prev_fn = curr_fn.clone();
-                    curr_fn = f_name;
+                comments.subprograms.insert(
+                    curr_fn.as_ref().unwrap().to_string(),
+                    SubprogramComments {
+                        head: curr_comment.clone(),
+                        neck: Vec::new(),
+                        foot: Vec::new(),
+                    },
+                );
 
-                    if let Some(x) = &prev_fn {
-                        comments.subprograms.get_mut(x).unwrap().foot = curr_comment.clone();
-                    }
-
-                    comments.subprograms.insert(
-                        curr_fn.as_ref().unwrap().to_string(),
-                        SubprogramComments {
-                            head: curr_comment.clone(),
-                            neck: Vec::new(),
-                            foot: Vec::new(),
-                        },
-                    );
-
-                    curr_comment.clear();
-                    in_neck = true;
-                } else if line_ends_subpgm(&l) {
-                    curr_comment.clear();
-                } else if line_is_continuation(&l, extension) {
-                    continue;
-                } else if in_neck {
-                    comments
-                        .subprograms
-                        .get_mut(&curr_fn.clone().unwrap())
-                        .unwrap()
-                        .neck = curr_comment.clone();
-                    in_neck = false;
-                    curr_comment.clear();
-                }
+                curr_comment.clear();
+                in_neck = true;
+            } else if line_ends_subpgm(&l) {
+                curr_comment.clear();
+            } else if line_is_continuation(&l, extension) {
+                continue;
+            } else if in_neck {
+                comments
+                    .subprograms
+                    .get_mut(&curr_fn.clone().unwrap())
+                    .unwrap()
+                    .neck = curr_comment.clone();
+                in_neck = false;
+                curr_comment.clear();
             }
         }
     }
