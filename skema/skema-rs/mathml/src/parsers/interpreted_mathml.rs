@@ -148,9 +148,8 @@ fn exp(input: Span) -> IResult<()> {
 
 pub fn exponential(input: Span) -> IResult<(Operator, MathExpression)> {
     let (s, x) = delimited(stag!("msup"), pair(exp, math_expression), etag!("msup"))(input)?;
-    //let (s, x) = delimited(stag!("msup"), pair(exp, math_expression), etag!("msup"))(input)?;
     let (_, comp) = x;
-    Ok((s, (Operator::Exponential, comp)))
+    Ok((s, (Operator::Exp, comp)))
 }
 
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
