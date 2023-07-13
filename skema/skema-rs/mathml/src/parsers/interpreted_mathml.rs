@@ -57,7 +57,7 @@ pub fn ci_univariate_func(input: Span) -> IResult<Ci> {
 /// Parse content identifier for Msub
 pub fn ci_subscript(input: Span) -> IResult<Ci> {
     let (s, x) = msub(input)?;
-    Ok((s, Ci::new(None, x))
+    Ok((s, Ci::new(None, Box::new(x))))
 }
 
 /// Parse the identifier 'd'
