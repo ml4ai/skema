@@ -12,7 +12,7 @@ pub struct Mi(pub String);
 pub struct Mrow(pub Vec<MathExpression>);
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
-pub enum Type {
+pub enum CiType {
     Integer,
     Rational,
     Real,
@@ -29,8 +29,14 @@ pub enum Type {
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct Ci {
-    pub r#type: Option<Type>,
+    pub r#type: Option<CiType>,
     pub content: Box<MathExpression>,
+}
+
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Cn {
+    pub r#type: Option<CiType>,
+    pub content: String,
 }
 
 /// The MathExpression enum represents the corresponding element type in MathML 3
@@ -56,11 +62,19 @@ pub enum MathExpression {
     Mstyle(Vec<MathExpression>),
     Mspace(String),
     MoLine(String),
-    //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
     #[default]
     None,
 }
+
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub enum CnType {
+    Integer,
+    Real,
+    Double,
+    Hexdouble,
+}
+
 
 impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

@@ -1,7 +1,7 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, MathExpression, Type,
+        Ci, MathExpression, CiType,
     },
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
@@ -59,7 +59,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         map(ci_univariate_func, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
-                r#type: Some(Type::Function),
+                r#type: Some(CiType::Function),
                 content,
             })
         }),
@@ -108,7 +108,7 @@ fn test_ci_univariate_func() {
         "<mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>",
         ci_univariate_func,
         Ci::new(
-            Some(Type::Function),
+            Some(CiType::Function),
             Box::new(MathExpression::Mi(Mi("S".to_string()))),
         ),
     );
@@ -125,7 +125,7 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
         (
             Derivative::new(1, 1),
             Ci::new(
-                Some(Type::Function),
+                Some(CiType::Function),
                 Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
         ),
@@ -143,7 +143,7 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
         (
             Derivative::new(1, 1),
             Ci::new(
-                Some(Type::Function),
+                Some(CiType::Function),
                 Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
         ),

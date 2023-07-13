@@ -7,13 +7,17 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, Math, MathExpression, Mi, Mrow, Type,
+        Ci, CiType, Cn, Math, MathExpression, Mi, Mrow,
     },
-    parsers::generic_mathml::{
-        add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
-        rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+    parsers::{
+        generic_mathml::{
+            add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
+            rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+        },
+        math_expression_tree::MathExpressionTree,
     },
 };
+use derive_new::new;
 
 use nom::{
     branch::alt,
@@ -48,7 +52,7 @@ pub fn ci_univariate_func(input: Span) -> IResult<Ci> {
     Ok((
         s,
         Ci::new(
-            Some(Type::Function),
+            Some(CiType::Function),
             Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
         ),
     ))
@@ -79,7 +83,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
     let (s, func) = ws(alt((
         ci_univariate_func,
         map(ci_unknown, |Ci { content, .. }| Ci {
-            r#type: Some(Type::Function),
+            r#type: Some(CiType::Function),
             content,
         }),
     )))(s)?;
@@ -109,7 +113,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
             stag!("mover"),
             pair(
                 map(ci_unknown, |Ci { content, .. }| Ci {
-                    r#type: Some(Type::Function),
+                    r#type: Some(CiType::Function),
                     content,
                 }),
                 n_dots,
@@ -150,7 +154,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         map(ci_univariate_func, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
-                r#type: Some(Type::Function),
+                r#type: Some(CiType::Function),
                 content,
             })
         }),
@@ -165,9 +169,23 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     )))(input)
 }
 
+
+
+
 /// Parser for interpreted math expressions.
 /// testing MathML documents
 pub fn interpreted_math(input: Span) -> IResult<Math> {
     let (s, elements) = preceded(opt(xml_declaration), elem_many0!("math"))(input)?;
     Ok((s, Math { content: elements }))
+}
+
+fn summation(input: Span) -> IResult<Sum> {
+    let (s, _) = tag_parser!("munder", tag_parser!("mo", tag("∑")))?;
+    Ok((
+        s,
+        Sum::new(
+            vec![],
+            Domain::Condition(ContExp::Apply(Operator::In, vec![])),
+        ),
+    ))
 }
