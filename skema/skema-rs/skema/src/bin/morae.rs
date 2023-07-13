@@ -1,7 +1,7 @@
 use clap::Parser;
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
-use mathml::parsers::first_order_ode::FirstOrderODE;
+use mathml::parsers::first_order_ode::{get_FirstOrderODE_vec_from_file, FirstOrderODE};
 #[cfg(test)]
 use std::fs;
 use std::fs::File;
@@ -48,7 +48,7 @@ fn main() {
 
         let math_content = module_id2mathml_ast(module_id, host);
 
-        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list2.txt";
+        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list3.txt";
 
         // This does get a panic with a message, so need to figure out how to forward it
         let mathml_ast = get_mathml_asts_from_file(input_src.clone());
@@ -56,11 +56,11 @@ fn main() {
         let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
         println!("\nmath_content: {:?}", math_content);
-        println!("\nmathml_ast: {:?}", mathml_ast);
+        println!("\nmathml_ast: {:?}", odes.clone());
 
         println!("\nPN from code: {:?}", ACSet::from(math_content.clone()));
-        println!("\nPN from mathml: {:?}\n", RegNet::from(mathml_ast.clone()));
 
+        println!("\nAMR from mathml: {:?}\n", PetriNet::from(odes.clone()));
         println!(
             "\nAMR from code: {:?}",
             PetriNet::from(ACSet::from(math_content))
@@ -100,95 +100,6 @@ fn main() {
     } else {
         println!("Unknown Command!");
     }
-}
-
-pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
-    let f = File::open(filepath).unwrap();
-    let lines = BufReader::new(f).lines();
-
-    let mut ode_vec = Vec::<FirstOrderODE>::new();
-
-    for line in lines.flatten() {
-        if let Some('#') = &line.chars().next() {
-            // Ignore lines starting with '#'
-        } else {
-            // Parse MathML into FirstOrderODE
-            let mut ode = line
-                .parse::<FirstOrderODE>()
-                .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
-            println!(
-                "ode_line rhs string before: {:?}\n",
-                ode.rhs.to_string().clone()
-            );
-            //println!("ode_line rhs data struct: {:?}\n", ode.rhs.clone());
-            //println!("ode_line state: {:?}\n", ode.lhs_var.to_string().clone());
-            ode.rhs = flatten_mults(ode.rhs.clone());
-            println!(
-                "ode_line rhs string after: {:?}\n",
-                ode.rhs.to_string().clone()
-            );
-            ode_vec.push(ode);
-        }
-    }
-    ode_vec
-}
-
-pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
-    match equation {
-        Cons(ref x, ref mut y) => match x {
-            Multiply => {
-                match y[1].clone() {
-                    Cons(x1, y1) => match x1 {
-                        Multiply => {
-                            let mut temp1 = flatten_mults(y1[0].clone());
-                            let mut temp2 = flatten_mults(y1[1].clone());
-                            y.remove(1);
-                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec())
-                        }
-                        _ => {
-                            let mut temp1 = y1[0].clone();
-                            let mut temp2 = y1[1].clone();
-                            y.remove(1);
-                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec())
-                        }
-                    },
-                    Atom(x1) => {}
-                }
-                match y[0].clone() {
-                    Cons(x0, y0) => match x0 {
-                        Multiply => {
-                            let mut temp1 = flatten_mults(y0[0].clone());
-                            let mut temp2 = flatten_mults(y0[1].clone());
-                            y.remove(0);
-                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec());
-                        }
-                        _ => {
-                            let mut temp1 = y0[0].clone();
-                            let mut temp2 = y0[1].clone();
-                            y.remove(0);
-                            y.append(&mut [temp1.clone(), temp2.clone()].to_vec())
-                        }
-                    },
-                    Atom(x0) => {}
-                }
-            }
-            _ => {
-                if y.len() > 1 {
-                    let temp1 = flatten_mults(y[1].clone());
-                    let temp0 = flatten_mults(y[0].clone());
-                    y.remove(1);
-                    y.remove(0);
-                    y.append(&mut [temp0.clone(), temp1.clone()].to_vec())
-                } else {
-                    let temp0 = flatten_mults(y[0].clone());
-                    y.remove(0);
-                    y.append(&mut [temp0.clone()].to_vec())
-                }
-            }
-        },
-        Atom(ref x) => {}
-    }
-    equation
 }
 
 #[test]

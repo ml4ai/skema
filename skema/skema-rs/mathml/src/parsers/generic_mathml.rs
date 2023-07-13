@@ -181,10 +181,10 @@ pub fn add(input: Span) -> IResult<Operator> {
 }
 
 pub fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((
-        value(Operator::Subtract, one_of("-−")),
-        value(Operator::Subtract, tag("&#x2212;")),
-    ))(input)?;
+    let (s, op) = value(
+        Operator::Subtract,
+        alt((tag("-"), tag("−"), tag("&#x2212;"))),
+    )(input)?;
     Ok((s, op))
 }
 

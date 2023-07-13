@@ -1,6 +1,6 @@
 //! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
-use crate::parsers::first_order_ode::FirstOrderODE;
+use crate::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
 use crate::{
     ast::{Math, MathExpression, Mi},
     mml2pn::{group_by_operators, Term},
@@ -60,6 +60,8 @@ pub struct PetriNet {
     pub model_version: String,
     pub model: ModelPetriNet,
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantics: Option<Semantics>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Metadata>,
 }
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
@@ -89,8 +91,6 @@ pub struct ModelPetriNet {
     pub transitions: BTreeSet<Transition>,
     /// Note: parameters is a required field in the schema, but we make it optional since we want
     /// to reuse this schema for partial extractions as well.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub semantics: Option<Semantics>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Metadata>,
 }
@@ -416,7 +416,6 @@ impl From<ACSet> for PetriNet {
         let model = ModelPetriNet {
             states: states_vec,
             transitions: transitions_vec,
-            semantics: Some(semantics),
             metadata: None,
         };
 
@@ -426,7 +425,8 @@ impl From<ACSet> for PetriNet {
         schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model,
+        model: model,
+        semantics: Some(semantics),
         metadata: None,
     }
     }
@@ -440,6 +440,48 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         let mut initial_vec = Vec::<Initial>::new();
         let mut parameter_vec = Vec::<Parameter>::new();
         let mut rate_vec = Vec::<Rate>::new();
+        let mut state_string_list = Vec::<String>::new();
+        let mut terms = Vec::<PnTerm>::new();
+
+        // this first for loop is for the creation state related parameters in the AMR
+        for ode in ode_vec.iter() {
+            let states = State {
+                id: ode.lhs_var.to_string().clone(),
+                name: ode.lhs_var.to_string().clone(),
+                ..Default::default()
+            };
+            let initials = Initial {
+                target: ode.lhs_var.to_string().clone(),
+                expression: format!("{}0", ode.lhs_var.to_string().clone()),
+                ..Default::default()
+            };
+            let parameters = Parameter {
+                id: initials.expression.clone(),
+                name: Some(initials.expression.clone()),
+                description: Some(format!(
+                    "The total {} population at timestep 0",
+                    ode.lhs_var.to_string().clone()
+                )),
+                ..Default::default()
+            };
+            parameter_vec.push(parameters.clone());
+            initial_vec.push(initials.clone());
+            states_vec.insert(states.clone());
+            state_string_list.push(ode.lhs_var.to_string().clone()); // used later for transition parsing
+        }
+
+        // now for the construction of the transitions and their results
+
+        // this collects all the terms from the equations
+        for ode in ode_vec.iter() {
+            terms.append(&mut get_terms(state_string_list.clone(), ode.clone()));
+        }
+
+        for term in terms.iter() {
+            println!("term: {:?}\n", term.clone());
+        }
+
+        // now for polarity pairs of terms we need to construct the transistions
 
         // construct the PetriNet
         let ode = Ode {
@@ -454,7 +496,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         let model = ModelPetriNet {
             states: states_vec,
             transitions: transitions_vec,
-            semantics: Some(semantics),
             metadata: None,
         };
 
@@ -464,7 +505,8 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model,
+        model: model,
+        semantics: Some(semantics),
         metadata: None,
     }
     }
