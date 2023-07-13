@@ -27,16 +27,21 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import json
-import os
+<pre><code class="python">import os
 import requests
 from pathlib import Path
 import urllib.request
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
+from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
+import torch
+from typing import Tuple, List, Any, Dict
+from logging import info
+from skema.img2mml.translate import define_model
+import json
 
 
-def retrieve_model(model_path=None):
+def retrieve_model(model_path=None) -&gt; str:
     &#34;&#34;&#34;
     Retrieve the img2mml model from the specified path or download it if not found.
 
@@ -63,27 +68,177 @@ def retrieve_model(model_path=None):
     return str(model_path)
 
 
-def get_mathml_from_bytes(data: bytes):
-    # read config file
+def check_gpu_availability() -&gt; torch.device:
+    &#34;&#34;&#34;
+    Check if GPU is available and return the appropriate device.
+
+    Returns:
+        torch.device: The device (GPU or CPU) to be used for computation.
+    &#34;&#34;&#34;
+    if not torch.cuda.is_available():
+        print(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+        device = torch.device(&#34;cpu&#34;)
+    else:
+        device = torch.device(&#34;cuda&#34;)
+
+    return device
+
+
+def load_model(
+    model_path: str,
+    config: dict,
+    vocab: List[str],
+    device: torch.device = torch.device(&#34;cpu&#34;),
+) -&gt; Image2MathML_Xfmer:
+    &#34;&#34;&#34;
+    Load the model&#39;s state dictionary from a file.
+
+    Args:
+        model_path: The path to the model state dictionary file.
+        config: The configuration setting.
+        vocab: The vocabulary dictionary of the img2mml model.
+        device: The device (GPU or CPU) to be used for computation.
+
+    Returns:
+        The model with loaded state dictionary.
+
+    Raises:
+        FileNotFoundError: If the model state dictionary file does not exist.
+        RuntimeError: If there is an error during loading the state dictionary.
+
+    Note:
+        If `clean_state_dict` is True, the function removes the &#34;module.&#34; prefix from the state_dict keys
+        if present.
+
+        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
+    &#34;&#34;&#34;
+
+    model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
     cwd = Path(__file__).parents[0]
-    config_path = cwd / &#34;configs&#34; / &#34;xfmer_mml_config.json&#34;
-    with open(config_path, &#34;r&#34;) as cfg:
-        config = json.load(cfg)
+    if model_path is None:
+        model_path = (
+            cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_best.pt&#34;
+        )
+    try:
+        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
+        # we need to remove the &#34;module.&#34; from key_names
+        if config[&#34;clean_state_dict&#34;]:
+            new_model = dict()
+            for key, value in torch.load(model_path, map_location=device).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
+        else:
+            if not torch.cuda.is_available():
+                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+                new_model = dict()
+                for key, value in torch.load(model_path, map_location=device).items():
+                    new_model[key[7:]] = value
+                    model.load_state_dict(new_model, strict=False)
+            else:
+                model.load_state_dict(torch.load(model_path))
+    except FileNotFoundError:
+        raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
+    except Exception as e:
+        raise RuntimeError(
+            f&#34;Error loading state dictionary from file: {model_path}\n{e}&#34;
+        )
+
+    return model
+
+
+def load_vocab(vocab_path: str = None) -&gt; Tuple[List[str], dict, dict]:
+    &#34;&#34;&#34;
+    Load vocabulary from a list and create dictionaries for both forward and backward mapping.
+
+    Args:
+        vocab (Optional[str, Path]): The vocabulary path.
+
+    Returns:
+        Tuple[List[str], dict, dict]: A tuple containing two dictionaries:
+            - vocab (List[str]): A complete dictionary.
+            - vocab_itos (dict): A dictionary mapping index to token.
+            - vocab_stoi (dict): A dictionary mapping token to index.
+    &#34;&#34;&#34;
+    cwd = Path(__file__).parents[0]
+    if vocab_path is None:
+        vocab_path = (
+            cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_vocab.txt&#34;
+        )
+
+    # read vocab.txt
+    with open(vocab_path) as f:
+        vocab = f.readlines()
+
+    vocab_itos = dict()
+    vocab_stoi = dict()
+
+    for v in vocab:
+        k, v = v.split()
+        vocab_itos[v.strip()] = k.strip()
+        vocab_stoi[k.strip()] = v.strip()
+
+    return vocab, vocab_itos, vocab_stoi
+
+
+class Image2MathML:
+    def __init__(self, config_path: str, vocab_path: str, model_path: str) -&gt; None:
+        self.config = self.load_config(config_path)
+        self.vocab, self.vocab_itos, self.vocab_stoi = self.load_vocab(vocab_path)
+        self.device = self.check_gpu_availability()
+        self.model = self.load_model(model_path)
+
+    def load_config(self, config_path: str) -&gt; Dict[str, Any]:
+        with open(config_path, &#34;r&#34;) as cfg:
+            config = json.load(cfg)
+        return config
+
+    def load_vocab(self, vocab_path: str) -&gt; Tuple[Any, Dict[str, Any], Dict[str, Any]]:
+        # Load the image2mathml vocabulary
+        vocab, vocab_itos, vocab_stoi = load_vocab(vocab_path=vocab_path)
+        return vocab, vocab_itos, vocab_stoi
+
+    def check_gpu_availability(self) -&gt; torch.device:
+        # Check GPU availability
+        if torch.cuda.is_available():
+            device = torch.device(&#34;cuda&#34;)
+        else:
+            device = torch.device(&#34;cpu&#34;)
+        return device
+
+    def load_model(self, model_path: str) -&gt; Image2MathML_Xfmer:
+        # Load the image2mathml model
+        MODEL_PATH = retrieve_model(model_path=model_path)
+        img2mml_model: Image2MathML_Xfmer = load_model(
+            model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+        )
+        return img2mml_model
+
+def get_mathml_from_bytes(
+    data: bytes,
+    image2mathml_db: Image2MathML,
+) -&gt; str:
+    &#34;&#34;&#34;
+    Convert an image in bytes format to MathML representation using the provided model.
+
+    Args:
+        data (bytes): The image data in bytes format.
+        model (Image2MathML_Xfmer): The pre-trained image-to-MathML model.
+        config (Dict): Configuration dictionary for rendering MathML.
+        vocab_itos (Dict): Dictionary mapping index to token for vocabulary.
+        vocab_stoi (Dict): Dictionary mapping token to index for vocabulary.
+        device (torch.device): CPU or GPU.
+
+    Returns:
+        str: The MathML representation of the input image.
+    &#34;&#34;&#34;
     # convert png image to tensor
-    imagetensor = convert_to_torch_tensor(data, config)
+    imagetensor = convert_to_torch_tensor(data, image2mathml_db.config)
 
     # change the shape of tensor from (C_in, H, W)
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
-    VOCAB_NAME = &#34;arxiv_im2mml_with_fonts_with_boldface_vocab.txt&#34;
 
-    # read vocab.txt
-    with open(cwd / &#34;trained_models&#34; / VOCAB_NAME) as f:
-        vocab = f.readlines()
-
-    model_path = retrieve_model()
-
-    return render_mml(config, model_path, vocab, imagetensor)
+    return render_mml(image2mathml_db.model, image2mathml_db.vocab_itos, image2mathml_db.vocab_stoi, imagetensor, image2mathml_db.device)
 
 
 def get_mathml_from_file(filepath) -&gt; str:
@@ -132,36 +287,91 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="skema.img2mml.api.get_mathml_from_bytes"><code class="name flex">
-<span>def <span class="ident">get_mathml_from_bytes</span></span>(<span>data: bytes)</span>
+<dt id="skema.img2mml.api.check_gpu_availability"><code class="name flex">
+<span>def <span class="ident">check_gpu_availability</span></span>(<span>) ‑> torch.device</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Check if GPU is available and return the appropriate device.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>torch.device</code></dt>
+<dd>The device (GPU or CPU) to be used for computation.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_mathml_from_bytes(data: bytes):
-    # read config file
-    cwd = Path(__file__).parents[0]
-    config_path = cwd / &#34;configs&#34; / &#34;xfmer_mml_config.json&#34;
-    with open(config_path, &#34;r&#34;) as cfg:
-        config = json.load(cfg)
+<pre><code class="python">def check_gpu_availability() -&gt; torch.device:
+    &#34;&#34;&#34;
+    Check if GPU is available and return the appropriate device.
+
+    Returns:
+        torch.device: The device (GPU or CPU) to be used for computation.
+    &#34;&#34;&#34;
+    if not torch.cuda.is_available():
+        print(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+        device = torch.device(&#34;cpu&#34;)
+    else:
+        device = torch.device(&#34;cuda&#34;)
+
+    return device</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.api.get_mathml_from_bytes"><code class="name flex">
+<span>def <span class="ident">get_mathml_from_bytes</span></span>(<span>data: bytes, image2mathml_db: <a title="skema.img2mml.api.Image2MathML" href="#skema.img2mml.api.Image2MathML">Image2MathML</a>) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Convert an image in bytes format to MathML representation using the provided model.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>data</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>The image data in bytes format.</dd>
+<dt><strong><code>model</code></strong> :&ensp;<code>Image2MathML_Xfmer</code></dt>
+<dd>The pre-trained image-to-MathML model.</dd>
+<dt><strong><code>config</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>Configuration dictionary for rendering MathML.</dd>
+<dt><strong><code>vocab_itos</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>Dictionary mapping index to token for vocabulary.</dd>
+<dt><strong><code>vocab_stoi</code></strong> :&ensp;<code>Dict</code></dt>
+<dd>Dictionary mapping token to index for vocabulary.</dd>
+<dt><strong><code>device</code></strong> :&ensp;<code>torch.device</code></dt>
+<dd>CPU or GPU.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The MathML representation of the input image.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_mathml_from_bytes(
+    data: bytes,
+    image2mathml_db: Image2MathML,
+) -&gt; str:
+    &#34;&#34;&#34;
+    Convert an image in bytes format to MathML representation using the provided model.
+
+    Args:
+        data (bytes): The image data in bytes format.
+        model (Image2MathML_Xfmer): The pre-trained image-to-MathML model.
+        config (Dict): Configuration dictionary for rendering MathML.
+        vocab_itos (Dict): Dictionary mapping index to token for vocabulary.
+        vocab_stoi (Dict): Dictionary mapping token to index for vocabulary.
+        device (torch.device): CPU or GPU.
+
+    Returns:
+        str: The MathML representation of the input image.
+    &#34;&#34;&#34;
     # convert png image to tensor
-    imagetensor = convert_to_torch_tensor(data, config)
+    imagetensor = convert_to_torch_tensor(data, image2mathml_db.config)
 
     # change the shape of tensor from (C_in, H, W)
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
-    VOCAB_NAME = &#34;arxiv_im2mml_with_fonts_with_boldface_vocab.txt&#34;
 
-    # read vocab.txt
-    with open(cwd / &#34;trained_models&#34; / VOCAB_NAME) as f:
-        vocab = f.readlines()
-
-    model_path = retrieve_model()
-
-    return render_mml(config, model_path, vocab, imagetensor)</code></pre>
+    return render_mml(image2mathml_db.model, image2mathml_db.vocab_itos, image2mathml_db.vocab_stoi, imagetensor, image2mathml_db.device)</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.api.get_mathml_from_file"><code class="name flex">
@@ -221,8 +431,159 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
             return &#34;Conversion Failed.&#34;</code></pre>
 </details>
 </dd>
+<dt id="skema.img2mml.api.load_model"><code class="name flex">
+<span>def <span class="ident">load_model</span></span>(<span>model_path: str, config: dict, vocab: List[str], device: torch.device = device(type='cpu')) ‑> <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load the model's state dictionary from a file.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>model_path</code></strong></dt>
+<dd>The path to the model state dictionary file.</dd>
+<dt><strong><code>config</code></strong></dt>
+<dd>The configuration setting.</dd>
+<dt><strong><code>vocab</code></strong></dt>
+<dd>The vocabulary dictionary of the img2mml model.</dd>
+<dt><strong><code>device</code></strong></dt>
+<dd>The device (GPU or CPU) to be used for computation.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The model with loaded state dictionary.</p>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>FileNotFoundError</code></dt>
+<dd>If the model state dictionary file does not exist.</dd>
+<dt><code>RuntimeError</code></dt>
+<dd>If there is an error during loading the state dictionary.</dd>
+</dl>
+<h2 id="note">Note</h2>
+<p>If <code>clean_state_dict</code> is True, the function removes the "module." prefix from the state_dict keys
+if present.</p>
+<p>If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_model(
+    model_path: str,
+    config: dict,
+    vocab: List[str],
+    device: torch.device = torch.device(&#34;cpu&#34;),
+) -&gt; Image2MathML_Xfmer:
+    &#34;&#34;&#34;
+    Load the model&#39;s state dictionary from a file.
+
+    Args:
+        model_path: The path to the model state dictionary file.
+        config: The configuration setting.
+        vocab: The vocabulary dictionary of the img2mml model.
+        device: The device (GPU or CPU) to be used for computation.
+
+    Returns:
+        The model with loaded state dictionary.
+
+    Raises:
+        FileNotFoundError: If the model state dictionary file does not exist.
+        RuntimeError: If there is an error during loading the state dictionary.
+
+    Note:
+        If `clean_state_dict` is True, the function removes the &#34;module.&#34; prefix from the state_dict keys
+        if present.
+
+        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
+    &#34;&#34;&#34;
+
+    model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
+    cwd = Path(__file__).parents[0]
+    if model_path is None:
+        model_path = (
+            cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_best.pt&#34;
+        )
+    try:
+        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
+        # we need to remove the &#34;module.&#34; from key_names
+        if config[&#34;clean_state_dict&#34;]:
+            new_model = dict()
+            for key, value in torch.load(model_path, map_location=device).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
+        else:
+            if not torch.cuda.is_available():
+                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+                new_model = dict()
+                for key, value in torch.load(model_path, map_location=device).items():
+                    new_model[key[7:]] = value
+                    model.load_state_dict(new_model, strict=False)
+            else:
+                model.load_state_dict(torch.load(model_path))
+    except FileNotFoundError:
+        raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
+    except Exception as e:
+        raise RuntimeError(
+            f&#34;Error loading state dictionary from file: {model_path}\n{e}&#34;
+        )
+
+    return model</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.api.load_vocab"><code class="name flex">
+<span>def <span class="ident">load_vocab</span></span>(<span>vocab_path: str = None) ‑> Tuple[List[str], dict, dict]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Load vocabulary from a list and create dictionaries for both forward and backward mapping.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>vocab</code></strong> :&ensp;<code>Optional[str, Path]</code></dt>
+<dd>The vocabulary path.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Tuple[List[str], dict, dict]</code></dt>
+<dd>A tuple containing two dictionaries:
+- vocab (List[str]): A complete dictionary.
+- vocab_itos (dict): A dictionary mapping index to token.
+- vocab_stoi (dict): A dictionary mapping token to index.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_vocab(vocab_path: str = None) -&gt; Tuple[List[str], dict, dict]:
+    &#34;&#34;&#34;
+    Load vocabulary from a list and create dictionaries for both forward and backward mapping.
+
+    Args:
+        vocab (Optional[str, Path]): The vocabulary path.
+
+    Returns:
+        Tuple[List[str], dict, dict]: A tuple containing two dictionaries:
+            - vocab (List[str]): A complete dictionary.
+            - vocab_itos (dict): A dictionary mapping index to token.
+            - vocab_stoi (dict): A dictionary mapping token to index.
+    &#34;&#34;&#34;
+    cwd = Path(__file__).parents[0]
+    if vocab_path is None:
+        vocab_path = (
+            cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_vocab.txt&#34;
+        )
+
+    # read vocab.txt
+    with open(vocab_path) as f:
+        vocab = f.readlines()
+
+    vocab_itos = dict()
+    vocab_stoi = dict()
+
+    for v in vocab:
+        k, v = v.split()
+        vocab_itos[v.strip()] = k.strip()
+        vocab_stoi[k.strip()] = v.strip()
+
+    return vocab, vocab_itos, vocab_stoi</code></pre>
+</details>
+</dd>
 <dt id="skema.img2mml.api.retrieve_model"><code class="name flex">
-<span>def <span class="ident">retrieve_model</span></span>(<span>model_path=None)</span>
+<span>def <span class="ident">retrieve_model</span></span>(<span>model_path=None) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Retrieve the img2mml model from the specified path or download it if not found.</p>
@@ -240,7 +601,7 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def retrieve_model(model_path=None):
+<pre><code class="python">def retrieve_model(model_path=None) -&gt; str:
     &#34;&#34;&#34;
     Retrieve the img2mml model from the specified path or download it if not found.
 
@@ -270,6 +631,122 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
 </dl>
 </section>
 <section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.img2mml.api.Image2MathML"><code class="flex name class">
+<span>class <span class="ident">Image2MathML</span></span>
+<span>(</span><span>config_path: str, vocab_path: str, model_path: str)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class Image2MathML:
+    def __init__(self, config_path: str, vocab_path: str, model_path: str) -&gt; None:
+        self.config = self.load_config(config_path)
+        self.vocab, self.vocab_itos, self.vocab_stoi = self.load_vocab(vocab_path)
+        self.device = self.check_gpu_availability()
+        self.model = self.load_model(model_path)
+
+    def load_config(self, config_path: str) -&gt; Dict[str, Any]:
+        with open(config_path, &#34;r&#34;) as cfg:
+            config = json.load(cfg)
+        return config
+
+    def load_vocab(self, vocab_path: str) -&gt; Tuple[Any, Dict[str, Any], Dict[str, Any]]:
+        # Load the image2mathml vocabulary
+        vocab, vocab_itos, vocab_stoi = load_vocab(vocab_path=vocab_path)
+        return vocab, vocab_itos, vocab_stoi
+
+    def check_gpu_availability(self) -&gt; torch.device:
+        # Check GPU availability
+        if torch.cuda.is_available():
+            device = torch.device(&#34;cuda&#34;)
+        else:
+            device = torch.device(&#34;cpu&#34;)
+        return device
+
+    def load_model(self, model_path: str) -&gt; Image2MathML_Xfmer:
+        # Load the image2mathml model
+        MODEL_PATH = retrieve_model(model_path=model_path)
+        img2mml_model: Image2MathML_Xfmer = load_model(
+            model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+        )
+        return img2mml_model</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.img2mml.api.Image2MathML.check_gpu_availability"><code class="name flex">
+<span>def <span class="ident">check_gpu_availability</span></span>(<span>self) ‑> torch.device</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_gpu_availability(self) -&gt; torch.device:
+    # Check GPU availability
+    if torch.cuda.is_available():
+        device = torch.device(&#34;cuda&#34;)
+    else:
+        device = torch.device(&#34;cpu&#34;)
+    return device</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.api.Image2MathML.load_config"><code class="name flex">
+<span>def <span class="ident">load_config</span></span>(<span>self, config_path: str) ‑> Dict[str, Any]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_config(self, config_path: str) -&gt; Dict[str, Any]:
+    with open(config_path, &#34;r&#34;) as cfg:
+        config = json.load(cfg)
+    return config</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.api.Image2MathML.load_model"><code class="name flex">
+<span>def <span class="ident">load_model</span></span>(<span>self, model_path: str) ‑> <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_model(self, model_path: str) -&gt; Image2MathML_Xfmer:
+    # Load the image2mathml model
+    MODEL_PATH = retrieve_model(model_path=model_path)
+    img2mml_model: Image2MathML_Xfmer = load_model(
+        model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+    )
+    return img2mml_model</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.api.Image2MathML.load_vocab"><code class="name flex">
+<span>def <span class="ident">load_vocab</span></span>(<span>self, vocab_path: str) ‑> Tuple[Any, Dict[str, Any], Dict[str, Any]]</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def load_vocab(self, vocab_path: str) -&gt; Tuple[Any, Dict[str, Any], Dict[str, Any]]:
+    # Load the image2mathml vocabulary
+    vocab, vocab_itos, vocab_stoi = load_vocab(vocab_path=vocab_path)
+    return vocab, vocab_itos, vocab_stoi</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -285,10 +762,26 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.img2mml.api.check_gpu_availability" href="#skema.img2mml.api.check_gpu_availability">check_gpu_availability</a></code></li>
 <li><code><a title="skema.img2mml.api.get_mathml_from_bytes" href="#skema.img2mml.api.get_mathml_from_bytes">get_mathml_from_bytes</a></code></li>
 <li><code><a title="skema.img2mml.api.get_mathml_from_file" href="#skema.img2mml.api.get_mathml_from_file">get_mathml_from_file</a></code></li>
 <li><code><a title="skema.img2mml.api.get_mathml_from_latex" href="#skema.img2mml.api.get_mathml_from_latex">get_mathml_from_latex</a></code></li>
+<li><code><a title="skema.img2mml.api.load_model" href="#skema.img2mml.api.load_model">load_model</a></code></li>
+<li><code><a title="skema.img2mml.api.load_vocab" href="#skema.img2mml.api.load_vocab">load_vocab</a></code></li>
 <li><code><a title="skema.img2mml.api.retrieve_model" href="#skema.img2mml.api.retrieve_model">retrieve_model</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.img2mml.api.Image2MathML" href="#skema.img2mml.api.Image2MathML">Image2MathML</a></code></h4>
+<ul class="">
+<li><code><a title="skema.img2mml.api.Image2MathML.check_gpu_availability" href="#skema.img2mml.api.Image2MathML.check_gpu_availability">check_gpu_availability</a></code></li>
+<li><code><a title="skema.img2mml.api.Image2MathML.load_config" href="#skema.img2mml.api.Image2MathML.load_config">load_config</a></code></li>
+<li><code><a title="skema.img2mml.api.Image2MathML.load_model" href="#skema.img2mml.api.Image2MathML.load_model">load_model</a></code></li>
+<li><code><a title="skema.img2mml.api.Image2MathML.load_vocab" href="#skema.img2mml.api.Image2MathML.load_vocab">load_vocab</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

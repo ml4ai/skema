@@ -38,53 +38,68 @@ Please run the following command to initialize the MathJAX service:
 node data_generation/mathjax_server.js
 &#34;&#34;&#34;
 
-from typing import Text, Union
+from typing import Text
 from typing_extensions import Annotated
-from fastapi import APIRouter, FastAPI, File, Response, Request, Query
+from fastapi import APIRouter, FastAPI, Response, Request, Query, UploadFile
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
-from skema.img2mml.api import (get_mathml_from_bytes, get_mathml_from_latex)
+from skema.img2mml.api import (
+    get_mathml_from_bytes,
+    get_mathml_from_latex,
+)
 from skema.img2mml import schema
-from skema.data.eq2mml import img_b64_bayes_white_bg
 import base64
 import requests
+from skema.img2mml.api import Image2MathML
+from pathlib import Path
 
+cwd = Path(__file__).parents[0]
+config_path = cwd / &#34;configs&#34; / &#34;xfmer_mml_config.json&#34;
+vocab_path = cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_vocab.txt&#34;
+model_path = (
+    cwd / &#34;trained_models&#34; / &#34;cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt&#34;
+)
+
+image2mathml_db = Image2MathML(
+    config_path=config_path, vocab_path=vocab_path, model_path=model_path
+)
 
 router = APIRouter()
+
 
 def b64_image_to_mml(img_b64: str) -&gt; str:
     &#34;&#34;&#34;Helper method to convert image (encoded as base64) to MML&#34;&#34;&#34;
     img_bytes = base64.b64decode(img_b64)
-    # convert bytes of png image to tensor
-    return get_mathml_from_bytes(img_bytes)
+    # convert bytes of png image to tensor:q
+    return get_mathml_from_bytes(img_bytes, image2mathml_db)
+
 
 EquationQueryParameter = Annotated[
-  Text,
-  Query(
-      examples={
-          &#34;lotka eq1&#34;: {
-              &#34;summary&#34;: &#34;Lotka-Volterra (eq1)&#34;,
-              &#34;description&#34;: &#34;Lotka-Volterra (eq1)&#34;,
-              &#34;value&#34;: &#34;\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}&#34;
-          },
-          &#34;lotka eq2&#34;: {
-              &#34;summary&#34;: &#34;Lotka-Volterra (eq2)&#34;,
-              &#34;description&#34;: &#34;Lotka-Volterra (eq2)&#34;,
-              &#34;value&#34;: &#34;\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}&#34;
-          },
-          &#34;simple&#34;: {
-              &#34;summary&#34;: &#34;A familiar equation&#34;,
-              &#34;description&#34;: &#34;A simple equation (mass-energy equivalence)&#34;,
-              &#34;value&#34;: &#34;E = mc^{2}&#34;,
-          },
-          &#34;complex&#34;: {
-              &#34;summary&#34;: &#34;A more feature-rich equation (Bayes&#39; rule)&#34;,
-              &#34;description&#34;: &#34;A equation drawing on latex features&#34;,
-              &#34;value&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
-          }
-      },
-  ),
+    Text,
+    Query(
+        examples={
+            &#34;lotka eq1&#34;: {
+                &#34;summary&#34;: &#34;Lotka-Volterra (eq1)&#34;,
+                &#34;description&#34;: &#34;Lotka-Volterra (eq1)&#34;,
+                &#34;value&#34;: &#34;\\frac{\\delta x}{\\delta t} = {\\alpha x} - {\\beta x y}&#34;,
+            },
+            &#34;lotka eq2&#34;: {
+                &#34;summary&#34;: &#34;Lotka-Volterra (eq2)&#34;,
+                &#34;description&#34;: &#34;Lotka-Volterra (eq2)&#34;,
+                &#34;value&#34;: &#34;\\frac{\\delta y}{\\delta t} = {\\alpha x y} - {\\gamma y}&#34;,
+            },
+            &#34;simple&#34;: {
+                &#34;summary&#34;: &#34;A familiar equation&#34;,
+                &#34;description&#34;: &#34;A simple equation (mass-energy equivalence)&#34;,
+                &#34;value&#34;: &#34;E = mc^{2}&#34;,
+            },
+            &#34;complex&#34;: {
+                &#34;summary&#34;: &#34;A more feature-rich equation (Bayes&#39; rule)&#34;,
+                &#34;description&#34;: &#34;A equation drawing on latex features&#34;,
+                &#34;value&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
+            },
+        },
+    ),
 ]
-
 
 
 def process_latex_equation(eqn: Text) -&gt; Response:
@@ -92,19 +107,32 @@ def process_latex_equation(eqn: Text) -&gt; Response:
     res = get_mathml_from_latex(eqn)
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
-@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=int, status_code=200)
+
+@router.get(
+    &#34;/img2mml/healthcheck&#34;,
+    summary=&#34;Check health of eqn2mml service&#34;,
+    response_model=int,
+    status_code=200,
+)
 def img2mml_healthcheck() -&gt; int:
     return 200
 
-@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=int, status_code=200)
+
+@router.get(
+    &#34;/latex2mml/healthcheck&#34;,
+    summary=&#34;Check health of mathjax service&#34;,
+    response_model=int,
+    status_code=200,
+)
 def latex2mml_healthcheck() -&gt; int:
     try:
-      return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
+        return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
     except:
-      return 500
+        return 500
+
 
 @router.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
-async def post_image_to_mathml(data: schema.ImageBytes) -&gt; Response:
+async def post_image_to_mathml(data: UploadFile) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
 
@@ -118,13 +146,18 @@ async def post_image_to_mathml(data: schema.ImageBytes) -&gt; Response:
     r = requests.post(&#34;http://0.0.0.0:8000/image/mml&#34;, files=files)
     print(r.text)
     &#34;&#34;&#34;
-    # convert bytes of png image to tensor
-    res =  get_mathml_from_bytes(data)
-    print(res)
-    print(type(res))
+    # Read image data
+    image_bytes = await data.read()
+
+    # pass image bytes to get_mathml_from_bytes function
+    res = get_mathml_from_bytes(image_bytes, image2mathml_db)
+
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
-@router.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+
+@router.post(
+    &#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;
+)
 async def post_b64image_to_mathml(request: Request) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
@@ -146,6 +179,7 @@ async def post_b64image_to_mathml(request: Request) -&gt; Response:
     res = b64_image_to_mml(img_b64)
     return Response(content=res, media_type=&#34;application/xml&#34;)
 
+
 @router.get(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
 async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     &#34;&#34;&#34;
@@ -159,6 +193,7 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
     print(r.text)
     &#34;&#34;&#34;
     return process_latex_equation(tex_src)
+
 
 @router.post(&#34;/latex/mml&#34;, summary=&#34;Get MathML representation of a LaTeX equation&#34;)
 async def post_tex_to_mathml(eqn: schema.LatexEquation) -&gt; Response:
@@ -174,6 +209,7 @@ async def post_tex_to_mathml(eqn: schema.LatexEquation) -&gt; Response:
     &#34;&#34;&#34;
     # convert latex string to presentation mathml
     return process_latex_equation(eqn.tex_src)
+
 
 app = FastAPI()
 app.include_router(router)</code></pre>
@@ -198,8 +234,8 @@ app.include_router(router)</code></pre>
 <pre><code class="python">def b64_image_to_mml(img_b64: str) -&gt; str:
     &#34;&#34;&#34;Helper method to convert image (encoded as base64) to MML&#34;&#34;&#34;
     img_bytes = base64.b64decode(img_b64)
-    # convert bytes of png image to tensor
-    return get_mathml_from_bytes(img_bytes)</code></pre>
+    # convert bytes of png image to tensor:q
+    return get_mathml_from_bytes(img_bytes, image2mathml_db)</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.eqn2mml.get_tex_to_mathml"><code class="name flex">
@@ -240,7 +276,12 @@ async def get_tex_to_mathml(tex_src: EquationQueryParameter) -&gt; Response:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.get(&#34;/img2mml/healthcheck&#34;, summary=&#34;Check health of eqn2mml service&#34;, response_model=int, status_code=200)
+<pre><code class="python">@router.get(
+    &#34;/img2mml/healthcheck&#34;,
+    summary=&#34;Check health of eqn2mml service&#34;,
+    response_model=int,
+    status_code=200,
+)
 def img2mml_healthcheck() -&gt; int:
     return 200</code></pre>
 </details>
@@ -254,12 +295,17 @@ def img2mml_healthcheck() -&gt; int:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.get(&#34;/latex2mml/healthcheck&#34;, summary=&#34;Check health of mathjax service&#34;, response_model=int, status_code=200)
+<pre><code class="python">@router.get(
+    &#34;/latex2mml/healthcheck&#34;,
+    summary=&#34;Check health of mathjax service&#34;,
+    response_model=int,
+    status_code=200,
+)
 def latex2mml_healthcheck() -&gt; int:
     try:
-      return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
+        return int(requests.get(f&#34;{SKEMA_MATHJAX_ADDRESS}/healthcheck&#34;).status_code)
     except:
-      return 500</code></pre>
+        return 500</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.eqn2mml.post_b64image_to_mathml"><code class="name flex">
@@ -282,7 +328,9 @@ print(r.text)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@router.post(&#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
+<pre><code class="python">@router.post(
+    &#34;/image/base64/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;
+)
 async def post_b64image_to_mathml(request: Request) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
@@ -306,7 +354,7 @@ async def post_b64image_to_mathml(request: Request) -&gt; Response:
 </details>
 </dd>
 <dt id="skema.img2mml.eqn2mml.post_image_to_mathml"><code class="name flex">
-<span>async def <span class="ident">post_image_to_mathml</span></span>(<span>data: typing_extensions.Annotated[bytes, File(PydanticUndefined)]) ‑> starlette.responses.Response</span>
+<span>async def <span class="ident">post_image_to_mathml</span></span>(<span>data: fastapi.datastructures.UploadFile) ‑> starlette.responses.Response</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Endpoint for generating MathML from an input image.</p>
@@ -323,7 +371,7 @@ print(r.text)</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@router.post(&#34;/image/mml&#34;, summary=&#34;Get MathML representation of an equation image&#34;)
-async def post_image_to_mathml(data: schema.ImageBytes) -&gt; Response:
+async def post_image_to_mathml(data: UploadFile) -&gt; Response:
     &#34;&#34;&#34;
     Endpoint for generating MathML from an input image.
 
@@ -337,10 +385,12 @@ async def post_image_to_mathml(data: schema.ImageBytes) -&gt; Response:
     r = requests.post(&#34;http://0.0.0.0:8000/image/mml&#34;, files=files)
     print(r.text)
     &#34;&#34;&#34;
-    # convert bytes of png image to tensor
-    res =  get_mathml_from_bytes(data)
-    print(res)
-    print(type(res))
+    # Read image data
+    image_bytes = await data.read()
+
+    # pass image bytes to get_mathml_from_bytes function
+    res = get_mathml_from_bytes(image_bytes, image2mathml_db)
+
     return Response(content=res, media_type=&#34;application/xml&#34;)</code></pre>
 </details>
 </dd>

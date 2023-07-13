@@ -35,14 +35,13 @@ import torch
 from torchvision import transforms
 from PIL import Image
 from skema.img2mml.models.encoders.cnn_encoder import CNN_Encoder
-from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from skema.img2mml.models.encoders.xfmer_encoder import Transformer_Encoder
 from skema.img2mml.models.decoders.xfmer_decoder import Transformer_Decoder
 import io
-from typing import List, Optional
+from typing import List
 import logging
-from logging import info
 import re
+from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 
 # Set logging level to INFO
 logging.basicConfig(level=logging.INFO)
@@ -278,7 +277,7 @@ def remove_spaces_between_tags(mathml_string: str) -&gt; str:
     return replaced_string
 
 
-def evaluate(
+def render_mml(
     model: Image2MathML_Xfmer,
     vocab_itos: dict,
     vocab_stoi: dict,
@@ -286,7 +285,17 @@ def evaluate(
     device: torch.device,
 ) -&gt; str:
     &#34;&#34;&#34;
-    It predicts the sequence for the image to translate it into MathML contents
+    Perform sequence prediction for an input image to translate it into MathML contents.
+
+    Args:
+        model (Image2MathML_Xfmer): The image-to-MathML model.
+        vocab_itos (dict): The vocabulary lookup dictionary (index to symbol).
+        vocab_stoi (dict): The vocabulary lookup dictionary (symbol to index).
+        img (torch.Tensor): The input image as a tensor.
+        device (torch.device): The device (GPU or CPU) to be used for computation.
+
+    Returns:
+        str: The generated MathML string.
     &#34;&#34;&#34;
 
     model.eval()
@@ -310,87 +319,27 @@ def evaluate(
         return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
 
 
-def load_model(
-    model: Image2MathML_Xfmer, model_path: str, clean_state_dict: Optional[bool] = True
-) -&gt; Image2MathML_Xfmer:
-    &#34;&#34;&#34;
-    Load the model&#39;s state dictionary from a file.
-
-    Args:
-        model: The model to load the state dictionary into.
-        model_path: The path to the model state dictionary file.
-        clean_state_dict: Whether to clean the state dictionary keys.
-
-    Returns:
-        The model with loaded state dictionary.
-
-    Raises:
-        FileNotFoundError: If the model state dictionary file does not exist.
-        RuntimeError: If there is an error during loading the state dictionary.
-
-    Note:
-        If `clean_state_dict` is True, the function removes the &#34;module.&#34; prefix from the state_dict keys
-        if present.
-
-        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
-    &#34;&#34;&#34;
-    if not torch.cuda.is_available():
-        print(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-        device = torch.device(&#34;cpu&#34;)
-    else:
-        device = torch.device(&#34;cuda&#34;)
-
-    try:
-        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
-        # we need to remove the &#34;module.&#34; from key_names
-        if clean_state_dict:
-            new_model = dict()
-            for key, value in torch.load(model_path, map_location=device).items():
-                new_model[key[7:]] = value
-                model.load_state_dict(new_model, strict=False)
-        else:
-            if not torch.cuda.is_available():
-                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-                new_model = dict()
-                for key, value in torch.load(model_path, map_location=device).items():
-                    new_model[key[7:]] = value
-                    model.load_state_dict(new_model, strict=False)
-            else:
-                model.load_state_dict(torch.load(model_path))
-    except FileNotFoundError:
-        raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
-    except Exception as e:
-        raise RuntimeError(
-            f&#34;Error loading state dictionary from file: {model_path}\n{e}&#34;
-        )
-
-    return model
-
-
-def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; str:
-    &#34;&#34;&#34;
-    It allows us to obtain mathML for an image
-    &#34;&#34;&#34;
-    # set_random_seed
-    set_random_seed(config[&#34;seed&#34;])
-
-    # defining model using DataParallel
-    device = torch.device(&#34;cuda:0&#34; if torch.cuda.is_available() else &#34;cpu&#34;)
-    model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
-
-    # creating a dictionary from vocab list
-    vocab_itos = dict()
-    vocab_stoi = dict()
-    for v in vocab:
-        k, v = v.split()
-        vocab_itos[v.strip()] = k.strip()
-        vocab_stoi[k.strip()] = v.strip()
-
-    # generating equation
-    print(&#34;loading trained model...&#34;)
-    model = load_model(model, model_path, config[&#34;clean_state_dict&#34;])
-
-    return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)</code></pre>
+# def render_mml(
+#     model: Image2MathML_Xfmer,
+#     vocab_itos: dict,
+#     vocab_stoi: dict,
+#     imagetensor: torch.Tensor,
+#     device: torch.device,
+# ) -&gt; str:
+#     &#34;&#34;&#34;
+#     Render MathML for an input image using the provided model.
+#
+#     Args:
+#         model (Image2MathML_Xfmer): The image-to-MathML model.
+#         vocab_itos (dict): The vocabulary lookup dictionary (index to symbol).
+#         vocab_stoi (dict): The vocabulary lookup dictionary (symbol to index).
+#         imagetensor (torch.Tensor): The input image as a tensor.
+#         device (torch.device): The device (GPU or CPU) to be used for computation.
+#
+#     Returns:
+#         str: The generated MathML string.
+#     &#34;&#34;&#34;
+#     return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)</code></pre>
 </details>
 </section>
 <section>
@@ -585,135 +534,6 @@ initializing encoder, decoder, and model</p></div>
     return model</code></pre>
 </details>
 </dd>
-<dt id="skema.img2mml.translate.evaluate"><code class="name flex">
-<span>def <span class="ident">evaluate</span></span>(<span>model: <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a>, vocab_itos: dict, vocab_stoi: dict, img: torch.Tensor, device: torch.device) ‑> str</span>
-</code></dt>
-<dd>
-<div class="desc"><p>It predicts the sequence for the image to translate it into MathML contents</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def evaluate(
-    model: Image2MathML_Xfmer,
-    vocab_itos: dict,
-    vocab_stoi: dict,
-    img: torch.Tensor,
-    device: torch.device,
-) -&gt; str:
-    &#34;&#34;&#34;
-    It predicts the sequence for the image to translate it into MathML contents
-    &#34;&#34;&#34;
-
-    model.eval()
-    with torch.no_grad():
-        img = img.to(device)
-
-        output = model(
-            img,
-            device,
-            is_inference=True,
-            SOS_token=int(vocab_stoi[&#34;&lt;sos&gt;&#34;]),
-            EOS_token=int(vocab_stoi[&#34;&lt;eos&gt;&#34;]),
-            PAD_token=int(vocab_stoi[&#34;&lt;pad&gt;&#34;]),
-        )  # O: (1, max_len, output_dim), preds: (1, max_len)
-
-        pred = list()
-        for p in output:
-            pred.append(vocab_itos[str(p)])
-
-        pred_seq = &#34; &#34;.join(pred[1:-1])
-        return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))</code></pre>
-</details>
-</dd>
-<dt id="skema.img2mml.translate.load_model"><code class="name flex">
-<span>def <span class="ident">load_model</span></span>(<span>model: <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a>, model_path: str, clean_state_dict: Optional[bool] = True) ‑> <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a></span>
-</code></dt>
-<dd>
-<div class="desc"><p>Load the model's state dictionary from a file.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>model</code></strong></dt>
-<dd>The model to load the state dictionary into.</dd>
-<dt><strong><code>model_path</code></strong></dt>
-<dd>The path to the model state dictionary file.</dd>
-<dt><strong><code>clean_state_dict</code></strong></dt>
-<dd>Whether to clean the state dictionary keys.</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<p>The model with loaded state dictionary.</p>
-<h2 id="raises">Raises</h2>
-<dl>
-<dt><code>FileNotFoundError</code></dt>
-<dd>If the model state dictionary file does not exist.</dd>
-<dt><code>RuntimeError</code></dt>
-<dd>If there is an error during loading the state dictionary.</dd>
-</dl>
-<h2 id="note">Note</h2>
-<p>If <code>clean_state_dict</code> is True, the function removes the "module." prefix from the state_dict keys
-if present.</p>
-<p>If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def load_model(
-    model: Image2MathML_Xfmer, model_path: str, clean_state_dict: Optional[bool] = True
-) -&gt; Image2MathML_Xfmer:
-    &#34;&#34;&#34;
-    Load the model&#39;s state dictionary from a file.
-
-    Args:
-        model: The model to load the state dictionary into.
-        model_path: The path to the model state dictionary file.
-        clean_state_dict: Whether to clean the state dictionary keys.
-
-    Returns:
-        The model with loaded state dictionary.
-
-    Raises:
-        FileNotFoundError: If the model state dictionary file does not exist.
-        RuntimeError: If there is an error during loading the state dictionary.
-
-    Note:
-        If `clean_state_dict` is True, the function removes the &#34;module.&#34; prefix from the state_dict keys
-        if present.
-
-        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
-    &#34;&#34;&#34;
-    if not torch.cuda.is_available():
-        print(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-        device = torch.device(&#34;cpu&#34;)
-    else:
-        device = torch.device(&#34;cuda&#34;)
-
-    try:
-        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
-        # we need to remove the &#34;module.&#34; from key_names
-        if clean_state_dict:
-            new_model = dict()
-            for key, value in torch.load(model_path, map_location=device).items():
-                new_model[key[7:]] = value
-                model.load_state_dict(new_model, strict=False)
-        else:
-            if not torch.cuda.is_available():
-                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-                new_model = dict()
-                for key, value in torch.load(model_path, map_location=device).items():
-                    new_model[key[7:]] = value
-                    model.load_state_dict(new_model, strict=False)
-            else:
-                model.load_state_dict(torch.load(model_path))
-    except FileNotFoundError:
-        raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
-    except Exception as e:
-        raise RuntimeError(
-            f&#34;Error loading state dictionary from file: {model_path}\n{e}&#34;
-        )
-
-    return model</code></pre>
-</details>
-</dd>
 <dt id="skema.img2mml.translate.preprocess_img"><code class="name flex">
 <span>def <span class="ident">preprocess_img</span></span>(<span>image: PIL.Image.Image, config: dict) ‑> PIL.Image.Image</span>
 </code></dt>
@@ -865,38 +685,72 @@ Defaults to 0.1.</dd>
 </details>
 </dd>
 <dt id="skema.img2mml.translate.render_mml"><code class="name flex">
-<span>def <span class="ident">render_mml</span></span>(<span>config: dict, model_path, vocab: List[str], imagetensor) ‑> str</span>
+<span>def <span class="ident">render_mml</span></span>(<span>model: <a title="skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer" href="models/image2mml_xfmer.html#skema.img2mml.models.image2mml_xfmer.Image2MathML_Xfmer">Image2MathML_Xfmer</a>, vocab_itos: dict, vocab_stoi: dict, img: torch.Tensor, device: torch.device) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"><p>It allows us to obtain mathML for an image</p></div>
+<div class="desc"><p>Perform sequence prediction for an input image to translate it into MathML contents.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>model</code></strong> :&ensp;<code>Image2MathML_Xfmer</code></dt>
+<dd>The image-to-MathML model.</dd>
+<dt><strong><code>vocab_itos</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The vocabulary lookup dictionary (index to symbol).</dd>
+<dt><strong><code>vocab_stoi</code></strong> :&ensp;<code>dict</code></dt>
+<dd>The vocabulary lookup dictionary (symbol to index).</dd>
+<dt><strong><code>img</code></strong> :&ensp;<code>torch.Tensor</code></dt>
+<dd>The input image as a tensor.</dd>
+<dt><strong><code>device</code></strong> :&ensp;<code>torch.device</code></dt>
+<dd>The device (GPU or CPU) to be used for computation.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>The generated MathML string.</dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def render_mml(config: dict, model_path, vocab: List[str], imagetensor) -&gt; str:
+<pre><code class="python">def render_mml(
+    model: Image2MathML_Xfmer,
+    vocab_itos: dict,
+    vocab_stoi: dict,
+    img: torch.Tensor,
+    device: torch.device,
+) -&gt; str:
     &#34;&#34;&#34;
-    It allows us to obtain mathML for an image
+    Perform sequence prediction for an input image to translate it into MathML contents.
+
+    Args:
+        model (Image2MathML_Xfmer): The image-to-MathML model.
+        vocab_itos (dict): The vocabulary lookup dictionary (index to symbol).
+        vocab_stoi (dict): The vocabulary lookup dictionary (symbol to index).
+        img (torch.Tensor): The input image as a tensor.
+        device (torch.device): The device (GPU or CPU) to be used for computation.
+
+    Returns:
+        str: The generated MathML string.
     &#34;&#34;&#34;
-    # set_random_seed
-    set_random_seed(config[&#34;seed&#34;])
 
-    # defining model using DataParallel
-    device = torch.device(&#34;cuda:0&#34; if torch.cuda.is_available() else &#34;cpu&#34;)
-    model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
+    model.eval()
+    with torch.no_grad():
+        img = img.to(device)
 
-    # creating a dictionary from vocab list
-    vocab_itos = dict()
-    vocab_stoi = dict()
-    for v in vocab:
-        k, v = v.split()
-        vocab_itos[v.strip()] = k.strip()
-        vocab_stoi[k.strip()] = v.strip()
+        output = model(
+            img,
+            device,
+            is_inference=True,
+            SOS_token=int(vocab_stoi[&#34;&lt;sos&gt;&#34;]),
+            EOS_token=int(vocab_stoi[&#34;&lt;eos&gt;&#34;]),
+            PAD_token=int(vocab_stoi[&#34;&lt;pad&gt;&#34;]),
+        )  # O: (1, max_len, output_dim), preds: (1, max_len)
 
-    # generating equation
-    print(&#34;loading trained model...&#34;)
-    model = load_model(model, model_path, config[&#34;clean_state_dict&#34;])
+        pred = list()
+        for p in output:
+            pred.append(vocab_itos[str(p)])
 
-    return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)</code></pre>
+        pred_seq = &#34; &#34;.join(pred[1:-1])
+        return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.translate.set_random_seed"><code class="name flex">
@@ -939,8 +793,6 @@ Defaults to 0.1.</dd>
 <li><code><a title="skema.img2mml.translate.calculate_scale_factor" href="#skema.img2mml.translate.calculate_scale_factor">calculate_scale_factor</a></code></li>
 <li><code><a title="skema.img2mml.translate.convert_to_torch_tensor" href="#skema.img2mml.translate.convert_to_torch_tensor">convert_to_torch_tensor</a></code></li>
 <li><code><a title="skema.img2mml.translate.define_model" href="#skema.img2mml.translate.define_model">define_model</a></code></li>
-<li><code><a title="skema.img2mml.translate.evaluate" href="#skema.img2mml.translate.evaluate">evaluate</a></code></li>
-<li><code><a title="skema.img2mml.translate.load_model" href="#skema.img2mml.translate.load_model">load_model</a></code></li>
 <li><code><a title="skema.img2mml.translate.preprocess_img" href="#skema.img2mml.translate.preprocess_img">preprocess_img</a></code></li>
 <li><code><a title="skema.img2mml.translate.remove_eqn_number" href="#skema.img2mml.translate.remove_eqn_number">remove_eqn_number</a></code></li>
 <li><code><a title="skema.img2mml.translate.remove_spaces_between_tags" href="#skema.img2mml.translate.remove_spaces_between_tags">remove_spaces_between_tags</a></code></li>

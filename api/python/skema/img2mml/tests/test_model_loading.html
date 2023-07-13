@@ -28,22 +28,53 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from pathlib import Path
-from skema.img2mml.api import get_mathml_from_file, retrieve_model
+from skema.img2mml.api import get_mathml_from_bytes, retrieve_model, Image2MathML
+import os
+
 
 def test_model_retrieval():
-    &#39;&#39;&#39;Tests model retrieval&#39;&#39;&#39;
+    &#34;&#34;&#34;Tests model retrieval&#34;&#34;&#34;
     model_path = retrieve_model()
-    # TODO: delete if exists and retrieve again
+    # Delete the model file if it exists
+    if Path(model_path).exists():
+        os.remove(model_path)
+    # Retrieve the model again
+    model_path = retrieve_model()
     assert Path(model_path).exists(), f&#34;model was not found at {model_path}&#34;
 
 
-def test_local_loading_and_prediction():
-    &#39;&#39;&#39;Tests model loading and prediction&#39;&#39;&#39;
-    # FIXME: this should be split into two tests: a) one that instantiates the model and b) one that tests the instantiated model&#39;s ability to make predictions
+def local_loading():
+    &#34;&#34;&#34;Tests local loading files&#34;&#34;&#34;
+    cwd = Path(__file__).parents[0].parents[0]
+    config_path = cwd / &#34;configs&#34; / &#34;xfmer_mml_config.json&#34;
+    vocab_path = (
+        cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_vocab.txt&#34;
+    )
+    model_path = (
+        cwd / &#34;trained_models&#34; / &#34;cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt&#34;
+    )
+
+    image2mathml_db = Image2MathML(
+        config_path=config_path, vocab_path=vocab_path, model_path=model_path
+    )
+    assert image2mathml_db.model != None, &#34;Fail to load the model checkpoint&#34;
+    assert image2mathml_db.vocab != None, &#34;Fail to load the vocabulary file&#34;
+    assert image2mathml_db.config != None, &#34;Fail to load the configuration file&#34;
+    return image2mathml_db
+
+
+def test_local_loading_prediction():
+    &#34;&#34;&#34;Tests model loading and prediction&#34;&#34;&#34;
+    # a) Local loading test
+    image2mathml_db = local_loading()
+    # b) Prediction test
     cwd = Path(__file__).parents[0]
     image_path = cwd / &#34;data&#34; / &#34;261.png&#34;
+    with Path(image_path).open(&#34;rb&#34;) as infile:
+        img_bytes = infile.read()
+
     try:
-        mathml = get_mathml_from_file(image_path)
+        mathml = get_mathml_from_bytes(img_bytes, image2mathml_db)
     except FileNotFoundError:
         raise FileNotFoundError(f&#34;Model state dictionary file not found&#34;)
     except RuntimeError:
@@ -60,8 +91,37 @@ def test_local_loading_and_prediction():
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="skema.img2mml.tests.test_model_loading.test_local_loading_and_prediction"><code class="name flex">
-<span>def <span class="ident">test_local_loading_and_prediction</span></span>(<span>)</span>
+<dt id="skema.img2mml.tests.test_model_loading.local_loading"><code class="name flex">
+<span>def <span class="ident">local_loading</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Tests local loading files</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def local_loading():
+    &#34;&#34;&#34;Tests local loading files&#34;&#34;&#34;
+    cwd = Path(__file__).parents[0].parents[0]
+    config_path = cwd / &#34;configs&#34; / &#34;xfmer_mml_config.json&#34;
+    vocab_path = (
+        cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_vocab.txt&#34;
+    )
+    model_path = (
+        cwd / &#34;trained_models&#34; / &#34;cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt&#34;
+    )
+
+    image2mathml_db = Image2MathML(
+        config_path=config_path, vocab_path=vocab_path, model_path=model_path
+    )
+    assert image2mathml_db.model != None, &#34;Fail to load the model checkpoint&#34;
+    assert image2mathml_db.vocab != None, &#34;Fail to load the vocabulary file&#34;
+    assert image2mathml_db.config != None, &#34;Fail to load the configuration file&#34;
+    return image2mathml_db</code></pre>
+</details>
+</dd>
+<dt id="skema.img2mml.tests.test_model_loading.test_local_loading_prediction"><code class="name flex">
+<span>def <span class="ident">test_local_loading_prediction</span></span>(<span>)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Tests model loading and prediction</p></div>
@@ -69,13 +129,18 @@ def test_local_loading_and_prediction():
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def test_local_loading_and_prediction():
-    &#39;&#39;&#39;Tests model loading and prediction&#39;&#39;&#39;
-    # FIXME: this should be split into two tests: a) one that instantiates the model and b) one that tests the instantiated model&#39;s ability to make predictions
+<pre><code class="python">def test_local_loading_prediction():
+    &#34;&#34;&#34;Tests model loading and prediction&#34;&#34;&#34;
+    # a) Local loading test
+    image2mathml_db = local_loading()
+    # b) Prediction test
     cwd = Path(__file__).parents[0]
     image_path = cwd / &#34;data&#34; / &#34;261.png&#34;
+    with Path(image_path).open(&#34;rb&#34;) as infile:
+        img_bytes = infile.read()
+
     try:
-        mathml = get_mathml_from_file(image_path)
+        mathml = get_mathml_from_bytes(img_bytes, image2mathml_db)
     except FileNotFoundError:
         raise FileNotFoundError(f&#34;Model state dictionary file not found&#34;)
     except RuntimeError:
@@ -95,9 +160,13 @@ def test_local_loading_and_prediction():
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_model_retrieval():
-    &#39;&#39;&#39;Tests model retrieval&#39;&#39;&#39;
+    &#34;&#34;&#34;Tests model retrieval&#34;&#34;&#34;
     model_path = retrieve_model()
-    # TODO: delete if exists and retrieve again
+    # Delete the model file if it exists
+    if Path(model_path).exists():
+        os.remove(model_path)
+    # Retrieve the model again
+    model_path = retrieve_model()
     assert Path(model_path).exists(), f&#34;model was not found at {model_path}&#34;</code></pre>
 </details>
 </dd>
@@ -119,7 +188,8 @@ def test_local_loading_and_prediction():
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="skema.img2mml.tests.test_model_loading.test_local_loading_and_prediction" href="#skema.img2mml.tests.test_model_loading.test_local_loading_and_prediction">test_local_loading_and_prediction</a></code></li>
+<li><code><a title="skema.img2mml.tests.test_model_loading.local_loading" href="#skema.img2mml.tests.test_model_loading.local_loading">local_loading</a></code></li>
+<li><code><a title="skema.img2mml.tests.test_model_loading.test_local_loading_prediction" href="#skema.img2mml.tests.test_model_loading.test_local_loading_prediction">test_local_loading_prediction</a></code></li>
 <li><code><a title="skema.img2mml.tests.test_model_loading.test_model_retrieval" href="#skema.img2mml.tests.test_model_loading.test_model_retrieval">test_model_retrieval</a></code></li>
 </ul>
 </li>
