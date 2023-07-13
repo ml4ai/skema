@@ -64,8 +64,6 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
- 
-        print(json.dumps(self.out_cast[0].to_json_object(), sort_keys=True, indent=None))
 
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -1107,5 +1105,3 @@ class TS2CAST(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
-
-TS2CAST("cons.f95")
