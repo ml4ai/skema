@@ -6,9 +6,10 @@ from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 import torch
-from typing import Tuple, List
+from typing import Tuple, List, Any, Dict
 from logging import info
 from skema.img2mml.translate import define_model
+import json
 
 
 def retrieve_model(model_path=None) -> str:
@@ -150,13 +151,42 @@ def load_vocab(vocab_path: str = None) -> Tuple[List[str], dict, dict]:
     return vocab, vocab_itos, vocab_stoi
 
 
+class Image2MathML:
+    def __init__(self, config_path: str, vocab_path: str, model_path: str) -> None:
+        self.config = self.load_config(config_path)
+        self.vocab, self.vocab_itos, self.vocab_stoi = self.load_vocab(vocab_path)
+        self.device = self.check_gpu_availability()
+        self.model = self.load_model(model_path)
+
+    def load_config(self, config_path: str) -> Dict[str, Any]:
+        with open(config_path, "r") as cfg:
+            config = json.load(cfg)
+        return config
+
+    def load_vocab(self, vocab_path: str) -> Tuple[Any, Dict[str, Any], Dict[str, Any]]:
+        # Load the image2mathml vocabulary
+        vocab, vocab_itos, vocab_stoi = load_vocab(vocab_path=vocab_path)
+        return vocab, vocab_itos, vocab_stoi
+
+    def check_gpu_availability(self) -> torch.device:
+        # Check GPU availability
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+        else:
+            device = torch.device("cpu")
+        return device
+
+    def load_model(self, model_path: str) -> Image2MathML_Xfmer:
+        # Load the image2mathml model
+        MODEL_PATH = retrieve_model(model_path=model_path)
+        img2mml_model: Image2MathML_Xfmer = load_model(
+            model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+        )
+        return img2mml_model
+
 def get_mathml_from_bytes(
     data: bytes,
-    model: Image2MathML_Xfmer,
-    config: dict,
-    vocab_itos: dict,
-    vocab_stoi: dict,
-    device: torch.device = torch.device("cpu"),
+    image2mathml_db: Image2MathML,
 ) -> str:
     """
     Convert an image in bytes format to MathML representation using the provided model.
@@ -173,13 +203,13 @@ def get_mathml_from_bytes(
         str: The MathML representation of the input image.
     """
     # convert png image to tensor
-    imagetensor = convert_to_torch_tensor(data, config)
+    imagetensor = convert_to_torch_tensor(data, image2mathml_db.config)
 
     # change the shape of tensor from (C_in, H, W)
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
 
-    return render_mml(model, vocab_itos, vocab_stoi, imagetensor, device)
+    return render_mml(image2mathml_db.model, image2mathml_db.vocab_itos, image2mathml_db.vocab_stoi, imagetensor, image2mathml_db.device)
 
 
 def get_mathml_from_file(filepath) -> str:
@@ -219,3 +249,5 @@ def get_mathml_from_latex(eqn: str) -> str:
             return f"An error occurred: {e}"
         finally:
             return "Conversion Failed."
+
+

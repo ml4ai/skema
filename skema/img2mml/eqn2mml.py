@@ -12,34 +12,22 @@ from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (
     get_mathml_from_bytes,
     get_mathml_from_latex,
-    retrieve_model,
 )
 from skema.img2mml import schema
 import base64
 import requests
-from skema.img2mml.api import load_vocab, load_model, check_gpu_availability
-from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
+from skema.img2mml.api import Image2MathML
 from pathlib import Path
-import json
 
-# Read config file
 cwd = Path(__file__).parents[0]
 config_path = cwd / "configs" / "xfmer_mml_config.json"
-with open(config_path, "r") as cfg:
-    config = json.load(cfg)
-
-#  Load the image2mathml vocabulary
-VOCAB_PATH = cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
-vocab, vocab_itos, vocab_stoi = load_vocab(vocab_path=VOCAB_PATH)
-
-#  Load the image2mathml model
+vocab_path = cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
 model_path = (
     cwd / "trained_models" / "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
 )
-MODEL_PATH = retrieve_model(model_path=model_path)
-device = check_gpu_availability()
-img2mml_model: Image2MathML_Xfmer = load_model(
-    model_path=MODEL_PATH, config=config, vocab=vocab, device=device
+
+image2mathml_db = Image2MathML(
+    config_path=config_path, vocab_path=vocab_path, model_path=model_path
 )
 
 router = APIRouter()
@@ -47,12 +35,9 @@ router = APIRouter()
 
 def b64_image_to_mml(img_b64: str) -> str:
     """Helper method to convert image (encoded as base64) to MML"""
-    global img2mml_model, config, vocab_itos, vocab_stoi, device
     img_bytes = base64.b64decode(img_b64)
     # convert bytes of png image to tensor:q
-    return get_mathml_from_bytes(
-        img_bytes, img2mml_model, config, vocab_itos, vocab_stoi, device
-    )
+    return get_mathml_from_bytes(img_bytes, image2mathml_db)
 
 
 EquationQueryParameter = Annotated[
@@ -128,14 +113,11 @@ async def post_image_to_mathml(data: UploadFile) -> Response:
     r = requests.post("http://0.0.0.0:8000/image/mml", files=files)
     print(r.text)
     """
-    global img2mml_model, config, vocab_itos, vocab_stoi, device
     # Read image data
     image_bytes = await data.read()
 
     # pass image bytes to get_mathml_from_bytes function
-    res = get_mathml_from_bytes(
-        image_bytes, img2mml_model, config, vocab_itos, vocab_stoi, device
-    )
+    res = get_mathml_from_bytes(image_bytes, image2mathml_db)
 
     return Response(content=res, media_type="application/xml")
 
