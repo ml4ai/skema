@@ -1,12 +1,11 @@
-use actix_web::{put, web, HttpResponse, test};
+use actix_web::{put, web, HttpResponse};
 use mathml::{
     acset::{ACSet, AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
+    parsers::first_order_ode::FirstOrderODE,
 };
 use petgraph::dot::{Config, Dot};
-
-use std::string::String;
 use utoipa;
 
 /// Parse MathML and return a DOT representation of the abstract syntax tree (AST)
@@ -23,9 +22,6 @@ use utoipa;
 pub async fn get_ast_graph(payload: String) -> String {
     let contents = &payload;
     let math = contents.parse::<Math>().unwrap();
-    //let (_, math) =
-    //parse(contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
-
     let g = math.to_graph();
     let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
     dot_representation.to_string()
@@ -53,6 +49,23 @@ pub async fn get_math_exp_graph(payload: String) -> String {
     let g = new_math.to_graph();
     let dot_representation = Dot::new(&g);
     dot_representation.to_string()
+}
+
+/// Parse presentation MathML and return a content MathML representation. Currently limited to
+/// first-order ODEs.
+#[utoipa::path(
+    request_body = String,
+    responses(
+        (
+            status = 200,
+            body = String
+        )
+    )
+)]
+#[put("/mathml/content-mathml")]
+pub async fn get_content_mathml(payload: String) -> String {
+    let ode = payload.parse::<FirstOrderODE>().unwrap();
+    ode.to_cmml()
 }
 
 /// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.

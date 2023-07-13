@@ -1,0 +1,50 @@
+{
+	"name": "mathml model",
+	"schema": "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/petrinet_v0.1/petrinet/petrinet_schema.json",
+	"schema_name": "PetriNet",
+	"description": "This is a model from mathml equations",
+	"model_version": "0.1",
+	"model": {
+		"states": [
+			{
+				"id": "I",
+				"name": "I",
+				"description": "Infected population"
+			},
+			{
+				"id": "R",
+				"name": "R",
+				"description": "Recovered population"
+			},
+			{
+				"id": "S",
+				"name": "S",
+				"description": "Susceptible population"
+			}
+		],
+		"transitions": [
+			{
+				"id": "β",
+				"input": [
+					"I",
+					"S"
+				],
+				"output": [
+					"I",
+					"I"
+				],
+				"grounding": null
+			},
+			{
+				"id": "γ",
+				"input": [
+					"I"
+				],
+				"output": [
+					"R"
+				],
+				"grounding": null
+			}
+		]
+	}
+}

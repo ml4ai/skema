@@ -4,8 +4,8 @@ use std::fmt;
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct Derivative {
-    order: u8,
-    var_index: u8,
+    pub order: u8,
+    pub var_index: u8,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]

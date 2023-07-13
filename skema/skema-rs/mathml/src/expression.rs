@@ -15,7 +15,7 @@ pub type MathExpressionGraph<'a> = Graph<String, String>;
 
 use std::string::ToString;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum Atom {
     Number(String),
     Identifier(String),

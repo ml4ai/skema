@@ -52,13 +52,24 @@ isa = [
 # See the skema/img2mml directory.
 img2mml = ["torch", "torchvision"]
 
+# dependencies for METAL utilities.
+metal = ["fire==0.5.0",
+      "torch",
+      "pyarrow",
+      "transformers",
+      "sentence_transformers",
+      "mock",
+      "askem_extractions[all]@git+https://github.com/ml4ai/ASKEM-TA1-DataModel"]
+
 # dependencies for text reading utilities.
-tr = ["transformers", "pyarrow", "SPARQLWrapper", "tqdm", "pandas", "askem_extractions[all]@git+https://github.com/ml4ai/ASKEM-TA1-DataModel"]
+tr = ["pyarrow",
+      "tqdm",
+      "pandas"]
 
 # project documentation generation
 doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-git-revision-date-localized-plugin==0.11.1", "mkdocs-git-authors-plugin==0.6.3", "mkdocs-rtd-dropdown==1.0.2", "jinja2<3.1.0"]
 
-core = ["skema[img2mml]", "skema[isa]", "skema[tr]"]
+core = ["skema[img2mml]", "skema[isa]", "skema[tr]", "skema[metal]"]
 
 # all extras
 all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
@@ -71,7 +82,8 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
 "skema.program_analysis" = "skema/program_analysis"
 "skema.skema_py" = "skema/skema_py"
 # re-map skema/text_reading/python to skema.text_reading
-"skema.text_reading.mention_linking" = "skema/text_reading/mention_linking"
+#"skema.text_reading" = "skema/text_reading/python"
+"skema.metal.model_linker" = "skema/metal/model_linker/skema_model_linker"
 "skema.data" = "skema/data"
 
 # [tool.setuptools.packages]
@@ -86,6 +98,8 @@ readme = {file = ["README.md"], content-type = "text/markdown"}
 # runnables
 [project.scripts]
 #skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
+link_amr = "skema.metal.model_linker.link_amr:main"
+#parquet2json = "skema.text_reading.cosmos_integration:main"
 
 # Minimum requirements for the build system to execute.
 [build-system]
