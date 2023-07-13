@@ -6,7 +6,7 @@ use crate::{
         operator::{Derivative, Operator},
         Math, MathExpression, Mi, Mrow,
     },
-    parsers::interpreted_mathml::interpreted_math,
+    parsers::interpreted_mathml::{exponential, interpreted_math},
 };
 use derive_new::new;
 use nom::error::Error;
@@ -210,6 +210,15 @@ impl Lexer {
     fn peek(&self) -> Token {
         self.tokens.last().cloned().unwrap_or(Token::Eof)
     }
+}
+
+/// Handles exponential as an operator in msub
+fn exp(input: Span) -> MathExpressionTree {
+    let s = exponential(input);
+    MathExpressionTree::Cons(
+        Operator::Exp,
+        MathExpressionTree::Atom::new(MathExpression::s),
+    )
 }
 
 /// Construct a MathExpressionTree from a vector of MathExpression structs.
@@ -544,4 +553,20 @@ fn test_content_hackathon2_scenario1_eq8() {
         cmml,
         "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
     );
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq9() {
+    let input = "
+    <math>
+        <mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>=</mo>
+        <mfrac>
+        <mrow><msub><mi>β</mi><mi>s</mi></msub><mo>-</mo><msub><mi>β</mi><mi>c</mi></msub></mrow>
+        <mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>k</mi><mo>(</mo><mo>-</mo><mi>t</mi><mo>+</mo><msub><mi>t</mi><mn>0</mn></msub><mo>)</mo></mrow></msup></mrow>
+        </mfrac>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
 }
