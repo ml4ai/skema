@@ -20,6 +20,7 @@ pub enum Operator {
     Rparen,
     Compose,
     Factorial,
+    Exponential,
     Derivative(Derivative),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
@@ -41,6 +42,7 @@ impl fmt::Display for Operator {
             Operator::Derivative(Derivative { order, var_index }) => {
                 write!(f, "D({order}, {var_index})")
             }
+            Operator::Exponential => write!(f, "Exp"),
             Operator::Other(op) => write!(f, "{op}"),
         }
     }

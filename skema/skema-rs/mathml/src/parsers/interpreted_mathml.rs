@@ -60,11 +60,17 @@ pub fn ci_subscript(input: Span) -> IResult<Ci> {
     Ok((s, Ci::new(None, Box::new(x))))
 }
 
+/// Parse content identifier for Msup
+pub fn ci_superscript(input: Span) -> IResult<Ci> {
+    let (s, x) = msup(input)?;
+    Ok((s, Ci::new(None, Box::new(x))))
+}
+
 /// Parse the identifier 'd'
-fn d(input: Span) -> IResult<()> {
+fn d(input: Span) -> IResult<Operator> {
     let (s, Mi(x)) = mi(input)?;
     if let "d" = x.as_ref() {
-        Ok((s, ()))
+        Ok((s, Operator::Exponential))
     } else {
         Err(nom::Err::Error(ParseError::new(
             "Unable to identify Mi('d')".to_string(),
@@ -128,6 +134,25 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     Ok((s, (Derivative::new(order, 1), x)))
 }
 
+fn exp(input: Span) -> IResult<()> {
+    let (s, Mi(x)) = mi(input)?;
+    if let "e" = x.as_ref() {
+        Ok((s, ()))
+    } else {
+        Err(nom::Err::Error(ParseError::new(
+            "Unable to identify Mi('e')".to_string(),
+            input,
+        )))
+    }
+}
+
+pub fn exponential(input: Span) -> IResult<(Operator, MathExpression)> {
+    let (s, x) = delimited(stag!("msup"), pair(exp, math_expression), etag!("msup"))(input)?;
+    //let (s, x) = delimited(stag!("msup"), pair(exp, math_expression), etag!("msup"))(input)?;
+    let (_, comp) = x;
+    Ok((s, (Operator::Exponential, comp)))
+}
+
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
 // the generic_mathml module) to work with the specialized version of the math_expression parser
 // (also in this file).
@@ -155,6 +180,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(ci_univariate_func, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
+        map(ci_superscript, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
@@ -163,8 +189,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         }),
         map(operator, MathExpression::Mo),
         mn,
-        msup,
-        msub,
         msqrt,
         mfrac,
         map(mrow, MathExpression::Mrow),
