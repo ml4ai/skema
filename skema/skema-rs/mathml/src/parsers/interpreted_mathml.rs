@@ -67,10 +67,10 @@ pub fn ci_superscript(input: Span) -> IResult<Ci> {
 }
 
 /// Parse the identifier 'd'
-fn d(input: Span) -> IResult<Operator> {
+fn d(input: Span) -> IResult<()> {
     let (s, Mi(x)) = mi(input)?;
     if let "d" = x.as_ref() {
-        Ok((s, Operator::Exponential))
+        Ok((s, ()))
     } else {
         Err(nom::Err::Error(ParseError::new(
             "Unable to identify Mi('d')".to_string(),
@@ -146,10 +146,10 @@ fn exp(input: Span) -> IResult<()> {
     }
 }
 
-pub fn exponential(input: Span) -> IResult<(Operator, MathExpression)> {
+pub fn exponential(input: Span) -> IResult<MathExpression> {
     let (s, x) = delimited(stag!("msup"), pair(exp, math_expression), etag!("msup"))(input)?;
     let (_, comp) = x;
-    Ok((s, (Operator::Exp, comp)))
+    Ok((s, comp))
 }
 
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
