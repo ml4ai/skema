@@ -55,20 +55,9 @@ pub fn ci_univariate_func(input: Span) -> IResult<Ci> {
 }
 
 /// Parse content identifier for Msub
-pub fn ci_subscript(input: Span) -> IResult<MathExpression> {
-    let (s, sub) = ws(map(
-        tag_parser!("msub", pair(math_expression, math_expression)),
-        |(x, y)| {
-            MathExpression::Msub(
-                Box::new(MathExpression::Ci(Ci::new(
-                    None,
-                    Box::new(MathExpression::Mi(Mi(x.to_string()))),
-                ))),
-                Box::new(y),
-            )
-        },
-    ))(input)?;
-    Ok((s, sub))
+pub fn ci_subscript(input: Span) -> IResult<Ci> {
+    let (s, x) = msub(input)?;
+    Ok((s, Ci::new(None, x))
 }
 
 /// Parse the identifier 'd'
@@ -165,6 +154,7 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(ci_univariate_func, MathExpression::Ci),
+        map(ci_subscript, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
