@@ -59,6 +59,8 @@ from skema.gromet.execution_engine.primitive_map import (
     is_primitive,
 )
 
+PYTHON_VERSION = "3.8"
+
 
 def is_inline(func_name):
     # Tells us which functions should be inlined in GroMEt (i.e. don't make GroMEt FNs for these)
@@ -917,7 +919,6 @@ class ToGrometPass:
         (FunctionType, ImportType, ImportVersion, ImportSource, SourceLanguage, SourceLanguageVersion)
         """
         func_name, _ = retrieve_name_id_pair(node)
-        PYTHON_VERSION = "3.8"
 
         # print(f"Checking {func_name}...")
         if is_primitive(func_name, "Python"):
@@ -1869,7 +1870,114 @@ class ToGrometPass:
                     ),
                 ),
             )
+        elif isinstance(node.value, AnnCastOperator):
+            # Added to support scenario 2 of Jul'23 hackathon
+            # Create an expression FN
+            new_gromet = GrometFN()
+            new_gromet.b = insert_gromet_object(
+                new_gromet.b,
+                GrometBoxFunction(function_type=FunctionType.EXPRESSION),
+            )
 
+            self.visit(node.value, new_gromet, node)
+
+            new_gromet.opo = insert_gromet_object(
+                new_gromet.opo, GrometPort(box=len(new_gromet.b))
+            )
+
+            new_gromet.wfopo = insert_gromet_object(
+                new_gromet.wfopo,
+                GrometWire(
+                    src=len(new_gromet.opo), tgt=len(new_gromet.pof)
+                )
+            )
+
+            self.gromet_module.fn_array = insert_gromet_object(
+                self.gromet_module.fn_array, new_gromet
+            )
+            self.set_index()
+
+            parent_gromet_fn.bf = insert_gromet_object(
+                parent_gromet_fn.bf,
+                GrometBoxFunction(
+                    function_type=FunctionType.FUNCTION,
+                    body=len(self.gromet_module.fn_array),
+                    metadata=self.insert_metadata(
+                        self.create_source_code_reference(ref)
+                    ),
+                ),
+            )
+
+            operator_idx = len(parent_gromet_fn.bf)
+            # The operation makes some opis, we attempt to
+            # match the number of opis with pifs in the parent FN
+            # and also wire these ports appropriately
+            for opi in new_gromet.opi:
+                parent_gromet_fn.pif = insert_gromet_object(
+                    parent_gromet_fn.pif, 
+                    GrometPort(
+                        box=operator_idx
+                    )
+                )
+
+                # Attempt to find where the port is in the parent FN and wire it
+                # NOTE: this will need to be updated with more handling, i.e. for loops cond etc
+                var_loc = self.retrieve_var_port(opi.name)                    
+                parent_gromet_fn.wff = insert_gromet_object(
+                    parent_gromet_fn.wff,
+                    GrometWire(
+                        src=len(parent_gromet_fn.pif),
+                        tgt=var_loc,
+                    )
+                )
+
+            parent_gromet_fn.pof = insert_gromet_object(
+                parent_gromet_fn.pof,
+                GrometPort(
+                    box=operator_idx
+                )
+            )
+            operator_pof_idx = len(parent_gromet_fn.pof)
+
+            if isinstance(parent_cast_node, AnnCastCall):
+                func_name = node.attr.name
+                func_info = (FunctionType.IMPORTED, ImportType.NATIVE, None, None, "Python", PYTHON_VERSION)
+
+                parent_gromet_fn.bf = insert_gromet_object(
+                    parent_gromet_fn.bf,
+                    GrometBoxFunction(
+                        name=f"{func_name}",
+                        function_type=func_info[0],
+                        import_type=func_info[1],
+                        import_version=func_info[2],
+                        import_source=func_info[3],
+                        source_language=func_info[4],
+                        source_language_version=func_info[5],
+                        body=None,
+                    ),
+                )
+                # Add the input for this function, and then wire it
+                # NOTE: This needs more development to support multiple arguments
+                parent_gromet_fn.pif = insert_gromet_object(
+                    parent_gromet_fn.pif,
+                    GrometPort(box=len(parent_gromet_fn.bf)),
+                )
+
+                parent_gromet_fn.wff = insert_gromet_object(
+                    parent_gromet_fn.wff,
+                    GrometWire(
+                        src=len(parent_gromet_fn.pif),
+                        tgt=operator_pof_idx,
+                    )       
+                )
+
+                parent_gromet_fn.pof = insert_gromet_object(
+                    parent_gromet_fn.pof,
+                    GrometPort(box=len(parent_gromet_fn.bf)),
+                )
+
+        else:
+            pass
             # if node.value.name not in self.record.keys():
             #  pass
             # if func_name in self.record.keys():
@@ -2448,6 +2556,7 @@ class ToGrometPass:
                                 ),
                             )
                 else:
+                    print(type(arg))
                     parent_gromet_fn.wff = insert_gromet_object(
                         parent_gromet_fn.wff,
                         GrometWire(src=len(parent_gromet_fn.pif), tgt=pof),
