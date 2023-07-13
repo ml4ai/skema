@@ -41,7 +41,9 @@ class EquationImagesToAMR(BaseModel):
 
 
 class EquationLatexToAMR(BaseModel):
-    equations: List[str] = Field(description="Equations in LaTeX", example=["\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}", "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"])
+    equations: List[str] = Field(description="Equations in LaTeX",
+                                 example=["\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}",
+                                          "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"])
     model: Literal["regnet", "petrinet"] = Field(description="The model type", example="regnet")
 
 
@@ -53,6 +55,57 @@ class CodeSnippet(BaseModel):
     )
     language: Literal["Python", "Fortran", "CppOrC"] = Field(
         title="language", description="Programming language corresponding to `code`"
+    )
+
+
+class MiraGroundingInputs(BaseModel):
+    """Model of text reading request body"""
+
+    queries: List[str] = Field(
+        description="List of input plain texts to be grounded to MIRA using embedding similarity",
+        example=["susceptible population", "covid-19"],
+    )
+
+
+class MiraGroundingOutputItem(BaseModel):
+    class MiraDKGConcept(BaseModel):
+        id: str = Field(
+            description="DKG element id",
+            example="apollosv:00000233"
+        )
+        name: str = Field(
+            description="Canonical name of the concept",
+            example="infected population"
+        )
+        description: Optional[str] = Field(
+            description="Long winded description of the concept",
+            example="A population of only infected members of one species."
+        )
+        synonyms: List[str] = Field(
+            description="Any alternative name to the cannonical one for the concept",
+            example=["Ill individuals", "The sick and ailing"]
+        )
+        embedding: List[float] = Field(
+            description="Word embedding of the underlying model for the concept"
+        )
+
+    score: float = Field(
+        description="Cosine similarity of the embedding representation of the input with that of the DKG element",
+        example=0.7896
+    )
+    groundingConcept: MiraDKGConcept = Field(
+        description="DKG concept associated to the query",
+        example=MiraDKGConcept(
+            id="apollosv:00000233",
+            name="infected population",
+            description="A population of only infected members of one species.",
+            synonyms=[],
+            embedding=[
+                0.01590670458972454,
+                0.03795482963323593,
+                -0.08787763118743896,
+            ]
+        )
     )
 
 
