@@ -9,9 +9,12 @@ use crate::{
         operator::{Derivative, Operator},
         Ci, Math, MathExpression, Mi, Mrow, Type,
     },
-    parsers::generic_mathml::{
-        add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
-        rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+    parsers::{
+        generic_mathml::{
+            add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
+            rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+        },
+        math_expression_tree::MathExpressionTree,
     },
 };
 
@@ -134,6 +137,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     Ok((s, (Derivative::new(order, 1), x)))
 }
 
+/// Parse identifier 'e' for exponential
 fn exp(input: Span) -> IResult<()> {
     let (s, Mi(x)) = mi(input)?;
     if let "e" = x.as_ref() {
@@ -146,10 +150,14 @@ fn exp(input: Span) -> IResult<()> {
     }
 }
 
-pub fn exponential(input: Span) -> IResult<MathExpression> {
+pub fn exponential(input: Span) -> IResult<MathExpressionTree> {
     let (s, x) = delimited(stag!("msup"), pair(exp, math_expression), etag!("msup"))(input)?;
     let (_, comp) = x;
-    Ok((s, comp))
+
+    Ok((
+        s,
+        MathExpressionTree::Cons(Operator::Exp, vec![MathExpressionTree::Atom(comp)]),
+    ))
 }
 
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
@@ -179,7 +187,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(ci_univariate_func, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
-        map(ci_superscript, MathExpression::Ci),
+        //map(ci_superscript, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),

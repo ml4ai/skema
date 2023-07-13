@@ -6,7 +6,7 @@ use crate::{
         operator::{Derivative, Operator},
         Math, MathExpression, Mi, Mrow,
     },
-    parsers::interpreted_mathml::{exponential, interpreted_math},
+    parsers::interpreted_mathml::interpreted_math,
 };
 use derive_new::new;
 use nom::error::Error;
@@ -210,15 +210,6 @@ impl Lexer {
     fn peek(&self) -> Token {
         self.tokens.last().cloned().unwrap_or(Token::Eof)
     }
-}
-
-/// Handles exponential as an operator in msub
-fn exp(input: Span) -> MathExpressionTree {
-    let s = exponential(input);
-    MathExpressionTree::Cons(
-        Operator::Exp,
-        MathExpressionTree::Atom::new(MathExpression::s),
-    )
 }
 
 /// Construct a MathExpressionTree from a vector of MathExpression structs.
