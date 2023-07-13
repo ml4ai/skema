@@ -1,7 +1,7 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, MathExpression, CiType,
+        Ci, CiType, MathExpression,
     },
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
@@ -81,9 +81,9 @@ impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
             Operator::Derivative(Derivative::new(1, 1)),
-            vec![MathExpressionTree::Atom(MathExpression::Ci(
+            vec![MathExpressionTree::Atom(Box::new(MathExpression::Ci(
                 self.lhs_var.clone(),
-            ))],
+            )))],
         );
         let combined = MathExpressionTree::Cons(
             Operator::Equals,

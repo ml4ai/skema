@@ -13,10 +13,11 @@ pub enum ContExp {
     Cn(Cn),
 
     /// We deviate from the W3 spec with the Apply variant for convenience.
-    Apply(Operator, MathExpressionTree),
+    Apply(Operator, Box<MathExpressionTree>),
 }
 
-/// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
+/// Derivative operator, in line with Spivak notation
+/// http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct Derivative {
     pub order: u8,
@@ -28,8 +29,11 @@ pub struct Derivative {
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum Domain {
     DomainOfApplication(Box<ContExp>),
-    Condition(MathExpressionTree),
-    Limits { lower: ContExp, upper: ContExp },
+    Condition(Box<MathExpressionTree>),
+    Limits {
+        lower: Box<ContExp>,
+        upper: Box<ContExp>,
+    },
 }
 
 /// Summation operator, structured for easy conversion to content MathML
@@ -62,8 +66,15 @@ pub enum Operator {
     /// Set inclusion operator
     /// https://www.w3.org/TR/MathML3/chapter4.html#contm.in
     In,
+
     /// Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
+}
+
+impl fmt::Display for Sum {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "∑ {:?} {:?}", self.bound_variables, self.domain)
+    }
 }
 
 impl fmt::Display for Operator {
@@ -80,13 +91,12 @@ impl fmt::Display for Operator {
             Operator::Compose => write!(f, "."),
             Operator::Factorial => write!(f, "!"),
             Operator::In => write!(f, "∈"),
+            Operator::Set => write!(f, "Set"),
             Operator::Derivative(Derivative { order, var_index }) => {
                 write!(f, "D({order}, {var_index})")
             }
-            Operator::Sum(sum) => {
-                write!(f, "{sum:?}")
-            }
             Operator::Other(op) => write!(f, "{op:?}"),
+            op => write!(f, "{}", op.to_string()),
         }
     }
 }

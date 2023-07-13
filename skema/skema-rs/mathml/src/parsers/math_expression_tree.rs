@@ -19,7 +19,7 @@ use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
 /// An S-expression like structure to represent mathematical expressions.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum MathExpressionTree {
-    Atom(MathExpression),
+    Atom(Box<MathExpression>),
     Cons(Operator, Vec<MathExpressionTree>),
 }
 
@@ -29,10 +29,12 @@ pub enum MathExpressionTree {
 impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MathExpressionTree::Atom(MathExpression::Ci(x)) => {
-                write!(f, "{}", x.content)
-            }
-            MathExpressionTree::Atom(i) => write!(f, "{}", i),
+            MathExpressionTree::Atom(atom) => match atom.as_ref() {
+                MathExpression::Ci(x) => {
+                    write!(f, "{}", x.content)
+                }
+                t => write!(f, "{}", t),
+            },
             MathExpressionTree::Cons(head, rest) => {
                 write!(f, "({}", head)?;
                 for s in rest {
@@ -49,7 +51,7 @@ impl MathExpressionTree {
     pub fn to_cmml(&self) -> String {
         let mut content_mathml = String::new();
         match self {
-            MathExpressionTree::Atom(i) => match i {
+            MathExpressionTree::Atom(i) => match i.as_ref() {
                 MathExpression::Ci(x) => {
                     content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
                 }
@@ -73,7 +75,7 @@ impl MathExpressionTree {
                     Operator::Equals => content_mathml.push_str("<eq/>"),
                     Operator::Divide => content_mathml.push_str("<divide/>"),
                     Operator::Derivative(Derivative { order, var_index })
-                        if (*order, *var_index) == (1_u8, 1_u8) =>
+                        if (order, var_index) == (&1_u8, &1_u8) =>
                     {
                         content_mathml.push_str("<diff/>")
                     }
@@ -242,7 +244,7 @@ impl FromStr for MathExpressionTree {
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     let mut lhs = match lexer.next() {
-        Token::Atom(it) => MathExpressionTree::Atom(it),
+        Token::Atom(it) => MathExpressionTree::Atom(Box::new(it)),
         Token::Op(Operator::Lparen) => {
             let lhs = expr_bp(lexer, 0);
             assert_eq!(lexer.next(), Token::Op(Operator::Rparen));

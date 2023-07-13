@@ -6,7 +6,7 @@
 
 use crate::{
     ast::{
-        operator::{Derivative, Operator},
+        operator::{Derivative, Domain, Operator, Sum},
         Ci, CiType, Cn, Math, MathExpression, Mi, Mrow,
     },
     parsers::{
@@ -17,30 +17,68 @@ use crate::{
         math_expression_tree::MathExpressionTree,
     },
 };
-use derive_new::new;
 
 use nom::{
     branch::alt,
     bytes::complete::tag,
+    character::complete::char,
     combinator::{map, opt},
-    multi::{many0, many1},
-    sequence::{delimited, pair, preceded, terminated, tuple},
+    multi::{many0, many1, separated_list1},
+    sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
 };
+
+/// A macro to recognize specific mi elements.
+macro_rules! mi {
+    ($parser:expr) => {{
+        tag_parser!("mi", $parser)
+    }};
+}
+
+/// A macro to recognize specific mo elements.
+macro_rules! mo {
+    ($parser:expr) => {{
+        tag_parser!("mo", $parser)
+    }};
+}
+
+/// A macro to recognize mrows with specific contents
+macro_rules! mrow {
+    ($parser:expr) => {{
+        tag_parser!("mrow", $parser)
+    }};
+}
+
+/// A macro to recognize mover elements with specific contents
+macro_rules! mover {
+    ($parser:expr) => {{
+        tag_parser!("mover", $parser)
+    }};
+}
+
+/// A macro to recognize munder elements with specific contents
+macro_rules! munder {
+    ($parser:expr) => {{
+        tag_parser!("munder", $parser)
+    }};
+}
+
+/// A macro to recognize mfrac elements with specific contents
+macro_rules! mfrac {
+    ($parser:expr) => {{
+        tag_parser!("mfrac", $parser)
+    }};
+}
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
 /// disallowing operators besides +, -, =, (, and ).
 pub fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = ws(delimited(
-        stag!("mo"),
-        alt((add, subtract, equals, lparen, rparen)),
-        etag!("mo"),
-    ))(input)?;
+    let (s, op) = mo!(alt((add, subtract, equals, lparen, rparen)))(input)?;
     Ok((s, op))
 }
 
 fn parenthesized_identifier(input: Span) -> IResult<()> {
-    let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
-    let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
+    let mo_lparen = mo!(lparen);
+    let mo_rparen = mo!(rparen);
     let (s, _) = delimited(mo_lparen, mi, mo_rparen)(input)?;
     Ok((s, ()))
 }
@@ -66,15 +104,8 @@ pub fn ci_subscript(input: Span) -> IResult<Ci> {
 
 /// Parse the identifier 'd'
 fn d(input: Span) -> IResult<()> {
-    let (s, Mi(x)) = mi(input)?;
-    if let "d" = x.as_ref() {
-        Ok((s, ()))
-    } else {
-        Err(nom::Err::Error(ParseError::new(
-            "Unable to identify Mi('d')".to_string(),
-            input,
-        )))
-    }
+    let (s, _) = mi!(tag("d"))(input)?;
+    Ok((s, ()))
 }
 
 /// Parse a content identifier of unknown type.
@@ -106,26 +137,16 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
 
 pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     // Get number of dots to recognize the order of the derivative
-    let n_dots = delimited(
-        stag!("mo"),
-        map(many1(nom::character::complete::char('˙')), |x| {
-            x.len() as u8
-        }),
-        etag!("mo"),
-    );
+    let n_dots = mo!(map(many1(char('˙')), |x| { x.len() as u8 }));
 
     let (s, (x, order)) = terminated(
-        delimited(
-            stag!("mover"),
-            pair(
-                map(ci_unknown, |Ci { content, .. }| Ci {
-                    r#type: Some(CiType::Function),
-                    content,
-                }),
-                n_dots,
-            ),
-            etag!("mover"),
-        ),
+        mover!(pair(
+            map(ci_unknown, |Ci { content, .. }| Ci {
+                r#type: Some(CiType::Function),
+                content,
+            }),
+            n_dots,
+        )),
         opt(parenthesized_identifier),
     )(input)?;
 
@@ -137,7 +158,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
 // (also in this file).
 pub fn mfrac(input: Span) -> IResult<MathExpression> {
     let (s, frac) = ws(map(
-        tag_parser!("mfrac", pair(math_expression, math_expression)),
+        mfrac!(pair(math_expression, math_expression)),
         |(x, y)| MathExpression::Mfrac(Box::new(x), Box::new(y)),
     ))(input)?;
 
@@ -145,11 +166,7 @@ pub fn mfrac(input: Span) -> IResult<MathExpression> {
 }
 
 pub fn mrow(input: Span) -> IResult<Mrow> {
-    let (s, elements) = ws(delimited(
-        stag!("mrow"),
-        many0(math_expression),
-        etag!("mrow"),
-    ))(input)?;
+    let (s, elements) = ws(mrow!(many0(math_expression)))(input)?;
     Ok((s, Mrow(elements)))
 }
 
@@ -176,9 +193,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     )))(input)
 }
 
-
-
-
 /// Parser for interpreted math expressions.
 /// testing MathML documents
 pub fn interpreted_math(input: Span) -> IResult<Math> {
@@ -187,12 +201,58 @@ pub fn interpreted_math(input: Span) -> IResult<Math> {
 }
 
 fn summation(input: Span) -> IResult<Sum> {
-    let (s, _) = tag_parser!("munder", tag_parser!("mo", tag("∑")))?;
+    let summation_symbol = tag_parser!("mo", tag("∑"));
+    let comma = mo!(tag(","));
+
+    let to_ci = |x| {
+        MathExpressionTree::Atom(Box::new(MathExpression::Ci(Ci::new(
+            None,
+            Box::new(MathExpression::Mi(x)),
+        ))))
+    };
+
+    let domain = mrow!(separated_pair(
+        mi,
+        mo!(tag("=")),
+        map(separated_list1(comma, mi), move |xs| {
+            xs.into_iter()
+                .map(to_ci)
+                .collect::<Vec<MathExpressionTree>>()
+        })
+    ));
+
+    let (s, (bvar, domain_elements)) = munder!(preceded(summation_symbol, domain))(input)?;
+
+    let args = vec![
+        to_ci(bvar.clone()),
+        MathExpressionTree::Cons(Operator::Set, domain_elements),
+    ];
+
     Ok((
         s,
         Sum::new(
-            vec![],
-            Domain::Condition(ContExp::Apply(Operator::In, vec![])),
+            vec![Ci::new(None, Box::new(MathExpression::Mi(bvar)))],
+            Domain::Condition(Box::new(MathExpressionTree::Cons(Operator::In, args))),
         ),
     ))
+}
+
+#[test]
+fn test_summation() {
+    let input = "
+        <munder>
+            <mo>∑</mo>
+            <mrow>
+            <mi>X</mi>
+            <mo>=</mo>
+            <mi>W</mi>
+            <mo>,</mo>
+            <mi>A</mi>
+            <mo>,</mo>
+            <mi>D</mi>
+            </mrow>
+        </munder>";
+
+    let (_, summation) = summation(input.into()).unwrap();
+    println!("{summation}");
 }
