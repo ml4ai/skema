@@ -486,9 +486,6 @@ async def ground_to_mira(k: int, queries: MiraGroundingInputs, response: Respons
     response.status_code = inner_response.status_code
 
     if inner_response.status_code == 200:
-        for q in inner_response.json():
-            for o in q:
-                MiraGroundingOutputItem(**o)
         return [[MiraGroundingOutputItem(**o) for o in q] for q in inner_response.json()]
     else:
         return inner_response.content
