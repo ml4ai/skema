@@ -1,3 +1,0 @@
-(function() {var implementors = {
-"skema_service":[["impl <a class=\"trait\" href=\"utoipa/trait.OpenApi.html\" title=\"trait utoipa::OpenApi\">OpenApi</a> for <a class=\"struct\" href=\"skema_service/struct.ApiDoc.html\" title=\"struct skema_service::ApiDoc\">ApiDoc</a>"]]
-};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

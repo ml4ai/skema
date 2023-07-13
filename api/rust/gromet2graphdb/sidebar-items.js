@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["main"],"static":["DEFAULT_VALUE"],"struct":["Cli"]};
+window.SIDEBAR_ITEMS = {"fn":["main"],"struct":["Cli"]};
