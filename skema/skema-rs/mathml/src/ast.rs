@@ -75,7 +75,6 @@ pub enum CnType {
     Hexdouble,
 }
 
-
 impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {

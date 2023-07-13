@@ -7,9 +7,10 @@ use crate::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
             ci_univariate_func, ci_unknown, first_order_derivative_leibniz_notation,
-            math_expression, newtonian_derivative, operator,
+            math_expression_tree, newtonian_derivative, operator,
         },
-        math_expression_tree::MathExpressionTree,
+        math_expression_tree::{Atom, MathExpressionTree},
+        specific_tag_macros::{mi, mo},
     },
 };
 
@@ -42,65 +43,30 @@ pub struct FirstOrderODE {
 }
 
 /// Parse a first order ODE with a single derivative term on the LHS.
-pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
-    let (s, _) = stag!("math")(input)?;
+//pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
+//let (s, _) = stag!("math")(input)?;
 
-    // Recognize LHS derivative
-    let (s, (_, ci)) = alt((
-        first_order_derivative_leibniz_notation,
-        newtonian_derivative,
-    ))(s)?;
+//// Recognize LHS derivative
+//let (s, lhs) = alt((
+//first_order_derivative_leibniz_notation,
+//newtonian_derivative,
+//))(s)?;
 
-    // Recognize equals sign
-    let (s, _) = delimited(stag!("mo"), equals, etag!("mo"))(s)?;
+//// Recognize equals sign
+//let (s, _) = mo!(tag("="))(s)?;
 
-    // Recognize other tokens
-    let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, MathExpression::Ci),
-        map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(CiType::Function),
-                content,
-            })
-        }),
-        map(operator, MathExpression::Mo),
-        math_expression,
-    )))(s)?;
+//// Recognize other tokens
+//let (s, remaining_tokens) = math_expression_tree(s)?;
 
-    let (s, _) = etag!("math")(s)?;
+//let (s, _) = etag!("math")(s)?;
 
-    let ode = FirstOrderODE {
-        lhs_var: ci,
-        rhs: MathExpressionTree::from(remaining_tokens),
-    };
+//let ode = FirstOrderODE {
+//lhs_var: ci,
+//rhs: MathExpressionTree::from(remaining_tokens),
+//};
 
-    Ok((s, ode))
-}
-
-impl FirstOrderODE {
-    pub fn to_cmml(&self) -> String {
-        let lhs_expression_tree = MathExpressionTree::Cons(
-            Operator::Derivative(Derivative::new(1, 1)),
-            vec![MathExpressionTree::Atom(Box::new(MathExpression::Ci(
-                self.lhs_var.clone(),
-            )))],
-        );
-        let combined = MathExpressionTree::Cons(
-            Operator::Equals,
-            vec![lhs_expression_tree, self.rhs.clone()],
-        );
-        combined.to_cmml()
-    }
-}
-
-impl FromStr for FirstOrderODE {
-    type Err = Error<String>;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let ode = first_order_ode(s.into()).unwrap().1;
-        Ok(ode)
-    }
-}
+//Ok((s, ode))
+//}
 
 #[test]
 fn test_ci_univariate_func() {
@@ -122,12 +88,13 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
         <mrow><mi>d</mi><mi>t</mi></mrow>
         </mfrac>",
         first_order_derivative_leibniz_notation,
-        (
-            Derivative::new(1, 1),
-            Ci::new(
+        MathExpressionTree::new_cons(
+            Operator::Derivative(Derivative::new(1, 1)),
+            vec![Ci::new(
                 Some(CiType::Function),
                 Box::new(MathExpression::Mi(Mi("S".to_string()))),
-            ),
+            )
+            .into()],
         ),
     );
 }
@@ -140,52 +107,13 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
         <mrow><mi>d</mi><mi>t</mi></mrow>
         </mfrac>",
         first_order_derivative_leibniz_notation,
-        (
-            Derivative::new(1, 1),
-            Ci::new(
+        MathExpressionTree::new_cons(
+            Operator::Derivative(Derivative::new(1, 1)),
+            vec![Ci::new(
                 Some(CiType::Function),
                 Box::new(MathExpression::Mi(Mi("S".to_string()))),
-            ),
+            )
+            .into()],
         ),
     );
-}
-
-#[test]
-fn test_first_order_ode() {
-    // ASKEM Hackathon 2, scenario 1, equation 1.
-    let input = "
-    <math>
-        <mfrac>
-        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
-        <mrow><mi>d</mi><mi>t</mi></mrow>
-        </mfrac>
-        <mo>=</mo>
-        <mo>-</mo>
-        <mi>β</mi>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
-    </math>
-    ";
-
-    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
-
-    assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
-
-    // ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
-    let input = "
-    <math>
-        <mover><mi>S</mi><mo>˙</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mo>=</mo>
-        <mo>-</mo>
-        <mi>β</mi>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
-    </math>
-    ";
-
-    let FirstOrderODE { lhs_var, rhs } = input.parse::<FirstOrderODE>().unwrap();
-
-    assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
 }

@@ -7,14 +7,15 @@
 use crate::{
     ast::{
         operator::{Derivative, Domain, Operator, Sum},
-        Ci, CiType, Cn, Math, MathExpression, Mi, Mrow,
+        Ci, CiType, Math, MathExpression, Mi, Mrow,
     },
     parsers::{
         generic_mathml::{
-            add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
-            rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+            add, attribute, elem_many0, equals, etag, lparen, mfrac, mi, mn, mo, msqrt, msub,
+            msubsup, msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, Span,
         },
-        math_expression_tree::MathExpressionTree,
+        math_expression_tree::{Atom, MathExpressionTree},
+        specific_tag_macros::{math, mfrac, mi, mo, mover, mrow, munder},
     },
 };
 
@@ -26,48 +27,6 @@ use nom::{
     multi::{many0, many1, separated_list1},
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
 };
-
-/// A macro to recognize specific mi elements.
-macro_rules! mi {
-    ($parser:expr) => {{
-        tag_parser!("mi", $parser)
-    }};
-}
-
-/// A macro to recognize specific mo elements.
-macro_rules! mo {
-    ($parser:expr) => {{
-        tag_parser!("mo", $parser)
-    }};
-}
-
-/// A macro to recognize mrows with specific contents
-macro_rules! mrow {
-    ($parser:expr) => {{
-        tag_parser!("mrow", $parser)
-    }};
-}
-
-/// A macro to recognize mover elements with specific contents
-macro_rules! mover {
-    ($parser:expr) => {{
-        tag_parser!("mover", $parser)
-    }};
-}
-
-/// A macro to recognize munder elements with specific contents
-macro_rules! munder {
-    ($parser:expr) => {{
-        tag_parser!("munder", $parser)
-    }};
-}
-
-/// A macro to recognize mfrac elements with specific contents
-macro_rules! mfrac {
-    ($parser:expr) => {{
-        tag_parser!("mfrac", $parser)
-    }};
-}
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
 /// disallowing operators besides +, -, =, (, and ).
@@ -115,7 +74,7 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
 }
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
-pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
+pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<MathExpressionTree> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), d))(input)?;
     let (s, func) = ws(alt((
         ci_univariate_func,
@@ -132,10 +91,16 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
         etag!("mrow"),
         etag!("mfrac"),
     ))(s)?;
-    Ok((s, (Derivative::new(1, 1), func)))
+
+    let tree = MathExpressionTree::new_cons(
+        Operator::Derivative(Derivative::new(1, 1)),
+        vec![func.into()],
+    );
+
+    Ok((s, tree))
 }
 
-pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
+pub fn newtonian_derivative(input: Span) -> IResult<MathExpressionTree> {
     // Get number of dots to recognize the order of the derivative
     let n_dots = mo!(map(many1(char('˙')), |x| { x.len() as u8 }));
 
@@ -150,66 +115,96 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         opt(parenthesized_identifier),
     )(input)?;
 
-    Ok((s, (Derivative::new(order, 1), x)))
+    let tree = MathExpressionTree::new_cons(
+        Operator::Derivative(Derivative::new(order, 1)),
+        vec![x.into()],
+    );
+
+    Ok((s, tree))
 }
 
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
 // the generic_mathml module) to work with the specialized version of the math_expression parser
 // (also in this file).
-pub fn mfrac(input: Span) -> IResult<MathExpression> {
-    let (s, frac) = ws(map(
-        mfrac!(pair(math_expression, math_expression)),
-        |(x, y)| MathExpression::Mfrac(Box::new(x), Box::new(y)),
-    ))(input)?;
+pub fn fraction(input: Span) -> IResult<MathExpressionTree> {
+    let (s, (numerator, denominator)) =
+        mfrac!(pair(math_expression_tree, math_expression_tree))(input)?;
 
-    Ok((s, frac))
+    let tree = MathExpressionTree::new_cons(Operator::Divide, vec![numerator, denominator]);
+    Ok((s, tree))
 }
 
-pub fn mrow(input: Span) -> IResult<Mrow> {
-    let (s, elements) = ws(mrow!(many0(math_expression)))(input)?;
-    Ok((s, Mrow(elements)))
+pub fn mrow(input: Span) -> IResult<MathExpressionTree> {
+    let (s, elements) = mrow!(pmml_elements)(input)?;
+    let tree = MathExpressionTree::from(elements);
+    Ok((s, tree))
+}
+
+pub fn pmml_elements(input: Span) -> IResult<Vec<MathExpression>> {
+    let (s, elements) = many1(alt((
+        map(ci, MathExpression::Ci),
+        mo,
+        mn,
+        map(ci_univariate_func, MathExpression::Ci),
+        mfrac,
+    )))(input)?;
+    Ok((s, elements))
+}
+
+/// Parse a first order ODE with a single derivative term on the LHS.
+pub fn first_order_ode(input: Span) -> IResult<MathExpressionTree> {
+    // Recognize LHS derivative
+    let (s, lhs) = alt((
+        first_order_derivative_leibniz_notation,
+        newtonian_derivative,
+    ))(input)?;
+
+    // Recognize equals sign
+    let (s, _) = mo!(tag("="))(s)?;
+
+    // Recognize other tokens
+    let (s, remaining_tokens) = pmml_elements(s)?;
+
+    let tree = MathExpressionTree::new_cons(Operator::Equals, vec![lhs, remaining_tokens.into()]);
+
+    Ok((s, tree))
+}
+
+fn ci(input: Span) -> IResult<Ci> {
+    let (s, res) = alt((ci_univariate_func, ci_subscript, ci_unknown))(input)?;
+    Ok((s, res))
 }
 
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
-pub fn math_expression(input: Span) -> IResult<MathExpression> {
+pub fn math_expression_tree(input: Span) -> IResult<MathExpressionTree> {
     ws(alt((
-        map(ci_univariate_func, MathExpression::Ci),
-        map(ci_subscript, MathExpression::Ci),
+        first_order_ode,
+        fraction,
+        map(ci_univariate_func, |x| x.into()),
+        map(ci_subscript, |x| x.into()),
         map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(CiType::Function),
-                content,
-            })
+            Ci::new(Some(CiType::Function), content).into()
         }),
-        map(operator, MathExpression::Mo),
-        mn,
-        msup,
-        msub,
-        msqrt,
-        mfrac,
-        map(mrow, MathExpression::Mrow),
-        msubsup,
+        map(pmml_elements, MathExpressionTree::from),
+        mrow,
+        //msubsup,
     )))(input)
 }
 
 /// Parser for interpreted math expressions.
 /// testing MathML documents
-pub fn interpreted_math(input: Span) -> IResult<Math> {
-    let (s, elements) = preceded(opt(xml_declaration), elem_many0!("math"))(input)?;
-    Ok((s, Math { content: elements }))
+pub fn math_expression_tree_document(input: Span) -> IResult<MathExpressionTree> {
+    let (s, tree) = preceded(opt(xml_declaration), math!(math_expression_tree))(input)?;
+    Ok((s, tree))
 }
 
 fn summation(input: Span) -> IResult<Sum> {
     let summation_symbol = tag_parser!("mo", tag("∑"));
     let comma = mo!(tag(","));
 
-    let to_ci = |x| {
-        MathExpressionTree::Atom(Box::new(MathExpression::Ci(Ci::new(
-            None,
-            Box::new(MathExpression::Mi(x)),
-        ))))
-    };
+    let to_ci =
+        |x| MathExpressionTree::Atom(Atom::Ci(Ci::new(None, Box::new(MathExpression::Mi(x)))));
 
     let domain = mrow!(separated_pair(
         mi,

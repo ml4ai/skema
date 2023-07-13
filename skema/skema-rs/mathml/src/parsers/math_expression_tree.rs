@@ -4,22 +4,37 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Math, MathExpression, Mi, Mrow,
+        Ci, Cn, Math, MathExpression, Mi, Mrow,
     },
-    parsers::interpreted_mathml::interpreted_math,
+    parsers::interpreted_mathml::math_expression_tree_document,
 };
+
 use derive_new::new;
 use nom::error::Error;
 
 use std::{fmt, str::FromStr};
 
-#[cfg(test)]
-use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub enum Atom {
+    Ci(Ci),
+    Cn(Cn),
+}
+
+impl From<MathExpression> for Atom {
+    fn from(expression: MathExpression) -> Self {
+        match expression {
+            MathExpression::Ci(x) => Atom::Ci(x),
+            MathExpression::Mn(x) => Atom::Cn(Cn::new(None, x)),
+            MathExpression::Mi(x) => Atom::Ci(Ci::new(None, Box::new(MathExpression::Mi(x)))),
+            t => todo!("{t:?}"),
+        }
+    }
+}
 
 /// An S-expression like structure to represent mathematical expressions.
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub enum MathExpressionTree {
-    Atom(Box<MathExpression>),
+    Atom(Atom),
     Cons(Operator, Vec<MathExpressionTree>),
 }
 
@@ -29,11 +44,13 @@ pub enum MathExpressionTree {
 impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            MathExpressionTree::Atom(atom) => match atom.as_ref() {
-                MathExpression::Ci(x) => {
-                    write!(f, "{}", x.content)
+            MathExpressionTree::Atom(x) => match x {
+                Atom::Ci(Ci { content, .. }) => {
+                    write!(f, "{}", content)
                 }
-                t => write!(f, "{}", t),
+                Atom::Cn(Cn { content, .. }) => {
+                    write!(f, "{}", content)
+                }
             },
             MathExpressionTree::Cons(head, rest) => {
                 write!(f, "({}", head)?;
@@ -51,20 +68,13 @@ impl MathExpressionTree {
     pub fn to_cmml(&self) -> String {
         let mut content_mathml = String::new();
         match self {
-            MathExpressionTree::Atom(i) => match i.as_ref() {
-                MathExpression::Ci(x) => {
-                    content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
+            MathExpressionTree::Atom(atom) => match atom {
+                Atom::Ci(Ci { r#type, content }) => {
+                    content_mathml.push_str(&format!("<ci>{}</ci>", content));
                 }
-                MathExpression::Mi(Mi(id)) => {
-                    content_mathml.push_str(&format!("<ci>{}</ci>", id));
+                Atom::Cn(Cn { r#type, content }) => {
+                    content_mathml.push_str(&format!("<ci>{}</ci>", content));
                 }
-                MathExpression::Mn(number) => {
-                    content_mathml.push_str(&format!("<cn>{}</cn>", number));
-                }
-                MathExpression::Mrow(_) => {
-                    panic!("All Mrows should have been removed by now!");
-                }
-                t => panic!("Unhandled MathExpression: {:?}", t),
             },
             MathExpressionTree::Cons(head, rest) => {
                 content_mathml.push_str("<apply>");
@@ -226,6 +236,12 @@ impl From<Vec<MathExpression>> for MathExpressionTree {
     }
 }
 
+impl From<Ci> for MathExpressionTree {
+    fn from(input: Ci) -> Self {
+        MathExpressionTree::Atom(Atom::Ci(input))
+    }
+}
+
 impl From<Math> for MathExpressionTree {
     fn from(input: Math) -> Self {
         expr(input.content)
@@ -236,15 +252,15 @@ impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
     fn from_str(input: &str) -> Result<Self, Self::Err> {
-        let (_, math) = interpreted_math(input.into()).unwrap();
-        Ok(MathExpressionTree::from(math))
+        let (_, math) = math_expression_tree_document(input.into()).unwrap();
+        Ok(math)
     }
 }
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     let mut lhs = match lexer.next() {
-        Token::Atom(it) => MathExpressionTree::Atom(Box::new(it)),
+        Token::Atom(atom) => MathExpressionTree::Atom(atom.into()),
         Token::Op(Operator::Lparen) => {
             let lhs = expr_bp(lexer, 0);
             assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
@@ -323,8 +339,8 @@ fn test_conversion() {
     let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
     println!("Input: {input}");
     let s = input.parse::<MathExpressionTree>().unwrap();
-    assert_eq!(s.to_string(), "(+ x y)");
     println!("Output: {s}\n");
+    assert_eq!(s.to_string(), "(+ x y)");
 
     let input = "<math><mi>a</mi><mo>=</mo><mi>x</mi><mo>+</mo><mi>y</mi><mi>z</mi></math>";
     println!("Input: {input}");
@@ -333,17 +349,13 @@ fn test_conversion() {
     println!("Output: {s}\n");
 
     let input = "<math><mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo></math>";
-    println!("Input: {input}");
     let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(+ a (- b))");
-    println!("Output: {s}\n");
 
     let input =
         "<math><mn>2</mn><mi>a</mi><mo>(</mo><mi>c</mi><mo>+</mo><mi>d</mi><mo>)</mo></math>";
-    println!("Input: {input}");
     let s = input.parse::<MathExpressionTree>().unwrap();
     assert_eq!(s.to_string(), "(* (* 2 a) (+ c d))");
-    println!("Output: {s}\n");
 
     let input = "
     <math>
@@ -351,11 +363,8 @@ fn test_conversion() {
         <mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
         </math>
         ";
-    println!("Input: {input}");
-    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
-    assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
-    println!("Output: {s}\n");
+    let s = input.parse::<MathExpressionTree>().unwrap();
+    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
 
     let input = "
     <math>
@@ -364,10 +373,8 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
-    assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
-    println!("Output: {s}\n");
+    let s = input.parse::<MathExpressionTree>().unwrap();
+    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
 }
 
 #[test]
@@ -384,7 +391,8 @@ fn test_to_content_mathml_example2() {
         <mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
         </math>
         ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>S</ci></apply><ci>I</ci></apply></apply>");
 }
@@ -404,7 +412,8 @@ fn test_content_hackathon2_scenario1_eq1() {
         <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
     </math>
     ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
 }
@@ -425,7 +434,8 @@ fn test_content_hackathon2_scenario1_eq2() {
         <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml,"<apply><eq/><apply><diff/><ci>E</ci></apply><apply><minus/><apply><divide/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
 }
@@ -446,7 +456,8 @@ fn test_content_hackathon2_scenario1_eq3() {
         <mi>α</mi><mi>ρ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
 }
@@ -463,7 +474,8 @@ fn test_content_hackathon2_scenario1_eq4() {
         <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply>");
 }
@@ -482,7 +494,8 @@ fn test_content_hackathon2_scenario1_eq5() {
         <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>D</ci></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply>");
 }
@@ -505,7 +518,8 @@ fn test_content_hackathon2_scenario1_eq6() {
         <mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><plus/><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
 }
@@ -525,7 +539,8 @@ fn test_content_hackathon2_scenario1_eq7() {
         <mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
-    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let ode = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", ode.to_string());
     let cmml = ode.to_cmml();
     assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><minus/><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
 }
@@ -541,6 +556,7 @@ fn test_content_hackathon2_scenario1_eq8() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("{}", exp.to_string());
     let cmml = exp.to_cmml();
     assert_eq!(
         cmml,
