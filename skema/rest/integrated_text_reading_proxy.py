@@ -454,31 +454,34 @@ async def integrated_pdf_extractions(
     )
 
 
-## These are some direct proxies to the SKEMA and MIT APIs
+# These are some direct proxies to the SKEMA and MIT APIs
 @router.post(
     "/cosmos_to_json",
     status_code=200,
     description="Calls COSMOS on a pdf and converts the data into json"
 )
-async def cosmos_to_json(pdf:UploadFile) -> List[Dict]:
+async def cosmos_to_json(pdf: UploadFile) -> List[Dict]:
     """ Calls COSMOS on a pdf and converts the data into json """
     return cosmos_client(pdf.filename, pdf.file)
+
 
 @router.post(
     "/ground_to_mira",
     status_code=200,
     response_model=List[List[MiraGroundingOutputItem]]
 )
-async def ground_to_mira(k:int, queries:MiraGroundingInputs, response:Response) -> List[List[MiraGroundingOutputItem]]:
+async def ground_to_mira(k: int, queries: MiraGroundingInputs, response: Response) -> List[
+    List[MiraGroundingOutputItem]]:
     """ Proxy to the MIRA grounding functionality on the SKEMA TR service """
     params = {
         "k": k
     }
-    headers={
+    headers = {
         "Content-Type": "text/plain"
     }
     payload = "\n".join(queries.queries)
-    inner_response = requests.post(f"{SKEMA_TR_ADDRESS}/groundStringsToMira",  headers=headers, params=params, data=payload)
+    inner_response = requests.post(f"{SKEMA_TR_ADDRESS}/groundStringsToMira", headers=headers, params=params,
+                                   data=payload)
 
     response.status_code = inner_response.status_code
 
@@ -490,6 +493,40 @@ async def ground_to_mira(k:int, queries:MiraGroundingInputs, response:Response) 
     else:
         return inner_response.content
 
+
+@router.post("/cards/get_model_card")
+async def get_model_card(text_file: UploadFile, code_file: UploadFile, response: Response):
+    """ Calls the model card endpoint from MIT's pipeline """
+
+    params = {
+        "gpt_key": OPENAI_KEY,
+    }
+    files = {
+        "text_file": (text_file.filename, text_file.file, "text/plain"),
+        "code_file": (code_file.filename, code_file.file, "text/plain")
+    }
+
+    inner_response = requests.post(f"{MIT_TR_ADDRESS}/cards/get_model_card", params=params, files=files)
+
+    response.status_code = inner_response.status_code
+    return inner_response.json()
+
+@router.post("/cards/get_data_card")
+async def get_model_card(csv_file: UploadFile, doc_file: UploadFile, response: Response):
+    """ Calls the data card endpoint from MIT's pipeline """
+
+    params = {
+        "gpt_key": OPENAI_KEY,
+    }
+    files = {
+        "csv_file": (csv_file.filename, csv_file.file, "text/csv"),
+        "doc_file": (doc_file.filename, doc_file.file, "text/plain")
+    }
+
+    inner_response = requests.post(f"{MIT_TR_ADDRESS}/cards/get_data_card", params=params, files=files)
+
+    response.status_code = inner_response.status_code
+    return inner_response.json()
 ####
 
 
