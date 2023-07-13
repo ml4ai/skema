@@ -73,7 +73,7 @@ impl MathExpressionTree {
                     content_mathml.push_str(&format!("<ci>{}</ci>", content));
                 }
                 Atom::Cn(Cn { r#type, content }) => {
-                    content_mathml.push_str(&format!("<ci>{}</ci>", content));
+                    content_mathml.push_str(&format!("<cn>{}</cn>", content));
                 }
             },
             MathExpressionTree::Cons(head, rest) => {
@@ -409,7 +409,7 @@ fn test_content_hackathon2_scenario1_eq1() {
         <mo>-</mo>
         <mi>β</mi>
         <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mrow><mi>N</mi></mrow></mfrac>
     </math>
     ";
     let ode = input.parse::<MathExpressionTree>().unwrap();

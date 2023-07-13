@@ -142,11 +142,11 @@ pub fn mrow(input: Span) -> IResult<MathExpressionTree> {
 
 pub fn pmml_elements(input: Span) -> IResult<Vec<MathExpression>> {
     let (s, elements) = many1(alt((
+        mfrac,
         map(ci, MathExpression::Ci),
         mo,
         mn,
         map(ci_univariate_func, MathExpression::Ci),
-        mfrac,
     )))(input)?;
     Ok((s, elements))
 }
@@ -181,11 +181,11 @@ pub fn math_expression_tree(input: Span) -> IResult<MathExpressionTree> {
     ws(alt((
         first_order_ode,
         fraction,
-        map(ci_univariate_func, |x| x.into()),
-        map(ci_subscript, |x| x.into()),
-        map(ci_unknown, |Ci { content, .. }| {
-            Ci::new(Some(CiType::Function), content).into()
-        }),
+        //map(ci_univariate_func, |x| x.into()),
+        //map(ci_subscript, |x| x.into()),
+        //map(ci_unknown, |Ci { content, .. }| {
+        //Ci::new(Some(CiType::Function), content).into()
+        //}),
         map(pmml_elements, MathExpressionTree::from),
         mrow,
         //msubsup,
