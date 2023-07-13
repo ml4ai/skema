@@ -2,7 +2,6 @@ import os
 import requests
 from pathlib import Path
 import urllib.request
-
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer

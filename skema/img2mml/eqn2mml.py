@@ -7,8 +7,7 @@ node data_generation/mathjax_server.js
 
 from typing import Text
 from typing_extensions import Annotated
-from fastapi import APIRouter, FastAPI, Response, Request, Query
-
+from fastapi import APIRouter, FastAPI, Response, Request, Query, UploadFile
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.api import (
     get_mathml_from_bytes,
@@ -22,7 +21,6 @@ from skema.img2mml.api import load_vocab, load_model, check_gpu_availability
 from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
 from pathlib import Path
 import json
-
 
 # Read config file
 cwd = Path(__file__).parents[0]
@@ -116,7 +114,7 @@ def latex2mml_healthcheck() -> int:
 
 
 @router.post("/image/mml", summary="Get MathML representation of an equation image")
-async def post_image_to_mathml(data: schema.ImageBytes) -> Response:
+async def post_image_to_mathml(data: UploadFile) -> Response:
     """
     Endpoint for generating MathML from an input image.
 
@@ -131,12 +129,14 @@ async def post_image_to_mathml(data: schema.ImageBytes) -> Response:
     print(r.text)
     """
     global img2mml_model, config, vocab_itos, vocab_stoi, device
-    # convert bytes of png image to tensor
+    # Read image data
+    image_bytes = await data.read()
+
+    # pass image bytes to get_mathml_from_bytes function
     res = get_mathml_from_bytes(
-        data, img2mml_model, config, vocab_itos, vocab_stoi, device
+        image_bytes, img2mml_model, config, vocab_itos, vocab_stoi, device
     )
-    print(res)
-    print(type(res))
+
     return Response(content=res, media_type="application/xml")
 
 
