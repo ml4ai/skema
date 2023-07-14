@@ -31,7 +31,7 @@ def test_link_amr():
 
     # There should be more than 5 linked AMR elements
     metadata = AttributeCollection(**linked_amr["metadata"])
-    num_linked_elements = len([md.amr_element_id is not None for md in metadata.attributes])
+    num_linked_elements = sum([isinstance(md.amr_element_id, str) for md in metadata.attributes])
     assert num_linked_elements > 5, f"Only {num_linked_elements}, should be close to 17 with the testing configuration"
 
 
