@@ -373,7 +373,7 @@ impl From<ACSet> for PetriNet {
             }
 
             let transitions = Transition {
-                id: trans.tname.clone(),
+                id: format!("t{}", i.clone()),
                 input: Some(string_vec1.clone()),
                 output: Some(string_vec2.clone()),
                 ..Default::default()
@@ -392,7 +392,7 @@ impl From<ACSet> for PetriNet {
             }
 
             let rate = Rate {
-                target: trans.tname.clone(),
+                target: format!("t{}", i.clone()),
                 expression: format!("{}{}", trans.tname.clone(), terms.clone()), // the second term needs to be the product of the inputs
                 ..Default::default()
             };
@@ -485,7 +485,10 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         let mut transition_pair = Vec::<(PnTerm, PnTerm)>::new();
         for term1 in terms.clone().iter() {
             for term2 in terms.clone().iter() {
-                if term1.polarity != term2.polarity && term1.parameters == term2.parameters && term1.polarity {
+                if term1.polarity != term2.polarity
+                    && term1.parameters == term2.parameters
+                    && term1.polarity
+                {
                     let temp_pair = (term1.clone(), term2.clone());
                     transition_pair.push(temp_pair);
                 }
