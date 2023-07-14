@@ -1,6 +1,7 @@
 use actix_web::{put, web, HttpResponse};
+use mathml::parsers::first_order_ode::flatten_mults;
 use mathml::{
-    acset::{ACSet, AMRmathml, PetriNet, RegNet},
+    acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsers::first_order_ode::FirstOrderODE,
@@ -80,8 +81,16 @@ pub async fn get_content_mathml(payload: String) -> String {
 )]
 #[put("/mathml/petrinet")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<Math> = payload.iter().map(|x| x.parse::<Math>().unwrap()).collect();
-    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
+    let asts: Vec<FirstOrderODE> = payload
+        .iter()
+        .map(|x| x.parse::<FirstOrderODE>().unwrap())
+        .collect();
+    let mut flattened_asts = Vec::<FirstOrderODE>::new();
+    for mut eq in asts {
+        eq.rhs = flatten_mults(eq.rhs.clone());
+        flattened_asts.push(eq.clone());
+    }
+    HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
 }
 
 /// Return a JSON representation of a RegNet ModelRep constructed from an array of MathML strings.
@@ -113,8 +122,20 @@ pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/amr")]
 pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
+    let mt_asts: Vec<FirstOrderODE> = payload
+        .clone()
+        .mathml
+        .iter()
+        .map(|x| x.parse::<FirstOrderODE>().unwrap())
+        .collect();
+    let mut flattened_asts = Vec::<FirstOrderODE>::new();
+    for mut eq in mt_asts {
+        eq.rhs = flatten_mults(eq.rhs.clone());
+        flattened_asts.push(eq.clone());
+    }
     let asts: Vec<Math> = payload
         .mathml
+        .clone()
         .iter()
         .map(|x| x.parse::<Math>().unwrap())
         .collect();
@@ -122,7 +143,7 @@ pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
     if model_type == *"regnet" {
         HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
     } else if model_type == *"petrinet" {
-        HttpResponse::Ok().json(PetriNet::from(ACSet::from(asts)))
+        HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
     } else {
         HttpResponse::BadRequest().into()
     }

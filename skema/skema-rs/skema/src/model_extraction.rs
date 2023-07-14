@@ -187,6 +187,10 @@ pub fn subgraph2_core_dyn_ast(
     let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the subgraph of the given expression
+        /*println!(
+            "These are the nodes for expressions: {:?}",
+            graph[expression_nodes[i]].id.clone()
+        );*/
         expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
     }
 
@@ -204,6 +208,8 @@ pub fn subgraph2_core_dyn_ast(
     for i in 0..expressions_wiring.clone().len() {
         let (nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
         if nodes1.len() > 3 {
+            //println!("\n{:?}\n", nodes1.clone());
+            // SINCE THE POF'S ARE THE SOURCE OF THE STATE VARIABLES, NOT THE OPI'S. THEY'RE NOT BEING WIRED IN PROPERLY
             trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
         }
     }
