@@ -1,16 +1,16 @@
 use clap::Parser;
+use mathml::ast::operator::Operator::Multiply;
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
 use mathml::parsers::first_order_ode::{get_FirstOrderODE_vec_from_file, FirstOrderODE};
+use mathml::parsers::math_expression_tree::MathExpressionTree;
+use mathml::parsers::math_expression_tree::MathExpressionTree::{Atom, Cons};
+use serde_json;
 #[cfg(test)]
 use std::fs;
 use std::fs::File;
 use std::io::BufRead;
 use std::io::BufReader;
-
-use mathml::ast::operator::Operator::Multiply;
-use mathml::parsers::math_expression_tree::MathExpressionTree;
-use mathml::parsers::math_expression_tree::MathExpressionTree::{Atom, Cons};
 
 // new imports
 use mathml::acset::{PetriNet, RegNet};
@@ -48,7 +48,7 @@ fn main() {
 
         let math_content = module_id2mathml_ast(module_id, host);
 
-        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list3.txt";
+        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list4.txt";
 
         // This does get a panic with a message, so need to figure out how to forward it
         let mathml_ast = get_mathml_asts_from_file(input_src.clone());
@@ -60,7 +60,10 @@ fn main() {
 
         println!("\nPN from code: {:?}", ACSet::from(math_content.clone()));
 
-        println!("\nAMR from mathml: {:?}\n", PetriNet::from(odes.clone()));
+        println!(
+            "\nAMR from mathml: {}\n",
+            serde_json::to_string(&PetriNet::from(odes.clone())).unwrap()
+        );
         println!(
             "\nAMR from code: {:?}",
             PetriNet::from(ACSet::from(math_content))
