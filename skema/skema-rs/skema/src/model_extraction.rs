@@ -12,7 +12,7 @@ use mathml::ast::Ci;
 use mathml::ast::MathExpression::Mo;
 use mathml::ast::Type::Function;
 use mathml::ast::{MathExpression, Mi, Mrow};
-use mathml::parsers::first_order_ode::FirstOrderODE;
+use mathml::parsers::first_order_ode::{flatten_mults, FirstOrderODE};
 use mathml::parsers::math_expression_tree::MathExpressionTree;
 use mathml::petri_net::recognizers::is_add_or_subtract_operator;
 
@@ -236,7 +236,6 @@ pub fn subgrapg2_core_dyn_MET_ast(
 
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
-        println!("expr: {:?}", expr.clone());
         for node_index in expr.clone().node_indices() {
             if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
@@ -370,10 +369,11 @@ fn tree_2_MET_ast(
             if graph[node].labels == ["Primitive"] {
                 let operate = get_operator_MET(graph.clone(), node); // output -> Operator
                 let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
-                let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
+                let mut rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
+                let rhs_flat = flatten_mults(rhs.clone());
                 let fo_eq = FirstOrderODE {
                     lhs_var: lhs[0].clone(),
-                    rhs: rhs,
+                    rhs: rhs_flat,
                 };
                 fo_eq_vec.push(fo_eq);
             } else {
@@ -381,6 +381,7 @@ fn tree_2_MET_ast(
             }
         }
     }
+    println!("FirstOrderODE: {:?}", fo_eq_vec[0].rhs.clone().to_string());
     Ok(fo_eq_vec[0].clone())
 }
 
@@ -399,8 +400,10 @@ pub fn get_args_MET(
             args.push(rhs.clone());
         } else {
             // asummption it is atomic
+            let temp_string = graph[node].properties["name"].to_string().clone();
             let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].properties
                 ["name"]
+                .to_string()[1..(temp_string.len() - 1 as usize)]
                 .to_string())));
             args.push(arg2.clone());
         }
@@ -419,6 +422,8 @@ pub fn get_operator_MET(
     } else if graph[root_node].properties["name"].to_string() == *"'ast.Add'" {
         op.push(Operator::Add);
     } else if graph[root_node].properties["name"].to_string() == *"'ast.Sub'" {
+        op.push(Operator::Subtract);
+    } else if graph[root_node].properties["name"].to_string() == *"'ast.USub'" {
         op.push(Operator::Subtract);
     } else if graph[root_node].properties["name"].to_string() == *"'ast.Div'" {
         op.push(Operator::Divide);
@@ -803,11 +808,8 @@ fn distribute_args(
             // don't swap operators manual beginning push
             arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind[0] - 1) as usize]);
             //arg_dist.push(Mo(Operator::Multiply));
-            println!("arg_dist: {:?}", arg_dist.clone());
-            println!("arg1: {:?}", arg1.clone());
             let vec_len1 = arg1.clone().len(); // let vec_len1 = arg1.clone().len() - 1;
             arg_dist.extend_from_slice(&arg1[1..vec_len1]);
-            println!("arg_dist: {:?}", arg_dist.clone());
             for (i, ind) in arg2_term_ind.iter().enumerate() {
                 if arg2[*ind as usize] == Mo(Operator::Add) {
                     if (i + 1) != arg2_term_ind.len() {
