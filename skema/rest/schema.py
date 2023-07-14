@@ -32,6 +32,11 @@ class HealthStatus(BaseModel):
         ge=100,
         le=599,
     )
+    metal: int = Field(
+        description="HTTP status code for the integrated text reading service",
+        ge=100,
+        le=599,
+    )
 
 
 class EquationImagesToAMR(BaseModel):

@@ -2,22 +2,17 @@
 import io
 import itertools as it
 import json
-import os
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Union, Text, BinaryIO, Callable
-
-from pydantic import Json
-from typing_extensions import Literal
+from typing import List, Union, BinaryIO, Callable
 from typing import Optional, Dict, Any
 from zipfile import ZipFile
-import pandas as pd
 
+import pandas as pd
 import requests
 from askem_extractions.data_model import AttributeCollection
-from askem_extractions.importers import import_arizona, import_mit
-from askem_extractions.importers.mit import merge_collections
+from askem_extractions.importers import import_arizona
 from fastapi import APIRouter, FastAPI, UploadFile, Response, status
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY, COSMOS_ADDRESS
