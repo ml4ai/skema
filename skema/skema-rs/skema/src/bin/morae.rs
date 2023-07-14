@@ -8,7 +8,9 @@ use std::fs;
 // new imports
 use mathml::acset::{PetriNet, RegNet};
 
-use skema::model_extraction::{module_id2mathml_ast, subgraph2_core_dyn_ast};
+use skema::model_extraction::{
+    module_id2mathml_MET_ast, module_id2mathml_ast, subgraph2_core_dyn_ast,
+};
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -39,21 +41,20 @@ fn main() {
 
         let host = "localhost";
 
-        let math_content = module_id2mathml_ast(module_id, host);
+        let math_content = module_id2mathml_MET_ast(module_id, host);
 
         // This does get a panic with a message, so need to figure out how to forward it
         let mathml_ast =
-            get_mathml_asts_from_file("../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+            get_mathml_asts_from_file("../../data/mml2pn_inputs/testing_eqns/mml_list4.txt");
 
         println!("\nmath_content: {:?}", math_content);
         println!("\nmathml_ast: {:?}", mathml_ast);
 
-        println!("\nPN from code: {:?}", ACSet::from(math_content.clone()));
-        println!("\nPN from mathml: {:?}\n", RegNet::from(mathml_ast.clone()));
+        println!("\nAMR from code: {:?}", ACSet::from(math_content.clone()));
 
         println!(
             "\nAMR from code: {:?}",
-            PetriNet::from(ACSet::from(math_content))
+            PetriNet::from(ACSet::from(mathml_ast))
         );
         /*println!(
             "\nAMR from mathml: {:?}\n",

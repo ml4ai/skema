@@ -62,6 +62,25 @@ pub fn get_line_span(
     }
 }
 
+pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE> {
+    let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
+
+    let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
+
+    let _line_span = get_line_span(core_id[0], graph); // get's the line span of function id
+
+    //println!("\n{:?}", line_span);
+
+    //println!("function_core_id: {:?}", core_id[0].clone());
+    //println!("module_id: {:?}\n", module_id.clone());
+    // 4.5 now to check if of those expressions, if they are arithmetric in nature
+
+    // 5. pass id to subgrapg2_core_dyn to get core dynamics
+    let (core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[0], host).unwrap();
+
+    core_dynamics_ast
+}
+
 pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
     let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
@@ -150,6 +169,85 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     core_id
 }
 
+pub fn subgrapg2_core_dyn_MET_ast(
+    root_node_id: i64,
+    host: &str,
+) -> Result<(Vec<FirstOrderODE>, HashMap<String, rsmgclient::Node>), MgError> {
+    // get the petgraph of the subgraph
+    let graph = subgraph2petgraph(root_node_id, host);
+
+    /* MAKE THIS A FUNCTION THAT TAKES IN A PETGRAPH */
+    // create the metadata rust rep
+    // this will be a map of the name of the node and the metadata node it's attached to with the mapping to our standard metadata struct
+    // grab metadata nodes
+    let mut metadata_map = HashMap::new();
+    for node in graph.node_indices() {
+        if graph[node].labels == ["Metadata"] {
+            for neighbor_node in graph.neighbors_directed(node, Incoming) {
+                // NOTE: these names have slightly off formating, the key is: "'name'"
+                metadata_map.insert(
+                    graph[neighbor_node].properties["name"].to_string().clone(),
+                    graph[node].clone(),
+                );
+            }
+        }
+    }
+
+    // find all the expressions
+    let mut expression_nodes = Vec::<NodeIndex>::new();
+    for node in graph.node_indices() {
+        if graph[node].labels == ["Expression"] {
+            expression_nodes.push(node);
+            // println!("Expression Nodes: {:?}", graph[node].clone().id);
+        }
+    }
+
+    // initialize vector to collect all expressions
+    let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+    for i in 0..expression_nodes.len() {
+        // grab the subgraph of the given expression
+        expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
+    }
+
+    // initialize vector to collect all expression wiring graphs
+    let mut expressions_wiring =
+        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+    for i in 0..expression_nodes.len() {
+        // grab the wiring subgraph of the given expression
+        expressions_wiring.push(subgraph_wiring(graph[expression_nodes[i]].id, host).unwrap());
+    }
+
+    // now to trim off the un-named filler nodes and filler expressions
+    let mut trimmed_expressions_wiring =
+        Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
+    for i in 0..expressions_wiring.clone().len() {
+        let (nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
+        if nodes1.len() > 3 {
+            trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
+        }
+    }
+
+    // this is the actual convertion
+    let mut core_dynamics = Vec::<FirstOrderODE>::new();
+
+    for expr in trimmed_expressions_wiring.clone() {
+        let mut root_node = Vec::<NodeIndex>::new();
+        println!("expr: {:?}", expr.clone());
+        for node_index in expr.clone().node_indices() {
+            if expr[node_index].labels == ["Opo"] {
+                root_node.push(node_index);
+            }
+        }
+        if root_node.len() >= 2 {
+            // println!("More than one Opo! Skipping Expression!");
+        } else {
+            core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[0]).unwrap());
+        }
+    }
+
+    Ok((core_dynamics, metadata_map))
+}
+
 pub fn subgraph2_core_dyn_ast(
     root_node_id: i64,
     host: &str,
@@ -213,6 +311,7 @@ pub fn subgraph2_core_dyn_ast(
 
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
+        println!("expr: {:?}", expr.clone());
         for node_index in expr.clone().node_indices() {
             if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
@@ -226,6 +325,97 @@ pub fn subgraph2_core_dyn_ast(
     }
 
     Ok((core_dynamics, metadata_map))
+}
+
+fn tree_2_MET_ast(
+    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    root_node: NodeIndex,
+) -> Result<FirstOrderODE, MgError> {
+    let mut fo_eq_vec = Vec::<FirstOrderODE>::new();
+    let mut math_vec = Vec::<MathExpressionTree>::new();
+    let mut lhs = Vec::<Ci>::new();
+    if graph[root_node].labels == ["Opo"] {
+        // we first construct the derivative of the first node
+        let deriv_name: &str = &graph[root_node].properties["name"].to_string();
+        // this will let us know if additional trimming is needed to handle the code implementation of the equations
+        let mut step_impl = false;
+        // This is very bespoke right now
+        // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
+        // currently we convert to leibniz form
+        if deriv_name[1..2].to_string() == "d" {
+            let deriv = Ci {
+                r#type: Some(Function),
+                content: MathExpression::Mi(Mi(deriv_name[2..3].to_string())),
+            };
+            lhs.push(deriv);
+        } else {
+            step_impl = true;
+            let deriv = Ci {
+                r#type: Some(Function),
+                content: MathExpression::Mi(Mi(deriv_name[1..2].to_string())),
+            };
+            lhs.push(deriv);
+        }
+        for node in graph.neighbors_directed(root_node, Outgoing) {
+            if graph[node].labels == ["Primitive"] {
+                let operate = get_operator_MET(graph.clone(), node); // output -> Operator
+                let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
+                let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
+                let fo_eq = FirstOrderODE {
+                    lhs_var: lhs[0],
+                    rhs: rhs,
+                };
+                fo_eq_vec.push(fo_eq);
+            } else {
+                println!("Error, expect RHS to have at least 1 primitive");
+            }
+        }
+    }
+    fo_eq_vec[0]
+}
+
+pub fn get_args_MET(
+    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    root_node: NodeIndex,
+) -> Vec<MathExpressionTree> {
+    let mut args = Vec::<MathExpressionTree>::new();
+
+    // first need to check for operator
+    for node in graph.neighbors_directed(root_node, Outgoing) {
+        if graph[node].labels == ["Primitive"] {
+            let operate = get_operator_MET(graph.clone(), node); // output -> Operator
+            let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
+            let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
+            args.append(rhs.clone());
+        } else {
+            // asummption it is atomic
+            let arg2 = MathExpressionTree::Atom(Mi(Mi(graph[node].properties["name"].to_string())));
+            args.push(arg2.clone());
+        }
+    }
+    args
+}
+
+// this gets the operator from the node name
+pub fn get_operator_MET(
+    graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
+    root_node: NodeIndex,
+) -> Operator {
+    let mut op = Vec::<Operator>::new();
+    if graph[root_node].properties["name"].to_string() == *"'ast.Mult'" {
+        op.push(Operator::Multiply);
+    } else if graph[root_node].properties["name"].to_string() == *"'ast.Add'" {
+        op.push(Operator::Add);
+    } else if graph[root_node].properties["name"].to_string() == *"'ast.Sub'" {
+        op.push(Operator::Subtract);
+    } else if graph[root_node].properties["name"].to_string() == *"'ast.Div'" {
+        op.push(Operator::Divide);
+    } else {
+        op.push(Operator::Other(
+            graph[root_node].properties["name"].to_string(),
+        ));
+    }
+    op[0].clone()
 }
 
 fn tree_2_ast(
@@ -601,8 +791,11 @@ fn distribute_args(
             // don't swap operators manual beginning push
             arg_dist.extend_from_slice(&arg2.clone()[0..(arg2_term_ind[0] - 1) as usize]);
             //arg_dist.push(Mo(Operator::Multiply));
-            let vec_len1 = arg1.clone().len() - 1;
+            println!("arg_dist: {:?}", arg_dist.clone());
+            println!("arg1: {:?}", arg1.clone());
+            let vec_len1 = arg1.clone().len(); // let vec_len1 = arg1.clone().len() - 1;
             arg_dist.extend_from_slice(&arg1[1..vec_len1]);
+            println!("arg_dist: {:?}", arg_dist.clone());
             for (i, ind) in arg2_term_ind.iter().enumerate() {
                 if arg2[*ind as usize] == Mo(Operator::Add) {
                     if (i + 1) != arg2_term_ind.len() {
