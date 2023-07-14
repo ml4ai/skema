@@ -558,6 +558,10 @@
 <a href="#558" id="558">558</a>
 <a href="#559" id="559">559</a>
 <a href="#560" id="560">560</a>
+<a href="#561" id="561">561</a>
+<a href="#562" id="562">562</a>
+<a href="#563" id="563">563</a>
+<a href="#564" id="564">564</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -566,10 +570,11 @@
     },
     Mi, Mrow,
 };
+
 <span class="kw">use </span>nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
+    character::complete::{alphanumeric1, multispace0, not_line_ending},
     combinator::{map, map_parser, opt, recognize, value},
     error::Error,
     multi::many0,
@@ -740,7 +745,10 @@
 }
 
 <span class="kw">pub fn </span>subtract(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Subtract, ws(one_of(<span class="string">&quot;-−&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(
+        Operator::Subtract,
+        alt((tag(<span class="string">&quot;-&quot;</span>), tag(<span class="string">&quot;−&quot;</span>), tag(<span class="string">&quot;&amp;#x2212;&quot;</span>))),
+    )(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 

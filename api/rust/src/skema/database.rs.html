@@ -6515,7 +6515,7 @@ There being a second function call of the same function which contains an expres
 
     <span class="comment">// now we add a check for if this is an imported function
     </span><span class="kw">match </span>eboxf.b.clone().unwrap()[<span class="number">0</span>].function_type.clone() {
-        FunctionType::Import =&gt; {
+        FunctionType::Imported =&gt; {
             (nodes, edges, start, meta_nodes) = create_import(
                 <span class="kw-2">&amp;</span>gromet.clone(),
                 function_net,

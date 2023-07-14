@@ -961,6 +961,12 @@
 <a href="#961" id="961">961</a>
 <a href="#962" id="962">962</a>
 <a href="#963" id="963">963</a>
+<a href="#964" id="964">964</a>
+<a href="#965" id="965">965</a>
+<a href="#966" id="966">966</a>
+<a href="#967" id="967">967</a>
+<a href="#968" id="968">968</a>
+<a href="#969" id="969">969</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{operator::Operator, Math};
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -1150,6 +1156,10 @@
     </span><span class="kw">let </span><span class="kw-2">mut </span>expressions = Vec::&lt;petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;&gt;::new();
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..expression_nodes.len() {
         <span class="comment">// grab the subgraph of the given expression
+        /*println!(
+            &quot;These are the nodes for expressions: {:?}&quot;,
+            graph[expression_nodes[i]].id.clone()
+        );*/
         </span>expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
     }
 
@@ -1167,7 +1177,9 @@
     <span class="kw">for </span>i <span class="kw">in </span><span class="number">0</span>..expressions_wiring.clone().len() {
         <span class="kw">let </span>(nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
         <span class="kw">if </span>nodes1.len() &gt; <span class="number">3 </span>{
-            trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
+            <span class="comment">//println!(&quot;\n{:?}\n&quot;, nodes1.clone());
+            // SINCE THE POF&#39;S ARE THE SOURCE OF THE STATE VARIABLES, NOT THE OPI&#39;S. THEY&#39;RE NOT BEING WIRED IN PROPERLY
+            </span>trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
         }
     }
 

@@ -562,6 +562,8 @@
 <a href="#562" id="562">562</a>
 <a href="#563" id="563">563</a>
 <a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
 </pre></div><pre class="rust"><code><span class="comment">// Inclusion of additional modules
 </span><span class="kw">pub mod </span>config;
 <span class="kw">pub mod </span>database;
@@ -596,7 +598,9 @@
     Module,
     Expression,
     Literal,
-    Import,
+    Imported,
+    <span class="attr">#[serde(rename = <span class="string">&quot;IMPORTED_METHOD&quot;</span>)]
+    </span>ImportedMethod,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]

@@ -127,9 +127,31 @@
 <a href="#127" id="127">127</a>
 <a href="#128" id="128">128</a>
 <a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
+<a href="#141" id="141">141</a>
+<a href="#142" id="142">142</a>
+<a href="#143" id="143">143</a>
+<a href="#144" id="144">144</a>
+<a href="#145" id="145">145</a>
+<a href="#146" id="146">146</a>
+<a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{put, web, HttpResponse};
+<span class="kw">use </span>mathml::parsers::first_order_ode::flatten_mults;
 <span class="kw">use </span>mathml::{
-    acset::{ACSet, AMRmathml, PetriNet, RegNet},
+    acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
     parsers::first_order_ode::FirstOrderODE,
@@ -209,8 +231,16 @@
 )]
 #[put(<span class="string">&quot;/mathml/petrinet&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_acset(payload: web::Json&lt;Vec&lt;String&gt;&gt;) -&gt; HttpResponse {
-    <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload.iter().map(|x| x.parse::&lt;Math&gt;().unwrap()).collect();
-    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(asts))))
+    <span class="kw">let </span>asts: Vec&lt;FirstOrderODE&gt; = payload
+        .iter()
+        .map(|x| x.parse::&lt;FirstOrderODE&gt;().unwrap())
+        .collect();
+    <span class="kw">let </span><span class="kw-2">mut </span>flattened_asts = Vec::&lt;FirstOrderODE&gt;::new();
+    <span class="kw">for </span><span class="kw-2">mut </span>eq <span class="kw">in </span>asts {
+        eq.rhs = flatten_mults(eq.rhs.clone());
+        flattened_asts.push(eq.clone());
+    }
+    HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
 }
 
 <span class="doccomment">/// Return a JSON representation of a RegNet ModelRep constructed from an array of MathML strings.
@@ -242,8 +272,20 @@
 )]
 #[put(<span class="string">&quot;/mathml/amr&quot;</span>)]
 </span><span class="kw">pub async fn </span>get_amr(payload: web::Json&lt;AMRmathml&gt;) -&gt; HttpResponse {
+    <span class="kw">let </span>mt_asts: Vec&lt;FirstOrderODE&gt; = payload
+        .clone()
+        .mathml
+        .iter()
+        .map(|x| x.parse::&lt;FirstOrderODE&gt;().unwrap())
+        .collect();
+    <span class="kw">let </span><span class="kw-2">mut </span>flattened_asts = Vec::&lt;FirstOrderODE&gt;::new();
+    <span class="kw">for </span><span class="kw-2">mut </span>eq <span class="kw">in </span>mt_asts {
+        eq.rhs = flatten_mults(eq.rhs.clone());
+        flattened_asts.push(eq.clone());
+    }
     <span class="kw">let </span>asts: Vec&lt;Math&gt; = payload
         .mathml
+        .clone()
         .iter()
         .map(|x| x.parse::&lt;Math&gt;().unwrap())
         .collect();
@@ -251,7 +293,7 @@
     <span class="kw">if </span>model_type == <span class="kw-2">*</span><span class="string">&quot;regnet&quot; </span>{
         HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
     } <span class="kw">else if </span>model_type == <span class="kw-2">*</span><span class="string">&quot;petrinet&quot; </span>{
-        HttpResponse::Ok().json(PetriNet::from(ACSet::from(asts)))
+        HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
     } <span class="kw">else </span>{
         HttpResponse::BadRequest().into()
     }
