@@ -12,14 +12,14 @@ client = TestClient(app)
 # TODO Add a unit test with a small document
 
 
-# Commented out for now
 # Test the cosmos endpoint
-# def test_cosmos():
-#     """Test that we are able to fetch COSMOS data correctly"""
-#     path = Path(__file__).parents[0] / "data" / "CHIME_SVIIvR_model.pdf"
-#     with path.open("rb") as pdf:
-#         ret = cosmos_client(path.name, pdf)
-#     assert ret is not None and len(ret) > 0
+def test_cosmos():
+    """Test that we are able to fetch COSMOS data correctly"""
+    path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
+    print(path)
+    with path.open("rb") as pdf:
+        ret = cosmos_client(path.name, pdf)
+    assert ret is not None and len(ret) > 0
 
 
 def test_healthcheck():

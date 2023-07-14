@@ -5,7 +5,7 @@ from skema.rest import (
     workflows,
     integrated_text_reading_proxy,
     morae_proxy,
-    comments_proxy,
+    comments_proxy, metal_proxy,
 )
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
@@ -65,6 +65,10 @@ tags_metadata = [
         "name": "text reading",
         "description": "Unified proxy and integration code for MIT and SKEMA TR pipelines",
     },
+    {
+        "name": "metal",
+        "description": "AMR linking endpoints",
+    },
 ]
 
 app = FastAPI(
@@ -106,7 +110,15 @@ app.include_router(
 )
 
 app.include_router(
-    integrated_text_reading_proxy.router, prefix="/text-reading", tags=["text reading"]
+    integrated_text_reading_proxy.router,
+    prefix="/text-reading",
+    tags=["text reading"]
+)
+
+app.include_router(
+    metal_proxy.router,
+    prefix="/metal",
+    tags=["metal"]
 )
 
 
@@ -137,6 +149,7 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
     eqn2mml_status = eqn2mml.img2mml_healthcheck()
     code2fn_status = code2fn.ping()
     text_reading_status = integrated_text_reading_proxy.healthcheck()
+    metal_status = metal_proxy.healthcheck()
     # check if any services failing and alter response status code accordingly
     status_code = (
         status.HTTP_200_OK
@@ -148,6 +161,7 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
                 eqn2mml_status,
                 code2fn_status,
                 text_reading_status,
+                metal_status
             ]
         )
         else status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -158,4 +172,6 @@ async def healthcheck(response: Response) -> schema.HealthStatus:
         mathjax=mathjax_status,
         eqn2mml=eqn2mml_status,
         code2fn=code2fn_status,
+        text_reading=text_reading_status,
+        metal=metal_status
     )
