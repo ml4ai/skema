@@ -1,16 +1,16 @@
 use clap::Parser;
-use mathml::ast::operator::Operator::Multiply;
+
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
-use mathml::parsers::first_order_ode::{get_FirstOrderODE_vec_from_file, FirstOrderODE};
-use mathml::parsers::math_expression_tree::MathExpressionTree;
-use mathml::parsers::math_expression_tree::MathExpressionTree::{Atom, Cons};
-use serde_json;
+use mathml::parsers::first_order_ode::{get_FirstOrderODE_vec_from_file};
+
+
+
 #[cfg(test)]
 use std::fs;
-use std::fs::File;
-use std::io::BufRead;
-use std::io::BufReader;
+
+
+
 
 // new imports
 use mathml::acset::{PetriNet, RegNet};
@@ -51,18 +51,18 @@ fn main() {
         let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list4.txt";
 
         // This does get a panic with a message, so need to figure out how to forward it
-        let mathml_ast = get_mathml_asts_from_file(input_src.clone());
+        let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
 
         let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
         println!("\nmath_content: {:?}", math_content);
-        println!("\nmathml_ast: {:?}", odes.clone());
+        println!("\nmathml_ast: {:?}", odes);
 
         println!("\nPN from code: {:?}", ACSet::from(math_content.clone()));
 
         println!(
             "\nAMR from mathml: {}\n",
-            serde_json::to_string(&PetriNet::from(odes.clone())).unwrap()
+            serde_json::to_string(&PetriNet::from(odes)).unwrap()
         );
         println!(
             "\nAMR from code: {:?}",
@@ -90,7 +90,7 @@ fn main() {
         let mathml_asts =
             get_mathml_asts_from_file("../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
         let regnet = RegNet::from(mathml_asts);
-        println!("\nRegnet AMR: {:?}\n", regnet.clone());
+        println!("\nRegnet AMR: {:?}\n", regnet);
         let regnet_serial = serde_json::to_string(&regnet).unwrap();
         println!("For serialization test:\n\n {}", regnet_serial);
 

@@ -10,7 +10,7 @@ use crate::ast::{
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
+    character::complete::{alphanumeric1, multispace0, not_line_ending},
     combinator::{map, map_parser, opt, recognize, value},
     error::Error,
     multi::many0,

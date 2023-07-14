@@ -425,7 +425,7 @@ impl From<ACSet> for PetriNet {
         schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model: model,
+        model,
         semantics: Some(semantics),
         metadata: None,
     }
@@ -485,11 +485,9 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         let mut transition_pair = Vec::<(PnTerm, PnTerm)>::new();
         for term1 in terms.clone().iter() {
             for term2 in terms.clone().iter() {
-                if term1.polarity != term2.polarity && term1.parameters == term2.parameters {
-                    if term1.polarity {
-                        let temp_pair = (term1.clone(), term2.clone());
-                        transition_pair.push(temp_pair);
-                    }
+                if term1.polarity != term2.polarity && term1.parameters == term2.parameters && term1.polarity {
+                    let temp_pair = (term1.clone(), term2.clone());
+                    transition_pair.push(temp_pair);
                 }
             }
         }
@@ -588,7 +586,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         schema_name: "PetriNet".to_string(),
         description: "This is a model from mathml equations".to_string(),
         model_version: "0.1".to_string(),
-        model: model,
+        model,
         semantics: Some(semantics),
         metadata: None,
     }
