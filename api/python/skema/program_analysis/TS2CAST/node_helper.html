@@ -30,76 +30,53 @@
 <pre><code class="python">from typing import List, Dict
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
 
+from tree_sitter import Node
 
-class NodeHelper(object):
-    def __init__(self, source_file_name: str, source: str):
-        self.source_file_name = source_file_name
+CONTROL_CHARACTERS = [
+    &#34;,&#34;,
+    &#34;=&#34;,
+    &#34;==&#34;,
+    &#34;(&#34;,
+    &#34;)&#34;,
+    &#34;(/&#34;,
+    &#34;/)&#34;,
+    &#34;:&#34;,
+    &#34;::&#34;,
+    &#34;+&#34;,
+    &#34;-&#34;,
+    &#34;*&#34;,
+    &#34;**&#34;,
+    &#34;/&#34;,
+    &#34;&gt;&#34;,
+    &#34;&lt;&#34;,
+    &#34;&lt;=&#34;,
+    &#34;&gt;=&#34;,
+    &#34;only&#34;,
+]
+
+class NodeHelper():
+    def __init__(self, source: str, source_file_name: str):
         self.source = source
+        self.source_file_name = source_file_name
 
-    def parse_tree_to_dict(self, node) -&gt; Dict:
-        node_dict = {
-            &#34;type&#34;: self.get_node_type(node),
-            &#34;source_refs&#34;: [self.get_node_source_ref(node)],
-            &#34;identifier&#34;: self.get_node_identifier(node),
-            &#34;original_children_order&#34;: [],
-            &#34;children&#34;: [],
-            &#34;comments&#34;: [],
-            &#34;control&#34;: [],
-        }
 
-        for child in node.children:
-            child_dict = self.parse_tree_to_dict(child)
-            node_dict[&#34;original_children_order&#34;].append(child_dict)
-            if self.is_comment_node(child):
-                node_dict[&#34;comments&#34;].append(child_dict)
-            elif self.is_control_character_node(child):
-                node_dict[&#34;control&#34;].append(child_dict)
-            else:
-                node_dict[&#34;children&#34;].append(child_dict)
-
-        return node_dict
-
-    def is_comment_node(self, node):
-        if node.type == &#34;comment&#34;:
-            return True
-        return False
-
-    def is_control_character_node(self, node):
-        control_characters = [
-            &#34;,&#34;,
-            &#34;=&#34;,
-            &#34;(&#34;,
-            &#34;)&#34;,
-            &#34;:&#34;,
-            &#34;::&#34;,
-            &#34;+&#34;,
-            &#34;-&#34;,
-            &#34;*&#34;,
-            &#34;**&#34;,
-            &#34;/&#34;,
-            &#34;&gt;&#34;,
-            &#34;&lt;&#34;,
-            &#34;&lt;=&#34;,
-            &#34;&gt;=&#34;,
-        ]
-        return node.type in control_characters
-
-    def get_node_source_ref(self, node) -&gt; SourceRef:
+    def get_source_ref(self, node: Node) -&gt; SourceRef:
+        &#34;&#34;&#34;Given a node and file name, return a CAST SourceRef object.&#34;&#34;&#34;
         row_start, col_start = node.start_point
         row_end, col_end = node.end_point
         return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)
 
-    def get_node_identifier(self, node) -&gt; str:
-        source_ref = self.get_node_source_ref(node)
 
+    def get_identifier(self, node: Node) -&gt; str:
+        &#34;&#34;&#34;Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point&#34;&#34;&#34;
         line_num = 0
         column_num = 0
         in_identifier = False
         identifier = &#34;&#34;
         for i, char in enumerate(self.source):
-            if line_num == source_ref.row_start and column_num == source_ref.col_start:
+            if line_num == node.start_point[0] and column_num == node.start_point[1]:
                 in_identifier = True
-            elif line_num == source_ref.row_end and column_num == source_ref.col_end:
+            elif line_num == node.end_point[0] and column_num == node.end_point[1]:
                 break
 
             if char == &#34;\n&#34;:
@@ -113,22 +90,54 @@ class NodeHelper(object):
 
         return identifier
 
-    def get_node_type(self, node) -&gt; str:
-        return node.type
+def get_first_child_by_type(node: Node, type: str, recurse=False):
+    &#34;&#34;&#34;Takes in a node and a type string as inputs and returns the first child matching that type. Otherwise, return None
+    When the recurse argument is set, it will also recursivly search children nodes as well.
+    &#34;&#34;&#34;
+    for child in node.children:
+        if child.type == type:
+            return child
 
-    def get_first_child_by_type(self, node: Dict, node_type: str) -&gt; Dict:
-        children = self.get_children_by_type(node, node_type)
-        if len(children) &gt;= 1:
-            return children[0]
+    if recurse:
+        for child in node.children:
+            out = get_first_child_by_type(child, type, True)
+            if out:
+                return out
+    return None
 
-    def get_children_by_type(self, node: Dict, node_type: str) -&gt; List:
-        children = []
 
-        for child in node[&#34;children&#34;]:
-            if child[&#34;type&#34;] == node_type:
-                children.append(child)
+def get_children_by_types(node: Node, types: List):
+    &#34;&#34;&#34;Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list&#34;&#34;&#34;
+    return [child for child in node.children if child.type in types]
 
-        return children</code></pre>
+
+def get_first_child_index(node, type: str):
+    &#34;&#34;&#34;Get the index of the first child of node with type type.&#34;&#34;&#34;
+    for i, child in enumerate(node.children):
+        if child.type == type:
+            return i
+
+
+def get_last_child_index(node, type: str):
+    &#34;&#34;&#34;Get the index of the last child of node with type type.&#34;&#34;&#34;
+    last = None
+    for i, child in enumerate(node.children):
+        if child.type == type:
+            last = child
+    return last
+
+
+def get_control_children(node: Node):
+    return get_children_by_types(node, CONTROL_CHARACTERS)
+
+
+def get_non_control_children(node: Node):
+    children = []
+    for child in node.children:
+        if child.type not in CONTROL_CHARACTERS:
+            children.append(child)
+
+    return children</code></pre>
 </details>
 </section>
 <section>
@@ -136,13 +145,121 @@ class NodeHelper(object):
 <section>
 </section>
 <section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.program_analysis.TS2CAST.node_helper.get_children_by_types"><code class="name flex">
+<span>def <span class="ident">get_children_by_types</span></span>(<span>node: tree_sitter.Node, types: List[~T])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_children_by_types(node: Node, types: List):
+    &#34;&#34;&#34;Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list&#34;&#34;&#34;
+    return [child for child in node.children if child.type in types]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.node_helper.get_control_children"><code class="name flex">
+<span>def <span class="ident">get_control_children</span></span>(<span>node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_control_children(node: Node):
+    return get_children_by_types(node, CONTROL_CHARACTERS)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.node_helper.get_first_child_by_type"><code class="name flex">
+<span>def <span class="ident">get_first_child_by_type</span></span>(<span>node: tree_sitter.Node, type: str, recurse=False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes in a node and a type string as inputs and returns the first child matching that type. Otherwise, return None
+When the recurse argument is set, it will also recursivly search children nodes as well.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_first_child_by_type(node: Node, type: str, recurse=False):
+    &#34;&#34;&#34;Takes in a node and a type string as inputs and returns the first child matching that type. Otherwise, return None
+    When the recurse argument is set, it will also recursivly search children nodes as well.
+    &#34;&#34;&#34;
+    for child in node.children:
+        if child.type == type:
+            return child
+
+    if recurse:
+        for child in node.children:
+            out = get_first_child_by_type(child, type, True)
+            if out:
+                return out
+    return None</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.node_helper.get_first_child_index"><code class="name flex">
+<span>def <span class="ident">get_first_child_index</span></span>(<span>node, type: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the index of the first child of node with type type.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_first_child_index(node, type: str):
+    &#34;&#34;&#34;Get the index of the first child of node with type type.&#34;&#34;&#34;
+    for i, child in enumerate(node.children):
+        if child.type == type:
+            return i</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.node_helper.get_last_child_index"><code class="name flex">
+<span>def <span class="ident">get_last_child_index</span></span>(<span>node, type: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the index of the last child of node with type type.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_last_child_index(node, type: str):
+    &#34;&#34;&#34;Get the index of the last child of node with type type.&#34;&#34;&#34;
+    last = None
+    for i, child in enumerate(node.children):
+        if child.type == type:
+            last = child
+    return last</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.TS2CAST.node_helper.get_non_control_children"><code class="name flex">
+<span>def <span class="ident">get_non_control_children</span></span>(<span>node: tree_sitter.Node)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_non_control_children(node: Node):
+    children = []
+    for child in node.children:
+        if child.type not in CONTROL_CHARACTERS:
+            children.append(child)
+
+    return children</code></pre>
+</details>
+</dd>
+</dl>
 </section>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
 <dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper"><code class="flex name class">
 <span>class <span class="ident">NodeHelper</span></span>
-<span>(</span><span>source_file_name: str, source: str)</span>
+<span>(</span><span>source: str, source_file_name: str)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -150,75 +267,29 @@ class NodeHelper(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class NodeHelper(object):
-    def __init__(self, source_file_name: str, source: str):
-        self.source_file_name = source_file_name
+<pre><code class="python">class NodeHelper():
+    def __init__(self, source: str, source_file_name: str):
         self.source = source
+        self.source_file_name = source_file_name
 
-    def parse_tree_to_dict(self, node) -&gt; Dict:
-        node_dict = {
-            &#34;type&#34;: self.get_node_type(node),
-            &#34;source_refs&#34;: [self.get_node_source_ref(node)],
-            &#34;identifier&#34;: self.get_node_identifier(node),
-            &#34;original_children_order&#34;: [],
-            &#34;children&#34;: [],
-            &#34;comments&#34;: [],
-            &#34;control&#34;: [],
-        }
 
-        for child in node.children:
-            child_dict = self.parse_tree_to_dict(child)
-            node_dict[&#34;original_children_order&#34;].append(child_dict)
-            if self.is_comment_node(child):
-                node_dict[&#34;comments&#34;].append(child_dict)
-            elif self.is_control_character_node(child):
-                node_dict[&#34;control&#34;].append(child_dict)
-            else:
-                node_dict[&#34;children&#34;].append(child_dict)
-
-        return node_dict
-
-    def is_comment_node(self, node):
-        if node.type == &#34;comment&#34;:
-            return True
-        return False
-
-    def is_control_character_node(self, node):
-        control_characters = [
-            &#34;,&#34;,
-            &#34;=&#34;,
-            &#34;(&#34;,
-            &#34;)&#34;,
-            &#34;:&#34;,
-            &#34;::&#34;,
-            &#34;+&#34;,
-            &#34;-&#34;,
-            &#34;*&#34;,
-            &#34;**&#34;,
-            &#34;/&#34;,
-            &#34;&gt;&#34;,
-            &#34;&lt;&#34;,
-            &#34;&lt;=&#34;,
-            &#34;&gt;=&#34;,
-        ]
-        return node.type in control_characters
-
-    def get_node_source_ref(self, node) -&gt; SourceRef:
+    def get_source_ref(self, node: Node) -&gt; SourceRef:
+        &#34;&#34;&#34;Given a node and file name, return a CAST SourceRef object.&#34;&#34;&#34;
         row_start, col_start = node.start_point
         row_end, col_end = node.end_point
         return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)
 
-    def get_node_identifier(self, node) -&gt; str:
-        source_ref = self.get_node_source_ref(node)
 
+    def get_identifier(self, node: Node) -&gt; str:
+        &#34;&#34;&#34;Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point&#34;&#34;&#34;
         line_num = 0
         column_num = 0
         in_identifier = False
         identifier = &#34;&#34;
         for i, char in enumerate(self.source):
-            if line_num == source_ref.row_start and column_num == source_ref.col_start:
+            if line_num == node.start_point[0] and column_num == node.start_point[1]:
                 in_identifier = True
-            elif line_num == source_ref.row_end and column_num == source_ref.col_end:
+            elif line_num == node.end_point[0] and column_num == node.end_point[1]:
                 break
 
             if char == &#34;\n&#34;:
@@ -230,81 +301,29 @@ class NodeHelper(object):
             if in_identifier:
                 identifier += char
 
-        return identifier
-
-    def get_node_type(self, node) -&gt; str:
-        return node.type
-
-    def get_first_child_by_type(self, node: Dict, node_type: str) -&gt; Dict:
-        children = self.get_children_by_type(node, node_type)
-        if len(children) &gt;= 1:
-            return children[0]
-
-    def get_children_by_type(self, node: Dict, node_type: str) -&gt; List:
-        children = []
-
-        for child in node[&#34;children&#34;]:
-            if child[&#34;type&#34;] == node_type:
-                children.append(child)
-
-        return children</code></pre>
+        return identifier</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_children_by_type"><code class="name flex">
-<span>def <span class="ident">get_children_by_type</span></span>(<span>self, node: Dict[~KT, ~VT], node_type: str) ‑> List[~T]</span>
+<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_identifier"><code class="name flex">
+<span>def <span class="ident">get_identifier</span></span>(<span>self, node: tree_sitter.Node) ‑> str</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_children_by_type(self, node: Dict, node_type: str) -&gt; List:
-    children = []
-
-    for child in node[&#34;children&#34;]:
-        if child[&#34;type&#34;] == node_type:
-            children.append(child)
-
-    return children</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_first_child_by_type"><code class="name flex">
-<span>def <span class="ident">get_first_child_by_type</span></span>(<span>self, node: Dict[~KT, ~VT], node_type: str) ‑> Dict[~KT, ~VT]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_first_child_by_type(self, node: Dict, node_type: str) -&gt; Dict:
-    children = self.get_children_by_type(node, node_type)
-    if len(children) &gt;= 1:
-        return children[0]</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_identifier"><code class="name flex">
-<span>def <span class="ident">get_node_identifier</span></span>(<span>self, node) ‑> str</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_node_identifier(self, node) -&gt; str:
-    source_ref = self.get_node_source_ref(node)
-
+<pre><code class="python">def get_identifier(self, node: Node) -&gt; str:
+    &#34;&#34;&#34;Given a node, return the identifier it represents. ie. The code between node.start_point and node.end_point&#34;&#34;&#34;
     line_num = 0
     column_num = 0
     in_identifier = False
     identifier = &#34;&#34;
     for i, char in enumerate(self.source):
-        if line_num == source_ref.row_start and column_num == source_ref.col_start:
+        if line_num == node.start_point[0] and column_num == node.start_point[1]:
             in_identifier = True
-        elif line_num == source_ref.row_end and column_num == source_ref.col_end:
+        elif line_num == node.end_point[0] and column_num == node.end_point[1]:
             break
 
         if char == &#34;\n&#34;:
@@ -319,110 +338,20 @@ class NodeHelper(object):
     return identifier</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_source_ref"><code class="name flex">
-<span>def <span class="ident">get_node_source_ref</span></span>(<span>self, node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef" href="../CAST2FN/model/cast/source_ref.html#skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef">SourceRef</a></span>
+<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_source_ref"><code class="name flex">
+<span>def <span class="ident">get_source_ref</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef" href="../CAST2FN/model/cast/source_ref.html#skema.program_analysis.CAST2FN.model.cast.source_ref.SourceRef">SourceRef</a></span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Given a node and file name, return a CAST SourceRef object.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def get_node_source_ref(self, node) -&gt; SourceRef:
+<pre><code class="python">def get_source_ref(self, node: Node) -&gt; SourceRef:
+    &#34;&#34;&#34;Given a node and file name, return a CAST SourceRef object.&#34;&#34;&#34;
     row_start, col_start = node.start_point
     row_end, col_end = node.end_point
     return SourceRef(self.source_file_name, col_start, col_end, row_start, row_end)</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_type"><code class="name flex">
-<span>def <span class="ident">get_node_type</span></span>(<span>self, node) ‑> str</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_node_type(self, node) -&gt; str:
-    return node.type</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.is_comment_node"><code class="name flex">
-<span>def <span class="ident">is_comment_node</span></span>(<span>self, node)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_comment_node(self, node):
-    if node.type == &#34;comment&#34;:
-        return True
-    return False</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.is_control_character_node"><code class="name flex">
-<span>def <span class="ident">is_control_character_node</span></span>(<span>self, node)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def is_control_character_node(self, node):
-    control_characters = [
-        &#34;,&#34;,
-        &#34;=&#34;,
-        &#34;(&#34;,
-        &#34;)&#34;,
-        &#34;:&#34;,
-        &#34;::&#34;,
-        &#34;+&#34;,
-        &#34;-&#34;,
-        &#34;*&#34;,
-        &#34;**&#34;,
-        &#34;/&#34;,
-        &#34;&gt;&#34;,
-        &#34;&lt;&#34;,
-        &#34;&lt;=&#34;,
-        &#34;&gt;=&#34;,
-    ]
-    return node.type in control_characters</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.TS2CAST.node_helper.NodeHelper.parse_tree_to_dict"><code class="name flex">
-<span>def <span class="ident">parse_tree_to_dict</span></span>(<span>self, node) ‑> Dict[~KT, ~VT]</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def parse_tree_to_dict(self, node) -&gt; Dict:
-    node_dict = {
-        &#34;type&#34;: self.get_node_type(node),
-        &#34;source_refs&#34;: [self.get_node_source_ref(node)],
-        &#34;identifier&#34;: self.get_node_identifier(node),
-        &#34;original_children_order&#34;: [],
-        &#34;children&#34;: [],
-        &#34;comments&#34;: [],
-        &#34;control&#34;: [],
-    }
-
-    for child in node.children:
-        child_dict = self.parse_tree_to_dict(child)
-        node_dict[&#34;original_children_order&#34;].append(child_dict)
-        if self.is_comment_node(child):
-            node_dict[&#34;comments&#34;].append(child_dict)
-        elif self.is_control_character_node(child):
-            node_dict[&#34;control&#34;].append(child_dict)
-        else:
-            node_dict[&#34;children&#34;].append(child_dict)
-
-    return node_dict</code></pre>
 </details>
 </dd>
 </dl>
@@ -441,19 +370,23 @@ class NodeHelper(object):
 <li><code><a title="skema.program_analysis.TS2CAST" href="index.html">skema.program_analysis.TS2CAST</a></code></li>
 </ul>
 </li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.get_children_by_types" href="#skema.program_analysis.TS2CAST.node_helper.get_children_by_types">get_children_by_types</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.get_control_children" href="#skema.program_analysis.TS2CAST.node_helper.get_control_children">get_control_children</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.get_first_child_by_type" href="#skema.program_analysis.TS2CAST.node_helper.get_first_child_by_type">get_first_child_by_type</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.get_first_child_index" href="#skema.program_analysis.TS2CAST.node_helper.get_first_child_index">get_first_child_index</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.get_last_child_index" href="#skema.program_analysis.TS2CAST.node_helper.get_last_child_index">get_last_child_index</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.get_non_control_children" href="#skema.program_analysis.TS2CAST.node_helper.get_non_control_children">get_non_control_children</a></code></li>
+</ul>
+</li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
 <h4><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper">NodeHelper</a></code></h4>
 <ul class="">
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_children_by_type" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_children_by_type">get_children_by_type</a></code></li>
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_first_child_by_type" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_first_child_by_type">get_first_child_by_type</a></code></li>
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_identifier" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_identifier">get_node_identifier</a></code></li>
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_source_ref" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_source_ref">get_node_source_ref</a></code></li>
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_type" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_node_type">get_node_type</a></code></li>
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.is_comment_node" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.is_comment_node">is_comment_node</a></code></li>
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.is_control_character_node" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.is_control_character_node">is_control_character_node</a></code></li>
-<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.parse_tree_to_dict" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.parse_tree_to_dict">parse_tree_to_dict</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_identifier" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_identifier">get_identifier</a></code></li>
+<li><code><a title="skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_source_ref" href="#skema.program_analysis.TS2CAST.node_helper.NodeHelper.get_source_ref">get_source_ref</a></code></li>
 </ul>
 </li>
 </ul>
