@@ -2,20 +2,17 @@
 import io
 import itertools as it
 import json
-import os
 import tempfile
 import time
 from pathlib import Path
-from typing import List, Union, Text, BinaryIO, Callable
-from typing_extensions import Literal
+from typing import List, Union, BinaryIO, Callable
 from typing import Optional, Dict, Any
 from zipfile import ZipFile
-import pandas as pd
 
+import pandas as pd
 import requests
 from askem_extractions.data_model import AttributeCollection
-from askem_extractions.importers import import_arizona, import_mit
-from askem_extractions.importers.mit import merge_collections
+from askem_extractions.importers import import_arizona
 from fastapi import APIRouter, FastAPI, UploadFile, Response, status
 
 from skema.rest.proxies import SKEMA_TR_ADDRESS, MIT_TR_ADDRESS, OPENAI_KEY, COSMOS_ADDRESS
@@ -23,7 +20,7 @@ from skema.rest.schema import (
     TextReadingInputDocuments,
     TextReadingAnnotationsOutput,
     TextReadingDocumentResults,
-    TextReadingError,
+    TextReadingError, MiraGroundingInputs, MiraGroundingOutputItem,
 )
 
 router = APIRouter()
@@ -113,7 +110,7 @@ def normalize_extractions(
         if mit_extractions:
             try:
                 # MIT extractions already come normalized
-                canonical_mit = mit_extractions
+                canonical_mit = AttributeCollection(**mit_extractions)
                 collections.append(canonical_mit)
             except Exception as ex:
                 print(ex)
@@ -126,8 +123,7 @@ def normalize_extractions(
             mit_path = tmp_dir / "canonical_mit.json"
 
             canonical_arizona.save_json(skema_path)
-            with mit_path.open("w") as f:
-                json.dump(canonical_mit, f)
+            canonical_mit.save_json(mit_path)
 
             data = {
                 "mit_file": mit_path.open(),
@@ -451,6 +447,79 @@ async def integrated_pdf_extractions(
         annotate_skema,
         annotate_mit
     )
+
+
+# These are some direct proxies to the SKEMA and MIT APIs
+@router.post(
+    "/cosmos_to_json",
+    status_code=200,
+    description="Calls COSMOS on a pdf and converts the data into json"
+)
+async def cosmos_to_json(pdf: UploadFile) -> List[Dict]:
+    """ Calls COSMOS on a pdf and converts the data into json """
+    return cosmos_client(pdf.filename, pdf.file)
+
+
+@router.post(
+    "/ground_to_mira",
+    status_code=200,
+    response_model=List[List[MiraGroundingOutputItem]]
+)
+async def ground_to_mira(k: int, queries: MiraGroundingInputs, response: Response) -> List[
+    List[MiraGroundingOutputItem]]:
+    """ Proxy to the MIRA grounding functionality on the SKEMA TR service """
+    params = {
+        "k": k
+    }
+    headers = {
+        "Content-Type": "text/plain"
+    }
+    payload = "\n".join(queries.queries)
+    inner_response = requests.post(f"{SKEMA_TR_ADDRESS}/groundStringsToMira", headers=headers, params=params,
+                                   data=payload)
+
+    response.status_code = inner_response.status_code
+
+    if inner_response.status_code == 200:
+        return [[MiraGroundingOutputItem(**o) for o in q] for q in inner_response.json()]
+    else:
+        return inner_response.content
+
+
+@router.post("/cards/get_model_card")
+async def get_model_card(text_file: UploadFile, code_file: UploadFile, response: Response):
+    """ Calls the model card endpoint from MIT's pipeline """
+
+    params = {
+        "gpt_key": OPENAI_KEY,
+    }
+    files = {
+        "text_file": (text_file.filename, text_file.file, "text/plain"),
+        "code_file": (code_file.filename, code_file.file, "text/plain")
+    }
+
+    inner_response = requests.post(f"{MIT_TR_ADDRESS}/cards/get_model_card", params=params, files=files)
+
+    response.status_code = inner_response.status_code
+    return inner_response.json()
+
+@router.post("/cards/get_data_card")
+async def get_model_card(csv_file: UploadFile, doc_file: UploadFile, response: Response):
+    """ Calls the data card endpoint from MIT's pipeline """
+
+    params = {
+        "gpt_key": OPENAI_KEY,
+    }
+    files = {
+        "csv_file": (csv_file.filename, csv_file.file, "text/csv"),
+        "doc_file": (doc_file.filename, doc_file.file, "text/plain")
+    }
+
+    inner_response = requests.post(f"{MIT_TR_ADDRESS}/cards/get_data_card", params=params, files=files)
+
+    response.status_code = inner_response.status_code
+    return inner_response.json()
+####
 
 
 @router.get(

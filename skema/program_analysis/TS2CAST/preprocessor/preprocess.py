@@ -2,7 +2,9 @@ import argparse
 import re
 import os
 import shutil
-from typing import List
+import logging
+from typing import List, Optional
+from pathlib import Path
 from subprocess import run, PIPE
 
 from tree_sitter import Parser, Node, Language, Tree
@@ -13,15 +15,14 @@ from skema.program_analysis.TS2CAST.build_tree_sitter_fortran import (
 
 
 def preprocess(
-    source_path: str,
-    out_path: str,
+    source_path: Path,
+    out_dir=None,
     overwrite=False,
     out_missing_includes=False,
     out_gcc=False,
     out_unsupported=False,
     out_corrected=False,
-    out_parse=False,
-) -> Tree:
+) -> str:
     """Run the full preprocessing pipeline for Fortran->Tree-Sitter->CAST
     Takes the original source as input and will return the tree-sitter parse tree as output
     An intermediary directory will also be created containing:
@@ -29,44 +30,46 @@ def preprocess(
     2. The intermediary product from running the c-preprocessor
     3. A log of unsupported idioms
     4. The source code with unsupported idioms corrected
-    5. The tree-sitter parse tree
     """
-
-    source = open(source_path, "r").read()
-    source_file_name = os.path.basename(source_path).split(".")[0]
-    source_directory = os.path.dirname(source_path)
-    include_base_directory = os.path.join(
-        source_directory, f"include_{source_file_name}"
-    )
-
     # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
-    try:
-        os.mkdir(out_path)
-    except FileExistsError:
-        if not overwrite:
-            exit()
+
+    source = source_path.read_text()
+
+    # Get paths for intermediate products
+    if out_dir:
+        if not (out_missing_includes or out_gcc or out_unsupported or out_corrected):
+            logging.warning("out_dir is specified, but no out flags are set")
+
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        missing_includes_path = Path(out_dir, "missing_includes.txt")
+        gcc_path = Path(out_dir, "gcc.F")
+        unsupported_path = Path(out_dir, "unsupported_idioms.txt")
+        corrected_path = Path(out_dir, "corrected.F")
+        parse_path = Path(out_dir, "parse_tree.txt")
 
     # Step 1: Check for missing included files
-    missing_includes = check_for_missing_includes(source_path)
-    if out_missing_includes:
-        missing_includes_path = os.path.join(out_path, "missing_includes.txt")
-        with open(missing_includes_path, "w") as f:
-            f.write("\n".join(missing_includes))
-    if len(missing_includes) > 0:
-        print("Missing required included files, missing files were:")
-        for include in missing_includes:
-            print(include)
-        exit()
+    # Many source files won't have includes. We only need to check missing includes if a source contains an include statement.
+    if len(produce_include_summary(source)) > 0:
+        missing_includes = check_for_missing_includes(source_path)
+        if out_missing_includes:
+            missing_includes_path.write_text("\n".join(missing_includes))
+
+        if len(missing_includes) > 0:
+            logging.error("Missing required included files, missing files were:")
+            for include in missing_includes:
+                logging.error(include)
+            exit()
+    elif out_missing_includes:
+        missing_includes_path.write_text("Source file contains no include statements")
 
     # Step 2: Correct include directives to remove system references
     source = fix_include_directives(source)
 
     # Step 3: Process with gcc c-preprocessor
-    source = run_c_preprocessor(source, include_base_directory)
+    source = run_c_preprocessor(source, source_path.parent)
     if out_gcc:
-        gcc_path = os.path.join(out_path, "gcc.F")
-        with open(gcc_path, "w") as f:
-            f.write(source)
+        gcc_path.write_text(source)
 
     # Step 4: Prepare for tree-sitter
     # This step removes any additional preprocessor directives added or not removed by GCC
@@ -76,53 +79,41 @@ def preprocess(
 
     # Step 5: Check for unsupported idioms
     if out_unsupported:
-        unsupported_path = os.path.join(out_path, "unsupported_idioms.txt")
-        with open(unsupported_path, "w") as f:
-            f.writelines(search_for_unsupported_idioms(source, "idioms_regex.txt"))
+        unsupported_path.write_text(
+            "\n".join(search_for_unsupported_idioms(source, "idioms_regex.txt"))
+        )
 
     # Step 6 : Fix unsupported idioms
     source = fix_unsupported_idioms(source)
     if out_corrected:
-        corrected_path = os.path.join(out_path, "corrected.F")
-        with open(corrected_path, "w") as f:
-            f.write(source)
+        corrected_path.write_text(source)
 
-    # Stage 7: Parse with tree-sitter
-    parse_tree = tree_sitter_parse(source)
-    if out_parse:
-        parse_path = os.path.join(out_path, "parse_tree.txt")
-        with open(parse_path, "w") as f:
-            f.write(parse_tree.root_node.sexp())
-
-    return parse_tree
+    return source
 
 
-def check_for_missing_includes(source_path: str):
+def produce_include_summary(source: str) -> List:
+    """Uses regex to produce a list of all included files in a source"""
+    includes = []
+
+    system_re = "#include\s+<(.*)>"
+    local_re = '#include\s+"(.*)"'
+
+    for match in re.finditer(system_re, source):
+        includes.append(match.group(1))
+    for match in re.finditer(local_re, source):
+        includes.append(match.group(1))
+
+    return includes
+
+
+def check_for_missing_includes(source_path: Path):
     """Gathers all required includes and check if they have been added to the include_SOURCE directory"""
-
-    def produce_include_summary(source: str) -> List:
-        """Uses regex to produce a list of all included files in a source"""
-        includes = []
-
-        system_re = "#include\s+<(.*)>"
-        local_re = '#include\s+"(.*)"'
-
-        for match in re.finditer(system_re, source):
-            includes.append(match.group(1))
-        for match in re.finditer(local_re, source):
-            includes.append(match.group(1))
-
-        return includes
 
     missing_files = []
 
     # First we will check for the include directory
-    source_file_name = os.path.basename(source_path).split(".")[0]
-    source_directory = os.path.dirname(source_path)
-    include_base_directory = os.path.join(
-        source_directory, f"include_{source_file_name}"
-    )
-    if not os.path.isdir(include_base_directory):
+    include_base_directory = Path(source_path.parent, f"include_{source_path.stem}")
+    if not include_base_directory.exists():
         missing_files.append(include_base_directory)
         return missing_files
 
@@ -133,7 +124,7 @@ def check_for_missing_includes(source_path: str):
     includes = []
     for dirpath, dirnames, filenames in os.walk(include_base_directory):
         for file in filenames:
-            file_source = open(os.path.join(dirpath, file), "r").read()
+            file_source = Path(dirpath, file).read_text()
             includes.extend(produce_include_summary(file_source))
 
     # Check for missing files
@@ -141,7 +132,7 @@ def check_for_missing_includes(source_path: str):
     for include in includes:
         if include in already_checked:
             continue
-        if not os.path.isfile(os.path.join(include_base_directory, include)):
+        if not Path(include_base_directory, include).exists():
             missing_files.append(include)
         already_checked.add(include)
     return missing_files
@@ -154,10 +145,9 @@ def search_for_unsupported_idioms(source: str, idioms_regex_path: str):
     for line in lines:
         for match in re.finditer(line, source, flags=re.MULTILINE):
             line_number = source[: match.span()[0]].count("\n")
-            log.append(f"Found unsupported idiom matching regex: {line}" + "\n")
-            log.append(f"Match was: {match.group(0)}" + "\n")
-            log.append(f"Line was: {line_number}" + "\n")
-            log.append(f"\n")
+            log.append(f"Found unsupported idiom matching regex: {line}")
+            log.append(f"Match was: {match.group(0)}")
+            log.append(f"Line was: {line_number}")
     return log
 
 
@@ -192,7 +182,7 @@ def fix_include_directives(source: str) -> str:
     return source
 
 
-def run_c_preprocessor(source: str, include_base_path: str) -> str:
+def run_c_preprocessor(source: str, include_base_path: Path) -> str:
     """Run the gcc c-preprocessor. Its run from the context of the include_base_path, so that it can find all included files"""
     result = run(
         ["gcc", "-cpp", "-E", "-"],
@@ -205,24 +195,11 @@ def run_c_preprocessor(source: str, include_base_path: str) -> str:
     return result.stdout
 
 
-def tree_sitter_parse(source: str) -> Tree:
-    """Use tree-sitter to parse the source code and output the parse tree"""
-    parser = Parser()
-
-    parser.set_language(
-        Language(
-            os.path.join(os.path.dirname("../"), LANGUAGE_LIBRARY_REL_PATH), "fortran"
-        )
-    )
-
-    return parser.parse(bytes(source, "utf8"))
-
-
 def main():
     """Run the preprocessor as a script"""
     parser = argparse.ArgumentParser(description="Fortran preprocessing script")
     parser.add_argument("source_path", type=str, help="Path to the source file")
-    parser.add_argument("out_path", type=str, help="Output directory path")
+    parser.add_argument("out_dir", type=str, help="Output directory path")
     parser.add_argument(
         "-o",
         "--overwrite",
@@ -249,22 +226,16 @@ def main():
         action="store_true",
         help="Output source after fixing unsupported idioms",
     )
-    parser.add_argument(
-        "--out_parse",
-        action="store_true",
-        help="Output tree-sitter parse tree",
-    )
     args = parser.parse_args()
 
     preprocess(
-        args.source_path,
-        args.out_path,
+        Path(args.source_path),
+        Path(args.out_dir),
         args.overwrite,
         args.out_missing_includes,
         args.out_gcc,
         args.out_unsupported,
         args.out_corrected,
-        args.out_parse,
     )
 
 

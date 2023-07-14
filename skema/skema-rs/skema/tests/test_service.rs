@@ -1,7 +1,7 @@
-use actix_web::{test, App, http::{self, header::ContentType}};
+use actix_web::{http::header::ContentType, test, App};
 use skema::services::{
     comment_extraction::{get_comments, CommentExtractionRequest, Language},
-    mathml::get_amr
+    mathml::get_amr,
 };
 use std::fs;
 
@@ -27,7 +27,8 @@ async fn test_get_amr() {
     let request = test::TestRequest::put()
         .uri("/mathml/amr")
         .insert_header(ContentType::json())
-        .set_payload(payload).to_request();
+        .set_payload(payload)
+        .to_request();
     let response = test::call_service(&app, request).await;
     assert!(response.status().is_success());
 }

@@ -8,9 +8,12 @@ use std::collections::HashMap;
 use std::string::ToString;
 
 // new imports
-
+use mathml::ast::Ci;
 use mathml::ast::MathExpression::Mo;
+use mathml::ast::Type::Function;
 use mathml::ast::{MathExpression, Mi, Mrow};
+use mathml::parsers::first_order_ode::FirstOrderODE;
+use mathml::parsers::math_expression_tree::MathExpressionTree;
 use mathml::petri_net::recognizers::is_add_or_subtract_operator;
 
 // struct for returning line spans
@@ -76,7 +79,8 @@ pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE
     // 4.5 now to check if of those expressions, if they are arithmetric in nature
 
     // 5. pass id to subgrapg2_core_dyn to get core dynamics
-    let (core_dynamics_ast, _metadata_map_ast) = subgraph2_core_dyn_ast(core_id[0], host).unwrap();
+    let (core_dynamics_ast, _metadata_map_ast) =
+        subgrapg2_core_dyn_MET_ast(core_id[0], host).unwrap();
 
     core_dynamics_ast
 }
@@ -285,6 +289,10 @@ pub fn subgraph2_core_dyn_ast(
     let mut expressions = Vec::<petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>>::new();
     for i in 0..expression_nodes.len() {
         // grab the subgraph of the given expression
+        /*println!(
+            "These are the nodes for expressions: {:?}",
+            graph[expression_nodes[i]].id.clone()
+        );*/
         expressions.push(subgraph2petgraph(graph[expression_nodes[i]].id, host));
     }
 
@@ -302,6 +310,8 @@ pub fn subgraph2_core_dyn_ast(
     for i in 0..expressions_wiring.clone().len() {
         let (nodes1, _edges1) = expressions_wiring[i].clone().into_nodes_edges();
         if nodes1.len() > 3 {
+            //println!("\n{:?}\n", nodes1.clone());
+            // SINCE THE POF'S ARE THE SOURCE OF THE STATE VARIABLES, NOT THE OPI'S. THEY'RE NOT BEING WIRED IN PROPERLY
             trimmed_expressions_wiring.push(trim_un_named(expressions_wiring[i].clone()));
         }
     }
@@ -345,14 +355,14 @@ fn tree_2_MET_ast(
         if deriv_name[1..2].to_string() == "d" {
             let deriv = Ci {
                 r#type: Some(Function),
-                content: MathExpression::Mi(Mi(deriv_name[2..3].to_string())),
+                content: Box::new(MathExpression::Mi(Mi(deriv_name[2..3].to_string()))),
             };
             lhs.push(deriv);
         } else {
             step_impl = true;
             let deriv = Ci {
                 r#type: Some(Function),
-                content: MathExpression::Mi(Mi(deriv_name[1..2].to_string())),
+                content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
             };
             lhs.push(deriv);
         }
@@ -362,7 +372,7 @@ fn tree_2_MET_ast(
                 let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
                 let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
                 let fo_eq = FirstOrderODE {
-                    lhs_var: lhs[0],
+                    lhs_var: lhs[0].clone(),
                     rhs: rhs,
                 };
                 fo_eq_vec.push(fo_eq);
@@ -371,7 +381,7 @@ fn tree_2_MET_ast(
             }
         }
     }
-    fo_eq_vec[0]
+    Ok(fo_eq_vec[0].clone())
 }
 
 pub fn get_args_MET(
@@ -386,10 +396,12 @@ pub fn get_args_MET(
             let operate = get_operator_MET(graph.clone(), node); // output -> Operator
             let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
             let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
-            args.append(rhs.clone());
+            args.push(rhs.clone());
         } else {
             // asummption it is atomic
-            let arg2 = MathExpressionTree::Atom(Mi(Mi(graph[node].properties["name"].to_string())));
+            let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].properties
+                ["name"]
+                .to_string())));
             args.push(arg2.clone());
         }
     }

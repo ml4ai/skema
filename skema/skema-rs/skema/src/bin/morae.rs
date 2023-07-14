@@ -1,6 +1,8 @@
 use clap::Parser;
+
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
+use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 
 #[cfg(test)]
 use std::fs;
@@ -43,19 +45,21 @@ fn main() {
 
         let math_content = module_id2mathml_MET_ast(module_id, host);
 
+        let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list4.txt";
+
         // This does get a panic with a message, so need to figure out how to forward it
-        let mathml_ast =
-            get_mathml_asts_from_file("../../data/mml2pn_inputs/testing_eqns/mml_list4.txt");
+        let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
+
+        let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
         println!("\nmath_content: {:?}", math_content);
-        println!("\nmathml_ast: {:?}", mathml_ast);
-
-        println!("\nAMR from code: {:?}", ACSet::from(math_content.clone()));
+        println!("\nmathml_ast: {:?}", odes);
 
         println!(
-            "\nAMR from code: {:?}",
-            PetriNet::from(ACSet::from(mathml_ast))
+            "\nAMR from mathml: {}\n",
+            serde_json::to_string(&PetriNet::from(odes)).unwrap()
         );
+        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
         /*println!(
             "\nAMR from mathml: {:?}\n",
             PetriNet::from(ACSet::from(mathml_ast))
@@ -78,7 +82,7 @@ fn main() {
         let mathml_asts =
             get_mathml_asts_from_file("../../data/mml2pn_inputs/lotka_voltera/mml_list.txt");
         let regnet = RegNet::from(mathml_asts);
-        println!("\nRegnet AMR: {:?}\n", regnet.clone());
+        println!("\nRegnet AMR: {:?}\n", regnet);
         let regnet_serial = serde_json::to_string(&regnet).unwrap();
         println!("For serialization test:\n\n {}", regnet_serial);
 
