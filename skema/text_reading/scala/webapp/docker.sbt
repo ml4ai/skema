@@ -10,7 +10,7 @@ val port = 9000
 val tag = "1.0.0"
 
 Docker / defaultLinuxInstallLocation := appDir
-Docker / dockerBaseImage := "eclipse-temurin:11-jre-focal"
+Docker / dockerBaseImage := "openjdk:8"
 Docker / daemonUser := "nobody"
 Docker / dockerExposedPorts := List(port)
 Docker / maintainer := "Keith Alcock <docker@keithalcock.com>"
