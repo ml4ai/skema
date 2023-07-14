@@ -482,6 +482,89 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         }
 
         // now for polarity pairs of terms we need to construct the transistions
+        let mut transition_pair = Vec::<(PnTerm, PnTerm)>::new();
+        for term1 in terms.clone().iter() {
+            for term2 in terms.clone().iter() {
+                if term1.polarity != term2.polarity && term1.parameters == term2.parameters {
+                    if term1.polarity {
+                        let temp_pair = (term1.clone(), term2.clone());
+                        transition_pair.push(temp_pair);
+                    }
+                }
+            }
+        }
+
+        for (i, t) in transition_pair.iter().enumerate() {
+            println!("t-pair: {:?}\n", t.clone());
+            if t.0.exp_states.len() == 1 {
+                // construct transtions for simple transtions
+                let transitions = Transition {
+                    id: format!("t{}", i.clone()),
+                    input: Some([t.1.dyn_state.clone()].to_vec()),
+                    output: Some([t.0.dyn_state.clone()].to_vec()),
+                    ..Default::default()
+                };
+                transitions_vec.insert(transitions.clone());
+
+                let rate = Rate {
+                    target: transitions.id.clone(),
+                    expression: "".to_string(), // the second term needs to be the product of the inputs
+                    expression_mathml: Some(t.0.expression.clone()),
+                };
+                rate_vec.push(rate.clone());
+
+                for param in &t.0.parameters {
+                    let parameters = Parameter {
+                        id: param.clone(),
+                        name: Some(param.clone()),
+                        description: Some(format!("{} rate", param.clone())),
+                        ..Default::default()
+                    };
+                    parameter_vec.push(parameters.clone());
+                }
+            } else {
+                // construct transitions for complicated transitions
+                // mainly need to construct the output specially,
+                // run by clay
+                let mut output = [t.0.dyn_state.clone()].to_vec();
+
+                for state in t.0.exp_states.iter() {
+                    if *state != t.1.dyn_state {
+                        output.push(state.clone());
+                    }
+                }
+
+                let transitions = Transition {
+                    id: format!("t{}", i.clone()),
+                    input: Some(t.1.exp_states.clone()),
+                    output: Some(output.clone()),
+                    ..Default::default()
+                };
+                transitions_vec.insert(transitions.clone());
+
+                let rate = Rate {
+                    target: transitions.id.clone(),
+                    expression: "".to_string(), // the second term needs to be the product of the inputs
+                    expression_mathml: Some(t.0.expression.clone()),
+                };
+                rate_vec.push(rate.clone());
+
+                for param in &t.0.parameters {
+                    let parameters = Parameter {
+                        id: param.clone(),
+                        name: Some(param.clone()),
+                        description: Some(format!("{} rate", param.clone())),
+                        ..Default::default()
+                    };
+                    parameter_vec.push(parameters.clone());
+                }
+            }
+        }
+
+        // trim duplicate parameters and remove integer parameters
+
+        parameter_vec.sort();
+        parameter_vec.dedup();
 
         // construct the PetriNet
         let ode = Ode {
