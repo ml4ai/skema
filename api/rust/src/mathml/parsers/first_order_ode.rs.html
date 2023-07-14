@@ -703,12 +703,6 @@
 <a href="#703" id="703">703</a>
 <a href="#704" id="704">704</a>
 <a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
-<a href="#711" id="711">711</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::operator::Operator::{Add, Divide, Multiply, Subtract};
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Atom;
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Cons;
@@ -904,10 +898,7 @@
                                         get_term_mult(sys_states.clone(), y1.clone());
                                     temp_term.dyn_state = dyn_state.clone();
                                     terms.push(temp_term.clone());
-                                    <span class="macro">println!</span>(
-                                        <span class="string">&quot;binary sub1 mult temp_term: {:?}\n&quot;</span>,
-                                        temp_term
-                                    )
+                                    <span class="macro">println!</span>(<span class="string">&quot;binary sub1 mult temp_term: {:?}\n&quot;</span>, temp_term)
                                 }
                                 Subtract =&gt; {
                                     <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
@@ -1029,8 +1020,7 @@
                         <span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">1</span>] {
                             Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span>x1 {
                                 Multiply =&gt; {
-                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                        get_term_mult(sys_states, y1.clone());
+                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y1.clone());
                                     temp_term.dyn_state = dyn_state;
                                     <span class="kw">if </span>temp_term.polarity {
                                         temp_term.polarity = <span class="bool-val">false</span>;
@@ -1038,15 +1028,11 @@
                                         temp_term.polarity = <span class="bool-val">true</span>;
                                     }
                                     terms.push(temp_term.clone());
-                                    <span class="macro">println!</span>(
-                                        <span class="string">&quot;binary sub2 mult temp_term: {:?}\n&quot;</span>,
-                                        temp_term
-                                    )
+                                    <span class="macro">println!</span>(<span class="string">&quot;binary sub2 mult temp_term: {:?}\n&quot;</span>, temp_term)
                                 }
                                 Subtract =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
                                     Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                            get_term_mult(sys_states, y2.clone());
+                                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y2.clone());
                                         temp_term.dyn_state = dyn_state;
                                         terms.push(temp_term.clone());
                                         <span class="macro">println!</span>(
@@ -1110,8 +1096,7 @@
                             }
                             Subtract =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
                                 Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                        get_term_mult(sys_states, y2.clone());
+                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y2.clone());
                                     temp_term.dyn_state = dyn_state;
                                     <span class="kw">if </span>temp_term.polarity {
                                         temp_term.polarity = <span class="bool-val">false</span>;
@@ -1149,8 +1134,7 @@
                                 Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
                                     <span class="comment">/* unary to mult */
                                     /* This has to be a unary sub into a mult (unless really stupid equation) */
-                                    </span><span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                        get_term_mult(sys_states, y2.clone());
+                                    </span><span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y2.clone());
                                     <span class="comment">// swap polarity of temp term
                                     </span><span class="kw">if </span>temp_term.polarity {
                                         temp_term.polarity = <span class="bool-val">false</span>;
@@ -1264,8 +1248,6 @@
         parameters.push(var.clone());
     }
 
-    
-
     PnTerm {
         dyn_state: <span class="string">&quot;temp&quot;</span>.to_string(),
         exp_states,
@@ -1305,10 +1287,16 @@
                             y.append(<span class="kw-2">&amp;mut </span>[temp1, temp2].to_vec());
                         }
                         <span class="kw">_ </span>=&gt; {
-                            <span class="kw">let </span>temp1 = y0[<span class="number">0</span>].clone();
-                            <span class="kw">let </span>temp2 = y0[<span class="number">1</span>].clone();
-                            y.remove(<span class="number">0</span>);
-                            y.append(<span class="kw-2">&amp;mut </span>[temp1, temp2].to_vec())
+                            <span class="kw">if </span>y0.len() &gt; <span class="number">1 </span>{
+                                <span class="kw">let </span>temp1 = y0[<span class="number">0</span>].clone();
+                                <span class="kw">let </span>temp2 = y0[<span class="number">1</span>].clone();
+                                y.remove(<span class="number">0</span>);
+                                y.append(<span class="kw-2">&amp;mut </span>[temp1, temp2].to_vec())
+                            } <span class="kw">else </span>{
+                                <span class="kw">let </span>temp1 = y0[<span class="number">0</span>].clone();
+                                y.remove(<span class="number">0</span>);
+                                y.append(<span class="kw-2">&amp;mut </span>[temp1].to_vec())
+                            }
                         }
                     },
                     Atom(_x0) =&gt; {}
