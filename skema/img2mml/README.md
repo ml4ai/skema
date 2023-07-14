@@ -7,8 +7,8 @@ of equations and returns presentation MathML corresponding to those equations.
 2. the code for the `latex2mml` service, which processes LaTeX
 of equations and returns presentation MathML corresponding to those equations.
 
-The model was developed by Gaurav Sharma, Clay Morrison, and Liang Zhang, and this wrapper
-service was developed by Deepsana Shahi, Adarsh Pyarelal, and Liang Zhang.
+The model was developed by Gaurav Sharma, Clay Morrison and Liang Zhang, and this wrapper
+service was developed by Deepsana Shahi, Adarsh Pyarelal and Liang Zhang.
 
 The model itself is not checked into the repository, but you can get it from
 here:
@@ -26,7 +26,7 @@ If you have the checkpoint in the `trained_models` directory already and hope to
 
 To update the model name or path, please make the following modifications to support updating the img2mml service and the corresponding Docker operations:
 
-1. Modify the paths of the model_path variable in the `skema/img2mml/eqn2mml.py` file.
+1. Modify the ENV variable of `SKEMA_IMG2MML_MODEL_PATH`.
 2. Update the path settings in the "retrieve latest model for img2mml component" section of `skema/.github/workflows/tests-and-docs.yml`.
 3. Adjust the curl command in the test_equation_reading section of `skema/.drone.yml` to download the checkpoint.
 4. Update the download checkpoint path in `skema/img2mml/README.md`.
@@ -49,9 +49,8 @@ Then, run the following command to launch the `eqn2mml` server program, includin
 uvicorn skema.img2mml.eqn2mml:app --reload
 ```
 
-Unit tests are provided as well, which you can find them in the `tests` directory folder:
-
+Unit tests are provided as well, which you can find them in the `tests` directory folder.
+Using the following invocation to perform these tests:
 ```
-test_model_loading.py
-test_eqn2mml.py
+pytest tests
 ```
