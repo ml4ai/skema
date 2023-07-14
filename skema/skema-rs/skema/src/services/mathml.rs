@@ -24,9 +24,6 @@ use mathml::parsers::first_order_ode::flatten_mults;
 pub async fn get_ast_graph(payload: String) -> String {
     let contents = &payload;
     let math = contents.parse::<Math>().unwrap();
-    //let (_, math) =
-    //parse(contents).unwrap_or_else(|_| panic!("{}", "Unable to parse payload!".to_string()));
-
     let g = math.to_graph();
     let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
     dot_representation.to_string()
@@ -70,8 +67,7 @@ pub async fn get_math_exp_graph(payload: String) -> String {
 #[put("/mathml/content-mathml")]
 pub async fn get_content_mathml(payload: String) -> String {
     let ode = payload.parse::<FirstOrderODE>().unwrap();
-    let content_mathml = ode.to_cmml();
-    content_mathml
+    ode.to_cmml()
 }
 
 /// Return a JSON representation of a PetriNet ModelRep constructed from an array of MathML strings.
