@@ -30,7 +30,3 @@ def test_healthcheck():
         status.HTTP_502_BAD_GATEWAY,
         status.HTTP_500_INTERNAL_SERVER_ERROR
     }
-
-
-if __name__ == "__main__":
-    test_cosmos()
