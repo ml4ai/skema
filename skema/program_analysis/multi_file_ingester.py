@@ -39,7 +39,7 @@ def get_args():
 
 
 def process_file_system(
-    system_name, path, files, write_to_file=False
+    system_name, path, files, write_to_file=False, original_source=False
 ) -> GrometFNModuleCollection:
     root_dir = path.strip()
     file_list = open(files, "r").readlines()
@@ -70,6 +70,16 @@ def process_file_system(
                 cast, gromet=True, to_file=False, from_obj=True
             )
             os.chdir(cur_dir)
+
+            # NOTE: July '23 Hackathon addition
+            # If this flag is set to true, then we read the entire source file into a string, and store it in the 
+            if original_source:
+                source_metadata = generated_gromet.metadata_collection[1]
+                # Open the original source code file, read the lines into a list
+                # and then convert back into a string representing the full file    
+                file_text = "".join(open(full_file).readlines())
+                source_metadata[0].files[0].source_string = file_text
+
 
             # Then, after we generate the GroMEt we store it in the 'modules' field
             # and store its path in the 'module_index' field
