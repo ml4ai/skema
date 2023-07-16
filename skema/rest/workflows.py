@@ -96,6 +96,8 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
         )
     return res.json()
 
+'''This is a stub for the mathml2amr endpoint on the workflow services domain'''
+
 
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
