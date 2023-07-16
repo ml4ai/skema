@@ -479,6 +479,15 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
         for term in terms.iter() {
             println!("term: {:?}\n", term.clone());
+            for param in &term.parameters {
+                let parameters = Parameter {
+                    id: param.clone(),
+                    name: Some(param.clone()),
+                    description: Some(format!("{} rate", param.clone())),
+                    ..Default::default()
+                };
+                parameter_vec.push(parameters.clone());
+            }
         }
 
         // now for polarity pairs of terms we need to construct the transistions
@@ -513,16 +522,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                     expression_mathml: Some(t.0.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
-
-                for param in &t.0.parameters {
-                    let parameters = Parameter {
-                        id: param.clone(),
-                        name: Some(param.clone()),
-                        description: Some(format!("{} rate", param.clone())),
-                        ..Default::default()
-                    };
-                    parameter_vec.push(parameters.clone());
-                }
             } else {
                 // construct transitions for complicated transitions
                 // mainly need to construct the output specially,
@@ -549,16 +548,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                     expression_mathml: Some(t.0.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
-
-                for param in &t.0.parameters {
-                    let parameters = Parameter {
-                        id: param.clone(),
-                        name: Some(param.clone()),
-                        description: Some(format!("{} rate", param.clone())),
-                        ..Default::default()
-                    };
-                    parameter_vec.push(parameters.clone());
-                }
             }
         }
 

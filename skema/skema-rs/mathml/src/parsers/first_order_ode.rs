@@ -193,10 +193,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                                         get_term_mult(sys_states.clone(), y1.clone());
                                     temp_term.dyn_state = dyn_state.clone();
                                     terms.push(temp_term.clone());
-                                    println!(
-                                        "binary sub1 mult temp_term: {:?}\n",
-                                        temp_term
-                                    )
+                                    println!("binary sub1 mult temp_term: {:?}\n", temp_term)
                                 }
                                 Subtract => {
                                     match &y1[0] {
@@ -318,8 +315,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                         match &y[1] {
                             Cons(x1, ref y1) => match x1 {
                                 Multiply => {
-                                    let mut temp_term =
-                                        get_term_mult(sys_states, y1.clone());
+                                    let mut temp_term = get_term_mult(sys_states, y1.clone());
                                     temp_term.dyn_state = dyn_state;
                                     if temp_term.polarity {
                                         temp_term.polarity = false;
@@ -327,15 +323,11 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                                         temp_term.polarity = true;
                                     }
                                     terms.push(temp_term.clone());
-                                    println!(
-                                        "binary sub2 mult temp_term: {:?}\n",
-                                        temp_term
-                                    )
+                                    println!("binary sub2 mult temp_term: {:?}\n", temp_term)
                                 }
                                 Subtract => match &y1[0] {
                                     Cons(_x2, ref y2) => {
-                                        let mut temp_term =
-                                            get_term_mult(sys_states, y2.clone());
+                                        let mut temp_term = get_term_mult(sys_states, y2.clone());
                                         temp_term.dyn_state = dyn_state;
                                         terms.push(temp_term.clone());
                                         println!(
@@ -399,8 +391,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                             }
                             Subtract => match &y1[0] {
                                 Cons(_x2, ref y2) => {
-                                    let mut temp_term =
-                                        get_term_mult(sys_states, y2.clone());
+                                    let mut temp_term = get_term_mult(sys_states, y2.clone());
                                     temp_term.dyn_state = dyn_state;
                                     if temp_term.polarity {
                                         temp_term.polarity = false;
@@ -438,8 +429,7 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                                 Cons(_x2, ref y2) => {
                                     /* unary to mult */
                                     /* This has to be a unary sub into a mult (unless really stupid equation) */
-                                    let mut temp_term =
-                                        get_term_mult(sys_states, y2.clone());
+                                    let mut temp_term = get_term_mult(sys_states, y2.clone());
                                     // swap polarity of temp term
                                     if temp_term.polarity {
                                         temp_term.polarity = false;
@@ -553,8 +543,6 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
         parameters.push(var.clone());
     }
 
-    
-
     PnTerm {
         dyn_state: "temp".to_string(),
         exp_states,
@@ -594,10 +582,16 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
                             y.append(&mut [temp1, temp2].to_vec());
                         }
                         _ => {
-                            let temp1 = y0[0].clone();
-                            let temp2 = y0[1].clone();
-                            y.remove(0);
-                            y.append(&mut [temp1, temp2].to_vec())
+                            if y0.len() > 1 {
+                                let temp1 = y0[0].clone();
+                                let temp2 = y0[1].clone();
+                                y.remove(0);
+                                y.append(&mut [temp1, temp2].to_vec())
+                            } else {
+                                let temp1 = y0[0].clone();
+                                y.remove(0);
+                                y.append(&mut [temp1].to_vec())
+                            }
                         }
                     },
                     Atom(_x0) => {}
