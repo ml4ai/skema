@@ -18,12 +18,19 @@ import base64
 import requests
 from skema.img2mml.api import Image2MathML
 from pathlib import Path
+import os
 
 cwd = Path(__file__).parents[0]
-config_path = cwd / "configs" / "xfmer_mml_config.json"
-vocab_path = cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
-model_path = (
-    cwd / "trained_models" / "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
+config_path = os.getenv(
+    "SKEMA_IMG2MML_CONFIG_PATH", str(cwd / "configs" / "xfmer_mml_config.json")
+)
+vocab_path = os.getenv(
+    "SKEMA_IMG2MML_VOCAB_PATH",
+    str(cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"),
+)
+model_path = os.getenv(
+    "SKEMA_IMG2MML_MODEL_PATH",
+    str(cwd / "trained_models" / "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"),
 )
 
 image2mathml_db = Image2MathML(
