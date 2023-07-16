@@ -255,6 +255,8 @@ def train(
     model.train()
 
     epoch_loss = 0
+    epoch_ce_loss = 0
+    epoch_ted_loss = 0
 
     for i, (img, mml) in enumerate(train_dataloader):
         # mml: (B, max_len)
@@ -279,13 +281,19 @@ def train(
         elif model_type == "cnn_xfmer" or model_type == "resnet_xfmer":
             outputs = outputs.contiguous().view(-1, output_dim)
 
-        loss = criterion(outputs, mml) + weight * batch_ted_loss
+        ce_loss = criterion(outputs, mml)
+        loss = ce_loss + weight * batch_ted_loss
         loss.backward()
 
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
         optimizer.step()
 
         epoch_loss += loss.item()
+        epoch_ce_loss += ce_loss.item()
+        epoch_ted_loss += batch_ted_loss
 
     net_loss = epoch_loss / len(train_dataloader)
-    return net_loss
+    net_ce_loss = epoch_ce_loss / len(train_dataloader)
+    net_ted_loss = epoch_ted_loss / len(train_dataloader)
+
+    return net_loss, net_ce_loss, net_ted_loss

@@ -25,6 +25,8 @@ def evaluate(
 ):
     model.eval()
     epoch_loss = 0
+    epoch_ce_loss = 0
+    epoch_ted_loss = 0
 
     if is_test:
         dataset = config["dataset"]
@@ -80,9 +82,12 @@ def evaluate(
                     )  # (B * max_len-1, output_dim)
                 mml_reshaped = mml[:, 1:].contiguous().view(-1)
 
-            loss = criterion(outputs_reshaped, mml_reshaped) + weight * batch_ted_loss
+            ce_loss = criterion(outputs_reshaped, mml_reshaped)
+            loss = ce_loss + weight * batch_ted_loss
 
             epoch_loss += loss.item()
+            epoch_ce_loss += ce_loss.item()
+            epoch_ted_loss += batch_ted_loss
 
             if is_test:
                 for idx in range(batch_size):
@@ -111,4 +116,7 @@ def evaluate(
                     pred_seqs.write(pred_seq + "\n")
 
     net_loss = epoch_loss / len(test_dataloader)
-    return net_loss
+    net_ce_loss = epoch_ce_loss / len(test_dataloader)
+    net_ted_loss = epoch_ted_loss / len(test_dataloader)
+
+    return net_loss, net_ce_loss, net_ted_loss

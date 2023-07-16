@@ -423,7 +423,7 @@ def train_model(
                 start_time = time.time()
 
                 # training and validation
-                train_loss = train(
+                train_loss, train_ce_loss, train_ted_loss = train(
                     model,
                     model_type,
                     img_tnsr_path,
@@ -434,10 +434,10 @@ def train_model(
                     device,
                     ddp=ddp,
                     rank=rank,
-                    vocab=vocab
+                    vocab=vocab,
                 )
 
-                val_loss = evaluate(
+                val_loss, val_ce_loss, val_ted_loss = evaluate(
                     model,
                     model_type,
                     img_tnsr_path,
@@ -487,22 +487,22 @@ def train_model(
 
                 # logging
                 if (not ddp) or (ddp and rank == 0):
-                    print(f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s")
+                    print(f"Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s")
                     print(
-                        f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
+                        f"\tTrain Loss: {train_loss:.3f} | Train CE Loss: {train_ce_loss:.3f} | Train TED Loss: {train_ted_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
                     )
                     print(
-                        f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}"
+                        f"\t Val. Loss: {val_loss:.3f} | Val. CE Loss: {val_ce_loss:.3f} | Val. TED Loss: {val_ted_loss:.3f} | Val. PPL: {math.exp(val_loss):7.3f}"
                     )
 
                     loss_file.write(
-                        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\n"
+                        f"Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s\n"
                     )
                     loss_file.write(
-                        f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}\n"
+                        f"\tTrain Loss: {train_loss:.3f} | Train CE Loss: {train_ce_loss:.3f} | Train TED Loss: {train_ted_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}\n"
                     )
                     loss_file.write(
-                        f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
+                        f"\t Val. Loss: {val_loss:.3f} | Val. CE Loss: {val_ce_loss:.3f} | Val. TED Loss: {val_ted_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
                     )
 
             else:
@@ -568,7 +568,7 @@ def train_model(
     else:
         beam_params = None
 
-    test_loss = evaluate(
+    test_loss, test_ce_loss, test_ted_loss = evaluate(
         model,
         model_type,
         img_tnsr_path,
@@ -582,13 +582,15 @@ def train_model(
         ddp=ddp,
         rank=rank,
         g2p=g2p,
-        config=config
+        config=config,
     )
 
     if (not ddp) or (ddp and rank == 0):
-        print(f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |")
+        print(
+            f"| Test Loss: {test_loss:.3f} | Test CE Loss: {test_ce_loss:.3f} | Test TED Loss: {test_ted_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
+        )
         loss_file.write(
-            f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
+            f"| Test Loss: {test_loss:.3f} | Test CE Loss: {test_ce_loss:.3f} | Test TED Loss: {test_ted_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
         )
 
     # stopping time
