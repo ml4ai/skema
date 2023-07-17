@@ -76,8 +76,54 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a new model by parsing and validating input data from keyword arguments.</p>
-<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p></div>
+<div class="desc"><p>A base model class for creating Pydantic models.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>model_config</code></strong></dt>
+<dd>Configuration settings for the model.</dd>
+<dt><strong><code>model_fields</code></strong></dt>
+<dd>Metadata about the fields defined on the model.
+This replaces <code>Model.__fields__</code> from Pydantic V1.</dd>
+<dt><strong><code>__class_vars__</code></strong></dt>
+<dd>The names of classvars defined on the model.</dd>
+<dt><strong><code>__private_attributes__</code></strong></dt>
+<dd>Metadata about the private attributes of the model.</dd>
+<dt><strong><code>__signature__</code></strong></dt>
+<dd>The signature for instantiating the model.</dd>
+<dt><strong><code>__pydantic_complete__</code></strong></dt>
+<dd>Whether model building is completed, or if there are still undefined fields.</dd>
+<dt><strong><code>__pydantic_core_schema__</code></strong></dt>
+<dd>The pydantic-core schema used to build the SchemaValidator and SchemaSerializer.</dd>
+<dt><strong><code>__pydantic_custom_init__</code></strong></dt>
+<dd>Whether the model has a custom <code>__init__</code> function.</dd>
+<dt><strong><code>__pydantic_decorators__</code></strong></dt>
+<dd>Metadata containing the decorators defined on the model.
+This replaces <code>Model.__validators__</code> and <code>Model.__root_validators__</code> from Pydantic V1.</dd>
+<dt><strong><code>__pydantic_generic_metadata__</code></strong></dt>
+<dd>Metadata for generic models; contains data used for a similar purpose to
+<strong>args</strong>, <strong>origin</strong>, <strong>parameters</strong> in typing-module generics. May eventually be replaced by these.</dd>
+<dt><strong><code>__pydantic_parent_namespace__</code></strong></dt>
+<dd>Parent namespace of the model, used for automatic rebuilding of models.</dd>
+<dt><strong><code>__pydantic_post_init__</code></strong></dt>
+<dd>The name of the post-init method for the model, if defined.</dd>
+<dt><strong><code>__pydantic_root_model__</code></strong></dt>
+<dd>Whether the model is a <code>RootModel</code>.</dd>
+<dt><strong><code>__pydantic_serializer__</code></strong></dt>
+<dd>The pydantic-core SchemaSerializer used to dump instances of the model.</dd>
+<dt><strong><code>__pydantic_validator__</code></strong></dt>
+<dd>The pydantic-core SchemaValidator used to validate instances of the model.</dd>
+<dt><strong><code>__pydantic_extra__</code></strong></dt>
+<dd>An instance attribute with the values of extra fields from validation when
+<code>model_config['extra'] == 'allow'</code>.</dd>
+<dt><strong><code>__pydantic_fields_set__</code></strong></dt>
+<dd>An instance attribute with the names of fields explicitly specified during validation.</dd>
+<dt><strong><code>__pydantic_private__</code></strong></dt>
+<dd>Instance attribute with the values of private attributes set on the model instance.</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<p>Uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
+allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -96,11 +142,18 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>pydantic.main.BaseModel</li>
-<li>pydantic.utils.Representation</li>
 </ul>
 <h3>Class variables</h3>
 <dl>
 <dt id="skema.program_analysis.comments.MultiFileCodeComments.files"><code class="name">var <span class="ident">files</span> : Dict[str, <a title="skema.program_analysis.comments.SingleFileCodeComments" href="#skema.program_analysis.comments.SingleFileCodeComments">SingleFileCodeComments</a>]</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.comments.MultiFileCodeComments.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.comments.MultiFileCodeComments.model_fields"><code class="name">var <span class="ident">model_fields</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -111,8 +164,54 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a new model by parsing and validating input data from keyword arguments.</p>
-<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p></div>
+<div class="desc"><p>A base model class for creating Pydantic models.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>model_config</code></strong></dt>
+<dd>Configuration settings for the model.</dd>
+<dt><strong><code>model_fields</code></strong></dt>
+<dd>Metadata about the fields defined on the model.
+This replaces <code>Model.__fields__</code> from Pydantic V1.</dd>
+<dt><strong><code>__class_vars__</code></strong></dt>
+<dd>The names of classvars defined on the model.</dd>
+<dt><strong><code>__private_attributes__</code></strong></dt>
+<dd>Metadata about the private attributes of the model.</dd>
+<dt><strong><code>__signature__</code></strong></dt>
+<dd>The signature for instantiating the model.</dd>
+<dt><strong><code>__pydantic_complete__</code></strong></dt>
+<dd>Whether model building is completed, or if there are still undefined fields.</dd>
+<dt><strong><code>__pydantic_core_schema__</code></strong></dt>
+<dd>The pydantic-core schema used to build the SchemaValidator and SchemaSerializer.</dd>
+<dt><strong><code>__pydantic_custom_init__</code></strong></dt>
+<dd>Whether the model has a custom <code>__init__</code> function.</dd>
+<dt><strong><code>__pydantic_decorators__</code></strong></dt>
+<dd>Metadata containing the decorators defined on the model.
+This replaces <code>Model.__validators__</code> and <code>Model.__root_validators__</code> from Pydantic V1.</dd>
+<dt><strong><code>__pydantic_generic_metadata__</code></strong></dt>
+<dd>Metadata for generic models; contains data used for a similar purpose to
+<strong>args</strong>, <strong>origin</strong>, <strong>parameters</strong> in typing-module generics. May eventually be replaced by these.</dd>
+<dt><strong><code>__pydantic_parent_namespace__</code></strong></dt>
+<dd>Parent namespace of the model, used for automatic rebuilding of models.</dd>
+<dt><strong><code>__pydantic_post_init__</code></strong></dt>
+<dd>The name of the post-init method for the model, if defined.</dd>
+<dt><strong><code>__pydantic_root_model__</code></strong></dt>
+<dd>Whether the model is a <code>RootModel</code>.</dd>
+<dt><strong><code>__pydantic_serializer__</code></strong></dt>
+<dd>The pydantic-core SchemaSerializer used to dump instances of the model.</dd>
+<dt><strong><code>__pydantic_validator__</code></strong></dt>
+<dd>The pydantic-core SchemaValidator used to validate instances of the model.</dd>
+<dt><strong><code>__pydantic_extra__</code></strong></dt>
+<dd>An instance attribute with the values of extra fields from validation when
+<code>model_config['extra'] == 'allow'</code>.</dd>
+<dt><strong><code>__pydantic_fields_set__</code></strong></dt>
+<dd>An instance attribute with the names of fields explicitly specified during validation.</dd>
+<dt><strong><code>__pydantic_private__</code></strong></dt>
+<dd>Instance attribute with the values of private attributes set on the model instance.</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<p>Uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
+allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -130,7 +229,6 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>pydantic.main.BaseModel</li>
-<li>pydantic.utils.Representation</li>
 </ul>
 <h3>Class variables</h3>
 <dl>
@@ -142,6 +240,14 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <dd>
 <div class="desc"></div>
 </dd>
+<dt id="skema.program_analysis.comments.SingleFileCodeComments.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.comments.SingleFileCodeComments.model_fields"><code class="name">var <span class="ident">model_fields</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 </dl>
 </dd>
 <dt id="skema.program_analysis.comments.SingleLineComment"><code class="flex name class">
@@ -149,8 +255,54 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Create a new model by parsing and validating input data from keyword arguments.</p>
-<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p></div>
+<div class="desc"><p>A base model class for creating Pydantic models.</p>
+<h2 id="attributes">Attributes</h2>
+<dl>
+<dt><strong><code>model_config</code></strong></dt>
+<dd>Configuration settings for the model.</dd>
+<dt><strong><code>model_fields</code></strong></dt>
+<dd>Metadata about the fields defined on the model.
+This replaces <code>Model.__fields__</code> from Pydantic V1.</dd>
+<dt><strong><code>__class_vars__</code></strong></dt>
+<dd>The names of classvars defined on the model.</dd>
+<dt><strong><code>__private_attributes__</code></strong></dt>
+<dd>Metadata about the private attributes of the model.</dd>
+<dt><strong><code>__signature__</code></strong></dt>
+<dd>The signature for instantiating the model.</dd>
+<dt><strong><code>__pydantic_complete__</code></strong></dt>
+<dd>Whether model building is completed, or if there are still undefined fields.</dd>
+<dt><strong><code>__pydantic_core_schema__</code></strong></dt>
+<dd>The pydantic-core schema used to build the SchemaValidator and SchemaSerializer.</dd>
+<dt><strong><code>__pydantic_custom_init__</code></strong></dt>
+<dd>Whether the model has a custom <code>__init__</code> function.</dd>
+<dt><strong><code>__pydantic_decorators__</code></strong></dt>
+<dd>Metadata containing the decorators defined on the model.
+This replaces <code>Model.__validators__</code> and <code>Model.__root_validators__</code> from Pydantic V1.</dd>
+<dt><strong><code>__pydantic_generic_metadata__</code></strong></dt>
+<dd>Metadata for generic models; contains data used for a similar purpose to
+<strong>args</strong>, <strong>origin</strong>, <strong>parameters</strong> in typing-module generics. May eventually be replaced by these.</dd>
+<dt><strong><code>__pydantic_parent_namespace__</code></strong></dt>
+<dd>Parent namespace of the model, used for automatic rebuilding of models.</dd>
+<dt><strong><code>__pydantic_post_init__</code></strong></dt>
+<dd>The name of the post-init method for the model, if defined.</dd>
+<dt><strong><code>__pydantic_root_model__</code></strong></dt>
+<dd>Whether the model is a <code>RootModel</code>.</dd>
+<dt><strong><code>__pydantic_serializer__</code></strong></dt>
+<dd>The pydantic-core SchemaSerializer used to dump instances of the model.</dd>
+<dt><strong><code>__pydantic_validator__</code></strong></dt>
+<dd>The pydantic-core SchemaValidator used to validate instances of the model.</dd>
+<dt><strong><code>__pydantic_extra__</code></strong></dt>
+<dd>An instance attribute with the values of extra fields from validation when
+<code>model_config['extra'] == 'allow'</code>.</dd>
+<dt><strong><code>__pydantic_fields_set__</code></strong></dt>
+<dd>An instance attribute with the names of fields explicitly specified during validation.</dd>
+<dt><strong><code>__pydantic_private__</code></strong></dt>
+<dd>Instance attribute with the values of private attributes set on the model instance.</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
+<p>Uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
+allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -162,7 +314,6 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li>pydantic.main.BaseModel</li>
-<li>pydantic.utils.Representation</li>
 </ul>
 <h3>Class variables</h3>
 <dl>
@@ -171,6 +322,14 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <div class="desc"></div>
 </dd>
 <dt id="skema.program_analysis.comments.SingleLineComment.line_number"><code class="name">var <span class="ident">line_number</span> : int</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.comments.SingleLineComment.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.comments.SingleLineComment.model_fields"><code class="name">var <span class="ident">model_fields</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -196,6 +355,8 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <h4><code><a title="skema.program_analysis.comments.MultiFileCodeComments" href="#skema.program_analysis.comments.MultiFileCodeComments">MultiFileCodeComments</a></code></h4>
 <ul class="">
 <li><code><a title="skema.program_analysis.comments.MultiFileCodeComments.files" href="#skema.program_analysis.comments.MultiFileCodeComments.files">files</a></code></li>
+<li><code><a title="skema.program_analysis.comments.MultiFileCodeComments.model_config" href="#skema.program_analysis.comments.MultiFileCodeComments.model_config">model_config</a></code></li>
+<li><code><a title="skema.program_analysis.comments.MultiFileCodeComments.model_fields" href="#skema.program_analysis.comments.MultiFileCodeComments.model_fields">model_fields</a></code></li>
 </ul>
 </li>
 <li>
@@ -203,6 +364,8 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <ul class="">
 <li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.comments" href="#skema.program_analysis.comments.SingleFileCodeComments.comments">comments</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.docstrings" href="#skema.program_analysis.comments.SingleFileCodeComments.docstrings">docstrings</a></code></li>
+<li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.model_config" href="#skema.program_analysis.comments.SingleFileCodeComments.model_config">model_config</a></code></li>
+<li><code><a title="skema.program_analysis.comments.SingleFileCodeComments.model_fields" href="#skema.program_analysis.comments.SingleFileCodeComments.model_fields">model_fields</a></code></li>
 </ul>
 </li>
 <li>
@@ -210,6 +373,8 @@ CodeComments = Union[SingleFileCodeComments, MultiFileCodeComments]</code></pre>
 <ul class="">
 <li><code><a title="skema.program_analysis.comments.SingleLineComment.contents" href="#skema.program_analysis.comments.SingleLineComment.contents">contents</a></code></li>
 <li><code><a title="skema.program_analysis.comments.SingleLineComment.line_number" href="#skema.program_analysis.comments.SingleLineComment.line_number">line_number</a></code></li>
+<li><code><a title="skema.program_analysis.comments.SingleLineComment.model_config" href="#skema.program_analysis.comments.SingleLineComment.model_config">model_config</a></code></li>
+<li><code><a title="skema.program_analysis.comments.SingleLineComment.model_fields" href="#skema.program_analysis.comments.SingleLineComment.model_fields">model_fields</a></code></li>
 </ul>
 </li>
 </ul>
