@@ -120,7 +120,7 @@ impl MathExpressionTree {
                 }
                 let mut component = Vec::new();
                 for s in rest {
-                    component.push(s.to_expression());
+                    component.push(s.to_infix_expression());
                 }
                 let math_exp = format!("({})", component.join(&operation.to_string()));
                 expression.push_str(&math_exp);
@@ -591,7 +591,7 @@ fn test_content_hackathon2_scenario1_eq8() {
 fn test_expression1() {
     let input = "<math><mi>γ</mi><mi>I</mi></math>";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    let math = exp.to_expression();
+    let math = exp.to_infix_expression();
     assert_eq!(math, "(γ*I)");
 }
 
@@ -605,7 +605,7 @@ fn test_expression2() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    let math = exp.to_expression();
+    let math = exp.to_infix_expression();
     assert_eq!(math, "((α*ρ)*I)");
 }
 
@@ -621,7 +621,7 @@ fn test_expression3() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    let math = exp.to_expression();
+    let math = exp.to_infix_expression();
     assert_eq!(math, "((((β*I)*S)/N)-(δ*E))")
 }
 
@@ -636,6 +636,6 @@ fn test_expression4() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    let math = exp.to_expression();
+    let math = exp.to_infix_expression();
     assert_eq!(math, "((((1-α)*γ)*I)-(ϵ*R))")
 }
