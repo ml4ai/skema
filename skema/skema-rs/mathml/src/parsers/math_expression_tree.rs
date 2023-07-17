@@ -87,6 +87,47 @@ impl MathExpressionTree {
         }
         content_mathml
     }
+
+    /// Translates to Math Expression (e.g. ((α*ρ)*I)  )
+    pub fn to_expression(&self) -> String {
+        let mut expression = String::new();
+        match self {
+            MathExpressionTree::Atom(i) => match i {
+                MathExpression::Ci(x) => {
+                    expression.push_str(&format!("{}", x.content));
+                }
+                MathExpression::Mi(Mi(id)) => {
+                    expression.push_str(&id.to_string());
+                }
+                MathExpression::Mn(number) => {
+                    expression.push_str(&number.to_string());
+                }
+                MathExpression::Mrow(_) => {
+                    panic!("All Mrows should have been removed by now!");
+                }
+                t => panic!("Unhandled MathExpression: {:?}", t),
+            },
+
+            MathExpressionTree::Cons(head, rest) => {
+                let mut operation = String::new();
+                match head {
+                    Operator::Add => operation.push('+'),
+                    Operator::Subtract => operation.push('-'),
+                    Operator::Multiply => operation.push('*'),
+                    Operator::Equals => operation.push('='),
+                    Operator::Divide => operation.push('/'),
+                    _ => {}
+                }
+                let mut component = Vec::new();
+                for s in rest {
+                    component.push(s.to_expression());
+                }
+                let math_exp = format!("({})", component.join(&operation.to_string()));
+                expression.push_str(&math_exp);
+            }
+        }
+        expression
+    }
 }
 
 /// Represents a token for the Pratt parsing algorithm.
@@ -545,19 +586,55 @@ fn test_content_hackathon2_scenario1_eq8() {
         "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
     );
 }
+#[test]
+fn test_expression1() {
+    let input = "<math><mi>γ</mi><mi>I</mi></math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let math = exp.to_expression();
+    assert_eq!(math, "(γ*I)");
+}
 
 #[test]
-fn test_content_hackathon2_scenario1_eq9() {
+fn test_expression2() {
     let input = "
     <math>
-        <mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mo>=</mo>
-        <mfrac>
-        <mrow><msub><mi>β</mi><mi>s</mi></msub><mo>-</mo><msub><mi>β</mi><mi>c</mi></msub></mrow>
-        <mrow><msup><mi>e</mi><mrow><mo>−</mo><mi>k</mi><mo>(</mo><mo>-</mo><mi>t</mi><mo>+</mo><msub><mi>t</mi><mn>0</mn></msub><mo>)</mo></mrow></msup></mrow>
-        </mfrac>
+        <mi>α</mi>
+        <mi>ρ</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let math = exp.to_expression();
+    assert_eq!(math, "((α*ρ)*I)");
+}
+
+#[test]
+fn test_expression3() {
+    let input = "
+    <math>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mo>−</mo>
+        <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let math = exp.to_expression();
+    assert_eq!(math, "((((β*I)*S)/N)-(δ*E))")
+}
+
+#[test]
+fn test_expression4() {
+    let input = "
+    <math>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>-</mo>
+        <mi>ϵ</mi>
+        <mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let math = exp.to_expression();
+    assert_eq!(math, "((((1-α)*γ)*I)-(ϵ*R))")
 }
