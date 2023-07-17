@@ -88,8 +88,8 @@ impl MathExpressionTree {
         content_mathml
     }
 
-    /// Translates to Math Expression (e.g. ((α*ρ)*I)  )
-    pub fn to_expression(&self) -> String {
+    /// Translates to infix Math Expression to provide "string expressions" for content MathML (e.g. ((α*ρ)*I)  )
+    pub fn to_infix_expression(&self) -> String {
         let mut expression = String::new();
         match self {
             MathExpressionTree::Atom(i) => match i {
@@ -586,6 +586,7 @@ fn test_content_hackathon2_scenario1_eq8() {
         "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
     );
 }
+
 #[test]
 fn test_expression1() {
     let input = "<math><mi>γ</mi><mi>I</mi></math>";
