@@ -2,20 +2,17 @@ use clap::Parser;
 
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
-use mathml::parsers::first_order_ode::{get_FirstOrderODE_vec_from_file};
-
-
+use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 
 #[cfg(test)]
 use std::fs;
 
-
-
-
 // new imports
 use mathml::acset::{PetriNet, RegNet};
 
-use skema::model_extraction::{module_id2mathml_ast, subgraph2_core_dyn_ast};
+use skema::model_extraction::{
+    module_id2mathml_MET_ast, module_id2mathml_ast, subgraph2_core_dyn_ast,
+};
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -46,7 +43,7 @@ fn main() {
 
         let host = "localhost";
 
-        let math_content = module_id2mathml_ast(module_id, host);
+        let math_content = module_id2mathml_MET_ast(module_id, host);
 
         let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list4.txt";
 
@@ -58,16 +55,11 @@ fn main() {
         println!("\nmath_content: {:?}", math_content);
         println!("\nmathml_ast: {:?}", odes);
 
-        println!("\nPN from code: {:?}", ACSet::from(math_content.clone()));
-
         println!(
             "\nAMR from mathml: {}\n",
             serde_json::to_string(&PetriNet::from(odes)).unwrap()
         );
-        println!(
-            "\nAMR from code: {:?}",
-            PetriNet::from(ACSet::from(math_content))
-        );
+        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
         /*println!(
             "\nAMR from mathml: {:?}\n",
             PetriNet::from(ACSet::from(mathml_ast))

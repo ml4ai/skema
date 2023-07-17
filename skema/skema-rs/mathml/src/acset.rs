@@ -479,6 +479,15 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
         for term in terms.iter() {
             println!("term: {:?}\n", term.clone());
+            for param in &term.parameters {
+                let parameters = Parameter {
+                    id: param.clone(),
+                    name: Some(param.clone()),
+                    description: Some(format!("{} rate", param.clone())),
+                    ..Default::default()
+                };
+                parameter_vec.push(parameters.clone());
+            }
         }
 
         // now for polarity pairs of terms we need to construct the transistions
@@ -507,22 +516,28 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 };
                 transitions_vec.insert(transitions.clone());
 
+                let mut expression_string = "".to_string();
+
+                for param in t.0.parameters.clone().iter() {
+                    expression_string = format!("{}{}*", expression_string.clone(), param.clone());
+                }
+
+                let exp_len = t.0.exp_states.len();
+                for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
+                    if i != exp_len {
+                        expression_string =
+                            format!("{}{}*", expression_string.clone(), exp.clone());
+                    } else {
+                        expression_string = format!("{}{}", expression_string.clone(), exp.clone());
+                    }
+                }
+
                 let rate = Rate {
                     target: transitions.id.clone(),
-                    expression: "".to_string(), // the second term needs to be the product of the inputs
+                    expression: expression_string.clone(), // the second term needs to be the product of the inputs
                     expression_mathml: Some(t.0.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
-
-                for param in &t.0.parameters {
-                    let parameters = Parameter {
-                        id: param.clone(),
-                        name: Some(param.clone()),
-                        description: Some(format!("{} rate", param.clone())),
-                        ..Default::default()
-                    };
-                    parameter_vec.push(parameters.clone());
-                }
             } else {
                 // construct transitions for complicated transitions
                 // mainly need to construct the output specially,
@@ -543,22 +558,28 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 };
                 transitions_vec.insert(transitions.clone());
 
+                let mut expression_string = "".to_string();
+
+                for param in t.0.parameters.clone().iter() {
+                    expression_string = format!("{}{}*", expression_string.clone(), param.clone());
+                }
+
+                let exp_len = t.0.exp_states.len() - 1;
+                for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
+                    if i != exp_len {
+                        expression_string =
+                            format!("{}{}*", expression_string.clone(), exp.clone());
+                    } else {
+                        expression_string = format!("{}{}", expression_string.clone(), exp.clone());
+                    }
+                }
+
                 let rate = Rate {
                     target: transitions.id.clone(),
-                    expression: "".to_string(), // the second term needs to be the product of the inputs
+                    expression: expression_string.clone(), // the second term needs to be the product of the inputs
                     expression_mathml: Some(t.0.expression.clone()),
                 };
                 rate_vec.push(rate.clone());
-
-                for param in &t.0.parameters {
-                    let parameters = Parameter {
-                        id: param.clone(),
-                        name: Some(param.clone()),
-                        description: Some(format!("{} rate", param.clone())),
-                        ..Default::default()
-                    };
-                    parameter_vec.push(parameters.clone());
-                }
             }
         }
 

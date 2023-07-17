@@ -516,6 +516,15 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
                             Atom(_x) => variables.push(y[1].to_string()),
                         }
                     }
+                    Add => {
+                        if y.len() == 1 {
+                            variables.push(y[0].to_string());
+                        } else {
+                            for var in y.iter() {
+                                variables.push(var.to_string().clone());
+                            }
+                        }
+                    }
                     _ => {
                         println!("Not expected operation inside Multiply")
                     }
