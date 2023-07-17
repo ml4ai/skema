@@ -52,6 +52,13 @@ class EquationLatexToAMR(BaseModel):
     model: Literal["regnet", "petrinet"] = Field(description="The model type", example="regnet")
 
 
+class MmlToAMR(BaseModel):
+    equations: List[str] = Field(description="Equations in pMML",
+                                 example=["<math><mfrac><mrow><mi>d</mi><mi>Susceptible</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
+                                          "<math><mfrac><mrow><mi>d</mi><mi>Infected</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Recovery</mi><mi>Infected</mi><mo>+</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
+                                          "<math><mfrac><mrow><mi>d</mi><mi>Recovered</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>Recovery</mi><mi>Infected</mi></math>"])
+    model: Literal["regnet", "petrinet"] = Field(description="The model type", example="petrinet")
+
 class CodeSnippet(BaseModel):
     code: str = Field(
         title="code",

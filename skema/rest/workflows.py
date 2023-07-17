@@ -96,6 +96,21 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
         )
     return res.json()
 
+# pmml -> amr
+@router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
+async def equations_to_amr(data: schema.MmlToAMR):
+
+    payload = {"mathml": data.equations, "model": data.model}
+    res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "payload": payload,
+            },
+        )
+    return res.json()
 
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
