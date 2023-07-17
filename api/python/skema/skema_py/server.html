@@ -134,7 +134,7 @@ async def system_to_enriched_system(system: System) -&gt; System:
     comments = {&#34;files&#34;: {}}
     for file_path, result in zip(file_paths, results):
         comments[&#34;files&#34;][str(file_path)] = result
-    system.comments = MultiFileCodeComments.model_validate(comments)
+    system.comments = MultiFileCodeComments.parse_obj(comments)
 
     return system
 
@@ -607,7 +607,7 @@ def ping() -&gt; int:
     comments = {&#34;files&#34;: {}}
     for file_path, result in zip(file_paths, results):
         comments[&#34;files&#34;][str(file_path)] = result
-    system.comments = MultiFileCodeComments.model_validate(comments)
+    system.comments = MultiFileCodeComments.parse_obj(comments)
 
     return system</code></pre>
 </details>
