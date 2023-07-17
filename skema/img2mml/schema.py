@@ -25,7 +25,7 @@ ImageBytes = Annotated[
 class LatexEquation(BaseModel):
     tex_src: str = Field(title="LaTeX equation", description="The LaTeX equation to process")
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "tex_src": "\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}",
             },

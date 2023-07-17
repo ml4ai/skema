@@ -1,4 +1,4 @@
-///! Program to parse MathML and convert it to a Petri Net
+//! Program to parse MathML and convert it to a Petri Net
 use clap::{Parser, ValueEnum};
 use mathml::mml2pn::ACSet;
 

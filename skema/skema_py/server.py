@@ -105,7 +105,7 @@ async def system_to_enriched_system(system: System) -> System:
     comments = {"files": {}}
     for file_path, result in zip(file_paths, results):
         comments["files"][str(file_path)] = result
-    system.comments = MultiFileCodeComments.model_validate(comments)
+    system.comments = MultiFileCodeComments.parse_obj(comments)
 
     return system
 
