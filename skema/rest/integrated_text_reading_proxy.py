@@ -236,7 +236,10 @@ def parquet_to_json(path):
 
 
 def cosmos_client(name: str, data: BinaryIO):
-    """ Posts a pdf to COSMOS and returns the JSON representation of the parquet file """
+    """
+    Posts a pdf to COSMOS and returns the JSON representation of the parquet file
+
+    """
 
     # Create POST request to COSMOS server
     # Prep the pdf data for upload
@@ -404,6 +407,21 @@ async def integrated_text_extractions(
         annotate_skema: bool = True,
         annotate_mit: bool = True,
 ) -> TextReadingAnnotationsOutput:
+    """
+    ### Python example
+    ```
+    params = {
+       "annotate_skema":True,
+       "annotate_mit": True
+    }
+
+    files = [("pdfs", ("paper.txt", open("paper.txt", "rb")))]
+
+    response = request.post(f"{URL}/text-reading/integrated-text-extractions", params=params, files=files)
+    if response.status_code == 200:
+        data = response.json()
+    ```
+    """
     # Get the input plain texts
     texts = texts.texts
 
@@ -429,6 +447,22 @@ async def integrated_pdf_extractions(
         annotate_skema: bool = True,
         annotate_mit: bool = True
 ) -> TextReadingAnnotationsOutput:
+    """
+
+    ### Python example
+    ```
+    params = {
+       "annotate_skema":True,
+       "annotate_mit": True
+    }
+
+    files = [("pdfs", ("ijerp.pdf", open("ijerp.pdf", "rb")))]
+
+    response = request.post(f"{URL}/text-reading/integrated-pdf-extractions", params=params, files=files)
+    if response.status_code == 200:
+        data = response.json()
+    ```
+    """
     # TODO: Make this handle multiple pdf files in parallel
     # Call COSMOS on the pdfs
     cosmos_data = list()
@@ -453,10 +487,19 @@ async def integrated_pdf_extractions(
 @router.post(
     "/cosmos_to_json",
     status_code=200,
-    description="Calls COSMOS on a pdf and converts the data into json"
 )
 async def cosmos_to_json(pdf: UploadFile) -> List[Dict]:
-    """ Calls COSMOS on a pdf and converts the data into json """
+    """ Calls COSMOS on a pdf and converts the data into json
+
+        ### Python example
+        ```
+        response = requests.post(f"{endpoint}/text-reading/cosmos_to_json",
+                        files=[
+                            ("pdf", ("ijerp.pdf", open("ijerph-18-09027.pdf", 'rb')))
+                        ]
+                    )
+        ```
+    """
     return cosmos_client(pdf.filename, pdf.file)
 
 
@@ -467,7 +510,18 @@ async def cosmos_to_json(pdf: UploadFile) -> List[Dict]:
 )
 async def ground_to_mira(k: int, queries: MiraGroundingInputs, response: Response) -> List[
     List[MiraGroundingOutputItem]]:
-    """ Proxy to the MIRA grounding functionality on the SKEMA TR service """
+    """ Proxy to the MIRA grounding functionality on the SKEMA TR service
+
+        ### Python example
+        ```
+        queries = {"queries": ["infected", "suceptible"]}
+        params = {"k": 5}
+        response = requests.post(f"{endpoint}/text-reading/ground_to_mira", params=params, json=queries)
+
+        if response.status_code == 200:
+            results = response.json()
+        ```
+    """
     params = {
         "k": k
     }
@@ -488,7 +542,18 @@ async def ground_to_mira(k: int, queries: MiraGroundingInputs, response: Respons
 
 @router.post("/cards/get_model_card")
 async def get_model_card(text_file: UploadFile, code_file: UploadFile, response: Response):
-    """ Calls the model card endpoint from MIT's pipeline """
+    """ Calls the model card endpoint from MIT's pipeline
+
+        ### Python example
+        ```
+        files = {
+            "text_file": ('text_file.txt", open("text_file.txt", 'rb')),
+            "code_file": ('code_file.py", open("code_file.py", 'rb')),
+        }
+
+        response = requests.post(f"{endpoint}/text-reading/cards/get_model_card", files=files)
+        ```
+    """
 
     params = {
         "gpt_key": OPENAI_KEY,
@@ -504,11 +569,29 @@ async def get_model_card(text_file: UploadFile, code_file: UploadFile, response:
     return inner_response.json()
 
 @router.post("/cards/get_data_card")
-async def get_model_card(csv_file: UploadFile, doc_file: UploadFile, response: Response):
-    """ Calls the data card endpoint from MIT's pipeline """
+async def get_data_card(smart:bool, csv_file: UploadFile, doc_file: UploadFile, response: Response):
+    """
+        Calls the data card endpoint from MIT's pipeline.
+        Smart run provides better results but may result in slow response times as a consequence of extra GPT calls.
+
+        ### Python example
+        ```
+        params = {
+            "smart": False
+        }
+
+        files = {
+            "csv_file": ('csv_file.csv", open("csv_file.csv", 'rb')),
+            "doc_file": ('doc_file.txt", open("doc_file.txt", 'rb')),
+        }
+
+        response = requests.post(f"{endpoint}/text-reading/cards/get_data_card", params=params files=files)
+        ```
+    """
 
     params = {
         "gpt_key": OPENAI_KEY,
+        "smart": smart
     }
     files = {
         "csv_file": (csv_file.filename, csv_file.file, "text/csv"),

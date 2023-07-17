@@ -738,6 +738,21 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
                         meta_nodes.clone(),
                     );
                 }
+                FunctionType::Abstract => {
+                    (nodes, edges, meta_nodes) = create_att_primitive(
+                        &gromet.clone(),
+                        eboxf.clone(),
+                        sboxf.clone(),
+                        nodes.clone(),
+                        edges.clone(),
+                        n1.clone(),
+                        idx,
+                        box_counter,
+                        bf_counter,
+                        start,
+                        meta_nodes.clone(),
+                    );
+                }
                 _ => {}
             }
             box_counter += 1;

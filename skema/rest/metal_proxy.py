@@ -21,7 +21,24 @@ def link_amr(amr_type: str,
              similarity_threshold: float = 0.5,
              amr_file: UploadFile = File(...),
              text_extractions_file: UploadFile = File(...)):
-    """ Links an AMR to a text extractions file """
+    """ Links an AMR to a text extractions file
+
+        ### Python example
+        ```
+        params = {
+          "amr_type": "petrinet"
+        }
+
+        files = {
+          "amr_file": ("amr.json", open("amr.json"), "application/json"),
+          "text_extractions_file": ("extractions.json", open("extractions.json"), "application/json")
+        }
+
+        response = requests.post(f"{ENDPOINT}/metal/link_amr", params=params, files=files)
+        if response.status_code == 200:
+            enriched_amr = response.json()
+        ```
+    """
 
     # Load the AMR
     amr = json.load(amr_file.file)
