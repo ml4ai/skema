@@ -396,87 +396,87 @@ def integrated_extractions(
 # End utility code for the endpoints
 
 
-@router.post(
-    "/integrated-text-extractions",
-    summary="Posts one or more plain text documents and annotates with SKEMA and/or MIT text reading pipelines",
-    status_code=200
-)
-async def integrated_text_extractions(
-        response: Response,
-        texts: TextReadingInputDocuments,
-        annotate_skema: bool = True,
-        annotate_mit: bool = True,
-) -> TextReadingAnnotationsOutput:
-    """
+# @router.post(
+#     "/integrated-text-extractions",
+#     summary="Posts one or more plain text documents and annotates with SKEMA and/or MIT text reading pipelines",
+#     status_code=200
+# )
+# async def integrated_text_extractions(
+#         response: Response,
+#         texts: TextReadingInputDocuments,
+#         annotate_skema: bool = True,
+#         annotate_mit: bool = True,
+# ) -> TextReadingAnnotationsOutput:
+#     """
 
-    params = {
-       "annotate_skema":True,
-       "annotate_mit": True
-    }
+#     params = {
+#        "annotate_skema":True,
+#        "annotate_mit": True
+#     }
 
-    files = [("pdfs", ("paper.txt", open("paper.txt", "rb")))]
+#     files = [("pdfs", ("paper.txt", open("paper.txt", "rb")))]
 
-    response = request.post(f"{URL}/text-reading/integrated-text-extractions", params=params, files=files)
-    if response.status_code == 200:
-        data = response.json()
+#     response = request.post(f"{URL}/text-reading/integrated-text-extractions", params=params, files=files)
+#     if response.status_code == 200:
+#         data = response.json()
 
-    """
-    # Get the input plain texts
-    texts = texts.texts
+#     """
+#     # Get the input plain texts
+#     texts = texts.texts
 
-    # Run the text extractors
-    return integrated_extractions(
-        response,
-        annotate_text_with_skema,
-        texts,
-        texts,
-        annotate_skema,
-        annotate_mit
-    )
+#     # Run the text extractors
+#     return integrated_extractions(
+#         response,
+#         annotate_text_with_skema,
+#         texts,
+#         texts,
+#         annotate_skema,
+#         annotate_mit
+#     )
 
 
-@router.post(
-    "/integrated-pdf-extractions",
-    summary="Posts one or more pdf documents and annotates with SKEMA and/or MIT text reading pipelines",
-    status_code=200
-)
-async def integrated_pdf_extractions(
-        response: Response,
-        pdfs: List[UploadFile],
-        annotate_skema: bool = True,
-        annotate_mit: bool = True
-) -> TextReadingAnnotationsOutput:
-    """
-    params = {
-       "annotate_skema":True,
-       "annotate_mit": True
-    }
+# @router.post(
+#     "/integrated-pdf-extractions",
+#     summary="Posts one or more pdf documents and annotates with SKEMA and/or MIT text reading pipelines",
+#     status_code=200
+# )
+# async def integrated_pdf_extractions(
+#         response: Response,
+#         pdfs: List[UploadFile],
+#         annotate_skema: bool = True,
+#         annotate_mit: bool = True
+# ) -> TextReadingAnnotationsOutput:
+#     """
+#     params = {
+#        "annotate_skema":True,
+#        "annotate_mit": True
+#     }
 
-    files = [("pdfs", ("ijerp.pdf", open("ijerp.pdf", "rb")))]
+#     files = [("pdfs", ("ijerp.pdf", open("ijerp.pdf", "rb")))]
 
-    response = request.post(f"{URL}/text-reading/integrated-pdf-extractions", params=params, files=files)
-    if response.status_code == 200:
-        data = response.json()
+#     response = request.post(f"{URL}/text-reading/integrated-pdf-extractions", params=params, files=files)
+#     if response.status_code == 200:
+#         data = response.json()
 
-    """
-    # TODO: Make this handle multiple pdf files in parallel
-    # Call COSMOS on the pdfs
-    cosmos_data = list()
-    for pdf in pdfs:
-        cosmos_data.append(cosmos_client(pdf.filename, pdf.file))
+#     """
+#     # TODO: Make this handle multiple pdf files in parallel
+#     # Call COSMOS on the pdfs
+#     cosmos_data = list()
+#     for pdf in pdfs:
+#         cosmos_data.append(cosmos_client(pdf.filename, pdf.file))
 
-    # Get the plain text version from cosmos, passed through to MIT pipeline
-    plain_texts = ['\n'.join(block['content'] for block in c) for c in cosmos_data]
+#     # Get the plain text version from cosmos, passed through to MIT pipeline
+#     plain_texts = ['\n'.join(block['content'] for block in c) for c in cosmos_data]
 
-    # Run the text extractors
-    return integrated_extractions(
-        response,
-        annotate_pdfs_with_skema,
-        cosmos_data,
-        plain_texts,
-        annotate_skema,
-        annotate_mit
-    )
+#     # Run the text extractors
+#     return integrated_extractions(
+#         response,
+#         annotate_pdfs_with_skema,
+#         cosmos_data,
+#         plain_texts,
+#         annotate_skema,
+#         annotate_mit
+#     )
 
 
 # These are some direct proxies to the SKEMA and MIT APIs
