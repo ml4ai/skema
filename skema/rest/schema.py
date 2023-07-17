@@ -122,17 +122,17 @@ class MiraGroundingOutputItem(BaseModel):
     )
     groundingConcept: MiraDKGConcept = Field(
         description="DKG concept associated to the query",
-        # example=MiraDKGConcept(
-        #     id="apollosv:00000233",
-        #     name="infected population",
-        #     description="A population of only infected members of one species.",
-        #     synonyms=[],
-        #     embedding=[
-        #         0.01590670458972454,
-        #         0.03795482963323593,
-        #         -0.08787763118743896,
-        #     ],
-        # ),
+        example=MiraDKGConcept(
+            id="apollosv:00000233",
+            name="infected population",
+            description="A population of only infected members of one species.",
+            synonyms=[],
+            embedding=[
+                0.01590670458972454,
+                0.03795482963323593,
+                -0.08787763118743896,
+            ],
+        ),
     )
 
 
