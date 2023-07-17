@@ -559,20 +559,26 @@ async def get_model_card(text_file: UploadFile, code_file: UploadFile, response:
     return inner_response.json()
 
 @router.post("/cards/get_data_card")
-async def get_model_card(csv_file: UploadFile, doc_file: UploadFile, response: Response):
+async def get_data_card(smart:bool, csv_file: UploadFile, doc_file: UploadFile, response: Response):
     """
-        Calls the data card endpoint from MIT's pipeline
+        Calls the data card endpoint from MIT's pipeline.
+        Smart run provides better results but may result in slow response times as a consequence of extra GPT calls.
+
+        params = {
+            "smart": False
+        }
 
         files = {
             "csv_file": ('csv_file.csv", open("csv_file.csv", 'rb')),
             "doc_file": ('doc_file.txt", open("doc_file.txt", 'rb')),
         }
 
-        response = requests.post(f"{endpoint}/text-reading/cards/get_data_card", files=files)
+        response = requests.post(f"{endpoint}/text-reading/cards/get_data_card", params=params files=files)
     """
 
     params = {
         "gpt_key": OPENAI_KEY,
+        "smart": smart
     }
     files = {
         "csv_file": (csv_file.filename, csv_file.file, "text/csv"),
