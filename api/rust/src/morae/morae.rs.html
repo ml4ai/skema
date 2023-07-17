@@ -155,24 +155,24 @@
 
         <span class="kw">let </span>host = <span class="string">&quot;localhost&quot;</span>;
 
-        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(module_id, host);
+        <span class="comment">//let math_content = module_id2mathml_MET_ast(module_id, host);
 
-        <span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/mml_list4.txt&quot;</span>;
+        </span><span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/mml_list3.txt&quot;</span>;
 
         <span class="comment">// This does get a panic with a message, so need to figure out how to forward it
-        </span><span class="kw">let </span>_mathml_ast = get_mathml_asts_from_file(input_src.clone());
+        //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
 
-        <span class="kw">let </span>odes = get_FirstOrderODE_vec_from_file(input_src.clone());
+        </span><span class="kw">let </span>odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
-        <span class="macro">println!</span>(<span class="string">&quot;\nmath_content: {:?}&quot;</span>, math_content);
-        <span class="macro">println!</span>(<span class="string">&quot;\nmathml_ast: {:?}&quot;</span>, odes);
+        <span class="comment">//println!(&quot;\nmath_content: {:?}&quot;, math_content);
+        </span><span class="macro">println!</span>(<span class="string">&quot;\nmathml_ast: {:?}&quot;</span>, odes);
 
         <span class="macro">println!</span>(
             <span class="string">&quot;\nAMR from mathml: {}\n&quot;</span>,
             serde_json::to_string(<span class="kw-2">&amp;</span>PetriNet::from(odes)).unwrap()
         );
-        <span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
-        <span class="comment">/*println!(
+        <span class="comment">//println!(&quot;\nAMR from code: {:?}&quot;, PetriNet::from(math_content));
+        /*println!(
             &quot;\nAMR from mathml: {:?}\n&quot;,
             PetriNet::from(ACSet::from(mathml_ast))
         );*/
