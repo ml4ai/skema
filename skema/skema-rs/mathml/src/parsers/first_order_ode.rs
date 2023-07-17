@@ -475,8 +475,6 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
     terms
 }
 
-// this will
-
 // this takes in the arguments of a multiply term and returns the PnTerm for it
 // we do expect at most only one unary subtraction
 pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
@@ -516,6 +514,15 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
                                 variables.push(y1[1].to_string())
                             }
                             Atom(_x) => variables.push(y[1].to_string()),
+                        }
+                    }
+                    Add => {
+                        if y.len() == 1 {
+                            variables.push(y[0].to_string());
+                        } else {
+                            for var in y.iter() {
+                                variables.push(var.to_string().clone());
+                            }
                         }
                     }
                     _ => {
