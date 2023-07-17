@@ -4885,6 +4885,21 @@
 <a href="#4885" id="4885">4885</a>
 <a href="#4886" id="4886">4886</a>
 <a href="#4887" id="4887">4887</a>
+<a href="#4888" id="4888">4888</a>
+<a href="#4889" id="4889">4889</a>
+<a href="#4890" id="4890">4890</a>
+<a href="#4891" id="4891">4891</a>
+<a href="#4892" id="4892">4892</a>
+<a href="#4893" id="4893">4893</a>
+<a href="#4894" id="4894">4894</a>
+<a href="#4895" id="4895">4895</a>
+<a href="#4896" id="4896">4896</a>
+<a href="#4897" id="4897">4897</a>
+<a href="#4898" id="4898">4898</a>
+<a href="#4899" id="4899">4899</a>
+<a href="#4900" id="4900">4900</a>
+<a href="#4901" id="4901">4901</a>
+<a href="#4902" id="4902">4902</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -5611,6 +5626,21 @@ There being a second function call of the same function which contains an expres
                     );
                 }
                 FunctionType::Primitive =&gt; {
+                    (nodes, edges, meta_nodes) = create_att_primitive(
+                        <span class="kw-2">&amp;</span>gromet.clone(),
+                        eboxf.clone(),
+                        sboxf.clone(),
+                        nodes.clone(),
+                        edges.clone(),
+                        n1.clone(),
+                        idx,
+                        box_counter,
+                        bf_counter,
+                        start,
+                        meta_nodes.clone(),
+                    );
+                }
+                FunctionType::Abstract =&gt; {
                     (nodes, edges, meta_nodes) = create_att_primitive(
                         <span class="kw-2">&amp;</span>gromet.clone(),
                         eboxf.clone(),

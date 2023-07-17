@@ -373,11 +373,14 @@
 <a href="#373" id="373">373</a>
 <a href="#374" id="374">374</a>
 <a href="#375" id="375">375</a>
+<a href="#376" id="376">376</a>
+<a href="#377" id="377">377</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{execute_query, parse_gromet_queries};
 <span class="kw">use </span><span class="kw">crate</span>::model_extraction::module_id2mathml_ast;
 <span class="kw">use </span><span class="kw">crate</span>::ModuleCollection;
+<span class="kw">use </span><span class="kw">crate</span>::model_extraction::module_id2mathml_MET_ast;
 <span class="kw">use </span>actix_web::web::ServiceConfig;
 <span class="kw">use </span>actix_web::{delete, get, post, put, web, HttpResponse};
 <span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
@@ -408,13 +411,14 @@
     </span><span class="prelude-val">Ok</span>(RegNet::from(mathml_ast))
 }
 
-<span class="kw">pub fn </span>model_to_PN(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;PetriNet, MgError&gt; {
+<span class="comment">// this is updated to mathexpressiontrees
+</span><span class="kw">pub fn </span>model_to_PN(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;PetriNet, MgError&gt; {
     <span class="kw">let </span>module_id = push_model_to_db(gromet, host); <span class="comment">// pushes model to db and gets id
     </span><span class="kw">let </span>ref_module_id1 = module_id.as_ref();
     <span class="kw">let </span>ref_module_id2 = module_id.as_ref();
-    <span class="kw">let </span>mathml_ast = module_id2mathml_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), host); <span class="comment">// turns model into mathml ast equations
+    <span class="kw">let </span>mathml_ast = module_id2mathml_MET_ast(<span class="kw-2">*</span>ref_module_id1.unwrap(), host); <span class="comment">// turns model into mathml ast equations
     </span><span class="kw">let </span>_del_response = delete_module(<span class="kw-2">*</span>ref_module_id2.unwrap(), host); <span class="comment">// deletes model from db
-    </span><span class="prelude-val">Ok</span>(PetriNet::from(ACSet::from(mathml_ast)))
+    </span><span class="prelude-val">Ok</span>(PetriNet::from(mathml_ast))
 }
 
 <span class="kw">pub fn </span>push_model_to_db(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;i64, MgError&gt; {

@@ -110,32 +110,21 @@
 <a href="#110" id="110">110</a>
 <a href="#111" id="111">111</a>
 <a href="#112" id="112">112</a>
-<a href="#113" id="113">113</a>
-<a href="#114" id="114">114</a>
-<a href="#115" id="115">115</a>
-<a href="#116" id="116">116</a>
-<a href="#117" id="117">117</a>
-<a href="#118" id="118">118</a>
-<a href="#119" id="119">119</a>
-<a href="#120" id="120">120</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
-<span class="kw">use </span>mathml::parsers::first_order_ode::{get_FirstOrderODE_vec_from_file};
-
-
+<span class="kw">use </span>mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">use </span>std::fs;
 
-
-
-
 <span class="comment">// new imports
 </span><span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
 
-<span class="kw">use </span>skema::model_extraction::{module_id2mathml_ast, subgraph2_core_dyn_ast};
+<span class="kw">use </span>skema::model_extraction::{
+    module_id2mathml_MET_ast, module_id2mathml_ast, subgraph2_core_dyn_ast,
+};
 
 <span class="attr">#[derive(Parser, Debug)]
 </span><span class="kw">struct </span>Cli {
@@ -166,7 +155,7 @@
 
         <span class="kw">let </span>host = <span class="string">&quot;localhost&quot;</span>;
 
-        <span class="kw">let </span>math_content = module_id2mathml_ast(module_id, host);
+        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(module_id, host);
 
         <span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/mml_list4.txt&quot;</span>;
 
@@ -178,16 +167,11 @@
         <span class="macro">println!</span>(<span class="string">&quot;\nmath_content: {:?}&quot;</span>, math_content);
         <span class="macro">println!</span>(<span class="string">&quot;\nmathml_ast: {:?}&quot;</span>, odes);
 
-        <span class="macro">println!</span>(<span class="string">&quot;\nPN from code: {:?}&quot;</span>, ACSet::from(math_content.clone()));
-
         <span class="macro">println!</span>(
             <span class="string">&quot;\nAMR from mathml: {}\n&quot;</span>,
             serde_json::to_string(<span class="kw-2">&amp;</span>PetriNet::from(odes)).unwrap()
         );
-        <span class="macro">println!</span>(
-            <span class="string">&quot;\nAMR from code: {:?}&quot;</span>,
-            PetriNet::from(ACSet::from(math_content))
-        );
+        <span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
         <span class="comment">/*println!(
             &quot;\nAMR from mathml: {:?}\n&quot;,
             PetriNet::from(ACSet::from(mathml_ast))
