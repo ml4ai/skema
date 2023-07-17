@@ -3,6 +3,7 @@ use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
 use crate::model_extraction::module_id2mathml_ast;
 use crate::ModuleCollection;
+use crate::model_extraction::module_id2mathml_MET_ast;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
@@ -33,13 +34,14 @@ pub fn model_to_RN(gromet: ModuleCollection, host: &str) -> Result<RegNet, MgErr
     Ok(RegNet::from(mathml_ast))
 }
 
+// this is updated to mathexpressiontrees
 pub fn model_to_PN(gromet: ModuleCollection, host: &str) -> Result<PetriNet, MgError> {
     let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
     let ref_module_id2 = module_id.as_ref();
-    let mathml_ast = module_id2mathml_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
+    let mathml_ast = module_id2mathml_MET_ast(*ref_module_id1.unwrap(), host); // turns model into mathml ast equations
     let _del_response = delete_module(*ref_module_id2.unwrap(), host); // deletes model from db
-    Ok(PetriNet::from(ACSet::from(mathml_ast)))
+    Ok(PetriNet::from(mathml_ast))
 }
 
 pub fn push_model_to_db(gromet: ModuleCollection, host: &str) -> Result<i64, MgError> {

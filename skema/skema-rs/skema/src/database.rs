@@ -738,6 +738,21 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
                         meta_nodes.clone(),
                     );
                 }
+                FunctionType::Abstract => {
+                    (nodes, edges, meta_nodes) = create_att_primitive(
+                        &gromet.clone(),
+                        eboxf.clone(),
+                        sboxf.clone(),
+                        nodes.clone(),
+                        edges.clone(),
+                        n1.clone(),
+                        idx,
+                        box_counter,
+                        bf_counter,
+                        start,
+                        meta_nodes.clone(),
+                    );
+                }
                 _ => {}
             }
             box_counter += 1;
@@ -1628,7 +1643,7 @@ pub fn create_function(
 
     // now we add a check for if this is an imported function
     match eboxf.b.clone().unwrap()[0].function_type.clone() {
-        FunctionType::Import => {
+        FunctionType::Imported => {
             (nodes, edges, start, meta_nodes) = create_import(
                 &gromet.clone(),
                 function_net,

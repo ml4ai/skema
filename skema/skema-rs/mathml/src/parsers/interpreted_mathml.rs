@@ -9,12 +9,9 @@ use crate::{
         operator::{Derivative, Operator},
         Ci, Math, MathExpression, Mi, Mrow, Type,
     },
-    parsers::{
-        generic_mathml::{
-            add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
-            rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
-        },
-        math_expression_tree::MathExpressionTree,
+    parsers::generic_mathml::{
+        add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
+        rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
     },
 };
 
@@ -60,12 +57,6 @@ pub fn ci_univariate_func(input: Span) -> IResult<Ci> {
 /// Parse content identifier for Msub
 pub fn ci_subscript(input: Span) -> IResult<Ci> {
     let (s, x) = msub(input)?;
-    Ok((s, Ci::new(None, Box::new(x))))
-}
-
-/// Parse content identifier for Msup
-pub fn ci_superscript(input: Span) -> IResult<Ci> {
-    let (s, x) = msup(input)?;
     Ok((s, Ci::new(None, Box::new(x))))
 }
 
@@ -137,29 +128,6 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     Ok((s, (Derivative::new(order, 1), x)))
 }
 
-/// Parse identifier 'e' for exponential
-fn exp(input: Span) -> IResult<()> {
-    let (s, Mi(x)) = mi(input)?;
-    if let "e" = x.as_ref() {
-        Ok((s, ()))
-    } else {
-        Err(nom::Err::Error(ParseError::new(
-            "Unable to identify Mi('e')".to_string(),
-            input,
-        )))
-    }
-}
-
-pub fn exponential(input: Span) -> IResult<MathExpressionTree> {
-    let (s, x) = delimited(stag!("msup"), pair(exp, math_expression), etag!("msup"))(input)?;
-    let (_, comp) = x;
-
-    Ok((
-        s,
-        MathExpressionTree::Cons(Operator::Exp, vec![MathExpressionTree::Atom(comp)]),
-    ))
-}
-
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
 // the generic_mathml module) to work with the specialized version of the math_expression parser
 // (also in this file).
@@ -187,7 +155,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         map(ci_univariate_func, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
-        //map(ci_superscript, MathExpression::Ci),
         map(ci_unknown, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
@@ -196,6 +163,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         }),
         map(operator, MathExpression::Mo),
         mn,
+        msup,
+        msub,
         msqrt,
         mfrac,
         map(mrow, MathExpression::Mrow),

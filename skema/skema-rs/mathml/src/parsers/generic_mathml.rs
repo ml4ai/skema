@@ -6,10 +6,11 @@ use crate::ast::{
     },
     Mi, Mrow,
 };
+
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
+    character::complete::{alphanumeric1, multispace0, not_line_ending},
     combinator::{map, map_parser, opt, recognize, value},
     error::Error,
     multi::many0,
@@ -180,7 +181,10 @@ pub fn add(input: Span) -> IResult<Operator> {
 }
 
 pub fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, ws(one_of("-−")))(input)?;
+    let (s, op) = value(
+        Operator::Subtract,
+        alt((tag("-"), tag("−"), tag("&#x2212;"))),
+    )(input)?;
     Ok((s, op))
 }
 

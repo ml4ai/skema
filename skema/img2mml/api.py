@@ -1,13 +1,18 @@
-import json
 import os
 import requests
 from pathlib import Path
 import urllib.request
 from skema.rest.proxies import SKEMA_MATHJAX_ADDRESS
 from skema.img2mml.translate import convert_to_torch_tensor, render_mml
+from skema.img2mml.models.image2mml_xfmer import Image2MathML_Xfmer
+import torch
+from typing import Tuple, List, Any, Dict
+from logging import info
+from skema.img2mml.translate import define_model
+import json
 
 
-def retrieve_model(model_path=None):
+def retrieve_model(model_path=None) -> str:
     """
     Retrieve the img2mml model from the specified path or download it if not found.
 
@@ -20,8 +25,8 @@ def retrieve_model(model_path=None):
     cwd = Path(__file__).parents[0]
     MODEL_BASE_ADDRESS = "https://artifacts.askem.lum.ai/skema/img2mml/models"
     MODEL_NAME = "cnn_xfmer_arxiv_im2mml_with_fonts_boldface_best.pt"
-
-    if model_path is None:
+    # If the model path is none or doesn't exist, the default model will be downloaded from server.
+    if model_path is None or not os.path.exists(model_path):
         model_path = cwd / "trained_models" / MODEL_NAME
 
         # Check if the model file already exists
@@ -34,27 +39,177 @@ def retrieve_model(model_path=None):
     return str(model_path)
 
 
-def get_mathml_from_bytes(data: bytes):
-    # read config file
+def check_gpu_availability() -> torch.device:
+    """
+    Check if GPU is available and return the appropriate device.
+
+    Returns:
+        torch.device: The device (GPU or CPU) to be used for computation.
+    """
+    if not torch.cuda.is_available():
+        print("CUDA is not available, falling back to using the CPU.")
+        device = torch.device("cpu")
+    else:
+        device = torch.device("cuda")
+
+    return device
+
+
+def load_model(
+    model_path: str,
+    config: dict,
+    vocab: List[str],
+    device: torch.device = torch.device("cpu"),
+) -> Image2MathML_Xfmer:
+    """
+    Load the model's state dictionary from a file.
+
+    Args:
+        model_path: The path to the model state dictionary file.
+        config: The configuration setting.
+        vocab: The vocabulary dictionary of the img2mml model.
+        device: The device (GPU or CPU) to be used for computation.
+
+    Returns:
+        The model with loaded state dictionary.
+
+    Raises:
+        FileNotFoundError: If the model state dictionary file does not exist.
+        RuntimeError: If there is an error during loading the state dictionary.
+
+    Note:
+        If `clean_state_dict` is True, the function removes the "module." prefix from the state_dict keys
+        if present.
+
+        If CUDA is not available, the function falls back to using the CPU for loading the state dictionary.
+    """
+
+    model: Image2MathML_Xfmer = define_model(config, vocab, device).to(device)
     cwd = Path(__file__).parents[0]
-    config_path = cwd / "configs" / "xfmer_mml_config.json"
-    with open(config_path, "r") as cfg:
-        config = json.load(cfg)
+    if model_path is None:
+        model_path = (
+            cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_best.pt"
+        )
+    try:
+        # if state_dict keys has "module.<key_name>"
+        # we need to remove the "module." from key_names
+        if config["clean_state_dict"]:
+            new_model = dict()
+            for key, value in torch.load(model_path, map_location=device).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
+        else:
+            if not torch.cuda.is_available():
+                info("CUDA is not available, falling back to using the CPU.")
+                new_model = dict()
+                for key, value in torch.load(model_path, map_location=device).items():
+                    new_model[key[7:]] = value
+                    model.load_state_dict(new_model, strict=False)
+            else:
+                model.load_state_dict(torch.load(model_path))
+    except FileNotFoundError:
+        raise FileNotFoundError(f"Model state dictionary file not found: {model_path}")
+    except Exception as e:
+        raise RuntimeError(
+            f"Error loading state dictionary from file: {model_path}\n{e}"
+        )
+
+    return model
+
+
+def load_vocab(vocab_path: str = None) -> Tuple[List[str], dict, dict]:
+    """
+    Load vocabulary from a list and create dictionaries for both forward and backward mapping.
+
+    Args:
+        vocab (Optional[str, Path]): The vocabulary path.
+
+    Returns:
+        Tuple[List[str], dict, dict]: A tuple containing two dictionaries:
+            - vocab (List[str]): A complete dictionary.
+            - vocab_itos (dict): A dictionary mapping index to token.
+            - vocab_stoi (dict): A dictionary mapping token to index.
+    """
+    cwd = Path(__file__).parents[0]
+    if vocab_path is None:
+        vocab_path = (
+            cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
+        )
+
+    # read vocab.txt
+    with open(vocab_path) as f:
+        vocab = f.readlines()
+
+    vocab_itos = dict()
+    vocab_stoi = dict()
+
+    for v in vocab:
+        k, v = v.split()
+        vocab_itos[v.strip()] = k.strip()
+        vocab_stoi[k.strip()] = v.strip()
+
+    return vocab, vocab_itos, vocab_stoi
+
+
+class Image2MathML:
+    def __init__(self, config_path: str, vocab_path: str, model_path: str) -> None:
+        self.config = self.load_config(config_path)
+        self.vocab, self.vocab_itos, self.vocab_stoi = self.load_vocab(vocab_path)
+        self.device = self.check_gpu_availability()
+        self.model = self.load_model(model_path)
+
+    def load_config(self, config_path: str) -> Dict[str, Any]:
+        with open(config_path, "r") as cfg:
+            config = json.load(cfg)
+        return config
+
+    def load_vocab(self, vocab_path: str) -> Tuple[Any, Dict[str, Any], Dict[str, Any]]:
+        # Load the image2mathml vocabulary
+        vocab, vocab_itos, vocab_stoi = load_vocab(vocab_path=vocab_path)
+        return vocab, vocab_itos, vocab_stoi
+
+    def check_gpu_availability(self) -> torch.device:
+        # Check GPU availability
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+        else:
+            device = torch.device("cpu")
+        return device
+
+    def load_model(self, model_path: str) -> Image2MathML_Xfmer:
+        # Load the image2mathml model
+        MODEL_PATH = retrieve_model(model_path=model_path)
+        img2mml_model: Image2MathML_Xfmer = load_model(
+            model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+        )
+        return img2mml_model
+
+def get_mathml_from_bytes(
+    data: bytes,
+    image2mathml_db: Image2MathML,
+) -> str:
+    """
+    Convert an image in bytes format to MathML representation using the provided model.
+
+    Args:
+        data (bytes): The image data in bytes format.
+        model (Image2MathML_Xfmer): The pre-trained image-to-MathML model.
+        config (Dict): Configuration dictionary for rendering MathML.
+        vocab_itos (Dict): Dictionary mapping index to token for vocabulary.
+        vocab_stoi (Dict): Dictionary mapping token to index for vocabulary.
+        device (torch.device): CPU or GPU.
+
+    Returns:
+        str: The MathML representation of the input image.
+    """
     # convert png image to tensor
-    imagetensor = convert_to_torch_tensor(data, config)
+    imagetensor = convert_to_torch_tensor(data, image2mathml_db.config)
 
     # change the shape of tensor from (C_in, H, W)
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
-    VOCAB_NAME = "arxiv_im2mml_with_fonts_with_boldface_vocab.txt"
 
-    # read vocab.txt
-    with open(cwd / "trained_models" / VOCAB_NAME) as f:
-        vocab = f.readlines()
-
-    model_path = retrieve_model()
-
-    return render_mml(config, model_path, vocab, imagetensor)
+    return render_mml(image2mathml_db.model, image2mathml_db.vocab_itos, image2mathml_db.vocab_stoi, imagetensor, image2mathml_db.device)
 
 
 def get_mathml_from_file(filepath) -> str:
@@ -94,3 +249,5 @@ def get_mathml_from_latex(eqn: str) -> str:
             return f"An error occurred: {e}"
         finally:
             return "Conversion Failed."
+
+
