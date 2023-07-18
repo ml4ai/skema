@@ -135,7 +135,7 @@ def normalize_extractions(
 
             # MIT merges the collection for us
             if response.status_code == 200:
-                merged_collection = AttributeCollection(**response.json())
+                merged_collection = AttributeCollection.from_json(response.json())
                 # Return the merged collection here
                 return merged_collection
 
