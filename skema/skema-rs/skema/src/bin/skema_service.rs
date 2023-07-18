@@ -1,7 +1,7 @@
 use actix_web::{get, web::Data, App, HttpResponse, HttpServer};
 use skema::config::Config;
 use skema::services::{comment_extraction, gromet};
-
+use std::env;
 use clap::Parser;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -34,10 +34,18 @@ pub async fn ping() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+
+    let version = env::var("APP_VERSION").unwrap();
+    let version_slice = &version[0..6];
+
     pretty_env_logger::init();
 
     #[derive(OpenApi)]
     #[openapi(
+        info(
+            title = "SKEMA RUST SERVICES",
+            version = version_slice,
+        ),
         paths(
             comment_extraction::get_comments,
             comment_extraction::get_comments_from_zipfile,
