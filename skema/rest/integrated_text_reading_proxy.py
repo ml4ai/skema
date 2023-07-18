@@ -346,6 +346,8 @@ def merge_pipelines_results(
     )
 
 
+
+
 def integrated_extractions(
         response: Response,
         skema_annotator: Callable,
