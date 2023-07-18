@@ -110,7 +110,7 @@ def normalize_extractions(
         if mit_extractions:
             try:
                 # MIT extractions already come normalized
-                canonical_mit = AttributeCollection(**mit_extractions)
+                canonical_mit = AttributeCollection.from_json(mit_extractions)
                 collections.append(canonical_mit)
             except Exception as ex:
                 print(ex)
