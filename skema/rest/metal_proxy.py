@@ -44,13 +44,15 @@ def link_amr(amr_type: str,
     amr = json.load(amr_file.file)
     amr = replace_xml_codepoints(amr)
 
-    # Load the extractions, that come out of the TR Proxy endpoing
-    text_extractions = TextReadingAnnotationsOutput(**json.load(text_extractions_file.file))
+    # Load the extractions, that come out of the TR Proxy endpoint
+    raw_extractions = json.load(text_extractions_file.file)
+    text_extractions = [AttributeCollection.from_json(o['data']) for o in raw_extractions['outputs']]
+    # text_extractions = TextReadingAnnotationsOutput(**json.load(text_extractions_file.file))
 
     # Merge all the attribute collections
     extractions = AttributeCollection(
         attributes=list(
-            it.chain.from_iterable(o.data.attributes for o in text_extractions.outputs)
+            it.chain.from_iterable(o.attributes for o in text_extractions)
         )
     )
 

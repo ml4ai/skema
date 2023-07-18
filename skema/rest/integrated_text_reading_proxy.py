@@ -110,7 +110,7 @@ def normalize_extractions(
         if mit_extractions:
             try:
                 # MIT extractions already come normalized
-                canonical_mit = AttributeCollection(**mit_extractions)
+                canonical_mit = AttributeCollection.from_json(mit_extractions)
                 collections.append(canonical_mit)
             except Exception as ex:
                 print(ex)
@@ -135,7 +135,7 @@ def normalize_extractions(
 
             # MIT merges the collection for us
             if response.status_code == 200:
-                merged_collection = AttributeCollection(**response.json())
+                merged_collection = AttributeCollection.from_json(response.json())
                 # Return the merged collection here
                 return merged_collection
 
@@ -344,6 +344,8 @@ def merge_pipelines_results(
         outputs=results,
         generalized_errors=generalized_errors if generalized_errors else None
     )
+
+
 
 
 def integrated_extractions(
