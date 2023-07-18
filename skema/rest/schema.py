@@ -6,6 +6,7 @@ from typing import List, Optional
 
 from askem_extractions.data_model import AttributeCollection
 from pydantic import BaseModel, Field
+
 # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
 from typing_extensions import Literal
 
@@ -42,22 +43,37 @@ class HealthStatus(BaseModel):
 class EquationImagesToAMR(BaseModel):
     # FIXME: will this work or do we need base64?
     images: List[eqn2mml_schema.ImageBytes]
-    model: Literal["regnet", "petrinet"] = Field(description="The model type")
+    model: Literal["regnet", "petrinet"] = Field(
+        description="The model type", example="petrinet"
+    )
 
 
 class EquationLatexToAMR(BaseModel):
-    equations: List[str] = Field(description="Equations in LaTeX",
-                                 example=["\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}",
-                                          "\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}"])
-    model: Literal["regnet", "petrinet"] = Field(description="The model type", example="regnet")
+    equations: List[str] = Field(
+        description="Equations in LaTeX",
+        example=[
+            r"\frac{\partial x}{\partial t} = {\alpha x} - {\beta x y}",
+            r"\frac{\partial y}{\partial t} = {\alpha x y} - {\gamma y}",
+        ],
+    )
+    model: Literal["regnet", "petrinet"] = Field(
+        description="The model type", example="regnet"
+    )
 
 
 class MmlToAMR(BaseModel):
-    equations: List[str] = Field(description="Equations in pMML",
-                                 example=["<math><mfrac><mrow><mi>d</mi><mi>Susceptible</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
-                                          "<math><mfrac><mrow><mi>d</mi><mi>Infected</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Recovery</mi><mi>Infected</mi><mo>+</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
-                                          "<math><mfrac><mrow><mi>d</mi><mi>Recovered</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>Recovery</mi><mi>Infected</mi></math>"])
-    model: Literal["regnet", "petrinet"] = Field(description="The model type", example="petrinet")
+    equations: List[str] = Field(
+        description="Equations in pMML",
+        example=[
+            "<math><mfrac><mrow><mi>d</mi><mi>Susceptible</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
+            "<math><mfrac><mrow><mi>d</mi><mi>Infected</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mo>−</mo><mi>Recovery</mi><mi>Infected</mi><mo>+</mo><mi>Infection</mi><mi>Infected</mi><mi>Susceptible</mi></math>",
+            "<math><mfrac><mrow><mi>d</mi><mi>Recovered</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mo>=</mo><mi>Recovery</mi><mi>Infected</mi></math>",
+        ],
+    )
+    model: Literal["regnet", "petrinet"] = Field(
+        description="The model type", example="petrinet"
+    )
+
 
 class CodeSnippet(BaseModel):
     code: str = Field(
@@ -81,29 +97,28 @@ class MiraGroundingInputs(BaseModel):
 
 class MiraGroundingOutputItem(BaseModel):
     class MiraDKGConcept(BaseModel):
-        id: str = Field(
-            description="DKG element id",
-            example="apollosv:00000233"
-        )
+        id: str = Field(description="DKG element id", example="apollosv:00000233")
         name: str = Field(
-            description="Canonical name of the concept",
-            example="infected population"
+            description="Canonical name of the concept", example="infected population"
         )
         description: Optional[str] = Field(
             description="Long winded description of the concept",
-            example="A population of only infected members of one species."
+            example="A population of only infected members of one species.",
         )
         synonyms: List[str] = Field(
             description="Any alternative name to the cannonical one for the concept",
-            example=["Ill individuals", "The sick and ailing"]
+            example=[["Ill individuals", "The sick and ailing"]],
         )
         embedding: List[float] = Field(
             description="Word embedding of the underlying model for the concept"
         )
 
+        def __hash__(self):
+            return hash(tuple([self.id, tuple(self.synonyms), tuple(self.embedding)]))
+
     score: float = Field(
         description="Cosine similarity of the embedding representation of the input with that of the DKG element",
-        example=0.7896
+        example=0.7896,
     )
     groundingConcept: MiraDKGConcept = Field(
         description="DKG concept associated to the query",
@@ -116,8 +131,8 @@ class MiraGroundingOutputItem(BaseModel):
                 0.01590670458972454,
                 0.03795482963323593,
                 -0.08787763118743896,
-            ]
-        )
+            ],
+        ),
     )
 
 
@@ -143,6 +158,9 @@ class TextReadingError(BaseModel):
         example="Out of memory error",
     )
 
+    def __hash__(self):
+        return hash(f"{self.pipeline}-{self.message}")
+
 
 class TextReadingDocumentResults(BaseModel):
     data: Optional[AttributeCollection] = Field(
@@ -156,6 +174,11 @@ class TextReadingDocumentResults(BaseModel):
         example=[TextReadingError(pipeline="MIT", message="Unauthorized API key")],
     )
 
+    def __hash__(self):
+        return hash(
+            tuple([self.data, "NONE" if self.errors is None else tuple(self.errors)])
+        )
+
 
 class TextReadingAnnotationsOutput(BaseModel):
     """Contains the TR document results for all the documents submitted for annotation"""
@@ -163,11 +186,14 @@ class TextReadingAnnotationsOutput(BaseModel):
     outputs: List[TextReadingDocumentResults] = Field(
         name="outputs",
         description="Contains the results of TR annotations for each input document. There is one entry per input and "
-                    "inputs and outputs are matched by the same index in the list",
+        "inputs and outputs are matched by the same index in the list",
         example=[
-            TextReadingDocumentResults(data=AttributeCollection(attributes=[])),
             TextReadingDocumentResults(
-                errors=[TextReadingError(pipeline="SKEMA", message="Dummy error")]
+                data=AttributeCollection(attributes=[]), errors=None
+            ),
+            TextReadingDocumentResults(
+                data=AttributeCollection(attributes=[]),
+                errors=[TextReadingError(pipeline="SKEMA", message="Dummy error")],
             ),
         ],
     )
@@ -175,5 +201,5 @@ class TextReadingAnnotationsOutput(BaseModel):
     generalized_errors: Optional[List[TextReadingError]] = Field(
         name="generalized_errors",
         description="Any pipeline-wide errors, not specific to a particular input",
-        example=[TextReadingError(pipeline="MIT", message="API quota exceeded")]
+        example=[TextReadingError(pipeline="MIT", message="API quota exceeded")],
     )

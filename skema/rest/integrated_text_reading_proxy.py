@@ -346,6 +346,8 @@ def merge_pipelines_results(
     )
 
 
+
+
 def integrated_extractions(
         response: Response,
         skema_annotator: Callable,
@@ -408,7 +410,8 @@ async def integrated_text_extractions(
         annotate_mit: bool = True,
 ) -> TextReadingAnnotationsOutput:
     """
-
+    ### Python example
+    ```
     params = {
        "annotate_skema":True,
        "annotate_mit": True
@@ -419,7 +422,7 @@ async def integrated_text_extractions(
     response = request.post(f"{URL}/text-reading/integrated-text-extractions", params=params, files=files)
     if response.status_code == 200:
         data = response.json()
-
+    ```
     """
     # Get the input plain texts
     texts = texts.texts
@@ -447,6 +450,9 @@ async def integrated_pdf_extractions(
         annotate_mit: bool = True
 ) -> TextReadingAnnotationsOutput:
     """
+
+    ### Python example
+    ```
     params = {
        "annotate_skema":True,
        "annotate_mit": True
@@ -457,7 +463,7 @@ async def integrated_pdf_extractions(
     response = request.post(f"{URL}/text-reading/integrated-pdf-extractions", params=params, files=files)
     if response.status_code == 200:
         data = response.json()
-
+    ```
     """
     # TODO: Make this handle multiple pdf files in parallel
     # Call COSMOS on the pdfs
@@ -483,17 +489,18 @@ async def integrated_pdf_extractions(
 @router.post(
     "/cosmos_to_json",
     status_code=200,
-    description="Calls COSMOS on a pdf and converts the data into json"
 )
 async def cosmos_to_json(pdf: UploadFile) -> List[Dict]:
     """ Calls COSMOS on a pdf and converts the data into json
 
+        ### Python example
+        ```
         response = requests.post(f"{endpoint}/text-reading/cosmos_to_json",
                         files=[
                             ("pdf", ("ijerp.pdf", open("ijerph-18-09027.pdf", 'rb')))
                         ]
                     )
-
+        ```
     """
     return cosmos_client(pdf.filename, pdf.file)
 
@@ -507,12 +514,15 @@ async def ground_to_mira(k: int, queries: MiraGroundingInputs, response: Respons
     List[MiraGroundingOutputItem]]:
     """ Proxy to the MIRA grounding functionality on the SKEMA TR service
 
+        ### Python example
+        ```
         queries = {"queries": ["infected", "suceptible"]}
         params = {"k": 5}
         response = requests.post(f"{endpoint}/text-reading/ground_to_mira", params=params, json=queries)
 
         if response.status_code == 200:
             results = response.json()
+        ```
     """
     params = {
         "k": k
@@ -536,13 +546,15 @@ async def ground_to_mira(k: int, queries: MiraGroundingInputs, response: Respons
 async def get_model_card(text_file: UploadFile, code_file: UploadFile, response: Response):
     """ Calls the model card endpoint from MIT's pipeline
 
+        ### Python example
+        ```
         files = {
             "text_file": ('text_file.txt", open("text_file.txt", 'rb')),
             "code_file": ('code_file.py", open("code_file.py", 'rb')),
         }
 
         response = requests.post(f"{endpoint}/text-reading/cards/get_model_card", files=files)
-
+        ```
     """
 
     params = {
@@ -564,6 +576,8 @@ async def get_data_card(smart:bool, csv_file: UploadFile, doc_file: UploadFile, 
         Calls the data card endpoint from MIT's pipeline.
         Smart run provides better results but may result in slow response times as a consequence of extra GPT calls.
 
+        ### Python example
+        ```
         params = {
             "smart": False
         }
@@ -574,6 +588,7 @@ async def get_data_card(smart:bool, csv_file: UploadFile, doc_file: UploadFile, 
         }
 
         response = requests.post(f"{endpoint}/text-reading/cards/get_data_card", params=params files=files)
+        ```
     """
 
     params = {
