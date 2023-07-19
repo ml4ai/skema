@@ -34,17 +34,13 @@ pub async fn ping() -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
-    let version = env::var("APP_VERSION").unwrap();
-    let version_slice = &version[0..6];
-
     pretty_env_logger::init();
 
     #[derive(OpenApi)]
     #[openapi(
         info(
             title = "SKEMA RUST SERVICES",
-            version = version_slice,
+            version = "version",
         ),
         paths(
             comment_extraction::get_comments,
@@ -122,8 +118,10 @@ async fn main() -> std::io::Result<()> {
     )]
     struct ApiDoc;
 
-    let openapi = ApiDoc::openapi();
+    let version = env::var("APP_VERSION").unwrap_or("?????".to_string());
 
+    let mut openapi = ApiDoc::openapi();
+    openapi.info.version = version.to_string();
     let args = Cli::parse();
 
     HttpServer::new(move || {
