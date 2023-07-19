@@ -18,31 +18,6 @@ def test_text_integrated_extractions():
         "annotate_mit": False
     }
 
-    path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
-
-    with path.open("rb") as pdf:
-        files = [
-            ("pdf", ("CHIME_SVIIvR_model.pdf", pdf, "application/pdf"))
-        ]
-        response = client.post(f"/integrated-text-extractions", params=params, files=files)
-
-    assert response.status_code == 200
-
-    results = TextReadingAnnotationsOutput(**response.json())
-    assert len(results.outputs) == 1, "The inputs doesn't have outputs"
-    assert results.generalized_errors is None, f"Generalized TR errors"
-    for ix, output in enumerate(results.outputs):
-        assert output.data is not None, f"Document {ix + 1} didn't generate AttributeCollection"
-        assert len(output.data.attributes) > 0, f"Document {ix + 1} generated an empty attribute collection"
-        assert output.errors is None, f"Document {ix+1} reported errors"
-
-def test_integrated_pdf_extraction():
-    """ Tests the pdf endpoint """
-    params = {
-        "annotate_skema": True,
-        "annotate_mit": False
-    }
-
     payload = {
         "texts": [
             "x = 0",
@@ -56,6 +31,32 @@ def test_integrated_pdf_extraction():
 
     results = TextReadingAnnotationsOutput(**response.json())
     assert len(results.outputs) == 3, "One of the inputs doesn't have outputs"
+    assert results.generalized_errors is None, f"Generalized TR errors"
+    for ix, output in enumerate(results.outputs):
+        assert output.data is not None, f"Document {ix + 1} didn't generate AttributeCollection"
+        assert len(output.data.attributes) > 0, f"Document {ix + 1} generated an empty attribute collection"
+        assert output.errors is None, f"Document {ix + 1} reported errors"
+
+
+def test_integrated_pdf_extraction():
+    """ Tests the pdf endpoint """
+    params = {
+        "annotate_skema": True,
+        "annotate_mit": False
+    }
+
+    path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
+    with path.open("rb") as pdf:
+        files = [
+            ("pdfs", ("CHIME_SVIIvR_model.pdf", pdf, "application/pdf"))
+        ]
+
+        response = client.post(f"/integrated-pdf-extractions", params=params, files=files)
+
+    assert response.status_code == 200
+
+    results = TextReadingAnnotationsOutput(**response.json())
+    assert len(results.outputs) == 1, "The inputs doesn't have outputs"
     assert results.generalized_errors is None, f"Generalized TR errors"
     for ix, output in enumerate(results.outputs):
         assert output.data is not None, f"Document {ix + 1} didn't generate AttributeCollection"
@@ -82,8 +83,8 @@ def test_mira_grounding():
 
     data = [[MiraGroundingOutputItem(**r) for r in q] for q in ret.json()]
     assert len(data) == 2, "Service didn't return results for all queries"
-    assert all(len(groundings) == params["k"] for groundings in data), "Service didn't return the requested number of candidates for each query"
-
+    assert all(len(groundings) == params["k"] for groundings in
+               data), "Service didn't return the requested number of candidates for each query"
 
 
 def test_healthcheck():
