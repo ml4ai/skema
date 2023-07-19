@@ -5,12 +5,62 @@ from fastapi.testclient import TestClient
 from fastapi import status
 
 from skema.rest.integrated_text_reading_proxy import app, cosmos_client
-from skema.rest.schema import MiraGroundingOutputItem
+from skema.rest.schema import MiraGroundingOutputItem, TextReadingAnnotationsOutput
 
 client = TestClient(app)
 
 
-# TODO Add a unit test with a small document
+def test_text_integrated_extractions():
+    """ Tests the integrated text extractions endpoint """
+    # Read an example document to annotate
+    params = {
+        "annotate_skema": True,
+        "annotate_mit": False
+    }
+
+    path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
+
+    with path.open("rb") as pdf:
+        files = [
+            ("pdf", ("CHIME_SVIIvR_model.pdf", pdf, "application/pdf"))
+        ]
+        response = client.post(f"/integrated-text-extractions", params=params, files=files)
+
+    assert response.status_code == 200
+
+    results = TextReadingAnnotationsOutput(**response.json())
+    assert len(results.outputs) == 1, "The inputs doesn't have outputs"
+    assert results.generalized_errors is None, f"Generalized TR errors"
+    for ix, output in enumerate(results.outputs):
+        assert output.data is not None, f"Document {ix + 1} didn't generate AttributeCollection"
+        assert len(output.data.attributes) > 0, f"Document {ix + 1} generated an empty attribute collection"
+        assert output.errors is None, f"Document {ix+1} reported errors"
+
+def test_integrated_pdf_extraction():
+    """ Tests the pdf endpoint """
+    params = {
+        "annotate_skema": True,
+        "annotate_mit": False
+    }
+
+    payload = {
+        "texts": [
+            "x = 0",
+            "y = 1",
+            "I: Infected population"
+        ]
+    }
+
+    response = client.post(f"/integrated-text-extractions", params=params, json=payload)
+    assert response.status_code == 200
+
+    results = TextReadingAnnotationsOutput(**response.json())
+    assert len(results.outputs) == 3, "One of the inputs doesn't have outputs"
+    assert results.generalized_errors is None, f"Generalized TR errors"
+    for ix, output in enumerate(results.outputs):
+        assert output.data is not None, f"Document {ix + 1} didn't generate AttributeCollection"
+        assert len(output.data.attributes) > 0, f"Document {ix + 1} generated an empty attribute collection"
+        assert output.errors is None, f"Document {ix + 1} reported errors"
 
 
 # Test the cosmos endpoint
