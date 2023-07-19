@@ -104,6 +104,7 @@ class MiraGroundingOutputItem(BaseModel):
         description: Optional[str] = Field(
             description="Long winded description of the concept",
             example="A population of only infected members of one species.",
+            default=None
         )
         synonyms: List[str] = Field(
             description="Any alternative name to the cannonical one for the concept",
