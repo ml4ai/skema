@@ -32,6 +32,19 @@ pub async fn ping() -> HttpResponse {
     HttpResponse::Ok().body("The SKEMA Rust web services are running.")
 }
 
+
+/// This endpoint can be used to check the version of the service.
+#[utoipa::path(
+    responses(
+        (status = 200, description = "Version")
+    )
+)]
+#[get("/version")]
+pub async fn version() -> HttpResponse {
+    let end_version = env::var("APP_VERSION").unwrap_or("?????".to_string());
+    HttpResponse::Ok().body(end_version)
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     pretty_env_logger::init();
@@ -62,7 +75,8 @@ async fn main() -> std::io::Result<()> {
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
-            ping
+            ping,
+            version
         ),
         components(
             schemas(
@@ -118,10 +132,10 @@ async fn main() -> std::io::Result<()> {
     )]
     struct ApiDoc;
 
-    let version = env::var("APP_VERSION").unwrap_or("?????".to_string());
+    let version_hash = env::var("APP_VERSION").unwrap_or("?????".to_string());
 
     let mut openapi = ApiDoc::openapi();
-    openapi.info.version = version.to_string();
+    openapi.info.version = version_hash.to_string();
     let args = Cli::parse();
 
     HttpServer::new(move || {
@@ -143,6 +157,7 @@ async fn main() -> std::io::Result<()> {
             .service(gromet::model2PN)
             .service(gromet::model2RN)
             .service(ping)
+            .service(version)
             .service(SwaggerUi::new("/docs/{_:.*}").url("/api-doc/openapi.json", openapi.clone()))
     })
     .bind((args.host, args.port))?
