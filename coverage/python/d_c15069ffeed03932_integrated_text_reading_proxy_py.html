@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for skema/rest/integrated_text_reading_proxy.py: 48%</title>
+    <title>Coverage for skema/rest/integrated_text_reading_proxy.py: 50%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>skema/rest/integrated_text_reading_proxy.py</b>:
-            <span class="pc_cov">48%</span>
+            <span class="pc_cov">50%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">240 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">114<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">126<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">121<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">119<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_metal_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-19 01:50 +0000
+            created at 2023-07-19 17:10 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -606,20 +606,20 @@
     <p class="pln"><span class="n"><a id="t524" href="#t524">524</a></span><span class="t"><span class="str">            results = response.json()</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t525" href="#t525">525</a></span><span class="t"><span class="str">        ```</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t526" href="#t526">526</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t527" href="#t527">527</a></span><span class="t">    <span class="nam">params</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t527" href="#t527">527</a></span><span class="t">    <span class="nam">params</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t528" href="#t528">528</a></span><span class="t">        <span class="str">"k"</span><span class="op">:</span> <span class="nam">k</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t529" href="#t529">529</a></span><span class="t">    <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t530" href="#t530">530</a></span><span class="t">    <span class="nam">headers</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t530" href="#t530">530</a></span><span class="t">    <span class="nam">headers</span> <span class="op">=</span> <span class="op">{</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t531" href="#t531">531</a></span><span class="t">        <span class="str">"Content-Type"</span><span class="op">:</span> <span class="str">"text/plain"</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t532" href="#t532">532</a></span><span class="t">    <span class="op">}</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t533" href="#t533">533</a></span><span class="t">    <span class="nam">payload</span> <span class="op">=</span> <span class="str">"\n"</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">queries</span><span class="op">.</span><span class="nam">queries</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t534" href="#t534">534</a></span><span class="t">    <span class="nam">inner_response</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">f"{SKEMA_TR_ADDRESS}/groundStringsToMira"</span><span class="op">,</span> <span class="nam">headers</span><span class="op">=</span><span class="nam">headers</span><span class="op">,</span> <span class="nam">params</span><span class="op">=</span><span class="nam">params</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t533" href="#t533">533</a></span><span class="t">    <span class="nam">payload</span> <span class="op">=</span> <span class="str">"\n"</span><span class="op">.</span><span class="nam">join</span><span class="op">(</span><span class="nam">queries</span><span class="op">.</span><span class="nam">queries</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t534" href="#t534">534</a></span><span class="t">    <span class="nam">inner_response</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="str">f"{SKEMA_TR_ADDRESS}/groundStringsToMira"</span><span class="op">,</span> <span class="nam">headers</span><span class="op">=</span><span class="nam">headers</span><span class="op">,</span> <span class="nam">params</span><span class="op">=</span><span class="nam">params</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t535" href="#t535">535</a></span><span class="t">                                   <span class="nam">data</span><span class="op">=</span><span class="nam">payload</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t536" href="#t536">536</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t537" href="#t537">537</a></span><span class="t">    <span class="nam">response</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">=</span> <span class="nam">inner_response</span><span class="op">.</span><span class="nam">status_code</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t537" href="#t537">537</a></span><span class="t">    <span class="nam">response</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">=</span> <span class="nam">inner_response</span><span class="op">.</span><span class="nam">status_code</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t538" href="#t538">538</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t539" href="#t539">539</a></span><span class="t">    <span class="key">if</span> <span class="nam">inner_response</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">==</span> <span class="num">200</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t540" href="#t540">540</a></span><span class="t">        <span class="key">return</span> <span class="op">[</span><span class="op">[</span><span class="nam">MiraGroundingOutputItem</span><span class="op">(</span><span class="op">**</span><span class="nam">o</span><span class="op">)</span> <span class="key">for</span> <span class="nam">o</span> <span class="key">in</span> <span class="nam">q</span><span class="op">]</span> <span class="key">for</span> <span class="nam">q</span> <span class="key">in</span> <span class="nam">inner_response</span><span class="op">.</span><span class="nam">json</span><span class="op">(</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t539" href="#t539">539</a></span><span class="t">    <span class="key">if</span> <span class="nam">inner_response</span><span class="op">.</span><span class="nam">status_code</span> <span class="op">==</span> <span class="num">200</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t540" href="#t540">540</a></span><span class="t">        <span class="key">return</span> <span class="op">[</span><span class="op">[</span><span class="nam">MiraGroundingOutputItem</span><span class="op">(</span><span class="op">**</span><span class="nam">o</span><span class="op">)</span> <span class="key">for</span> <span class="nam">o</span> <span class="key">in</span> <span class="nam">q</span><span class="op">]</span> <span class="key">for</span> <span class="nam">q</span> <span class="key">in</span> <span class="nam">inner_response</span><span class="op">.</span><span class="nam">json</span><span class="op">(</span><span class="op">)</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t541" href="#t541">541</a></span><span class="t">    <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t542" href="#t542">542</a></span><span class="t">        <span class="key">return</span> <span class="nam">inner_response</span><span class="op">.</span><span class="nam">content</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t543" href="#t543">543</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -747,7 +747,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_metal_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.2.7">coverage.py v7.2.7</a>,
-            created at 2023-07-19 01:50 +0000
+            created at 2023-07-19 17:10 +0000
         </p>
     </div>
 </footer>
