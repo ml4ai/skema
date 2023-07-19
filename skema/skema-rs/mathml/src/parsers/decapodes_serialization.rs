@@ -71,31 +71,46 @@ pub fn to_decapodes_serialization(
     mut variable_count: usize,
     mut operation_count: usize,
 ) -> (Vec<Variable>, Vec<ProjectionOperator>, usize, usize) {
-    //let mut variables: Vec<Variable> = Vec::new();
-    //let mut projection_operators: Vec<ProjectionOperator> = Vec::new();
-    if let MathExpressionTree::Cons(head, rest) = input {
-        //let mut variables: Vec<Variable> = Vec::new();
-        //let mut projection_operators: Vec<ProjectionOperator> = Vec::new();
-        //let mut variable_count = 0;
-        //let mut operation_count = 0;
+    if let MathExpressionTree::Atom(i) = input {
+        println!("i={:?}", i);
+        println!("----INSIDE ELSE IF");
+        match i {
+            MathExpression::Ci(x) => {
+                variable_count += 1;
+                println!("---- Ci INSIDE ELSE IF");
+                println!("x.content={}", x.content);
+                println!("variable_count in Ci(x)= {}", variable_count);
+                let variable = Variable {
+                    r#type: Type::infer,
+                    name: x.content.to_string(),
+                };
+                variables.push(variable.clone());
+            }
+            _ => println!("Unhandled"),
+        }
+    } else if let MathExpressionTree::Cons(head, rest) = input {
+        println!("head={:?}, rest={:?}", head, rest);
         match head {
             Operator::Add => println!("+"),
             Operator::Subtract => println!("-"),
             Operator::Multiply => {
                 println!("*");
-                operation_count += 1;
-                variable_count += 1;
-                let temp_str = format!("•{}", operation_count.to_string());
-                let temp_variable = Variable {
-                    r#type: Type::infer,
-                    name: temp_str,
-                };
-                variables.push(temp_variable.clone());
-                println!("temp_variable={:?}", temp_variable);
+                if operation_count == 0 {
+                    operation_count += 1;
+                    variable_count += 1;
+                    let temp_variable = Variable {
+                        r#type: Type::infer,
+                        name: "mult_1".to_string(),
+                    };
+                    variables.push(temp_variable.clone());
+                } else {
+                }
+                println!("var_count={}", variable_count);
+                println!("op_count={}", operation_count);
                 let projection = ProjectionOperator {
                     proj1: variable_count,
-                    proj2: variable_count,
-                    res: variable_count,
+                    proj2: variable_count + 3,
+                    res: variable_count - 1,
                     op2: "*".to_string(),
                 };
                 println!("projection = {:?}", projection);
@@ -150,27 +165,94 @@ pub fn to_decapodes_serialization(
                     }
                     t => panic!("Unhandled MathExpression: {:?}", t),
                 },
-                MathExpressionTree::Cons(Operator, comp) => {
-                    return to_decapodes_serialization(
-                        &MathExpressionTree::Cons(Operator::Multiply, comp.to_vec()),
-                        //s,
-                        variables,
-                        projection_operators,
-                        variable_count,
-                        operation_count,
-                    );
+                MathExpressionTree::Cons(head, comp) => {
+                    println!("Operator={:?} , comp = {:?}", head, comp);
+                    println!("Operator={:?} , comp = {:?}", head, comp.to_vec());
+                    println!("comp[0]={:?}", comp[0]);
+                    println!("comp[1]={:?}", comp[1]);
+
+                    match head {
+                        Operator::Add => println!("+"),
+                        Operator::Subtract => println!("-"),
+                        Operator::Multiply => {
+                            println!("*");
+                            println!("--op_count={}", operation_count);
+                            if operation_count == 0 {
+                                operation_count += 1;
+                                variable_count += 1;
+                                let temp_variable = Variable {
+                                    r#type: Type::infer,
+                                    name: "mult_1".to_string(),
+                                };
+                                variables.push(temp_variable.clone());
+                            } else {
+                            }
+                            println!("--var_count={}", variable_count);
+                            println!("--op_count={}", operation_count);
+                            let projection = ProjectionOperator {
+                                proj1: variable_count + 1,
+                                proj2: variable_count + 2,
+                                res: variable_count,
+                                op2: "*".to_string(),
+                            };
+                            println!("projection = {:?}", projection);
+                            projection_operators.push(projection.clone());
+                        }
+                        Operator::Equals => {}
+                        Operator::Divide => println!("/"),
+                        Operator::Derivative(Derivative { order, var_index })
+                            if (order, var_index) == (&1_u8, &1_u8) =>
+                        {
+                            println!("diff");
+                        }
+                        _ => {}
+                    }
+                    println!("comp.len()={}", comp.len());
+                    for c in comp.iter() {
+                        println!("c ={:?}", c);
+                        let (v1, p1, variable_count, operation_count) = to_decapodes_serialization(
+                            &c,
+                            variables,
+                            projection_operators,
+                            variable_count,
+                            operation_count,
+                        );
+                        println!("v1={:?}", v1);
+                        println!(
+                            "!!!!!!!!!!!!!!!!!!!!!!!!!!!!1 operation_count={}",
+                            operation_count
+                        );
+                    }
                 }
             }
         }
-        println!("variables={:?}", variables);
     }
 
+    println!("variables={:?}", variables);
     return (
         variables.to_vec(),
         projection_operators.to_vec(),
         variable_count,
         operation_count,
     );
+}
+
+pub fn to_serialize_json(input: &MathExpressionTree) -> WiringDiagram {
+    let mut variables: Vec<Variable> = Vec::new();
+    let mut projection_operators: Vec<ProjectionOperator> = Vec::new();
+    let mut unary_operators: Vec<UnaryOperator> = Vec::new();
+    let mut sum_op: Vec<Sum> = Vec::new();
+    let mut summand_op: Vec<Summation> = Vec::new();
+    let (variables, projection_operators, variables_count, operation_count) =
+        to_decapodes_serialization(&input, &mut variables, &mut projection_operators, 0, 0);
+
+    return WiringDiagram {
+        Var: variables,
+        Op1: unary_operators,
+        Op2: projection_operators,
+        Σ: sum_op,
+        Summand: summand_op,
+    };
 }
 
 #[test]
@@ -191,7 +273,10 @@ fn test_serialize1() {
     let mut proj: Vec<ProjectionOperator> = Vec::new();
     //let serialize = expression.to_decapodes_serialization();
     //let serialize = to_decapodes_serialization(expression);
-    let serialize = to_decapodes_serialization(&expression, &mut var, &mut proj, 0, 0);
-    println!("|||||||||||||||||||||||||||||||||||||||");
+    /*let serialize = to_decapodes_serialization(&expression, &mut var, &mut proj, 0, 0);
+        println!("|||||||||||||||||||||||||||||||||||||||");
+        println!("serialize = {:?}", serialize);
+    */
+    let serialize = to_serialize_json(&expression);
     println!("serialize = {:?}", serialize);
 }
