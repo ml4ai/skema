@@ -10,7 +10,8 @@ use crate::{
 use derive_new::new;
 use nom::error::Error;
 use serde::{Deserialize, Serialize};
-use std::{fmt, io, str::FromStr};
+use serde_json::{json, Result};
+use std::{fmt, fs::File, io::Write, str::FromStr};
 
 #[cfg(test)]
 use crate::parsers::first_order_ode::{first_order_ode, FirstOrderODE};
@@ -237,7 +238,7 @@ pub fn to_decapodes_serialization(
     );
 }
 
-pub fn to_serialize_json(input: &MathExpressionTree) -> WiringDiagram {
+pub fn to_wiring_diagram(input: &MathExpressionTree) -> WiringDiagram {
     let mut variables: Vec<Variable> = Vec::new();
     let mut projection_operators: Vec<ProjectionOperator> = Vec::new();
     let mut unary_operators: Vec<UnaryOperator> = Vec::new();
@@ -253,6 +254,13 @@ pub fn to_serialize_json(input: &MathExpressionTree) -> WiringDiagram {
         Σ: sum_op,
         Summand: summand_op,
     };
+}
+
+pub fn to_decapodes_json(input: WiringDiagram) -> Result<()> {
+    let json_wiring_diagram = serde_json::to_string_pretty(&input).unwrap();
+    println!("json_wiring_diagran={:?}", json_wiring_diagram);
+
+    Ok(())
 }
 
 #[test]
@@ -271,12 +279,8 @@ fn test_serialize1() {
     println!("expression.to_string()={}", expression.to_string());
     let mut var: Vec<Variable> = Vec::new();
     let mut proj: Vec<ProjectionOperator> = Vec::new();
-    //let serialize = expression.to_decapodes_serialization();
-    //let serialize = to_decapodes_serialization(expression);
-    /*let serialize = to_decapodes_serialization(&expression, &mut var, &mut proj, 0, 0);
-        println!("|||||||||||||||||||||||||||||||||||||||");
-        println!("serialize = {:?}", serialize);
-    */
-    let serialize = to_serialize_json(&expression);
-    println!("serialize = {:?}", serialize);
+    let wiring_diagram = to_wiring_diagram(&expression);
+    println!("wiring_diagram = {:?}", wiring_diagram);
+    let json = to_decapodes_json(wiring_diagram);
+    println!("json={:?}", json);
 }
