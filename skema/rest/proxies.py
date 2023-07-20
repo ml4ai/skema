@@ -20,7 +20,7 @@ SKEMA_MATHJAX_ADDRESS = os.environ.get(
 )
 
 # Text Reading services
-MIT_TR_ADDRESS = os.environ.get("MIT_TR_ADDRESS", "http://100.26.10.46")
+MIT_TR_ADDRESS = os.environ.get("MIT_TR_ADDRESS", "http://3.83.68.208")
 SKEMA_TR_ADDRESS = os.environ.get("SKEMA_TR_ADDRESS", "http://hopper.sista.arizona.edu")
 OPENAI_KEY = os.environ.get("OPENAI_KEY", "YOU_FORGOT_TO_SET_OPENAI_KEY")
 COSMOS_ADDRESS = os.environ.get("COSMOS_ADDRESS", "http://cosmos0002.chtc.wisc.edu:8089")
