@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Response, status
+from fastapi.responses import PlainTextResponse
 import os
 from skema.rest import (
     schema,
@@ -124,7 +125,7 @@ app.include_router(
 
 @app.get("/version", tags=["core"], summary="API version")
 async def version() -> str:
-    return VERSION
+    return PlainTextResponse(VERSION)
 
 
 @app.get(
