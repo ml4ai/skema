@@ -1,4 +1,4 @@
-use actix_web::{get, web::Data, App, HttpResponse, HttpServer};
+use actix_web::{get, web::Data, App, http::header::ContentType, HttpResponse, HttpServer};
 use skema::config::Config;
 use skema::services::{comment_extraction, gromet};
 use std::env;
@@ -42,7 +42,7 @@ pub async fn ping() -> HttpResponse {
 #[get("/version")]
 pub async fn version() -> HttpResponse {
     let end_version = env::var("APP_VERSION").unwrap_or("?????".to_string());
-    HttpResponse::Ok().body(end_version)
+    HttpResponse::Ok().content_type(ContentType::plaintext()).body(end_version)
 }
 
 #[actix_web::main]
