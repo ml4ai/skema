@@ -16,16 +16,12 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
     1.to(10).foreach { index =>
       array(0) = index.toFloat
       floatBuffer.put(array, 0, 1)
-      (floatBuffer: Buffer).flip()
+      floatBuffer.flip()
       val float = byteBuffer.getFloat
       float should be (index)
 
-      // reset goes back to marked position, so needs a mark.
-      floatBuffer.mark()
-      (floatBuffer: Buffer).clear()
       floatBuffer.clear()
-      byteBuffer.mark()
-      (byteBuffer: Buffer).clear()
+      byteBuffer.clear()
     }
   }
 }
