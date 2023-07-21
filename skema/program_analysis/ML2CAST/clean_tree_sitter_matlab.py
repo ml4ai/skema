@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Clean any files created by building the tree-sitter grammar 
 
 import os.path
@@ -14,7 +16,7 @@ PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 os.chdir(PROJECT_PATH)
 
 # clean existing generated grammar files
-cmd = 'rm -rf bindings.gyp bindings build src'
+cmd = 'rm -rf binding.gyp bindings build src'
 subprocess.call(cmd, shell = True)
 
 # Move back to caller directory
