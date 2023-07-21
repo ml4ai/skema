@@ -10,8 +10,14 @@ Modified by Adi
 
 import os
 import requests
-import config
 import json
+
+try:
+    import config
+
+    MATHPIX_API_KEY = config.MATHPIX_API_KEY
+except ModuleNotFoundError:
+    MATHPIX_API_KEY = "NOT_A_REAL_KEY"
 
 BASE_IMG_URL = "https://raw.githubusercontent.com/ml4ai/equation-images/main/images/"
 
@@ -22,7 +28,7 @@ class BatchRequestHandler:
 
         self.headers = {
             "app_id": "Zach's MathML requests",
-            "app_key": config.MATHPIX_API_KEY,
+            "app_key": MATHPIX_API_KEY,
         }
 
         with open("./image_ids.json", "r") as f:
