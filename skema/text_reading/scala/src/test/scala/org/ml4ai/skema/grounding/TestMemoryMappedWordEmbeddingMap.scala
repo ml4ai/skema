@@ -17,7 +17,7 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
       array(0) = index.toFloat
       array(1) = (index + 1).toFloat
       floatBuffer.put(array)
-      floatBuffer.flip()
+      (floatBuffer: Buffer).flip()
 
       val float1 = byteBuffer.getFloat
       float1 should be (array(0))
@@ -25,8 +25,8 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
       val float2 = byteBuffer.getFloat
       float2 should be (array(1))
 
-      floatBuffer.clear()
-      byteBuffer.clear()
+      (floatBuffer: Buffer).clear()
+      (byteBuffer: Buffer).clear()
     }
   }
 }
