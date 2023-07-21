@@ -11,14 +11,19 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
   it should "buffer" in {
     val byteBuffer = ByteBuffer.allocate(8)
     val floatBuffer = byteBuffer.asFloatBuffer
-    val array = new Array[Float](1)
+    val array = new Array[Float](2)
 
     1.to(10).foreach { index =>
       array(0) = index.toFloat
-      floatBuffer.put(array, 0, 1)
+      array(1) = (index + 1).toFloat
+      floatBuffer.put(array)
       floatBuffer.flip()
-      val float = byteBuffer.getFloat
-      float should be (index)
+
+      val float1 = byteBuffer.getFloat
+      float1 should be (array(0))
+
+      val float2 = byteBuffer.getFloat
+      float2 should be (array(1))
 
       floatBuffer.clear()
       byteBuffer.clear()
