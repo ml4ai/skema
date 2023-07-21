@@ -9,7 +9,8 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
   behavior of "float buffer"
 
   it should "buffer" in {
-    val byteBuffer = ByteBuffer.allocate(8).order(ByteOrder.nativeOrder())
+    val floatBytes = java.lang.Float.BYTES
+    val byteBuffer = ByteBuffer.allocate(2 * floatBytes).order(ByteOrder.nativeOrder())
     val floatBuffer = byteBuffer.asFloatBuffer
     val array = new Array[Float](2)
 

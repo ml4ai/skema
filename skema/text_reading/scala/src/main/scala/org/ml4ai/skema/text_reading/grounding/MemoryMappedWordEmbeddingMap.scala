@@ -1,9 +1,10 @@
 package org.ml4ai.skema.text_reading.grounding
 
 import org.clulab.embeddings.{CompactWordEmbeddingMap, WordEmbeddingMap}
+import requests.RequestBlob.ByteSourceRequestBlob
 
-import java.io.{ByteArrayOutputStream, DataOutputStream, File, FileOutputStream, OutputStream, RandomAccessFile}
-import java.nio.{ByteBuffer, FloatBuffer}
+import java.io.{BufferedOutputStream, ByteArrayOutputStream, DataOutputStream, File, FileOutputStream, OutputStream, RandomAccessFile}
+import java.nio.{Buffer, ByteBuffer, ByteOrder, FloatBuffer}
 import java.nio.channels.FileChannel
 import scala.collection.mutable.{HashMap => MutableHashMap}
 import scala.util.Using
@@ -29,15 +30,16 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
     // https://stackoverflow.com/questions/12132595/mappedbytebuffer-asfloatbuffer-vs-in-memory-float-performance
 
     {
-      val byteBuffer = ByteBuffer.allocate(columns * 4)
+      val floatBytes = java.lang.Float.BYTES
+      val byteBuffer = ByteBuffer.allocate(columns * floatBytes).order(ByteOrder.nativeOrder)
       val floatBuffer = byteBuffer.asFloatBuffer
       val array = buildType.array
 
-      Using.resource(new FileOutputStream(file)) { fileOutputStream =>
+      Using.resource(new BufferedOutputStream(new FileOutputStream(file))) { outputStream =>
         Range(0, rows).foreach { row =>
           floatBuffer.put(array, row * columns, columns)
-          fileOutputStream.write(byteBuffer.array)
-          floatBuffer.clear()
+          outputStream.write(byteBuffer.array)
+          (floatBuffer: Buffer).clear()
         }
       }
     }
@@ -45,8 +47,10 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
     {
       val randomAccessFile = new RandomAccessFile(file, "r")
       val channel = randomAccessFile.getChannel
-      val size = channel.size()
-      val mappedMemoryBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
+      // Channel size cannot exceed Integer.MAX_VALUE.
+      // Several channels will be required.
+      val size = Math.min(channel.size(), Int.MaxValue)
+      val mappedMemoryBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, size).order(ByteOrder.nativeOrder)
       val floatBuffer = mappedMemoryBuffer.asFloatBuffer
 
       floatBuffer
