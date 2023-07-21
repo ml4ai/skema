@@ -2,7 +2,7 @@ package org.ml4ai.skema.grounding
 
 import org.ml4ai.skema.test.Test
 
-import java.nio.ByteBuffer
+import java.nio.{Buffer, ByteBuffer}
 
 class TestMemoryMappedWordEmbeddingMap extends Test {
 
@@ -16,10 +16,12 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
     1.to(10).foreach { index =>
       array(0) = index.toFloat
       floatBuffer.put(array, 0, 1)
-      byteBuffer.flip()
-      val bytes = byteBuffer.array
+      (floatBuffer: Buffer).flip()
+      val float = byteBuffer.getFloat
+      (floatBuffer: Buffer).flip()
+//      (floatBuffer: Buffer).reset()
 
-      floatBuffer.clear()
+      float should be (index)
     }
   }
 }
