@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>skema.img2mml.render_mml.json_to_js API documentation</title>
+<title>skema.img2mml.render_mml.mathpix_annotator API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -20,87 +20,23 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>skema.img2mml.render_mml.json_to_js</code></h1>
+<h1 class="title">Namespace <code>skema.img2mml.render_mml.mathpix_annotator</code></h1>
 </header>
 <section id="section-intro">
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def json2js(json_data, output_file, var_name=&#34;eqn_src&#34;):
-    &#34;&#34;&#34;
-    Helper function to write &#39;json&#39; version of latex source data as a javascript list of dicts.
-    Use json.load() to read the json into python object.
-    Args:
-        json_data: Assumed format: [ {&#34;src&#34;: &lt;string&gt;, &#34;mml&#34;: &lt;string&gt;}, ... ]
-        output_file: Path to .js output file
-        var_name: Name of the variable being assigned the list of dicts in the .js file
-    Returns:
-    &#34;&#34;&#34;
-    with open(output_file, &#34;w&#34;) as fout:
-        fout.write(f&#34;{var_name} = [\n&#34;)
-        for i, datum in enumerate(json_data):
-            fout.write(&#34;  {\n&#34;)
-            fout.write(f&#39;    mml1: {repr(datum[&#34;mml1&#34;])},\n&#39;)
-            fout.write(f&#39;    mml2: {repr(datum[&#34;mml2&#34;])}\n&#39;)
-            fout.write(&#34;  }&#34;)
-            if i &lt; len(json_data):
-                fout.write(&#34;,&#34;)
-            fout.write(&#34;\n&#34;)
-        fout.write(&#34;];&#34;)</code></pre>
-</details>
 </section>
 <section>
-</section>
-<section>
-</section>
-<section>
-<h2 class="section-title" id="header-functions">Functions</h2>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt id="skema.img2mml.render_mml.json_to_js.json2js"><code class="name flex">
-<span>def <span class="ident">json2js</span></span>(<span>json_data, output_file, var_name='eqn_src')</span>
-</code></dt>
+<dt><code class="name"><a title="skema.img2mml.render_mml.mathpix_annotator.batchRequestHandler" href="batchRequestHandler.html">skema.img2mml.render_mml.mathpix_annotator.batchRequestHandler</a></code></dt>
 <dd>
-<div class="desc"><p>Helper function to write 'json' version of latex source data as a javascript list of dicts.
-Use json.load() to read the json into python object.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>json_data</code></strong></dt>
-<dd>Assumed format: [ {"src": <string>, "mml": <string>}, &hellip; ]</dd>
-<dt><strong><code>output_file</code></strong></dt>
-<dd>Path to .js output file</dd>
-<dt><strong><code>var_name</code></strong></dt>
-<dd>Name of the variable being assigned the list of dicts in the .js file</dd>
-</dl>
-<p>Returns:</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def json2js(json_data, output_file, var_name=&#34;eqn_src&#34;):
-    &#34;&#34;&#34;
-    Helper function to write &#39;json&#39; version of latex source data as a javascript list of dicts.
-    Use json.load() to read the json into python object.
-    Args:
-        json_data: Assumed format: [ {&#34;src&#34;: &lt;string&gt;, &#34;mml&#34;: &lt;string&gt;}, ... ]
-        output_file: Path to .js output file
-        var_name: Name of the variable being assigned the list of dicts in the .js file
-    Returns:
-    &#34;&#34;&#34;
-    with open(output_file, &#34;w&#34;) as fout:
-        fout.write(f&#34;{var_name} = [\n&#34;)
-        for i, datum in enumerate(json_data):
-            fout.write(&#34;  {\n&#34;)
-            fout.write(f&#39;    mml1: {repr(datum[&#34;mml1&#34;])},\n&#39;)
-            fout.write(f&#39;    mml2: {repr(datum[&#34;mml2&#34;])}\n&#39;)
-            fout.write(&#34;  }&#34;)
-            if i &lt; len(json_data):
-                fout.write(&#34;,&#34;)
-            fout.write(&#34;\n&#34;)
-        fout.write(&#34;];&#34;)</code></pre>
-</details>
+<div class="desc"><p>This program sends requests to the Mathpix server. The image_ids.json file is used to get the specific images
+from the raws on github after attaching …</p></div>
 </dd>
 </dl>
+</section>
+<section>
+</section>
+<section>
 </section>
 <section>
 </section>
@@ -113,12 +49,12 @@ Use json.load() to read the json into python object.</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="skema.img2mml.render_mml" href="index.html">skema.img2mml.render_mml</a></code></li>
+<li><code><a title="skema.img2mml.render_mml" href="../index.html">skema.img2mml.render_mml</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="skema.img2mml.render_mml.json_to_js.json2js" href="#skema.img2mml.render_mml.json_to_js.json2js">json2js</a></code></li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="skema.img2mml.render_mml.mathpix_annotator.batchRequestHandler" href="batchRequestHandler.html">skema.img2mml.render_mml.mathpix_annotator.batchRequestHandler</a></code></li>
 </ul>
 </li>
 </ul>
