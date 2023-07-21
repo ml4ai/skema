@@ -3,12 +3,18 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 import lxml.etree as etree
 import json
+import os
 
+
+PARENT_DIRECTORY = os.path.split(os.path.abspath(__file__))[0]
+STATIC_FILES_DIRECTORY = os.path.join(PARENT_DIRECTORY, "static/")
+MATHPIX_ANNOTATION_DATA_PATH = os.path.join(
+    PARENT_DIRECTORY, "data/mathpix_ocr_tweaker_data.json"
+)
+MODEL_RESULTS_DATA_PATH = os.path.join(PARENT_DIRECTORY, "data/ocr_verify_data.json")
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="./static"), name="static")
-MATHPIX_ANNOTATION_DATA_PATH = "./data/mathpix_ocr_tweaker_data.json"
-MODEL_RESULTS_DATA_PATH = "./data/ocr_verify_data.json"
+app.mount("/static", StaticFiles(directory=STATIC_FILES_DIRECTORY), name="static")
 
 
 @app.get("/model_results")
