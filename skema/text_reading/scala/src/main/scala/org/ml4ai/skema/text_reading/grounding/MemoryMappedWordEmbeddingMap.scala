@@ -13,6 +13,7 @@ import scala.util.Using
 class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType) extends WordEmbeddingMap {
   protected val map: MutableHashMap[String, Int] = buildType.map // (word -> row)
   val columns: Int = buildType.columns
+  val rows: Int = map.size
   val unkEmbeddingOpt: Option[IndexedSeq[Float]] = buildType.unknownArray.map { inside =>
     inside: IndexedSeq[Float]
   }
@@ -26,26 +27,30 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
 
     // https://stackoverflow.com/questions/9346746/convert-float-to-byte-to-float-again
     // https://stackoverflow.com/questions/12132595/mappedbytebuffer-asfloatbuffer-vs-in-memory-float-performance
-    val array = buildType.array
-    val floatBuffer = FloatBuffer.wrap(array)
-    // Have a floatBuffer and just transfer a few at a time.
-    val byteBuffer = ByteBuffer.allocate(array.length * 4)
-//    byteBuffer.asFloatBuffer.put(array)
-    byteBuffer.asFloatBuffer.put(floatBuffer)
-    // Something about native order
 
-    Using.resource(new FileOutputStream(file)) { fileOutputStream =>
-      // Could just do it a row at a time instead.
-      fileOutputStream.write(byteBuffer.array)
+    {
+      val byteBuffer = ByteBuffer.allocate(columns * 4)
+      val floatBuffer = byteBuffer.asFloatBuffer
+      val array = buildType.array
+
+      Using.resource(new FileOutputStream(file)) { fileOutputStream =>
+        Range(0, rows).foreach { row =>
+          floatBuffer.put(array, row * columns, columns)
+          fileOutputStream.write(byteBuffer.array)
+          floatBuffer.clear()
+        }
+      }
     }
 
-    val randomAccessFile = new RandomAccessFile(file, "r")
-    val channel = randomAccessFile.getChannel
-    val size = channel.size()
-    val mappedMemoryBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
-    val floatBuffer2 = mappedMemoryBuffer.asFloatBuffer
+    {
+      val randomAccessFile = new RandomAccessFile(file, "r")
+      val channel = randomAccessFile.getChannel
+      val size = channel.size()
+      val mappedMemoryBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size())
+      val floatBuffer = mappedMemoryBuffer.asFloatBuffer
 
-    floatBuffer2
+      floatBuffer
+    }
   }
 
   /** The dimension of an embedding vector */
