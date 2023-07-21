@@ -2,7 +2,7 @@
  * Showing different parts of the page
  */
 const BASE_IMG_URL =
-  "https://raw.githubusercontent.com/imzoc/mathpix-annotation/master/mathml-images/images_filtered/";
+  "https://raw.githubusercontent.com/ml4ai/equation-images/main/images/";
 
 async function show_original_image() {
   const image_id = data.id;
@@ -32,6 +32,8 @@ async function show_mathml() {
 }
 
 async function refresh_view() {
+  $("#edit-latex-form")[0].reset();
+  $("#edit-mathml-form")[0].reset();
   show_latex();
   show_mathml();
   show_image_info();
@@ -92,9 +94,8 @@ $("#mathml-code").on("keyup", () => {
 $("#edit-latex-form").submit(async (e) => {
   e.preventDefault();
   if (confirm("Permanently save changes to LaTeX code?")) {
-    const updatedData = data;
-    updatedData.latex = $("#latex-code").val();
-    await post_data(cur_data_index, updatedData);
+    data.latex = $("#latex-code").val();
+    await post_data(cur_data_index, data);
     $("#edit-latex-form")[0].reset();
     refresh_view();
   }
@@ -103,9 +104,8 @@ $("#edit-latex-form").submit(async (e) => {
 $("#edit-mathml-form").submit(async (e) => {
   e.preventDefault();
   if (confirm("Permanently save changes to MathML code?")) {
-    const updatedData = data;
-    updatedData.mathml = $("#mathml-code").val();
-    await post_data(cur_data_index, updatedData);
+    data.mathml = $("#mathml-code").val();
+    await post_data(cur_data_index, data);
     $("#edit-mathml-form")[0].reset();
     refresh_view();
   }

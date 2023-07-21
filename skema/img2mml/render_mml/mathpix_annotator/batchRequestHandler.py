@@ -1,7 +1,7 @@
 """
-This program sends requests to the Mathpix server. This handler is only for images stored
-in the original git repo linked below. The image_ids.json file is used to get the specific images
-from the raws on github. There is no way to specify the source image URLs outside the handler.
+This program sends requests to the Mathpix server. The image_ids.json file is used to get the specific images
+from the raws on github after attaching the ids to the base url. There is no way to specify the source image
+URLs outside the handler.
 
 Original: https://github.com/imzoc/mathpix-annotation/tree/master
 Modified by Adi
@@ -13,7 +13,7 @@ import requests
 import config
 import json
 
-BASE_IMG_URL = "https://raw.githubusercontent.com/imzoc/mathpix-annotation/master/mathml-images/images_filtered/"
+BASE_IMG_URL = "https://raw.githubusercontent.com/ml4ai/equation-images/main/images/"
 
 
 class BatchRequestHandler:

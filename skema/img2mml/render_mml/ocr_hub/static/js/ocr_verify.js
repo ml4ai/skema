@@ -1,5 +1,5 @@
 const BASE_IMG_URL =
-  "https://raw.githubusercontent.com/imzoc/mathpix-annotation/master/mathml-images/images_filtered/";
+  "https://raw.githubusercontent.com/ml4ai/equation-images/main/images/";
 
 async function init_table() {
   $("#model-results-table").DataTable({
