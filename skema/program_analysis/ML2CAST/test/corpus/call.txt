@@ -1,0 +1,315 @@
+================================================================================
+Function Call: No arguments
+================================================================================
+
+rnd()
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_call
+    (identifier)))
+
+================================================================================
+Function Call: With Arguments
+================================================================================
+
+add(1, 2)
+eig (A)
+false(2)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_call
+    (identifier)
+    (arguments
+      (number)
+      (number)))
+  (function_call
+    (identifier)
+    (arguments
+      (identifier)))
+  (function_call
+    (identifier)
+    (arguments
+      (number))))
+
+================================================================================
+Function Call: Indexing With Spread
+================================================================================
+
+A(:)
+A(1, :)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_call
+    (identifier)
+    (arguments
+      (spread_operator)))
+  (function_call
+    (identifier)
+    (arguments
+      (number)
+      (spread_operator))))
+
+================================================================================
+Function Call: Call after Cell Indexing
+================================================================================
+
+A{:}(1)
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_call
+    (function_call
+      (identifier)
+      (arguments
+        (spread_operator)))
+    (arguments
+      (number))))
+
+================================================================================
+Function Call: Indexing of Indirect Field Access
+================================================================================
+
+a.("b"){:}
+a.(b){:}
+a.(b(2)){:}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (field_expression
+    (identifier)
+    (function_call
+      (indirect_access
+        (string
+          (string_content)))
+      (arguments
+        (spread_operator))))
+  (field_expression
+    (identifier)
+    (function_call
+      (indirect_access
+        (identifier))
+      (arguments
+        (spread_operator))))
+  (field_expression
+    (identifier)
+    (function_call
+      (indirect_access
+        (function_call
+          (identifier)
+          (arguments
+            (number))))
+      (arguments
+        (spread_operator)))))
+
+================================================================================
+Command Call: No Arguments
+================================================================================
+
+pwd
+pwd,
+pwd;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name))
+  (command
+    (command_name))
+  (command
+    (command_name)))
+
+================================================================================
+Command Call: Bang
+================================================================================
+
+disp !
+disp ! ;
+disp !s;
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument)))
+
+================================================================================
+Command Call: With Arguments
+================================================================================
+
+cd ../something
+disp some text
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument)
+    (command_argument)))
+
+================================================================================
+Command Call: CVX
+================================================================================
+
+cvx_begin sdp % quiet
+    cvx_solver Mosek
+    variable P(n, n) semidefinite
+    variable Y(n, p, 4)
+    variable K(n, p, 4)
+    minimize max(P(1,2), P(2,1))
+    subject to
+cvx_end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name)
+    (command_argument))
+  (comment)
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument))
+  (command
+    (command_name)))
+
+================================================================================
+Command Call: Comment
+================================================================================
+
+cmd % comment
+cmd arg1 % comment
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name))
+  (comment)
+  (command
+    (command_name)
+    (command_argument))
+  (comment))
+
+================================================================================
+Command Call: Line Continuation
+================================================================================
+
+cmd ... comment
+    arg1
+cmd arg1 ... comment
+    arg2
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name)
+    (line_continuation)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument)
+    (line_continuation)
+    (command_argument)))
+
+================================================================================
+Command Call: Shell Escape Without Arguments
+================================================================================
+
+!ls
+! ls
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name))
+  (command
+    (command_name)))
+
+================================================================================
+Command Call: Shell Escape With Arguments
+================================================================================
+
+!cd somewhere new
+! echo (something here
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name)
+    (command_argument)
+    (command_argument))
+  (command
+    (command_name)
+    (command_argument)
+    (command_argument)))
+
+================================================================================
+Command Call: Parens Breaking
+================================================================================
+
+var A(b, c)   % one arg
+var A(b; c)   % one arg and an error
+var A('b; c)' % one arg (wrong in matlab, ok here)
+var A) b c( d % two args
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (command
+    (command_name)
+    (command_argument))
+  (comment)
+  (command
+    (command_name)
+    (command_argument))
+  (ERROR
+    (identifier))
+  (comment)
+  (command
+    (command_name)
+    (command_argument))
+  (comment)
+  (command
+    (command_name)
+    (command_argument)
+    (command_argument))
+  (comment))

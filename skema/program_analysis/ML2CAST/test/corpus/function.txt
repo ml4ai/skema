@@ -1,0 +1,215 @@
+================================================================================
+Function Declaration: No Args, No Output
+================================================================================
+
+function a
+    1
+end
+
+function a()
+    1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (block
+      (number)))
+  (function_definition
+    (identifier)
+    (function_arguments)
+    (block
+      (number))))
+
+================================================================================
+Function Declaration: Args, No Output
+================================================================================
+
+function a(a)
+    1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (function_arguments
+      (identifier))
+    (block
+      (number))))
+
+================================================================================
+Function Declaration: No Args, Simple Output
+================================================================================
+
+function a = b
+    1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (function_output
+      (identifier))
+    (identifier)
+    (block
+      (number))))
+
+================================================================================
+Function Declaration: No Args, Multiple Outputs
+================================================================================
+
+function [a,b] = c
+    1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (function_output
+      (multioutput_variable
+        (identifier)
+        (identifier)))
+    (identifier)
+    (block
+      (number))))
+
+================================================================================
+Function Declaration: Args, Multiple Outputs
+================================================================================
+
+function [a, b] = c(a, b)
+    1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (function_output
+      (multioutput_variable
+        (identifier)
+        (identifier)))
+    (identifier)
+    (function_arguments
+      (identifier)
+      (identifier))
+    (block
+      (number))))
+
+================================================================================
+Function Declaration: After Script
+================================================================================
+
+1 + a()
+
+function a
+    2
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (binary_operator
+    (number)
+    (function_call
+      (identifier)))
+  (function_definition
+    (identifier)
+    (block
+      (number))))
+
+================================================================================
+Function Declaration: Getter and Setter
+================================================================================
+
+function get.A
+    2
+end
+
+function self = set.B(value)
+    self.B = value
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (block
+      (number)))
+  (function_definition
+    (function_output
+      (identifier))
+    (identifier)
+    (function_arguments
+      (identifier))
+    (block
+      (assignment
+        (field_expression
+          (identifier)
+          (identifier))
+        (identifier)))))
+
+================================================================================
+Function Declaration: Empty Body
+================================================================================
+
+function A
+end
+
+function B
+    % just a coment
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier))
+  (function_definition
+    (identifier)
+    (comment)))
+
+================================================================================
+Function Declaration: Nested Functions
+================================================================================
+
+function A
+    x = 1
+    B()
+    function B
+        x = x + 1
+    end
+    x = x + 1
+end
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_definition
+    (identifier)
+    (block
+      (assignment
+        (identifier)
+        (number))
+      (function_call
+        (identifier))
+      (function_definition
+        (identifier)
+        (block
+          (assignment
+            (identifier)
+            (binary_operator
+              (identifier)
+              (number)))))
+      (assignment
+        (identifier)
+        (binary_operator
+          (identifier)
+          (number))))))
