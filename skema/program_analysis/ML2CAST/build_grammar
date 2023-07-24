@@ -4,6 +4,7 @@
 
 import os.path
 import subprocess
+import shutil
 from tree_sitter import Language
 
 # Determine the caller path
@@ -17,9 +18,21 @@ os.chdir(PROJECT_PATH)
 
 # Create the tree-sitter grammar 
 ret = subprocess.call('tree-sitter generate', shell = True)
-if(ret == 0):
-    # Build the C shared object
+shutil.copy('scanner.c', 'src/scanner.c')
+
+if(ret):
+
+    LANGUAGE_LIBRARY_REL_PATH = os.path.join("build", "matlab.so")
+
     Language.build_library(
-        os.path.join("build", "ts-matlab.so"),
-        'tree-sitter-matlab'
+        # Store the library in the `build` directory
+        LANGUAGE_LIBRARY_REL_PATH,
+        # Include one or more languages
+        ["matlab"],
     )
+
+    subprocess.call('cp scanner.c src/scanner.c', shell = True)
+
+
+# Return to caller directory
+os.chdir(CALLER_PATH)
