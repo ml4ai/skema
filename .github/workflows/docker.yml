@@ -152,6 +152,8 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         # references `tags` step in steps for current job
         tags: ${{ steps.tags.outputs.tags }}
+        build-args: |
+          APP_VERSION=${{github.sha}}
 
   text_reading:
     name: "docker image for text reading component"
