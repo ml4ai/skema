@@ -6,7 +6,9 @@ const BASE_IMG_URL =
 
 async function show_original_image() {
   const image_id = data.id;
-  $("#original-image-from-paper").attr("src", `${BASE_IMG_URL}${image_id}.png`);
+  const image_link = `${BASE_IMG_URL}${image_id}.png`;
+  $("#original-image-from-paper").attr("src", image_link);
+  $("#original-image-from-paper-link").attr("href", image_link);
 }
 
 async function show_image_info() {
