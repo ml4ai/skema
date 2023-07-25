@@ -68,6 +68,7 @@ class TS2CAST(object):
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
+        print(json.dumps([module.to_dict() for module in modules]))
         return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
         
     def run(self, root) -> List[Module]:
@@ -402,7 +403,6 @@ class TS2CAST(object):
                         source_refs=symbol_source_refs,
                     )
                 )
-
             return imports
 
     def visit_do_loop_statement(self, node) -> Loop:
@@ -581,6 +581,7 @@ class TS2CAST(object):
             orelse = ModelIf()
             prev = orelse
             for condition in node.children[elseif_index:else_index]:
+                print(node.children)
                 elseif_expr = self.visit(condition.children[2])
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
 
@@ -951,11 +952,9 @@ class TS2CAST(object):
         if call_expression_node:
             value = self._visit_get(call_expression_node)
         else:
-            value = self.variable_context.get_node(
-                self.node_helper.get_identifier(
-                    get_first_child_by_type(node, "identifier", recurse=True),
-                )
-            )
+            # TODO: We shouldn't be accessing get_node directly, since it may not exist in the case of an import.
+            # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn't exist.
+            value = self.visit(get_first_child_by_type(node, "identifier", recurse=True))
 
         attr = self.node_helper.get_identifier(
             get_first_child_by_type(node, "type_member", recurse=True)
@@ -1105,3 +1104,5 @@ class TS2CAST(object):
             return self.variable_context.get_node(func_name)
 
         return self.variable_context.add_variable(func_name, "function", None)
+
+TS2CAST("tiegcm2.0/src/addfld.F")
