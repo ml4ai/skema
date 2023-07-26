@@ -18,9 +18,12 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
   val unkEmbeddingOpt: Option[IndexedSeq[Float]] = buildType.unknownArray.map { inside =>
     inside: IndexedSeq[Float]
   }
-  val floatBuffer = {
+  val bytesPerRow = columns * java.lang.Float.BYTES
+  val rowsPerBuffer = Int.MaxValue / bytesPerRow
+  val bufferCount = math.ceil(rows.toDouble / rowsPerBuffer).toInt
+  val floatBuffers = Range(0, bufferCount).map { index =>
     val file = {
-      val file = File.createTempFile("skema", ".tmp")
+      val file = File.createTempFile(s"skema-$index-", ".tmp")
 
       file.deleteOnExit()
       file
@@ -30,14 +33,16 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
     // https://stackoverflow.com/questions/12132595/mappedbytebuffer-asfloatbuffer-vs-in-memory-float-performance
 
     {
-      val floatBytes = java.lang.Float.BYTES
-      val byteBuffer = ByteBuffer.allocate(columns * floatBytes).order(ByteOrder.nativeOrder)
+      val rowRange = Range(index * rowsPerBuffer, math.min((index + 1) * rowsPerBuffer, rows))
+      // Keep the size of this buffer small so that we don't have two sets of data at once.
+      val byteBuffer = ByteBuffer.allocate(bytesPerRow).order(ByteOrder.nativeOrder)
       val floatBuffer = byteBuffer.asFloatBuffer
-      val array = buildType.array
+      val maxBufferSize = 100000
+      val bufferSize = maxBufferSize - (maxBufferSize % bytesPerRow)
 
-      Using.resource(new BufferedOutputStream(new FileOutputStream(file))) { outputStream =>
-        Range(0, rows).foreach { row =>
-          floatBuffer.put(array, row * columns, columns)
+      Using.resource(new BufferedOutputStream(new FileOutputStream(file), bufferSize)) { outputStream =>
+        rowRange.foreach { row =>
+          floatBuffer.put(buildType.array, row * columns, columns)
           outputStream.write(byteBuffer.array)
           (floatBuffer: Buffer).clear()
         }
@@ -47,10 +52,7 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
     {
       val randomAccessFile = new RandomAccessFile(file, "r")
       val channel = randomAccessFile.getChannel
-      // Channel size cannot exceed Integer.MAX_VALUE.
-      // Several channels will be required.
-      val size = Math.min(channel.size(), Int.MaxValue)
-      val mappedMemoryBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, size).order(ByteOrder.nativeOrder)
+      val mappedMemoryBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size).order(ByteOrder.nativeOrder)
       val floatBuffer = mappedMemoryBuffer.asFloatBuffer
 
       floatBuffer
@@ -65,22 +67,18 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
 
   protected def get(row: Int): IndexedSeq[Float] = {
     val array = new Array[Float](columns)
-    val bytePosition = 1L * row * columns * java.lang.Float.BYTES
+    val bufferIndex = row / rowsPerBuffer
+    val bufferOffset = (row % rowsPerBuffer) * columns
 
-    if (bytePosition + columns * java.lang.Float.BYTES - 1 <= Int.MaxValue) {
-      val floatPosition = row * columns
+    try {
+      val floatBuffer = floatBuffers(bufferIndex)
 
-      try {
-        (floatBuffer: Buffer).position(floatPosition)
-        floatBuffer.get(array)
-      }
-      catch {
-        case e: Throwable =>
-          println("What happened?")
-      }
+      (floatBuffer: Buffer).position(bufferOffset)
+      floatBuffer.get(array)
     }
-    else {
-      println("Check your work!")
+    catch {
+      case e: Throwable =>
+        println("What happened?")
     }
     array
   }

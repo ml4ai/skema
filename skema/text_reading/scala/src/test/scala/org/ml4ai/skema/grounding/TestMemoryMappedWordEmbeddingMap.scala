@@ -10,8 +10,8 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
   behavior of "MemoryMappedWordEmbeddingMap"
 
   it should "produce the same results if not memory mapped" in {
-//    val resourcePath = "/org/clulab/epimodel/epidemiology_embeddings_model.ser"
-    val resourcePath = "/org/clulab/spaceweather/spaceweather_model_unigram.ser"
+    val resourcePath = "/org/clulab/epimodel/epidemiology_embeddings_model.ser" // fits into ? buffers
+//    val resourcePath = "/org/clulab/spaceweather/spaceweather_model_unigram.ser" // fits into one buffer
     val inputStreamer = new InputStreamer(this)
     val inputStream = inputStreamer.getResourceAsStream(resourcePath)
     val buildType: CompactWordEmbeddingMap.BuildType = CompactWordEmbeddingMap.loadSer(inputStream)
@@ -20,20 +20,19 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
     val memoryMappedWordEmbeddingsMap = new MemoryMappedWordEmbeddingMap(buildType)
     val knownKeys = compactWordEmbeddingsMap.knownKeys
 
-    knownKeys.take(100).foreach { word =>
+    knownKeys/*.take(10000)*/.foreach { word =>
       val compactArray = compactWordEmbeddingsMap.get(word).get
       val memoryMappedArray = memoryMappedWordEmbeddingsMap.get(word).get
 
       val compactString = compactArray.mkString(", ")
       val memoryMappedString = memoryMappedArray.mkString(", ")
 
-      if (compactString != memoryMappedString)
-        println("It isn't matching!")
+      memoryMappedString should be (compactString)
     }
-
+/*
     val compactTimer = new Timer("compactWordEmbeddingsMap")
     compactTimer.time {
-      knownKeys.take(10000).foreach { word =>
+      knownKeys.foreach { word =>
         compactWordEmbeddingsMap.get(word).get
       }
     }
@@ -41,10 +40,12 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
 
     val memoryMappedTimer = new Timer("memoryMappedWordEmbeddingsMap")
     memoryMappedTimer.time {
-      knownKeys.take(10000).foreach { word =>
+      knownKeys.foreach { word =>
         memoryMappedWordEmbeddingsMap.get(word).get
       }
     }
     println(memoryMappedTimer)
+
+  */
   }
 }
