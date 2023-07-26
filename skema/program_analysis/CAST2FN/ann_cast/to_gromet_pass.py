@@ -1185,9 +1185,13 @@ class ToGrometPass:
                         parent_gromet_fn.pof == None
                     ):  # TODO: check this guard later
                         # print(node.source_refs[0])
+                        if isinstance(node.left, AnnCastAttribute):
+                            name = node.left.attr
+                        else:
+                            name = node.left.val.name
                         parent_gromet_fn.pof = insert_gromet_object(
                             parent_gromet_fn.pof,
-                            GrometPort(name=node.left.val.name, box=-1),
+                            GrometPort(name=name, box=-1),
                         )
                     else:
                         if isinstance(node.left, AnnCastAttribute):
@@ -1226,14 +1230,8 @@ class ToGrometPass:
                                     node.left.val.name, parent_gromet_fn
                                 )
                         else:
+                            # NOTE: This case needs to eventually removed as this handler gets fleshed out more
                             parent_gromet_fn.pof[-1].name = node.left.val.name
-                            # parent_gromet_fn.pof = insert_gromet_object(
-                            #    parent_gromet_fn.pof,
-                            #   GrometPort(
-                            #      name=node.left.val.name,
-                            #     box=len(parent_gromet_fn.pof),
-                            #  ),
-                            # )
                             self.add_var_to_env(
                                 node.left.val.name,
                                 node.left,
@@ -1679,10 +1677,15 @@ class ToGrometPass:
                         )
                         parent_gromet_fn.pof[pof_idx].name = elem.val.name
             else:
+                name = ""
+                if isinstance(node.left, AnnCastCall):
+                    name = node.left.func.name
+                else:
+                    name = node.left.val.name
                 parent_gromet_fn.pof = insert_gromet_object(
                     parent_gromet_fn.pof,
                     GrometPort(
-                        name=node.left.val.name, box=len(parent_gromet_fn.bf)
+                        name=name, box=len(parent_gromet_fn.bf)
                     ),
                 )
 
@@ -1734,8 +1737,13 @@ class ToGrometPass:
                         )
                         parent_gromet_fn.pof[pof_idx].name = elem.val.name
             else:
+                name = ""
+                if isinstance(node.left, AnnCastCall):
+                    name = node.left.func.name
+                else:
+                    name = node.left.val.name
                 self.add_var_to_env(
-                    node.left.val.name,
+                    name,
                     node.left,
                     parent_gromet_fn.pof[-1],
                     len(parent_gromet_fn.pof),
@@ -4778,11 +4786,16 @@ class ToGrometPass:
             )
         else:
             base = node.bases[0]
+            name = ""
+            if isinstance(base, AnnCastAttribute):
+                name = base.attr
+            else:
+                name = base.name
             new_gromet.bf = insert_gromet_object(
                 new_gromet.bf,
                 GrometBoxFunction(
                     function_type=FunctionType.LITERAL,
-                    value=GLiteralValue("string", base.name),
+                    value=GLiteralValue("string", name),
                 ),
             )
             new_gromet.pof = insert_gromet_object(
