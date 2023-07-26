@@ -65,9 +65,23 @@ class MemoryMappedWordEmbeddingMap(buildType: CompactWordEmbeddingMap.BuildType)
 
   protected def get(row: Int): IndexedSeq[Float] = {
     val array = new Array[Float](columns)
+    val bytePosition = 1L * row * columns * java.lang.Float.BYTES
 
-    floatBuffer.position(row * columns)
-    floatBuffer.get(array)
+    if (bytePosition + columns * java.lang.Float.BYTES - 1 <= Int.MaxValue) {
+      val floatPosition = row * columns
+
+      try {
+        (floatBuffer: Buffer).position(floatPosition)
+        floatBuffer.get(array)
+      }
+      catch {
+        case e: Throwable =>
+          println("What happened?")
+      }
+    }
+    else {
+      println("Check your work!")
+    }
     array
   }
 
