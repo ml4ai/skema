@@ -370,7 +370,7 @@ def train_model(
     print(f"The model has {count_parameters(model):,} trainable parameters")
 
     # initializing loss function
-    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"], reduction="sum")
+    criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
     _lr = starting_lr if use_scheduler else learning_rate
