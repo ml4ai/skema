@@ -1,10 +1,10 @@
 import typing
 from functools import singledispatchmethod
 
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.model.cast import (
     AstNode,
 )
-from skema.program_analysis.CAST2FN.model.cast_to_air_model import (
+from skema.program_analysis.CAST.Fortran.model.cast_to_air_model import (
     C2ATypeError,
 )
 

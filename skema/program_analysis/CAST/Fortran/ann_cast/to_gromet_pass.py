@@ -9,7 +9,7 @@ from functools import singledispatchmethod
 from datetime import datetime
 from time import time
 
-from skema.program_analysis.CAST2FN.model.cast import StructureType
+from skema.program_analysis.CAST.Fortran.model.cast import StructureType
 
 from skema.gromet.fn import (
     FunctionType,
@@ -43,9 +43,9 @@ from skema.program_analysis.PyAST2CAST.builtin_map import (
     dump_map,
     check_builtin,
 )
-from skema.program_analysis.CAST2FN.model.cast.scalar_type import ScalarType
+from skema.program_analysis.CAST.Fortran.model.cast.scalar_type import ScalarType
 
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
 from skema.program_analysis.PyAST2CAST.modules_list import (
     BUILTINS,
     find_func_in_module,

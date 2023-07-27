@@ -1,25 +1,25 @@
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import (
     PipelineState,
 )
-from skema.program_analysis.CAST2FN.ann_cast.id_collapse_pass import (
+from skema.program_analysis.CAST.Fortran.ann_cast.id_collapse_pass import (
     IdCollapsePass,
 )
-from skema.program_analysis.CAST2FN.ann_cast.container_scope_pass import (
+from skema.program_analysis.CAST.Fortran.ann_cast.container_scope_pass import (
     ContainerScopePass,
 )
-from skema.program_analysis.CAST2FN.ann_cast.variable_version_pass import (
+from skema.program_analysis.CAST.Fortran.ann_cast.variable_version_pass import (
     VariableVersionPass,
 )
-from skema.program_analysis.CAST2FN.ann_cast.grfn_var_creation_pass import (
+from skema.program_analysis.CAST.Fortran.ann_cast.grfn_var_creation_pass import (
     GrfnVarCreationPass,
 )
-from skema.program_analysis.CAST2FN.ann_cast.grfn_assignment_pass import (
+from skema.program_analysis.CAST.Fortran.ann_cast.grfn_assignment_pass import (
     GrfnAssignmentPass,
 )
-from skema.program_analysis.CAST2FN.ann_cast.lambda_expression_pass import (
+from skema.program_analysis.CAST.Fortran.ann_cast.lambda_expression_pass import (
     LambdaExpressionPass,
 )
-from skema.program_analysis.CAST2FN.ann_cast.to_grfn_pass import ToGrfnPass
+from skema.program_analysis.CAST.Fortran.ann_cast.to_grfn_pass import ToGrfnPass
 
 ANN_CAST_ALL_PASSES = {
     "IdCollapsePass": IdCollapsePass,

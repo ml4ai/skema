@@ -4,9 +4,9 @@ from functools import singledispatchmethod
 from skema.utils.misc import uuid
 
 from .cast_visitor import CASTVisitor
-from skema.program_analysis.CAST2FN.cast import CAST
+from skema.program_analysis.CAST.Fortran.cast import CAST
 
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.model.cast import (
     AstNode,
     Assignment,
     Attribute,

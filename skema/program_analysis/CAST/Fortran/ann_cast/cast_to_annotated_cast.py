@@ -1,9 +1,9 @@
 from functools import singledispatchmethod
 import typing
 
-from skema.program_analysis.CAST2FN.cast import CAST
+from skema.program_analysis.CAST.Fortran.cast import CAST
 
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -22,8 +22,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
 )
 
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast.structure_type import StructureType
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast.structure_type import StructureType
 
 
 class CASTTypeError(TypeError):

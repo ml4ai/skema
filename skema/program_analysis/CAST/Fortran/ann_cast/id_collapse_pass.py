@@ -3,11 +3,11 @@ import typing
 from collections import defaultdict
 from functools import singledispatchmethod
 
-from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST.Fortran.ann_cast.ann_cast_helpers import (
     call_container_name,
 )
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast import (
     ScalarType,
     StructureType,
     ValueConstructor,

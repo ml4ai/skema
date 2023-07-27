@@ -16,7 +16,7 @@ from skema.model_assembly.networks import (
 )
 from skema.model_assembly.sandbox import load_lambda_function
 from skema.model_assembly.structures import ContainerIdentifier
-from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST.Fortran.ann_cast.ann_cast_helpers import (
     ELSEBODY,
     IFBODY,
     MODULE_SCOPE,
@@ -27,8 +27,8 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     is_func_def_main,
     lambda_var_from_fullid,
 )
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast import (
     ScalarType,
     ValueConstructor,
 )

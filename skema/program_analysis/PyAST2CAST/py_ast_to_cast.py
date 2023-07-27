@@ -7,7 +7,7 @@ from functools import singledispatchmethod
 
 from skema.utils.misc import uuid
 from skema.program_analysis.astpp import parseprint
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.model.cast import (
     AstNode,
     Assignment,
     Attribute,

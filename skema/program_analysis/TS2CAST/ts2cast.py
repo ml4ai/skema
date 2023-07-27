@@ -5,8 +5,8 @@ from typing import Any, Dict, List, Union
 
 from tree_sitter import Language, Parser, Node
 
-from skema.program_analysis.CAST2FN.cast import CAST
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.cast import CAST
+from skema.program_analysis.CAST.Fortran.model.cast import (
     Module,
     SourceRef,
     Assignment,

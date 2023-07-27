@@ -5,9 +5,9 @@ from skema.gromet.fn import GrometFNModuleCollection
 import ast
 
 from skema.program_analysis.PyAST2CAST import py_ast_to_cast
-from skema.program_analysis.CAST2FN.model.cast import SourceRef
-from skema.program_analysis.CAST2FN import cast
-from skema.program_analysis.CAST2FN.cast import CAST
+from skema.program_analysis.CAST.Fortran.model.cast import SourceRef
+from skema.program_analysis.CAST.Fortran import cast
+from skema.program_analysis.CAST.Fortran.cast import CAST
 from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
 
 # NOTE: these examples are very trivial for the realm of recursion

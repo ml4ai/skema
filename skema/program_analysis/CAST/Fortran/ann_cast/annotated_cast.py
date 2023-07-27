@@ -1,7 +1,7 @@
 import typing
 import difflib
 
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -21,7 +21,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 )
 
 from skema.model_assembly.networks import GroundedFunctionNetwork, VariableNode
-from skema.program_analysis.CAST2FN.model.cast.model_import import (
+from skema.program_analysis.CAST.Fortran.model.cast.model_import import (
     ModelImport,
 )
 

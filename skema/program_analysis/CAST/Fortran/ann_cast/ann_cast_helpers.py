@@ -21,8 +21,8 @@ from skema.model_assembly.networks import (
     UnpackNode,
 )
 from skema.model_assembly.structures import VariableIdentifier
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast import SourceRef
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast import SourceRef
 
 # NOTE: the GrFN json loading seems to rely on "." as the separator for container scopes
 # For the Annotated Cast pipeline, it is fine to change these separators as long as they

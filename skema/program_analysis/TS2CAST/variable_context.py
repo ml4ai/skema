@@ -1,5 +1,5 @@
 from typing import List, Dict, Set
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.model.cast import (
     Var,
     Name,
 )

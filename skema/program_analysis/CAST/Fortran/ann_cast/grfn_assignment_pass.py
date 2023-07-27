@@ -2,7 +2,7 @@ import typing
 from functools import singledispatchmethod
 
 from skema.model_assembly.metadata import LambdaType
-from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST.Fortran.ann_cast.ann_cast_helpers import (
     GrfnAssignment,
     ann_cast_name_to_fullid,
     create_grfn_assign_node,
@@ -12,8 +12,8 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     create_lambda_node_metadata,
     is_literal_assignment,
 )
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast import (
     ScalarType,
     StructureType,
     ValueConstructor,

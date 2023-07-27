@@ -2,7 +2,7 @@ import typing
 from functools import singledispatchmethod
 
 from skema.model_assembly.metadata import VariableCreationReason
-from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST.Fortran.ann_cast.ann_cast_helpers import (
     CON_STR_SEP,
     ELSEBODY,
     IFBODY,
@@ -26,8 +26,8 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     make_cond_var_name,
     make_loop_exit_name,
 )
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast import (
     ScalarType,
     StructureType,
     ValueConstructor,

@@ -3,8 +3,8 @@ import sys
 import json
 import argparse
 
-from skema.program_analysis.CAST2FN.cast import CAST
-from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
+from skema.program_analysis.CAST.Fortran.cast import CAST
+from skema.program_analysis.CAST.Fortran.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
 

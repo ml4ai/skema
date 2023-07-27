@@ -1,5 +1,5 @@
 from typing import List
-from skema.program_analysis.CAST2FN.model.cast import AstNode, LiteralValue, SourceRef
+from skema.program_analysis.CAST.Fortran.model.cast import AstNode, LiteralValue, SourceRef
 
 
 def generate_dummy_source_refs(node: AstNode) -> AstNode:

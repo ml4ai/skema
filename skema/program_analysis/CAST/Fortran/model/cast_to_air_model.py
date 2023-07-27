@@ -1,11 +1,11 @@
-from skema.program_analysis.CAST2FN.model.cast import source_ref
-from skema.program_analysis.CAST2FN.model.cast.source_ref import SourceRef
+from skema.program_analysis.CAST.Fortran.model.cast import source_ref
+from skema.program_analysis.CAST.Fortran.model.cast.source_ref import SourceRef
 from typing import List, Dict, NoReturn, Set
 from enum import Enum
 from dataclasses import dataclass
 from datetime import datetime
 
-from skema.program_analysis.CAST2FN.model.cast import AstNode, var
+from skema.program_analysis.CAST.Fortran.model.cast import AstNode, var
 from skema.model_assembly.metadata import (
     BaseMetadata,
     MetadataType,

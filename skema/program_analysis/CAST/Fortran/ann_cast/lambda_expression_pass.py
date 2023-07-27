@@ -1,7 +1,7 @@
 import typing
 from functools import singledispatchmethod
 
-from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST.Fortran.ann_cast.ann_cast_helpers import (
     ELSEBODY,
     IFBODY,
     GrfnAssignment,
@@ -9,8 +9,8 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     cast_op_to_str,
     lambda_var_from_fullid,
 )
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast import (
     ScalarType,
     StructureType,
     ValueConstructor,

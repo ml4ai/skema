@@ -4,7 +4,7 @@ import difflib
 import typing
 import networkx as nx
 
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -28,7 +28,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     ValueConstructor,
 )
-# from skema.program_analysis.CAST2FN.visitors import (
+# from skema.program_analysis.CAST.Fortran.visitors import (
 #    CASTToAIRVisitor,
 #)
 from skema.model_assembly.air import AutoMATES_IR

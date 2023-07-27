@@ -4,7 +4,7 @@ from collections import defaultdict
 from enum import Enum
 from functools import singledispatchmethod
 
-from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST.Fortran.ann_cast.ann_cast_helpers import (
     CON_STR_SEP,
     ELSEBODY,
     IFBODY,
@@ -22,8 +22,8 @@ from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
     func_def_container_name,
     var_dict_to_str,
 )
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.model.cast import (
     ScalarType,
     StructureType,
     ValueConstructor,

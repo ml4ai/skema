@@ -4,8 +4,8 @@ from functools import singledispatchmethod
 from skema.utils.misc import uuid
 
 from .cast_visitor import CASTVisitor
-from skema.program_analysis.CAST2FN.cast import CAST
-from skema.program_analysis.CAST2FN.model.cast import (
+from skema.program_analysis.CAST.Fortran.cast import CAST
+from skema.program_analysis.CAST.Fortran.model.cast import (
     AstNode,
     Assignment,
     Attribute,
@@ -29,8 +29,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     ValueConstructor,
 )
-from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.CAST2FN.ann_cast.ann_cast_helpers import (
+from skema.program_analysis.CAST.Fortran.ann_cast.annotated_cast import *
+from skema.program_analysis.CAST.Fortran.ann_cast.ann_cast_helpers import (
     var_dict_to_str,
     interface_to_str,
     decision_in_to_str,

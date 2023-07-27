@@ -1,5 +1,5 @@
 from typing import List, Dict
-from skema.program_analysis.CAST2FN.model.cast import SourceRef
+from skema.program_analysis.CAST.Fortran.model.cast import SourceRef
 
 from tree_sitter import Node
 
