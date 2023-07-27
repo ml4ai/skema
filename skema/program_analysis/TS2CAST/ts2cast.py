@@ -68,7 +68,7 @@ class TS2CAST(object):
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
-        print(json.dumps([module.to_dict() for module in modules]))
+        #print(json.dumps([module.to_dict() for module in modules]))
         return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
         
     def run(self, root) -> List[Module]:
@@ -139,6 +139,8 @@ class TS2CAST(object):
             return self.visit_do_loop_statement(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
+        elif node.type == "logical_expression":
+            return self.visit_logical_expression(node)
         elif node.type == "derived_type_definition":
             return self.visit_derived_type(node)
         elif node.type == "derived_type_member_expression":
@@ -556,7 +558,14 @@ class TS2CAST(object):
         #  (end_if_statement)
 
         # First we need to identify if this is a componund conditional
-        # We can do this by counting the number of control characters in a relational expression
+        # We can do this by checking if the node.parenthesized_expression.logical_expression child exists
+        top_level_logical_expression = get_first_child_by_type(get_first_child_by_type(node, "parenthesized_expression"), "logical_expression")
+        if top_level_logical_expression:
+            # TODO: This shouldn't be a return. The visitor will only return a stub with no content
+            temp = self.visit(top_level_logical_expression)
+            print(temp)
+            return temp#self.visit(top_level_logical_expression)
+
         child_types = [child.type for child in node.children]
 
         try:
@@ -581,7 +590,8 @@ class TS2CAST(object):
             orelse = ModelIf()
             prev = orelse
             for condition in node.children[elseif_index:else_index]:
-                print(node.children)
+                if condition.type == "comment":
+                    continue
                 elseif_expr = self.visit(condition.children[2])
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
 
@@ -605,6 +615,39 @@ class TS2CAST(object):
             body=[self.visit(child) for child in node.children[3:body_stop_index]],
             orelse=orelse,
         )
+
+    def visit_logical_expression(self, node):
+        def get_most_bottom_if(if_node: ModelIf):       
+            if if_node.body and  len(if_node.body) > 0:
+                return get_most_bottom_if(if_node.body[0])
+            return if_node
+
+        literal_value_false = LiteralValue("Boolean", False)
+        litearl_value_true = LiteralValue("Boolean", True)
+        
+        # TODO: Body else should be False
+        # AND: Right side goes in body if, left side in condition
+        # OR: Right side goes in body else, left side in condition 
+        left, operator, right = node.children
+        
+        # First we need to check if this is logical and or a logical or
+        # The tehcnical types for these are \.or\. and \.and\. so to simplify things we can use the in keyword
+        is_or = "or" in operator.type 
+        
+        top_if = ModelIf()
+
+        top_if_expr = self.visit(left)
+        top_if.expr = top_if_expr
+        
+        bottom_if_expr = self.visit(right)
+        if is_or:
+            top_if.orelse = bottom_if_expr
+            top_if.body = [litearl_value_true]
+        else:
+            top_if.orelse = [literal_value_false]
+            top_if.body = bottom_if_expr
+
+        return top_if
 
     def visit_assignment_statement(self, node):
         left, _, right = node.children
@@ -1105,4 +1148,6 @@ class TS2CAST(object):
 
         return self.variable_context.add_variable(func_name, "function", None)
 
-TS2CAST("tiegcm2.0/src/addfld.F")
+
+TS2CAST("examples/compound.f95")
+#TS2CAST("tiegcm2.0/src/addfld.F")
