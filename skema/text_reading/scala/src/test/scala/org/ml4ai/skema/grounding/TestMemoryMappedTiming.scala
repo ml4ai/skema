@@ -1,15 +1,15 @@
 package org.ml4ai.skema.grounding
 
 import org.clulab.embeddings.CompactWordEmbeddingMap
-import org.clulab.utils.InputStreamer
+import org.clulab.utils.{InputStreamer, Timer}
 import org.ml4ai.skema.test.Test
 import org.ml4ai.skema.text_reading.grounding.MemoryMappedWordEmbeddingMap
 
-class TestMemoryMappedWordEmbeddingMap extends Test {
+class TestMemoryMappedTiming extends Test {
 
   behavior of "MemoryMappedWordEmbeddingMap"
 
-  it should "produce the same results as the im-memory variety" in {
+  it should "be slower than the in-memory variety" in {
     val resourcePath = "/org/clulab/epimodel/epidemiology_embeddings_model.ser" // fits into 2 buffers
 //    val resourcePath = "/org/clulab/spaceweather/spaceweather_model_unigram.ser" // fits into one buffer
     val inputStreamer = new InputStreamer(this)
@@ -20,11 +20,22 @@ class TestMemoryMappedWordEmbeddingMap extends Test {
     val memoryMappedWordEmbeddingsMap = new MemoryMappedWordEmbeddingMap(buildType)
     val knownKeys = compactWordEmbeddingsMap.knownKeys
 
-    knownKeys.foreach { word =>
-      val compactArray = compactWordEmbeddingsMap.get(word).get
-      val memoryMappedArray = memoryMappedWordEmbeddingsMap.get(word).get
-
-      compactArray should equal (memoryMappedArray)
+    val compactTimer = new Timer("compactWordEmbeddingsMap")
+    compactTimer.time {
+      knownKeys.foreach { word =>
+        compactWordEmbeddingsMap.get(word).get
+      }
     }
+    println(compactTimer)
+
+    val memoryMappedTimer = new Timer("memoryMappedWordEmbeddingsMap")
+    memoryMappedTimer.time {
+      knownKeys.foreach { word =>
+        memoryMappedWordEmbeddingsMap.get(word).get
+      }
+    }
+    println(memoryMappedTimer)
+
+    memoryMappedTimer.elapsedTime should be > (compactTimer.elapsedTime)
   }
 }
