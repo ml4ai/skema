@@ -3797,7 +3797,7 @@ class ToGrometPass:
                     # through an opi
                     if isinstance(parent_cast_node, AnnCastModule):
                         parent_gromet_fn.wfl = insert_gromet_object(
-                            parent_gromet_fn.wlopi,
+                            parent_gromet_fn.wfl,
                             GrometWire(
                                 src = pil_idx,
                                 tgt = port
@@ -4417,19 +4417,12 @@ class ToGrometPass:
                                 )
                             elif self.check_var_location(pic.name, "global"):
                                 parent_gromet_fn.wfc = insert_gromet_object(
-                                    parent_gromet_fn.wcopi,
+                                    parent_gromet_fn.wfc,
                                     GrometWire(
                                         src = pic_idx,
                                         tgt = port
                                     )
                                 )
-               # parent_gromet_fn.wcopi = insert_gromet_object(
-                #    parent_gromet_fn.wcopi,
-                 #   GrometWire(
-                  #      src=len(parent_gromet_fn.pic),
-                   #     tgt=len(parent_gromet_fn.opi),
-                   # ),
-               # )
 
         if isinstance(parent_cast_node, AnnCastModule):
             for pic_idx,pic in enumerate(parent_gromet_fn.pic,1):
@@ -4453,7 +4446,7 @@ class ToGrometPass:
                         )
                     elif self.check_var_location(pic.name, "global"):
                         parent_gromet_fn.wfc = insert_gromet_object(
-                            parent_gromet_fn.wcopi,
+                            parent_gromet_fn.wfc,
                             GrometWire(
                                 src = pic_idx,
                                 tgt = port
