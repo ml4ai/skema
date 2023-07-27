@@ -99,13 +99,16 @@ impl FirstOrderODE {
 }
 
 impl FromStr for FirstOrderODE {
-    type Err = Error<String>;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let ode = first_order_ode(s.into()).unwrap().1;
-        Ok(ode)
+        first_order_ode(s.into())
+            .map(|(_, ode)| ode)
+            .map_err(|err| err.to_string())
     }
 }
+
+
 
 //--------------------------------------
 // Methods for extraction of PN AMR from ODE's

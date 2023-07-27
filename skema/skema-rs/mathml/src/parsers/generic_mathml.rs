@@ -347,11 +347,12 @@ pub fn parse(input: &str) -> IResult<Math> {
 }
 
 impl FromStr for Math {
-    type Err = Error<String>;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let (_, math) = math(s.into()).unwrap();
-        Ok(math)
+        math(s.into())
+            .map(|(_, math)| math)
+            .map_err(|err| err.to_string())
     }
 }
 
