@@ -715,7 +715,6 @@ class ToGrometPass:
 
         # Construct the pifs for the pack and wire them
         for port in tuple_values:
-            print(port)
             parent_gromet_fn.pif = insert_gromet_object(
                 parent_gromet_fn.pif, GrometPort(box=pack_index)
             )
@@ -1943,24 +1942,25 @@ class ToGrometPass:
             # The operation makes some opis, we attempt to
             # match the number of opis with pifs in the parent FN
             # and also wire these ports appropriately
-            for opi in new_gromet.opi:
-                parent_gromet_fn.pif = insert_gromet_object(
-                    parent_gromet_fn.pif, 
-                    GrometPort(
-                        box=operator_idx
+            if new_gromet.opi != None:
+                for opi in new_gromet.opi:
+                    parent_gromet_fn.pif = insert_gromet_object(
+                        parent_gromet_fn.pif, 
+                        GrometPort(
+                            box=operator_idx
+                        )
                     )
-                )
 
-                # Attempt to find where the port is in the parent FN and wire it
-                # NOTE: this will need to be updated with more handling, i.e. for loops cond etc
-                var_loc = self.retrieve_var_port(opi.name)                    
-                parent_gromet_fn.wff = insert_gromet_object(
-                    parent_gromet_fn.wff,
-                    GrometWire(
-                        src=len(parent_gromet_fn.pif),
-                        tgt=var_loc,
+                    # Attempt to find where the port is in the parent FN and wire it
+                    # NOTE: this will need to be updated with more handling, i.e. for loops cond etc
+                    var_loc = self.retrieve_var_port(opi.name)                    
+                    parent_gromet_fn.wff = insert_gromet_object(
+                        parent_gromet_fn.wff,
+                        GrometWire(
+                            src=len(parent_gromet_fn.pif),
+                            tgt=var_loc,
+                        )
                     )
-                )
 
             parent_gromet_fn.pof = insert_gromet_object(
                 parent_gromet_fn.pof,
@@ -2258,7 +2258,6 @@ class ToGrometPass:
                 name = node.operands[0].val.name
 
             if (parent_gromet_fn.b[0].function_type != FunctionType.FUNCTION):
-                print(parent_gromet_fn.b[0].function_type)
                 # This check is used for when the binary operation is part of a Function and not an Expression
                 # the FunctionDef handles creating opis, so we create any here as necessary
                 found_opi, opi_idx = find_existing_opi(
@@ -2993,7 +2992,6 @@ class ToGrometPass:
                         metadata=self.insert_metadata(metadata),
                     ),
                 )
-                print(parent_gromet_fn.b[0].function_type)
                 if parent_gromet_fn.b[0].function_type == FunctionType.PREDICATE:
                     parent_gromet_fn.pof = insert_gromet_object(
                         parent_gromet_fn.pof,
@@ -3001,8 +2999,6 @@ class ToGrometPass:
                             box=len(parent_gromet_fn.bf)
                         )
                     )
-                    print(qualified_func_name)
-                    print("Adding pof")
             else:
                 idx, found = self.find_gromet(identified_func_name)
                 if not found and func_name not in self.record.keys():
