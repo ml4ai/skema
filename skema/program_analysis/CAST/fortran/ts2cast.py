@@ -27,8 +27,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
 )
 
-from skema.program_analysis.TS2CAST.variable_context import VariableContext
-from skema.program_analysis.TS2CAST.node_helper import (
+from skema.program_analysis.CAST.fortran.variable_context import VariableContext
+from skema.program_analysis.CAST.fortran.node_helper import (
     NodeHelper,
     get_children_by_types,
     get_first_child_by_type,
@@ -37,10 +37,10 @@ from skema.program_analysis.TS2CAST.node_helper import (
     get_first_child_index,
     get_last_child_index,
 )
-from skema.program_analysis.TS2CAST.util import generate_dummy_source_refs
+from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
 
-from skema.program_analysis.TS2CAST.preprocessor.preprocess import preprocess
-from skema.program_analysis.TS2CAST.build_tree_sitter_fortran import LANGUAGE_LIBRARY_REL_PATH
+from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
+from skema.program_analysis.CAST.fortran.build_tree_sitter_fortran import LANGUAGE_LIBRARY_REL_PATH
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
