@@ -1,12 +1,16 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
-use crate::ast::{
-    operator::{Derivative, Operator},
-    Math, MathExpression,
+use crate::{
+    ast::{
+        operator::{Derivative, Operator},
+        Math, MathExpression, Mi, Mrow,
+    },
+    parsers::interpreted_mathml::interpreted_math,
 };
 use derive_new::new;
 use nom::error::Error;
+
 use std::{fmt, str::FromStr};
 
 #[cfg(test)]
@@ -40,6 +44,93 @@ impl fmt::Display for MathExpressionTree {
     }
 }
 
+impl MathExpressionTree {
+    /// Translates a MathExpressionTree struct to a content MathML string.
+    pub fn to_cmml(&self) -> String {
+        let mut content_mathml = String::new();
+        match self {
+            MathExpressionTree::Atom(i) => match i {
+                MathExpression::Ci(x) => {
+                    content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
+                }
+                MathExpression::Mi(Mi(id)) => {
+                    content_mathml.push_str(&format!("<ci>{}</ci>", id));
+                }
+                MathExpression::Mn(number) => {
+                    content_mathml.push_str(&format!("<cn>{}</cn>", number));
+                }
+                MathExpression::Mrow(_) => {
+                    panic!("All Mrows should have been removed by now!");
+                }
+                t => panic!("Unhandled MathExpression: {:?}", t),
+            },
+            MathExpressionTree::Cons(head, rest) => {
+                content_mathml.push_str("<apply>");
+                match head {
+                    Operator::Add => content_mathml.push_str("<plus/>"),
+                    Operator::Subtract => content_mathml.push_str("<minus/>"),
+                    Operator::Multiply => content_mathml.push_str("<times/>"),
+                    Operator::Equals => content_mathml.push_str("<eq/>"),
+                    Operator::Divide => content_mathml.push_str("<divide/>"),
+                    Operator::Derivative(Derivative { order, var_index })
+                        if (*order, *var_index) == (1_u8, 1_u8) =>
+                    {
+                        content_mathml.push_str("<diff/>")
+                    }
+                    _ => {}
+                }
+                for s in rest {
+                    content_mathml.push_str(&s.to_cmml());
+                }
+                content_mathml.push_str("</apply>");
+            }
+        }
+        content_mathml
+    }
+
+    /// Translates to infix math expression to provide "string expressions" (e.g. ((α*ρ)*I)  )
+    /// TA-4 uses "string expressions" to display over the transitions in their visual front end.
+    pub fn to_infix_expression(&self) -> String {
+        let mut expression = String::new();
+        match self {
+            MathExpressionTree::Atom(i) => match i {
+                MathExpression::Ci(x) => {
+                    expression.push_str(&format!("{}", x.content));
+                }
+                MathExpression::Mi(Mi(id)) => {
+                    expression.push_str(&id.to_string());
+                }
+                MathExpression::Mn(number) => {
+                    expression.push_str(&number.to_string());
+                }
+                MathExpression::Mrow(_) => {
+                    panic!("All Mrows should have been removed by now!");
+                }
+                t => panic!("Unhandled MathExpression: {:?}", t),
+            },
+
+            MathExpressionTree::Cons(head, rest) => {
+                let mut operation = String::new();
+                match head {
+                    Operator::Add => operation.push('+'),
+                    Operator::Subtract => operation.push('-'),
+                    Operator::Multiply => operation.push('*'),
+                    Operator::Equals => operation.push('='),
+                    Operator::Divide => operation.push('/'),
+                    _ => {}
+                }
+                let mut component = Vec::new();
+                for s in rest {
+                    component.push(s.to_infix_expression());
+                }
+                let math_exp = format!("({})", component.join(&operation.to_string()));
+                expression.push_str(&math_exp);
+            }
+        }
+        expression
+    }
+}
+
 /// Represents a token for the Pratt parsing algorithm.
 #[derive(Debug, Clone, PartialEq, Eq, new)]
 pub enum Token {
@@ -54,34 +145,39 @@ struct Lexer {
     tokens: Vec<Token>,
 }
 
+impl MathExpression {
+    /// Flatten Mfrac and Mrow elements.
+    fn flatten(&self, tokens: &mut Vec<MathExpression>) {
+        match self {
+            // Flatten/unwrap Mrows
+            MathExpression::Mrow(Mrow(elements)) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                for element in elements {
+                    element.flatten(tokens);
+                }
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            // Insert implicit division operators, and wrap numerators and denominators in
+            // parentheses for the Pratt parsing algorithm.
+            MathExpression::Mfrac(numerator, denominator) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                numerator.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+                tokens.push(MathExpression::Mo(Operator::Divide));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                denominator.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            t => tokens.push(t.clone()),
+        }
+    }
+}
+
 impl Lexer {
     fn new(input: Vec<MathExpression>) -> Lexer {
-        // Recognize derivatives in Newtonian notation.
+        // Flatten mrows and mfracs
         let tokens = input.iter().fold(vec![], |mut acc, x| {
-            match x {
-                MathExpression::Mover(base, overscript) => match **overscript {
-                    MathExpression::Mo(Operator::Other(ref os)) => {
-                        if os.chars().all(|c| c == '˙') {
-                            acc.push(MathExpression::Mo(Operator::new_derivative(
-                                Derivative::new(os.chars().count() as u8, 1),
-                            )));
-                            acc.push(*base.clone());
-                        } else {
-                            acc.push(x.clone());
-                        }
-                    }
-                    _ => todo!(),
-                },
-                // Insert implicit division operators.
-                MathExpression::Mfrac(numerator, denominator) => {
-                    acc.push(*numerator.clone());
-                    acc.push(MathExpression::Mo(Operator::Divide));
-                    acc.push(*denominator.clone());
-                }
-                t => {
-                    acc.push(t.clone());
-                }
-            }
+            x.flatten(&mut acc);
             acc
         });
 
@@ -102,22 +198,32 @@ impl Lexer {
                         }
                         acc.push(x);
                     }
+
                     // Handle other types of operators.
                     MathExpression::Mo(_) => {
                         acc.push(x);
                     }
                     // Handle other types of MathExpression objects.
-                    t => match acc.last().unwrap() {
-                        MathExpression::Mo(_) => {
-                            // If the last item in the accumulator is an Mo, add the current token.
-                            acc.push(t);
+                    t => {
+                        let last_token = acc.last().unwrap();
+                        match last_token {
+                            MathExpression::Mo(Operator::Rparen) => {
+                                // If the last item in the accumulator is a right parenthesis ')',
+                                // insert a multiplication operator
+                                acc.push(&MathExpression::Mo(Operator::Multiply));
+                            }
+                            MathExpression::Mo(_) => {
+                                // If the last item in the accumulator is an Mo (but not a right
+                                // parenthesis), noop
+                            }
+                            _ => {
+                                // Otherwise, insert a multiplication operator
+                                acc.push(&MathExpression::Mo(Operator::Multiply));
+                            }
                         }
-                        _ => {
-                            // Otherwise, insert a multiplication operator followed by the token.
-                            acc.push(&MathExpression::Mo(Operator::Multiply));
-                            acc.push(t);
-                        }
-                    },
+                        // Insert the token
+                        acc.push(t);
+                    }
                 }
             }
             acc
@@ -169,8 +275,8 @@ impl From<Math> for MathExpressionTree {
 impl FromStr for MathExpressionTree {
     type Err = Error<String>;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let math = s.parse::<Math>()?;
+    fn from_str(input: &str) -> Result<Self, Self::Err> {
+        let (_, math) = interpreted_math(input.into()).unwrap();
         Ok(MathExpressionTree::from(math))
     }
 }
@@ -266,22 +372,6 @@ fn test_conversion() {
     assert_eq!(s.to_string(), "(= a (+ x (* y z)))");
     println!("Output: {s}\n");
 
-    let input = "<math>
-        <mover><mi>S</mi><mo>˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        </math>";
-    println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
-    assert_eq!(s.to_string(), "(= (D(1, 1) S) (* (* (- β) S) I))");
-    println!("Output: {s}\n");
-
-    let input = "<math>
-        <mover><mi>S</mi><mo>˙˙</mo></mover><mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
-        </math>";
-    println!("Input: {input}");
-    let s = input.parse::<MathExpressionTree>().unwrap();
-    assert_eq!(s.to_string(), "(= (D(2, 1) S) (* (* (- β) S) I))");
-    println!("Output: {s}\n");
-
     let input = "<math><mi>a</mi><mo>+</mo><mo>(</mo><mo>-</mo><mi>b</mi><mo>)</mo></math>";
     println!("Input: {input}");
     let s = input.parse::<MathExpressionTree>().unwrap();
@@ -318,4 +408,235 @@ fn test_conversion() {
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
+}
+
+#[test]
+fn test_to_content_mathml_example1() {
+    let input = "<math><mi>x</mi><mo>+</mo><mi>y</mi></math>";
+    let s = input.parse::<MathExpressionTree>().unwrap();
+    let content = s.to_cmml();
+    assert_eq!(content, "<apply><plus/><ci>x</ci><ci>y</ci></apply>");
+}
+#[test]
+fn test_to_content_mathml_example2() {
+    let input = "<math>
+        <mfrac><mrow><mi>d</mi><mi>S</mi></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo><mo>−</mo><mi>β</mi><mi>S</mi><mi>I</mi>
+        </math>
+        ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>S</ci></apply><ci>I</ci></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq1() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq2() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mo>−</mo>
+        <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml,"<apply><eq/><apply><diff/><ci>E</ci></apply><apply><minus/><apply><divide/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq3() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>−</mo>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>−</mo>
+        <mi>α</mi><mi>ρ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq4() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq5() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>D</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mi>α</mi>
+        <mi>ρ</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>D</ci></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq6() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mo>+</mo>
+        <mi>ϵ</mi>
+        <mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><plus/><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq7() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>-</mo>
+        <mi>ϵ</mi>
+        <mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let ode = input.parse::<FirstOrderODE>().unwrap();
+    let cmml = ode.to_cmml();
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><minus/><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
+}
+
+#[test]
+fn test_content_hackathon2_scenario1_eq8() {
+    let input = "
+    <math>
+        <mi>β</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>=</mo>
+        <mi>κ</mi>
+        <mi>m</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let cmml = exp.to_cmml();
+    assert_eq!(
+        cmml,
+        "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
+    );
+}
+
+#[test]
+fn test_expression1() {
+    let input = "<math><mi>γ</mi><mi>I</mi></math>";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let math = exp.to_infix_expression();
+    assert_eq!(math, "(γ*I)");
+}
+
+#[test]
+fn test_expression2() {
+    let input = "
+    <math>
+        <mi>α</mi>
+        <mi>ρ</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let math = exp.to_infix_expression();
+    assert_eq!(math, "((α*ρ)*I)");
+}
+
+#[test]
+fn test_expression3() {
+    let input = "
+    <math>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mo>−</mo>
+        <mi>δ</mi><mi>E</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let math = exp.to_infix_expression();
+    assert_eq!(math, "((((β*I)*S)/N)-(δ*E))")
+}
+
+#[test]
+fn test_expression4() {
+    let input = "
+    <math>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>-</mo>
+        <mi>ϵ</mi>
+        <mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    let math = exp.to_infix_expression();
+    assert_eq!(math, "((((1-α)*γ)*I)-(ϵ*R))")
 }

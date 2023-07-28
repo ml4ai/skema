@@ -4,8 +4,8 @@ use std::fmt;
 /// Derivative operator, in line with Spivak notation: http://ceres-solver.org/spivak_notation.html
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct Derivative {
-    order: u8,
-    var_index: u8,
+    pub order: u8,
+    pub var_index: u8,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -20,6 +20,7 @@ pub enum Operator {
     Rparen,
     Compose,
     Factorial,
+    Exp,
     Derivative(Derivative),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
@@ -41,6 +42,7 @@ impl fmt::Display for Operator {
             Operator::Derivative(Derivative { order, var_index }) => {
                 write!(f, "D({order}, {var_index})")
             }
+            Operator::Exp => write!(f, "Exp"),
             Operator::Other(op) => write!(f, "{op}"),
         }
     }

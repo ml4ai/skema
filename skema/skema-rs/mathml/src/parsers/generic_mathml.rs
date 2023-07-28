@@ -6,10 +6,11 @@ use crate::ast::{
     },
     Mi, Mrow,
 };
+
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::{alphanumeric1, multispace0, not_line_ending, one_of},
+    character::complete::{alphanumeric1, multispace0, not_line_ending},
     combinator::{map, map_parser, opt, recognize, value},
     error::Error,
     multi::many0,
@@ -81,7 +82,7 @@ where
 }
 
 ///Quoted string
-fn quoted_string(input: Span) -> IResult<Span> {
+pub fn quoted_string(input: Span) -> IResult<Span> {
     delimited(tag("\""), take_until("\""), tag("\""))(input)
 }
 
@@ -90,12 +91,14 @@ pub fn attribute(input: Span) -> IResult<(&str, &str)> {
     Ok((s, (&key, &value)))
 }
 
+#[macro_export]
 macro_rules! stag {
     ($tag:expr) => {{
         ws(tuple((tag("<"), tag($tag), many0(attribute), tag(">"))))
     }};
 }
 
+#[macro_export]
 macro_rules! etag {
     ($tag:expr) => {{
         ws(delimited(tag("</"), tag($tag), tag(">")))
@@ -103,6 +106,7 @@ macro_rules! etag {
 }
 
 /// A macro to help build tag parsers
+#[macro_export]
 macro_rules! tag_parser {
     ($tag:expr, $parser:expr) => {{
         ws(delimited(stag!($tag), $parser, etag!($tag)))
@@ -110,6 +114,7 @@ macro_rules! tag_parser {
 }
 
 /// A macro to help build parsers for simple MathML elements (i.e., without further nesting).
+#[macro_export]
 macro_rules! elem0 {
     ($tag:expr) => {{
         let tag_end = concat!("</", $tag, ">");
@@ -118,6 +123,7 @@ macro_rules! elem0 {
 }
 
 /// A macro to help build parsers for MathML elements with 1 argument.
+#[macro_export]
 macro_rules! elem1 {
     ($tag:expr, $t:ident) => {{
         map(tag_parser!($tag, math_expression), |x| $t(Box::new(x)))
@@ -125,6 +131,7 @@ macro_rules! elem1 {
 }
 
 /// A macro to help build parsers for MathML elements with 2 arguments.
+#[macro_export]
 macro_rules! elem2 {
     ($tag:expr, $t:ident) => {{
         map(
@@ -135,6 +142,7 @@ macro_rules! elem2 {
 }
 
 /// A macro to help build parsers for MathML elements with 3 arguments.
+#[macro_export]
 macro_rules! elem3 {
     ($tag:expr, $t:ident) => {{
         map(
@@ -148,6 +156,7 @@ macro_rules! elem3 {
 }
 
 /// A macro to help build parsers for MathML elements with zero or more arguments.
+#[macro_export]
 macro_rules! elem_many0 {
     ($tag:expr) => {{
         tag_parser!($tag, many0(math_expression))
@@ -161,7 +170,7 @@ pub fn mi(input: Span) -> IResult<Mi> {
 }
 
 /// Numbers
-fn mn(input: Span) -> IResult<MathExpression> {
+pub fn mn(input: Span) -> IResult<MathExpression> {
     let (s, element) = elem0!("mn")(input)?;
     Ok((s, Mn(element.trim().to_string())))
 }
@@ -172,7 +181,10 @@ pub fn add(input: Span) -> IResult<Operator> {
 }
 
 pub fn subtract(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Subtract, ws(one_of("-−")))(input)?;
+    let (s, op) = value(
+        Operator::Subtract,
+        alt((tag("-"), tag("−"), tag("&#x2212;"))),
+    )(input)?;
     Ok((s, op))
 }
 
@@ -221,33 +233,33 @@ pub fn mo(input: Span) -> IResult<MathExpression> {
 /// Rows
 pub fn mrow(input: Span) -> IResult<Mrow> {
     let (s, elements) = ws(delimited(
-        tag("<mrow>"),
+        stag!("mrow"),
         many0(math_expression),
-        tag("</mrow>"),
+        etag!("mrow"),
     ))(input)?;
     Ok((s, Mrow(elements)))
 }
 
 /// Fractions
-fn mfrac(input: Span) -> IResult<MathExpression> {
+pub fn mfrac(input: Span) -> IResult<MathExpression> {
     let (s, frac) = elem2!("mfrac", Mfrac)(input)?;
     Ok((s, frac))
 }
 
 /// Superscripts
-fn msup(input: Span) -> IResult<MathExpression> {
+pub fn msup(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem2!("msup", Msup)(input)?;
     Ok((s, expression))
 }
 
 /// Subscripts
-fn msub(input: Span) -> IResult<MathExpression> {
+pub fn msub(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem2!("msub", Msub)(input)?;
     Ok((s, expression))
 }
 
 /// Square roots
-fn msqrt(input: Span) -> IResult<MathExpression> {
+pub fn msqrt(input: Span) -> IResult<MathExpression> {
     let (s, expression) = elem1!("msqrt", Msqrt)(input)?;
     Ok((s, expression))
 }
@@ -259,13 +271,13 @@ fn munder(input: Span) -> IResult<MathExpression> {
 }
 
 // Overscripts
-fn mover(input: Span) -> IResult<MathExpression> {
+pub fn mover(input: Span) -> IResult<MathExpression> {
     let (s, overscript) = elem2!("mover", Mover)(input)?;
     Ok((s, overscript))
 }
 
 // Subscript-superscript Pair
-fn msubsup(input: Span) -> IResult<MathExpression> {
+pub fn msubsup(input: Span) -> IResult<MathExpression> {
     let (s, subsup) = elem3!("msubsup", Msubsup)(input)?;
     Ok((s, subsup))
 }
@@ -487,7 +499,6 @@ fn test_math() {
         },
     )
 }
-
 #[test]
 fn test_mathml_parser() {
     let eqn = std::fs::read_to_string("tests/test01.xml").unwrap();
@@ -546,6 +557,7 @@ fn test_mathml_parser() {
 }
 
 // Exporting macros
+pub(crate) use elem2;
 pub(crate) use elem_many0;
 pub(crate) use etag;
 pub(crate) use stag;

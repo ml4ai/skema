@@ -6,7 +6,8 @@ End-to-end skema workflows
 
 from typing import List
 from skema.rest.proxies import SKEMA_RS_ADDESS
-from skema.rest import schema, utils
+from skema.rest import schema, utils, comments_proxy
+from skema.program_analysis.comments import MultiFileCodeComments
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
 from fastapi import APIRouter, File, UploadFile
@@ -18,7 +19,9 @@ router = APIRouter()
 
 
 # equation images -> mml -> amr
-@router.post("/images/base64/equations-to-amr", summary="Equations (base64 images) → MML → AMR")
+@router.post(
+    "/images/base64/equations-to-amr", summary="Equations (base64 images) → MML → AMR"
+)
 async def equations_to_amr(data: schema.EquationImagesToAMR):
     """
     Converts images of equations to AMR.
@@ -47,11 +50,15 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
     mml: List[str] = [eqn2mml.b64_image_to_mml(img) for img in data.images]
     payload = {"mathml": mml, "model": data.model}
     # FIXME: why is this a PUT?
-    res = requests.put(
-        f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload
-    )
+    res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
-        return JSONResponse(status_code=400, content={"error": f"MORAE PUT /mathml/amr failed to process payload", "payload": payload})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "payload": payload,
+            },
+        )
     return res.json()
 
 
@@ -74,63 +81,103 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
     r.json()
     """
     mml: List[str] = [
-        utils.clean_mml(eqn2mml.get_mathml_from_latex(tex))
-        for tex in data.equations
+        utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
     ]
     payload = {"mathml": mml, "model": data.model}
-    res = requests.put(
-        f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload
-    )
+    res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
-        return JSONResponse(status_code=400, content={"error": f"MORAE PUT /mathml/amr failed to process payload", "payload": payload})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "payload": payload,
+            },
+        )
+    return res.json()
+
+
+# pmml -> amr
+@router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
+async def equations_to_amr(data: schema.MmlToAMR):
+
+    payload = {"mathml": data.equations, "model": data.model}
+    res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
+    if res.status_code != 200:
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "payload": payload,
+            },
+        )
     return res.json()
 
 
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System):
-    if system.comments == None:
-        # FIXME: get comments
-        pass
     gromet = await code2fn.fn_given_filepaths(system)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
-        return JSONResponse(status_code=400, content={"error": f"MORAE POST /models/PN failed to process payload", "payload": gromet})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /models/PN failed to process payload",
+                "payload": gromet,
+            },
+        )
     return res.json()
 
 
-
+""" TODO: The regnet endpoints are currently outdated
 # code snippets -> fn -> regnet amr
 @router.post("/code/snippets-to-rn-amr", summary="Code snippets → RegNet AMR")
 async def code_snippets_to_rn_amr(system: code2fn.System):
-    if system.comments == None:
-        # FIXME: get comments and produce another system
-        pass
     gromet = await code2fn.fn_given_filepaths(system)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
-        return JSONResponse(status_code=400, content={"error": f"MORAE POST /models/RN failed to process payload", "payload": gromet})
+        print(res.status_code)
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE POST /models/RN failed to process payload",
+                "payload": gromet,
+            },
+        )
     return res.json()
+"""
 
 # zip archive -> fn -> petrinet amr
 @router.post(
     "/code/codebase-to-pn-amr", summary="Code repo (zip archive) → PetriNet AMR"
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File()):
-    # FIXME: get comments
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
-        return JSONResponse(status_code=400, content={"error": f"MORAE POST /models/PN failed to process payload", "payload": gromet})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE PUT /models/PN failed to process payload",
+                "payload": gromet,
+            },
+        )
     return res.json()
 
 
+""" TODO: The regnet endpoints are currently outdated
 # zip archive -> fn -> regnet amr
 @router.post("/code/codebase-to-rn-amr", summary="Code repo (zip archive) → RegNet AMR")
 async def repo_to_rn_amr(zip_file: UploadFile = File()):
-    # FIXME: get comments
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
-        return JSONResponse(status_code=400, content={"error": f"MORAE POST /models/RN failed to process payload", "payload": gromet})
+        return JSONResponse(
+            status_code=400,
+            content={
+                "error": f"MORAE POST /models/RN failed to process payload",
+                "payload": gromet,
+            },
+        )
     return res.json()
+"""

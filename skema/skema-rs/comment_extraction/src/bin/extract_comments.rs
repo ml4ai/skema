@@ -2,14 +2,9 @@
 
 use clap::Parser;
 use comment_extraction::{
-    conventions,
     conventions::Convention,
     extraction::{extract_comments_from_directory, extract_comments_from_file},
 };
-use std::{collections::HashSet, fs::read_to_string};
-
-#[cfg(test)]
-use serde_json as json;
 
 /// Command line arguments
 #[derive(Parser)]
@@ -45,6 +40,9 @@ fn main() {
 /// Test DSSAT-style comment extraction
 #[test]
 fn test_dssat_style_extraction() {
+    use comment_extraction::conventions;
+    use serde_json as json;
+    use std::fs::read_to_string;
     let output: json::Value =
         json::from_str(&read_to_string("tests/data/chime_sir_output.json").unwrap()).unwrap();
     let comments: json::Value = json::from_str(
