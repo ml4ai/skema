@@ -1,4 +1,4 @@
-# TreeSitter MATLAB support
+# TreeS-sitter MATLAB support
 
 ## building the grammar
 
