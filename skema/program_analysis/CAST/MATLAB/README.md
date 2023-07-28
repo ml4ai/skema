@@ -1,4 +1,4 @@
-# Tree-sitter MATLAB support
+# Tree-sitter MATLAB parser integration
 MATLAB is now supported as a tree-sitter grammar for Linux and MacOs operating systems.
 Files 'grammar.js', 'scanner.c', and the test corpus were sourced externally:
 - Repository:  https://github.com/acristoffers/tree-sitter-matlab 
