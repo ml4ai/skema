@@ -133,7 +133,7 @@ class IdCollapsePass:
         assert (
             isinstance(node.left, AnnCastVar)
             or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-            or isinstance(node.left, AnnCastAttribute)
+            or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
         ), f&#34;id_collapse: visit_assigment: node.left is {type(node.left)}&#34;
         self.visit(node.left, at_module_scope)
 
@@ -394,7 +394,7 @@ class IdCollapsePass:
         assert (
             isinstance(node.left, AnnCastVar)
             or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-            or isinstance(node.left, AnnCastAttribute)
+            or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
         ), f&#34;id_collapse: visit_assigment: node.left is {type(node.left)}&#34;
         self.visit(node.left, at_module_scope)
 
@@ -663,7 +663,7 @@ def visit_assignment(self, node: AnnCastAssignment, at_module_scope):
     assert (
         isinstance(node.left, AnnCastVar)
         or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-        or isinstance(node.left, AnnCastAttribute)
+        or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
     ), f&#34;id_collapse: visit_assigment: node.left is {type(node.left)}&#34;
     self.visit(node.left, at_module_scope)</code></pre>
 </details>

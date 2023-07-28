@@ -326,7 +326,7 @@ class ContainerScopePass:
         assert (
             isinstance(node.left, AnnCastVar)
             or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-            or isinstance(node.left, AnnCastAttribute)
+            or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
         ), f&#34;container_scope: visit_assigment: node.left is {type(node.left)}&#34;
         left_src_ref = self.visit(
             node.left, base_func_scopestr, enclosing_con_scope, AssignSide.LEFT
@@ -1176,7 +1176,7 @@ class ContainerScopePass:
         assert (
             isinstance(node.left, AnnCastVar)
             or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-            or isinstance(node.left, AnnCastAttribute)
+            or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
         ), f&#34;container_scope: visit_assigment: node.left is {type(node.left)}&#34;
         left_src_ref = self.visit(
             node.left, base_func_scopestr, enclosing_con_scope, AssignSide.LEFT
@@ -1951,7 +1951,7 @@ def visit_assignment(
     assert (
         isinstance(node.left, AnnCastVar)
         or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-        or isinstance(node.left, AnnCastAttribute)
+        or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
     ), f&#34;container_scope: visit_assigment: node.left is {type(node.left)}&#34;
     left_src_ref = self.visit(
         node.left, base_func_scopestr, enclosing_con_scope, AssignSide.LEFT

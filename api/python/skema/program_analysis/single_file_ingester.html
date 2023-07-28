@@ -36,9 +36,10 @@ from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.gromet.fn import GrometFNModuleCollection
 
 
-def process_file(path: str, write_to_file=False) -&gt; GrometFNModuleCollection:
+def process_file(path: str, write_to_file=False, original_source=False) -&gt; GrometFNModuleCollection:
     &#34;&#34;&#34;Run a single Python or Fortran file through the CODE2FN pipeline and return the GrometFNModuleCollection.
     Optionally, output the Gromet JSON to a file.
+    Optionally, include the entire original source code of the file in the GrometFNModuleCollection.
     &#34;&#34;&#34;
 
     path_obj = Path(path)
@@ -52,7 +53,7 @@ def process_file(path: str, write_to_file=False) -&gt; GrometFNModuleCollection:
     tmp.close()
 
     gromet_collection = process_file_system(
-        system_name, root_path, tmp.name, write_to_file
+        system_name, root_path, tmp.name, write_to_file, original_source
     )
 
     # Delete temporary system_filepaths file
@@ -66,8 +67,11 @@ if __name__ == &#34;__main__&#34;:
     parser.add_argument(
         &#34;path&#34;, type=str, help=&#34;The relative or absolute path of the file to process&#34;
     )
+    parser.add_argument(
+        &#34;--source&#34;, action=&#34;store_true&#34;, help=&#34;Toggle whether or not to include the full source code of the code in the GroMEt metadata&#34;
+    )
     args = parser.parse_args()
-    process_file(args.path, True)</code></pre>
+    process_file(args.path, True, args.source)</code></pre>
 </details>
 </section>
 <section>
@@ -78,18 +82,20 @@ if __name__ == &#34;__main__&#34;:
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="skema.program_analysis.single_file_ingester.process_file"><code class="name flex">
-<span>def <span class="ident">process_file</span></span>(<span>path: str, write_to_file=False) ‑> skema.gromet.fn.gromet_fn_module_collection.GrometFNModuleCollection</span>
+<span>def <span class="ident">process_file</span></span>(<span>path: str, write_to_file=False, original_source=False) ‑> skema.gromet.fn.gromet_fn_module_collection.GrometFNModuleCollection</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Run a single Python or Fortran file through the CODE2FN pipeline and return the GrometFNModuleCollection.
-Optionally, output the Gromet JSON to a file.</p></div>
+Optionally, output the Gromet JSON to a file.
+Optionally, include the entire original source code of the file in the GrometFNModuleCollection.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def process_file(path: str, write_to_file=False) -&gt; GrometFNModuleCollection:
+<pre><code class="python">def process_file(path: str, write_to_file=False, original_source=False) -&gt; GrometFNModuleCollection:
     &#34;&#34;&#34;Run a single Python or Fortran file through the CODE2FN pipeline and return the GrometFNModuleCollection.
     Optionally, output the Gromet JSON to a file.
+    Optionally, include the entire original source code of the file in the GrometFNModuleCollection.
     &#34;&#34;&#34;
 
     path_obj = Path(path)
@@ -103,7 +109,7 @@ Optionally, output the Gromet JSON to a file.</p></div>
     tmp.close()
 
     gromet_collection = process_file_system(
-        system_name, root_path, tmp.name, write_to_file
+        system_name, root_path, tmp.name, write_to_file, original_source
     )
 
     # Delete temporary system_filepaths file
