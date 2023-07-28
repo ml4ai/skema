@@ -19,7 +19,7 @@ This grammar was sourced externally:
 - Test corpus is included in this repository
 
 
-## Testing MATLAB code
+## Parsing MATLAB code
 - First build and test the grammar
 - Then execute the following
 - ```tree-sitter parse <your_matlab_file.m>```
