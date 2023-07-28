@@ -297,7 +297,7 @@ class ContainerScopePass:
         assert (
             isinstance(node.left, AnnCastVar)
             or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-            or isinstance(node.left, AnnCastAttribute)
+            or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
         ), f"container_scope: visit_assigment: node.left is {type(node.left)}"
         left_src_ref = self.visit(
             node.left, base_func_scopestr, enclosing_con_scope, AssignSide.LEFT

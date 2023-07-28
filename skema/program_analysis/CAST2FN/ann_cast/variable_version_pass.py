@@ -1093,7 +1093,7 @@ class VariableVersionPass:
             isinstance(node.left, AnnCastVar)
             or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
             or isinstance(node.left, AnnCastAssignment)
-            or isinstance(node.left, AnnCastAttribute)
+            or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
         ), f"container_scope: visit_assigment: node.left is {type(node.left)}"
         self.visit(node.left, True)
 
