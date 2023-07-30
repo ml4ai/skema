@@ -41,6 +41,7 @@ from skema.program_analysis.TS2CAST.util import generate_dummy_source_refs
 
 from skema.program_analysis.TS2CAST.preprocessor.preprocess import preprocess
 from skema.program_analysis.TS2CAST.build_tree_sitter_fortran import LANGUAGE_LIBRARY_REL_PATH
+
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
@@ -57,6 +58,9 @@ class TS2CAST(object):
             )
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
+        print(self.tree.root_node.sexp())
+        self.tree.root_node.
+        del self.tree.root_node
 
         # Walking data
         self.variable_context = VariableContext()
@@ -68,7 +72,7 @@ class TS2CAST(object):
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
-        #print(json.dumps([module.to_dict() for module in modules]))
+        print(json.dumps([module.to_dict() for module in modules]))
         return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
         
     def run(self, root) -> List[Module]:
@@ -103,7 +107,7 @@ class TS2CAST(object):
     
         return modules
 
-    def visit(self, node):
+    def visit(self, node: Node):
         if node.type in ["program", "module"] :
             return self.visit_module(node)
         elif node.type == "internal_procedures":
@@ -557,14 +561,7 @@ class TS2CAST(object):
         #  (else_clause)
         #  (end_if_statement)
 
-        # First we need to identify if this is a componund conditional
-        # We can do this by checking if the node.parenthesized_expression.logical_expression child exists
-        top_level_logical_expression = get_first_child_by_type(get_first_child_by_type(node, "parenthesized_expression"), "logical_expression")
-        if top_level_logical_expression:
-            # TODO: This shouldn't be a return. The visitor will only return a stub with no content
-            temp = self.visit(top_level_logical_expression)
-            print(temp)
-            return temp#self.visit(top_level_logical_expression)
+        if_condition = self.visit(get_first_child_by_type(node, "parenthesized_expression"))
 
         child_types = [child.type for child in node.children]
 
