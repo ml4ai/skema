@@ -108,8 +108,6 @@ impl FromStr for FirstOrderODE {
     }
 }
 
-
-
 //--------------------------------------
 // Methods for extraction of PN AMR from ODE's
 //--------------------------------------

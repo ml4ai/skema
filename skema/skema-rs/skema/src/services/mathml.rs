@@ -4,7 +4,7 @@ use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
-    parsers::first_order_ode::FirstOrderODE,
+    parsers::first_order_ode::{FirstOrderODE, first_order_ode},
 };
 use petgraph::dot::{Config, Dot};
 use utoipa;
@@ -136,7 +136,7 @@ pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
     let mt_asts: Result<Vec<_>, _> = payload
         .mathml
         .iter()
-        .map(|x| x.parse::<FirstOrderODE>())
+        .map(|x| first_order_ode(x.as_str().into()))
         .collect();
 
     match mt_asts {
@@ -144,8 +144,8 @@ pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
             let mut flattened_asts = Vec::<FirstOrderODE>::new();
 
             for mut eq in mt_asts {
-                eq.rhs = flatten_mults(eq.rhs.clone());
-                flattened_asts.push(eq.clone());
+                eq.1.rhs = flatten_mults(eq.1.rhs.clone());
+                flattened_asts.push(eq.1.clone());
             }
             let asts: Vec<Math> = payload
                 .mathml
