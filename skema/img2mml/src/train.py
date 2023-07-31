@@ -238,7 +238,9 @@ def get_batch_ted_loss(outputs: torch.Tensor, mml: torch.Tensor, vocab: Vocab) -
     return batch_ted_loss
 
 
-def get_batch_bleu_loss(outputs: torch.Tensor, mml: torch.Tensor, vocab: Vocab) -> float:
+def get_batch_bleu_loss(
+    outputs: torch.Tensor, mml: torch.Tensor, vocab: Vocab
+) -> float:
     """
     Calculates the batch BLEU loss based on the given outputs, MathML tensor, and vocabulary.
 
@@ -274,18 +276,21 @@ def get_batch_bleu_loss(outputs: torch.Tensor, mml: torch.Tensor, vocab: Vocab) 
             mathml_tree = convert_to_mathml_tree(output_str)
         except:
             # Apply a penalty in the form of reduced BLEU score because of the structure predication failure
-            bleu_loss += 0.5
+            bleu_loss = 1
+            # Accumulate the BLEU loss for all outputs in the batch
+            batch_bleu_loss += bleu_loss
+            continue
 
-        # If the token length difference is larger than 10, it returns -1
+        # If the token length difference is larger than 10, it returns 1
         if abs(output_str.count(" ") - mml_str.count(" ")) >= 10:
-            bleu_loss += 0.5
+            bleu_loss = 1
         else:
             candidate_corpus, references_corpus = [], []
             candidate_corpus.append(output_str.split())
             references_corpus.append([mml_str.split()])
             # Calculate the BLEU score and accumulate the BLEU loss
             bleu = bleu_score(candidate_corpus, references_corpus)
-            bleu_loss = 0.5 * (1 - bleu)
+            bleu_loss = 1 - bleu
         # Accumulate the BLEU loss for all outputs in the batch
         batch_bleu_loss += bleu_loss
 
@@ -306,7 +311,7 @@ def train(
     ddp=False,
     rank=None,
     vocab=None,
-    weight=0.5,
+    weight=1,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()

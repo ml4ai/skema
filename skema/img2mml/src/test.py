@@ -21,7 +21,7 @@ def evaluate(
     rank=None,
     g2p=False,
     config=None,
-    weight=0.5,
+    weight=1,
 ):
     model.eval()
     epoch_loss = 0
