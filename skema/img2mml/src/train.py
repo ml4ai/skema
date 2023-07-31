@@ -9,6 +9,7 @@ import zss
 from typing import List, Optional
 import math
 import torch.nn.functional as F
+from torchtext.data.metrics import bleu_score
 
 
 class MathMLNode:
@@ -237,6 +238,62 @@ def get_batch_ted_loss(outputs: torch.Tensor, mml: torch.Tensor, vocab: Vocab) -
     return batch_ted_loss
 
 
+def get_batch_bleu_loss(outputs: torch.Tensor, mml: torch.Tensor, vocab: Vocab) -> float:
+    """
+    Calculates the batch BLEU loss based on the given outputs, MathML tensor, and vocabulary.
+
+    Args:
+        outputs (torch.Tensor): Tensor containing the model outputs.
+        mml (torch.Tensor): Tensor containing the MathML sequences.
+        vocab (Vocab): Vocabulary object containing the mapping between tokens and indices.
+
+    Returns:
+        float: The calculated batch BLEU loss.
+
+    """
+    batch_size = outputs.size(0)
+    output_dim = outputs.size(2)
+    batch_bleu_loss = 0
+
+    for i in range(batch_size):
+        bleu_loss = 0
+        # Convert output and MathML tensors to token sequences
+        output_tokens = [
+            vocab.itos[idx] for idx in torch.argmax(F.softmax(outputs[i], dim=1), dim=1)
+        ]
+        mml_tokens = [vocab.itos[idx] for idx in mml[i]]
+
+        output_str = " ".join(output_tokens)
+        mml_str = " ".join(mml_tokens)
+
+        # Remove <EOS> and everything after it
+        output_str = output_str.split(" <eos>", 1)[0]
+        mml_str = mml_str.split(" <eos>", 1)[0]
+        # If the prediction cannot make a tree structure, it returns -1.
+        try:
+            mathml_tree = convert_to_mathml_tree(output_str)
+        except:
+            # Apply a penalty in the form of reduced BLEU score because of the structure predication failure
+            bleu_loss += 0.5
+
+        # If the token length difference is larger than 10, it returns -1
+        if abs(output_str.count(" ") - mml_str.count(" ")) >= 10:
+            bleu_loss += 0.5
+        else:
+            candidate_corpus, references_corpus = [], []
+            candidate_corpus.append(output_str.split())
+            references_corpus.append([mml_str.split()])
+            # Calculate the BLEU score and accumulate the BLEU loss
+            bleu = bleu_score(candidate_corpus, references_corpus)
+            bleu_loss = 0.5 * (1 - bleu)
+        # Accumulate the BLEU loss for all outputs in the batch
+        batch_bleu_loss += bleu_loss
+
+    # Normalize the BLEU loss by the batch size
+    batch_bleu_loss = batch_bleu_loss / batch_size
+    return batch_bleu_loss
+
+
 def train(
     model,
     model_type,
@@ -256,7 +313,7 @@ def train(
 
     epoch_loss = 0
     epoch_ce_loss = 0
-    epoch_ted_loss = 0
+    epoch_bleu_loss = 0
 
     for i, (img, mml) in enumerate(train_dataloader):
         # mml: (B, max_len)
@@ -273,7 +330,7 @@ def train(
 
         outputs, _ = model(img, mml)  # (B, max_len, output_dim)
         output_dim = outputs.shape[-1]
-        batch_ted_loss = get_batch_ted_loss(outputs, mml[:, 1:], vocab)
+        batch_bleu_loss = get_batch_bleu_loss(outputs, mml[:, 1:], vocab)
         # avoiding <sos> token while Calculating loss
         mml = mml[:, 1:].contiguous().view(-1)
         if model_type == "opennmt":
@@ -282,7 +339,7 @@ def train(
             outputs = outputs.contiguous().view(-1, output_dim)
 
         ce_loss = criterion(outputs, mml)
-        loss = ce_loss + weight * batch_ted_loss
+        loss = ce_loss + weight * batch_bleu_loss
         loss.backward()
 
         torch.nn.utils.clip_grad_norm_(model.parameters(), clip)
@@ -290,10 +347,10 @@ def train(
 
         epoch_loss += loss.item()
         epoch_ce_loss += ce_loss.item()
-        epoch_ted_loss += batch_ted_loss
+        epoch_bleu_loss += batch_bleu_loss
 
     net_loss = epoch_loss / len(train_dataloader)
     net_ce_loss = epoch_ce_loss / len(train_dataloader)
-    net_ted_loss = epoch_ted_loss / len(train_dataloader)
+    net_bleu_loss = epoch_bleu_loss / len(train_dataloader)
 
-    return net_loss, net_ce_loss, net_ted_loss
+    return net_loss, net_ce_loss, net_bleu_loss

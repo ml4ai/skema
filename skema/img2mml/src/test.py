@@ -26,7 +26,7 @@ def evaluate(
     model.eval()
     epoch_loss = 0
     epoch_ce_loss = 0
-    epoch_ted_loss = 0
+    epoch_bleu_loss = 0
 
     if is_test:
         dataset = config["dataset"]
@@ -58,7 +58,7 @@ def evaluate(
             if is_test:
                 preds = garbage2pad(preds, vocab, is_test=is_test)
                 output_dim = outputs.shape[-1]
-                batch_ted_loss = get_batch_ted_loss(outputs, mml[:, 1:], vocab)
+                batch_bleu_loss = get_batch_bleu_loss(outputs, mml[:, 1:], vocab)
                 mml_reshaped = mml[:, 1:].contiguous().view(-1)
                 if model_type == "opennmt":
                     outputs_reshaped = (
@@ -71,7 +71,7 @@ def evaluate(
 
             else:
                 output_dim = outputs.shape[-1]
-                batch_ted_loss = get_batch_ted_loss(outputs, mml[:, 1:], vocab)
+                batch_bleu_loss = get_batch_bleu_loss(outputs, mml[:, 1:], vocab)
                 if model_type == "opennmt":
                     outputs_reshaped = (
                         outputs[:, 1:, :].contiguous().view(-1, output_dim)
@@ -83,11 +83,11 @@ def evaluate(
                 mml_reshaped = mml[:, 1:].contiguous().view(-1)
 
             ce_loss = criterion(outputs_reshaped, mml_reshaped)
-            loss = ce_loss + weight * batch_ted_loss
+            loss = ce_loss + weight * batch_bleu_loss
 
             epoch_loss += loss.item()
             epoch_ce_loss += ce_loss.item()
-            epoch_ted_loss += batch_ted_loss
+            epoch_bleu_loss += batch_bleu_loss
 
             if is_test:
                 for idx in range(batch_size):
@@ -117,6 +117,6 @@ def evaluate(
 
     net_loss = epoch_loss / len(test_dataloader)
     net_ce_loss = epoch_ce_loss / len(test_dataloader)
-    net_ted_loss = epoch_ted_loss / len(test_dataloader)
+    net_bleu_loss = epoch_bleu_loss / len(test_dataloader)
 
-    return net_loss, net_ce_loss, net_ted_loss
+    return net_loss, net_ce_loss, net_bleu_loss
