@@ -489,20 +489,20 @@ def train_model(
                 if (not ddp) or (ddp and rank == 0):
                     print(f"Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s")
                     print(
-                        f"\tTrain Loss: {train_loss:.3f} | Train CE Loss: {train_ce_loss:.3f} | Train BLEU Loss: {train_bleu_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
+                        f"\tTrain Loss: {train_loss:.4f} | Train CE Loss: {train_ce_loss:.4f} | Train BLEU Loss: {train_bleu_loss:.4f} | Train PPL: {math.exp(train_loss):7.4f}"
                     )
                     print(
-                        f"\t Val. Loss: {val_loss:.3f} | Val. CE Loss: {val_ce_loss:.3f} | Val. BLEU Loss: {val_bleu_loss:.3f} | Val. PPL: {math.exp(val_loss):7.3f}"
+                        f"\t Val. Loss: {val_loss:.4f} | Val. CE Loss: {val_ce_loss:.4f} | Val. BLEU Loss: {val_bleu_loss:.4f} | Val. PPL: {math.exp(val_loss):7.4f}"
                     )
 
                     loss_file.write(
                         f"Epoch: {epoch + 1:02} | Time: {epoch_mins}m {epoch_secs}s\n"
                     )
                     loss_file.write(
-                        f"\tTrain Loss: {train_loss:.3f} | Train CE Loss: {train_ce_loss:.3f} | Train BLEU Loss: {train_bleu_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}\n"
+                        f"\tTrain Loss: {train_loss:.4f} | Train CE Loss: {train_ce_loss:.4f} | Train BLEU Loss: {train_bleu_loss:.4f} | Train PPL: {math.exp(train_loss):7.4f}\n"
                     )
                     loss_file.write(
-                        f"\t Val. Loss: {val_loss:.3f} | Val. CE Loss: {val_ce_loss:.3f} | Val. BLEU Loss: {val_bleu_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
+                        f"\t Val. Loss: {val_loss:.4f} | Val. CE Loss: {val_ce_loss:.4f} | Val. BLEU Loss: {val_bleu_loss:.4f} |  Val. PPL: {math.exp(val_loss):7.4f}\n"
                     )
 
             else:
@@ -587,10 +587,10 @@ def train_model(
 
     if (not ddp) or (ddp and rank == 0):
         print(
-            f"| Test Loss: {test_loss:.3f} | Test CE Loss: {test_ce_loss:.3f} | Test BLEU Loss: {test_bleu_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
+            f"| Test Loss: {test_loss:.4f} | Test CE Loss: {test_ce_loss:.4f} | Test BLEU Loss: {test_bleu_loss:.4f} | Test PPL: {math.exp(test_loss):7.4f} |"
         )
         loss_file.write(
-            f"| Test Loss: {test_loss:.3f} | Test CE Loss: {test_ce_loss:.3f} | Test BLEU Loss: {test_bleu_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
+            f"| Test Loss: {test_loss:.4f} | Test CE Loss: {test_ce_loss:.4f} | Test BLEU Loss: {test_bleu_loss:.4f} | Test PPL: {math.exp(test_loss):7.4f} |"
         )
 
     # stopping time
