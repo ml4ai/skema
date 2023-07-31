@@ -1,10 +1,11 @@
 use actix_web::{put, web, HttpResponse};
 use mathml::parsers::first_order_ode::flatten_mults;
+use mathml::parsers::generic_mathml::math;
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
-    parsers::first_order_ode::{FirstOrderODE, first_order_ode},
+    parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
 use petgraph::dot::{Config, Dot};
 use utoipa;
@@ -22,9 +23,9 @@ use utoipa;
 #[put("/mathml/ast-graph")]
 pub async fn get_ast_graph(payload: String) -> String {
     let contents = &payload;
-    let math_results = contents.parse::<Math>();
+    let math_results = math(contents.as_str().into());
     match math_results {
-        Ok(math) => {
+        Ok((_, math)) => {
             let g = math.to_graph();
             let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
             dot_representation.to_string()
@@ -86,13 +87,15 @@ pub async fn get_content_mathml(payload: String) -> String {
 )]
 #[put("/mathml/petrinet")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts_result: Result<Vec<_>, _> =
-        payload.iter().map(|x| x.parse::<FirstOrderODE>()).collect();
+    let asts_result: Result<Vec<_>, _> = payload
+        .iter()
+        .map(|x| first_order_ode(x.as_str().into()))
+        .collect();
 
     match asts_result {
         Ok(asts) => {
             let mut flattened_asts = Vec::<FirstOrderODE>::new();
-            for mut eq in asts {
+            for (_, mut eq) in asts {
                 eq.rhs = flatten_mults(eq.rhs.clone());
                 flattened_asts.push(eq.clone());
             }
@@ -143,9 +146,9 @@ pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
         Ok(mt_asts) => {
             let mut flattened_asts = Vec::<FirstOrderODE>::new();
 
-            for mut eq in mt_asts {
-                eq.1.rhs = flatten_mults(eq.1.rhs.clone());
-                flattened_asts.push(eq.1.clone());
+            for (_, mut eq) in mt_asts {
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                flattened_asts.push(eq.clone());
             }
             let asts: Vec<Math> = payload
                 .mathml

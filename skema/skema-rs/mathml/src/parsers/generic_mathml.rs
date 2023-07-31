@@ -12,7 +12,6 @@ use nom::{
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0, not_line_ending},
     combinator::{map, map_parser, opt, recognize, value},
-    error::Error,
     multi::many0,
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
@@ -43,6 +42,10 @@ impl<'a> ParseError<'a> {
 
     pub fn offset(&self) -> usize {
         self.span().location_offset()
+    }
+
+    pub fn append_message(&mut self, msg: &str) {
+        self.message.push_str(&format!("\nERROR: {}", msg));
     }
 }
 
@@ -89,6 +92,16 @@ pub fn quoted_string(input: Span) -> IResult<Span> {
 pub fn attribute(input: Span) -> IResult<(&str, &str)> {
     let (s, (key, value)) = ws(separated_pair(alphanumeric1, ws(tag("=")), quoted_string))(input)?;
     Ok((s, (&key, &value)))
+}
+
+#[macro_export]
+macro_rules! append_msg_to_parse_err {
+    ($mapped_err:expr, $msg: expr) => {{
+        $mapped_err.map(|mut my_err| {
+            my_err.append_message($msg);
+            return my_err;
+        })
+    }};
 }
 
 #[macro_export]
@@ -334,7 +347,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
 }
 
 /// testing MathML documents
-fn math(input: Span) -> IResult<Math> {
+pub fn math(input: Span) -> IResult<Math> {
     let (s, elements) = preceded(opt(xml_declaration), elem_many0!("math"))(input)?;
     Ok((s, Math { content: elements }))
 }
@@ -558,6 +571,7 @@ fn test_mathml_parser() {
 }
 
 // Exporting macros
+pub(crate) use append_msg_to_parse_err;
 pub(crate) use elem2;
 pub(crate) use elem_many0;
 pub(crate) use etag;

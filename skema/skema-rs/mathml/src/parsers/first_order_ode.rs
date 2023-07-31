@@ -7,7 +7,9 @@ use crate::{
         Ci, MathExpression, Type,
     },
     parsers::{
-        generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
+        generic_mathml::{
+            append_msg_to_parse_err, attribute, equals, etag, stag, ws, IResult, Span,
+        },
         interpreted_mathml::{
             ci_univariate_func, ci_unknown, first_order_derivative_leibniz_notation,
             math_expression, newtonian_derivative, operator,
@@ -17,6 +19,7 @@ use crate::{
 };
 
 use derive_new::new;
+
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -25,6 +28,7 @@ use nom::{
     multi::{many0, many1},
     sequence::{delimited, tuple},
 };
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
@@ -48,16 +52,19 @@ pub struct FirstOrderODE {
 
 /// Parse a first order ODE with a single derivative term on the LHS.
 pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
-    let (s, _) = stag!("math")(input)?;
+    let (s, _) = stag!("math")(input)
+        .map_err(|err| append_msg_to_parse_err!(err, "MISSING STARTING <math> TAG."))?;
 
     // Recognize LHS derivative
     let (s, (_, ci)) = alt((
         first_order_derivative_leibniz_notation,
         newtonian_derivative,
-    ))(s)?;
+    ))(s)
+    .map_err(|err| append_msg_to_parse_err!(err, "INVALID DERIVATIVE ON LHS."))?;
 
     // Recognize equals sign
-    let (s, _) = delimited(stag!("mo"), equals, etag!("mo"))(s)?;
+    let (s, _) = delimited(stag!("mo"), equals, etag!("mo"))(s)
+        .map_err(|err| append_msg_to_parse_err!(err, "MISSING EQUALS SIGN."))?;
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
@@ -70,9 +77,11 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         }),
         map(operator, MathExpression::Mo),
         math_expression,
-    )))(s)?;
+    )))(s)
+    .map_err(|err| append_msg_to_parse_err!(err, "COULD NOT PARSE RHS."))?;
 
-    let (s, _) = etag!("math")(s)?;
+    let (s, _) = etag!("math")(s)
+        .map_err(|err| append_msg_to_parse_err!(err, "MISSING ENDING </math> tag."))?;
 
     let ode = FirstOrderODE {
         lhs_var: ci,
