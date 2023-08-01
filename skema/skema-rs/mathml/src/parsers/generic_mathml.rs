@@ -9,7 +9,7 @@ use crate::ast::{
 
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_until},
+    bytes::complete::take_until,
     character::complete::{alphanumeric1, multispace0, not_line_ending},
     combinator::{map, map_parser, opt, recognize, value},
     error::Error,
@@ -17,9 +17,14 @@ use nom::{
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
 use nom_locate::LocatedSpan;
+use nom_supreme::{
+    error::{BaseErrorKind, ErrorTree},
+    parser_ext::ParserExt,
+    tag::complete::tag,
+};
 use std::str::FromStr;
 
-pub type Span<'a> = LocatedSpan<&'a str>;
+pub type Span<'a> = &'a str;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct ParseError<'a> {
@@ -28,49 +33,49 @@ pub struct ParseError<'a> {
 }
 
 /// We implement the ParseError trait here to support the Span type.
-impl<'a> ParseError<'a> {
-    pub fn new(message: String, span: Span<'a>) -> Self {
-        Self { message, span }
-    }
+//impl<'a> ParseError<'a> {
+//pub fn new(message: String, span: Span<'a>) -> Self {
+//Self { message, span }
+//}
 
-    pub fn span(&self) -> &Span {
-        &self.span
-    }
+//pub fn span(&self) -> &Span {
+//&self.span
+//}
 
-    pub fn line(&self) -> u32 {
-        self.span().location_line()
-    }
+//pub fn line(&self) -> u32 {
+//self.span().location_line()
+//}
 
-    pub fn offset(&self) -> usize {
-        self.span().location_offset()
-    }
-}
+//pub fn offset(&self) -> usize {
+//self.span().location_offset()
+//}
+//}
 
 /// Further trait implementation for Span
-impl<'a> nom::error::ParseError<Span<'a>> for ParseError<'a> {
-    fn from_error_kind(input: Span<'a>, kind: nom::error::ErrorKind) -> Self {
-        Self::new(format!("Parse error {kind:?}"), input)
-    }
+//impl<'a> nom::error::ParseError<Span<'a>> for ParseError<'a> {
+//fn from_error_kind(input: Span<'a>, kind: nom::error::ErrorKind) -> Self {
+//Self::new(format!("Parse error {kind:?}"), input)
+//}
 
-    fn append(_input: Span<'a>, _kind: nom::error::ErrorKind, other: Self) -> Self {
-        other
-    }
+//fn append(_input: Span<'a>, _kind: nom::error::ErrorKind, other: Self) -> Self {
+//other
+//}
 
-    fn from_char(input: Span<'a>, c: char) -> Self {
-        Self::new(format!("Unexpected character '{c}'"), input)
-    }
-}
+//fn from_char(input: Span<'a>, c: char) -> Self {
+//Self::new(format!("Unexpected character '{c}'"), input)
+//}
+//}
 
 /// Implementing ContextError to support Span
-impl<'a> nom::error::ContextError<Span<'a>> for ParseError<'a> {
-    fn add_context(input: Span<'a>, ctx: &'static str, other: Self) -> Self {
-        let message = format!("{}: {}", ctx, other.message);
-        ParseError::new(message, input)
-    }
-}
+//impl<'a> nom::error::ContextError<Span<'a>> for ParseError<'a> {
+//fn add_context(input: Span<'a>, ctx: &'static str, other: Self) -> Self {
+//let message = format!("{}: {}", ctx, other.message);
+//ParseError::new(message, input)
+//}
+//}
 
 /// Redefine IResult, filling in the first generic type parameter with Span, for increased brevity.
-pub type IResult<'a, O> = nom::IResult<Span<'a>, O, ParseError<'a>>;
+pub type IResult<'a, O> = nom::IResult<Span<'a>, O, ErrorTree<&'a str>>;
 
 /// A combinator that takes a parser `inner` and produces a parser that also consumes both leading
 /// and trailing whitespace, returning the output of `inner`.
@@ -341,8 +346,7 @@ fn math(input: Span) -> IResult<Math> {
 
 /// The `parse` function is part of the public API. It takes a string and returns a Math object.
 pub fn parse(input: &str) -> IResult<Math> {
-    let span = Span::new(input);
-    let (remaining, math) = math(span)?;
+    let (remaining, math) = math(input.into())?;
     Ok((remaining, math))
 }
 
