@@ -62,15 +62,9 @@ pub fn ci_subscript(input: Span) -> IResult<Ci> {
 
 /// Parse the identifier 'd'
 fn d(input: Span) -> IResult<()> {
-    let (s, Mi(x)) = mi(input)?;
-    if let "d" = x.as_ref() {
-        Ok((s, ()))
-    } else {
-        Err(nom::Err::Error(ParseError::new(
-            "Unable to identify Mi('d')".to_string(),
-            input,
-        )))
-    }
+    //let (s, Mi(x)) = mi(input)?;
+    let (s, _) = delimited(stag!("mi"), ws(tag("d")), etag!("mi"))(input)?;
+    Ok((s, ()))
 }
 
 /// Parse a content identifier of unknown type.

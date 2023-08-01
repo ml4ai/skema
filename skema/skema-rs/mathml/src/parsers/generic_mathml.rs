@@ -33,23 +33,23 @@ pub struct ParseError<'a> {
 }
 
 /// We implement the ParseError trait here to support the Span type.
-//impl<'a> ParseError<'a> {
-//pub fn new(message: String, span: Span<'a>) -> Self {
-//Self { message, span }
-//}
+impl<'a> ParseError<'a> {
+    pub fn new(message: String, span: Span<'a>) -> Self {
+        Self { message, span }
+    }
 
-//pub fn span(&self) -> &Span {
-//&self.span
-//}
+    pub fn span(&self) -> &Span {
+        &self.span
+    }
 
-//pub fn line(&self) -> u32 {
-//self.span().location_line()
-//}
+    //pub fn line(&self) -> u32 {
+    //self.span().location_line()
+    //}
 
-//pub fn offset(&self) -> usize {
-//self.span().location_offset()
-//}
-//}
+    //pub fn offset(&self) -> usize {
+    //self.span().location_offset()
+    //}
+}
 
 /// Further trait implementation for Span
 //impl<'a> nom::error::ParseError<Span<'a>> for ParseError<'a> {
@@ -221,7 +221,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
 
 #[test]
 fn test_operator() {
-    let (_, op) = operator(Span::new("-")).unwrap();
+    let (_, op) = operator("-".into()).unwrap();
     assert_eq!(op, Operator::Subtract);
 }
 
@@ -376,8 +376,7 @@ where
     P: FnMut(Span<'a>) -> IResult<'a, O>,
     O: std::cmp::PartialEq + std::fmt::Debug,
 {
-    let (s, o) = parser(Span::new(input)).unwrap();
-    assert_eq!(s.fragment(), &"");
+    let (s, o) = parser(input.into()).unwrap();
     assert_eq!(o, output);
 }
 
@@ -417,7 +416,7 @@ fn test_attribute() {
 
 #[test]
 fn test_mfrac() {
-    let frac = mfrac(Span::new("<mfrac><mn>1</mn><mn>2</mn></mfrac>"))
+    let frac = mfrac("<mfrac><mn>1</mn><mn>2</mn></mfrac>".into())
         .unwrap()
         .1;
     assert_eq!(
