@@ -124,6 +124,10 @@ pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
             let mut ode = line
                 .parse::<FirstOrderODE>()
                 .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
+            println!(
+                "ode_line rhs string below: {:?}\n",
+                ode.rhs.to_string().clone()
+            );
             ode.rhs = flatten_mults(ode.rhs.clone());
             println!(
                 "ode_line rhs string after: {:?}\n",
@@ -574,10 +578,9 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
                             y.append(&mut [temp1, temp2].to_vec())
                         }
                         _ => {
-                            let temp1 = y1[0].clone();
-                            let temp2 = y1[1].clone();
+                            let temp1 = y[1].clone();
                             y.remove(1);
-                            y.append(&mut [temp1, temp2].to_vec())
+                            y.append(&mut [temp1].to_vec())
                         }
                     },
                     Atom(_x1) => {}
@@ -591,16 +594,9 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
                             y.append(&mut [temp1, temp2].to_vec());
                         }
                         _ => {
-                            if y0.len() > 1 {
-                                let temp1 = y0[0].clone();
-                                let temp2 = y0[1].clone();
-                                y.remove(0);
-                                y.append(&mut [temp1, temp2].to_vec())
-                            } else {
-                                let temp1 = y0[0].clone();
-                                y.remove(0);
-                                y.append(&mut [temp1].to_vec())
-                            }
+                            let temp1 = y[0].clone();
+                            y.remove(0);
+                            y.append(&mut [temp1].to_vec())
                         }
                     },
                     Atom(_x0) => {}

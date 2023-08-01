@@ -1,5 +1,11 @@
 from rust:1.65
 
+# =====================
+# ENV setup for app
+# =====================
+ARG APP_VERSION=unknown
+ENV APP_VERSION=$APP_VERSION
+
 run apt update \
     && apt install -y \
         cmake openssl libclang-13-dev

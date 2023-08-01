@@ -17,8 +17,9 @@ dependencies=[
     "tree-sitter",
     "requests",
     "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
-    "typing_extensions==4.5.0", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
-    "fastapi",
+    "typing_extensions", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
+    "fastapi~=0.100.0",
+    "pydantic~=2.0.0",
     "uvicorn",
     "python-multipart"
 ]
@@ -50,7 +51,7 @@ isa = [
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
-img2mml = ["torch", "torchvision"]
+img2mml = ["torch", "torchvision","lxml==4.9.3"]
 
 # dependencies for METAL utilities.
 metal = ["fire==0.5.0",

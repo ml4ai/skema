@@ -21,19 +21,38 @@ def link_amr(amr_type: str,
              similarity_threshold: float = 0.5,
              amr_file: UploadFile = File(...),
              text_extractions_file: UploadFile = File(...)):
-    """ Links an AMR to a text extractions file """
+    """ Links an AMR to a text extractions file
+
+        ### Python example
+        ```
+        params = {
+          "amr_type": "petrinet"
+        }
+
+        files = {
+          "amr_file": ("amr.json", open("amr.json"), "application/json"),
+          "text_extractions_file": ("extractions.json", open("extractions.json"), "application/json")
+        }
+
+        response = requests.post(f"{ENDPOINT}/metal/link_amr", params=params, files=files)
+        if response.status_code == 200:
+            enriched_amr = response.json()
+        ```
+    """
 
     # Load the AMR
     amr = json.load(amr_file.file)
     amr = replace_xml_codepoints(amr)
 
-    # Load the extractions, that come out of the TR Proxy endpoing
-    text_extractions = TextReadingAnnotationsOutput(**json.load(text_extractions_file.file))
+    # Load the extractions, that come out of the TR Proxy endpoint
+    raw_extractions = json.load(text_extractions_file.file)
+    text_extractions = [AttributeCollection.from_json(o['data']) for o in raw_extractions['outputs']]
+    # text_extractions = TextReadingAnnotationsOutput(**json.load(text_extractions_file.file))
 
     # Merge all the attribute collections
     extractions = AttributeCollection(
         attributes=list(
-            it.chain.from_iterable(o.data.attributes for o in text_extractions.outputs)
+            it.chain.from_iterable(o.attributes for o in text_extractions)
         )
     )
 

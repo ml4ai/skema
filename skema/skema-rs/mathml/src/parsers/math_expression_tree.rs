@@ -89,7 +89,7 @@ impl MathExpressionTree {
     }
 
     /// Translates to infix math expression to provide "string expressions" (e.g. ((α*ρ)*I)  )
-    /// TA-4 use "string expressions" to display over the transitions in their visual front end
+    /// TA-4 uses "string expressions" to display over the transitions in their visual front end.
     pub fn to_infix_expression(&self) -> String {
         let mut expression = String::new();
         match self {
