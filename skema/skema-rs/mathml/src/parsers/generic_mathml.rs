@@ -97,16 +97,6 @@ pub fn attribute(input: Span) -> IResult<(&str, &str)> {
 }
 
 #[macro_export]
-macro_rules! append_msg_to_parse_err {
-    ($mapped_err:expr, $msg: expr) => {{
-        $mapped_err.map(|mut my_err| {
-            my_err.append_message($msg);
-            return my_err;
-        })
-    }};
-}
-
-#[macro_export]
 macro_rules! stag {
     ($tag:expr) => {{
         ws(tuple((tag("<"), tag($tag), many0(attribute), tag(">"))))
@@ -604,7 +594,6 @@ fn test_mathml_parser() {
 }
 
 // Exporting macros
-pub(crate) use append_msg_to_parse_err;
 pub(crate) use elem2;
 pub(crate) use elem_many0;
 pub(crate) use etag;

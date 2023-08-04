@@ -7,9 +7,7 @@ use crate::{
         Ci, MathExpression, Type,
     },
     parsers::{
-        generic_mathml::{
-            append_msg_to_parse_err, attribute, equals, etag, stag, ws, IResult, Span,
-        },
+        generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
             ci_univariate_func, ci_unknown, first_order_derivative_leibniz_notation,
             math_expression, newtonian_derivative, operator,
@@ -20,6 +18,7 @@ use crate::{
 
 use derive_new::new;
 
+use nom::error::context;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -52,36 +51,40 @@ pub struct FirstOrderODE {
 
 /// Parse a first order ODE with a single derivative term on the LHS.
 pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
-    let (s, _) = stag!("math")(input)
-        .map_err(|err| append_msg_to_parse_err!(err, "MISSING STARTING <math> TAG."))?;
+    let (s, _) = context("MISSING STARTING <math> TAG.", stag!("math"))(input)?;
 
     // Recognize LHS derivative
-    let (s, (_, ci)) = alt((
-        first_order_derivative_leibniz_notation,
-        newtonian_derivative,
-    ))(s)
-    .map_err(|err| append_msg_to_parse_err!(err, "INVALID DERIVATIVE ON LHS."))?;
+    let (s, (_, ci)) = context(
+        "INVALID LHS DERIVATIVE.",
+        alt((
+            first_order_derivative_leibniz_notation,
+            newtonian_derivative,
+        )),
+    )(s)?;
 
     // Recognize equals sign
-    let (s, _) = delimited(stag!("mo"), equals, etag!("mo"))(s)
-        .map_err(|err| append_msg_to_parse_err!(err, "MISSING EQUALS SIGN."))?;
+    let (s, _) = context(
+        "MISSING EQUALS SIGN.",
+        delimited(stag!("mo"), equals, etag!("mo")),
+    )(s)?;
 
     // Recognize other tokens
-    let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, MathExpression::Ci),
-        map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(Type::Function),
-                content,
-            })
-        }),
-        map(operator, MathExpression::Mo),
-        math_expression,
-    )))(s)
-    .map_err(|err| append_msg_to_parse_err!(err, "COULD NOT PARSE RHS."))?;
+    let (s, remaining_tokens) = context(
+        "INVALID RHS.",
+        many1(alt((
+            map(ci_univariate_func, MathExpression::Ci),
+            map(ci_unknown, |Ci { content, .. }| {
+                MathExpression::Ci(Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                })
+            }),
+            map(operator, MathExpression::Mo),
+            math_expression,
+        ))),
+    )(s)?;
 
-    let (s, _) = etag!("math")(s)
-        .map_err(|err| append_msg_to_parse_err!(err, "MISSING ENDING </math> tag."))?;
+    let (s, _) = context("INVALID ENDING MATH TAG", etag!("math"))(s)?;
 
     let ode = FirstOrderODE {
         lhs_var: ci,
