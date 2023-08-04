@@ -617,6 +617,53 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
     }
 }
 
+// This impl will take a vector of FirstOrderODE and return the RegNet for it
+impl From<Vec<FirstOrderODE>> for RegNet {
+    fn from(ode_vec: Vec<FirstOrderODE>) -> RegNet {
+        // get the terms
+        let mut terms = Vec::<PnTerm>::new();
+        let mut sys_states = Vec::<String>::new();
+
+        for ode in ode_vec.iter() {
+            sys_states.push(ode.lhs_var.to_string().clone());
+        }
+
+        for ode in ode_vec.iter() {
+            terms.append(&mut get_terms(sys_states.clone(), ode.clone()));
+        }
+        // -----------------------------------------------------------
+        // -----------------------------------------------------------
+
+        let mut states_vec = BTreeSet::<RegState>::new();
+        let mut transitions_vec = BTreeSet::<RegTransition>::new();
+        let mut parameter_vec = Vec::<Parameter>::new();
+
+        // construct the states
+
+        // construct the transitions
+
+        // construct the parameters
+
+        // ------------------------------------------
+
+        let model = ModelRegNet {
+            vertices: states_vec,
+            edges: transitions_vec,
+            parameters: Some(parameter_vec),
+        };
+
+        RegNet {
+            name: "Regnet mathml model".to_string(),
+            schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
+            schema_name: "regnet".to_string(),
+            description: "This is a Regnet model from mathml equations".to_string(),
+            model_version: "0.1".to_string(),
+            model,
+            metadata: None,
+        }
+    }
+}
+
 // This function takes in a mathml string and returns a Regnet
 impl From<Vec<Math>> for RegNet {
     fn from(mathml_asts: Vec<Math>) -> RegNet {
