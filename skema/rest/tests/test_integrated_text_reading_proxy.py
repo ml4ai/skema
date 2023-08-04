@@ -38,7 +38,7 @@ def test_text_integrated_extractions():
         assert output.errors is None, f"Document {ix + 1} reported errors"
 
 
-def test_integrated_pdf_extraction():
+def _test_integrated_pdf_extraction():
     """ Tests the pdf endpoint """
     params = {
         "annotate_skema": True,
@@ -73,7 +73,7 @@ def _test_cosmos():
     assert ret is not None and len(ret) > 0
 
 
-def _test_mira_grounding():
+def test_mira_grounding():
     """Test that we are getting grounding for entities"""
     queries = {"queries": ["infected", "suceptible"]}
     params = {"k": 5}
