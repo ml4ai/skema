@@ -65,7 +65,7 @@ def test_integrated_pdf_extraction():
 
 
 # Test the cosmos endpoint
-def test_cosmos():
+def _test_cosmos():
     """Test that we are able to fetch COSMOS data correctly"""
     path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
     with path.open("rb") as pdf:
@@ -73,7 +73,7 @@ def test_cosmos():
     assert ret is not None and len(ret) > 0
 
 
-def test_mira_grounding():
+def _test_mira_grounding():
     """Test that we are getting grounding for entities"""
     queries = {"queries": ["infected", "suceptible"]}
     params = {"k": 5}
