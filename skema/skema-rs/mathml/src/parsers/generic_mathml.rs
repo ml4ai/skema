@@ -338,10 +338,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     if tag_name.contains('/') {
         // Found a closing tag! This means no more math expressions, but is not wrong.
         // We want the parent combinator to still continue to try and parse the remaining input
-        context(
-            concat!("EXPECTED FAILURE TO PARSE MATHML FOR CLOSING TAG"),
-            mn,
-        )(input)
+        mn(input)
     } else {
         match tag_name.as_str() {
             "mi" => context("FAILED TO PARSE <mi>", cut(ws(map(mi, MathExpression::Mi))))(input),
