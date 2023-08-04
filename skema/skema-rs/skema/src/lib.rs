@@ -201,7 +201,7 @@ pub struct FunctionNet {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gromet_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
     // these additions are I guess how imports are being handled...
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -223,7 +223,7 @@ pub struct Attribute {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gromet_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
