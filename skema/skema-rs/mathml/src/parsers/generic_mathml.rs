@@ -11,10 +11,12 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0, not_line_ending},
-    combinator::{map, map_parser, opt, recognize, value},
+    combinator::{cut, map, map_parser, opt, peek, recognize, value},
     multi::many0,
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
+use nom::{character::complete::char as nom_char, error::context};
+
 use nom_locate::LocatedSpan;
 use std::str::FromStr;
 
@@ -92,16 +94,6 @@ pub fn quoted_string(input: Span) -> IResult<Span> {
 pub fn attribute(input: Span) -> IResult<(&str, &str)> {
     let (s, (key, value)) = ws(separated_pair(alphanumeric1, ws(tag("=")), quoted_string))(input)?;
     Ok((s, (&key, &value)))
-}
-
-#[macro_export]
-macro_rules! append_msg_to_parse_err {
-    ($mapped_err:expr, $msg: expr) => {{
-        $mapped_err.map(|mut my_err| {
-            my_err.append_message($msg);
-            return my_err;
-        })
-    }};
 }
 
 #[macro_export]
@@ -327,23 +319,51 @@ fn mo_line(input: Span) -> IResult<MathExpression> {
 
 /// Math expressions
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
-    ws(alt((
-        map(mi, MathExpression::Mi),
-        mn,
-        msup,
-        msub,
-        msqrt,
-        mfrac,
-        map(mrow, MathExpression::Mrow),
-        munder,
-        mover,
-        msubsup,
-        mtext,
-        mstyle,
-        mspace,
-        mo_line,
-        mo,
-    )))(input)
+    // Lookahead for next open tag
+    let tag_name = peek(delimited(
+        multispace0,
+        delimited(
+            nom_char('<'),
+            take_until(">"),
+            alt((tag(">"), tag("/>"))), // Matches both self-closing and regular tags
+        ),
+        multispace0,
+    ))(input)
+    .map(|(_, tag_name)| {
+        let tag_name_string = tag_name.to_string();
+        let mut split_tag_name = tag_name_string.split_whitespace(); // We only want the tag name and no attributes
+        split_tag_name.next().unwrap().to_string()
+    })?;
+
+    if tag_name.contains('/') {
+        // Found a closing tag! This means no more math expressions, but is not wrong.
+        // We want the parent combinator to still continue to try and parse the remaining input
+        mn(input)
+    } else {
+        match tag_name.as_str() {
+            "mi" => context("FAILED TO PARSE <mi>", cut(ws(map(mi, MathExpression::Mi))))(input),
+            "mn" => context("FAILED TO PARSE <mn>", cut(ws(mn)))(input),
+            "msup" => context("FAILED TO PARSE <msup>", cut(ws(msup)))(input),
+            "msub" => context("FAILED TO PARSE <msub>", cut(ws(msub)))(input),
+            "msqrt" => context("FAILED TO PARSE <msqrt>", cut(ws(msqrt)))(input),
+            "mfrac" => context("FAILED TO PARSE <mfrac>", cut(ws(mfrac)))(input),
+            "mrow" => context(
+                "FAILED TO PARSE <mrow>",
+                cut(map(mrow, MathExpression::Mrow)),
+            )(input),
+            "munder" => context("FAILED TO PARSE <munder>", cut(ws(munder)))(input),
+            "mover" => context("FAILED TO PARSE <mover>", cut(ws(mover)))(input),
+            "msubsup" => context("FAILED TO PARSE <msubsup>", cut(ws(msubsup)))(input),
+            "mtext" => context("FAILED TO PARSE <mtext>", cut(ws(mtext)))(input),
+            "mstyle" => context("FAILED TO PARSE <mstyle>", cut(ws(mstyle)))(input),
+            "mspace" => context("FAILED TO PARSE <mspace>", cut(ws(mspace)))(input),
+            "mo" => context("FAILED TO PARSE <mo>", cut(ws(alt((mo, mo_line)))))(input),
+            _ => {
+                println!("Something went wrong. We grabbed a {} tag", tag_name);
+                context("SOMETHING WENT WRONG. WE SHOULDN'T BE HERE.", cut(mn))(input)
+            }
+        }
+    }
 }
 
 /// testing MathML documents
@@ -571,7 +591,6 @@ fn test_mathml_parser() {
 }
 
 // Exporting macros
-pub(crate) use append_msg_to_parse_err;
 pub(crate) use elem2;
 pub(crate) use elem_many0;
 pub(crate) use etag;
