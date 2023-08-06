@@ -17,6 +17,8 @@ use crate::{
 };
 
 use derive_new::new;
+
+use nom::error::context;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -25,6 +27,7 @@ use nom::{
     multi::{many0, many1},
     sequence::{delimited, tuple},
 };
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
@@ -48,31 +51,40 @@ pub struct FirstOrderODE {
 
 /// Parse a first order ODE with a single derivative term on the LHS.
 pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
-    let (s, _) = stag!("math")(input)?;
+    let (s, _) = context("MISSING STARTING <math> TAG.", stag!("math"))(input)?;
 
     // Recognize LHS derivative
-    let (s, (_, ci)) = alt((
-        first_order_derivative_leibniz_notation,
-        newtonian_derivative,
-    ))(s)?;
+    let (s, (_, ci)) = context(
+        "INVALID LHS DERIVATIVE.",
+        alt((
+            first_order_derivative_leibniz_notation,
+            newtonian_derivative,
+        )),
+    )(s)?;
 
     // Recognize equals sign
-    let (s, _) = delimited(stag!("mo"), equals, etag!("mo"))(s)?;
+    let (s, _) = context(
+        "MISSING EQUALS SIGN.",
+        delimited(stag!("mo"), equals, etag!("mo")),
+    )(s)?;
 
     // Recognize other tokens
-    let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, MathExpression::Ci),
-        map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(Type::Function),
-                content,
-            })
-        }),
-        map(operator, MathExpression::Mo),
-        math_expression,
-    )))(s)?;
+    let (s, remaining_tokens) = context(
+        "INVALID RHS.",
+        many1(alt((
+            map(ci_univariate_func, MathExpression::Ci),
+            map(ci_unknown, |Ci { content, .. }| {
+                MathExpression::Ci(Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                })
+            }),
+            map(operator, MathExpression::Mo),
+            math_expression,
+        ))),
+    )(s)?;
 
-    let (s, _) = etag!("math")(s)?;
+    let (s, _) = context("INVALID ENDING MATH TAG", etag!("math"))(s)?;
 
     let ode = FirstOrderODE {
         lhs_var: ci,
@@ -99,11 +111,12 @@ impl FirstOrderODE {
 }
 
 impl FromStr for FirstOrderODE {
-    type Err = Error<String>;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let ode = first_order_ode(s.into()).unwrap().1;
-        Ok(ode)
+        first_order_ode(s.into())
+            .map(|(_, ode)| ode)
+            .map_err(|err| err.to_string())
     }
 }
 
