@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/generic_mathml.rs`."><title>generic_mathml.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.0 (8ede3aae2 2023-07-12)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mathml/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `mathml/src/parsers/generic_mathml.rs`."><title>generic_mathml.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-f3501f0f5ae15dfb.css" id="mainThemeStyle"><div id="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="mathml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.71.1 (eb26296b5 2023-08-03)" data-search-js="search-4926e5fc22a5646a.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ></div><script src="../../../static.files/storage-62ce34ea385b278a.js"></script><script defer src="../../../static.files/source-script-11255107d0a65077.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-f0540c1d82cde29b.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../mathml/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -562,6 +562,40 @@
 <a href="#562" id="562">562</a>
 <a href="#563" id="563">563</a>
 <a href="#564" id="564">564</a>
+<a href="#565" id="565">565</a>
+<a href="#566" id="566">566</a>
+<a href="#567" id="567">567</a>
+<a href="#568" id="568">568</a>
+<a href="#569" id="569">569</a>
+<a href="#570" id="570">570</a>
+<a href="#571" id="571">571</a>
+<a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
+<a href="#577" id="577">577</a>
+<a href="#578" id="578">578</a>
+<a href="#579" id="579">579</a>
+<a href="#580" id="580">580</a>
+<a href="#581" id="581">581</a>
+<a href="#582" id="582">582</a>
+<a href="#583" id="583">583</a>
+<a href="#584" id="584">584</a>
+<a href="#585" id="585">585</a>
+<a href="#586" id="586">586</a>
+<a href="#587" id="587">587</a>
+<a href="#588" id="588">588</a>
+<a href="#589" id="589">589</a>
+<a href="#590" id="590">590</a>
+<a href="#591" id="591">591</a>
+<a href="#592" id="592">592</a>
+<a href="#593" id="593">593</a>
+<a href="#594" id="594">594</a>
+<a href="#595" id="595">595</a>
+<a href="#596" id="596">596</a>
+<a href="#597" id="597">597</a>
+<a href="#598" id="598">598</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -575,11 +609,12 @@
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::{alphanumeric1, multispace0, not_line_ending},
-    combinator::{map, map_parser, opt, recognize, value},
-    error::Error,
+    combinator::{cut, map, map_parser, opt, peek, recognize, value},
     multi::many0,
     sequence::{delimited, pair, preceded, separated_pair, tuple},
 };
+<span class="kw">use </span>nom::{character::complete::char <span class="kw">as </span>nom_char, error::context};
+
 <span class="kw">use </span>nom_locate::LocatedSpan;
 <span class="kw">use </span>std::str::FromStr;
 
@@ -607,6 +642,10 @@
 
     <span class="kw">pub fn </span>offset(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
         <span class="self">self</span>.span().location_offset()
+    }
+
+    <span class="kw">pub fn </span>append_message(<span class="kw-2">&amp;mut </span><span class="self">self</span>, msg: <span class="kw-2">&amp;</span>str) {
+        <span class="self">self</span>.message.push_str(<span class="kw-2">&amp;</span><span class="macro">format!</span>(<span class="string">&quot;\nERROR: {}&quot;</span>, msg));
     }
 }
 
@@ -878,27 +917,55 @@
 
 <span class="doccomment">/// Math expressions
 </span><span class="kw">pub fn </span>math_expression(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    ws(alt((
-        map(mi, MathExpression::Mi),
-        mn,
-        msup,
-        msub,
-        msqrt,
-        mfrac,
-        map(mrow, MathExpression::Mrow),
-        munder,
-        mover,
-        msubsup,
-        mtext,
-        mstyle,
-        mspace,
-        mo_line,
-        mo,
-    )))(input)
+    <span class="comment">// Lookahead for next open tag
+    </span><span class="kw">let </span>tag_name = peek(delimited(
+        multispace0,
+        delimited(
+            nom_char(<span class="string">&#39;&lt;&#39;</span>),
+            take_until(<span class="string">&quot;&gt;&quot;</span>),
+            alt((tag(<span class="string">&quot;&gt;&quot;</span>), tag(<span class="string">&quot;/&gt;&quot;</span>))), <span class="comment">// Matches both self-closing and regular tags
+        </span>),
+        multispace0,
+    ))(input)
+    .map(|(<span class="kw">_</span>, tag_name)| {
+        <span class="kw">let </span>tag_name_string = tag_name.to_string();
+        <span class="kw">let </span><span class="kw-2">mut </span>split_tag_name = tag_name_string.split_whitespace(); <span class="comment">// We only want the tag name and no attributes
+        </span>split_tag_name.next().unwrap().to_string()
+    })<span class="question-mark">?</span>;
+
+    <span class="kw">if </span>tag_name.contains(<span class="string">&#39;/&#39;</span>) {
+        <span class="comment">// Found a closing tag! This means no more math expressions, but is not wrong.
+        // We want the parent combinator to still continue to try and parse the remaining input
+        </span>mn(input)
+    } <span class="kw">else </span>{
+        <span class="kw">match </span>tag_name.as_str() {
+            <span class="string">&quot;mi&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mi&gt;&quot;</span>, cut(ws(map(mi, MathExpression::Mi))))(input),
+            <span class="string">&quot;mn&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mn&gt;&quot;</span>, cut(ws(mn)))(input),
+            <span class="string">&quot;msup&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msup&gt;&quot;</span>, cut(ws(msup)))(input),
+            <span class="string">&quot;msub&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msub&gt;&quot;</span>, cut(ws(msub)))(input),
+            <span class="string">&quot;msqrt&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msqrt&gt;&quot;</span>, cut(ws(msqrt)))(input),
+            <span class="string">&quot;mfrac&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mfrac&gt;&quot;</span>, cut(ws(mfrac)))(input),
+            <span class="string">&quot;mrow&quot; </span>=&gt; context(
+                <span class="string">&quot;FAILED TO PARSE &lt;mrow&gt;&quot;</span>,
+                cut(map(mrow, MathExpression::Mrow)),
+            )(input),
+            <span class="string">&quot;munder&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;munder&gt;&quot;</span>, cut(ws(munder)))(input),
+            <span class="string">&quot;mover&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mover&gt;&quot;</span>, cut(ws(mover)))(input),
+            <span class="string">&quot;msubsup&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;msubsup&gt;&quot;</span>, cut(ws(msubsup)))(input),
+            <span class="string">&quot;mtext&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mtext&gt;&quot;</span>, cut(ws(mtext)))(input),
+            <span class="string">&quot;mstyle&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mstyle&gt;&quot;</span>, cut(ws(mstyle)))(input),
+            <span class="string">&quot;mspace&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mspace&gt;&quot;</span>, cut(ws(mspace)))(input),
+            <span class="string">&quot;mo&quot; </span>=&gt; context(<span class="string">&quot;FAILED TO PARSE &lt;mo&gt;&quot;</span>, cut(ws(alt((mo, mo_line)))))(input),
+            <span class="kw">_ </span>=&gt; {
+                <span class="macro">println!</span>(<span class="string">&quot;Something went wrong. We grabbed a {} tag&quot;</span>, tag_name);
+                context(<span class="string">&quot;SOMETHING WENT WRONG. WE SHOULDN&#39;T BE HERE.&quot;</span>, cut(mn))(input)
+            }
+        }
+    }
 }
 
 <span class="doccomment">/// testing MathML documents
-</span><span class="kw">fn </span>math(input: Span) -&gt; IResult&lt;Math&gt; {
+</span><span class="kw">pub fn </span>math(input: Span) -&gt; IResult&lt;Math&gt; {
     <span class="kw">let </span>(s, elements) = preceded(opt(xml_declaration), <span class="macro">elem_many0!</span>(<span class="string">&quot;math&quot;</span>))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, Math { content: elements }))
 }
@@ -911,11 +978,12 @@
 }
 
 <span class="kw">impl </span>FromStr <span class="kw">for </span>Math {
-    <span class="kw">type </span><span class="prelude-val">Err </span>= Error&lt;String&gt;;
+    <span class="kw">type </span><span class="prelude-val">Err </span>= String;
 
     <span class="kw">fn </span>from_str(s: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="self">Self</span>, <span class="self">Self</span>::Err&gt; {
-        <span class="kw">let </span>(<span class="kw">_</span>, math) = math(s.into()).unwrap();
-        <span class="prelude-val">Ok</span>(math)
+        math(s.into())
+            .map(|(<span class="kw">_</span>, math)| math)
+            .map_err(|err| err.to_string())
     }
 }
 
