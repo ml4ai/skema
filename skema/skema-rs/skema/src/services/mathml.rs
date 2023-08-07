@@ -1,10 +1,11 @@
 use actix_web::{put, web, HttpResponse};
 use mathml::parsers::first_order_ode::flatten_mults;
+use mathml::parsers::generic_mathml::math;
 use mathml::{
     acset::{AMRmathml, PetriNet, RegNet},
     ast::Math,
     expression::{preprocess_content, wrap_math},
-    parsers::first_order_ode::FirstOrderODE,
+    parsers::first_order_ode::{first_order_ode, FirstOrderODE},
 };
 use petgraph::dot::{Config, Dot};
 use utoipa;
@@ -22,10 +23,15 @@ use utoipa;
 #[put("/mathml/ast-graph")]
 pub async fn get_ast_graph(payload: String) -> String {
     let contents = &payload;
-    let math = contents.parse::<Math>().unwrap();
-    let g = math.to_graph();
-    let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
-    dot_representation.to_string()
+    let math_results = math(contents.as_str().into());
+    match math_results {
+        Ok((_, math)) => {
+            let g = math.to_graph();
+            let dot_representation = Dot::with_config(&g, &[Config::EdgeNoLabel]);
+            dot_representation.to_string()
+        }
+        Err(err) => err.to_string(),
+    }
 }
 
 /// Parse a MathML representation of an equation and return a DOT representation of the math
@@ -81,16 +87,24 @@ pub async fn get_content_mathml(payload: String) -> String {
 )]
 #[put("/mathml/petrinet")]
 pub async fn get_acset(payload: web::Json<Vec<String>>) -> HttpResponse {
-    let asts: Vec<FirstOrderODE> = payload
+    let asts_result: Result<Vec<_>, _> = payload
         .iter()
-        .map(|x| x.parse::<FirstOrderODE>().unwrap())
+        .map(|x| first_order_ode(x.as_str().into()))
         .collect();
-    let mut flattened_asts = Vec::<FirstOrderODE>::new();
-    for mut eq in asts {
-        eq.rhs = flatten_mults(eq.rhs.clone());
-        flattened_asts.push(eq.clone());
+
+    match asts_result {
+        Ok(asts) => {
+            let mut flattened_asts = Vec::<FirstOrderODE>::new();
+            for (_, mut eq) in asts {
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                flattened_asts.push(eq.clone());
+            }
+            HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
+        }
+        Err(err) => HttpResponse::BadRequest()
+            .content_type("text/plain")
+            .body(err.to_string()),
     }
-    HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
 }
 
 /// Return a JSON representation of a RegNet ModelRep constructed from an array of MathML strings.
@@ -122,29 +136,39 @@ pub async fn get_regnet(payload: web::Json<Vec<String>>) -> HttpResponse {
 )]
 #[put("/mathml/amr")]
 pub async fn get_amr(payload: web::Json<AMRmathml>) -> HttpResponse {
-    let mt_asts: Vec<FirstOrderODE> = payload
-        .clone()
+    let mt_asts: Result<Vec<_>, _> = payload
         .mathml
         .iter()
-        .map(|x| x.parse::<FirstOrderODE>().unwrap())
+        .map(|x| first_order_ode(x.as_str().into()))
         .collect();
-    let mut flattened_asts = Vec::<FirstOrderODE>::new();
-    for mut eq in mt_asts {
-        eq.rhs = flatten_mults(eq.rhs.clone());
-        flattened_asts.push(eq.clone());
-    }
-    let asts: Vec<Math> = payload
-        .mathml
-        .clone()
-        .iter()
-        .map(|x| x.parse::<Math>().unwrap())
-        .collect();
-    let model_type = payload.model.clone();
-    if model_type == *"regnet" {
-        HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
-    } else if model_type == *"petrinet" {
-        HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
-    } else {
-        HttpResponse::BadRequest().into()
+
+    match mt_asts {
+        Ok(mt_asts) => {
+            let mut flattened_asts = Vec::<FirstOrderODE>::new();
+
+            for (_, mut eq) in mt_asts {
+                eq.rhs = flatten_mults(eq.rhs.clone());
+                flattened_asts.push(eq.clone());
+            }
+            let asts: Vec<Math> = payload
+                .mathml
+                .clone()
+                .iter()
+                .map(|x| x.parse::<Math>().unwrap())
+                .collect();
+            let model_type = payload.model.clone();
+            if model_type == *"regnet" {
+                HttpResponse::Ok().json(web::Json(RegNet::from(asts)))
+            } else if model_type == *"petrinet" {
+                HttpResponse::Ok().json(web::Json(PetriNet::from(flattened_asts)))
+            } else {
+                HttpResponse::BadRequest()
+                    .content_type("text/plain")
+                    .body("Please specify a valid model.")
+            }
+        }
+        Err(err) => HttpResponse::BadRequest()
+            .content_type("text/plain")
+            .body(err.to_string()),
     }
 }
