@@ -38,7 +38,7 @@ def test_text_integrated_extractions():
         assert output.errors is None, f"Document {ix + 1} reported errors"
 
 
-def _test_integrated_pdf_extraction():
+def test_integrated_pdf_extraction():
     """ Tests the pdf endpoint """
     params = {
         "annotate_skema": True,
@@ -65,7 +65,7 @@ def _test_integrated_pdf_extraction():
 
 
 # Test the cosmos endpoint
-def _test_cosmos():
+def test_cosmos():
     """Test that we are able to fetch COSMOS data correctly"""
     path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
     with path.open("rb") as pdf:
