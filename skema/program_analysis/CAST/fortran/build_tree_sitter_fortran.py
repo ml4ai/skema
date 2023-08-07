@@ -8,12 +8,12 @@ from tree_sitter import Language, Parser
 FORTRAN_CLONE_URL = "https://github.com/stadelmanma/tree-sitter-fortran.git"
 LANGUAGE_LIBRARY_REL_PATH = os.path.join("build", "ts-fortran.so")
 
-# We are using __file__ to guarantee that the library is created relative to the TS2CAST directory no matter where its called from
+# We are using __file__ to guarantee that the library is created relative to the CAST/fortran directory no matter where its called from
 root_path = os.path.dirname(os.path.abspath(__file__))
 
 
 def main():
-    # Set working directory to TS2CAST
+    # Set working directory to CAST/fortran
     wd = os.getcwd()
     os.chdir(root_path)
 
