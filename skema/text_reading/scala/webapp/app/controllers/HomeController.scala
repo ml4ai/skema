@@ -46,53 +46,50 @@ import org.clulab.pdf2txt.common.pdf.TextConverter
 import org.clulab.pdf2txt.languageModel.GigawordLanguageModel
 import org.clulab.pdf2txt.preprocessor.{CasePreprocessor, LigaturePreprocessor, LineBreakPreprocessor, LinePreprocessor, NumberPreprocessor, ParagraphPreprocessor, UnicodePreprocessor, WordBreakByHyphenPreprocessor, WordBreakBySpacePreprocessor}
 
-
-
 /**
   * This controller creates an `Action` to handle HTTP requests to the
   * application's home page.
   */
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
+  type Trigger = String
 
-  // -------------------------------------------------
+  val logger: Logger = LoggerFactory.getLogger(this.getClass)
   logger.info("Initializing the OdinEngine ...")
-  val generalConfig: Config = ConfigFactory.load()
-  val readerType: String = generalConfig[String]("ReaderType")
-  val defaultConfig: Config = generalConfig[Config](readerType)
-  val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
-  val groundingConfig = generalConfig.getConfig("Grounding")
-  val miraEmbeddingsGrounder = GrounderFactory.getInstance(groundingConfig, chosenEngine = Some("miraembeddings"))
-  val textReadingPipelineWithContext = new TextReadingPipelineWithContext()
-  val ieSystem = OdinEngine.fromConfig(config)
-  var proc = ieSystem.proc
-  val serializer = JSONSerializer
-  lazy val scienceParse = new ScienceParseClient(domain = "localhost", port = "8080")
-  lazy val commentReader = OdinEngine.fromConfigSection("CommentEngine")
-  lazy val alignmentHandler = new AlignmentHandler(ConfigFactory.load()[Config]("alignment"))
-  protected lazy val logger: Logger = LoggerFactory.getLogger(this.getClass)
+
   // fixme: these should come from config if possible
-  private val numAlignments: Int = 5
-  private val numAlignmentsSrcToComment: Int = 3
-  private val scoreThreshold: Double = 0.0
-  private val maxSVOgroundingsPerVarDefault: Int = 5
-  private val groundToSVODefault = true
-  private val appendToGrFNDefault = true
-  private val defaultSerializerName = "AutomatesJSONSerializer" // other - "JSONSerializer"
-  private val debugDefault = true
-  private val groundToWikiDefault: Boolean = generalConfig[Boolean]("apps.groundToWiki")
-  private val saveWikiGroundingsDefault: Boolean = generalConfig[Boolean]("apps.saveWikiGroundingsDefault")
+  val numAlignments: Int = 5
+  val numAlignmentsSrcToComment: Int = 3
+  val scoreThreshold: Double = 0.0
+  val maxSVOgroundingsPerVarDefault: Int = 5
+  val groundToSVODefault = true
+  val appendToGrFNDefault = true
+  val defaultSerializerName = "AutomatesJSONSerializer" // other - "JSONSerializer"
+  val debugDefault = true
 
+  val applicationConfig: Config = ConfigFactory.load() // from application.conf and reference.conf
 
+  val       groundToWikiDefault: Boolean = applicationConfig[Boolean]("apps.groundToWiki")
+  val saveWikiGroundingsDefault: Boolean = applicationConfig[Boolean]("apps.saveWikiGroundingsDefault")
+  val         readerTypeDefault: String  = applicationConfig.getString("ReaderType")
 
-  private val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
-  private val plainTextPipeline = new TextReadingPipelineWithContext() // TODO Add the window parameter to the configuration file
+  val   groundingConfig: Config = applicationConfig.getConfig("Grounding")
+  val     commentConfig: Config = applicationConfig.getConfig("CommentEngine")
+  val   alignmentConfig: Config = applicationConfig.getConfig("alignment")
+  val  comparisonConfig: Config = applicationConfig.getConfig("modelComparisonAlignment")
+  val        odinConfig: Config = applicationConfig.getConfig(readerTypeDefault).withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
 
+  val miraEmbeddingsGrounder = GrounderFactory.getInstance(groundingConfig, chosenEngine = Some("miraembeddings"))
+  val alignmentHandler = new AlignmentHandler(alignmentConfig)
+  val modelCompAlignmentHandler = new AlignmentHandler(comparisonConfig)
+  val ieSystem = OdinEngine.fromConfig(odinConfig)
+
+  val serializer = JSONSerializer
+  val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3) // TODO Add the window parameter to the configuration file
+  val plainTextPipeline = new TextReadingPipelineWithContext() // TODO Add the window parameter to the configuration file
+  val textReadingPipelineWithContext = new TextReadingPipelineWithContext()
 
   logger.info("Completed Initialization ...")
-  // -------------------------------------------------
-
-  type Trigger = String
 
   /**
     * Create an Action to render an HTML page.
@@ -386,7 +383,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
 
   def alignMentionsFromTwoModels: Action[AnyContent] = Action { request =>
-
     val data = request.body.asJson.get.toString()
     val pathJson = ujson.read(data) //the json that contains the path to another json---the json that contains all the relevant components, e.g., mentions and equations
     val jsonPath = pathJson("pathToJson").str
@@ -395,13 +391,12 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val jsonObj = json.obj
 
     val debug = if (jsonObj.contains("debug")) json("debug").bool else debugDefault
-    val modelCompAlignmentHandler = new AlignmentHandler(ConfigFactory.load()[Config]("modelComparisonAlignment"))
 
     val inputFilePath = json("input_file").str
     val modelComparisonInputFile = new File(inputFilePath)
     val ujsonObj = ujson.read(modelComparisonInputFile.readString()).arr
     val paper1obj = ujsonObj.head.obj// keys: grfn_uid, "variable_descrs"
-  val paper2obj = ujsonObj.last.obj // keys: grfn_uid, "variable_descrs"
+    val paper2obj = ujsonObj.last.obj // keys: grfn_uid, "variable_descrs"
 
     val paper1id = paper1obj("grfn_uid").str
     val paper2id = paper2obj("grfn_uid").str
