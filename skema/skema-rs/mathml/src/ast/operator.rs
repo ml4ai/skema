@@ -1,3 +1,4 @@
+use crate::ast::Ci;
 use derive_new::new;
 use std::fmt;
 
@@ -6,6 +7,7 @@ use std::fmt;
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
+    pub var: Ci,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -39,8 +41,12 @@ impl fmt::Display for Operator {
             Operator::Rparen => write!(f, ")"),
             Operator::Compose => write!(f, "."),
             Operator::Factorial => write!(f, "!"),
-            Operator::Derivative(Derivative { order, var_index }) => {
-                write!(f, "D({order}, {var_index})")
+            Operator::Derivative(Derivative {
+                order,
+                var_index,
+                var,
+            }) => {
+                write!(f, "D({order}, {var_index}, {var})")
             }
             Operator::Exp => write!(f, "Exp"),
             Operator::Other(op) => write!(f, "{op}"),

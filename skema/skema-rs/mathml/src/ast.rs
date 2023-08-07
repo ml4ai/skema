@@ -58,6 +58,7 @@ pub enum MathExpression {
     MoLine(String),
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
+    BoundDerivative(Operator, Ci),
     #[default]
     None,
 }

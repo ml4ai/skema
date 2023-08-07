@@ -18,8 +18,9 @@ use crate::{
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::{map, opt},
-    multi::{many0, many1},
+    character::complete::char,
+    combinator::{map, map_opt, opt},
+    multi::{many0, many1, separated_list1},
     sequence::{delimited, pair, preceded, terminated, tuple},
 };
 
@@ -34,24 +35,51 @@ pub fn operator(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-fn parenthesized_identifier(input: Span) -> IResult<()> {
+fn parenthesized_identifier(input: Span) -> IResult<Mi> {
     let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
     let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
-    let (s, _) = delimited(mo_lparen, mi, mo_rparen)(input)?;
-    Ok((s, ()))
+    //let (s, bound_vars) = delimited(mo_lparen, separated_list1(char(','), mi), mo_rparen)(input)?;
+    let (s, bound_vars) = delimited(mo_lparen, mi, mo_rparen)(input)?;
+    println!("bouns_vars={:?}", bound_vars);
+    let mut if_bvar_exists = vec![&bound_vars];
+    println!("-----bound_vars={:?}", bound_vars);
+    if if_bvar_exists.is_empty() {
+        Ok((s, Mi(" ".to_string())))
+    } else {
+        Ok((s, bound_vars))
+    }
 }
 
 /// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
-pub fn ci_univariate_func(input: Span) -> IResult<Ci> {
-    let (s, (Mi(x), _pi)) = tuple((mi, parenthesized_identifier))(input)?;
-    Ok((
-        s,
-        Ci::new(
-            Some(Type::Function),
-            Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
-        ),
-    ))
+pub fn ci_univariate_func(input: Span) -> IResult<(Ci, Mi)> {
+    let (s, (Mi(x), bound_vars)) = tuple((mi, parenthesized_identifier))(input)?;
+    println!("bound_vars={:?}", bound_vars);
+    let mut if_bvar_exists = vec![&bound_vars];
+    println!("if_bvar_exists={:?}", if_bvar_exists);
+    if if_bvar_exists.is_empty() {
+        Ok((
+            s,
+            (
+                Ci::new(
+                    Some(Type::Function),
+                    Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
+                ),
+                Mi("  ".to_string()),
+            ),
+        ))
+    } else {
+        Ok((
+            s,
+            (
+                Ci::new(
+                    Some(Type::Function),
+                    Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
+                ),
+                bound_vars,
+            ),
+        ))
+    }
 }
 
 /// Parse content identifier for Msub
@@ -74,30 +102,52 @@ fn d(input: Span) -> IResult<()> {
 }
 
 /// Parse a content identifier of unknown type.
-pub fn ci_unknown(input: Span) -> IResult<Ci> {
-    let (s, x) = mi(input)?;
-    Ok((s, Ci::new(None, Box::new(MathExpression::Mi(x)))))
+pub fn ci_unknown(input: Span) -> IResult<(Ci, Mi)> {
+    let (s, (x, bound_vars)) = pair(mi, parenthesized_identifier)(input)?;
+    Ok((
+        s,
+        (Ci::new(None, Box::new(MathExpression::Mi(x))), bound_vars),
+    ))
 }
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
 pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), d))(input)?;
-    let (s, func) = ws(alt((
+    println!("s={:?}", s);
+    let (s, (func, bound_vars)) = ws(alt((
         ci_univariate_func,
-        map(ci_unknown, |Ci { content, .. }| Ci {
-            r#type: Some(Type::Function),
-            content,
+        map(ci_unknown, |(Ci { content, .. }, Mi(x))| {
+            (
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                },
+                Mi(x),
+            )
         }),
     )))(s)?;
-    let (s, _) = tuple((
-        etag!("mrow"),
-        stag!("mrow"),
-        d,
+    println!("func={:?}", func);
+    let (s, with_respect_to) = delimited(
+        tuple((etag!("mrow"), stag!("mrow"), d)),
         mi,
-        etag!("mrow"),
-        etag!("mfrac"),
-    ))(s)?;
-    Ok((s, (Derivative::new(1, 1), func)))
+        pair(etag!("mrow"), etag!("mfrac")),
+    )(s)?;
+    println!("with_respect_to={:?}", with_respect_to);
+
+    Ok((
+        s,
+        (
+            Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(with_respect_to)),
+                ),
+            ),
+            func,
+        ),
+    ))
 }
 
 pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
@@ -110,22 +160,36 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         etag!("mo"),
     );
 
-    let (s, (x, order)) = terminated(
+    let (s, ((x, with_respect_to),order)) = //terminated(
+          //                pair(
         delimited(
             stag!("mover"),
             pair(
-                map(ci_unknown, |Ci { content, .. }| Ci {
+                map(ci_unknown, |(Ci { content, .. }, Mi(id))| (Ci {
                     r#type: Some(Type::Function),
                     content,
-                }),
+                }, Mi(id))),
                 n_dots,
             ),
             etag!("mover"),
-        ),
-        opt(parenthesized_identifier),
-    )(input)?;
+        )
+        //opt(parenthesized_identifier),
+    (input)?;
 
-    Ok((s, (Derivative::new(order, 1), x)))
+    Ok((
+        s,
+        (
+            Derivative::new(
+                order,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(with_respect_to)),
+                ),
+            ),
+            x,
+        ),
+    ))
 }
 
 // We reimplement the mfrac and mrow parsers in this file (instead of importing them from
@@ -153,13 +217,24 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        map(ci_univariate_func, MathExpression::Ci),
+        map(ci_univariate_func, |(Ci { content, .. }, Mi(x))| {
+            MathExpression::BoundVariables(
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                },
+                Mi(x),
+            )
+        }),
         map(ci_subscript, MathExpression::Ci),
-        map(ci_unknown, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(Type::Function),
-                content,
-            })
+        map(ci_unknown, |(Ci { content, .. }, Mi(x))| {
+            MathExpression::BoundVariables(
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                },
+                Mi(x),
+            )
         }),
         map(operator, MathExpression::Mo),
         mn,

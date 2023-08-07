@@ -185,7 +185,7 @@ pub fn to_decapodes_serialization(
             }
             Operator::Equals => {}
             Operator::Divide => println!("/"),
-            Operator::Derivative(Derivative { order, var_index })
+            Operator::Derivative(Derivative { order, var_index, .. })
                 if (order, var_index) == (&1_u8, &1_u8) =>
             {
                 println!("diff");
@@ -292,7 +292,7 @@ pub fn to_decapodes_serialization(
                         }
                         Operator::Equals => {}
                         Operator::Divide => println!("/"),
-                        Operator::Derivative(Derivative { order, var_index })
+                        Operator::Derivative(Derivative { order, var_index , ..})
                             if (order, var_index) == (&1_u8, &1_u8) =>
                         {
                             println!("diff");
