@@ -9,7 +9,7 @@ from subprocess import run, PIPE
 
 from tree_sitter import Parser, Node, Language, Tree
 
-from skema.program_analysis.TS2CAST.build_tree_sitter_fortran import (
+from skema.program_analysis.CAST.fortran.build_tree_sitter_fortran import (
     LANGUAGE_LIBRARY_REL_PATH,
 )
 

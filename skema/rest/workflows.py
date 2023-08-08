@@ -5,15 +5,16 @@ End-to-end skema workflows
 
 
 from typing import List
-from skema.rest.proxies import SKEMA_RS_ADDESS
-from skema.rest import schema, utils, comments_proxy
-from skema.program_analysis.comments import MultiFileCodeComments
-from skema.img2mml import eqn2mml
-from skema.skema_py import server as code2fn
+
+import requests
 from fastapi import APIRouter, File, UploadFile
 from starlette.responses import JSONResponse
-import requests
 
+from skema.img2mml import eqn2mml
+from skema.program_analysis.comments import MultiFileCodeComments
+from skema.rest import comments_proxy, schema, utils
+from skema.rest.proxies import SKEMA_RS_ADDESS
+from skema.skema_py import server as code2fn
 
 router = APIRouter()
 
@@ -89,7 +90,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
                 "payload": payload,
             },
         )
@@ -99,14 +100,13 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
 # pmml -> amr
 @router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
 async def equations_to_amr(data: schema.MmlToAMR):
-
     payload = {"mathml": data.equations, "model": data.model}
     res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
                 "payload": payload,
             },
         )
@@ -146,6 +146,7 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
         )
     return res.json()
 """
+
 
 # zip archive -> fn -> petrinet amr
 @router.post(
