@@ -22,7 +22,8 @@ pub enum Atom {
     Operator(Operator),
 }
 
-#[derive(Debug, PartialEq, Clone)]
+/// Intermediate data structure to support the generation of graphs of mathematical expressions
+#[derive(Debug, Default, PartialEq, Clone)]
 pub struct Expression {
     pub ops: Vec<Operator>,
     pub args: Vec<Expr>,
@@ -37,14 +38,6 @@ pub enum Expr {
         args: Vec<Expr>,
         name: String,
     },
-}
-
-/// Intermediate data structure to support the generation of graphs of mathematical expressions
-#[derive(Debug, Default, PartialEq, Clone)]
-pub struct PreExp {
-    pub ops: Vec<Operator>,
-    pub args: Vec<Expr>,
-    pub name: String,
 }
 
 /// Check if the fraction is a derivative expressed in Leibniz notation. If yes, mutate it to
@@ -68,15 +61,15 @@ pub fn is_derivative(
 
 /// Identify if there is an implicit multiplication operator, and if so, add an
 /// explicit multiplication operator.
-fn insert_explicit_multiplication_operator(pre: &mut PreExp) {
+fn insert_explicit_multiplication_operator(pre: &mut Expression) {
     if pre.args.len() >= pre.ops.len() {
         pre.ops.push(Operator::Multiply);
     }
 }
 
 impl MathExpression {
-    /// Convert a MathExpression struct to a PreExp struct.
-    pub fn to_expr(self, pre: &mut PreExp) {
+    /// Convert a MathExpression struct to a Expression struct.
+    pub fn to_expr(self, pre: &mut Expression) {
         match self {
             MathExpression::Mi(Mi(x)) => {
                 // Process unary minus operation.
@@ -115,7 +108,7 @@ impl MathExpression {
             }
             MathExpression::Mrow(Mrow(xs)) => {
                 insert_explicit_multiplication_operator(pre);
-                let mut pre_exp = PreExp::default();
+                let mut pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other("".to_string()));
                 for x in xs {
                     x.to_expr(&mut pre_exp);
@@ -128,7 +121,7 @@ impl MathExpression {
             }
             Msubsup(xs1, xs2, xs3) => {
                 insert_explicit_multiplication_operator(pre);
-                let mut pre_exp = PreExp::default();
+                let mut pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other("".to_string()));
                 pre_exp.ops.push(Operator::Other("_".to_string()));
                 xs1.to_expr(&mut pre_exp);
@@ -143,7 +136,7 @@ impl MathExpression {
             }
             Msqrt(xs) => {
                 insert_explicit_multiplication_operator(pre);
-                let mut pre_exp = PreExp::default();
+                let mut pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Sqrt);
                 xs.to_expr(&mut pre_exp);
                 pre.args.push(Expr::Expression {
@@ -154,7 +147,7 @@ impl MathExpression {
             }
             Mfrac(mut xs1, mut xs2) => {
                 insert_explicit_multiplication_operator(pre);
-                let mut pre_exp = PreExp::default();
+                let mut pre_exp = Expression::default();
                 if is_derivative(&mut xs1, &mut xs2) {
                     pre_exp.ops.push(Operator::Other("derivative".to_string()));
                 } else {
@@ -171,7 +164,7 @@ impl MathExpression {
             }
             Msup(xs1, xs2) => {
                 insert_explicit_multiplication_operator(pre);
-                let mut pre_exp = PreExp::default();
+                let mut pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other("".to_string()));
                 xs1.to_expr(&mut pre_exp);
                 pre_exp.ops.push(Operator::Other("^".to_string()));
@@ -184,7 +177,7 @@ impl MathExpression {
             }
             Mover(xs1, xs2) => {
                 insert_explicit_multiplication_operator(pre);
-                let mut pre_exp = PreExp::default();
+                let mut pre_exp = Expression::default();
                 pre_exp.ops.push(Operator::Other("".to_string()));
                 xs1.to_expr(&mut pre_exp);
                 xs2.to_expr(&mut pre_exp);
@@ -202,7 +195,7 @@ impl MathExpression {
     }
 
     pub fn to_graph(self) -> MathExpressionGraph<'static> {
-        let mut pre_exp = PreExp {
+        let mut pre_exp = Expression {
             ops: Vec::<Operator>::new(),
             args: Vec::<Expr>::new(),
             name: "root".to_string(),
@@ -1014,7 +1007,7 @@ pub fn need_to_distribute(ops: Vec<Operator>) -> bool {
     false
 }
 
-impl PreExp {
+impl Expression {
     pub fn group_expr(&mut self) {
         for arg in &mut self.args {
             if let Expr::Expression { .. } = arg {
@@ -1215,7 +1208,7 @@ fn test_to_expr() {
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1244,7 +1237,7 @@ fn test_to_expr2() {
             MathExpression::Mi(Mi("d".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1282,7 +1275,7 @@ fn test_to_expr3() {
         Mo(Operator::Add),
         MathExpression::Mi(Mi("b".to_string())),
     ]))));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1317,7 +1310,7 @@ fn test_to_expr4() {
         ]))),
         Box::from(MathExpression::Mi(Mi("c".to_string()))),
     );
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1358,7 +1351,7 @@ fn test_to_expr5() {
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("c".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1405,7 +1398,7 @@ fn test_to_expr6() {
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("h".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1457,7 +1450,7 @@ fn test_to_expr7() {
         Mo(Operator::Multiply),
         MathExpression::Mi(Mi("c".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -1507,7 +1500,7 @@ fn test_to_expr8() {
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("h".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1567,7 +1560,7 @@ fn test_to_expr9() {
             MathExpression::Mi(Mi("d".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -1620,7 +1613,7 @@ fn test_to_expr10() {
             MathExpression::Mi(Mi("a".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -1646,7 +1639,7 @@ fn test_to_expr11() {
         ])),
     ]))));
 
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -1677,7 +1670,7 @@ fn test_to_expr12() {
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("h".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1708,7 +1701,7 @@ fn test_to_expr13() {
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("b".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1735,7 +1728,7 @@ fn test_to_expr14() {
             MathExpression::Mi(Mi("b".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1762,7 +1755,7 @@ fn test_to_expr15() {
             MathExpression::Mi(Mi("b".to_string())),
         ])))),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -1879,7 +1872,7 @@ fn test_to_expr21() {
         ]))),
         Box::from(MathExpression::Mi(Mi("c".to_string()))),
     );
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "".to_string(),
@@ -2078,7 +2071,7 @@ fn test_to_expr33() {
             MathExpression::Mi(Mi("c".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2132,7 +2125,7 @@ fn test_to_expr34() {
             MathExpression::Mi(Mi("d".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2186,7 +2179,7 @@ fn test_to_expr35() {
             MathExpression::Mi(Mi("c".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2222,7 +2215,7 @@ fn test_to_expr36() {
         Mo(Operator::Subtract),
         MathExpression::Mi(Mi("c".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2264,7 +2257,7 @@ fn test_to_expr37() {
         Mo(Operator::Add),
         MathExpression::Mi(Mi("e".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2308,7 +2301,7 @@ fn test_to_expr38() {
             MathExpression::Mi(Mi("d".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2350,7 +2343,7 @@ fn test_to_expr39() {
             MathExpression::Mi(Mi("d".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2394,7 +2387,7 @@ fn test_to_expr40() {
             MathExpression::Mi(Mi("e".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2476,7 +2469,7 @@ fn test_to_expr41() {
             MathExpression::Mi(Mi("d".to_string())),
         ])),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
@@ -2574,7 +2567,7 @@ fn test_to_expr42() {
         Mo(Operator::Add),
         MathExpression::Mi(Mi("l".to_string())),
     ]));
-    let mut pre_exp = PreExp {
+    let mut pre_exp = Expression {
         ops: Vec::<Operator>::new(),
         args: Vec::<Expr>::new(),
         name: "root".to_string(),
