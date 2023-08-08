@@ -67,7 +67,7 @@ from skema.gromet.metadata import (
     SourceCodeBoolOr,
 )
 
-from skema.program_analysis.PyAST2CAST.builtin_map import (
+from skema.program_analysis.CAST.pythonAST.builtin_map import (
     build_map,
     dump_map,
     check_builtin,
@@ -75,7 +75,7 @@ from skema.program_analysis.PyAST2CAST.builtin_map import (
 from skema.program_analysis.CAST2FN.model.cast.scalar_type import ScalarType
 
 from skema.program_analysis.CAST2FN.ann_cast.annotated_cast import *
-from skema.program_analysis.PyAST2CAST.modules_list import (
+from skema.program_analysis.CAST.pythonAST.modules_list import (
     BUILTINS,
     find_func_in_module,
     find_std_lib_module,

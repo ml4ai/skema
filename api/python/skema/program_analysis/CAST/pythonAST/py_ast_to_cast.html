@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>skema.program_analysis.PyAST2CAST.py_ast_to_cast API documentation</title>
+<title>skema.program_analysis.CAST.pythonAST.py_ast_to_cast API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -20,7 +20,7 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>skema.program_analysis.PyAST2CAST.py_ast_to_cast</code></h1>
+<h1 class="title">Module <code>skema.program_analysis.CAST.pythonAST.py_ast_to_cast</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
@@ -61,7 +61,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     ValueConstructor,
 )
-from skema.program_analysis.PyAST2CAST.modules_list import (
+from skema.program_analysis.CAST.pythonAST.modules_list import (
     BUILTINS,
     find_std_lib_module,
 )
@@ -4295,7 +4295,7 @@ class PyASTToCAST:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.construct_unique_name"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.construct_unique_name"><code class="name flex">
 <span>def <span class="ident">construct_unique_name</span></span>(<span>attr_name, var_name)</span>
 </code></dt>
 <dd>
@@ -4327,7 +4327,7 @@ where 'attribute' is either
     return f&#34;{attr_name}.{var_name}&#34;</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_node_name"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_node_name"><code class="name flex">
 <span>def <span class="ident">get_node_name</span></span>(<span>ast_node)</span>
 </code></dt>
 <dd>
@@ -4369,7 +4369,7 @@ where 'attribute' is either
         raise TypeError(f&#34;Type {type(ast_node)} not supported&#34;)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_op"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_op"><code class="name flex">
 <span>def <span class="ident">get_op</span></span>(<span>operator)</span>
 </code></dt>
 <dd>
@@ -4413,7 +4413,7 @@ where 'attribute' is either
     return str(operator)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_python_version"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_python_version"><code class="name flex">
 <span>def <span class="ident">get_python_version</span></span>(<span>)</span>
 </code></dt>
 <dd>
@@ -4450,7 +4450,7 @@ pipeline still needs to adjust for</p></div>
     return string_version</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.merge_dicts"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.merge_dicts"><code class="name flex">
 <span>def <span class="ident">merge_dicts</span></span>(<span>source, destination)</span>
 </code></dt>
 <dd>
@@ -4491,7 +4491,7 @@ is updated with any new key : value pairs that weren't in there before.</p>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST"><code class="flex name class">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST"><code class="flex name class">
 <span>class <span class="ident">PyASTToCAST</span></span>
 <span>(</span><span>file_name: str, legacy: bool = False)</span>
 </code></dt>
@@ -8650,7 +8650,7 @@ and lambda functions
 </details>
 <h3>Methods</h3>
 <dl>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.check_alias"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.check_alias"><code class="name flex">
 <span>def <span class="ident">check_alias</span></span>(<span>self, name)</span>
 </code></dt>
 <dd>
@@ -8674,7 +8674,7 @@ Otherwise, the original name is returned.</p></div>
         return name</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.collect_fields"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.collect_fields"><code class="name flex">
 <span>def <span class="ident">collect_fields</span></span>(<span>self, node: _ast.FunctionDef, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -8747,7 +8747,7 @@ for a class that get created in functions outside of <strong>init</strong></p></
     return fields</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.create_binary_compare_tree"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.create_binary_compare_tree"><code class="name flex">
 <span>def <span class="ident">create_binary_compare_tree</span></span>(<span>self, node)</span>
 </code></dt>
 <dd>
@@ -8827,7 +8827,7 @@ for a class that get created in functions outside of <strong>init</strong></p></
     print(f&#34;catch type {type(node)}&#34;)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.create_cond"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.create_cond"><code class="name flex">
 <span>def <span class="ident">create_cond</span></span>(<span>self, node, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -8923,7 +8923,7 @@ In the case that it doesn't explicitly then we have to add in an explicit check<
     return test</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.find_function"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.find_function"><code class="name flex">
 <span>def <span class="ident">find_function</span></span>(<span>module_node: _ast.Module, f_name: str)</span>
 </code></dt>
 <dd>
@@ -8949,8 +8949,8 @@ exist at the module level, and will not search deeper for functions within funct
     return None</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.identify_piece"><code class="name flex">
-<span>def <span class="ident">identify_piece</span></span>(<span>self, piece: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../CAST2FN/model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>, prev_scope_id_dict, curr_scope_id_dict)</span>
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.identify_piece"><code class="name flex">
+<span>def <span class="ident">identify_piece</span></span>(<span>self, piece: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../../CAST2FN/model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>This function is used to 'centralize' the handling of different node types
@@ -9067,7 +9067,7 @@ F3/F5 - generally a list, or something that gives back a list like:
         return piece</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.insert_alias"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.insert_alias"><code class="name flex">
 <span>def <span class="ident">insert_alias</span></span>(<span>self, originString, alias)</span>
 </code></dt>
 <dd>
@@ -9100,7 +9100,7 @@ np is an alias for the original name numpy</p>
     pass</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.insert_next_id"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.insert_next_id"><code class="name flex">
 <span>def <span class="ident">insert_next_id</span></span>(<span>self, scope_dict: dict, dict_key: str)</span>
 </code></dt>
 <dd>
@@ -9137,8 +9137,8 @@ ID isn't needed it gets ignored.</p>
     return new_id_to_insert</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit"><code class="name flex">
-<span>def <span class="ident">visit</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../CAST2FN/model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>, prev_scope_id_dict, curr_scope_id_dict)</span>
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit"><code class="name flex">
+<span>def <span class="ident">visit</span></span>(<span>self, node: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../../CAST2FN/model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -9156,7 +9156,7 @@ def visit(
     pass</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Assert"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Assert"><code class="name flex">
 <span>def <span class="ident">visit_Assert</span></span>(<span>self, node: _ast.Assert, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -9192,7 +9192,7 @@ def visit_Assert(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Assign"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Assign"><code class="name flex">
 <span>def <span class="ident">visit_Assign</span></span>(<span>self, node: _ast.Assign, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -9507,7 +9507,7 @@ def visit_Assign(
     return [Assignment(left[0], right[0], source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Attribute"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Attribute"><code class="name flex">
 <span>def <span class="ident">visit_Attribute</span></span>(<span>self, node: _ast.Attribute, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -9602,7 +9602,7 @@ def visit_Attribute(
     return [Attribute(value_cast[0], attr_cast, source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_AugAssign"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_AugAssign"><code class="name flex">
 <span>def <span class="ident">visit_AugAssign</span></span>(<span>self, node: _ast.AugAssign, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -9710,7 +9710,7 @@ def visit_AugAssign(
     return self.visit(convert, prev_scope_id_dict, curr_scope_id_dict)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_BinOp"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_BinOp"><code class="name flex">
 <span>def <span class="ident">visit_BinOp</span></span>(<span>self, node: _ast.BinOp, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -9782,7 +9782,7 @@ def visit_BinOp(
     )</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_BoolOp"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_BoolOp"><code class="name flex">
 <span>def <span class="ident">visit_BoolOp</span></span>(<span>self, node: _ast.BoolOp, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -9843,7 +9843,7 @@ def visit_BoolOp(
     return self.visit(x, prev_scope_id_dict, curr_scope_id_dict)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Break"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Break"><code class="name flex">
 <span>def <span class="ident">visit_Break</span></span>(<span>self, node: _ast.Break, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -9895,7 +9895,7 @@ def visit_Break(
     return [ModelBreak(source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Call"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Call"><code class="name flex">
 <span>def <span class="ident">visit_Call</span></span>(<span>self, node: _ast.Call, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10171,7 +10171,7 @@ def visit_Call(
                 ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ClassDef"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ClassDef"><code class="name flex">
 <span>def <span class="ident">visit_ClassDef</span></span>(<span>self, node: _ast.ClassDef, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10292,7 +10292,7 @@ def visit_ClassDef(
     return [RecordDef(name, bases, funcs, fields, source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Compare"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Compare"><code class="name flex">
 <span>def <span class="ident">visit_Compare</span></span>(<span>self, node: _ast.Compare, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10414,7 +10414,7 @@ def visit_Compare(
     return [tree_root]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Constant"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Constant"><code class="name flex">
 <span>def <span class="ident">visit_Constant</span></span>(<span>self, node: _ast.Constant, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10520,7 +10520,7 @@ def visit_Constant(
         raise TypeError(f&#34;Type {str(type(node.value))} not supported&#34;)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Continue"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Continue"><code class="name flex">
 <span>def <span class="ident">visit_Continue</span></span>(<span>self, node: _ast.Continue, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10569,7 +10569,7 @@ def visit_Continue(
     return [ModelContinue(source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Delete"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Delete"><code class="name flex">
 <span>def <span class="ident">visit_Delete</span></span>(<span>self, node: _ast.Delete, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10606,7 +10606,7 @@ def visit_Delete(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Dict"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Dict"><code class="name flex">
 <span>def <span class="ident">visit_Dict</span></span>(<span>self, node: _ast.Dict, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10696,7 +10696,7 @@ def visit_Dict(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_DictComp"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_DictComp"><code class="name flex">
 <span>def <span class="ident">visit_DictComp</span></span>(<span>self, node: _ast.DictComp, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10919,7 +10919,7 @@ def visit_DictComp(
     return to_ret</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Ellipsis"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Ellipsis"><code class="name flex">
 <span>def <span class="ident">visit_Ellipsis</span></span>(<span>self, node: ast.Ellipsis, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -10952,7 +10952,7 @@ def visit_Ellipsis(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Expr"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Expr"><code class="name flex">
 <span>def <span class="ident">visit_Expr</span></span>(<span>self, node: _ast.Expr, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11008,7 +11008,7 @@ def visit_Expr(
     return self.visit(node.value, prev_scope_id_dict, curr_scope_id_dict)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ExtSlice"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ExtSlice"><code class="name flex">
 <span>def <span class="ident">visit_ExtSlice</span></span>(<span>self, node: _ast.ExtSlice, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11045,7 +11045,7 @@ def visit_ExtSlice(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_For"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_For"><code class="name flex">
 <span>def <span class="ident">visit_For</span></span>(<span>self, node: _ast.For, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11232,7 +11232,7 @@ def visit_For(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_FunctionDef"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_FunctionDef"><code class="name flex">
 <span>def <span class="ident">visit_FunctionDef</span></span>(<span>self, node: _ast.FunctionDef, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11654,7 +11654,7 @@ def visit_FunctionDef(
             ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_GeneratorExp"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_GeneratorExp"><code class="name flex">
 <span>def <span class="ident">visit_GeneratorExp</span></span>(<span>self, node: _ast.GeneratorExp, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11688,7 +11688,7 @@ def visit_GeneratorExp(
     return self.visit(to_visit, prev_scope_id_dict, curr_scope_id_dict)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Global"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Global"><code class="name flex">
 <span>def <span class="ident">visit_Global</span></span>(<span>self, node: _ast.Global, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11742,7 +11742,7 @@ def visit_Global(
     return []</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_If"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_If"><code class="name flex">
 <span>def <span class="ident">visit_If</span></span>(<span>self, node: _ast.If, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11818,7 +11818,7 @@ def visit_If(
         return [ModelIf(node_test, node_body, node_orelse, source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_IfExp"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_IfExp"><code class="name flex">
 <span>def <span class="ident">visit_IfExp</span></span>(<span>self, node: _ast.IfExp, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11883,7 +11883,7 @@ def visit_IfExp(
     return [ModelIf(node_test[0], node_body, node_orelse, source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Import"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Import"><code class="name flex">
 <span>def <span class="ident">visit_Import</span></span>(<span>self, node: _ast.Import, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -11961,7 +11961,7 @@ def visit_Import(
     return to_ret</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ImportFrom"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ImportFrom"><code class="name flex">
 <span>def <span class="ident">visit_ImportFrom</span></span>(<span>self, node: _ast.ImportFrom, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12069,7 +12069,7 @@ def visit_ImportFrom(
     return to_ret</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Index"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Index"><code class="name flex">
 <span>def <span class="ident">visit_Index</span></span>(<span>self, node: _ast.Index, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12113,7 +12113,7 @@ def visit_Index(
     return self.visit(node.value, prev_scope_id_dict, curr_scope_id_dict)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_JoinedStr"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_JoinedStr"><code class="name flex">
 <span>def <span class="ident">visit_JoinedStr</span></span>(<span>self, node: _ast.JoinedStr, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12185,7 +12185,7 @@ def visit_JoinedStr(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Lambda"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Lambda"><code class="name flex">
 <span>def <span class="ident">visit_Lambda</span></span>(<span>self, node: _ast.Lambda, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12291,7 +12291,7 @@ def visit_Lambda(
         return to_ret</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_List"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_List"><code class="name flex">
 <span>def <span class="ident">visit_List</span></span>(<span>self, node: _ast.List, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12360,7 +12360,7 @@ def visit_List(
         # return [List([],source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ListComp"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ListComp"><code class="name flex">
 <span>def <span class="ident">visit_ListComp</span></span>(<span>self, node: _ast.ListComp, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12611,7 +12611,7 @@ def visit_ListComp(
     return to_ret</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Module"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Module"><code class="name flex">
 <span>def <span class="ident">visit_Module</span></span>(<span>self, node: _ast.Module, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12739,7 +12739,7 @@ def visit_Module(
     )</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Name"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Name"><code class="name flex">
 <span>def <span class="ident">visit_Name</span></span>(<span>self, node: _ast.Name, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12867,7 +12867,7 @@ def visit_Name(
         raise NotImplementedError()</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Pass"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Pass"><code class="name flex">
 <span>def <span class="ident">visit_Pass</span></span>(<span>self, node: _ast.Pass, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12904,7 +12904,7 @@ def visit_Pass(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Raise"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Raise"><code class="name flex">
 <span>def <span class="ident">visit_Raise</span></span>(<span>self, node: _ast.Raise, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -12967,7 +12967,7 @@ def visit_Raise(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Return"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Return"><code class="name flex">
 <span>def <span class="ident">visit_Return</span></span>(<span>self, node: _ast.Return, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13032,7 +13032,7 @@ def visit_Return(
         return [ModelReturn(val, source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Set"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Set"><code class="name flex">
 <span>def <span class="ident">visit_Set</span></span>(<span>self, node: _ast.Set, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13094,7 +13094,7 @@ def visit_Set(
         ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Slice"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Slice"><code class="name flex">
 <span>def <span class="ident">visit_Slice</span></span>(<span>self, node: _ast.Slice, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13131,7 +13131,7 @@ def visit_Slice(
     ]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Subscript"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Subscript"><code class="name flex">
 <span>def <span class="ident">visit_Subscript</span></span>(<span>self, node: _ast.Subscript, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13365,7 +13365,7 @@ def visit_Subscript(
     #   sl = self.visit(slc, prev_scope_id_dict, curr_scope_id_dict)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Try"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Try"><code class="name flex">
 <span>def <span class="ident">visit_Try</span></span>(<span>self, node: _ast.Try, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13407,7 +13407,7 @@ def visit_Try(
     return body</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Tuple"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Tuple"><code class="name flex">
 <span>def <span class="ident">visit_Tuple</span></span>(<span>self, node: _ast.Tuple, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13461,7 +13461,7 @@ def visit_Tuple(
     return [LiteralValue(StructureType.TUPLE, to_ret, source_code_data_type, source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_UnaryOp"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_UnaryOp"><code class="name flex">
 <span>def <span class="ident">visit_UnaryOp</span></span>(<span>self, node: _ast.UnaryOp, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13521,7 +13521,7 @@ def visit_UnaryOp(
             source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_While"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_While"><code class="name flex">
 <span>def <span class="ident">visit_While</span></span>(<span>self, node: _ast.While, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13589,7 +13589,7 @@ def visit_While(
         return [Loop(pre=[], expr=test, body=body, post=[], source_refs=ref)]</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_With"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_With"><code class="name flex">
 <span>def <span class="ident">visit_With</span></span>(<span>self, node: _ast.With, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13676,7 +13676,7 @@ def visit_With(
     return variables + body</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Yield"><code class="name flex">
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Yield"><code class="name flex">
 <span>def <span class="ident">visit_Yield</span></span>(<span>self, node: _ast.Yield, prev_scope_id_dict, curr_scope_id_dict)</span>
 </code></dt>
 <dd>
@@ -13725,77 +13725,77 @@ def visit_Yield(
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="skema.program_analysis.PyAST2CAST" href="index.html">skema.program_analysis.PyAST2CAST</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST" href="index.html">skema.program_analysis.CAST.pythonAST</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.construct_unique_name" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.construct_unique_name">construct_unique_name</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_node_name" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_node_name">get_node_name</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_op" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_op">get_op</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_python_version" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.get_python_version">get_python_version</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.merge_dicts" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.merge_dicts">merge_dicts</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.construct_unique_name" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.construct_unique_name">construct_unique_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_node_name" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_node_name">get_node_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_op" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_op">get_op</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_python_version" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_python_version">get_python_version</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.merge_dicts" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.merge_dicts">merge_dicts</a></code></li>
 </ul>
 </li>
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST">PyASTToCAST</a></code></h4>
+<h4><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST">PyASTToCAST</a></code></h4>
 <ul class="">
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.check_alias" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.check_alias">check_alias</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.collect_fields" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.collect_fields">collect_fields</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.create_binary_compare_tree" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.create_binary_compare_tree">create_binary_compare_tree</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.create_cond" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.create_cond">create_cond</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.find_function" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.find_function">find_function</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.identify_piece" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.identify_piece">identify_piece</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.insert_alias" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.insert_alias">insert_alias</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.insert_next_id" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.insert_next_id">insert_next_id</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit">visit</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Assert" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Assert">visit_Assert</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Assign" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Assign">visit_Assign</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Attribute" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Attribute">visit_Attribute</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_AugAssign" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_AugAssign">visit_AugAssign</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_BinOp" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_BinOp">visit_BinOp</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_BoolOp" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_BoolOp">visit_BoolOp</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Break" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Break">visit_Break</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Call" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Call">visit_Call</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ClassDef" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ClassDef">visit_ClassDef</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Compare" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Compare">visit_Compare</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Constant" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Constant">visit_Constant</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Continue" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Continue">visit_Continue</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Delete" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Delete">visit_Delete</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Dict" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Dict">visit_Dict</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_DictComp" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_DictComp">visit_DictComp</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Ellipsis" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Ellipsis">visit_Ellipsis</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Expr" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Expr">visit_Expr</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ExtSlice" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ExtSlice">visit_ExtSlice</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_For" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_For">visit_For</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_FunctionDef" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_FunctionDef">visit_FunctionDef</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_GeneratorExp" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_GeneratorExp">visit_GeneratorExp</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Global" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Global">visit_Global</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_If" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_If">visit_If</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_IfExp" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_IfExp">visit_IfExp</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Import" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Import">visit_Import</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ImportFrom" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ImportFrom">visit_ImportFrom</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Index" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Index">visit_Index</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_JoinedStr" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_JoinedStr">visit_JoinedStr</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Lambda" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Lambda">visit_Lambda</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_List" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_List">visit_List</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ListComp" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_ListComp">visit_ListComp</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Module" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Module">visit_Module</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Name" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Name">visit_Name</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Pass" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Pass">visit_Pass</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Raise" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Raise">visit_Raise</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Return" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Return">visit_Return</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Set" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Set">visit_Set</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Slice" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Slice">visit_Slice</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Subscript" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Subscript">visit_Subscript</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Try" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Try">visit_Try</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Tuple" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Tuple">visit_Tuple</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_UnaryOp" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_UnaryOp">visit_UnaryOp</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_While" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_While">visit_While</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_With" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_With">visit_With</a></code></li>
-<li><code><a title="skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Yield" href="#skema.program_analysis.PyAST2CAST.py_ast_to_cast.PyASTToCAST.visit_Yield">visit_Yield</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.check_alias" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.check_alias">check_alias</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.collect_fields" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.collect_fields">collect_fields</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.create_binary_compare_tree" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.create_binary_compare_tree">create_binary_compare_tree</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.create_cond" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.create_cond">create_cond</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.find_function" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.find_function">find_function</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.identify_piece" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.identify_piece">identify_piece</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.insert_alias" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.insert_alias">insert_alias</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.insert_next_id" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.insert_next_id">insert_next_id</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit">visit</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Assert" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Assert">visit_Assert</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Assign" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Assign">visit_Assign</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Attribute" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Attribute">visit_Attribute</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_AugAssign" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_AugAssign">visit_AugAssign</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_BinOp" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_BinOp">visit_BinOp</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_BoolOp" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_BoolOp">visit_BoolOp</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Break" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Break">visit_Break</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Call" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Call">visit_Call</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ClassDef" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ClassDef">visit_ClassDef</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Compare" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Compare">visit_Compare</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Constant" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Constant">visit_Constant</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Continue" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Continue">visit_Continue</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Delete" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Delete">visit_Delete</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Dict" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Dict">visit_Dict</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_DictComp" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_DictComp">visit_DictComp</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Ellipsis" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Ellipsis">visit_Ellipsis</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Expr" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Expr">visit_Expr</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ExtSlice" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ExtSlice">visit_ExtSlice</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_For" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_For">visit_For</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_FunctionDef" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_FunctionDef">visit_FunctionDef</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_GeneratorExp" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_GeneratorExp">visit_GeneratorExp</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Global" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Global">visit_Global</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_If" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_If">visit_If</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_IfExp" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_IfExp">visit_IfExp</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Import" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Import">visit_Import</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ImportFrom" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ImportFrom">visit_ImportFrom</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Index" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Index">visit_Index</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_JoinedStr" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_JoinedStr">visit_JoinedStr</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Lambda" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Lambda">visit_Lambda</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_List" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_List">visit_List</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ListComp" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_ListComp">visit_ListComp</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Module" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Module">visit_Module</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Name" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Name">visit_Name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Pass" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Pass">visit_Pass</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Raise" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Raise">visit_Raise</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Return" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Return">visit_Return</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Set" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Set">visit_Set</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Slice" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Slice">visit_Slice</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Subscript" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Subscript">visit_Subscript</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Try" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Try">visit_Try</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Tuple" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Tuple">visit_Tuple</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_UnaryOp" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_UnaryOp">visit_UnaryOp</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_While" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_While">visit_While</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_With" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_With">visit_With</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Yield" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.PyASTToCAST.visit_Yield">visit_Yield</a></code></li>
 </ul>
 </li>
 </ul>
