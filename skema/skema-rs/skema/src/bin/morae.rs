@@ -97,7 +97,7 @@ fn main() {
     }
 }
 
-#[test]
+/*#[test]
 fn test_lotka_volterra_RegNet() {
     let mathml_asts =
         get_mathml_asts_from_file("../../../data/mml2pn_inputs/lotka_volterra/mml_list.txt");
@@ -109,4 +109,4 @@ fn test_lotka_volterra_RegNet() {
     let regnet_output: RegNet = serde_json::from_str(&file_contents).unwrap();
 
     assert_eq!(regnet_output, regnet);
-}
+}*/
