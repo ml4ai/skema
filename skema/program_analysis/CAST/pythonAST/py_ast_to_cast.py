@@ -32,7 +32,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Var,
     ValueConstructor,
 )
-from skema.program_analysis.PyAST2CAST.modules_list import (
+from skema.program_analysis.CAST.pythonAST.modules_list import (
     BUILTINS,
     find_std_lib_module,
 )

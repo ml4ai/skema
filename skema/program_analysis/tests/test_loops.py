@@ -5,7 +5,7 @@ from skema.gromet.fn import GrometFNModuleCollection
 from skema.gromet.fn import FunctionType
 import ast
 
-from skema.program_analysis.PyAST2CAST import py_ast_to_cast
+from skema.program_analysis.CAST.pythonAST import py_ast_to_cast
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
 from skema.program_analysis.CAST2FN import cast
 from skema.program_analysis.CAST2FN.cast import CAST
