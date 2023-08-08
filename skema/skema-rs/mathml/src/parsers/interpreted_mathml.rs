@@ -10,8 +10,8 @@ use crate::{
         Ci, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup, msup,
-        rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+        add, attribute, comma, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup,
+        msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
     },
 };
 
@@ -25,11 +25,11 @@ use nom::{
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
-/// disallowing operators besides +, -, =, (, and ).
+/// disallowing operators besides +, -, =, (, ) and ,.
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((add, subtract, equals, lparen, rparen)),
+        alt((add, subtract, equals, lparen, rparen, comma)),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -40,24 +40,36 @@ fn parenthesized_identifier(input: Span) -> IResult<Mi> {
     let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
     //let (s, bound_vars) = delimited(mo_lparen, separated_list1(char(','), mi), mo_rparen)(input)?;
     let (s, bound_vars) = delimited(mo_lparen, mi, mo_rparen)(input)?;
-    println!("bouns_vars={:?}", bound_vars);
-    let mut if_bvar_exists = vec![&bound_vars];
-    println!("-----bound_vars={:?}", bound_vars);
-    if if_bvar_exists.is_empty() {
-        Ok((s, Mi(" ".to_string())))
-    } else {
-        Ok((s, bound_vars))
-    }
+    //let (_, parameter) = bound_vars;
+    //println!("bouns_vars={:?}", bound_vars);
+    // let mut if_bvar_exists = vec![&bound_vars];
+    //println!("-----bound_vars={:?}", bound_vars);
+    //if if_bvar_exists.is_empty() {
+    //  Ok((s, Mi(" ".to_string())))
+    //} else {
+    Ok((s, bound_vars))
+    //}
+}
+
+/// Parse empty univariate function.
+/// Example: S
+fn empty_parenthesis(input: Span) -> IResult<Mi> {
+    Ok((input, Mi("".to_string())))
 }
 
 /// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
 pub fn ci_univariate_func(input: Span) -> IResult<(Ci, Mi)> {
-    let (s, (Mi(x), bound_vars)) = tuple((mi, parenthesized_identifier))(input)?;
+    println!("-----input={:?}", input);
+    let (s, (Mi(x), bound_vars)) =
+        tuple((mi, alt((parenthesized_identifier, empty_parenthesis))))(input)?;
+    println!("-----s={:?}", s);
+    println!("-----x={:?}", x);
     println!("bound_vars={:?}", bound_vars);
-    let mut if_bvar_exists = vec![&bound_vars];
-    println!("if_bvar_exists={:?}", if_bvar_exists);
-    if if_bvar_exists.is_empty() {
+    //let mut if_bvar_exists = vec![&bound_vars];
+    //println!("if_bvar_exists={:?}", if_bvar_exists);
+    //if if_bvar_exists.is_empty() {
+    /*if bound_vars.0.is_empty() {
         Ok((
             s,
             (
@@ -68,18 +80,18 @@ pub fn ci_univariate_func(input: Span) -> IResult<(Ci, Mi)> {
                 Mi("  ".to_string()),
             ),
         ))
-    } else {
-        Ok((
-            s,
-            (
-                Ci::new(
-                    Some(Type::Function),
-                    Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
-                ),
-                bound_vars,
+    } else {*/
+    Ok((
+        s,
+        (
+            Ci::new(
+                Some(Type::Function),
+                Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
             ),
-        ))
-    }
+            bound_vars,
+        ),
+    ))
+    //}
 }
 
 /// Parse content identifier for Msub
@@ -103,11 +115,24 @@ fn d(input: Span) -> IResult<()> {
 
 /// Parse a content identifier of unknown type.
 pub fn ci_unknown(input: Span) -> IResult<(Ci, Mi)> {
+    println!(".....input={:?}", input);
     let (s, (x, bound_vars)) = pair(mi, parenthesized_identifier)(input)?;
-    Ok((
-        s,
-        (Ci::new(None, Box::new(MathExpression::Mi(x))), bound_vars),
-    ))
+    let mut if_bvar_exists = vec![&bound_vars];
+    println!("if_bvar_exists={:?}", if_bvar_exists);
+    if if_bvar_exists.is_empty() {
+        Ok((
+            s,
+            (
+                Ci::new(None, Box::new(MathExpression::Mi(x))),
+                Mi("  ".to_string()),
+            ),
+        ))
+    } else {
+        Ok((
+            s,
+            (Ci::new(None, Box::new(MathExpression::Mi(x))), bound_vars),
+        ))
+    }
 }
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
