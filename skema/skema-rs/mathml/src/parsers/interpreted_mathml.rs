@@ -35,11 +35,12 @@ pub fn operator(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-fn parenthesized_identifier(input: Span) -> IResult<Mi> {
+fn parenthesized_identifier(input: Span) -> IResult<Vec<Mi>> {
     let mo_lparen = delimited(stag!("mo"), lparen, etag!("mo"));
     let mo_rparen = delimited(stag!("mo"), rparen, etag!("mo"));
-    //let (s, bound_vars) = delimited(mo_lparen, separated_list1(char(','), mi), mo_rparen)(input)?;
-    let (s, bound_vars) = delimited(mo_lparen, mi, mo_rparen)(input)?;
+    let mo_comma = delimited(stag!("mo"), comma, etag!("mo"));
+    let (s, bound_vars) = delimited(mo_lparen, separated_list1(mo_comma, mi), mo_rparen)(input)?;
+    //let (s, bound_vars) = delimited(mo_lparen, mi, mo_rparen)(input)?;
     //let (_, parameter) = bound_vars;
     //println!("bouns_vars={:?}", bound_vars);
     // let mut if_bvar_exists = vec![&bound_vars];
@@ -53,13 +54,14 @@ fn parenthesized_identifier(input: Span) -> IResult<Mi> {
 
 /// Parse empty univariate function.
 /// Example: S
-fn empty_parenthesis(input: Span) -> IResult<Mi> {
-    Ok((input, Mi("".to_string())))
+fn empty_parenthesis(input: Span) -> IResult<Vec<Mi>> {
+    let empty = vec![Mi("".to_string())];
+    Ok((input, empty))
 }
 
 /// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
-pub fn ci_univariate_func(input: Span) -> IResult<(Ci, Mi)> {
+pub fn ci_univariate_func(input: Span) -> IResult<(Ci, Vec<Mi>)> {
     println!("-----input={:?}", input);
     let (s, (Mi(x), bound_vars)) =
         tuple((mi, alt((parenthesized_identifier, empty_parenthesis))))(input)?;
@@ -114,25 +116,13 @@ fn d(input: Span) -> IResult<()> {
 }
 
 /// Parse a content identifier of unknown type.
-pub fn ci_unknown(input: Span) -> IResult<(Ci, Mi)> {
+pub fn ci_unknown(input: Span) -> IResult<(Ci, Vec<Mi>)> {
     println!(".....input={:?}", input);
-    let (s, (x, bound_vars)) = pair(mi, parenthesized_identifier)(input)?;
-    let mut if_bvar_exists = vec![&bound_vars];
-    println!("if_bvar_exists={:?}", if_bvar_exists);
-    if if_bvar_exists.is_empty() {
-        Ok((
-            s,
-            (
-                Ci::new(None, Box::new(MathExpression::Mi(x))),
-                Mi("  ".to_string()),
-            ),
-        ))
-    } else {
-        Ok((
-            s,
-            (Ci::new(None, Box::new(MathExpression::Mi(x))), bound_vars),
-        ))
-    }
+    let (s, (x, bound_vars)) = pair(mi, alt((parenthesized_identifier, empty_parenthesis)))(input)?;
+    Ok((
+        s,
+        (Ci::new(None, Box::new(MathExpression::Mi(x))), bound_vars),
+    ))
 }
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
@@ -141,17 +131,18 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
     println!("s={:?}", s);
     let (s, (func, bound_vars)) = ws(alt((
         ci_univariate_func,
-        map(ci_unknown, |(Ci { content, .. }, Mi(x))| {
+        map(ci_unknown, |(Ci { content, .. }, vars)| {
             (
                 Ci {
                     r#type: Some(Type::Function),
                     content,
                 },
-                Mi(x),
+                vars,
             )
         }),
     )))(s)?;
     println!("func={:?}", func);
+    println!("bound_vars={:?}", bound_vars);
     let (s, with_respect_to) = delimited(
         tuple((etag!("mrow"), stag!("mrow"), d)),
         mi,
@@ -190,10 +181,10 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         delimited(
             stag!("mover"),
             pair(
-                map(ci_unknown, |(Ci { content, .. }, Mi(id))| (Ci {
+                map(ci_unknown, |(Ci { content, .. }, vars)| (Ci {
                     r#type: Some(Type::Function),
                     content,
-                }, Mi(id))),
+                }, vars)),
                 n_dots,
             ),
             etag!("mover"),
@@ -201,6 +192,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         //opt(parenthesized_identifier),
     (input)?;
 
+    let mut new_with_respect_to = with_respect_to[0].clone();
     Ok((
         s,
         (
@@ -209,7 +201,8 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
                 1,
                 Ci::new(
                     Some(Type::Real),
-                    Box::new(MathExpression::Mi(with_respect_to)),
+                    //Box::new(MathExpression::Mi(with_respect_to[0])),
+                    Box::new(MathExpression::Mi(new_with_respect_to)),
                 ),
             ),
             x,
@@ -242,23 +235,24 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        map(ci_univariate_func, |(Ci { content, .. }, Mi(x))| {
+        map(ci_univariate_func, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),
                     content,
                 },
-                Mi(x),
+                vars,
             )
         }),
         map(ci_subscript, MathExpression::Ci),
-        map(ci_unknown, |(Ci { content, .. }, Mi(x))| {
+        map(ci_unknown, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),
                     content,
                 },
-                Mi(x),
+                //Mi(x),
+                vars,
             )
         }),
         map(operator, MathExpression::Mo),
