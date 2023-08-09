@@ -72,9 +72,11 @@ impl MathExpressionTree {
                     Operator::Multiply => content_mathml.push_str("<times/>"),
                     Operator::Equals => content_mathml.push_str("<eq/>"),
                     Operator::Divide => content_mathml.push_str("<divide/>"),
-                    Operator::Derivative(Derivative { order, var_index })
-                        if (*order, *var_index) == (1_u8, 1_u8) =>
-                    {
+                    Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }) if (*order, *var_index) == (1_u8, 1_u8) => {
                         content_mathml.push_str("<diff/>")
                     }
                     _ => {}
@@ -168,6 +170,32 @@ impl MathExpression {
                 denominator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
+            /*MathExpression::Msup(base, superscript) => {
+                if let MathExpression::Mi(b) = &**base {
+                    if let b = "e" {
+                        tokens.push(MathExpression::Mo(Operator::Exp));
+                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        superscript.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                    } else {
+                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        base.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                        tokens.push(MathExpression::Mo(Operator::Power));
+                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        superscript.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                    }
+                } else {
+                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    base.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
+                    tokens.push(MathExpression::Mo(Operator::Power));
+                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    superscript.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
+                }
+            }*/
             t => tokens.push(t.clone()),
         }
     }
@@ -392,7 +420,11 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
+    let FirstOrderODE {
+        lhs_var,
+        bounded_var,
+        rhs,
+    } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
@@ -404,7 +436,11 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
+    let FirstOrderODE {
+        lhs_var,
+        bounded_var,
+        rhs,
+    } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
@@ -639,4 +675,29 @@ fn test_expression4() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let math = exp.to_infix_expression();
     assert_eq!(math, "((((1-α)*γ)*I)-(ϵ*R))")
+}
+
+#[test]
+fn test_mfrac() {
+    let input = "
+    <math>
+        <mfrac><mi>S</mi><mi>N</mi></mfrac>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_superscript() {
+    let input = "
+    <math>
+        <msup>
+        <mi>x</mi>
+        <mn>3</mn>
+        </msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
 }

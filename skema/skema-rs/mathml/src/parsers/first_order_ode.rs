@@ -66,22 +66,22 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, |(Ci { content, .. }, Mi(x))| {
+        map(ci_univariate_func, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),
                     content,
                 },
-                Mi(x),
+                vars,
             )
         }),
-        map(ci_unknown, |(Ci { content, .. }, Mi(x))| {
+        map(ci_unknown, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),
                     content,
                 },
-                Mi(x),
+                vars,
             )
         }),
         map(operator, MathExpression::Mo),
@@ -648,7 +648,7 @@ fn test_ci_univariate_func() {
                 Some(Type::Function),
                 Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
-            Mi("t".to_string()),
+            vec![Mi("t".to_string())],
         ),
     );
 }
@@ -682,17 +682,17 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
 fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() {
     test_parser(
         "<mfrac>
-        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
-        <mrow><mi>d</mi><mi>t</mi></mrow>
+        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>,</mo><mi>x</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>x</mi></mrow>
         </mfrac>",
         first_order_derivative_leibniz_notation,
         (
             Derivative::new(
                 1,
-                1,
+                2,
                 Ci::new(
                     Some(Type::Real),
-                    Box::new(MathExpression::Mi(Mi("t".to_string()))),
+                    Box::new(MathExpression::Mi(Mi("x".to_string()))),
                 ),
             ),
             Ci::new(
