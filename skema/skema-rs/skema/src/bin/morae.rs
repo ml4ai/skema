@@ -33,7 +33,7 @@ fn main() {
     */
     let new_args = Cli::parse();
 
-    let mut module_id = 2233;
+    let mut module_id = 883;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
     if new_args.arg == *"auto" {
@@ -43,7 +43,7 @@ fn main() {
 
         let host = "localhost";
 
-        //let math_content = module_id2mathml_MET_ast(module_id, host);
+        let math_content = module_id2mathml_MET_ast(module_id, host);
 
         let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list3.txt";
 

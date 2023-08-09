@@ -320,7 +320,6 @@ pub fn subgraph2_core_dyn_ast(
 
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
-        println!("expr: {:?}", expr.clone());
         for node_index in expr.clone().node_indices() {
             if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
@@ -933,7 +932,7 @@ fn trim_un_named(
                     bypass[0],
                     bypass[1],
                     graph
-                        .edge_weight(graph.find_edge(node_index, bypass[1]).unwrap())
+                        .edge_weight(graph.find_edge(bypass[0], node_index).unwrap())
                         .unwrap()
                         .clone(),
                 );
@@ -949,7 +948,7 @@ fn trim_un_named(
                         bypass[i],
                         bypass[end_node_idx],
                         graph
-                            .edge_weight(graph.find_edge(node_index, bypass[end_node_idx]).unwrap())
+                            .edge_weight(graph.find_edge(bypass[i], node_index).unwrap())
                             .unwrap()
                             .clone(),
                     );
