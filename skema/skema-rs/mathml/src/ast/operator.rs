@@ -7,7 +7,7 @@ use std::fmt;
 pub struct Derivative {
     pub order: u8,
     pub var_index: u8,
-    pub var: Ci,
+    pub bound_var: Ci,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
@@ -23,6 +23,8 @@ pub enum Operator {
     Compose,
     Factorial,
     Exp,
+    Power,
+    Comma,
     Derivative(Derivative),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
@@ -40,15 +42,17 @@ impl fmt::Display for Operator {
             Operator::Lparen => write!(f, "("),
             Operator::Rparen => write!(f, ")"),
             Operator::Compose => write!(f, "."),
+            Operator::Comma => write!(f, ","),
             Operator::Factorial => write!(f, "!"),
             Operator::Derivative(Derivative {
                 order,
                 var_index,
-                var,
+                bound_var,
             }) => {
-                write!(f, "D({order}, {var_index}, {var})")
+                write!(f, "D({order}, {var_index}, {bound_var})")
             }
             Operator::Exp => write!(f, "Exp"),
+            Operator::Power => write!(f, "Power"),
             Operator::Other(op) => write!(f, "{op}"),
         }
     }
