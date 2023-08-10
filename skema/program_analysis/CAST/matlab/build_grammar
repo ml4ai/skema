@@ -34,6 +34,12 @@ def clone(git_url):
         print('Clone failed')
     return ret
 
+def build_matlab_grammar():
+    pass
+
+def run_matlab_test_corpus():
+    pass
+
 def main():
     # Move to project directory
     os.chdir(PROJECT_PATH)
@@ -43,6 +49,10 @@ def main():
     clone(MATLAB_TEST_CORPUS_URL)
     # Return to caller directory
     os.chdir(CALLER_PATH)
+
+    build_matlab_grammar()
+
+    run_matlab_test_corpus()
 
 if __name__ == "__main__":
     main()
