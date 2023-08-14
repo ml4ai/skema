@@ -389,9 +389,16 @@ pub fn get_args_MET(
     root_node: NodeIndex,
 ) -> Vec<MathExpressionTree> {
     let mut args = Vec::<MathExpressionTree>::new();
+    let mut arg_order = Vec::<i64>::new();
+    let mut ordered_args = Vec::<MathExpressionTree>::new();
 
-    // first need to check for operator
+    // idea construct a vector of edge labels for the arguments
+    // construct vector of math expressions
+    // reorganize based on edge labels vector
+
+    // construct vecs
     for node in graph.neighbors_directed(root_node, Outgoing) {
+        // first need to check for operator
         if graph[node].labels == ["Primitive"] {
             let operate = get_operator_MET(graph.clone(), node); // output -> Operator
             let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
@@ -406,8 +413,25 @@ pub fn get_args_MET(
                 .to_string())));
             args.push(arg2.clone());
         }
+        // construct order of args
+        if let rsmgclient::Value::Int(x) = graph
+            .edge_weight(graph.find_edge(root_node, node).unwrap())
+            .unwrap()
+            .clone()
+            .properties["index"]
+        {
+            arg_order.push(x);
+        }
     }
-    args
+
+    // fix order of args
+    ordered_args = args.clone();
+    for (i, ind) in arg_order.iter().enumerate() {
+        // the ind'th element of order_args is the ith element of the unordered args
+        let temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i as usize].clone());
+    }
+
+    ordered_args
 }
 
 // this gets the operator from the node name
