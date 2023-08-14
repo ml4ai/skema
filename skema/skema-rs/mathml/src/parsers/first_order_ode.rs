@@ -322,6 +322,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                             } else {
                                 temp_term.polarity = true;
                             }
+                            terms.push(temp_term);
                         } else {
                             terms.push(temp_term);
                         }
@@ -335,6 +336,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                             } else {
                                 temp_term.polarity = true;
                             }
+                            terms.push(temp_term);
                         } else {
                             terms.push(temp_term);
                         }
