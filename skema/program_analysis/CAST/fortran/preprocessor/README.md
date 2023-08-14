@@ -29,7 +29,7 @@ The directory structure should look like the following:
  
 ## Running as library 
 
-    from skema.program_analysis.TS2CAST.preprocessor.preprocess import preprocess
+    from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
     
     parse_tree = preprocess("skema/data/TIE_GCM/cons.F", "skema/data/TIE_GCM/intermediate_products_cons/", out_parse=True) 
 

@@ -64,7 +64,7 @@ def process_file_system(
             else:
                 print(f"File extension not supported for {full_file}")
 
-            # The Fortran CAST inteface (TS2CAST) can produce multiple CAST modules.
+            # The Fortran CAST inteface (CAST/fortran) can produce multiple CAST modules.
             # However, the Python interface (python2cast) will only return a single module.
             # This workaround will normalize a single CAST module into a list for consistent processing.
             if isinstance(cast, List):
