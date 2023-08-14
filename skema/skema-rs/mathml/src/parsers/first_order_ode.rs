@@ -134,16 +134,7 @@ pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
             let mut ode = line
                 .parse::<FirstOrderODE>()
                 .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
-            println!(
-                "ode_line rhs string below: {:?}\n",
-                ode.rhs.to_string().clone()
-            );
             ode.rhs = flatten_mults(ode.rhs.clone());
-            println!(
-                "ode_line rhs string after: {:?}\n",
-                ode.rhs.to_string().clone()
-            );
-            println!("ode_line rhs object: {:?}\n", ode.rhs.clone());
             ode_vec.push(ode);
         }
     }
