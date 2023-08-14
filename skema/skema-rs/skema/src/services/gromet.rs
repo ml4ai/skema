@@ -1,9 +1,9 @@
 //! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 use crate::config::Config;
 use crate::database::{execute_query, parse_gromet_queries};
+use crate::model_extraction::module_id2mathml_MET_ast;
 use crate::model_extraction::module_id2mathml_ast;
 use crate::ModuleCollection;
-use crate::model_extraction::module_id2mathml_MET_ast;
 use actix_web::web::ServiceConfig;
 use actix_web::{delete, get, post, put, web, HttpResponse};
 use mathml::acset::{PetriNet, RegNet};
