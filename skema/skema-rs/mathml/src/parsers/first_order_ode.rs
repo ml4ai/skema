@@ -23,7 +23,6 @@ use nom::{
     branch::alt,
     bytes::complete::tag,
     combinator::map,
-    error::Error,
     multi::{many0, many1},
     sequence::{delimited, tuple},
 };
@@ -123,6 +122,7 @@ impl FromStr for FirstOrderODE {
 //--------------------------------------
 // Methods for extraction of PN AMR from ODE's
 //--------------------------------------
+#[allow(non_snake_case)]
 pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
     let f = File::open(filepath).unwrap();
     let lines = BufReader::new(f).lines();
@@ -168,23 +168,23 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
             Multiply => {
                 let mut temp_term = get_term_mult(sys_states, y.clone());
                 temp_term.dyn_state = dyn_state;
-                terms.push(temp_term.clone());
+                terms.push(temp_term);
             }
             Divide => {
                 let mut temp_term = get_term_div(sys_states, y.clone());
                 temp_term.dyn_state = dyn_state;
-                terms.push(temp_term.clone());
+                terms.push(temp_term);
             }
             Add => {
-                let mut temp_terms = get_terms_add(sys_states.clone(), y.clone());
+                let temp_terms = get_terms_add(sys_states, y.clone());
                 for term in temp_terms.iter() {
                     let mut t_term = term.clone();
                     t_term.dyn_state = dyn_state.clone();
                     terms.push(t_term.clone());
                 }
             }
-            Sub => {
-                let mut temp_terms = get_terms_sub(sys_states.clone(), y.clone());
+            _Sub => {
+                let temp_terms = get_terms_sub(sys_states, y.clone());
                 for term in temp_terms.iter() {
                     let mut t_term = term.clone();
                     t_term.dyn_state = dyn_state.clone();
@@ -210,21 +210,21 @@ pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
         match &arg {
             Cons(x1, ref y1) => match x1 {
                 Multiply => {
-                    let mut temp_term = get_term_mult(sys_states.clone(), y1.clone());
+                    let temp_term = get_term_mult(sys_states.clone(), y1.clone());
                     terms.push(temp_term);
                 }
                 Divide => {
-                    let mut temp_term = get_term_div(sys_states.clone(), y1.clone());
+                    let temp_term = get_term_div(sys_states.clone(), y1.clone());
                     terms.push(temp_term);
                 }
                 Subtract => {
-                    let mut temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                    let temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
                     for term in temp_terms.iter() {
                         terms.push(term.clone());
                     }
                 }
                 Add => {
-                    let mut temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                    let temp_terms = get_terms_add(sys_states.clone(), y1.clone());
                     for term in temp_terms.iter() {
                         terms.push(term.clone());
                     }
@@ -257,7 +257,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
         match &eq[0] {
             Cons(x1, ref y1) => match x1 {
                 Multiply => {
-                    let mut temp_term = get_term_mult(sys_states.clone(), y1.clone());
+                    let mut temp_term = get_term_mult(sys_states, y1.clone());
                     if temp_term.polarity {
                         temp_term.polarity = false;
                     } else {
@@ -266,7 +266,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                     terms.push(temp_term);
                 }
                 Divide => {
-                    let mut temp_term = get_term_div(sys_states.clone(), y1.clone());
+                    let mut temp_term = get_term_div(sys_states, y1.clone());
                     if temp_term.polarity {
                         temp_term.polarity = false;
                     } else {
@@ -274,8 +274,8 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                     }
                     terms.push(temp_term);
                 }
-                Sub => {
-                    let mut temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                _Sub => {
+                    let temp_terms = get_terms_sub(sys_states, y1.clone());
                     for term in temp_terms.iter() {
                         // swap polarity of temp term
                         let mut t_term = term.clone();
@@ -288,7 +288,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                     }
                 }
                 Add => {
-                    let mut temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                    let temp_terms = get_terms_add(sys_states.clone(), y1.clone());
                     for term in temp_terms.iter() {
                         // swap polarity of temp term
                         let mut t_term = term.clone();
@@ -342,7 +342,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         }
                     }
                     Subtract => {
-                        let mut temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                        let temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
                         for term in temp_terms.iter() {
                             let mut t_term = term.clone();
                             if i == 1 {
@@ -359,7 +359,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         }
                     }
                     Add => {
-                        let mut temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                        let temp_terms = get_terms_add(sys_states.clone(), y1.clone());
                         for term in temp_terms.iter() {
                             let mut t_term = term.clone();
                             if i == 1 {

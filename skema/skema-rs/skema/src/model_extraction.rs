@@ -65,6 +65,7 @@ pub fn get_line_span(
     }
 }
 
+#[allow(non_snake_case)]
 pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE> {
     let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
@@ -173,6 +174,7 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     core_id
 }
 
+#[allow(non_snake_case)]
 pub fn subgrapg2_core_dyn_MET_ast(
     root_node_id: i64,
     host: &str,
@@ -335,12 +337,13 @@ pub fn subgraph2_core_dyn_ast(
     Ok((core_dynamics, metadata_map))
 }
 
+#[allow(non_snake_case)]
 fn tree_2_MET_ast(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
 ) -> Result<FirstOrderODE, MgError> {
     let mut fo_eq_vec = Vec::<FirstOrderODE>::new();
-    let mut math_vec = Vec::<MathExpressionTree>::new();
+    let _math_vec = Vec::<MathExpressionTree>::new();
     let mut lhs = Vec::<Ci>::new();
     if graph[root_node].labels == ["Opo"] {
         // we first construct the derivative of the first node
@@ -368,7 +371,7 @@ fn tree_2_MET_ast(
             if graph[node].labels == ["Primitive"] {
                 let operate = get_operator_MET(graph.clone(), node); // output -> Operator
                 let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
-                let mut rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
+                let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
                 let rhs_flat = flatten_mults(rhs.clone());
                 let fo_eq = FirstOrderODE {
                     lhs_var: lhs[0].clone(),
@@ -384,13 +387,13 @@ fn tree_2_MET_ast(
     Ok(fo_eq_vec[0].clone())
 }
 
+#[allow(non_snake_case)]
 pub fn get_args_MET(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
 ) -> Vec<MathExpressionTree> {
     let mut args = Vec::<MathExpressionTree>::new();
     let mut arg_order = Vec::<i64>::new();
-    let mut ordered_args = Vec::<MathExpressionTree>::new();
 
     // idea construct a vector of edge labels for the arguments
     // construct vector of math expressions
@@ -409,7 +412,7 @@ pub fn get_args_MET(
             let temp_string = graph[node].properties["name"].to_string().clone();
             let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].properties
                 ["name"]
-                .to_string()[1..(temp_string.len() - 1 as usize)]
+                .to_string()[1..(temp_string.len() - 1_usize)]
                 .to_string())));
             args.push(arg2.clone());
         }
@@ -425,16 +428,17 @@ pub fn get_args_MET(
     }
 
     // fix order of args
-    ordered_args = args.clone();
+    let mut ordered_args = args.clone();
     for (i, ind) in arg_order.iter().enumerate() {
         // the ind'th element of order_args is the ith element of the unordered args
-        let temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i as usize].clone());
+        let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
     }
 
     ordered_args
 }
 
 // this gets the operator from the node name
+#[allow(non_snake_case)]
 pub fn get_operator_MET(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
@@ -698,9 +702,8 @@ fn distribute_args(
     mut arg2: Vec<MathExpression>,
 ) -> Vec<MathExpression> {
     let mut arg_dist = Vec::<MathExpression>::new();
-    let mut arg2_term_ind = Vec::<i32>::new();
 
-    arg2_term_ind = terms_indicies(arg2.clone());
+    let arg2_term_ind = terms_indicies(arg2.clone());
 
     // check if need to swap operator signs
     /* Is this running properly, not removing Mo(Other("'USub'")) in I equation in SIR */

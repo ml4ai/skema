@@ -676,7 +676,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         // now to construct the nodes inside the function, currently supported Literals and Primitives
         // first include an Expression for increased depth
         let mut box_counter: u8 = 1;
-        if !eboxf.bf.is_none() {
+        if eboxf.bf.is_some() {
             for sboxf in eboxf.bf.as_ref().unwrap().iter() {
                 match sboxf.function_type {
                     FunctionType::Predicate => {
@@ -1881,7 +1881,6 @@ pub fn create_function(
             }
             (nodes, edges, start, meta_nodes)
         }
-        _ => (nodes, edges, start, meta_nodes),
     }
 }
 
@@ -3894,7 +3893,7 @@ pub fn wfopi_wiring(
                 src: wfopi_src_tgt[0].clone(),
                 tgt: wfopi_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: prop,
+                prop,
             };
             edges.push(e6);
         }
@@ -4052,7 +4051,7 @@ pub fn wff_wiring(
                 src: wff_src_tgt[0].clone(),
                 tgt: wff_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: prop,
+                prop,
             };
             edges.push(e8);
         }

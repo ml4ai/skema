@@ -655,28 +655,26 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             // This finishes the construction of the state
             let mut counter = 0;
             for term in terms.iter() {
-                if term.exp_states.len() == 1 {
-                    if term.exp_states[0] == term.dyn_state {
-                        // note this is only grabbing one term. This is somewhat limited by the current AMR schema
-                        // it assumes only a simple single parameter for this Date: 08/10/23
-                        r_state.rate_constant = Some(term.parameters[0].clone());
-                        r_state.sign = Some(term.polarity.clone());
-                        // This adds the edges for the environment couplings
-                        let prop = Properties {
-                            name: term.parameters[0].clone(),
-                            rate_constant: None,
-                        };
-                        let self_trans = RegTransition {
-                            id: format!("s{}", counter.clone()),
-                            source: Some([term.dyn_state.clone()].to_vec()),
-                            target: Some([term.dyn_state.clone()].to_vec()),
-                            sign: Some(term.polarity.clone()),
-                            grounding: None,
-                            properties: Some(prop.clone()),
-                        };
-                        transitions_vec.insert(self_trans.clone());
-                        counter += 1;
-                    }
+                if term.exp_states.len() == 1 && term.exp_states[0] == term.dyn_state {
+                    // note this is only grabbing one term. This is somewhat limited by the current AMR schema
+                    // it assumes only a simple single parameter for this Date: 08/10/23
+                    r_state.rate_constant = Some(term.parameters[0].clone());
+                    r_state.sign = Some(term.polarity);
+                    // This adds the edges for the environment couplings
+                    let prop = Properties {
+                        name: term.parameters[0].clone(),
+                        rate_constant: None,
+                    };
+                    let self_trans = RegTransition {
+                        id: format!("s{}", counter.clone()),
+                        source: Some([term.dyn_state.clone()].to_vec()),
+                        target: Some([term.dyn_state.clone()].to_vec()),
+                        sign: Some(term.polarity),
+                        grounding: None,
+                        properties: Some(prop.clone()),
+                    };
+                    transitions_vec.insert(self_trans.clone());
+                    counter += 1;
                 }
             }
             // This adds the intial values from the state variables into the parameters vec
@@ -738,7 +736,7 @@ impl From<Vec<FirstOrderODE>> for RegNet {
                     }
                 }
 
-                let transitions = Transition {
+                let _transitions = Transition {
                     id: format!("t{}", i.clone()),
                     input: Some(t.1.exp_states.clone()),
                     output: Some(output.clone()),
