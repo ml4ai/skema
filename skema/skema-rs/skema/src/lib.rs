@@ -201,7 +201,7 @@ pub struct FunctionNet {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gromet_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
     // these additions are I guess how imports are being handled...
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -223,7 +223,7 @@ pub struct Attribute {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gromet_type: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Vec<Metadata>>,
+    pub metadata: Option<u32>,
 }
 
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
@@ -428,10 +428,10 @@ where
 // Tests
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use std::fs;
+    //use super::*;
+    //use std::fs;
 
-    fn test_roundtrip_serialization(path_example: &str) {
+    /*fn test_roundtrip_serialization(path_example: &str) {
         let mut file_contents = fs::read_to_string(path_example).expect("Unable to read file");
 
         let res: ModuleCollection = serde_json::from_str(&file_contents).expect("Unable to parse");
@@ -444,7 +444,7 @@ mod tests {
             .replace(['\n', ' '], "");
 
         assert_eq!(res_serialized, file_contents);
-    }
+    }*/
     /*
         #[test]
         fn de_ser_cond1() {
