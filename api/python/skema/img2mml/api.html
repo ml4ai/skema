@@ -39,6 +39,8 @@ from typing import Tuple, List, Any, Dict
 from logging import info
 from skema.img2mml.translate import define_model
 import json
+from PIL import Image
+from io import BytesIO
 
 
 def retrieve_model(model_path=None) -&gt; str:
@@ -209,9 +211,42 @@ class Image2MathML:
         # Load the image2mathml model
         MODEL_PATH = retrieve_model(model_path=model_path)
         img2mml_model: Image2MathML_Xfmer = load_model(
-            model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+            model_path=MODEL_PATH,
+            config=self.config,
+            vocab=self.vocab,
+            device=self.device,
         )
         return img2mml_model
+
+
+def replace_transparent_background(image_bytes: bytes) -&gt; bytes:
+    &#34;&#34;&#34;
+    Replace transparent background with white if the image has transparency.
+
+    Args:
+        image_bytes (bytes): Bytes of the input image.
+
+    Returns:
+        bytes: Bytes of the processed image with replaced background.
+    &#34;&#34;&#34;
+    # Open the image using PIL
+    image = Image.open(BytesIO(image_bytes))
+
+    # Check if the image has an alpha (transparency) channel
+    if image.mode in (&#34;RGBA&#34;, &#34;LA&#34;) and image.getchannel(&#34;A&#34;):
+        # Create a new image with white background
+        new_image = Image.new(&#34;RGB&#34;, image.size, (255, 255, 255))
+        new_image.paste(
+            image, mask=image.split()[3]
+        )  # Paste the original image on the new image with alpha mask
+        # Save the new image to bytes
+        output_bytes = BytesIO()
+        new_image.save(output_bytes, format=&#34;PNG&#34;)
+        return output_bytes.getvalue()
+    else:
+        # If the image does not have transparency, return the original image data
+        return image_bytes
+
 
 def get_mathml_from_bytes(
     data: bytes,
@@ -231,6 +266,8 @@ def get_mathml_from_bytes(
     Returns:
         str: The MathML representation of the input image.
     &#34;&#34;&#34;
+    # replace transparent background with white if the image has transparency
+    data = replace_transparent_background(data)
     # convert png image to tensor
     imagetensor = convert_to_torch_tensor(data, image2mathml_db.config)
 
@@ -238,7 +275,13 @@ def get_mathml_from_bytes(
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
 
-    return render_mml(image2mathml_db.model, image2mathml_db.vocab_itos, image2mathml_db.vocab_stoi, imagetensor, image2mathml_db.device)
+    return render_mml(
+        image2mathml_db.model,
+        image2mathml_db.vocab_itos,
+        image2mathml_db.vocab_stoi,
+        imagetensor,
+        image2mathml_db.device,
+    )
 
 
 def get_mathml_from_file(filepath) -&gt; str:
@@ -364,6 +407,8 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
     Returns:
         str: The MathML representation of the input image.
     &#34;&#34;&#34;
+    # replace transparent background with white if the image has transparency
+    data = replace_transparent_background(data)
     # convert png image to tensor
     imagetensor = convert_to_torch_tensor(data, image2mathml_db.config)
 
@@ -371,7 +416,13 @@ def get_mathml_from_latex(eqn: str) -&gt; str:
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
 
-    return render_mml(image2mathml_db.model, image2mathml_db.vocab_itos, image2mathml_db.vocab_stoi, imagetensor, image2mathml_db.device)</code></pre>
+    return render_mml(
+        image2mathml_db.model,
+        image2mathml_db.vocab_itos,
+        image2mathml_db.vocab_stoi,
+        imagetensor,
+        image2mathml_db.device,
+    )</code></pre>
 </details>
 </dd>
 <dt id="skema.img2mml.api.get_mathml_from_file"><code class="name flex">
@@ -582,6 +633,54 @@ if present.</p>
     return vocab, vocab_itos, vocab_stoi</code></pre>
 </details>
 </dd>
+<dt id="skema.img2mml.api.replace_transparent_background"><code class="name flex">
+<span>def <span class="ident">replace_transparent_background</span></span>(<span>image_bytes: bytes) ‑> bytes</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Replace transparent background with white if the image has transparency.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>image_bytes</code></strong> :&ensp;<code>bytes</code></dt>
+<dd>Bytes of the input image.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bytes</code></dt>
+<dd>Bytes of the processed image with replaced background.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def replace_transparent_background(image_bytes: bytes) -&gt; bytes:
+    &#34;&#34;&#34;
+    Replace transparent background with white if the image has transparency.
+
+    Args:
+        image_bytes (bytes): Bytes of the input image.
+
+    Returns:
+        bytes: Bytes of the processed image with replaced background.
+    &#34;&#34;&#34;
+    # Open the image using PIL
+    image = Image.open(BytesIO(image_bytes))
+
+    # Check if the image has an alpha (transparency) channel
+    if image.mode in (&#34;RGBA&#34;, &#34;LA&#34;) and image.getchannel(&#34;A&#34;):
+        # Create a new image with white background
+        new_image = Image.new(&#34;RGB&#34;, image.size, (255, 255, 255))
+        new_image.paste(
+            image, mask=image.split()[3]
+        )  # Paste the original image on the new image with alpha mask
+        # Save the new image to bytes
+        output_bytes = BytesIO()
+        new_image.save(output_bytes, format=&#34;PNG&#34;)
+        return output_bytes.getvalue()
+    else:
+        # If the image does not have transparency, return the original image data
+        return image_bytes</code></pre>
+</details>
+</dd>
 <dt id="skema.img2mml.api.retrieve_model"><code class="name flex">
 <span>def <span class="ident">retrieve_model</span></span>(<span>model_path=None) ‑> str</span>
 </code></dt>
@@ -672,7 +771,10 @@ if present.</p>
         # Load the image2mathml model
         MODEL_PATH = retrieve_model(model_path=model_path)
         img2mml_model: Image2MathML_Xfmer = load_model(
-            model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+            model_path=MODEL_PATH,
+            config=self.config,
+            vocab=self.vocab,
+            device=self.device,
         )
         return img2mml_model</code></pre>
 </details>
@@ -724,7 +826,10 @@ if present.</p>
     # Load the image2mathml model
     MODEL_PATH = retrieve_model(model_path=model_path)
     img2mml_model: Image2MathML_Xfmer = load_model(
-        model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+        model_path=MODEL_PATH,
+        config=self.config,
+        vocab=self.vocab,
+        device=self.device,
     )
     return img2mml_model</code></pre>
 </details>
@@ -768,6 +873,7 @@ if present.</p>
 <li><code><a title="skema.img2mml.api.get_mathml_from_latex" href="#skema.img2mml.api.get_mathml_from_latex">get_mathml_from_latex</a></code></li>
 <li><code><a title="skema.img2mml.api.load_model" href="#skema.img2mml.api.load_model">load_model</a></code></li>
 <li><code><a title="skema.img2mml.api.load_vocab" href="#skema.img2mml.api.load_vocab">load_vocab</a></code></li>
+<li><code><a title="skema.img2mml.api.replace_transparent_background" href="#skema.img2mml.api.replace_transparent_background">replace_transparent_background</a></code></li>
 <li><code><a title="skema.img2mml.api.retrieve_model" href="#skema.img2mml.api.retrieve_model">retrieve_model</a></code></li>
 </ul>
 </li>

@@ -53,6 +53,17 @@ def test_post_image_to_mml():
     assert response.status_code == 200, &#34;Request was unsuccessful&#34;
     assert response.text != None, &#34;Response was empty&#34;
 
+def test_post_image_with_transparent_background_to_mml():
+    &#39;&#39;&#39;Test case for /image/mml endpoint.&#39;&#39;&#39;
+    retrieve_and_load_model
+    cwd = Path(__file__).parents[0]
+    image_path = cwd / &#34;data&#34; / &#34;sidarthe_eqn1_with_transparent_background.png&#34;
+    with open(image_path, &#34;rb&#34;) as infile:
+        image_bytes = infile.read()
+    response = client.post(&#34;/image/mml&#34;, files={&#34;data&#34;: image_bytes})
+    assert response.status_code == 200, &#34;Request was unsuccessful&#34;
+    assert response.text != None, &#34;Response was empty&#34;
+
 def test_healthcheck():
     &#39;&#39;&#39;Test case for /img2mml/healthcheck endpoint.&#39;&#39;&#39;
     response = client.get(&#34;/img2mml/healthcheck&#34;)
@@ -117,6 +128,27 @@ def retrieve_and_load_model():
     assert response.text != None, &#34;Response was empty&#34;</code></pre>
 </details>
 </dd>
+<dt id="skema.img2mml.tests.test_eqn2mml.test_post_image_with_transparent_background_to_mml"><code class="name flex">
+<span>def <span class="ident">test_post_image_with_transparent_background_to_mml</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Test case for /image/mml endpoint.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_post_image_with_transparent_background_to_mml():
+    &#39;&#39;&#39;Test case for /image/mml endpoint.&#39;&#39;&#39;
+    retrieve_and_load_model
+    cwd = Path(__file__).parents[0]
+    image_path = cwd / &#34;data&#34; / &#34;sidarthe_eqn1_with_transparent_background.png&#34;
+    with open(image_path, &#34;rb&#34;) as infile:
+        image_bytes = infile.read()
+    response = client.post(&#34;/image/mml&#34;, files={&#34;data&#34;: image_bytes})
+    assert response.status_code == 200, &#34;Request was unsuccessful&#34;
+    assert response.text != None, &#34;Response was empty&#34;</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -138,6 +170,7 @@ def retrieve_and_load_model():
 <li><code><a title="skema.img2mml.tests.test_eqn2mml.retrieve_and_load_model" href="#skema.img2mml.tests.test_eqn2mml.retrieve_and_load_model">retrieve_and_load_model</a></code></li>
 <li><code><a title="skema.img2mml.tests.test_eqn2mml.test_healthcheck" href="#skema.img2mml.tests.test_eqn2mml.test_healthcheck">test_healthcheck</a></code></li>
 <li><code><a title="skema.img2mml.tests.test_eqn2mml.test_post_image_to_mml" href="#skema.img2mml.tests.test_eqn2mml.test_post_image_to_mml">test_post_image_to_mml</a></code></li>
+<li><code><a title="skema.img2mml.tests.test_eqn2mml.test_post_image_with_transparent_background_to_mml" href="#skema.img2mml.tests.test_eqn2mml.test_post_image_with_transparent_background_to_mml">test_post_image_with_transparent_background_to_mml</a></code></li>
 </ul>
 </li>
 </ul>
