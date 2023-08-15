@@ -375,12 +375,17 @@
 <a href="#375" id="375">375</a>
 <a href="#376" id="376">376</a>
 <a href="#377" id="377">377</a>
+<a href="#378" id="378">378</a>
+<a href="#379" id="379">379</a>
+<a href="#380" id="380">380</a>
+<a href="#381" id="381">381</a>
+<a href="#382" id="382">382</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! REST API endpoints related to CRUD operations and other queries on GroMEt objects.
 </span><span class="kw">use </span><span class="kw">crate</span>::config::Config;
 <span class="kw">use </span><span class="kw">crate</span>::database::{execute_query, parse_gromet_queries};
+<span class="kw">use </span><span class="kw">crate</span>::model_extraction::module_id2mathml_MET_ast;
 <span class="kw">use </span><span class="kw">crate</span>::model_extraction::module_id2mathml_ast;
 <span class="kw">use </span><span class="kw">crate</span>::ModuleCollection;
-<span class="kw">use </span><span class="kw">crate</span>::model_extraction::module_id2mathml_MET_ast;
 <span class="kw">use </span>actix_web::web::ServiceConfig;
 <span class="kw">use </span>actix_web::{delete, get, post, put, web, HttpResponse};
 <span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
@@ -401,8 +406,8 @@
             .service(get_subgraph);
     }
 }
-
-<span class="kw">pub fn </span>model_to_RN(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;RegNet, MgError&gt; {
+<span class="attr">#[allow(non_snake_case)]
+</span><span class="kw">pub fn </span>model_to_RN(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;RegNet, MgError&gt; {
     <span class="kw">let </span>module_id = push_model_to_db(gromet, host); <span class="comment">// pushes model to db and gets id
     </span><span class="kw">let </span>ref_module_id1 = module_id.as_ref();
     <span class="kw">let </span>ref_module_id2 = module_id.as_ref();
@@ -412,6 +417,7 @@
 }
 
 <span class="comment">// this is updated to mathexpressiontrees
+</span><span class="attr">#[allow(non_snake_case)]
 </span><span class="kw">pub fn </span>model_to_PN(gromet: ModuleCollection, host: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;PetriNet, MgError&gt; {
     <span class="kw">let </span>module_id = push_model_to_db(gromet, host); <span class="comment">// pushes model to db and gets id
     </span><span class="kw">let </span>ref_module_id1 = module_id.as_ref();
@@ -684,7 +690,8 @@
 }
 
 <span class="doccomment">/// This retrieves a PetriNet AMR based on model id.
-</span><span class="attr">#[utoipa::path(
+</span><span class="attr">#[allow(non_snake_case)]
+#[utoipa::path(
     responses(
         (
             status = <span class="number">200</span>, description = <span class="string">&quot;Successfully retrieved PN AMR&quot;</span>,
@@ -699,7 +706,8 @@
 }
 
 <span class="doccomment">/// This retrieves a RegNet AMR based on model id.
-</span><span class="attr">#[utoipa::path(
+</span><span class="attr">#[allow(non_snake_case)]
+#[utoipa::path(
     responses(
         (
             status = <span class="number">200</span>, description = <span class="string">&quot;Successfully retrieved RN AMR&quot;</span>,
@@ -714,7 +722,8 @@
 }
 
 <span class="doccomment">/// This returns a PetriNet AMR from a gromet.
-</span><span class="attr">#[utoipa::path(
+</span><span class="attr">#[allow(non_snake_case)]
+#[utoipa::path(
     request_body = ModuleCollection,
     responses(
         (
@@ -734,7 +743,8 @@
 }
 
 <span class="doccomment">/// This returns a RegNet AMR from a gromet.
-</span><span class="attr">#[utoipa::path(
+</span><span class="attr">#[allow(non_snake_case)]
+#[utoipa::path(
     request_body = ModuleCollection,
     responses(
         (

@@ -1168,6 +1168,34 @@
 <a href="#1168" id="1168">1168</a>
 <a href="#1169" id="1169">1169</a>
 <a href="#1170" id="1170">1170</a>
+<a href="#1171" id="1171">1171</a>
+<a href="#1172" id="1172">1172</a>
+<a href="#1173" id="1173">1173</a>
+<a href="#1174" id="1174">1174</a>
+<a href="#1175" id="1175">1175</a>
+<a href="#1176" id="1176">1176</a>
+<a href="#1177" id="1177">1177</a>
+<a href="#1178" id="1178">1178</a>
+<a href="#1179" id="1179">1179</a>
+<a href="#1180" id="1180">1180</a>
+<a href="#1181" id="1181">1181</a>
+<a href="#1182" id="1182">1182</a>
+<a href="#1183" id="1183">1183</a>
+<a href="#1184" id="1184">1184</a>
+<a href="#1185" id="1185">1185</a>
+<a href="#1186" id="1186">1186</a>
+<a href="#1187" id="1187">1187</a>
+<a href="#1188" id="1188">1188</a>
+<a href="#1189" id="1189">1189</a>
+<a href="#1190" id="1190">1190</a>
+<a href="#1191" id="1191">1191</a>
+<a href="#1192" id="1192">1192</a>
+<a href="#1193" id="1193">1193</a>
+<a href="#1194" id="1194">1194</a>
+<a href="#1195" id="1195">1195</a>
+<a href="#1196" id="1196">1196</a>
+<a href="#1197" id="1197">1197</a>
+<a href="#1198" id="1198">1198</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{operator::Operator, Math};
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -1235,7 +1263,8 @@
     }
 }
 
-<span class="kw">pub fn </span>module_id2mathml_MET_ast(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;FirstOrderODE&gt; {
+<span class="attr">#[allow(non_snake_case)]
+</span><span class="kw">pub fn </span>module_id2mathml_MET_ast(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;FirstOrderODE&gt; {
     <span class="kw">let </span>graph = subgraph2petgraph(module_id, host); <span class="comment">// makes petgraph of graph
 
     </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, host); <span class="comment">// gives back list of function nodes that might contain the dynamics
@@ -1287,6 +1316,7 @@
 
 <span class="comment">// this function finds the core dynamics and returns a vector of
 // node id&#39;s that meet the criteria for identification
+</span><span class="attr">#[allow(clippy::if_same_then_else)]
 </span><span class="kw">pub fn </span>find_pn_dynamics(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;i64&gt; {
     <span class="kw">let </span>graph = subgraph2petgraph(module_id, host);
     <span class="comment">// 1. find each function node
@@ -1343,7 +1373,8 @@
     core_id
 }
 
-<span class="kw">pub fn </span>subgrapg2_core_dyn_MET_ast(
+<span class="attr">#[allow(non_snake_case)]
+</span><span class="kw">pub fn </span>subgrapg2_core_dyn_MET_ast(
     root_node_id: i64,
     host: <span class="kw-2">&amp;</span>str,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;(Vec&lt;FirstOrderODE&gt;, HashMap&lt;String, rsmgclient::Node&gt;), MgError&gt; {
@@ -1490,7 +1521,6 @@
 
     <span class="kw">for </span>expr <span class="kw">in </span>trimmed_expressions_wiring.clone() {
         <span class="kw">let </span><span class="kw-2">mut </span>root_node = Vec::&lt;NodeIndex&gt;::new();
-        <span class="macro">println!</span>(<span class="string">&quot;expr: {:?}&quot;</span>, expr.clone());
         <span class="kw">for </span>node_index <span class="kw">in </span>expr.clone().node_indices() {
             <span class="kw">if </span>expr[node_index].labels == [<span class="string">&quot;Opo&quot;</span>] {
                 root_node.push(node_index);
@@ -1506,19 +1536,20 @@
     <span class="prelude-val">Ok</span>((core_dynamics, metadata_map))
 }
 
-<span class="kw">fn </span>tree_2_MET_ast(
+<span class="attr">#[allow(non_snake_case)]
+</span><span class="kw">fn </span>tree_2_MET_ast(
     graph: petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;,
     root_node: NodeIndex,
 ) -&gt; <span class="prelude-ty">Result</span>&lt;FirstOrderODE, MgError&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>fo_eq_vec = Vec::&lt;FirstOrderODE&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>math_vec = Vec::&lt;MathExpressionTree&gt;::new();
+    <span class="kw">let </span>_math_vec = Vec::&lt;MathExpressionTree&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>lhs = Vec::&lt;Ci&gt;::new();
     <span class="kw">if </span>graph[root_node].labels == [<span class="string">&quot;Opo&quot;</span>] {
         <span class="comment">// we first construct the derivative of the first node
         </span><span class="kw">let </span>deriv_name: <span class="kw-2">&amp;</span>str = <span class="kw-2">&amp;</span>graph[root_node].properties[<span class="string">&quot;name&quot;</span>].to_string();
         <span class="comment">// this will let us know if additional trimming is needed to handle the code implementation of the equations
-        </span><span class="kw">let </span><span class="kw-2">mut </span>step_impl = <span class="bool-val">false</span>;
-        <span class="comment">// This is very bespoke right now
+        // let mut step_impl = false; this will be used for step implementaion for later
+        // This is very bespoke right now
         // this check is for if it&#39;s leibniz notation or not, will need to expand as more cases are creating,
         // currently we convert to leibniz form
         </span><span class="kw">if </span>deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string() == <span class="string">&quot;d&quot; </span>{
@@ -1528,8 +1559,8 @@
             };
             lhs.push(deriv);
         } <span class="kw">else </span>{
-            step_impl = <span class="bool-val">true</span>;
-            <span class="kw">let </span>deriv = Ci {
+            <span class="comment">// step_impl = true; this will be used for step implementaion for later
+            </span><span class="kw">let </span>deriv = Ci {
                 r#type: <span class="prelude-val">Some</span>(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string()))),
             };
@@ -1539,7 +1570,7 @@
             <span class="kw">if </span>graph[node].labels == [<span class="string">&quot;Primitive&quot;</span>] {
                 <span class="kw">let </span>operate = get_operator_MET(graph.clone(), node); <span class="comment">// output -&gt; Operator
                 </span><span class="kw">let </span>rhs_arg = get_args_MET(graph.clone(), node); <span class="comment">// output -&gt; Vec&lt;MathExpressionTree&gt;
-                </span><span class="kw">let </span><span class="kw-2">mut </span>rhs = MathExpressionTree::Cons(operate, rhs_arg); <span class="comment">// MathExpressionTree
+                </span><span class="kw">let </span>rhs = MathExpressionTree::Cons(operate, rhs_arg); <span class="comment">// MathExpressionTree
                 </span><span class="kw">let </span>rhs_flat = flatten_mults(rhs.clone());
                 <span class="kw">let </span>fo_eq = FirstOrderODE {
                     lhs_var: lhs[<span class="number">0</span>].clone(),
@@ -1555,15 +1586,22 @@
     <span class="prelude-val">Ok</span>(fo_eq_vec[<span class="number">0</span>].clone())
 }
 
-<span class="kw">pub fn </span>get_args_MET(
+<span class="attr">#[allow(non_snake_case)]
+</span><span class="kw">pub fn </span>get_args_MET(
     graph: petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;,
     root_node: NodeIndex,
 ) -&gt; Vec&lt;MathExpressionTree&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>args = Vec::&lt;MathExpressionTree&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>arg_order = Vec::&lt;i64&gt;::new();
 
-    <span class="comment">// first need to check for operator
+    <span class="comment">// idea construct a vector of edge labels for the arguments
+    // construct vector of math expressions
+    // reorganize based on edge labels vector
+
+    // construct vecs
     </span><span class="kw">for </span>node <span class="kw">in </span>graph.neighbors_directed(root_node, Outgoing) {
-        <span class="kw">if </span>graph[node].labels == [<span class="string">&quot;Primitive&quot;</span>] {
+        <span class="comment">// first need to check for operator
+        </span><span class="kw">if </span>graph[node].labels == [<span class="string">&quot;Primitive&quot;</span>] {
             <span class="kw">let </span>operate = get_operator_MET(graph.clone(), node); <span class="comment">// output -&gt; Operator
             </span><span class="kw">let </span>rhs_arg = get_args_MET(graph.clone(), node); <span class="comment">// output -&gt; Vec&lt;MathExpressionTree&gt;
             </span><span class="kw">let </span>rhs = MathExpressionTree::Cons(operate, rhs_arg); <span class="comment">// MathExpressionTree
@@ -1573,15 +1611,34 @@
             </span><span class="kw">let </span>temp_string = graph[node].properties[<span class="string">&quot;name&quot;</span>].to_string().clone();
             <span class="kw">let </span>arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].properties
                 [<span class="string">&quot;name&quot;</span>]
-                .to_string()[<span class="number">1</span>..(temp_string.len() - <span class="number">1 </span><span class="kw">as </span>usize)]
+                .to_string()[<span class="number">1</span>..(temp_string.len() - <span class="number">1_usize</span>)]
                 .to_string())));
             args.push(arg2.clone());
         }
+        <span class="comment">// construct order of args
+        </span><span class="kw">if let </span>rsmgclient::Value::Int(x) = graph
+            .edge_weight(graph.find_edge(root_node, node).unwrap())
+            .unwrap()
+            .clone()
+            .properties[<span class="string">&quot;index&quot;</span>]
+        {
+            arg_order.push(x);
+        }
     }
-    args
+
+    <span class="comment">// fix order of args
+    </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_args = args.clone();
+    <span class="kw">for </span>(i, ind) <span class="kw">in </span>arg_order.iter().enumerate() {
+        <span class="comment">// the ind&#39;th element of order_args is the ith element of the unordered args
+        </span><span class="kw">let </span>_temp = std::mem::replace(<span class="kw-2">&amp;mut </span>ordered_args[<span class="kw-2">*</span>ind <span class="kw">as </span>usize], args[i].clone());
+    }
+
+    ordered_args
 }
 
 <span class="comment">// this gets the operator from the node name
+</span><span class="attr">#[allow(non_snake_case)]
+#[allow(clippy::if_same_then_else)]
 </span><span class="kw">pub fn </span>get_operator_MET(
     graph: petgraph::Graph&lt;rsmgclient::Node, rsmgclient::Relationship&gt;,
     root_node: NodeIndex,
@@ -1845,9 +1902,8 @@
     <span class="kw-2">mut </span>arg2: Vec&lt;MathExpression&gt;,
 ) -&gt; Vec&lt;MathExpression&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>arg_dist = Vec::&lt;MathExpression&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>arg2_term_ind = Vec::&lt;i32&gt;::new();
 
-    arg2_term_ind = terms_indicies(arg2.clone());
+    <span class="kw">let </span>arg2_term_ind = terms_indicies(arg2.clone());
 
     <span class="comment">// check if need to swap operator signs
     /* Is this running properly, not removing Mo(Other(&quot;&#39;USub&#39;&quot;)) in I equation in SIR */
@@ -2103,7 +2159,7 @@
                     bypass[<span class="number">0</span>],
                     bypass[<span class="number">1</span>],
                     graph
-                        .edge_weight(graph.find_edge(node_index, bypass[<span class="number">1</span>]).unwrap())
+                        .edge_weight(graph.find_edge(bypass[<span class="number">0</span>], node_index).unwrap())
                         .unwrap()
                         .clone(),
                 );
@@ -2119,7 +2175,7 @@
                         bypass[i],
                         bypass[end_node_idx],
                         graph
-                            .edge_weight(graph.find_edge(node_index, bypass[end_node_idx]).unwrap())
+                            .edge_weight(graph.find_edge(bypass[i], node_index).unwrap())
                             .unwrap()
                             .clone(),
                     );

@@ -4900,6 +4900,11 @@
 <a href="#4900" id="4900">4900</a>
 <a href="#4901" id="4901">4901</a>
 <a href="#4902" id="4902">4902</a>
+<a href="#4903" id="4903">4903</a>
+<a href="#4904" id="4904">4904</a>
+<a href="#4905" id="4905">4905</a>
+<a href="#4906" id="4906">4906</a>
+<a href="#4907" id="4907">4907</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -4924,7 +4929,7 @@ There being a second function call of the same function which contains an expres
 /* 3/20/23
    - &#39;+&#39; at the top level main are getting duplicate wires to the top level literals
 */
-
+</span><span class="attr">#[allow(clippy::all)] </span><span class="comment">// this is temporary until I refactor this code
 </span><span class="kw">use </span><span class="kw">crate</span>::FunctionType;
 <span class="kw">use crate</span>::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
 <span class="kw">use crate</span>::{FunctionNet, GrometBox};
@@ -5578,87 +5583,89 @@ There being a second function call of the same function which contains an expres
         <span class="comment">// now to construct the nodes inside the function, currently supported Literals and Primitives
         // first include an Expression for increased depth
         </span><span class="kw">let </span><span class="kw-2">mut </span>box_counter: u8 = <span class="number">1</span>;
-        <span class="kw">for </span>sboxf <span class="kw">in </span>eboxf.bf.as_ref().unwrap().iter() {
-            <span class="kw">match </span>sboxf.function_type {
-                FunctionType::Predicate =&gt; {
-                    (nodes, edges, start, meta_nodes) = create_att_predicate(
-                        <span class="kw-2">&amp;</span>gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
+        <span class="kw">if </span>eboxf.bf.is_some() {
+            <span class="kw">for </span>sboxf <span class="kw">in </span>eboxf.bf.as_ref().unwrap().iter() {
+                <span class="kw">match </span>sboxf.function_type {
+                    FunctionType::Predicate =&gt; {
+                        (nodes, edges, start, meta_nodes) = create_att_predicate(
+                            <span class="kw-2">&amp;</span>gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Expression =&gt; {
+                        (nodes, edges, start, meta_nodes) = create_att_expression(
+                            <span class="kw-2">&amp;</span>gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Literal =&gt; {
+                        (nodes, edges, meta_nodes) = create_att_literal(
+                            <span class="kw-2">&amp;</span>gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Primitive =&gt; {
+                        (nodes, edges, meta_nodes) = create_att_primitive(
+                            <span class="kw-2">&amp;</span>gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Abstract =&gt; {
+                        (nodes, edges, meta_nodes) = create_att_primitive(
+                            <span class="kw-2">&amp;</span>gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    <span class="kw">_ </span>=&gt; {}
                 }
-                FunctionType::Expression =&gt; {
-                    (nodes, edges, start, meta_nodes) = create_att_expression(
-                        <span class="kw-2">&amp;</span>gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                FunctionType::Literal =&gt; {
-                    (nodes, edges, meta_nodes) = create_att_literal(
-                        <span class="kw-2">&amp;</span>gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                FunctionType::Primitive =&gt; {
-                    (nodes, edges, meta_nodes) = create_att_primitive(
-                        <span class="kw-2">&amp;</span>gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                FunctionType::Abstract =&gt; {
-                    (nodes, edges, meta_nodes) = create_att_primitive(
-                        <span class="kw-2">&amp;</span>gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                <span class="kw">_ </span>=&gt; {}
+                box_counter += <span class="number">1</span>;
+                start += <span class="number">1</span>;
             }
-            box_counter += <span class="number">1</span>;
-            start += <span class="number">1</span>;
         }
 
         <span class="comment">// Now we perform the internal wiring of this branch
@@ -6781,7 +6788,6 @@ There being a second function call of the same function which contains an expres
             }
             (nodes, edges, start, meta_nodes)
         }
-        <span class="kw">_ </span>=&gt; (nodes, edges, start, meta_nodes),
     }
 }
 
@@ -8745,6 +8751,7 @@ There being a second function call of the same function which contains an expres
 ) -&gt; Vec&lt;Edge&gt; {
     <span class="comment">// iterate through all wires of type
     </span><span class="kw">for </span>wire <span class="kw">in </span>eboxf.wfopi.unwrap().iter() {
+        <span class="kw">let </span><span class="kw-2">mut </span>prop = <span class="prelude-val">None</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>wfopi_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
         <span class="comment">// find the src node
         </span><span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
@@ -8757,10 +8764,11 @@ There being a second function call of the same function which contains an expres
                         <span class="comment">// exclude opi&#39;s
                         </span><span class="kw">if </span>node.n_type != <span class="string">&quot;Opi&quot; </span>{
                             <span class="comment">// iterate through port to check for src
-                            </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
+                            </span><span class="kw">for </span>(i, p) <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter().enumerate() {
                                 <span class="comment">// push the src first, being pif
                                 </span><span class="kw">if </span>(wire.src <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
                                     wfopi_src_tgt.push(node.node_id.clone());
+                                    prop = <span class="prelude-val">Some</span>(i <span class="kw">as </span>u32);
                                 }
                             }
                         }
@@ -8778,7 +8786,7 @@ There being a second function call of the same function which contains an expres
                     </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opi&quot; </span>{
                         <span class="comment">// iterate through port to check for tgt
                         </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
-                            <span class="comment">// push the src first, being pif
+                            <span class="comment">// push the tgt now, being opi
                             </span><span class="kw">if </span>(wire.tgt <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
                                 wfopi_src_tgt.push(node.node_id.clone());
                             }
@@ -8792,7 +8800,7 @@ There being a second function call of the same function which contains an expres
                 src: wfopi_src_tgt[<span class="number">0</span>].clone(),
                 tgt: wfopi_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                prop,
             };
             edges.push(e6);
         }
@@ -8876,6 +8884,7 @@ There being a second function call of the same function which contains an expres
     <span class="comment">// iterate through all wires of type
     </span><span class="kw">for </span>wire <span class="kw">in </span>eboxf.wff.unwrap().iter() {
         <span class="kw">let </span><span class="kw-2">mut </span>wff_src_tgt: Vec&lt;String&gt; = <span class="macro">vec!</span>[];
+        <span class="kw">let </span><span class="kw-2">mut </span>prop = <span class="prelude-val">None</span>;
 
         <span class="kw">let </span>src_idx = wire.src; <span class="comment">// port index
 
@@ -8906,10 +8915,11 @@ There being a second function call of the same function which contains an expres
                             <span class="comment">// exclude opo&#39;s
                             </span><span class="kw">if </span>node.n_type != <span class="string">&quot;Opi&quot; </span>{
                                 <span class="comment">// iterate through port to check for src
-                                </span><span class="kw">for </span>p <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter() {
+                                </span><span class="kw">for </span>(i, p) <span class="kw">in </span>node.in_indx.as_ref().unwrap().iter().enumerate() {
                                     <span class="comment">// push the tgt
                                     </span><span class="kw">if </span>(wire.src <span class="kw">as </span>u32) == <span class="kw-2">*</span>p {
                                         wff_src_tgt.push(node.node_id.clone());
+                                        prop = <span class="prelude-val">Some</span>(i <span class="kw">as </span>u32);
                                     }
                                 }
                             }
@@ -8948,7 +8958,7 @@ There being a second function call of the same function which contains an expres
                 src: wff_src_tgt[<span class="number">0</span>].clone(),
                 tgt: wff_src_tgt[<span class="number">1</span>].clone(),
                 e_type: String::from(<span class="string">&quot;Wire&quot;</span>),
-                prop: <span class="prelude-val">None</span>,
+                prop,
             };
             edges.push(e8);
         }

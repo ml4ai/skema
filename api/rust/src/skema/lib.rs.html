@@ -767,7 +767,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;Vec&lt;Metadata&gt;&gt;,
+    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
     <span class="comment">// these additions are I guess how imports are being handled...
     </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -789,7 +789,7 @@
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>gromet_type: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;Vec&lt;Metadata&gt;&gt;,
+    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;u32&gt;,
 }
 
 <span class="attr">#[derive(Deserialize, Serialize, Clone, Debug, ToSchema, JsonSchema)]
@@ -994,24 +994,24 @@
 <span class="comment">// Tests
 </span><span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use super</span>::<span class="kw-2">*</span>;
-    <span class="kw">use </span>std::fs;
+    <span class="comment">//use super::*;
+    //use std::fs;
 
-    <span class="kw">fn </span>test_roundtrip_serialization(path_example: <span class="kw-2">&amp;</span>str) {
-        <span class="kw">let </span><span class="kw-2">mut </span>file_contents = fs::read_to_string(path_example).expect(<span class="string">&quot;Unable to read file&quot;</span>);
+    /*fn test_roundtrip_serialization(path_example: &amp;str) {
+        let mut file_contents = fs::read_to_string(path_example).expect(&quot;Unable to read file&quot;);
 
-        <span class="kw">let </span>res: ModuleCollection = serde_json::from_str(<span class="kw-2">&amp;</span>file_contents).expect(<span class="string">&quot;Unable to parse&quot;</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>res_serialized = serde_json::to_string(<span class="kw-2">&amp;</span>res).unwrap();
+        let res: ModuleCollection = serde_json::from_str(&amp;file_contents).expect(&quot;Unable to parse&quot;);
+        let mut res_serialized = serde_json::to_string(&amp;res).unwrap();
 
-        <span class="comment">// processing the imported data
-        </span>file_contents = file_contents.replace([<span class="string">&#39;\n&#39;</span>, <span class="string">&#39; &#39;</span>], <span class="string">&quot;&quot;</span>);
+        // processing the imported data
+        file_contents = file_contents.replace([&#39;\n&#39;, &#39; &#39;], &quot;&quot;);
         res_serialized = res_serialized
-            .replace(<span class="string">&quot;\\\\&quot;</span>, <span class="string">&quot;\\&quot;</span>) <span class="comment">// temp fix for the extra \\&#39;s
-            </span>.replace([<span class="string">&#39;\n&#39;</span>, <span class="string">&#39; &#39;</span>], <span class="string">&quot;&quot;</span>);
+            .replace(&quot;\\\\&quot;, &quot;\\&quot;) // temp fix for the extra \\&#39;s
+            .replace([&#39;\n&#39;, &#39; &#39;], &quot;&quot;);
 
-        <span class="macro">assert_eq!</span>(res_serialized, file_contents);
-    }
-    <span class="comment">/*
+        assert_eq!(res_serialized, file_contents);
+    }*/
+    /*
         #[test]
         fn de_ser_cond1() {
             test_roundtrip_serialization(

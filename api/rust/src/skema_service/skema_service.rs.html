@@ -164,11 +164,12 @@
 <a href="#164" id="164">164</a>
 <a href="#165" id="165">165</a>
 <a href="#166" id="166">166</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, web::Data, App, http::header::ContentType, HttpResponse, HttpServer};
+<a href="#167" id="167">167</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
+<span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>skema::config::Config;
 <span class="kw">use </span>skema::services::{comment_extraction, gromet};
 <span class="kw">use </span>std::env;
-<span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>utoipa::OpenApi;
 <span class="kw">use </span>utoipa_swagger_ui::SwaggerUi;
 
@@ -198,7 +199,6 @@
     HttpResponse::Ok().body(<span class="string">&quot;The SKEMA Rust web services are running.&quot;</span>)
 }
 
-
 <span class="doccomment">/// This endpoint can be used to check the version of the service.
 </span><span class="attr">#[utoipa::path(
     responses(
@@ -208,7 +208,9 @@
 #[get(<span class="string">&quot;/version&quot;</span>)]
 </span><span class="kw">pub async fn </span>version() -&gt; HttpResponse {
     <span class="kw">let </span>end_version = env::var(<span class="string">&quot;APP_VERSION&quot;</span>).unwrap_or(<span class="string">&quot;?????&quot;</span>.to_string());
-    HttpResponse::Ok().content_type(ContentType::plaintext()).body(end_version)
+    HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(end_version)
 }
 
 <span class="attr">#[actix_web::main]

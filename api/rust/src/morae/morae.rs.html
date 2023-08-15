@@ -105,25 +105,19 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
-<a href="#108" id="108">108</a>
-<a href="#109" id="109">109</a>
-<a href="#110" id="110">110</a>
-<a href="#111" id="111">111</a>
-<a href="#112" id="112">112</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
-<span class="kw">use </span>mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 
-<span class="attr">#[cfg(test)]
-</span><span class="kw">use </span>std::fs;
+
+
 
 <span class="comment">// new imports
 </span><span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
 
 <span class="kw">use </span>skema::model_extraction::{
-    module_id2mathml_MET_ast, module_id2mathml_ast, subgraph2_core_dyn_ast,
+    module_id2mathml_MET_ast, subgraph2_core_dyn_ast,
 };
 
 <span class="attr">#[derive(Parser, Debug)]
@@ -145,7 +139,7 @@
     */
     </span><span class="kw">let </span>new_args = Cli::parse();
 
-    <span class="kw">let </span><span class="kw-2">mut </span>module_id = <span class="number">2233</span>;
+    <span class="kw">let </span><span class="kw-2">mut </span>module_id = <span class="number">883</span>;
     <span class="comment">// now to prototype an algorithm to find the function that contains the core dynamics
 
     </span><span class="kw">if </span>new_args.arg == <span class="kw-2">*</span><span class="string">&quot;auto&quot; </span>{
@@ -155,28 +149,24 @@
 
         <span class="kw">let </span>host = <span class="string">&quot;localhost&quot;</span>;
 
-        <span class="comment">//let math_content = module_id2mathml_MET_ast(module_id, host);
+        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(module_id, host);
 
-        </span><span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/mml_list3.txt&quot;</span>;
+        <span class="comment">//let input_src = &quot;../../data/mml2pn_inputs/testing_eqns/mml_list3.txt&quot;;
 
-        <span class="comment">// This does get a panic with a message, so need to figure out how to forward it
+        // This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
 
-        </span><span class="kw">let </span>odes = get_FirstOrderODE_vec_from_file(input_src.clone());
+        //let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
-        <span class="comment">//println!(&quot;\nmath_content: {:?}&quot;, math_content);
-        </span><span class="macro">println!</span>(<span class="string">&quot;\nmathml_ast: {:?}&quot;</span>, odes);
+        //println!(&quot;\nmath_content: {:?}&quot;, math_content);
+        //println!(&quot;\nmathml_ast: {:?}&quot;, odes);
 
-        <span class="macro">println!</span>(
-            <span class="string">&quot;\nAMR from mathml: {}\n&quot;</span>,
-            serde_json::to_string(<span class="kw-2">&amp;</span>PetriNet::from(odes)).unwrap()
-        );
-        <span class="comment">//println!(&quot;\nAMR from code: {:?}&quot;, PetriNet::from(math_content));
         /*println!(
-            &quot;\nAMR from mathml: {:?}\n&quot;,
-            PetriNet::from(ACSet::from(mathml_ast))
+            &quot;\nAMR from mathml: {}\n&quot;,
+            serde_json::to_string(&amp;PetriNet::from(odes)).unwrap()
         );*/
-    </span>}
+        </span><span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
+    }
     <span class="comment">// This is the graph id for the top level function for the core dynamics for our test case.
     </span><span class="kw">else if </span>new_args.arg == <span class="kw-2">*</span><span class="string">&quot;manual&quot; </span>{
         <span class="comment">// still need to grab the module id
@@ -209,17 +199,17 @@
     }
 }
 
-<span class="attr">#[test]
-</span><span class="kw">fn </span>test_lotka_volterra_RegNet() {
-    <span class="kw">let </span>mathml_asts =
-        get_mathml_asts_from_file(<span class="string">&quot;../../../data/mml2pn_inputs/lotka_volterra/mml_list.txt&quot;</span>);
-    <span class="kw">let </span>regnet = RegNet::from(mathml_asts);
+<span class="comment">/*#[test]
+fn test_lotka_volterra_RegNet() {
+    let mathml_asts =
+        get_mathml_asts_from_file(&quot;../../../data/mml2pn_inputs/lotka_volterra/mml_list.txt&quot;);
+    let regnet = RegNet::from(mathml_asts);
 
-    <span class="kw">let </span>file_contents =
-        fs::read_to_string(<span class="string">&quot;../../../skema/skema-rs/mathml/tests/lotka_volterra_regnet.json&quot;</span>)
-            .expect(<span class="string">&quot;Unable to read file&quot;</span>);
-    <span class="kw">let </span>regnet_output: RegNet = serde_json::from_str(<span class="kw-2">&amp;</span>file_contents).unwrap();
+    let file_contents =
+        fs::read_to_string(&quot;../../../skema/skema-rs/mathml/tests/lotka_volterra_regnet.json&quot;)
+            .expect(&quot;Unable to read file&quot;);
+    let regnet_output: RegNet = serde_json::from_str(&amp;file_contents).unwrap();
 
-    <span class="macro">assert_eq!</span>(regnet_output, regnet);
-}
-</code></pre></div></section></main></body></html>
+    assert_eq!(regnet_output, regnet);
+}*/
+</span></code></pre></div></section></main></body></html>

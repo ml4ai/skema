@@ -690,37 +690,6 @@
 <a href="#690" id="690">690</a>
 <a href="#691" id="691">691</a>
 <a href="#692" id="692">692</a>
-<a href="#693" id="693">693</a>
-<a href="#694" id="694">694</a>
-<a href="#695" id="695">695</a>
-<a href="#696" id="696">696</a>
-<a href="#697" id="697">697</a>
-<a href="#698" id="698">698</a>
-<a href="#699" id="699">699</a>
-<a href="#700" id="700">700</a>
-<a href="#701" id="701">701</a>
-<a href="#702" id="702">702</a>
-<a href="#703" id="703">703</a>
-<a href="#704" id="704">704</a>
-<a href="#705" id="705">705</a>
-<a href="#706" id="706">706</a>
-<a href="#707" id="707">707</a>
-<a href="#708" id="708">708</a>
-<a href="#709" id="709">709</a>
-<a href="#710" id="710">710</a>
-<a href="#711" id="711">711</a>
-<a href="#712" id="712">712</a>
-<a href="#713" id="713">713</a>
-<a href="#714" id="714">714</a>
-<a href="#715" id="715">715</a>
-<a href="#716" id="716">716</a>
-<a href="#717" id="717">717</a>
-<a href="#718" id="718">718</a>
-<a href="#719" id="719">719</a>
-<a href="#720" id="720">720</a>
-<a href="#721" id="721">721</a>
-<a href="#722" id="722">722</a>
-<a href="#723" id="723">723</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::operator::Operator::{Add, Divide, Multiply, Subtract};
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Atom;
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Cons;
@@ -746,7 +715,6 @@
     branch::alt,
     bytes::complete::tag,
     combinator::map,
-    error::Error,
     multi::{many0, many1},
     sequence::{delimited, tuple},
 };
@@ -846,6 +814,7 @@
 <span class="comment">//--------------------------------------
 // Methods for extraction of PN AMR from ODE&#39;s
 //--------------------------------------
+</span><span class="attr">#[allow(non_snake_case)]
 </span><span class="kw">pub fn </span>get_FirstOrderODE_vec_from_file(filepath: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;FirstOrderODE&gt; {
     <span class="kw">let </span>f = File::open(filepath).unwrap();
     <span class="kw">let </span>lines = BufReader::new(f).lines();
@@ -860,16 +829,7 @@
             </span><span class="kw">let </span><span class="kw-2">mut </span>ode = line
                 .parse::&lt;FirstOrderODE&gt;()
                 .unwrap_or_else(|<span class="kw">_</span>| <span class="macro">panic!</span>(<span class="string">&quot;Unable to parse line {}!&quot;</span>, line));
-            <span class="macro">println!</span>(
-                <span class="string">&quot;ode_line rhs string below: {:?}\n&quot;</span>,
-                ode.rhs.to_string().clone()
-            );
             ode.rhs = flatten_mults(ode.rhs.clone());
-            <span class="macro">println!</span>(
-                <span class="string">&quot;ode_line rhs string after: {:?}\n&quot;</span>,
-                ode.rhs.to_string().clone()
-            );
-            <span class="macro">println!</span>(<span class="string">&quot;ode_line rhs object: {:?}\n&quot;</span>, ode.rhs.clone());
             ode_vec.push(ode);
         }
     }
@@ -886,7 +846,8 @@
     </span><span class="kw">pub </span>parameters: Vec&lt;String&gt;, <span class="comment">// list of parameters in term
 </span>}
 
-<span class="comment">// this function takes in one ode equations and returns a vector of the terms in it
+<span class="comment">// refactored
+// this function takes in one ode equations and returns a vector of the terms in it
 </span><span class="kw">pub fn </span>get_terms(sys_states: Vec&lt;String&gt;, ode: FirstOrderODE) -&gt; Vec&lt;PnTerm&gt; {
     <span class="kw">let </span><span class="kw-2">mut </span>terms = Vec::&lt;PnTerm&gt;::new();
     <span class="kw">let </span>_exp_states = Vec::&lt;String&gt;::new();
@@ -895,319 +856,37 @@
     <span class="kw">let </span>dyn_state = ode.lhs_var.to_string();
 
     <span class="kw">match </span>ode.rhs {
-        Cons(<span class="kw-2">ref </span>x, <span class="kw-2">ref </span>y) =&gt; {
-            <span class="kw">match </span><span class="kw-2">&amp;</span>x {
-                Multiply =&gt; {
-                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y.clone());
-                    temp_term.dyn_state = dyn_state;
-                    terms.push(temp_term.clone());
-                    <span class="macro">println!</span>(<span class="string">&quot;mult temp_term: {:?}\n&quot;</span>, temp_term)
-                }
-                Subtract =&gt; {
-                    <span class="comment">/* found multiple terms */
-                    </span><span class="kw">if </span>y.len() == <span class="number">1 </span>{
-                        <span class="comment">// unary sub, so much be mult inside
-                        </span><span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">0</span>] {
-                            Cons(_x1, <span class="kw-2">ref </span>y1) =&gt; {
-                                <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y1.clone());
-                                temp_term.dyn_state = dyn_state;
-                                <span class="kw">if </span>temp_term.polarity {
-                                    temp_term.polarity = <span class="bool-val">false</span>;
-                                } <span class="kw">else </span>{
-                                    temp_term.polarity = <span class="bool-val">true</span>;
-                                }
-                                terms.push(temp_term.clone());
-                                <span class="macro">println!</span>(<span class="string">&quot;Unary Sub temp_term: {:?}\n&quot;</span>, temp_term)
-                            }
-                            Atom(_x1) =&gt; {
-                                <span class="macro">println!</span>(<span class="string">&quot;Not valid term in PN&quot;</span>)
-                            }
-                        }
-                    } <span class="kw">else </span>{
-                        <span class="comment">/* this is the same as Add, but with a polarity swap on the second term */
-                        /* this actually need to support an entire binary sub inside it again :( */
-                        </span><span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">0</span>] {
-                            Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>x1 {
-                                Multiply =&gt; {
-                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                        get_term_mult(sys_states.clone(), y1.clone());
-                                    temp_term.dyn_state = dyn_state.clone();
-                                    terms.push(temp_term.clone());
-                                    <span class="macro">println!</span>(<span class="string">&quot;binary sub1 mult temp_term: {:?}\n&quot;</span>, temp_term)
-                                }
-                                Subtract =&gt; {
-                                    <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
-                                        Cons(x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                            <span class="kw">if </span>y2.len() == <span class="number">1 </span>{
-                                                <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                                    get_term_mult(sys_states.clone(), y2.clone());
-                                                temp_term.dyn_state = dyn_state.clone();
-                                                <span class="kw">if </span>temp_term.polarity {
-                                                    temp_term.polarity = <span class="bool-val">false</span>;
-                                                } <span class="kw">else </span>{
-                                                    temp_term.polarity = <span class="bool-val">true</span>;
-                                                }
-                                                terms.push(temp_term.clone());
-                                                <span class="macro">println!</span>(
-                                                    <span class="string">&quot;binary sub1 unarysub temp_term: {:?}\n&quot;</span>,
-                                                    temp_term
-                                                )
-                                            } <span class="kw">else </span>{
-                                                <span class="kw">match </span><span class="kw-2">&amp;</span>x2 {
-                                                    Subtract =&gt; {
-                                                        <span class="macro">println!</span>(<span class="string">&quot;to do&quot;</span>)
-                                                    }
-                                                    Add =&gt; {
-                                                        <span class="macro">println!</span>(<span class="string">&quot;to do&quot;</span>)
-                                                    }
-                                                    Divide =&gt; {
-                                                        <span class="macro">println!</span>(<span class="string">&quot;to do&quot;</span>)
-                                                    }
-                                                    Multiply =&gt; {
-                                                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(
-                                                            sys_states.clone(),
-                                                            y2.clone(),
-                                                        );
-                                                        temp_term.dyn_state = dyn_state.clone();
-                                                        terms.push(temp_term.clone());
-                                                        <span class="macro">println!</span>(<span class="string">&quot;binary sub1 binary sub1 mult temp_term: {:?}\n&quot;</span>, temp_term)
-                                                    }
-                                                    <span class="kw">_ </span>=&gt; <span class="macro">println!</span>(<span class="string">&quot;Not supported equation type&quot;</span>),
-                                                }
-                                            }
-                                        }
-                                        <span class="kw">_ </span>=&gt; {
-                                            <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                                        }
-                                    }
-                                    <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">1</span>] {
-                                        Cons(x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                            <span class="kw">if </span>y2.len() == <span class="number">1 </span>{
-                                                <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                                    get_term_mult(sys_states.clone(), y2.clone());
-                                                temp_term.dyn_state = dyn_state.clone();
-                                                terms.push(temp_term.clone());
-                                                <span class="macro">println!</span>(
-                                                    <span class="string">&quot;binary sub1 unarysub temp_term: {:?}\n&quot;</span>,
-                                                    temp_term
-                                                )
-                                            } <span class="kw">else </span>{
-                                                <span class="kw">match </span><span class="kw-2">&amp;</span>x2 {
-                                                    Subtract =&gt; {
-                                                        <span class="macro">println!</span>(<span class="string">&quot;to do&quot;</span>)
-                                                    }
-                                                    Add =&gt; {
-                                                        <span class="macro">println!</span>(<span class="string">&quot;to do&quot;</span>)
-                                                    }
-                                                    Divide =&gt; {
-                                                        <span class="macro">println!</span>(<span class="string">&quot;to do&quot;</span>)
-                                                    }
-                                                    Multiply =&gt; {
-                                                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(
-                                                            sys_states.clone(),
-                                                            y2.clone(),
-                                                        );
-                                                        temp_term.dyn_state = dyn_state.clone();
-                                                        <span class="kw">if </span>temp_term.polarity {
-                                                            temp_term.polarity = <span class="bool-val">false</span>;
-                                                        } <span class="kw">else </span>{
-                                                            temp_term.polarity = <span class="bool-val">true</span>;
-                                                        }
-                                                        terms.push(temp_term.clone());
-                                                        <span class="macro">println!</span>(<span class="string">&quot;binary sub1 binary sub2 mult temp_term: {:?}\n&quot;</span>, temp_term)
-                                                    }
-                                                    <span class="kw">_ </span>=&gt; <span class="macro">println!</span>(<span class="string">&quot;Not supported equation type&quot;</span>),
-                                                }
-                                            }
-                                        }
-                                        <span class="kw">_ </span>=&gt; {
-                                            <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                                        }
-                                    }
-                                }
-                                <span class="comment">// new edge case to handle
-                                </span>Divide =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
-                                    Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                            get_term_mult(sys_states.clone(), y2.clone());
-                                        temp_term.dyn_state = dyn_state.clone();
-                                        temp_term.parameters.push(y1[<span class="number">1</span>].to_string());
-                                        temp_term.expression =
-                                            MathExpressionTree::Cons(Divide, y1.clone()).to_cmml();
-                                        terms.push(temp_term.clone());
-                                        <span class="macro">println!</span>(
-                                            <span class="string">&quot;binary sub1 div temp_term: {:?}\n&quot;</span>,
-                                            temp_term.clone()
-                                        )
-                                    }
-                                    <span class="kw">_ </span>=&gt; {
-                                        <span class="macro">println!</span>(<span class="string">&quot;dont support this&quot;</span>)
-                                    }
-                                },
-                                <span class="kw">_ </span>=&gt; {
-                                    <span class="macro">println!</span>(<span class="string">&quot;Error unsupported operation&quot;</span>)
-                                }
-                            },
-                            Atom(_x1) =&gt; {
-                                <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                            }
-                        }
-                        <span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">1</span>] {
-                            Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span>x1 {
-                                Multiply =&gt; {
-                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y1.clone());
-                                    temp_term.dyn_state = dyn_state;
-                                    <span class="kw">if </span>temp_term.polarity {
-                                        temp_term.polarity = <span class="bool-val">false</span>;
-                                    } <span class="kw">else </span>{
-                                        temp_term.polarity = <span class="bool-val">true</span>;
-                                    }
-                                    terms.push(temp_term.clone());
-                                    <span class="macro">println!</span>(<span class="string">&quot;binary sub2 mult temp_term: {:?}\n&quot;</span>, temp_term)
-                                }
-                                Subtract =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
-                                    Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y2.clone());
-                                        temp_term.dyn_state = dyn_state;
-                                        terms.push(temp_term.clone());
-                                        <span class="macro">println!</span>(
-                                            <span class="string">&quot;binary sub2 unarysub temp_term: {:?}\n&quot;</span>,
-                                            temp_term
-                                        )
-                                    }
-                                    <span class="kw">_ </span>=&gt; {
-                                        <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                                    }
-                                },
-                                <span class="kw">_ </span>=&gt; {
-                                    <span class="macro">println!</span>(<span class="string">&quot;Error unsupported operation&quot;</span>)
-                                }
-                            },
-                            Atom(_x1) =&gt; {
-                                <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                            }
-                        }
-                    }
-                } <span class="comment">// unary or binary
-                </span>Add =&gt; {
-                    <span class="comment">/* found multiple terms */
-                    </span><span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">0</span>] {
-                        Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span>x1 {
-                            Multiply =&gt; {
-                                <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states.clone(), y1.clone());
-                                temp_term.dyn_state = dyn_state.clone();
-                                terms.push(temp_term);
-                            }
-                            Subtract =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
-                                Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term =
-                                        get_term_mult(sys_states.clone(), y2.clone());
-                                    temp_term.dyn_state = dyn_state.clone();
-                                    <span class="kw">if </span>temp_term.polarity {
-                                        temp_term.polarity = <span class="bool-val">false</span>;
-                                    } <span class="kw">else </span>{
-                                        temp_term.polarity = <span class="bool-val">true</span>;
-                                    }
-                                    terms.push(temp_term);
-                                }
-                                <span class="kw">_ </span>=&gt; {
-                                    <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                                }
-                            },
-                            <span class="kw">_ </span>=&gt; {
-                                <span class="macro">println!</span>(<span class="string">&quot;Error unsupported operation&quot;</span>)
-                            }
-                        },
-                        Atom(_x1) =&gt; {
-                            <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                        }
-                    }
-                    <span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">1</span>] {
-                        Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span>x1 {
-                            Multiply =&gt; {
-                                <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y1.clone());
-                                temp_term.dyn_state = dyn_state;
-                                terms.push(temp_term);
-                            }
-                            Subtract =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
-                                Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y2.clone());
-                                    temp_term.dyn_state = dyn_state;
-                                    <span class="kw">if </span>temp_term.polarity {
-                                        temp_term.polarity = <span class="bool-val">false</span>;
-                                    } <span class="kw">else </span>{
-                                        temp_term.polarity = <span class="bool-val">true</span>;
-                                    }
-                                    terms.push(temp_term);
-                                }
-                                <span class="kw">_ </span>=&gt; {
-                                    <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                                }
-                            },
-                            <span class="kw">_ </span>=&gt; {
-                                <span class="macro">println!</span>(<span class="string">&quot;Error unsupported operation&quot;</span>)
-                            }
-                        },
-                        Atom(_x1) =&gt; {
-                            <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
-                        }
-                    }
-                }
-                Divide =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">0</span>] {
-                    Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>x1 {
-                        Multiply =&gt; {
-                            <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y1.clone());
-                            temp_term.dyn_state = dyn_state;
-                            temp_term.parameters.push(y[<span class="number">1</span>].to_string());
-                            temp_term.expression =
-                                MathExpressionTree::Cons(Divide, y.clone()).to_cmml();
-                            terms.push(temp_term.clone())
-                        }
-                        Subtract =&gt; {
-                            <span class="comment">/* now to support unary subtract as numerator y[0] */
-                            </span><span class="kw">match </span><span class="kw-2">&amp;</span>y1[<span class="number">0</span>] {
-                                Cons(_x2, <span class="kw-2">ref </span>y2) =&gt; {
-                                    <span class="comment">/* unary to mult */
-                                    /* This has to be a unary sub into a mult (unless really stupid equation) */
-                                    </span><span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y2.clone());
-                                    <span class="comment">// swap polarity of temp term
-                                    </span><span class="kw">if </span>temp_term.polarity {
-                                        temp_term.polarity = <span class="bool-val">false</span>;
-                                    } <span class="kw">else </span>{
-                                        temp_term.polarity = <span class="bool-val">true</span>;
-                                    }
-                                    temp_term.parameters.push(y[<span class="number">1</span>].to_string());
-                                    temp_term.expression =
-                                        MathExpressionTree::Cons(Divide, y.clone()).to_cmml();
-                                    terms.push(temp_term.clone())
-                                }
-                                Atom(_x2) =&gt; {
-                                    <span class="comment">/* This is only the case of a parameter being 1/param and the top being a
-                                    negative of the state variable, since no mult */
-                                    </span><span class="kw">let </span>temp_term = PnTerm {
-                                        dyn_state,
-                                        exp_states: [y1[<span class="number">0</span>].to_string()].to_vec(),
-                                        polarity: <span class="bool-val">false</span>,
-                                        expression: ode.rhs.clone().to_cmml(),
-                                        parameters: [y[<span class="number">1</span>].to_string()].to_vec(),
-                                    };
-                                    terms.push(temp_term)
-                                }
-                            }
-                        }
-                        <span class="kw">_ </span>=&gt; {
-                            <span class="macro">println!</span>(<span class="string">&quot;Error expected only Multiply or Unary subtract for numerator&quot;</span>)
-                        }
-                    },
-                    Atom(_x1) =&gt; {
-                        <span class="macro">println!</span>(<span class="string">&quot;Error, expected numerator terms to be a Multiplication&quot;</span>)
-                    }
-                }, <span class="comment">// divide seem to be in front of mult always, will make that assumption.
-                </span><span class="kw">_ </span>=&gt; {
-                    <span class="macro">println!</span>(<span class="string">&quot;Warning unsupported operator on expression&quot;</span>)
+        Cons(<span class="kw-2">ref </span>x, <span class="kw-2">ref </span>y) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>x {
+            Multiply =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y.clone());
+                temp_term.dyn_state = dyn_state;
+                terms.push(temp_term);
+            }
+            Divide =&gt; {
+                <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_div(sys_states, y.clone());
+                temp_term.dyn_state = dyn_state;
+                terms.push(temp_term);
+            }
+            Add =&gt; {
+                <span class="kw">let </span>temp_terms = get_terms_add(sys_states, y.clone());
+                <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>t_term = term.clone();
+                    t_term.dyn_state = dyn_state.clone();
+                    terms.push(t_term.clone());
                 }
             }
-        }
+            Subtract =&gt; {
+                <span class="kw">let </span>temp_terms = get_terms_sub(sys_states, y.clone());
+                <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                    <span class="kw">let </span><span class="kw-2">mut </span>t_term = term.clone();
+                    t_term.dyn_state = dyn_state.clone();
+                    terms.push(t_term.clone());
+                }
+            }
+            <span class="kw">_ </span>=&gt; {
+                <span class="macro">println!</span>(<span class="string">&quot;Warning unsupported case&quot;</span>);
+            }
+        },
         Atom(_x) =&gt; {
             <span class="macro">println!</span>(<span class="string">&quot;Warning unexpected RHS structure&quot;</span>)
         }
@@ -1215,16 +894,204 @@
     terms
 }
 
-<span class="comment">// this takes in the arguments of a multiply term and returns the PnTerm for it
-// we do expect at most only one unary subtraction
-</span><span class="kw">pub fn </span>get_term_mult(sys_states: Vec&lt;String&gt;, eq: Vec&lt;MathExpressionTree&gt;) -&gt; PnTerm {
-    <span class="kw">let </span>_terms = Vec::&lt;PnTerm&gt;::new();
+<span class="comment">// this takes in the arguments of a closer to root level add operator and returns the PnTerms for it&#39;s subgraphs
+// we do expect at most multiplication, subtraction, division, or addition
+</span><span class="kw">pub fn </span>get_terms_add(sys_states: Vec&lt;String&gt;, eq: Vec&lt;MathExpressionTree&gt;) -&gt; Vec&lt;PnTerm&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>terms = Vec::&lt;PnTerm&gt;::new();
+
+    <span class="comment">/* found multiple terms */
+
+    </span><span class="kw">for </span>arg <span class="kw">in </span>eq.iter() {
+        <span class="kw">match </span><span class="kw-2">&amp;</span>arg {
+            Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span>x1 {
+                Multiply =&gt; {
+                    <span class="kw">let </span>temp_term = get_term_mult(sys_states.clone(), y1.clone());
+                    terms.push(temp_term);
+                }
+                Divide =&gt; {
+                    <span class="kw">let </span>temp_term = get_term_div(sys_states.clone(), y1.clone());
+                    terms.push(temp_term);
+                }
+                Subtract =&gt; {
+                    <span class="kw">let </span>temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                    <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                        terms.push(term.clone());
+                    }
+                }
+                Add =&gt; {
+                    <span class="kw">let </span>temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                    <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                        terms.push(term.clone());
+                    }
+                }
+                <span class="kw">_ </span>=&gt; {
+                    <span class="macro">println!</span>(<span class="string">&quot;Error unsupported operation&quot;</span>)
+                }
+            },
+            Atom(_x1) =&gt; {
+                <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
+            }
+        }
+    }
+    terms
+}
+
+<span class="comment">// this takes in the arguments of a closer to root level sub operator and returns the PnTerms for it&#39;s subgraphs
+// we do expect at most multiplication, subtraction, division, or addition
+</span><span class="kw">pub fn </span>get_terms_sub(sys_states: Vec&lt;String&gt;, eq: Vec&lt;MathExpressionTree&gt;) -&gt; Vec&lt;PnTerm&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>terms = Vec::&lt;PnTerm&gt;::new();
+
+    <span class="comment">/* found multiple terms */
+    /* similar to get_terms_add, but need to swap polarity on term from second arg
+    and handle unary subtraction too */
+
+    </span><span class="kw">let </span>arg_len = eq.len();
+
+    <span class="comment">// if unary subtraction
+    </span><span class="kw">if </span>arg_len == <span class="number">1 </span>{
+        <span class="kw">match </span><span class="kw-2">&amp;</span>eq[<span class="number">0</span>] {
+            Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span>x1 {
+                Multiply =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states, y1.clone());
+                    <span class="kw">if </span>temp_term.polarity {
+                        temp_term.polarity = <span class="bool-val">false</span>;
+                    } <span class="kw">else </span>{
+                        temp_term.polarity = <span class="bool-val">true</span>;
+                    }
+                    terms.push(temp_term);
+                }
+                Divide =&gt; {
+                    <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_div(sys_states, y1.clone());
+                    <span class="kw">if </span>temp_term.polarity {
+                        temp_term.polarity = <span class="bool-val">false</span>;
+                    } <span class="kw">else </span>{
+                        temp_term.polarity = <span class="bool-val">true</span>;
+                    }
+                    terms.push(temp_term);
+                }
+                Subtract =&gt; {
+                    <span class="kw">let </span>temp_terms = get_terms_sub(sys_states, y1.clone());
+                    <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                        <span class="comment">// swap polarity of temp term
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>t_term = term.clone();
+                        <span class="kw">if </span>t_term.polarity {
+                            t_term.polarity = <span class="bool-val">false</span>;
+                        } <span class="kw">else </span>{
+                            t_term.polarity = <span class="bool-val">true</span>;
+                        }
+                        terms.push(t_term.clone());
+                    }
+                }
+                Add =&gt; {
+                    <span class="kw">let </span>temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                    <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                        <span class="comment">// swap polarity of temp term
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>t_term = term.clone();
+                        <span class="kw">if </span>t_term.polarity {
+                            t_term.polarity = <span class="bool-val">false</span>;
+                        } <span class="kw">else </span>{
+                            t_term.polarity = <span class="bool-val">true</span>;
+                        }
+                        terms.push(t_term.clone());
+                    }
+                }
+                <span class="kw">_ </span>=&gt; {
+                    <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
+                }
+            },
+            Atom(_x1) =&gt; {
+                <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
+            }
+        }
+    } <span class="kw">else </span>{
+        <span class="comment">// need to treat second term with polarity swap
+        </span><span class="kw">for </span>(i, arg) <span class="kw">in </span>eq.iter().enumerate() {
+            <span class="kw">match </span><span class="kw-2">&amp;</span>arg {
+                Cons(x1, <span class="kw-2">ref </span>y1) =&gt; <span class="kw">match </span>x1 {
+                    Multiply =&gt; {
+                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states.clone(), y1.clone());
+                        <span class="kw">if </span>i == <span class="number">1 </span>{
+                            <span class="comment">// swap polarity of temp term
+                            </span><span class="kw">if </span>temp_term.polarity {
+                                temp_term.polarity = <span class="bool-val">false</span>;
+                            } <span class="kw">else </span>{
+                                temp_term.polarity = <span class="bool-val">true</span>;
+                            }
+                            terms.push(temp_term);
+                        } <span class="kw">else </span>{
+                            terms.push(temp_term);
+                        }
+                    }
+                    Divide =&gt; {
+                        <span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_div(sys_states.clone(), y1.clone());
+                        <span class="kw">if </span>i == <span class="number">1 </span>{
+                            <span class="comment">// swap polarity of temp term
+                            </span><span class="kw">if </span>temp_term.polarity {
+                                temp_term.polarity = <span class="bool-val">false</span>;
+                            } <span class="kw">else </span>{
+                                temp_term.polarity = <span class="bool-val">true</span>;
+                            }
+                            terms.push(temp_term);
+                        } <span class="kw">else </span>{
+                            terms.push(temp_term);
+                        }
+                    }
+                    Subtract =&gt; {
+                        <span class="kw">let </span>temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                        <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                            <span class="kw">let </span><span class="kw-2">mut </span>t_term = term.clone();
+                            <span class="kw">if </span>i == <span class="number">1 </span>{
+                                <span class="comment">// swap polarity of temp term
+                                </span><span class="kw">if </span>t_term.polarity {
+                                    t_term.polarity = <span class="bool-val">false</span>;
+                                } <span class="kw">else </span>{
+                                    t_term.polarity = <span class="bool-val">true</span>;
+                                }
+                                terms.push(t_term.clone());
+                            } <span class="kw">else </span>{
+                                terms.push(t_term.clone());
+                            }
+                        }
+                    }
+                    Add =&gt; {
+                        <span class="kw">let </span>temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                        <span class="kw">for </span>term <span class="kw">in </span>temp_terms.iter() {
+                            <span class="kw">let </span><span class="kw-2">mut </span>t_term = term.clone();
+                            <span class="kw">if </span>i == <span class="number">1 </span>{
+                                <span class="comment">// swap polarity of temp term
+                                </span><span class="kw">if </span>t_term.polarity {
+                                    t_term.polarity = <span class="bool-val">false</span>;
+                                } <span class="kw">else </span>{
+                                    t_term.polarity = <span class="bool-val">true</span>;
+                                }
+                                terms.push(t_term.clone());
+                            } <span class="kw">else </span>{
+                                terms.push(t_term.clone());
+                            }
+                        }
+                    }
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="macro">println!</span>(<span class="string">&quot;Error unsupported operation&quot;</span>)
+                    }
+                },
+                Atom(_x1) =&gt; {
+                    <span class="macro">println!</span>(<span class="string">&quot;Not valid term for PN&quot;</span>)
+                }
+            }
+        }
+    }
+    terms
+}
+
+<span class="comment">// this takes in the arguments of a div operator and returns the PnTerm for it
+// we do expect at most multiplication, subtraction, or addition
+</span><span class="kw">pub fn </span>get_term_div(sys_states: Vec&lt;String&gt;, eq: Vec&lt;MathExpressionTree&gt;) -&gt; PnTerm {
     <span class="kw">let </span><span class="kw-2">mut </span>variables = Vec::&lt;String&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>exp_states = Vec::&lt;String&gt;::new();
-    <span class="kw">let </span><span class="kw-2">mut </span>parameters = Vec::&lt;String&gt;::new();
     <span class="kw">let </span><span class="kw-2">mut </span>polarity = <span class="bool-val">true</span>;
 
-    <span class="kw">for </span>obj <span class="kw">in </span>eq.iter() {
+    <span class="comment">// this walks the tree and composes a vector of all variable and polarity changes
+    </span><span class="kw">for </span>obj <span class="kw">in </span>eq.iter() {
         <span class="kw">match </span>obj {
             Cons(x, y) =&gt; {
                 <span class="kw">match </span><span class="kw-2">&amp;</span>x {
@@ -1238,27 +1105,22 @@
                             }
                         }
                     }
-                    Divide =&gt; {
-                        <span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">0</span>] {
-                            Cons(_x1, y1) =&gt; {
-                                <span class="comment">// assumption only unary sub is possible
-                                </span>polarity = <span class="bool-val">false</span>;
-                                variables.push(y1[<span class="number">0</span>].to_string())
-                            }
-                            Atom(_x) =&gt; variables.push(y[<span class="number">0</span>].to_string()),
-                        }
-                        <span class="kw">match </span><span class="kw-2">&amp;</span>y[<span class="number">1</span>] {
-                            Cons(_x1, y1) =&gt; {
-                                <span class="comment">// assumption only unary sub is possible
-                                </span>polarity = <span class="bool-val">false</span>;
-                                variables.push(y1[<span class="number">1</span>].to_string())
-                            }
-                            Atom(_x) =&gt; variables.push(y[<span class="number">1</span>].to_string()),
-                        }
+                    Multiply =&gt; {
+                        <span class="comment">// call mult function to get a partial term
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_mult(sys_states.clone(), y.clone());
+
+                        <span class="comment">// parse term polarity
+                        </span>polarity = temp_term.polarity;
+
+                        <span class="comment">// parse term parameters and expression states
+                        // need to do both to populate both later
+                        </span>variables.append(<span class="kw-2">&amp;mut </span>temp_term.parameters);
+                        variables.append(<span class="kw-2">&amp;mut </span>temp_term.exp_states);
                     }
                     Add =&gt; {
                         <span class="kw">if </span>y.len() == <span class="number">1 </span>{
-                            variables.push(y[<span class="number">0</span>].to_string());
+                            <span class="comment">// really should need to support unary addition, but oh well
+                            </span>variables.push(y[<span class="number">0</span>].to_string());
                         } <span class="kw">else </span>{
                             <span class="kw">for </span>var <span class="kw">in </span>y.iter() {
                                 variables.push(var.to_string().clone());
@@ -1274,7 +1136,8 @@
         }
     }
 
-    <span class="kw">let </span><span class="kw-2">mut </span>ind = Vec::&lt;usize&gt;::new();
+    <span class="comment">// this compiles the vector of expression states for the term
+    </span><span class="kw">let </span><span class="kw-2">mut </span>ind = Vec::&lt;usize&gt;::new();
     <span class="kw">for </span>(i, var) <span class="kw">in </span>variables.iter().enumerate() {
         <span class="kw">for </span>sys_var <span class="kw">in </span>sys_states.iter() {
             <span class="kw">if </span>var == sys_var {
@@ -1284,12 +1147,9 @@
         }
     }
 
-    <span class="kw">for </span>i <span class="kw">in </span>ind.iter().rev() {
+    <span class="comment">// this removes the expression states from the variable vector
+    </span><span class="kw">for </span>i <span class="kw">in </span>ind.iter().rev() {
         variables.remove(<span class="kw-2">*</span>i);
-    }
-
-    <span class="kw">for </span>var <span class="kw">in </span>variables.iter() {
-        parameters.push(var.clone());
     }
 
     PnTerm {
@@ -1297,7 +1157,85 @@
         exp_states,
         polarity,
         expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
-        parameters,
+        parameters: variables,
+    }
+}
+
+<span class="comment">// this takes in the arguments of a multiply operator and returns the PnTerm for it
+// we do expect at most division, subtraction, or addition
+</span><span class="kw">pub fn </span>get_term_mult(sys_states: Vec&lt;String&gt;, eq: Vec&lt;MathExpressionTree&gt;) -&gt; PnTerm {
+    <span class="kw">let </span><span class="kw-2">mut </span>variables = Vec::&lt;String&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>exp_states = Vec::&lt;String&gt;::new();
+    <span class="kw">let </span><span class="kw-2">mut </span>polarity = <span class="bool-val">true</span>;
+
+    <span class="comment">// this walks the tree and composes a vector of all variable and polarity changes
+    </span><span class="kw">for </span>obj <span class="kw">in </span>eq.iter() {
+        <span class="kw">match </span>obj {
+            Cons(x, y) =&gt; {
+                <span class="kw">match </span><span class="kw-2">&amp;</span>x {
+                    Subtract =&gt; {
+                        <span class="kw">if </span>y.len() == <span class="number">1 </span>{
+                            polarity = <span class="bool-val">false</span>;
+                            variables.push(y[<span class="number">0</span>].to_string());
+                        } <span class="kw">else </span>{
+                            <span class="kw">for </span>var <span class="kw">in </span>y.iter() {
+                                variables.push(var.to_string().clone());
+                            }
+                        }
+                    }
+                    Divide =&gt; {
+                        <span class="comment">// call mult function to get a partial term
+                        </span><span class="kw">let </span><span class="kw-2">mut </span>temp_term = get_term_div(sys_states.clone(), y.clone());
+
+                        <span class="comment">// parse term polarity
+                        </span>polarity = temp_term.polarity;
+
+                        <span class="comment">// parse term parameters and expression states
+                        // need to do both to populate both later
+                        </span>variables.append(<span class="kw-2">&amp;mut </span>temp_term.parameters);
+                        variables.append(<span class="kw-2">&amp;mut </span>temp_term.exp_states);
+                    }
+                    Add =&gt; {
+                        <span class="kw">if </span>y.len() == <span class="number">1 </span>{
+                            <span class="comment">// really should need to support unary addition, but oh well
+                            </span>variables.push(y[<span class="number">0</span>].to_string());
+                        } <span class="kw">else </span>{
+                            <span class="kw">for </span>var <span class="kw">in </span>y.iter() {
+                                variables.push(var.to_string().clone());
+                            }
+                        }
+                    }
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="macro">println!</span>(<span class="string">&quot;Not expected operation inside Multiply&quot;</span>)
+                    }
+                }
+            }
+            Atom(x) =&gt; variables.push(x.to_string()),
+        }
+    }
+
+    <span class="comment">// this compiles the vector of expression states for the term
+    </span><span class="kw">let </span><span class="kw-2">mut </span>ind = Vec::&lt;usize&gt;::new();
+    <span class="kw">for </span>(i, var) <span class="kw">in </span>variables.iter().enumerate() {
+        <span class="kw">for </span>sys_var <span class="kw">in </span>sys_states.iter() {
+            <span class="kw">if </span>var == sys_var {
+                exp_states.push(var.clone());
+                ind.push(i);
+            }
+        }
+    }
+
+    <span class="comment">// this removes the expression states from the variable vector
+    </span><span class="kw">for </span>i <span class="kw">in </span>ind.iter().rev() {
+        variables.remove(<span class="kw-2">*</span>i);
+    }
+
+    PnTerm {
+        dyn_state: <span class="string">&quot;temp&quot;</span>.to_string(),
+        exp_states,
+        polarity,
+        expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
+        parameters: variables,
     }
 }
 
