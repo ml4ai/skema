@@ -3,12 +3,17 @@ import sys
 import json
 import argparse
 
-from skema.program_analysis.CAST2FN.cast import CAST
-from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
+# hack 
+CALLER_PATH = os.getcwd()
+sys.path.append(CALLER_PATH)
+
+
+from CAST2FN.cast import CAST
+from CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
 
-from skema.program_analysis.CAST.fortran.ts2cast import TS2CAST
+from skema.program_analysis.CAST.matlab.ts2cast import MATLAB2CAST
 
 from typing import Optional
 
