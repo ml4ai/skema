@@ -3,6 +3,11 @@ import tempfile
 import os
 from pathlib import Path
 
+# Add the execution directory to path so skema imports work
+import sys
+sys.path.append(os.getcwd())
+
+
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.gromet.fn import GrometFNModuleCollection
 
