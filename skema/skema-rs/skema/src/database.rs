@@ -22,7 +22,7 @@ There being a second function call of the same function which contains an expres
 /* 3/20/23
    - '+' at the top level main are getting duplicate wires to the top level literals
 */
-
+#[allow(clippy::all)] // this is temporary until I refactor this code
 use crate::FunctionType;
 use crate::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
 use crate::{FunctionNet, GrometBox};

@@ -118,6 +118,7 @@ pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
 
 // this function finds the core dynamics and returns a vector of
 // node id's that meet the criteria for identification
+#[allow(clippy::if_same_then_else)]
 pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     let graph = subgraph2petgraph(module_id, host);
     // 1. find each function node
@@ -439,6 +440,7 @@ pub fn get_args_MET(
 
 // this gets the operator from the node name
 #[allow(non_snake_case)]
+#[allow(clippy::if_same_then_else)]
 pub fn get_operator_MET(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
