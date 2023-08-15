@@ -61,8 +61,22 @@ fn empty_parenthesis(input: Span) -> IResult<Vec<Mi>> {
 
 /// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
-pub fn ci_univariate_bound(input: Span) -> IResult<Ci> {
-    let (s, (Mi(x), _pi)) = tuple((mi, parenthesized_identifier))(input)?;
+pub fn ci_univariate_with_bounds(input: Span) -> IResult<(Ci, Vec<Mi>)> {
+    let (s, (Mi(x), bound_vars)) = tuple((mi, parenthesized_identifier))(input)?;
+    Ok((
+        s,
+        (
+            Ci::new(
+                Some(Type::Function),
+                Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
+            ),
+            bound_vars,
+        ),
+    ))
+}
+
+pub fn ci_univariate_without_bounds(input: Span) -> IResult<Ci> {
+    let (s, Mi(x)) = mi(input)?;
     Ok((
         s,
         Ci::new(
@@ -71,6 +85,7 @@ pub fn ci_univariate_bound(input: Span) -> IResult<Ci> {
         ),
     ))
 }
+
 pub fn ci_univariate_func(input: Span) -> IResult<(Ci, Vec<Mi>)> {
     println!("-----input={:?}", input);
     let (s, (Mi(x), bound_vars)) =
@@ -133,7 +148,16 @@ fn d(input: Span) -> IResult<()> {
 }
 
 /// Parse a content identifier of unknown type.
-pub fn ci_unknowni_wo(input: Span) -> IResult<Ci> {
+pub fn ci_unknown_with_bounds(input: Span) -> IResult<(Ci, Vec<Mi>)> {
+    let (s, (x, bound_vars)) = pair(mi, parenthesized_identifier)(input)?;
+    Ok((
+        s,
+        (Ci::new(None, Box::new(MathExpression::Mi(x))), bound_vars),
+    ))
+}
+
+/// Parse a content identifier of unknown type.
+pub fn ci_unknown_without_bounds(input: Span) -> IResult<Ci> {
     let (s, x) = mi(input)?;
     Ok((s, Ci::new(None, Box::new(MathExpression::Mi(x)))))
 }
@@ -237,8 +261,11 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         )
         //opt(parenthesized_identifier),
     (input)?;
+    let (s, func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)?;
+    println!("func_of={:?}", func_of);
 
     let mut new_with_respect_to = with_respect_to[0].clone();
+    //println!("new_with_respect_to={:?}", new_with_respect_to);
     Ok((
         s,
         (
@@ -247,8 +274,8 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
                 1,
                 Ci::new(
                     Some(Type::Real),
-                    //Box::new(MathExpression::Mi(with_respect_to[0])),
                     Box::new(MathExpression::Mi(new_with_respect_to)),
+                    //Box::new(MathExpression::Mi()),
                 ),
             ),
             x,
@@ -282,7 +309,7 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         //map(ci_univariate_func, MathExpression::Ci),
-        map(ci_univariate_func, |(Ci { content, .. }, vars)| {
+        map(ci_univariate_with_bounds, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),
@@ -291,9 +318,34 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 vars,
             )
         }),
+        map(ci_univariate_without_bounds, MathExpression::Ci),
+        /* map(ci_univariate_func, |(Ci { content, .. }, vars)| {
+            MathExpression::BoundVariables(
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                },
+                vars,
+            )
+        }),*/
         map(ci_subscript, MathExpression::Ci),
         //map(ci_superscript, MathExpression::Ci),
-        map(ci_unknown, |(Ci { content, .. }, vars)| {
+        /*map(ci_unknown_with_bounds, |(Ci { content, .. }, vars)| {
+            MathExpression::BoundVariables(
+                Ci {
+                    r#type: Some(Type::Function),
+                    content,
+                },
+                vars,
+            )
+        }),*/
+        map(ci_unknown_without_bounds, |Ci { content, .. }| {
+            MathExpression::Ci(Ci {
+                r#type: Some(Type::Function),
+                content,
+            })
+        }),
+        map(ci_unknown_with_bounds, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),

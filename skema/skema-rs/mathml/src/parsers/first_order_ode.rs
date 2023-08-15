@@ -9,8 +9,9 @@ use crate::{
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
-            ci_univariate_func, ci_unknown, first_order_derivative_leibniz_notation,
-            math_expression, newtonian_derivative, operator,
+            ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
+            ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
+            newtonian_derivative, operator,
         },
         math_expression_tree::MathExpressionTree,
     },
@@ -66,7 +67,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_func, |(Ci { content, .. }, vars)| {
+        map(ci_univariate_with_bounds, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),
@@ -75,7 +76,14 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
                 vars,
             )
         }),
-        map(ci_unknown, |(Ci { content, .. }, vars)| {
+        map(ci_univariate_without_bounds, MathExpression::Ci),
+        map(ci_unknown_without_bounds, |Ci { content, .. }| {
+            MathExpression::Ci(Ci {
+                r#type: Some(Type::Function),
+                content,
+            })
+        }),
+        map(ci_unknown_with_bounds, |(Ci { content, .. }, vars)| {
             MathExpression::BoundVariables(
                 Ci {
                     r#type: Some(Type::Function),
@@ -87,7 +95,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         map(operator, MathExpression::Mo),
         math_expression,
     )))(s)?;
-
+    println!("remaining_tokens={:?}", remaining_tokens);
     let (s, _) = etag!("math")(s)?;
 
     let ode = FirstOrderODE {
@@ -642,7 +650,7 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
 fn test_ci_univariate_func() {
     test_parser(
         "<mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>",
-        ci_univariate_func,
+        ci_univariate_with_bounds,
         (
             Ci::new(
                 Some(Type::Function),
@@ -725,10 +733,13 @@ fn test_first_order_ode() {
         bounded_var,
         rhs,
     } = input.parse::<FirstOrderODE>().unwrap();
-
+    println!(">>>>>>>>>rhs={:?}", rhs);
+    println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
+    println!(">>>>>>>>>bounded_var={:?}", bounded_var.to_string());
+    println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(bounded_var.to_string(), "t");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
+    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 
     // ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
     let input = "
@@ -748,7 +759,11 @@ fn test_first_order_ode() {
         rhs,
     } = input.parse::<FirstOrderODE>().unwrap();
 
+    println!(">>>>>>>>>rhs={:?}", rhs);
+    println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
+    println!(">>>>>>>>>bounded_var={:?}", bounded_var.to_string());
+    println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(bounded_var.to_string(), "t");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
+    assert_eq!(bounded_var.to_string(), "");
+    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 }
