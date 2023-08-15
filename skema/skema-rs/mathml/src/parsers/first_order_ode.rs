@@ -183,13 +183,16 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
                     terms.push(t_term.clone());
                 }
             }
-            _Sub => {
+            Subtract => {
                 let temp_terms = get_terms_sub(sys_states, y.clone());
                 for term in temp_terms.iter() {
                     let mut t_term = term.clone();
                     t_term.dyn_state = dyn_state.clone();
                     terms.push(t_term.clone());
                 }
+            }
+            _ => {
+                println!("Warning unsupported case");
             }
         },
         Atom(_x) => {
@@ -274,7 +277,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                     }
                     terms.push(temp_term);
                 }
-                _Sub => {
+                Subtract => {
                     let temp_terms = get_terms_sub(sys_states, y1.clone());
                     for term in temp_terms.iter() {
                         // swap polarity of temp term

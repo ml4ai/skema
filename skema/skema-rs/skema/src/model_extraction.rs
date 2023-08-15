@@ -349,7 +349,7 @@ fn tree_2_MET_ast(
         // we first construct the derivative of the first node
         let deriv_name: &str = &graph[root_node].properties["name"].to_string();
         // this will let us know if additional trimming is needed to handle the code implementation of the equations
-        let mut step_impl = false;
+        // let mut step_impl = false; this will be used for step implementaion for later
         // This is very bespoke right now
         // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
         // currently we convert to leibniz form
@@ -360,7 +360,7 @@ fn tree_2_MET_ast(
             };
             lhs.push(deriv);
         } else {
-            step_impl = true;
+            // step_impl = true; this will be used for step implementaion for later
             let deriv = Ci {
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
