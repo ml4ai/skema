@@ -27,8 +27,8 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
 )
 
-from skema.program_analysis.CAST.fortran.variable_context import VariableContext
-from skema.program_analysis.CAST.fortran.node_helper import (
+from skema.program_analysis.CAST.matlab.variable_context import VariableContext
+from skema.program_analysis.CAST.matlab.node_helper import (
     NodeHelper,
     get_children_by_types,
     get_first_child_by_type,
@@ -37,23 +37,23 @@ from skema.program_analysis.CAST.fortran.node_helper import (
     get_first_child_index,
     get_last_child_index,
 )
-from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
-
-from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
-from skema.program_analysis.CAST.fortran.build_tree_sitter_fortran import LANGUAGE_LIBRARY_REL_PATH
-class TS2CAST(object):
+#from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
+#
+#from skema.program_analysis.CAST.matlab.preprocessor.preprocess import preprocess
+from skema.program_analysis.CAST.matlab.build_tree_sitter_matlab import LANGUAGE_LIBRARY_REL_PATH
+class MATLAB2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
-        self.source = preprocess(self.path)
+        self.source = self.path.read_text()
         
         # Run tree-sitter on preprocessor output to generate parse tree
         parser = Parser()
         parser.set_language(
             Language(
                 Path(Path(__file__).parent, LANGUAGE_LIBRARY_REL_PATH),
-                "fortran"
+                "matlab"
             )
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
@@ -68,7 +68,7 @@ class TS2CAST(object):
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
-        return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
+        return [CAST([generate_dummy_source_refs(module)], "MATLAB") for module in modules]
         
     def run(self, root) -> List[Module]:
         '''Top level visitor function. Will return between 1-3 Module objects.'''
