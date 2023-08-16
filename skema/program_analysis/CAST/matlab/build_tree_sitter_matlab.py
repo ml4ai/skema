@@ -6,7 +6,7 @@ import shutil
 from tree_sitter import Language
 
 MATLAB_CLONE_URL = 'https://github.com/acristoffers/tree-sitter-matlab.git'
-MATLAB_TEST_CORPUS_URL = 'https://github.com/mathworks/MATLAB-Language-grammar.git' 
+MATLAB_TEST_URL = 'https://github.com/mathworks/MATLAB-Language-grammar.git' 
 
 SHARED_OBJECT_DIR = 'build'
 LANGUAGE_LIBRARY_REL_PATH = os.path.join(SHARED_OBJECT_DIR, "ts-matlab.so")
@@ -19,7 +19,6 @@ PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # given a git repo URL return the source directory name
 def git_dir_from_url(git_url):
-    # TODO try block
     return git_url.split('/')[-1].split('.git')[0]
 
 # whack a directory
@@ -43,11 +42,13 @@ def clone(git_url):
         print('Clone failed')
     return ret
 
-
 def build_matlab_grammar():
-    Language.build_library(output_path=LANGUAGE_LIBRARY_REL_PATH, repo_paths=['tree-sitter-matlab'])
+    Language.build_library(
+        output_path=LANGUAGE_LIBRARY_REL_PATH,
+        repo_paths=['tree-sitter-matlab']
+    )
 
-
+# Test the grammar using the test corpus 
 def run_matlab_test_corpus():
     pass
 
@@ -58,14 +59,14 @@ def main():
     # Clean the target directories
     clean(SHARED_OBJECT_DIR)
     clean(git_dir_from_url(MATLAB_CLONE_URL))
-    clean(git_dir_from_url(MATLAB_TEST_CORPUS_URL))
+    clean(git_dir_from_url(MATLAB_TEST_URL))
 
     # create the build directory
     ret = subprocess.run(['mkdir', SHARED_OBJECT_DIR])
 
     # Clone the tree-sitter matlab grammar and test corpus repos
     clone(MATLAB_CLONE_URL)
-    clone(MATLAB_TEST_CORPUS_URL)
+    clone(MATLAB_TEST_URL)
 
     # Build the matlab shared object file
     build_matlab_grammar()
