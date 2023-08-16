@@ -44,7 +44,7 @@ class System(BaseModel):
                 "def sir(\r\n    s: float, i: float, r: float, beta: float, gamma: float, n: float\r\n) -> Tuple[float, float, float]:\r\n    \"\"\"The SIR model, one time step.\"\"\"\r\n    s_n = (-beta * s * i) + s\r\n    i_n = (beta * s * i - gamma * i) + i\r\n    r_n = gamma * i + r\r\n    scale = n \/ (s_n + i_n + r_n)\r\n    return s_n * scale, i_n * scale, r_n * scale\r\n"
         ],
     )
-"""    system_name: Optional[str] = Field(
+    system_name: Optional[str] = Field(
         default=None,
         description="A model name to associate with the provided code",
         example="example-system",
@@ -68,7 +68,7 @@ class System(BaseModel):
                 }
             }
         },
-    )"""
+    )
 
 
 async def system_to_enriched_system(system: System) -> System:
