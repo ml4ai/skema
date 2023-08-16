@@ -1,6 +1,4 @@
-#!/usr/bin/env python3
-
-# Clone, build, and test the treesitter matlab grammar
+# Clone and build the treesitter matlab grammar
 
 import os.path
 import subprocess
@@ -9,6 +7,8 @@ from tree_sitter import Language
 
 MATLAB_CLONE_URL = 'https://github.com/acristoffers/tree-sitter-matlab.git'
 MATLAB_TEST_CORPUS_URL = 'https://github.com/mathworks/MATLAB-Language-grammar.git' 
+
+LANGUAGE_LIBRARY_REL_PATH = os.path.join("build", "matlab.so")
 
 # Determine the caller path
 CALLER_PATH = os.getcwd()
