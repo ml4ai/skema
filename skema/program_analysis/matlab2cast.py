@@ -13,7 +13,7 @@ from CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
 
-from skema.program_analysis.CAST.matlab.ts2cast import MATLAB2CAST
+from skema.program_analysis.CAST.matlab.matlab_to_cast import MATLAB2CAST
 
 from typing import Optional
 
@@ -42,7 +42,7 @@ def matlab_to_cast(
     """
 
 
-    out_cast = TS2CAST(path).out_cast
+    out_cast = MATLAB2CAST(path).out_cast
 
     file_name = os.path.basename(path)
     if agraph:
