@@ -8,7 +8,7 @@ from tree_sitter import Language
 MATLAB_CLONE_URL = 'https://github.com/acristoffers/tree-sitter-matlab.git'
 MATLAB_TEST_CORPUS_URL = 'https://github.com/mathworks/MATLAB-Language-grammar.git' 
 
-LANGUAGE_LIBRARY_REL_PATH = os.path.join("build", "matlab.so")
+LANGUAGE_LIBRARY_REL_PATH = os.path.join("build", "ts-matlab.so")
 
 # Determine the caller path
 CALLER_PATH = os.getcwd()
@@ -41,7 +41,7 @@ def clone(git_url):
 
 
 def build_matlab_grammar():
-    Language.build_library(output_path='matlab.so', repo_paths=['tree-sitter-matlab'])
+    Language.build_library(output_path='build/ts-matlab.so', repo_paths=['tree-sitter-matlab'])
 
 
 def run_matlab_test_corpus():
