@@ -8,7 +8,8 @@ from tree_sitter import Language
 MATLAB_CLONE_URL = 'https://github.com/acristoffers/tree-sitter-matlab.git'
 MATLAB_TEST_CORPUS_URL = 'https://github.com/mathworks/MATLAB-Language-grammar.git' 
 
-LANGUAGE_LIBRARY_REL_PATH = os.path.join("build", "ts-matlab.so")
+SHARED_OBJECT_DIR = 'build'
+LANGUAGE_LIBRARY_REL_PATH = os.path.join(SHARED_OBJECT_DIR, "ts-matlab.so")
 
 # Determine the caller path
 CALLER_PATH = os.getcwd()
@@ -17,18 +18,21 @@ CALLER_PATH = os.getcwd()
 PROJECT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 # given a git repo URL return the source directory name
-def target_dir(git_url):
+def git_dir_from_url(git_url):
     # TODO try block
     return git_url.split('/')[-1].split('.git')[0]
 
+# whack a directory
+def clean(target):
+    ret = subprocess.run(['rm', '-rf', target])
+    if (ret):
+        print('Cleaned ' + target)
+    else:
+        print('Could not clean ' + target)
+    return ret
+
 # clone a git repo
 def clone(git_url):
-
-    # Remove the repo from local filesystem if it exists
-    target = target_dir(git_url)
-    print('Cleaning ' + target)
-    ret = subprocess.run(['rm', '-rf', target])
-
     # Clone the repo from github
     print('Cloning ' + git_url)
     ret = subprocess.run(['git', 'clone', git_url])
@@ -41,7 +45,7 @@ def clone(git_url):
 
 
 def build_matlab_grammar():
-    Language.build_library(output_path='build/ts-matlab.so', repo_paths=['tree-sitter-matlab'])
+    Language.build_library(output_path=LANGUAGE_LIBRARY_REL_PATH, repo_paths=['tree-sitter-matlab'])
 
 
 def run_matlab_test_corpus():
@@ -50,6 +54,14 @@ def run_matlab_test_corpus():
 def main():
     # Move to project directory
     os.chdir(PROJECT_PATH)
+
+    # Clean the target directories
+    clean(SHARED_OBJECT_DIR)
+    clean(git_dir_from_url(MATLAB_CLONE_URL))
+    clean(git_dir_from_url(MATLAB_TEST_CORPUS_URL))
+
+    # create the build directory
+    ret = subprocess.run(['mkdir', SHARED_OBJECT_DIR])
 
     # Clone the tree-sitter matlab grammar and test corpus repos
     clone(MATLAB_CLONE_URL)
