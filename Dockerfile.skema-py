@@ -52,7 +52,7 @@ RUN tree /app
 # exclude dependencies for docs
 RUN pip install ".[core,dev,demo]"
 # Build tree-sitter-fortran grammar required by Fortran code2fn
-RUN python /app/skema/program_analysis/CAST/fortran/build_tree_sitter_fortran.py
+RUN python /app/skema/program_analysis/tree_sitter_parsers/build_parsers.py --c --cpp --fortran --matlab --python --r
 
 # img2mml JS dependencies for MathJax server
 RUN (cd skema/img2mml/data_generation && npm install)
