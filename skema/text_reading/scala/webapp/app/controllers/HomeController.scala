@@ -1,12 +1,12 @@
 package controllers
 
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
+import org.clulab.pdf2txt.document.logical.DocumentByWord
 import org.clulab.processors.{Document, Sentence}
 import org.clulab.serialization.json.stringify
 import org.ml4ai.skema.text_reading.TextReadingPipeline
 import org.json4s.{JArray, JValue}
 import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, TextReadingPipelineWithContext}
-import org.ml4ai.skema.text_reading.grounding.GrounderFactory
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 import org.ml4ai.skema.text_reading.utils.DisplayUtils
 import org.slf4j.{Logger, LoggerFactory}
@@ -16,19 +16,38 @@ import play.api.mvc._
 import javax.inject._
 import scala.io.Source
 
+/*
+
+Models:
+  * MiraEmbeddingsGrounder has an embeddings file, e.g., epidemiology_embeddings_model.ser, but it is memory mapped.
+  * CluProcessor has a model, usually glove-840b-300d-10f-kryo, with vectors.  The 10f indicates frequency truncation.
+  * CosmosTextReadingPipeline as a model in the PdfConverter, gigaword.ser, but only words and counts are used.
+
+Processors:
+  * The OdinEngine has a FastNLPProcessor.
+  * The MiraEmbeddingsGrounder has a CluProcessor.
+  * DocumentByWord of Pdf2Text has a CluProcessor.
+
+*/
+
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass)
   logger.info("Initializing the OdinEngine ...")
 
   // Make one of each of these now and share it with the pipelines.
+  // This will have a FastNLPProcessor.
   val odinEngineOpt = Some(TextReadingPipeline.newOdinEngine())
-  val miraEmbeddingsGrounder = TextReadingPipeline.newGrounder(chosenEngineOpt = Some("miraembeddings"))
+  // val fastNlpProcessor = odinEngineOpt.get.proc
+
+  // Use this one instead of the lazy val in MireEmbeddingsGrounder.
+  val processorOpt = Some(DocumentByWord.processor)
+  val miraEmbeddingsGrounder = TextReadingPipeline.newGrounder(processorOpt, chosenEngineOpt = Some("miraembeddings"))
 
   // TODO Add the window parameter to the configuration file.
-  val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3, odinEngineOpt, Some(miraEmbeddingsGrounder))
+  val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3, processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
   // TODO Add the window parameter to the configuration file.
-  val plainTextPipeline = new TextReadingPipelineWithContext(odinEngineOpt, Some(miraEmbeddingsGrounder))
+  val plainTextPipeline = new TextReadingPipelineWithContext(processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
 
   logger.info("Completed Initialization ...")
 

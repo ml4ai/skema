@@ -3,7 +3,7 @@ package org.ml4ai.skema.text_reading
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
-import org.clulab.processors.Document
+import org.clulab.processors.{Document, Processor}
 import org.clulab.utils.Logging
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
 import org.ml4ai.skema.text_reading.grounding.{Grounder, GrounderFactory, GroundingCandidate}
@@ -12,11 +12,11 @@ import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
 import scala.language.implicitConversions
 import scala.util.matching.Regex
 
-class TextReadingPipeline(odinEngineOpt: Option[OdinEngine], grounderOpt: Option[Grounder]) extends Logging {
+class TextReadingPipeline(processorOpt: Option[Processor] = None, odinEngineOpt: Option[OdinEngine] = None, grounderOpt: Option[Grounder] = None) extends Logging {
   logger.info("Initializing the OdinEngine ...")
 
   val odinEngine = odinEngineOpt.getOrElse(TextReadingPipeline.newOdinEngine())
-  val grounder = grounderOpt.getOrElse(TextReadingPipeline.newGrounder())
+  val grounder = grounderOpt.getOrElse(TextReadingPipeline.newGrounder(processorOpt))
   val groundingAssignmentThreshold = {
     val config: Config = ConfigFactory.load()
     val groundingConfig: Config = config.getConfig("Grounding")
@@ -141,10 +141,10 @@ object TextReadingPipeline {
     odinEngine
   }
 
-  def newGrounder(chosenEngineOpt: Option[String] = None): Grounder = {
+  def newGrounder(processorOpt: Option[Processor] = None, chosenEngineOpt: Option[String] = None): Grounder = {
     val config: Config = ConfigFactory.load()
     val groundingConfig: Config = config.getConfig("Grounding")
 
-    GrounderFactory.getInstance(groundingConfig, chosenEngineOpt)
+    GrounderFactory.getInstance(groundingConfig, processorOpt, chosenEngineOpt)
   }
 }

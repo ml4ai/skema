@@ -1,16 +1,18 @@
 package org.ml4ai.skema.text_reading.grounding
 
 import com.typesafe.config.Config
+import org.clulab.processors.Processor
 import org.clulab.processors.fastnlp.FastNLPProcessor
+
 import scala.collection.JavaConverters._
 
 object GrounderFactory {
-  def getInstance(config: Config, chosenEngine: Option[String] = None): Grounder = {
+
+  def getInstance(config: Config, processorOpt: Option[Processor] = None, chosenEngine: Option[String] = None): Grounder = {
     val engine = chosenEngine getOrElse config.getString("engine")
     val prependManualGrounder = config.getBoolean("forceManualGroundings")
     val domain = config.getString("domain")
     val domainConfig = config.getConfig(domain)
-
     lazy val manualGrounder = buildManualGrounder(domainConfig)
     // Grounding parameters
     engine.toLowerCase match {
@@ -20,8 +22,8 @@ object GrounderFactory {
           val lambda = domainConfig.getInt("lambda")
           val alpha = domainConfig.getDouble("alpha").toFloat
           val namespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
-          val grounder = MiraEmbeddingsGrounder(ontologyFilePath, embeddingsModelPath, lambda, alpha, namespaces)
-          if(prependManualGrounder)
+          val grounder = MiraEmbeddingsGrounder(ontologyFilePath, embeddingsModelPath, lambda, alpha, namespaces, processorOpt)
+          if (prependManualGrounder)
             new PipelineGrounder(Seq(manualGrounder, grounder))
           else
             grounder
