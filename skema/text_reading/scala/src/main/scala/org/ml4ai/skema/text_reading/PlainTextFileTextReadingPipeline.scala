@@ -2,6 +2,7 @@ package org.ml4ai.skema.text_reading
 
 import org.clulab.odin.Mention
 import org.clulab.utils.FileUtils
+import org.ml4ai.skema.text_reading.grounding.Grounder
 import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, CosmosOrderer, SentenceIndexOrderer}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
@@ -9,7 +10,8 @@ import java.io.File
 import scala.io.Source
 import scala.util.{Failure, Success, Using}
 
-class PlainTextFileTextReadingPipeline(contextWindowSize:Int) extends TextReadingPipeline {
+class PlainTextFileTextReadingPipeline(contextWindowSize: Int, odinEngineOpt: Option[OdinEngine] = None,
+    grounderOpt: Option[Grounder] = None) extends TextReadingPipeline(odinEngineOpt, grounderOpt) {
 
   /**
     * Runs the textReadingPipeline over a plain text file

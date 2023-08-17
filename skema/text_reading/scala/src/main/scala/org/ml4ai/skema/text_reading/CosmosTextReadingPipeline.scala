@@ -7,14 +7,14 @@ import org.clulab.pdf2txt.languageModel.GigawordLanguageModel
 import org.clulab.pdf2txt.preprocessor._
 import org.ml4ai.skema.text_reading.attachments.MentionLocationAttachment
 import org.ml4ai.skema.text_reading.data.CosmosJsonDataLoader
+import org.ml4ai.skema.text_reading.grounding.Grounder
 import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, CosmosOrderer, SentenceIndexOrderer}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
 import scala.collection.mutable.ArrayBuffer
 
-
-
-class CosmosTextReadingPipeline(contextWindowSize:Int) extends TextReadingPipeline {
+class CosmosTextReadingPipeline(contextWindowSize: Int, odinEngineOpt: Option[OdinEngine] = None, grounderOpt: Option[Grounder] = None )
+    extends TextReadingPipeline(odinEngineOpt, grounderOpt) {
 
   // PDF converted to fix pdf tokenization artifacts
   private val pdfConverter = new TextConverter()
