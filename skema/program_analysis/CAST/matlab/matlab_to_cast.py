@@ -43,6 +43,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
 from skema.program_analysis.CAST.matlab.build_tree_sitter_matlab import LANGUAGE_LIBRARY_REL_PATH
 class MATLAB2CAST(object):
     def __init__(self, source_file_path: str):
+        print('__init__')
         # Prepare source with preprocessor
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
@@ -57,6 +58,7 @@ class MATLAB2CAST(object):
             )
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
+        print(self.tree)
 
         # Walking data
         self.variable_context = VariableContext()
@@ -64,6 +66,7 @@ class MATLAB2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
+        print(self.out_cast)
 
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -448,16 +451,16 @@ class MATLAB2CAST(object):
         loop_control_node = get_first_child_by_type(node, "loop_control_expression")
         loop_control_children = get_non_control_children(loop_control_node)
         if len(loop_control_children) == 3:
-            itterator, start, stop = [
+            iterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
             step = LiteralValue("Integer", "1")
         elif len(loop_control_children) == 4:
-            itterator, start, stop, step = [
+            iterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
             ]
         else:
-            itterator = None
+            iterator = None
             start = None
             stop = None
             step = None
@@ -486,7 +489,7 @@ class MATLAB2CAST(object):
                 left=LiteralValue(
                     "Tuple",
                     [
-                        itterator,
+                        iterator,
                         Var(generated_iter_name_node, "Iterator"),
                         Var(stop_condition_name_node, "Boolean"),
                     ],
@@ -516,7 +519,7 @@ class MATLAB2CAST(object):
                 left=LiteralValue(
                     "Tuple",
                     [
-                        itterator,
+                        iterator,
                         Var(generated_iter_name_node, "Iterator"),
                         Var(stop_condition_name_node, "Boolean"),
                     ],
@@ -532,8 +535,8 @@ class MATLAB2CAST(object):
         post = []
         post.append(
             Assignment(
-                left=itterator,
-                right=Operator(op="+", operands=[itterator, step]),
+                left=iterator,
+                right=Operator(op="+", operands=[iterator, step]),
             )
         )
 
@@ -1067,16 +1070,16 @@ class MATLAB2CAST(object):
         )
         loop_control_children = get_non_control_children(loop_control_node)
         if len(loop_control_children) == 3:
-            itterator, start, stop = [
+            iterator, start, stop = [
                 self.visit(child) for child in loop_control_children
             ]
             step = LiteralValue("Integer", "1")
         elif len(loop_control_children) == 4:
-            itterator, start, stop, step = [
+            iterator, start, stop, step = [
                 self.visit(child) for child in loop_control_children
             ]
         else:
-            itterator = None
+            iterator = None
             start = None
             stop = None
             step = None
