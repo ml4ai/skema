@@ -5,15 +5,16 @@ End-to-end skema workflows
 
 
 from typing import List
-from skema.rest.proxies import SKEMA_RS_ADDESS
-from skema.rest import schema, utils, comments_proxy
-from skema.program_analysis.comments import MultiFileCodeComments
-from skema.img2mml import eqn2mml
-from skema.skema_py import server as code2fn
+
+import requests
 from fastapi import APIRouter, File, UploadFile
 from starlette.responses import JSONResponse
-import requests
 
+from skema.img2mml import eqn2mml
+from skema.program_analysis.comments import MultiFileCodeComments
+from skema.rest import comments_proxy, schema, utils
+from skema.rest.proxies import SKEMA_RS_ADDESS
+from skema.skema_py import server as code2fn
 
 router = APIRouter()
 
@@ -81,8 +82,7 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
     r.json()
     """
     mml: List[str] = [
-        utils.clean_mml(eqn2mml.get_mathml_from_latex(tex))
-        for tex in data.equations
+        utils.clean_mml(eqn2mml.get_mathml_from_latex(tex)) for tex in data.equations
     ]
     payload = {"mathml": mml, "model": data.model}
     res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
@@ -90,50 +90,53 @@ async def equations_to_amr(data: schema.EquationLatexToAMR):
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
                 "payload": payload,
             },
         )
     return res.json()
 
+
 # pmml -> amr
 @router.post("/pmml/equations-to-amr", summary="Equations pMML → AMR")
 async def equations_to_amr(data: schema.MmlToAMR):
-
     payload = {"mathml": data.equations, "model": data.model}
     res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
                 "payload": payload,
             },
         )
     return res.json()
 
+
 # code snippets -> fn -> petrinet amr
 @router.post("/code/snippets-to-pn-amr", summary="Code snippets → PetriNet AMR")
 async def code_snippets_to_pn_amr(system: code2fn.System):
     gromet = await code2fn.fn_given_filepaths(system)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE POST /models/PN failed to process payload",
+                "error": f"MORAE PUT /models/PN failed to process payload",
                 "payload": gromet,
             },
         )
     return res.json()
 
 
+""" TODO: The regnet endpoints are currently outdated
 # code snippets -> fn -> regnet amr
 @router.post("/code/snippets-to-rn-amr", summary="Code snippets → RegNet AMR")
 async def code_snippets_to_rn_amr(system: code2fn.System):
     gromet = await code2fn.fn_given_filepaths(system)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
+        print(res.status_code)
         return JSONResponse(
             status_code=400,
             content={
@@ -142,6 +145,7 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
             },
         )
     return res.json()
+"""
 
 
 # zip archive -> fn -> petrinet amr
@@ -150,23 +154,24 @@ async def code_snippets_to_rn_amr(system: code2fn.System):
 )
 async def repo_to_pn_amr(zip_file: UploadFile = File()):
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/PN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE POST /models/PN failed to process payload",
+                "error": f"MORAE PUT /models/PN failed to process payload",
                 "payload": gromet,
             },
         )
     return res.json()
 
 
+""" TODO: The regnet endpoints are currently outdated
 # zip archive -> fn -> regnet amr
 @router.post("/code/codebase-to-rn-amr", summary="Code repo (zip archive) → RegNet AMR")
 async def repo_to_rn_amr(zip_file: UploadFile = File()):
     gromet = await code2fn.fn_given_filepaths_zip(zip_file)
-    res = requests.post(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
+    res = requests.put(f"{SKEMA_RS_ADDESS}/models/RN", json=gromet)
     if res.status_code != 200:
         return JSONResponse(
             status_code=400,
@@ -176,3 +181,4 @@ async def repo_to_rn_amr(zip_file: UploadFile = File()):
             },
         )
     return res.json()
+"""
