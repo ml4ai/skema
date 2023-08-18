@@ -4,7 +4,6 @@ from skema.program_analysis.CAST2FN.model.cast import AstNode, LiteralValue, Sou
 
 def generate_dummy_source_refs(node: AstNode) -> AstNode:
     print('generate_dummy_source_refs start')
-    print('node: ' + node)
     """Walks a tree of AstNodes replacing any null SourceRefs with a dummy value"""
     if isinstance(node, LiteralValue) and not node.source_code_data_type:
         node.source_code_data_type = ["Matlab", "None"]

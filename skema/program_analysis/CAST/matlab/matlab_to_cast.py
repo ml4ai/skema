@@ -89,6 +89,8 @@ class MATLAB2CAST(object):
     def run(self, root) -> List[Module]:
         print("run start")
         print("root: " + root.type)
+        for child in root.children:
+            print("child: " + child.type)
 
         '''Top level visitor function. Will return between 1-3 Module objects.'''
         # A program can have between 1-3 modules
@@ -97,17 +99,17 @@ class MATLAB2CAST(object):
         # 3. Everything else (defined functions)
         modules = []
 
-        contexts = get_children_by_types(root, ["module", "program"])
-        print("\nrunning contexts")
-        for context in contexts:
-            print("context")
-            modules.append(self.visit(context))
-        print("running contexts done")
+        #contexts = get_children_by_types(root, ["comment"])
+        #print("\nrunning contexts")
+        #for context in contexts:
+        #    print("context")
+        #    modules.append(self.visit(context))
+        #print("running contexts done")
 
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.
         # TODO: Research the above
-        outer_body_nodes = get_children_by_types(root, ["function", "subroutine"])
+        outer_body_nodes = get_children_by_types(root, ["comment", "assignment"])
         if len(outer_body_nodes) > 0:
             body = []
             for body_node in outer_body_nodes:
@@ -126,8 +128,9 @@ class MATLAB2CAST(object):
 
     def visit(self, node):
         print("\nvisit")
+        print(node.type)
 
-        if node.type in ["program", "module"] :
+        if node.type in ["program", "module", "source_file"] :
             return self.visit_module(node)
         elif node.type == "internal_procedures":
             return self.visit_internal_procedures(node)
@@ -139,7 +142,7 @@ class MATLAB2CAST(object):
             return self.visit_use_statement(node)
         elif node.type == "variable_declaration":
             return self.visit_variable_declaration(node)
-        elif node.type == "assignment_statement":
+        elif node.type == "assignment":
             return self.visit_assignment_statement(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
