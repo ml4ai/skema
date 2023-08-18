@@ -22,7 +22,7 @@ There being a second function call of the same function which contains an expres
 /* 3/20/23
    - '+' at the top level main are getting duplicate wires to the top level literals
 */
-
+#[allow(clippy::all)] // this is temporary until I refactor this code
 use crate::FunctionType;
 use crate::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
 use crate::{FunctionNet, GrometBox};
@@ -676,87 +676,89 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         // now to construct the nodes inside the function, currently supported Literals and Primitives
         // first include an Expression for increased depth
         let mut box_counter: u8 = 1;
-        for sboxf in eboxf.bf.as_ref().unwrap().iter() {
-            match sboxf.function_type {
-                FunctionType::Predicate => {
-                    (nodes, edges, start, meta_nodes) = create_att_predicate(
-                        &gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
+        if eboxf.bf.is_some() {
+            for sboxf in eboxf.bf.as_ref().unwrap().iter() {
+                match sboxf.function_type {
+                    FunctionType::Predicate => {
+                        (nodes, edges, start, meta_nodes) = create_att_predicate(
+                            &gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Expression => {
+                        (nodes, edges, start, meta_nodes) = create_att_expression(
+                            &gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Literal => {
+                        (nodes, edges, meta_nodes) = create_att_literal(
+                            &gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Primitive => {
+                        (nodes, edges, meta_nodes) = create_att_primitive(
+                            &gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    FunctionType::Abstract => {
+                        (nodes, edges, meta_nodes) = create_att_primitive(
+                            &gromet.clone(),
+                            eboxf.clone(),
+                            sboxf.clone(),
+                            nodes.clone(),
+                            edges.clone(),
+                            n1.clone(),
+                            idx,
+                            box_counter,
+                            bf_counter,
+                            start,
+                            meta_nodes.clone(),
+                        );
+                    }
+                    _ => {}
                 }
-                FunctionType::Expression => {
-                    (nodes, edges, start, meta_nodes) = create_att_expression(
-                        &gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                FunctionType::Literal => {
-                    (nodes, edges, meta_nodes) = create_att_literal(
-                        &gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                FunctionType::Primitive => {
-                    (nodes, edges, meta_nodes) = create_att_primitive(
-                        &gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                FunctionType::Abstract => {
-                    (nodes, edges, meta_nodes) = create_att_primitive(
-                        &gromet.clone(),
-                        eboxf.clone(),
-                        sboxf.clone(),
-                        nodes.clone(),
-                        edges.clone(),
-                        n1.clone(),
-                        idx,
-                        box_counter,
-                        bf_counter,
-                        start,
-                        meta_nodes.clone(),
-                    );
-                }
-                _ => {}
+                box_counter += 1;
+                start += 1;
             }
-            box_counter += 1;
-            start += 1;
         }
 
         // Now we perform the internal wiring of this branch
@@ -1879,7 +1881,6 @@ pub fn create_function(
             }
             (nodes, edges, start, meta_nodes)
         }
-        _ => (nodes, edges, start, meta_nodes),
     }
 }
 
@@ -3843,6 +3844,7 @@ pub fn wfopi_wiring(
 ) -> Vec<Edge> {
     // iterate through all wires of type
     for wire in eboxf.wfopi.unwrap().iter() {
+        let mut prop = None;
         let mut wfopi_src_tgt: Vec<String> = vec![];
         // find the src node
         for node in nodes.iter() {
@@ -3855,10 +3857,11 @@ pub fn wfopi_wiring(
                         // exclude opi's
                         if node.n_type != "Opi" {
                             // iterate through port to check for src
-                            for p in node.in_indx.as_ref().unwrap().iter() {
+                            for (i, p) in node.in_indx.as_ref().unwrap().iter().enumerate() {
                                 // push the src first, being pif
                                 if (wire.src as u32) == *p {
                                     wfopi_src_tgt.push(node.node_id.clone());
+                                    prop = Some(i as u32);
                                 }
                             }
                         }
@@ -3876,7 +3879,7 @@ pub fn wfopi_wiring(
                     if node.n_type == "Opi" {
                         // iterate through port to check for tgt
                         for p in node.in_indx.as_ref().unwrap().iter() {
-                            // push the src first, being pif
+                            // push the tgt now, being opi
                             if (wire.tgt as u32) == *p {
                                 wfopi_src_tgt.push(node.node_id.clone());
                             }
@@ -3890,7 +3893,7 @@ pub fn wfopi_wiring(
                 src: wfopi_src_tgt[0].clone(),
                 tgt: wfopi_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                prop,
             };
             edges.push(e6);
         }
@@ -3974,6 +3977,7 @@ pub fn wff_wiring(
     // iterate through all wires of type
     for wire in eboxf.wff.unwrap().iter() {
         let mut wff_src_tgt: Vec<String> = vec![];
+        let mut prop = None;
 
         let src_idx = wire.src; // port index
 
@@ -4004,10 +4008,11 @@ pub fn wff_wiring(
                             // exclude opo's
                             if node.n_type != "Opi" {
                                 // iterate through port to check for src
-                                for p in node.in_indx.as_ref().unwrap().iter() {
+                                for (i, p) in node.in_indx.as_ref().unwrap().iter().enumerate() {
                                     // push the tgt
                                     if (wire.src as u32) == *p {
                                         wff_src_tgt.push(node.node_id.clone());
+                                        prop = Some(i as u32);
                                     }
                                 }
                             }
@@ -4046,7 +4051,7 @@ pub fn wff_wiring(
                 src: wff_src_tgt[0].clone(),
                 tgt: wff_src_tgt[1].clone(),
                 e_type: String::from("Wire"),
-                prop: None,
+                prop,
             };
             edges.push(e8);
         }
