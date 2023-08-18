@@ -13,7 +13,7 @@ from skema.program_analysis.comment_extractor.model import (
     SupportedLanguageResponse,
 )
 
-SUPPORTED_FILE_EXTENSIONS = [".py", ".F", ".f", ".f95", ".for", ".m", ".r"]
+SUPPORTED_FILE_EXTENSIONS = [".c", ".cpp", ".py", ".F", ".f", ".f95", ".for", ".m", ".r"]
 EXTENSION_TO_LANGUAGE = {
     ".c": "c",
     ".cpp": "cpp",
@@ -48,7 +48,7 @@ async def comments_extract(
     """Endpoing for extracting comments from a single file.
 
     ### Python example
-    '''
+    ```
     request = {
         "source": "#Single line Python comment",
         "language": "python"
