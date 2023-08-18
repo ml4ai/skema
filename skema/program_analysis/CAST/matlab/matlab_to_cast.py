@@ -71,18 +71,18 @@ class MATLAB2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        print('\nCAST:')
+        print('\nCAST objects:')
         for c in self.out_cast:
             print(c)
-        print('CAST done')
+        print('CAST objects done\n\n')
 
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
-        print("\nrunning modules")
+        print('\nmodules:')
         for m in modules:
-            print("module")
-        print("running modules done")
+            print(m)
+        print("modules done")
 
         return [CAST([generate_dummy_source_refs(module)], "matlab") for module in modules]
         
