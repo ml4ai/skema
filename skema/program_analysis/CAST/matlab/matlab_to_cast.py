@@ -109,7 +109,7 @@ class MATLAB2CAST(object):
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.
         # TODO: Research the above
-        outer_body_nodes = get_children_by_types(root, ["comment", "assignment"])
+        outer_body_nodes = get_children_by_types(root, ["source_file", "comment", "assignment"])
         if len(outer_body_nodes) > 0:
             body = []
             for body_node in outer_body_nodes:
