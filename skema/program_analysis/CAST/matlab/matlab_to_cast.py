@@ -1,5 +1,6 @@
 import json
 import os.path
+import pprint
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
@@ -37,13 +38,13 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_first_child_index,
     get_last_child_index,
 )
-#from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
+from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
 #
 #from skema.program_analysis.CAST.matlab.preprocessor.preprocess import preprocess
 from skema.program_analysis.CAST.matlab.build_tree_sitter_matlab import LANGUAGE_LIBRARY_REL_PATH
 class MATLAB2CAST(object):
     def __init__(self, source_file_path: str):
-        print('__init__')
+        print('MATLAB2CAST.__init__')
         # Prepare source with preprocessor
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
@@ -57,8 +58,12 @@ class MATLAB2CAST(object):
                 "matlab"
             )
         )
+        print('\nSource: ')
+        print(self.source)
         self.tree = parser.parse(bytes(self.source, "utf8"))
-        print(self.tree)
+
+        print('\nTree: ')
+        pprint.pprint(self.tree)
 
         # Walking data
         self.variable_context = VariableContext()
@@ -66,14 +71,25 @@ class MATLAB2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        print(self.out_cast)
+        print('\nCAST:')
+        for c in self.out_cast:
+            print(c)
+        print('CAST done')
 
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
-        return [CAST([generate_dummy_source_refs(module)], "MATLAB") for module in modules]
+        print("\nrunning modules")
+        for m in modules:
+            print("module")
+        print("running modules done")
+
+        return [CAST([generate_dummy_source_refs(module)], "matlab") for module in modules]
         
     def run(self, root) -> List[Module]:
+        print("run start")
+        print("root: " + root.type)
+
         '''Top level visitor function. Will return between 1-3 Module objects.'''
         # A program can have between 1-3 modules
         # 1. A module body
@@ -82,8 +98,11 @@ class MATLAB2CAST(object):
         modules = []
 
         contexts = get_children_by_types(root, ["module", "program"])
+        print("\nrunning contexts")
         for context in contexts:
+            print("context")
             modules.append(self.visit(context))
+        print("running contexts done")
 
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.
@@ -106,6 +125,8 @@ class MATLAB2CAST(object):
         return modules
 
     def visit(self, node):
+        print("\nvisit")
+
         if node.type in ["program", "module"] :
             return self.visit_module(node)
         elif node.type == "internal_procedures":
