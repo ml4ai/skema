@@ -107,6 +107,7 @@ Please ensure that `data_path` and `dataset_type` are properly set under `params
 
 If only want to test the pre-trained model, change the `load_trained_model_for_testing` to true.
 
+NOTE: We always first want to preprocess Images to reject, if any, corrupt image. 
 #### To preprocess images:
 ```
 python preprocessing/preprocess_images.py --config configs/xfmer_mml_config.json
