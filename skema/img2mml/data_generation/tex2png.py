@@ -1,14 +1,12 @@
 # Render PNGs from Tex files using pdflatex and pdf2image
 
-import os, subprocess, random
+import os
+import subprocess
 import logging
 import json
-import multiprocessing
-import time
 from datetime import datetime
-from multiprocessing import Pool, Lock, TimeoutError
+from multiprocessing import Pool, Lock
 from threading import Timer
-from pdf2image import convert_from_path
 
 # Printing starting time
 print(" ")
@@ -32,10 +30,10 @@ num_cpus = config["num_cpus"]
 
 
 def main(year):
-    src_path = config["source_directory"]
+    config["source_directory"]
     destination = config["destination_directory"]
     directories = config["months"].split(",")
-    verbose = config["verbose"]
+    config["verbose"]
 
     # Setting up Logger - To get log files
     logger = logging.getLogger()
@@ -83,13 +81,15 @@ def pool_path(path, logger):
                 pdf_large if type_of_folder == large_tex_files else pdf_small
             )
 
-            # array to store pairs of [type_of_folder, file in type_of_folder] Will be used as arguments in pool.map
+            # array to store pairs of 
+            # [type_of_folder, file in type_of_folder] 
+            # Will be used as arguments in pool.map
             temp = []
             for texfile in os.listdir(type_of_folder):
                 temp.append([folder, type_of_folder, texfile, pdf_dst, logger])
 
             with Pool(num_cpus) as pool:
-                result = pool.map(run_pdflatex, temp)
+                pool.map(run_pdflatex, temp)
 
 
 # This function will run pdflatex
@@ -189,7 +189,8 @@ def pdf2png(folder, pdf_file, png_name, png_dst, type_of_folder, logger):
 
 
 # Function to kill process if TimeoutError occurs
-kill = lambda process: process.kill()
+def kill(process):
+    return process.kill()
 
 
 if __name__ == "__main__":

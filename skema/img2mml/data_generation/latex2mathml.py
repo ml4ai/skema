@@ -1,13 +1,13 @@
 # CONVERT LaTeX EQUATION TO MathML CODE USING MathJax
 import time
-
 import requests
-import subprocess, os
+import subprocess
+import os
 import json
 import multiprocessing
 import logging
 from datetime import datetime
-from multiprocessing import Pool, Lock, TimeoutError, Event
+from multiprocessing import Pool, Lock, Event
 import re
 from pathlib import Path
 
@@ -68,7 +68,7 @@ def main(year):
         if not os.path.exists(mml_dir):
             subprocess.call(["mkdir", mml_dir])
 
-        mml_folder_list = os.listdir(mml_dir)
+        os.listdir(mml_dir)
 
         temp = []
 
@@ -94,7 +94,7 @@ def main(year):
             )
 
         with Pool(num_cpus) as pool:
-            result = pool.map(creating_final_equations, temp)
+            pool.map(creating_final_equations, temp)
 
 
 def creating_macro_dmo_dictionaries(root, folder):
@@ -229,7 +229,7 @@ def creating_final_equations(args_list):
                             f" {type_of_folder}/{file_name}: can not be converted."
                         )
                         print(
-                            " =============================================================== "
+                            " ==================================================== "
                         )
 
                     logger.warning(
@@ -264,7 +264,7 @@ def correct_phi(string):
 
 
 def restart_mathjax_server():
-    response = requests.get("http://localhost:8081/restart")
+    requests.get("http://localhost:8081/restart")
 
 
 def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
@@ -299,7 +299,7 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
     if verbose:
         lock.acquire()
         print(
-            f"converting latex equation to MathML using MathJax webserver of {file_name}...."
+            f"converting latex to MML using MathJax webserver {file_name}...."
         )
         print(" ")
         print(f"response of the webservice request: {res.text}")
@@ -333,11 +333,13 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
             lock.acquire()
             if verbose:
                 print(
-                    f"{type_of_folder}/{file_name}:{unsupported_keyword} is either not supported by MathJax or incorrectly written."
+                    f"{type_of_folder}/{file_name}:{unsupported_keyword} is either not \
+                        supported by MathJax or incorrectly written."
                 )
 
             logger.warning(
-                f"{type_of_folder}/{file_name}:{unsupported_keyword} is either not supported by MathJax or incorrectly written."
+                f"{type_of_folder}/{file_name}:{unsupported_keyword} is either not \
+                    supported by MathJax or incorrectly written."
             )
             lock.release()
 
@@ -348,7 +350,9 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
             lock.acquire()
             print(folder)
             logger.warning(
-                f"{type_of_folder}/{file_name}:{tex_parse_error} -- Math Processing Error: Maximum call stack size exceeded. Killing the process and server."
+                f"Math Processing Error: Maximum call stack size exceeded.\
+                     Killing the process and server. \
+                    {type_of_folder}/{file_name}:{tex_parse_error}"
             )
             lock.release()
             pause_event.clear()
@@ -361,11 +365,13 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
             lock.acquire()
             if verbose:
                 print(
-                    f"{type_of_folder}/{file_name}:{tex_parse_error} is an error produced by MathJax webserver."
+                    f"{type_of_folder}/{file_name}:{tex_parse_error} is an \
+                        error produced by MathJax webserver."
                 )
 
             logger.warning(
-                f"{type_of_folder}/{file_name}:{tex_parse_error} is an error produced by MathJax webserver."
+                f"{type_of_folder}/{file_name}:{tex_parse_error} is an \
+                    error produced by MathJax webserver."
             )
             lock.release()
 
@@ -421,7 +427,8 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
     lock.acquire()
     equation_counter.value += 1
 
-    # To avoid the buffer issue from MathJax, restart the service once processing 1000 equations
+    # To avoid the buffer issue from MathJax, 
+    # restart the service once processing 1000 equations
     if equation_counter.value % 1000 == 0:
         pause_event.clear()
         restart_mathjax_server()

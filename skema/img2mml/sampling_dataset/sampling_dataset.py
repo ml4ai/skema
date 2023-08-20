@@ -1,10 +1,10 @@
-import os, json, random
+import os
+import json
+import random
 import shutil
-import threading
 import subprocess
 from threading import Timer
 from shutil import copyfile as CP
-from preprocessing.preprocess_mml import simplification
 import multiprocessing as mp
 
 # read config file and define paths
@@ -33,7 +33,9 @@ if not os.path.exists(data_path):
     os.mkdir(data_path)
 else:
     print(
-        "sample_data already exists. Removing old sample_data and replacing it with new one."
+        "sample_data already exists. \
+        Removing old sample_data and replacing \
+        it with new one."
     )
     shutil.rmtree(data_path)
     os.mkdir(data_path)
@@ -162,7 +164,8 @@ def get_bin(af):
 
 
 # Function to kill process if TimeoutError occurs
-kill = lambda process: process.kill()
+def kill(process):
+    return process.kill()
 
 
 def main():
@@ -239,7 +242,7 @@ def main():
                 all_files.append([i, ap])
 
             with mp.Pool(config["num_cpus"]) as pool:
-                result = pool.map(prepare_dataset, all_files)
+                pool.map(prepare_dataset, all_files)
 
             with mp.Pool(config["num_cpus"]) as pool:
                 results = [
@@ -249,7 +252,7 @@ def main():
             pool.close()
 
             for r in results:
-                if r != None:
+                if r is not None:
                     tgt_bin, ap = r
                     if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                         counter_dist_dict[tgt_bin] += 1

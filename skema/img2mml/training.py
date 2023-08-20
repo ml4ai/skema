@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 "Main script to train the model."
 
-import os, random
+import os
+import random
 import numpy as np
 import time
 import json
@@ -341,7 +342,7 @@ def train_model(rank=None,):
             momentum=momentum,
         )
     if use_scheduler:
-        scheduler = torch.optim.lr_scheduler.StepLR(
+        torch.optim.lr_scheduler.StepLR(
             optimizer, step_size=step_size, gamma=gamma
         )
 
@@ -443,7 +444,8 @@ def train_model(rank=None,):
 
             else:
                 print(
-                    f"Terminating the training process as the validation loss hasn't been reduced from last {early_stopping_counts} epochs."
+                    f"Terminating the training process as the validation \
+                    loss hasn't been reduced from last {early_stopping_counts} epochs."
                 )
                 break
 

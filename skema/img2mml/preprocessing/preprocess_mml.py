@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import re, json, argparse
-import subprocess, os, sys
+import re
+import json
+import sys
 
 
 def get_config(config_path):
@@ -77,8 +78,10 @@ def simplification(mml_org):
         "mathcolor",
     ]
 
-    ## Attributes that need to be checked before removing, if mentioned in code with their default value,
-    ## will be removed else will keep it. This dictionary contains all the attributes with thier default values.
+    ## Attributes that need to be checked before removing,
+    #  if mentioned in code with their default value,
+    ## will be removed else will keep it. This dictionary 
+    # contains all the attributes with thier default values.
     attr_tobe_checked = {
         "displaystyle": "false",
         "mathsize": "normal",
@@ -276,7 +279,7 @@ def remove_unecc_tokens(eqn):
                                 keep_token = true_k[0]
                         else:
                             keep_token = k
-                if flag == True:
+                if flag is True:
                     eqn = (
                         temp1[: open_angle[-1]]
                         + f" <{keep_token}>"

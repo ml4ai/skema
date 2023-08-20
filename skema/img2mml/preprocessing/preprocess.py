@@ -1,15 +1,10 @@
 import pandas as pd
-import random
 import torch
-import os
 from sklearn.model_selection import train_test_split
 from torch.utils.data import Dataset, DataLoader, DistributedSampler
 from collections import Counter
 from torchtext.vocab import Vocab
-from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import SequentialSampler
-from functools import partial
-from skema.img2mml.utils.utils import CreateVocab
 
 
 class Img2MML_dataset(Dataset):
@@ -24,7 +19,7 @@ class Img2MML_dataset(Dataset):
         eqn = self.dataframe.iloc[index, 1]
         indexed_eqn = []
         for token in eqn.split():
-            if self.vocab.stoi[token] != None:
+            if self.vocab.stoi[token] is not None:
                 indexed_eqn.append(self.vocab.stoi[token])
             else:
                 indexed_eqn.append(self.vocab.stoi["<unk>"])
@@ -77,7 +72,7 @@ def preprocess_dataset(config):
 
     # reading raw text files
     mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['markup']}.lst"
-    img_tnsr_path = (
+    (
         f"{config['data_path']}/{config['dataset_type']}/image_tensors"
     )
     mml_txt = open(mml_path).read().split("\n")[:-1][:10000]
@@ -126,7 +121,8 @@ def preprocess_dataset(config):
         vfile.write(f"{vidx} \t {vstr} \n")
 
     # define tokenizer function
-    tokenizer = lambda x: x.split()
+    def tokenizer(x):
+        return x.split()
 
     # initializing pad collate class
     mypadcollate = My_pad_collate(config["device"], vocab, config["max_len"])

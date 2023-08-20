@@ -96,7 +96,7 @@ def evaluate(
                             alpha,
                             min_length_bean_search_normalization,
                         )  # list of all eqns and score
-                        pred = predicted_seq[0][0]
+                        predicted_seq[0][0]
 
                     pred_arr = [
                         vocab.itos[ipred] for ipred in preds.int()[idx, :]

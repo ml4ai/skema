@@ -1,9 +1,10 @@
 # CREATING TEX FILES OF THE LATEX EQUATIONS
 
-import os, subprocess, json
-import multiprocessing
+import os
+import subprocess 
+import json
 from datetime import datetime
-from multiprocessing import Pool, Lock, TimeoutError
+from multiprocessing import Lock
 
 # Printing starting time
 print(" ")
@@ -94,7 +95,10 @@ def tex_builder(args_list):
 
             tex_name = eqn_file.split(".")[0]
 
-            # calling function to create tex doc for the particular folder --> giving all latex eqns, DMOs, Macros and tex_folder path as arguments
+            # calling function to create tex doc 
+            # for the particular folder --> giving all 
+            # latex eqns, DMOs, Macros and tex_folder 
+            # path as arguments
             if len(eqns) != 0:
                 if len(eqns) > 1:
                     eqn = " "

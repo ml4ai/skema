@@ -23,7 +23,7 @@ def train(
     for i, (img, mml) in enumerate(train_dataloader):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
-        batch_size = mml.shape[0]
+        mml.shape[0]
         mml = mml.to(device, dtype=torch.long)
         imgs = list()
         for im in img:

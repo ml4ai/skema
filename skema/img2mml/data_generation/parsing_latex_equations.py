@@ -8,14 +8,14 @@ NOTE: Please change the paths as per your system before running the code.
 
 
 import pandas as pd
-import json, os
+import json
+import os
 from subprocess import call
 import subprocess
 import logging
-import multiprocessing
 import chardet
 from datetime import datetime
-from multiprocessing import Pool, Lock, TimeoutError
+from multiprocessing import Pool, Lock
 
 # Printing starting time
 start_time = datetime.now()
@@ -174,15 +174,12 @@ def parse_equation(args_list):
         if encoding is not None:
             if encoding not in unknown_iconv:
                 # initializing the arrays and variables
-                total_macros = []
-                declare_math_operator = []
                 line_large_eqn_dict = {}  # For large equations
                 line_inline_eqn_dict = {}  # For small inline equations
                 final_eqn_num_line_num_dict = {}
                 total_equations = []
                 alpha = 0
                 matrix = 0
-                dollar = 1
                 brac = 1
 
                 # creating the paper folder
@@ -231,10 +228,10 @@ def parse_equation(args_list):
                         dmo_file.write(line)
 
                     # condition 1.a: if $(....)$ is present
-                    # condition 1.b: if $$(....)$$ is present --> replace it with $(---)$
+                    # condition 1.b: if $$(....)$$ is present
+                    # replace it with $(---)$
                     if "$" in line or "$$" in line and alpha == 0:
                         # if line has any eqn
-                        eqn_flag = True
 
                         if "$$" in line:
                             line = line.replace("$$", "$")
@@ -242,8 +239,12 @@ def parse_equation(args_list):
                         # array of the positions of the "$"
                         length = len([c for c in line if c == "$"])
 
-                        # length of the above array -- no. of the "$",  if even -- entire equation is in one line. If odd -- equation is going to next line
-                        # if instead of $....$, $.... is present, and upto next 5 lines, no closing "$" can be found, then that condition will be rejected.
+                        # length of the above array -- no. of the "$",  
+                        # if even -- entire equation is in one line.
+                        # If odd -- equation is going to next line
+                        # if instead of $....$, $.... is present, 
+                        # and upto next 5 lines, no closing "$" can be found, 
+                        # then that condition will be rejected.
                         if length % 2 == 0:
                             inline_equation = inline(length, line)
 
@@ -287,7 +288,6 @@ def parse_equation(args_list):
 
                     # condition 2: if \[....\] is present
                     if "\\[" in line and alpha == 0:
-                        eqn_flag = True
                         length_begin = len([c for c in line if c == "\\["])
                         length_end = len([c for c in line if c == "\\]"])
 
@@ -320,7 +320,7 @@ def parse_equation(args_list):
                             ]
                             if bool(r):
                                 total_equations.append(b_equations)
-                                line_inline_eqn_dict[Bequations] = index
+                                line_inline_eqn_dict[b_equations] = index
 
                     # condition 3: if \(....\) is present
                     if "\\(" in line and alpha == 0:
@@ -357,7 +357,9 @@ def parse_equation(args_list):
                                 total_equations.append(p_equations)
                                 line_inline_eqn_dict[p_equations] = index
 
-                    # condition 4: if \begin{equation(*)} \begin{case or split} --- \end{equation(*)} \begin{case or split}
+                    # condition 4: 
+                    # if \begin{equation(*)} \begin {case or split} 
+                    # --- \end{equation(*)} \begin{case or split}
                     # comdition 5: if \beginx{equation(*)} --- \end{equation(*)}
                     # if \label \ref \caption --> remove these lines
                     for ec in equation_cmds:
@@ -378,13 +380,15 @@ def parse_equation(args_list):
                                 )
 
                             """
-                            condition for removing unwanted tokens like \label
+                            condition for removing 
+                            unwanted tokens like \label
                             """
 
                             total_equations.append(eqn)
                             line_large_eqn_dict[eqn] = index
 
-                    # condition 6: if '\\begin{..matrix(*)}' but independent under condition 4
+                    # condition 6: if '\\begin{..matrix(*)}'
+                    # but independent under condition 4
                     """
                     Need to work on this condition
                     """
@@ -397,7 +401,8 @@ def parse_equation(args_list):
                             end_matrix_index = index
                             matrix = 0
 
-                            # append the array with the recet equation along with the \\begin{} and \\end{} statements
+                            # append the array with the recet equation 
+                            # along with the \\begin{} and \\end{} statements
                             equation = lines[
                                 begin_matrix_index : end_matrix_index + 1
                             ]
@@ -449,7 +454,9 @@ def parse_equation(args_list):
                     ),
                 )
 
-            # if tex has unknown encoding or which can not be converted to some known encoding
+            # if tex has unknown encoding or 
+            # which can not be converted to some 
+            # known encoding
             else:
                 # Log the tex_folder that has unknown encoding
                 lock.acquire()

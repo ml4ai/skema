@@ -2,12 +2,14 @@
 inspired by  https://github.com/harvardnlp/im2markup/blob/master/scripts/utils/image_utils.py
 """
 
-import torch, os, json, argparse, sys
+import torch
+import os
+import json
+import sys
 import numpy as np
 from torchvision import transforms
 from PIL import Image
-import multiprocessing
-from multiprocessing import Pool, Lock, TimeoutError
+from multiprocessing import Pool
 
 # read config file
 config_path = sys.argv[-1]
@@ -175,7 +177,7 @@ def main():
     with Pool(config["num_cpus"]) as pool:
         result = pool.map(preprocess_images, images)
 
-    blank_images = [i for i in result if i != None]
+    blank_images = [i for i in result if i is not None]
 
     with open("logs/blank_images.lst", "w") as out:
         out.write("\n".join(str(item) for item in blank_images))
