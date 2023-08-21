@@ -641,16 +641,17 @@ def healthcheck() -> int:
 
     # TODO replace this with a proper healthcheck endpoint
     mit_endpoint = f"{MIT_TR_ADDRESS}/annotation/find_text_vars/"
-    mit_params = {"gpt_key": OPENAI_KEY, "text": "x = 0"}
+    mit_params = {"gpt_key": OPENAI_KEY}
+    files = {"file": io.StringIO("x = 0")}
     try:
-        mit_response = requests.post(mit_endpoint, params=mit_params, timeout=10)
+        mit_response = requests.post(mit_endpoint, params=mit_params, files=files, timeout=10)
     except Exception:
         return status.HTTP_502_BAD_GATEWAY
     ######################################################
 
     status_code = (
         status.HTTP_200_OK
-        if all(code == 200 for code in [skema_response, mit_response])
+        if all(resp.status_code == 200 for resp in [skema_response, mit_response])
         else status.HTTP_500_INTERNAL_SERVER_ERROR
     )
     return status_code
