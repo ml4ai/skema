@@ -7,7 +7,7 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, Math, MathExpression, Mi, Mrow, Type,
+        BoundVariables, Ci, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
         add, attribute, comma, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup,
@@ -172,10 +172,12 @@ pub fn ci_unknown(input: Span) -> IResult<(Ci, Vec<Mi>)> {
 }
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
-pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
+pub fn first_order_derivative_leibniz_notation(
+    input: Span,
+) -> IResult<(Derivative, BoundVariables)> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), d))(input)?;
     println!("s={:?}", s);
-    let (s, (func, bound_vars)) = ws(alt((
+    let (s, (func, func_of)) = ws(alt((
         ci_univariate_func,
         map(ci_unknown, |(Ci { content, .. }, vars)| {
             (
@@ -188,14 +190,16 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
         }),
     )))(s)?;
     println!("func={:?}", func);
-    println!("bound_vars={:?}", bound_vars);
+    println!("func_of={:?}", func_of);
+    //let binding = BoundVariables(func, bound_vars);
+    let binding = BoundVariables::new(func, func_of);
     let (s, with_respect_to) = delimited(
         tuple((etag!("mrow"), stag!("mrow"), d)),
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
     println!("with_respect_to={:?}", with_respect_to);
-    for (indx, bvar) in bound_vars.iter().enumerate() {
+    for (indx, bvar) in binding.func_of.iter().enumerate() {
         if *bvar == with_respect_to {
             println!("Match successful");
             return Ok((
@@ -209,12 +213,13 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                             Box::new(MathExpression::Mi(with_respect_to)),
                         ),
                     ),
-                    func,
+                    //func,
+                    binding,
                 ),
             ));
         }
     }
-    if bound_vars[0] == Mi("".to_string()) {
+    if binding.func_of[0] == Mi("".to_string()) {
         return Ok((
             s,
             (
@@ -226,7 +231,8 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                         Box::new(MathExpression::Mi(with_respect_to)),
                     ),
                 ),
-                func,
+                //func,
+                binding,
             ),
         ));
     }
@@ -236,7 +242,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
     )))
 }
 
-pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
+pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, BoundVariables)> {
     // Get number of dots to recognize the order of the derivative
     let n_dots = delimited(
         stag!("mo"),
@@ -263,6 +269,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     (input)?;
     let (s, func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)?;
     println!("func_of={:?}", func_of);
+    let binding = BoundVariables::new(x, func_of);
 
     let mut new_with_respect_to = with_respect_to[0].clone();
     //println!("new_with_respect_to={:?}", new_with_respect_to);
@@ -278,7 +285,8 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
                     //Box::new(MathExpression::Mi()),
                 ),
             ),
-            x,
+            //x,
+            binding,
         ),
     ))
 }
