@@ -326,9 +326,11 @@ def merge_pipelines_results(
     for skema, mit in zip(skema_extractions, mit_extractions):
         if annotate_skema and isinstance(skema, str):
             errors.append(TextReadingError(pipeline="SKEMA", message=skema))
+            skema = None
 
         if annotate_mit and isinstance(mit, str):
             errors.append(TextReadingError(pipeline="MIT", message=mit))
+            mit = None
 
         normalized = normalize_extractions(
             arizona_extractions=skema, mit_extractions=mit
