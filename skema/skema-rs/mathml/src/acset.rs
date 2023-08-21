@@ -612,7 +612,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                 let exp_len = t.0.exp_states.len();
                 for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
-                    if i != exp_len {
+                    if i != exp_len - 1 {
                         expression_string =
                             format!("{}{}*", expression_string.clone(), exp.clone());
                     } else {
