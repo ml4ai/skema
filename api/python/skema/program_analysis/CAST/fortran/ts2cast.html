@@ -69,7 +69,7 @@ from skema.program_analysis.CAST.fortran.node_helper import (
 from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
 
 from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
-from skema.program_analysis.CAST.fortran.build_tree_sitter_fortran import LANGUAGE_LIBRARY_REL_PATH
+from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
@@ -81,7 +81,7 @@ class TS2CAST(object):
         parser = Parser()
         parser.set_language(
             Language(
-                Path(Path(__file__).parent, LANGUAGE_LIBRARY_REL_PATH),
+                INSTALLED_LANGUAGES_FILEPATH,
                 &#34;fortran&#34;
             )
         )
@@ -1166,7 +1166,7 @@ class TS2CAST(object):
         parser = Parser()
         parser.set_language(
             Language(
-                Path(Path(__file__).parent, LANGUAGE_LIBRARY_REL_PATH),
+                INSTALLED_LANGUAGES_FILEPATH,
                 &#34;fortran&#34;
             )
         )

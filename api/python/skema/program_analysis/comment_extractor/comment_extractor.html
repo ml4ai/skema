@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.comment_extractor.comment_extractor API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.comment_extractor.comment_extractor</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import argparse
+from typing import List, Dict, Tuple, Union, Optional
+from pathlib import Path
+
+import yaml
+from tree_sitter import Language, Parser, Node
+from pydantic import BaseModel, Field
+
+from skema.program_analysis.comment_extractor.model import (
+    SingleLineComment,
+    MultiLineComment,
+    Docstring,
+    SingleFileCommentRequest,
+    SingleFileCommentResponse,
+    MultiFileCommentRequest,
+    MultiFileCommentResponse,
+    SupportedLanguage,
+    SupportedLanguageResponse,
+)
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH,
+)
+
+
+def get_identifier(node: Node, source: str):
+    &#34;&#34;&#34;Given a tree-sitter node object, return the string representing the source between node.start_point and node.end_point&#34;&#34;&#34;
+    line_num = 0
+    column_num = 0
+    in_identifier = False
+    identifier = &#34;&#34;
+    for i, char in enumerate(source):
+        if line_num == node.start_point[0] and column_num == node.start_point[1]:
+            in_identifier = True
+        elif line_num == node.end_point[0] and column_num == node.end_point[1]:
+            break
+
+        if char == &#34;\n&#34;:
+            line_num += 1
+            column_num = 0
+        else:
+            column_num += 1
+
+        if in_identifier:
+            identifier += char
+
+    return identifier
+
+
+def node_to_single_line_comment(node: Node, source: str) -&gt; SingleLineComment:
+    &#34;&#34;&#34;Converts a tree-sitter node to a SingleLineComment object&#34;&#34;&#34;
+    content = get_identifier(node, source)
+    line_number = node.start_point[0]
+
+    return SingleLineComment(content=content, line_number=line_number)
+
+
+def node_to_multi_line_comment_partial(nodes: List[Node], source: str):
+    &#34;&#34;&#34;Converts a list of tree-sitter nodes to a single MultiLineCodeComment object&#34;&#34;&#34;
+    content = [get_identifier(node, source) for node in nodes]
+    start_line_number = nodes[0].start_point[0]
+    end_line_number = nodes[-1].end_point[0]
+
+    return MultiLineComment(
+        content=content,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )
+
+
+def node_to_multi_line_comment(node: Node, source: str) -&gt; Dict:
+    &#34;&#34;&#34;Converts a tree-sitter node to a MultiLineComment object&#34;&#34;&#34;
+    content = get_identifier(node, source).split(&#34;\n&#34;)
+    start_line_number = node.start_point[0]
+    end_line_number = node.end_point[0]
+
+    return MultiLineComment(
+        content=content,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )
+
+
+def nodes_to_docstring_partial(name_node: Node, content_nodes: List[Node], source: str):
+    &#34;&#34;&#34;Converts a list of tree-sitter nodes to a single Docstring object&#34;&#34;&#34;
+    content = [get_identifier(node, source) for node in content_nodes]
+    function_name = get_identifier(name_node, source)
+    start_line_number = content_nodes[0].start_point[0]
+    end_line_number = content_nodes[-1].end_point[0]
+
+    return Docstring(
+        content=content,
+        function_name=function_name,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )
+
+
+def nodes_to_docstring(name_node: Node, content_node: Node, source: str) -&gt; Dict:
+    &#34;&#34;&#34;Converts a tree-sitter node to a Docstring object&#34;&#34;&#34;
+    content = get_identifier(content_node, source).split(&#34;\n&#34;)
+    function_name = get_identifier(name_node, source)
+    start_line_number = content_node.start_point[0]
+    end_line_number = content_node.end_point[0]
+
+    return Docstring(
+        content=content,
+        function_name=function_name,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )
+
+
+def preprocess_captures(captures: List[Tuple[Node, str]]) -&gt; List[Tuple[Node, str]]:
+    &#34;&#34;&#34;Preprocess list of captures generated by tree-sitter. This preprocessing includes:
+    1. Reording captures to go docstring -&gt; multi -&gt; single
+    2. Moving docstring name node after docstring body node in languages with internal function docstrings
+    3. Removing duplicate nodes captured my multiple capture groups
+    &#34;&#34;&#34;
+
+    def hash_node(node: Node):
+        &#34;&#34;&#34;Create a hashable tuple of tree-sitter node.&#34;&#34;&#34;
+        return (node.type, node.start_point, node.end_point)
+
+    # Rearrange the captures to go Docstring -&gt; Multi -&gt; Single
+    order = {
+        &#34;docstring_body&#34;: 1,
+        &#34;docstring_name&#34;: 1,
+        &#34;docstring_body_partial&#34;: 1,
+        &#34;multi&#34;: 2,
+        &#34;multi_partial&#34;: 2,
+        &#34;single&#34;: 3,
+    }
+    ordered = sorted(captures, key=lambda capture: (order[capture[1]]))
+
+    # The order of docstring_body and docstring_name can differ between languages
+    # To standardize this, we will the docstring_name node to the back.
+    # We do this by additionally sorting on the line number.
+    if len(ordered) &gt; 0 and ordered[0][1] == &#34;docstring_name&#34;:
+        ordered = ordered = sorted(
+            captures, key=lambda capture: (order[capture[1]], -capture[0].start_byte)
+        )
+
+    output = []
+    duplicates = set()
+    for comment in ordered:
+        hash = hash_node(comment[0])
+        if hash in duplicates:
+            continue
+        output.append(comment)
+        duplicates.add(hash)
+
+    return output
+
+
+def extract_comments_single(
+    request: SingleFileCommentRequest,
+) -&gt; SingleFileCommentResponse:
+    # Get tree-sitter queries for given language
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
+    if request.language not in queries_obj:
+        return None
+    queries = queries_obj[request.language]
+
+    language_obj = Language(INSTALLED_LANGUAGES_FILEPATH, request.language)
+
+    # Parse source and run query with tree-sitter
+    parser = Parser()
+    parser.set_language(language_obj)
+    tree = parser.parse(bytes(request.source, encoding=&#34;UTF-8&#34;))
+    captures = language_obj.query(queries_obj[request.language]).captures(
+        tree.root_node
+    )
+    captures = preprocess_captures(captures)
+
+    # Loop over captures, converting them to CodeComment objects.
+    # There are currently 5 types of capture groups supported by the comment extarctor
+    # 1. single - Single line comment (i.e. Fortran &#39;!&#39;)
+    # 2. multi - Multi line comment (i.e. C &#39;/* */&#39;)
+    # 3. multi_partial - Adjacent single line comments in languages that don&#39;t have a multi line comment token
+    # 4. docstring_body - Docstring comment (def foo():\n&#34;&#34;&#34; &#34;&#34;&#34;)
+    # 5. docstring_body_partial - Adjacent single line docstring comments in languages that don&#39;t have a multi line comment token
+    single, multi, docstring = ([], [], [])
+    index = 0
+    while index &lt; len(captures):
+        node, type = captures[index]
+        if type == &#34;single&#34;:
+            single.append(node_to_single_line_comment(node, request.source))
+        elif type == &#34;multi&#34;:
+            multi.append(node_to_multi_line_comment(node, request.source))
+        elif type == &#34;multi_partial&#34;:
+            # For partial multi line comments, we have to determine the stopping point.
+            # We do this by checking the the line number of each capture. If its &gt;1 line away from the previous capture, we have hit the stopping point.
+            multi_start_index = index
+            multi_end_index = None
+            for i in range(index, len(captures) - 1):
+                current_line_number = captures[i][0].end_point[0]
+                next_line_number = captures[i + 1][0].end_point[0]
+                if next_line_number - current_line_number != 1:
+                    multi_end_index = i + 1
+                    break
+
+            multi_body_nodes = [
+                node for node, _ in captures[multi_start_index:multi_end_index]
+            ]
+            multi.append(
+                node_to_multi_line_comment_partial(multi_body_nodes, request.source)
+            )
+            index = multi_end_index
+            continue
+        elif type == &#34;docstring_body&#34;:
+            docstring_name_node = captures[index + 1][0]
+            docstring.append(
+                nodes_to_docstring(docstring_name_node, node, request.source)
+            )
+            index += 2
+            continue
+        elif type == &#34;docstring_body_partial&#34;:
+            # Similar to partial multi line comments, partial docstrings also need a stopping index.
+            # Due to the  preprocessing earlier, the stop index will always be the index of the next docstring_name node.
+            docstring_name_index = -1
+            for i in range(index, len(captures)):
+                if captures[i][1] == &#34;docstring_name&#34;:
+                    docstring_name_index = i
+                    break
+            docstring_name_node = captures[docstring_name_index][0]
+            docstring_body_nodes = [
+                node for node, _ in captures[index:docstring_name_index]
+            ]
+            docstring.append(
+                nodes_to_docstring_partial(
+                    docstring_name_node, docstring_body_nodes, request.source
+                )
+            )
+            index = docstring_name_index + 1
+            continue
+        index += 1
+
+    return SingleFileCommentResponse(single=single, multi=multi, docstring=docstring)
+
+
+def extract_comments_multi(
+    request: MultiFileCommentRequest,
+) -&gt; MultiFileCommentResponse:
+    &#34;&#34;&#34;Wrapper for processing multiple source files at a time.&#34;&#34;&#34;
+    return MultiFileCommentResponse.parse_obj(
+        {
+            &#34;files&#34;: {
+                file_name: extract_comments_single(file_request)
+                for file_name, file_request in request.files.items()
+            }
+        }
+    )
+
+
+def get_supported_languages() -&gt; SupportedLanguageResponse:
+    &#34;&#34;&#34;Return the languages supported for comment extraction&#34;&#34;&#34;
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
+
+    languages = []
+    for language, query in queries_obj.items():
+        single = True if &#34;@single&#34; in query else False
+        multi = True if &#34;@multi&#34; in query or &#34;@multi_partial&#34; in query else False
+        docstring = (
+            True
+            if &#34;@docstring_body&#34; in query or &#34;docstring_body_partial&#34; in query
+            else False
+        )
+        languages.append(
+            SupportedLanguage(
+                name=language, single=single, multi=multi, docstring=docstring
+            )
+        )
+
+    return SupportedLanguageResponse(languages=languages)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.extract_comments_multi"><code class="name flex">
+<span>def <span class="ident">extract_comments_multi</span></span>(<span>request: <a title="skema.program_analysis.comment_extractor.model.MultiFileCommentRequest" href="model.html#skema.program_analysis.comment_extractor.model.MultiFileCommentRequest">MultiFileCommentRequest</a>) ‑> <a title="skema.program_analysis.comment_extractor.model.MultiFileCommentResponse" href="model.html#skema.program_analysis.comment_extractor.model.MultiFileCommentResponse">MultiFileCommentResponse</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Wrapper for processing multiple source files at a time.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_comments_multi(
+    request: MultiFileCommentRequest,
+) -&gt; MultiFileCommentResponse:
+    &#34;&#34;&#34;Wrapper for processing multiple source files at a time.&#34;&#34;&#34;
+    return MultiFileCommentResponse.parse_obj(
+        {
+            &#34;files&#34;: {
+                file_name: extract_comments_single(file_request)
+                for file_name, file_request in request.files.items()
+            }
+        }
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.extract_comments_single"><code class="name flex">
+<span>def <span class="ident">extract_comments_single</span></span>(<span>request: <a title="skema.program_analysis.comment_extractor.model.SingleFileCommentRequest" href="model.html#skema.program_analysis.comment_extractor.model.SingleFileCommentRequest">SingleFileCommentRequest</a>) ‑> <a title="skema.program_analysis.comment_extractor.model.SingleFileCommentResponse" href="model.html#skema.program_analysis.comment_extractor.model.SingleFileCommentResponse">SingleFileCommentResponse</a></span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def extract_comments_single(
+    request: SingleFileCommentRequest,
+) -&gt; SingleFileCommentResponse:
+    # Get tree-sitter queries for given language
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
+    if request.language not in queries_obj:
+        return None
+    queries = queries_obj[request.language]
+
+    language_obj = Language(INSTALLED_LANGUAGES_FILEPATH, request.language)
+
+    # Parse source and run query with tree-sitter
+    parser = Parser()
+    parser.set_language(language_obj)
+    tree = parser.parse(bytes(request.source, encoding=&#34;UTF-8&#34;))
+    captures = language_obj.query(queries_obj[request.language]).captures(
+        tree.root_node
+    )
+    captures = preprocess_captures(captures)
+
+    # Loop over captures, converting them to CodeComment objects.
+    # There are currently 5 types of capture groups supported by the comment extarctor
+    # 1. single - Single line comment (i.e. Fortran &#39;!&#39;)
+    # 2. multi - Multi line comment (i.e. C &#39;/* */&#39;)
+    # 3. multi_partial - Adjacent single line comments in languages that don&#39;t have a multi line comment token
+    # 4. docstring_body - Docstring comment (def foo():\n&#34;&#34;&#34; &#34;&#34;&#34;)
+    # 5. docstring_body_partial - Adjacent single line docstring comments in languages that don&#39;t have a multi line comment token
+    single, multi, docstring = ([], [], [])
+    index = 0
+    while index &lt; len(captures):
+        node, type = captures[index]
+        if type == &#34;single&#34;:
+            single.append(node_to_single_line_comment(node, request.source))
+        elif type == &#34;multi&#34;:
+            multi.append(node_to_multi_line_comment(node, request.source))
+        elif type == &#34;multi_partial&#34;:
+            # For partial multi line comments, we have to determine the stopping point.
+            # We do this by checking the the line number of each capture. If its &gt;1 line away from the previous capture, we have hit the stopping point.
+            multi_start_index = index
+            multi_end_index = None
+            for i in range(index, len(captures) - 1):
+                current_line_number = captures[i][0].end_point[0]
+                next_line_number = captures[i + 1][0].end_point[0]
+                if next_line_number - current_line_number != 1:
+                    multi_end_index = i + 1
+                    break
+
+            multi_body_nodes = [
+                node for node, _ in captures[multi_start_index:multi_end_index]
+            ]
+            multi.append(
+                node_to_multi_line_comment_partial(multi_body_nodes, request.source)
+            )
+            index = multi_end_index
+            continue
+        elif type == &#34;docstring_body&#34;:
+            docstring_name_node = captures[index + 1][0]
+            docstring.append(
+                nodes_to_docstring(docstring_name_node, node, request.source)
+            )
+            index += 2
+            continue
+        elif type == &#34;docstring_body_partial&#34;:
+            # Similar to partial multi line comments, partial docstrings also need a stopping index.
+            # Due to the  preprocessing earlier, the stop index will always be the index of the next docstring_name node.
+            docstring_name_index = -1
+            for i in range(index, len(captures)):
+                if captures[i][1] == &#34;docstring_name&#34;:
+                    docstring_name_index = i
+                    break
+            docstring_name_node = captures[docstring_name_index][0]
+            docstring_body_nodes = [
+                node for node, _ in captures[index:docstring_name_index]
+            ]
+            docstring.append(
+                nodes_to_docstring_partial(
+                    docstring_name_node, docstring_body_nodes, request.source
+                )
+            )
+            index = docstring_name_index + 1
+            continue
+        index += 1
+
+    return SingleFileCommentResponse(single=single, multi=multi, docstring=docstring)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.get_identifier"><code class="name flex">
+<span>def <span class="ident">get_identifier</span></span>(<span>node: tree_sitter.Node, source: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a tree-sitter node object, return the string representing the source between node.start_point and node.end_point</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_identifier(node: Node, source: str):
+    &#34;&#34;&#34;Given a tree-sitter node object, return the string representing the source between node.start_point and node.end_point&#34;&#34;&#34;
+    line_num = 0
+    column_num = 0
+    in_identifier = False
+    identifier = &#34;&#34;
+    for i, char in enumerate(source):
+        if line_num == node.start_point[0] and column_num == node.start_point[1]:
+            in_identifier = True
+        elif line_num == node.end_point[0] and column_num == node.end_point[1]:
+            break
+
+        if char == &#34;\n&#34;:
+            line_num += 1
+            column_num = 0
+        else:
+            column_num += 1
+
+        if in_identifier:
+            identifier += char
+
+    return identifier</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.get_supported_languages"><code class="name flex">
+<span>def <span class="ident">get_supported_languages</span></span>(<span>) ‑> <a title="skema.program_analysis.comment_extractor.model.SupportedLanguageResponse" href="model.html#skema.program_analysis.comment_extractor.model.SupportedLanguageResponse">SupportedLanguageResponse</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Return the languages supported for comment extraction</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_supported_languages() -&gt; SupportedLanguageResponse:
+    &#34;&#34;&#34;Return the languages supported for comment extraction&#34;&#34;&#34;
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
+
+    languages = []
+    for language, query in queries_obj.items():
+        single = True if &#34;@single&#34; in query else False
+        multi = True if &#34;@multi&#34; in query or &#34;@multi_partial&#34; in query else False
+        docstring = (
+            True
+            if &#34;@docstring_body&#34; in query or &#34;docstring_body_partial&#34; in query
+            else False
+        )
+        languages.append(
+            SupportedLanguage(
+                name=language, single=single, multi=multi, docstring=docstring
+            )
+        )
+
+    return SupportedLanguageResponse(languages=languages)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.node_to_multi_line_comment"><code class="name flex">
+<span>def <span class="ident">node_to_multi_line_comment</span></span>(<span>node: tree_sitter.Node, source: str) ‑> Dict[~KT, ~VT]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts a tree-sitter node to a MultiLineComment object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def node_to_multi_line_comment(node: Node, source: str) -&gt; Dict:
+    &#34;&#34;&#34;Converts a tree-sitter node to a MultiLineComment object&#34;&#34;&#34;
+    content = get_identifier(node, source).split(&#34;\n&#34;)
+    start_line_number = node.start_point[0]
+    end_line_number = node.end_point[0]
+
+    return MultiLineComment(
+        content=content,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.node_to_multi_line_comment_partial"><code class="name flex">
+<span>def <span class="ident">node_to_multi_line_comment_partial</span></span>(<span>nodes: List[tree_sitter.Node], source: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts a list of tree-sitter nodes to a single MultiLineCodeComment object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def node_to_multi_line_comment_partial(nodes: List[Node], source: str):
+    &#34;&#34;&#34;Converts a list of tree-sitter nodes to a single MultiLineCodeComment object&#34;&#34;&#34;
+    content = [get_identifier(node, source) for node in nodes]
+    start_line_number = nodes[0].start_point[0]
+    end_line_number = nodes[-1].end_point[0]
+
+    return MultiLineComment(
+        content=content,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.node_to_single_line_comment"><code class="name flex">
+<span>def <span class="ident">node_to_single_line_comment</span></span>(<span>node: tree_sitter.Node, source: str) ‑> <a title="skema.program_analysis.comment_extractor.model.SingleLineComment" href="model.html#skema.program_analysis.comment_extractor.model.SingleLineComment">SingleLineComment</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts a tree-sitter node to a SingleLineComment object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def node_to_single_line_comment(node: Node, source: str) -&gt; SingleLineComment:
+    &#34;&#34;&#34;Converts a tree-sitter node to a SingleLineComment object&#34;&#34;&#34;
+    content = get_identifier(node, source)
+    line_number = node.start_point[0]
+
+    return SingleLineComment(content=content, line_number=line_number)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.nodes_to_docstring"><code class="name flex">
+<span>def <span class="ident">nodes_to_docstring</span></span>(<span>name_node: tree_sitter.Node, content_node: tree_sitter.Node, source: str) ‑> Dict[~KT, ~VT]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts a tree-sitter node to a Docstring object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nodes_to_docstring(name_node: Node, content_node: Node, source: str) -&gt; Dict:
+    &#34;&#34;&#34;Converts a tree-sitter node to a Docstring object&#34;&#34;&#34;
+    content = get_identifier(content_node, source).split(&#34;\n&#34;)
+    function_name = get_identifier(name_node, source)
+    start_line_number = content_node.start_point[0]
+    end_line_number = content_node.end_point[0]
+
+    return Docstring(
+        content=content,
+        function_name=function_name,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.nodes_to_docstring_partial"><code class="name flex">
+<span>def <span class="ident">nodes_to_docstring_partial</span></span>(<span>name_node: tree_sitter.Node, content_nodes: List[tree_sitter.Node], source: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Converts a list of tree-sitter nodes to a single Docstring object</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def nodes_to_docstring_partial(name_node: Node, content_nodes: List[Node], source: str):
+    &#34;&#34;&#34;Converts a list of tree-sitter nodes to a single Docstring object&#34;&#34;&#34;
+    content = [get_identifier(node, source) for node in content_nodes]
+    function_name = get_identifier(name_node, source)
+    start_line_number = content_nodes[0].start_point[0]
+    end_line_number = content_nodes[-1].end_point[0]
+
+    return Docstring(
+        content=content,
+        function_name=function_name,
+        start_line_number=start_line_number,
+        end_line_number=end_line_number,
+    )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.comment_extractor.preprocess_captures"><code class="name flex">
+<span>def <span class="ident">preprocess_captures</span></span>(<span>captures: List[Tuple[tree_sitter.Node, str]]) ‑> List[Tuple[tree_sitter.Node, str]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Preprocess list of captures generated by tree-sitter. This preprocessing includes:
+1. Reording captures to go docstring -&gt; multi -&gt; single
+2. Moving docstring name node after docstring body node in languages with internal function docstrings
+3. Removing duplicate nodes captured my multiple capture groups</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def preprocess_captures(captures: List[Tuple[Node, str]]) -&gt; List[Tuple[Node, str]]:
+    &#34;&#34;&#34;Preprocess list of captures generated by tree-sitter. This preprocessing includes:
+    1. Reording captures to go docstring -&gt; multi -&gt; single
+    2. Moving docstring name node after docstring body node in languages with internal function docstrings
+    3. Removing duplicate nodes captured my multiple capture groups
+    &#34;&#34;&#34;
+
+    def hash_node(node: Node):
+        &#34;&#34;&#34;Create a hashable tuple of tree-sitter node.&#34;&#34;&#34;
+        return (node.type, node.start_point, node.end_point)
+
+    # Rearrange the captures to go Docstring -&gt; Multi -&gt; Single
+    order = {
+        &#34;docstring_body&#34;: 1,
+        &#34;docstring_name&#34;: 1,
+        &#34;docstring_body_partial&#34;: 1,
+        &#34;multi&#34;: 2,
+        &#34;multi_partial&#34;: 2,
+        &#34;single&#34;: 3,
+    }
+    ordered = sorted(captures, key=lambda capture: (order[capture[1]]))
+
+    # The order of docstring_body and docstring_name can differ between languages
+    # To standardize this, we will the docstring_name node to the back.
+    # We do this by additionally sorting on the line number.
+    if len(ordered) &gt; 0 and ordered[0][1] == &#34;docstring_name&#34;:
+        ordered = ordered = sorted(
+            captures, key=lambda capture: (order[capture[1]], -capture[0].start_byte)
+        )
+
+    output = []
+    duplicates = set()
+    for comment in ordered:
+        hash = hash_node(comment[0])
+        if hash in duplicates:
+            continue
+        output.append(comment)
+        duplicates.add(hash)
+
+    return output</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.comment_extractor" href="index.html">skema.program_analysis.comment_extractor</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.extract_comments_multi" href="#skema.program_analysis.comment_extractor.comment_extractor.extract_comments_multi">extract_comments_multi</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.extract_comments_single" href="#skema.program_analysis.comment_extractor.comment_extractor.extract_comments_single">extract_comments_single</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.get_identifier" href="#skema.program_analysis.comment_extractor.comment_extractor.get_identifier">get_identifier</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.get_supported_languages" href="#skema.program_analysis.comment_extractor.comment_extractor.get_supported_languages">get_supported_languages</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.node_to_multi_line_comment" href="#skema.program_analysis.comment_extractor.comment_extractor.node_to_multi_line_comment">node_to_multi_line_comment</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.node_to_multi_line_comment_partial" href="#skema.program_analysis.comment_extractor.comment_extractor.node_to_multi_line_comment_partial">node_to_multi_line_comment_partial</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.node_to_single_line_comment" href="#skema.program_analysis.comment_extractor.comment_extractor.node_to_single_line_comment">node_to_single_line_comment</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.nodes_to_docstring" href="#skema.program_analysis.comment_extractor.comment_extractor.nodes_to_docstring">nodes_to_docstring</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.nodes_to_docstring_partial" href="#skema.program_analysis.comment_extractor.comment_extractor.nodes_to_docstring_partial">nodes_to_docstring_partial</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.comment_extractor.preprocess_captures" href="#skema.program_analysis.comment_extractor.comment_extractor.preprocess_captures">preprocess_captures</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

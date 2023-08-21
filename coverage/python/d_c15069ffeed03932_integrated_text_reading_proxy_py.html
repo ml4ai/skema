@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_metal_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
-            created at 2023-08-18 02:50 +0000
+            created at 2023-08-21 12:54 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -724,16 +724,16 @@
     <p class="run"><span class="n"><a id="t642" href="#t642">642</a></span><span class="t">    <span class="nam">mit_params</span> <span class="op">=</span> <span class="op">{</span><span class="str">"gpt_key"</span><span class="op">:</span> <span class="nam">OPENAI_KEY</span><span class="op">,</span> <span class="str">"text"</span><span class="op">:</span> <span class="str">"x = 0"</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t643" href="#t643">643</a></span><span class="t">    <span class="key">try</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t644" href="#t644">644</a></span><span class="t">        <span class="nam">mit_response</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">post</span><span class="op">(</span><span class="nam">mit_endpoint</span><span class="op">,</span> <span class="nam">params</span><span class="op">=</span><span class="nam">mit_params</span><span class="op">,</span> <span class="nam">timeout</span><span class="op">=</span><span class="num">10</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t645" href="#t645">645</a></span><span class="t">    <span class="key">except</span> <span class="nam">Exception</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="run"><span class="n"><a id="t646" href="#t646">646</a></span><span class="t">        <span class="key">return</span> <span class="nam">status</span><span class="op">.</span><span class="nam">HTTP_502_BAD_GATEWAY</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t645" href="#t645">645</a></span><span class="t">    <span class="key">except</span> <span class="nam">Exception</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t646" href="#t646">646</a></span><span class="t">        <span class="key">return</span> <span class="nam">status</span><span class="op">.</span><span class="nam">HTTP_502_BAD_GATEWAY</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t647" href="#t647">647</a></span><span class="t">    <span class="com">######################################################</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t648" href="#t648">648</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t649" href="#t649">649</a></span><span class="t">    <span class="nam">status_code</span> <span class="op">=</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t649" href="#t649">649</a></span><span class="t">    <span class="nam">status_code</span> <span class="op">=</span> <span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t650" href="#t650">650</a></span><span class="t">        <span class="nam">status</span><span class="op">.</span><span class="nam">HTTP_200_OK</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t651" href="#t651">651</a></span><span class="t">        <span class="key">if</span> <span class="nam">all</span><span class="op">(</span><span class="nam">code</span> <span class="op">==</span> <span class="num">200</span> <span class="key">for</span> <span class="nam">code</span> <span class="key">in</span> <span class="op">[</span><span class="nam">skema_response</span><span class="op">,</span> <span class="nam">mit_response</span><span class="op">]</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t652" href="#t652">652</a></span><span class="t">        <span class="key">else</span> <span class="nam">status</span><span class="op">.</span><span class="nam">HTTP_500_INTERNAL_SERVER_ERROR</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t653" href="#t653">653</a></span><span class="t">    <span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t654" href="#t654">654</a></span><span class="t">    <span class="key">return</span> <span class="nam">status_code</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t654" href="#t654">654</a></span><span class="t">    <span class="key">return</span> <span class="nam">status_code</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t655" href="#t655">655</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t656" href="#t656">656</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t657" href="#t657">657</a></span><span class="t"><span class="nam">app</span> <span class="op">=</span> <span class="nam">FastAPI</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -747,7 +747,7 @@
             <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_metal_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
-            created at 2023-08-18 02:50 +0000
+            created at 2023-08-21 12:54 +0000
         </p>
     </div>
 </footer>
