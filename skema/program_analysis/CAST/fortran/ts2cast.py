@@ -1,5 +1,6 @@
 import json
 import os.path
+import pprint
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
@@ -43,20 +44,26 @@ from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preproce
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
+        print('TS2CAST.__init__')
         # Prepare source with preprocessor
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
         self.source = preprocess(self.path)
+
+        print('\nSource:')
+        print(self.source)
         
         # Run tree-sitter on preprocessor output to generate parse tree
         parser = Parser()
         parser.set_language(
             Language(
-                INSTALLED_LANGUAGES_FILEPATH,
+                Path(Path(__file__).parent, INSTALLED_LANGUAGES_FILEPATH),
                 "fortran"
             )
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
+        print('\nTree: ')
+        pprint.pprint(self.tree)
 
         # Walking data
         self.variable_context = VariableContext()
@@ -64,13 +71,25 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
+        print('\nCAST:')
+        for c in self.out_cast:
+            print(c)
+        print('CAST done')
+
 
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
+        print("\nrunning modules")
+        for m in modules:
+            print("module")
+        print("running modules done")
         return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
         
     def run(self, root) -> List[Module]:
+        print("run start")
+        print("root: " + root.type)
+
         '''Top level visitor function. Will return between 1-3 Module objects.'''
         # A program can have between 1-3 modules
         # 1. A module body
@@ -79,8 +98,11 @@ class TS2CAST(object):
         modules = []
 
         contexts = get_children_by_types(root, ["module", "program"])
+        print("\nrunning contexts")
         for context in contexts:
+            print("context")
             modules.append(self.visit(context))
+        print("running contexts done")
 
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.

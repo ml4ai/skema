@@ -41,7 +41,8 @@ from skema.program_analysis.CAST.matlab.node_helper import (
 from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
 #
 #from skema.program_analysis.CAST.matlab.preprocessor.preprocess import preprocess
-from skema.program_analysis.CAST.matlab.build_tree_sitter_matlab import LANGUAGE_LIBRARY_REL_PATH
+from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
+
 class MATLAB2CAST(object):
     def __init__(self, source_file_path: str):
         print('MATLAB2CAST.__init__')
@@ -54,7 +55,7 @@ class MATLAB2CAST(object):
         parser = Parser()
         parser.set_language(
             Language(
-                Path(Path(__file__).parent, LANGUAGE_LIBRARY_REL_PATH),
+                Path(Path(__file__).parent, INSTALLED_LANGUAGES_FILEPATH),
                 "matlab"
             )
         )
