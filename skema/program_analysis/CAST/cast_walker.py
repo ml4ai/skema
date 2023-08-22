@@ -3,7 +3,7 @@ import os.path
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
-from tree_sitter import Language, Parser, Node
+from tree_sitter import Tree, Language, Parser, Node
 
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
