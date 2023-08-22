@@ -49,11 +49,3 @@ norm_bleu_score = bleu_score(normalized_candidate_corpus, references_corpus)
 
 print(f"BLEU score: {standard_bleu_score}")
 print(f"Normalized BLEU score: {norm_bleu_score}")
-
-
-v = r"str='{{{       \\dfrac{{3}}{{4}}    +   \\sqrt{3} }}}'"
-v = re.sub("([^a-zA-Z]) +", r"\1", v)
-v2 = re.sub("{{(([^{}]|{[^{}]*})*)}}", r"{\1}", v)
-while v2 != v:
-    v = v2
-    v2 = re.sub("{{(([^{}]|{[^{}]*})*)}}", r"{\1}", v)
