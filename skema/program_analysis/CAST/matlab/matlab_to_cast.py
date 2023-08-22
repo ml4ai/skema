@@ -78,6 +78,7 @@ class MATLAB2CAST(object):
         print('CAST objects done\n\n')
 
     def generate_cast(self) -> List[CAST]:
+        print("generate_cast")
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
         print('\nmodules:')
@@ -89,7 +90,8 @@ class MATLAB2CAST(object):
         
     def run(self, root) -> List[Module]:
         print("run start")
-        print("root: " + root.type)
+        print("\nTREE STRUCTURE ___________")
+        print("\nroot: " + root.type)
         for child in root.children:
             print("child: " + child.type)
 
@@ -110,7 +112,8 @@ class MATLAB2CAST(object):
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.
         # TODO: Research the above
-        outer_body_nodes = get_children_by_types(root, ["source_file", "comment", "assignment"])
+        print("\nTREE TRAVERSAL ___________")
+        outer_body_nodes = get_children_by_types(root, ["comment", "assignment"])
         if len(outer_body_nodes) > 0:
             body = []
             for body_node in outer_body_nodes:
@@ -151,12 +154,7 @@ class MATLAB2CAST(object):
             return self.visit_name(node)
         elif node.type in ["math_expression", "relational_expression"]:
             return self.visit_math_expression(node)
-        elif node.type in [
-            "number_literal",
-            "array_literal",
-            "string_literal",
-            "boolean_literal",
-        ]:
+        elif node.type in ["number", "array", "string", "boolean"]:
             return self.visit_literal(node)
         elif node.type == "keyword_statement":
             return self.visit_keyword_statement(node)
@@ -174,6 +172,7 @@ class MATLAB2CAST(object):
             return self._visit_passthrough(node)
 
     def visit_module(self, node: Node) -> Module:
+        print('visit_module')
         '''Visitor for program and module statement. Returns a Module object'''
         self.variable_context.push_context()
         
@@ -194,11 +193,13 @@ class MATLAB2CAST(object):
         )
 
     def visit_internal_procedures(self, node: Node) -> List[FunctionDef]:
+        print('visit_internal_procedures')
         '''Visitor for internal procedures. Returns list of FunctionDef'''
         internal_procedures = get_children_by_types(node, ["function", "subroutine"])
         return [self.visit(procedure) for procedure in internal_procedures]
 
     def visit_name(self, node):
+        print('visit_name')
         # Node structure
         # (name)
 
@@ -212,6 +213,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_function_def(self, node):
+        print('visit_function_def')
         # TODO: Refactor function def code to use new helper functions
         # Node structure
         # (subroutine)
@@ -318,6 +320,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_function_call(self, node):
+        print('visit_function_call')
         # Pull relevent nodes
         if node.type == "subroutine_call":
             function_node = node.children[1]
@@ -359,6 +362,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_keyword_statement(self, node):
+        print('visit_keyword_statement')
         # Currently, the only keyword_identifier produced by tree-sitter is Return
         # However, there may be other instances
 
@@ -394,6 +398,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_use_statement(self, node):
+        print('visit_use_statement')
         # (use)
         #   (use)
         #   (module_name)
@@ -434,6 +439,7 @@ class MATLAB2CAST(object):
             return imports
 
     def visit_do_loop_statement(self, node) -> Loop:
+        print('visit_do_loop_statement')
         """Visitor for Loops. Do to complexity, this visitor logic only handles the range-based do loop.
         The do while loop will be passed off to a seperate visitor. Returns a Loop object.
         """
@@ -574,6 +580,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_if_statement(self, node):
+        print('visit_if_statement')
         # (if_statement)
         #  (if)
         #  (parenthesised_expression)
@@ -634,6 +641,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_assignment_statement(self, node):
+        print('visit_assignment_statement')
         left, _, right = node.children
 
         # We need to check if the left side is a multidimensional array,
@@ -648,6 +656,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_literal(self, node) -> LiteralValue:
+        print('visit_literal')
         """Visitor for literals. Returns a LiteralValue"""
         literal_type = node.type
         literal_value = self.node_helper.get_identifier(node)
@@ -705,6 +714,7 @@ class MATLAB2CAST(object):
             )
 
     def visit_identifier(self, node):
+        print('visit_identifier')
         # By default, this is unknown, but can be updated by other visitors
         identifier = self.node_helper.get_identifier(node)
         if self.variable_context.is_variable(identifier):
@@ -727,6 +737,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_math_expression(self, node):
+        print('visit_math_expression')
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
@@ -745,6 +756,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_variable_declaration(self, node) -> List:
+        print('visit_variable_declaration')
         """Visitor for variable declaration. Will return a List of Var and Assignment nodes."""
         """
         # Node structure
@@ -851,6 +863,7 @@ class MATLAB2CAST(object):
         return vars
 
     def visit_extent_specifier(self, node):
+        print('visit_extent_specifier')
         # Node structure
         # (extent_specifier)
         #   (identifier)
@@ -880,6 +893,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_derived_type(self, node: Node) -> RecordDef:
+        print('visit_derived_type')
         """Visitor function for derived type definition. Will return a RecordDef"""
         """Node Structure:
         (derived_type_definition)
@@ -958,6 +972,7 @@ class MATLAB2CAST(object):
         )
 
     def visit_derived_type_member_expression(self, node) -> Attribute:
+        print('visit_derived_type_member_expression')
         """Visitor function for derived type access. Returns an Attribute object"""
         """ Node Structure
         Scalar Access
@@ -998,6 +1013,7 @@ class MATLAB2CAST(object):
     # NOTE: This function starts with _ because it will never be dispatched to directly. There is not a get node in the tree-sitter parse tree.
     # From context, we will determine when we are accessing an element of a List, and call this function,
     def _visit_get(self, node):
+        print('_visit_get')
         # Node structure
         # (call_expression)
         #  (identifier)
@@ -1036,6 +1052,7 @@ class MATLAB2CAST(object):
         )
 
     def _visit_set(self, node):
+        print('_visit_set')
         # Node structure
         # (assignment_statement)
         #  (call_expression)
@@ -1052,6 +1069,7 @@ class MATLAB2CAST(object):
         return cast_call
 
     def _visit_while(self, node) -> Loop:
+        print('_visit_while')
         """Custom visitor for while loop. Returns a Loop object"""
         """
         Node structure
@@ -1088,6 +1106,7 @@ class MATLAB2CAST(object):
         )
 
     def _visit_implied_do_loop(self, node) -> Call:
+        print('_visit_implied_do_loop')
         """Custom visitor for implied_do_loop array literal. This form gets converted to a call to range"""
         # TODO: This loop_control is the same as the do loop. Can we turn this into one visitor?
         loop_control_node = get_first_child_by_type(
@@ -1118,6 +1137,7 @@ class MATLAB2CAST(object):
         )
 
     def _visit_passthrough(self, node):
+        print('_visit_passthrough')
         if len(node.children) == 0:
             return None
 
@@ -1127,6 +1147,7 @@ class MATLAB2CAST(object):
                 return child_cast
 
     def get_gromet_function_node(self, func_name: str) -> Name:
+        print('get_gromet_function_node')
         # Idealy, we would be able to create a dummy node and just call the name visitor.
         # However, tree-sitter does not allow you to create or modify nodes, so we have to recreate the logic here.
         if self.variable_context.is_variable(func_name):
