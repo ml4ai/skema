@@ -4,7 +4,7 @@ import pprint
 from pathlib import Path
 from typing import Any, Dict, List, Union
 
-from tree_sitter import Language, Parser, Node
+from tree_sitter import Language, Parser, Node, Tree
 
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
@@ -63,8 +63,8 @@ class MATLAB2CAST(object):
         print(self.source)
         self.tree = parser.parse(bytes(self.source, "utf8"))
 
-        print('\nTree: ')
-        pprint.pprint(self.tree)
+        print('\nTREE_SITTER TREE: ')
+        self.traverse(self.tree.root_node, '')
 
         # Walking data
         self.variable_context = VariableContext()
@@ -76,6 +76,11 @@ class MATLAB2CAST(object):
         for c in self.out_cast:
             print(c)
         print('CAST objects done\n\n')
+
+    def traverse(self, root: Tree, indent):
+        for child in root.children:
+            print(indent + 'child:' + child.type)
+            self.traverse(child, indent + '  ')
 
     def generate_cast(self) -> List[CAST]:
         print("generate_cast")
@@ -112,7 +117,7 @@ class MATLAB2CAST(object):
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.
         # TODO: Research the above
-        print("\nTREE TRAVERSAL ___________")
+        print("\nNODE VISITS ___________")
         outer_body_nodes = get_children_by_types(root, ["comment", "assignment"])
         if len(outer_body_nodes) > 0:
             body = []
@@ -662,36 +667,36 @@ class MATLAB2CAST(object):
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
 
-        if literal_type == "number_literal":
+        if literal_type == "number":
             # Check if this is a real value, or an Integer
             if "e" in literal_value.lower() or "." in literal_value:
                 return LiteralValue(
                     value_type="AbstractFloat",
                     value=literal_value,
-                    source_code_data_type=["Fortran", "Fortran95", "real"],
+                    source_code_data_type=["matlab", "real"],
                     source_refs=[literal_source_ref],
                 )
             else:
                 return LiteralValue(
                     value_type="Integer",
                     value=literal_value,
-                    source_code_data_type=["Fortran", "Fortran95", "integer"],
+                    source_code_data_type=["matlab", "integer"],
                     source_refs=[literal_source_ref],
                 )
 
-        elif literal_type == "string_literal":
+        elif literal_type == "string":
             return LiteralValue(
                 value_type="Character",
                 value=literal_value,
-                source_code_data_type=["Fortran", "Fortran95", "character"],
+                source_code_data_type=["matlab", "character"],
                 source_refs=[literal_source_ref],
             )
 
-        elif literal_type == "boolean_literal":
+        elif literal_type == "boolean":
             return LiteralValue(
                 value_type="Boolean",
                 value=literal_value,
-                source_code_data_type=["Fortran", "Fortran95", "logical"],
+                source_code_data_type=["matlab", "logical"],
                 source_refs=[literal_source_ref],
             )
 
@@ -747,7 +752,7 @@ class MATLAB2CAST(object):
             operands.append(self.visit(operand))
 
         return Operator(
-            source_language="Fortran",
+            source_language="matlab",
             interpreter=None,
             version=None,
             op=op,
@@ -886,8 +891,8 @@ class MATLAB2CAST(object):
 
         return Call(
             func=self.get_gromet_function_node("slice"),
-            source_language="Fortran",
-            source_language_version="Fortran95",
+            source_language="matlab",
+            source_language_version="Fortran95",  # matlab version?
             arguments=arguments,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
