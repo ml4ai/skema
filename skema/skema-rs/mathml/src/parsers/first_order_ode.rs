@@ -4,7 +4,7 @@ use crate::parsers::math_expression_tree::MathExpressionTree::Cons;
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, MathExpression, Mi, Type,
+        BoundVariables, Ci, MathExpression, Mi, Type,
     },
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
@@ -43,7 +43,9 @@ pub struct FirstOrderODE {
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
 
-    pub bounded_var: Ci,
+    pub func_of: Vec<Mi>,
+
+    pub with_respect_to: Ci,
 
     /// An expression tree corresponding to the RHS of the ODE.
     pub rhs: MathExpressionTree,
@@ -54,12 +56,16 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     let (s, _) = stag!("math")(input)?;
 
     // Recognize LHS derivative
-    let (s, (derivative, ci)) = alt((
+    let (s, (derivative, binding)) = alt((
         first_order_derivative_leibniz_notation,
         newtonian_derivative,
     ))(s)?;
     println!("derivative={:?}", derivative);
 
+    println!("||||||||||||||||||||||||||||||||");
+    println!("binding = {:?}", binding);
+    let ci = binding.func_var;
+    let parenthesized = binding.func_of;
     let bvar = derivative.bound_var;
 
     // Recognize equals sign
@@ -100,7 +106,8 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     let ode = FirstOrderODE {
         lhs_var: ci,
-        bounded_var: bvar,
+        func_of: parenthesized,
+        with_respect_to: bvar,
         rhs: MathExpressionTree::from(remaining_tokens),
     };
 
@@ -110,9 +117,12 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
-            Operator::Derivative(Derivative::new(1, 1, self.bounded_var.clone())),
-            vec![MathExpressionTree::Atom(MathExpression::Ci(
+            Operator::Derivative(Derivative::new(1, 1, self.with_respect_to.clone())),
+            vec![MathExpressionTree::Atom(MathExpression::
+                //Ci(self.lhs_var.clone(),
+                BoundVariables(
                 self.lhs_var.clone(),
+                self.func_of.clone(),
             ))],
         );
         let combined = MathExpressionTree::Cons(
@@ -678,9 +688,12 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
                 ),
             ),
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi("S".to_string()))),
+            BoundVariables::new(
+                Ci::new(
+                    Some(Type::Function),
+                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
+                ),
+                vec![Mi("".to_string())],
             ),
         ),
     );
@@ -690,22 +703,25 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
 fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() {
     test_parser(
         "<mfrac>
-        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>,</mo><mi>x</mi><mo>)</mo></mrow>
-        <mrow><mi>d</mi><mi>x</mi></mrow>
+        <mrow><mi>d</mi><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
         </mfrac>",
         first_order_derivative_leibniz_notation,
         (
             Derivative::new(
                 1,
-                2,
+                1,
                 Ci::new(
                     Some(Type::Real),
-                    Box::new(MathExpression::Mi(Mi("x".to_string()))),
+                    Box::new(MathExpression::Mi(Mi("t".to_string()))),
                 ),
             ),
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi("S".to_string()))),
+            BoundVariables::new(
+                Ci::new(
+                    Some(Type::Function),
+                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
+                ),
+                vec![Mi("t".to_string())],
             ),
         ),
     );
@@ -730,15 +746,19 @@ fn test_first_order_ode() {
 
     let FirstOrderODE {
         lhs_var,
-        bounded_var,
+        func_of,
+        with_respect_to,
         rhs,
     } = input.parse::<FirstOrderODE>().unwrap();
     println!(">>>>>>>>>rhs={:?}", rhs);
     println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
-    println!(">>>>>>>>>bounded_var={:?}", bounded_var.to_string());
+    //println!(">>>>>>>>>lhs_var.1={:?}", lhs_var);
+    println!(">>>>>>>>>func_of={:?}", func_of[0]);
+    println!(">>>>>>>>>with_respect_to={:?}", with_respect_to);
     println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(bounded_var.to_string(), "t");
+    //assert_eq!(func_of, "t");
+    assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 
     // ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
@@ -755,15 +775,18 @@ fn test_first_order_ode() {
 
     let FirstOrderODE {
         lhs_var,
-        bounded_var,
+        func_of,
+        with_respect_to,
         rhs,
     } = input.parse::<FirstOrderODE>().unwrap();
 
     println!(">>>>>>>>>rhs={:?}", rhs);
     println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
-    println!(">>>>>>>>>bounded_var={:?}", bounded_var.to_string());
+    println!(">>>>>>>>>func_of={:?}", func_of[0]);
+    println!(">>>>>>>>>with_respect_to={:?}", with_respect_to);
     println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
-    assert_eq!(bounded_var.to_string(), "");
+    //assert_eq!(func_of.to_string(), "");
+    assert_eq!(with_respect_to.to_string(), "");
     assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 }
