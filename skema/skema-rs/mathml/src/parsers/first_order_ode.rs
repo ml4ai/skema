@@ -253,7 +253,7 @@ pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         dyn_state: "temp".to_string(),
                         exp_states: [x.to_string().clone()].to_vec(),
                         polarity: true,
-                        expression: "temp".to_string(),
+                        expression: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml(),
                         parameters: Vec::<String>::new(),
                         sub_terms: None,
                         math_vec: Some(arg.clone()),
@@ -264,7 +264,7 @@ pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         dyn_state: "temp".to_string(),
                         exp_states: Vec::<String>::new(),
                         polarity: true,
-                        expression: "temp".to_string(),
+                        expression: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml(),
                         parameters: [x.to_string().clone()].to_vec(),
                         sub_terms: None,
                         math_vec: Some(arg.clone()),
@@ -366,7 +366,8 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         dyn_state: "temp".to_string(),
                         exp_states: [x1.to_string().clone()].to_vec(),
                         polarity: false,
-                        expression: MathExpressionTree::Cons(Subtract, eq.clone()).to_cmml(),
+                        expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
+                            .to_cmml(),
                         parameters: Vec::<String>::new(),
                         sub_terms: None,
                         math_vec: Some(eq[0].clone()),
@@ -377,7 +378,8 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         dyn_state: "temp".to_string(),
                         exp_states: Vec::<String>::new(),
                         polarity: false,
-                        expression: MathExpressionTree::Cons(Subtract, eq.clone()).to_cmml(),
+                        expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
+                            .to_cmml(),
                         parameters: [x1.to_string().clone()].to_vec(),
                         sub_terms: None,
                         math_vec: Some(eq[0].clone()),
@@ -481,8 +483,12 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                     // also need to construct a partial term here to handle distribution of just a parameter
                     let mut is_state = false;
                     let mut polarity = true;
+                    let mut expression =
+                        MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml();
                     if i == 1 {
                         polarity = false;
+                        expression =
+                            MathExpressionTree::Cons(Subtract, [arg.clone()].to_vec()).to_cmml()
                     }
                     for state in sys_states.iter() {
                         if x.to_string() == *state {
@@ -494,7 +500,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                             dyn_state: "temp".to_string(),
                             exp_states: [x.to_string().clone()].to_vec(),
                             polarity: polarity,
-                            expression: "temp".to_string(),
+                            expression: expression,
                             parameters: Vec::<String>::new(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),
@@ -505,7 +511,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                             dyn_state: "temp".to_string(),
                             exp_states: Vec::<String>::new(),
                             polarity: polarity,
-                            expression: "temp".to_string(),
+                            expression: expression,
                             parameters: [x.to_string().clone()].to_vec(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),

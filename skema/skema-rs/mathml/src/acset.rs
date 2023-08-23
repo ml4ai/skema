@@ -587,11 +587,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             terms.remove(*i);
         }
 
-        // all that should be left are unpaired terms
-        for t in terms.clone().iter() {
-            println!("\nunpaired t: {:?}\n", t.clone());
-        }
-
         // now we construct transitions of all paired terms
         for (i, t) in transition_pair.iter().enumerate() {
             if t.0.exp_states.len() == 1 {
@@ -629,7 +624,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             } else {
                 // construct transitions for complicated transitions
                 // mainly need to construct the output specially,
-                // run by clay
                 let mut output = [t.0.dyn_state.clone()].to_vec();
 
                 for state in t.0.exp_states.iter() {
@@ -672,6 +666,95 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         }
 
         // now we construct transitions from unpaired terms, assuming them to be sources and sinks
+        if terms.len() != 0 {
+            for (i, term) in terms.iter().enumerate() {
+                if term.polarity {
+                    let mut input = Vec::<String>::new();
+
+                    let mut output = [term.dyn_state.clone()].to_vec();
+
+                    for state in term.exp_states.iter() {
+                        input.push(state.clone());
+                    }
+
+                    let transitions = Transition {
+                        id: format!("s{}", i),
+                        input: Some(input.clone()),
+                        output: Some(output.clone()),
+                        ..Default::default()
+                    };
+                    transitions_vec.insert(transitions.clone());
+
+                    let mut expression_string = "".to_string();
+
+                    if term.exp_states.len() != 0 {
+                        let exp_len = term.exp_states.len() - 1;
+                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                            if i != exp_len {
+                                expression_string =
+                                    format!("{}{}*", expression_string.clone(), exp.clone());
+                            } else {
+                                expression_string =
+                                    format!("{}{}", expression_string.clone(), exp.clone());
+                            }
+                        }
+                    }
+
+                    for param in term.parameters.clone().iter() {
+                        expression_string =
+                            format!("{}{}", expression_string.clone(), param.clone());
+                    }
+
+                    let rate = Rate {
+                        target: transitions.id.clone(),
+                        expression: expression_string.clone(), // the second term needs to be the product of the inputs
+                        expression_mathml: Some(term.expression.clone()),
+                    };
+                    rate_vec.push(rate.clone());
+                } else {
+                    let mut input = [term.dyn_state.clone()].to_vec();
+
+                    for state in term.exp_states.iter() {
+                        input.push(state.clone());
+                    }
+
+                    let transitions = Transition {
+                        id: format!("s{}", i),
+                        input: Some(input.clone()),
+                        output: None,
+                        ..Default::default()
+                    };
+                    transitions_vec.insert(transitions.clone());
+
+                    let mut expression_string = "".to_string();
+
+                    if term.exp_states.len() != 0 {
+                        let exp_len = term.exp_states.len() - 1;
+                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                            if i != exp_len {
+                                expression_string =
+                                    format!("{}{}*", expression_string.clone(), exp.clone());
+                            } else {
+                                expression_string =
+                                    format!("{}{}", expression_string.clone(), exp.clone());
+                            }
+                        }
+                    }
+
+                    for param in term.parameters.clone().iter() {
+                        expression_string =
+                            format!("{}{}", expression_string.clone(), param.clone());
+                    }
+
+                    let rate = Rate {
+                        target: transitions.id.clone(),
+                        expression: expression_string.clone(), // the second term needs to be the product of the inputs
+                        expression_mathml: Some(term.expression.clone()),
+                    };
+                    rate_vec.push(rate.clone());
+                }
+            }
+        }
 
         // trim duplicate parameters and (TODO)remove integer parameters
 
