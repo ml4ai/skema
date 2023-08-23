@@ -180,7 +180,31 @@ impl MathExpression {
             MathExpression::Mrow(Mrow(elements)) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for element in elements {
-                    element.flatten(tokens);
+                    println!("elements[0]={:?}", elements[0]);
+                    /*if elements[0]
+                        == MathExpression::Ci::new(
+                            Some(Type::Function),
+                            Box::new(MathExpression::Mi(Mi("cos".to_string()))),
+                        )
+                    {
+                        println!("cos");
+                    } else {
+                        element.flatten(tokens);
+                    }*/
+
+                    if let MathExpression::Ci(x) = element {
+                        println!("x.content={:?}", x.content);
+                        if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
+                            println!("cossss");
+                            tokens.push(MathExpression::Mo(Operator::Cos));
+                        } else if x.content == Box::new(MathExpression::Mi(Mi("sin".to_string()))) {
+                            tokens.push(MathExpression::Mo(Operator::Sin));
+                        } else {
+                            element.flatten(tokens);
+                        }
+                    } else {
+                        element.flatten(tokens);
+                    }
                 }
                 tokens.push(MathExpression::Mo(Operator::Rparen));
                 println!("-----tokens = {:?}", tokens);
@@ -233,12 +257,14 @@ impl Lexer {
         // Flatten mrows and mfracs
         let tokens = input.iter().fold(vec![], |mut acc, x| {
             x.flatten(&mut acc);
+            println!("1111----acc={:?}", acc);
             acc
         });
 
         // Insert implicit multiplication operators.
         let tokens = tokens.iter().fold(vec![], |mut acc, x| {
             if acc.is_empty() {
+                println!("x={:?}", x);
                 acc.push(x);
             } else {
                 match x {
@@ -252,11 +278,13 @@ impl Lexer {
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
                         acc.push(x);
+                        println!("----acc={:?}", acc);
                     }
 
                     // Handle other types of operators.
                     MathExpression::Mo(_) => {
                         acc.push(x);
+                        println!(".... acc={:?}", acc);
                     }
                     // Handle other types of MathExpression objects.
                     t => {
@@ -281,6 +309,7 @@ impl Lexer {
                     }
                 }
             }
+            println!("acc={:?}", acc);
             acc
         });
 
@@ -391,7 +420,10 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
         Operator::Exp => ((), 17),
-        Operator::Derivative(Derivative { .. }) => ((), 18),
+        Operator::Cos => ((), 18),
+        Operator::Sin => ((), 19),
+        Operator::Tan => ((), 20),
+        Operator::Derivative(Derivative { .. }) => ((), 21),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -455,10 +487,14 @@ fn test_conversion() {
     println!("Input: {input}");
     let FirstOrderODE {
         lhs_var,
-        bounded_var,
+        func_of,
+        with_respect_to,
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
+    println!("func_of[0]={:?}", func_of[0]);
+    //assert_eq!(func_of[0].to_string(), "");
+    assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
 
@@ -471,10 +507,12 @@ fn test_conversion() {
     println!("Input: {input}");
     let FirstOrderODE {
         lhs_var,
-        bounded_var,
+        func_of,
+        with_respect_to,
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
 }
