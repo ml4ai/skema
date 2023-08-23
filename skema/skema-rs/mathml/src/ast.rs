@@ -33,6 +33,12 @@ pub struct Ci {
     pub content: Box<MathExpression>,
 }
 
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct BoundVariables {
+    pub func_var: Ci,
+    pub func_of: Vec<Mi>,
+}
+
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
