@@ -32,14 +32,14 @@ impl fmt::Display for MathExpressionTree {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
                 write!(f, "{}", x.content)
             }
-            MathExpressionTree::Atom(MathExpression::BoundVariables(ci_comp, vec_mi)) => {
+            MathExpressionTree::Atom(MathExpression::BoundVariables(ci_comp, vec_ci)) => {
                 write!(f, "{}", ci_comp.content)?;
                 write!(f, "(")?;
-                for (i, v) in vec_mi.iter().enumerate() {
+                for (i, v) in vec_ci.iter().enumerate() {
                     if i > 0 {
                         write!(f, ",")?;
                     }
-                    write!(f, "{}", v.0)?
+                    write!(f, "{}", v.content)?
                 }
                 write!(f, ")")
             }
@@ -64,12 +64,12 @@ impl MathExpressionTree {
                 MathExpression::Ci(x) => {
                     content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
                 }
-                MathExpression::BoundVariables(ci_comp, vec_mi) => {
+                MathExpression::BoundVariables(ci_comp, vec_ci) => {
                     println!("---------------------------");
                     //if let MathExpression::Ci(x) = ci_comp {
                     content_mathml.push_str(&format!("<ci>{}</ci>", ci_comp.content));
-                    for vec in vec_mi {
-                        content_mathml.push_str(&format!("<ci>{}</ci>", vec.0));
+                    for vec in vec_ci {
+                        content_mathml.push_str(&format!("<ci>{}</ci>", vec.content));
                     }
                     //}
                     //println!("ci{:?}", ci);
@@ -202,6 +202,14 @@ impl MathExpression {
                         } else {
                             element.flatten(tokens);
                         }
+                    } else if let MathExpression::BoundVariables(x, y) = element {
+                        if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
+                            println!("cossss");
+                            tokens.push(MathExpression::Mo(Operator::Cos));
+                        }
+                        /*for comp in y {
+                            comp.flatten(tokens);
+                        }*/
                     } else {
                         element.flatten(tokens);
                     }
@@ -798,6 +806,22 @@ fn test_trig_cos() {
         <mrow>
         <mi>cos</mi>
         <mi>x</mi>
+        </mrow>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_trig_another_cos() {
+    let input = "
+    <math>
+        <mrow>
+        <mi>cos</mi>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
         </mrow>
     </math>
     ";

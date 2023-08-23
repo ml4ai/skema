@@ -61,8 +61,13 @@ fn empty_parenthesis(input: Span) -> IResult<Vec<Mi>> {
 
 /// Parse content identifiers corresponding to univariate functions.
 /// Example: S(t)
-pub fn ci_univariate_with_bounds(input: Span) -> IResult<(Ci, Vec<Mi>)> {
+pub fn ci_univariate_with_bounds(input: Span) -> IResult<(Ci, Vec<Ci>)> {
     let (s, (Mi(x), bound_vars)) = tuple((mi, parenthesized_identifier))(input)?;
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    for bvar in bound_vars {
+        let mut b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)));
+        ci_func_of.push(b.clone());
+    }
     Ok((
         s,
         (
@@ -70,7 +75,7 @@ pub fn ci_univariate_with_bounds(input: Span) -> IResult<(Ci, Vec<Mi>)> {
                 Some(Type::Function),
                 Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
             ),
-            bound_vars,
+            ci_func_of,
         ),
     ))
 }
@@ -148,11 +153,16 @@ fn d(input: Span) -> IResult<()> {
 }
 
 /// Parse a content identifier of unknown type.
-pub fn ci_unknown_with_bounds(input: Span) -> IResult<(Ci, Vec<Mi>)> {
+pub fn ci_unknown_with_bounds(input: Span) -> IResult<(Ci, Vec<Ci>)> {
     let (s, (x, bound_vars)) = pair(mi, parenthesized_identifier)(input)?;
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    for bvar in bound_vars {
+        let mut b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)));
+        ci_func_of.push(b.clone());
+    }
     Ok((
         s,
-        (Ci::new(None, Box::new(MathExpression::Mi(x))), bound_vars),
+        (Ci::new(None, Box::new(MathExpression::Mi(x))), ci_func_of),
     ))
 }
 
@@ -191,17 +201,23 @@ pub fn first_order_derivative_leibniz_notation(
     )))(s)?;
     println!("func={:?}", func);
     println!("func_of={:?}", func_of);
-    //let binding = BoundVariables(func, bound_vars);
-    let binding = BoundVariables::new(func, func_of);
     let (s, with_respect_to) = delimited(
         tuple((etag!("mrow"), stag!("mrow"), d)),
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
     println!("with_respect_to={:?}", with_respect_to);
-    for (indx, bvar) in binding.func_of.iter().enumerate() {
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    for bvar in func_of.iter() {
+        let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar.clone())));
+        ci_func_of.push(b.clone());
+    }
+    let binding = BoundVariables::new(func, ci_func_of);
+    println!("-----binding= {:?}", binding);
+    for (indx, bvar) in func_of.iter().enumerate() {
         if *bvar == with_respect_to {
             println!("Match successful");
+
             return Ok((
                 s,
                 (
@@ -219,7 +235,7 @@ pub fn first_order_derivative_leibniz_notation(
             ));
         }
     }
-    if binding.func_of[0] == Mi("".to_string()) {
+    if func_of[0] == Mi("".to_string()) {
         return Ok((
             s,
             (
@@ -269,7 +285,13 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, BoundVariables)
     (input)?;
     let (s, func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)?;
     println!("func_of={:?}", func_of);
-    let binding = BoundVariables::new(x, func_of);
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    for bvar in func_of {
+        let mut b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)));
+        ci_func_of.push(b.clone());
+    }
+    let binding = BoundVariables::new(x, ci_func_of);
+    //let binding = BoundVariables::new(x, func_of);
 
     let mut new_with_respect_to = with_respect_to[0].clone();
     //println!("new_with_respect_to={:?}", new_with_respect_to);

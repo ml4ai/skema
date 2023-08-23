@@ -43,7 +43,7 @@ pub struct FirstOrderODE {
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
 
-    pub func_of: Vec<Mi>,
+    pub func_of: Vec<Ci>,
 
     pub with_respect_to: Ci,
 
@@ -666,7 +666,10 @@ fn test_ci_univariate_func() {
                 Some(Type::Function),
                 Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
-            vec![Mi("t".to_string())],
+            vec![Ci::new(
+                Some(Type::Real),
+                Box::new(MathExpression::Mi(Mi("t".to_string()))),
+            )],
         ),
     );
 }
@@ -693,7 +696,11 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                     Some(Type::Function),
                     Box::new(MathExpression::Mi(Mi("S".to_string()))),
                 ),
-                vec![Mi("".to_string())],
+                //vec![Mi("".to_string())],
+                vec![Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(Mi("".to_string()))),
+                )],
             ),
         ),
     );
@@ -721,7 +728,10 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                     Some(Type::Function),
                     Box::new(MathExpression::Mi(Mi("S".to_string()))),
                 ),
-                vec![Mi("t".to_string())],
+                vec![Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(Mi("t".to_string()))),
+                )],
             ),
         ),
     );
