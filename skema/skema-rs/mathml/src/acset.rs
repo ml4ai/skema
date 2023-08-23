@@ -482,7 +482,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         }
 
         for term in terms.iter() {
-            println!("term: {:?}\n", term.clone());
             for param in &term.parameters {
                 let parameters = Parameter {
                     id: param.clone(),
