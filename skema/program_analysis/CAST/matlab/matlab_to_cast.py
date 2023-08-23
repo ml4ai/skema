@@ -45,13 +45,15 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 
 class MATLAB2CAST(object):
     def __init__(self, source_file_path: str):
-        print('MATLAB2CAST.__init__')
-        # Prepare source with preprocessor
+        
+        # Read the MATLAB source file
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
         self.source = self.path.read_text()
-        
-        # Run tree-sitter on preprocessor output to generate parse tree
+        print('\nSOURCE: ')
+        print(self.source)
+
+        # Create the tree-sitter MATLAB parser
         parser = Parser()
         parser.set_language(
             Language(
@@ -59,27 +61,27 @@ class MATLAB2CAST(object):
                 "matlab"
             )
         )
-        print('\nSource: ')
-        print(self.source)
-        self.tree = parser.parse(bytes(self.source, "utf8"))
 
-        print('\nTREE_SITTER TREE: ')
+        # Parse the MATLAB source code
+        self.tree = parser.parse(bytes(self.source, "utf8"))
+        print('\nTREE_SITTER PARSE TREE: ')
         self.traverse(self.tree.root_node, '')
 
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
 
-        # Start visiting
+        # Create CAST object  TODO:  Are there ever more than one ?
         self.out_cast = self.generate_cast()
         print('\nCAST objects:')
-        for c in self.out_cast:
+        for c in self.out_cast:  # Are there ever more than one ?
             print(c)
         print('CAST objects done\n\n')
 
+    # display the tree-sitter.TREE in pretty format
     def traverse(self, root: Tree, indent):
         for child in root.children:
-            print(indent + 'child:' + child.type)
+            print(indent + 'child: ' + child.type)
             self.traverse(child, indent + '  ')
 
     def generate_cast(self) -> List[CAST]:
