@@ -500,14 +500,12 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         let mut composite_term_ind = Vec::<usize>::new();
         let mut sub_terms = Vec::<PnTerm>::new();
         for (j, t) in terms.clone().iter().enumerate() {
-            if t.exp_states.len() > 2 {
-                if t.sub_terms.is_some() {
-                    for (i, _sub_t) in t.sub_terms.clone().unwrap().iter().enumerate() {
-                        terms[j].sub_terms.as_mut().unwrap()[i].dyn_state = t.dyn_state.clone();
-                        sub_terms.push(terms[j].sub_terms.as_mut().unwrap()[i].clone());
-                    }
-                    composite_term_ind.push(j);
+            if t.exp_states.len() > 2 && t.sub_terms.is_some() {
+                for (i, _sub_t) in t.sub_terms.clone().unwrap().iter().enumerate() {
+                    terms[j].sub_terms.as_mut().unwrap()[i].dyn_state = t.dyn_state.clone();
+                    sub_terms.push(terms[j].sub_terms.as_mut().unwrap()[i].clone());
                 }
+                composite_term_ind.push(j);
             }
         }
         // delete composite terms we are replacing
@@ -666,12 +664,12 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         }
 
         // now we construct transitions from unpaired terms, assuming them to be sources and sinks
-        if terms.len() != 0 {
+        if !terms.is_empty() {
             for (i, term) in terms.iter().enumerate() {
                 if term.polarity {
                     let mut input = Vec::<String>::new();
 
-                    let mut output = [term.dyn_state.clone()].to_vec();
+                    let output = [term.dyn_state.clone()].to_vec();
 
                     for state in term.exp_states.iter() {
                         input.push(state.clone());
@@ -687,7 +685,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                     let mut expression_string = "".to_string();
 
-                    if term.exp_states.len() != 0 {
+                    if !term.exp_states.is_empty() {
                         let exp_len = term.exp_states.len() - 1;
                         for (i, exp) in term.exp_states.clone().iter().enumerate() {
                             if i != exp_len {
@@ -728,7 +726,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                     let mut expression_string = "".to_string();
 
-                    if term.exp_states.len() != 0 {
+                    if !term.exp_states.is_empty() {
                         let exp_len = term.exp_states.len() - 1;
                         for (i, exp) in term.exp_states.clone().iter().enumerate() {
                             if i != exp_len {

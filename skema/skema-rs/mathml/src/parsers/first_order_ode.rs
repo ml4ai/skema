@@ -333,7 +333,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                     }
                 }
                 Add => {
-                    let temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                    let temp_terms = get_terms_add(sys_states, y1.clone());
                     for term in temp_terms.iter() {
                         // swap polarity of temp term
                         let mut t_term = term.clone();
@@ -364,7 +364,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                 if expression_term {
                     let temp_term = PnTerm {
                         dyn_state: "temp".to_string(),
-                        exp_states: [x1.to_string().clone()].to_vec(),
+                        exp_states: [x1.to_string()].to_vec(),
                         polarity: false,
                         expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
                             .to_cmml(),
@@ -372,7 +372,7 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         sub_terms: None,
                         math_vec: Some(eq[0].clone()),
                     };
-                    terms.push(temp_term.clone());
+                    terms.push(temp_term);
                 } else {
                     let temp_term = PnTerm {
                         dyn_state: "temp".to_string(),
@@ -380,11 +380,11 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         polarity: false,
                         expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
                             .to_cmml(),
-                        parameters: [x1.to_string().clone()].to_vec(),
+                        parameters: [x1.to_string()].to_vec(),
                         sub_terms: None,
                         math_vec: Some(eq[0].clone()),
                     };
-                    terms.push(temp_term.clone());
+                    terms.push(temp_term);
                 }
             }
         }
@@ -499,8 +499,8 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         let temp_term = PnTerm {
                             dyn_state: "temp".to_string(),
                             exp_states: [x.to_string().clone()].to_vec(),
-                            polarity: polarity,
-                            expression: expression,
+                            polarity,
+                            expression,
                             parameters: Vec::<String>::new(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),
@@ -510,8 +510,8 @@ pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Ve
                         let temp_term = PnTerm {
                             dyn_state: "temp".to_string(),
                             exp_states: Vec::<String>::new(),
-                            polarity: polarity,
-                            expression: expression,
+                            polarity,
+                            expression,
                             parameters: [x.to_string().clone()].to_vec(),
                             sub_terms: None,
                             math_vec: Some(arg.clone()),
@@ -629,9 +629,9 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
         }
     }
 
-    if distribution == false {
+    if !distribution {
         // simple mult, simple term
-        get_term_mult(sys_states.clone(), eq.clone())
+        get_term_mult(sys_states, eq)
     } else {
         for (i, arg) in eq.iter().enumerate() {
             match &arg {
