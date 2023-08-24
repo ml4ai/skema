@@ -3,15 +3,10 @@ use clap::Parser;
 use mathml::mml2pn::get_mathml_asts_from_file;
 pub use mathml::mml2pn::{ACSet, Term};
 
-
-
-
 // new imports
 use mathml::acset::{PetriNet, RegNet};
 
-use skema::model_extraction::{
-    module_id2mathml_MET_ast, subgraph2_core_dyn_ast,
-};
+use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
 
 #[derive(Parser, Debug)]
 struct Cli {
@@ -32,7 +27,8 @@ fn main() {
     */
     let new_args = Cli::parse();
 
-    let mut module_id = 883;
+    //let mut module_id = 883;
+    let mut module_id = 1035;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
     if new_args.arg == *"auto" {
