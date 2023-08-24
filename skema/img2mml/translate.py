@@ -362,35 +362,9 @@ def render_mml(
             pred.append(vocab_itos[str(p)])
 
         pred_seq = " ".join(pred[1:-1])
-        print(add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq)))
-        print(
-            process_mtext(
+        try:
+            return process_mtext(
                 add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
             )
-        )
-        return process_mtext(
-            add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))
-        )
-
-
-# def render_mml(
-#     model: Image2MathML_Xfmer,
-#     vocab_itos: dict,
-#     vocab_stoi: dict,
-#     imagetensor: torch.Tensor,
-#     device: torch.device,
-# ) -> str:
-#     """
-#     Render MathML for an input image using the provided model.
-#
-#     Args:
-#         model (Image2MathML_Xfmer): The image-to-MathML model.
-#         vocab_itos (dict): The vocabulary lookup dictionary (index to symbol).
-#         vocab_stoi (dict): The vocabulary lookup dictionary (symbol to index).
-#         imagetensor (torch.Tensor): The input image as a tensor.
-#         device (torch.device): The device (GPU or CPU) to be used for computation.
-#
-#     Returns:
-#         str: The generated MathML string.
-#     """
-#     return evaluate(model, vocab_itos, vocab_stoi, imagetensor, device)
+        except:
+            return add_semicolon_to_unicode(remove_spaces_between_tags(pred_seq))

@@ -2,13 +2,11 @@
 """
 All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
-Updated date: June 21, 2023
+Updated date: August 24, 2023
 """
 
 import warnings
-
-from typing import List, Tuple, Any, Union
-
+from typing import List, Any, Union, Dict
 from numpy import ndarray
 from pydot import Dot
 
@@ -23,6 +21,8 @@ from copy import deepcopy
 import Levenshtein
 from typing import Tuple
 import re
+import xml.etree.ElementTree as ET
+import html
 
 # Set up the random seed
 np.random.seed(1)
@@ -30,6 +30,75 @@ rng = np.random.default_rng(1)
 
 # The encodings of basic operators when converting adjacency matrix
 op_dict = {"+": 1, "-": 2, "*": 3, "/": 4, "=": 5, "√": 6}
+
+# Greek letters mapping
+# List of Greek letters mapping to their lowercase, name, and Unicode representation
+greek_letters: List[List[str]] = [
+    ["α", "alpha", "&#x03B1;"],
+    ["β", "beta", "&#x03B2;"],
+    ["γ", "gamma", "&#x03B3;"],
+    ["δ", "delta", "&#x03B4;"],
+    ["ε", "epsilon", "&#x03B5;"],
+    ["ζ", "zeta", "&#x03B6;"],
+    ["η", "eta", "&#x03B7;"],
+    ["θ", "theta", "&#x03B8;"],
+    ["ι", "iota", "&#x03B9;"],
+    ["κ", "kappa", "&#x03BA;"],
+    ["λ", "lambda", "&#x03BB;"],
+    ["μ", "mu", "&#x03BC;"],
+    ["ν", "nu", "&#x03BD;"],
+    ["ξ", "xi", "&#x03BE;"],
+    ["ο", "omicron", "&#x03BF;"],
+    ["π", "pi", "&#x03C0;"],
+    ["ρ", "rho", "&#x03C1;"],
+    ["σ", "sigma", "&#x03C3;"],
+    ["τ", "tau", "&#x03C4;"],
+    ["υ", "upsilon", "&#x03C5;"],
+    ["φ", "phi", "&#x03C6;"],
+    ["χ", "chi", "&#x03C7;"],
+    ["ψ", "psi", "&#x03C8;"],
+    ["ω", "omega", "&#x03C9;"],
+    ["Α", "Alpha", "&#x0391;"],
+    ["Β", "Beta", "&#x0392;"],
+    ["Γ", "Gamma", "&#x0393;"],
+    ["Δ", "Delta", "&#x0394;"],
+    ["Ε", "Epsilon", "&#x0395;"],
+    ["Ζ", "Zeta", "&#x0396;"],
+    ["Η", "Eta", "&#x0397;"],
+    ["Θ", "Theta", "&#x0398;"],
+    ["Ι", "Iota", "&#x0399;"],
+    ["Κ", "Kappa", "&#x039A;"],
+    ["Λ", "Lambda", "&#x039B;"],
+    ["Μ", "Mu", "&#x039C;"],
+    ["Ν", "Nu", "&#x039D;"],
+    ["Ξ", "Xi", "&#x039E;"],
+    ["Ο", "Omicron", "&#x039F;"],
+    ["Π", "Pi", "&#x03A0;"],
+    ["Ρ", "Rho", "&#x03A1;"],
+    ["Σ", "Sigma", "&#x03A3;"],
+    ["Τ", "Tau", "&#x03A4;"],
+    ["Υ", "Upsilon", "&#x03A5;"],
+    ["Φ", "Phi", "&#x03A6;"],
+    ["Χ", "Chi", "&#x03A7;"],
+    ["Ψ", "Psi", "&#x03A8;"],
+    ["Ω", "Omega", "&#x03A9;"],
+]
+
+mathml_operators = [
+    "sin",
+    "cos",
+    "tan",
+    "sec",
+    "csc",
+    "cot",
+    "log",
+    "ln",
+    "exp",
+    "sqrt",
+    "sum",
+    "prod",
+    "lim",
+]
 
 
 def levenshtein_similarity(var1: str, var2: str) -> float:
@@ -486,3 +555,184 @@ def align_mathml_eqs(
         union_graph,
         perfectly_matched_indices1,
     )
+
+
+def extract_variables_with_subsup(mathml_str: str) -> List[str]:
+    # Function to extract variable names from MathML
+    root = ET.fromstring(mathml_str)
+    variables = []
+
+    def process_math_element(element) -> str:
+        if element.tag == "mi":  # If it's a simple variable
+            variable_name = element.text
+            return variable_name
+        elif element.tag in ["msup", "msub", "msubsup"]:
+            # Handling superscripts, subscripts, and their combinations
+            base_name = process_math_element(element[0])
+            if element.tag == "msup":
+                modifier = "^" + process_math_element(element[1])
+            elif element.tag == "msub":
+                modifier = "_" + process_math_element(element[1])
+            else:  # msubsup
+                modifier = (
+                    "_"
+                    + process_math_element(element[1])
+                    + "^"
+                    + process_math_element(element[2])
+                )
+            variable_name = base_name + modifier
+            return variable_name
+        elif element.tag == "mrow":
+            # Handling row elements by concatenating children's results
+            variable_name = ""
+            for child in element:
+                variable_name += process_math_element(child)
+            return variable_name
+        elif element.tag in ["mfrac", "msqrt", "mroot"]:
+            # Handling fractions, square roots, and root expressions
+            base_name = process_math_element(element[0])
+            if element.tag == "mfrac":
+                modifier = "/" + process_math_element(element[1])
+            elif element.tag == "msqrt":
+                modifier = "√(" + base_name + ")"
+            else:  # mroot
+                modifier = "^" + process_math_element(element[1])
+            variable_name = base_name + modifier
+            return variable_name
+        elif element.tag in ["mover", "munder", "munderover"]:
+            # Handling overlines, underlines, and combinations
+            base_name = process_math_element(element[0])
+            if element.tag == "mover":
+                modifier = "^" + process_math_element(element[1])
+            elif element.tag == "munder":
+                modifier = "_" + process_math_element(element[1])
+            else:  # munderover
+                modifier = (
+                    "_"
+                    + process_math_element(element[1])
+                    + "^"
+                    + process_math_element(element[2])
+                )
+            variable_name = base_name + modifier
+            return variable_name
+        elif element.tag in ["mo", "mn"]:
+            # Handling operators and numbers
+            variable_name = element.text
+            return variable_name
+        elif element.tag == "mtext":
+            # Handling mtext
+            variable_name = element.text
+            return variable_name
+        else:
+            # Handling any other tag
+            try:
+                variable_name = element.text
+                return variable_name
+            except:
+                return ""
+
+    for elem in root.iter():
+        if elem.tag in ["mi", "msup", "msub", "msubsup"]:
+            variables.append(process_math_element(elem))
+    result_list = list(set(variables))
+    result_list = [item for item in result_list if item not in mathml_operators]
+    return result_list  # Returning unique variable names
+
+
+def format_subscripts_and_superscripts(latex_str: str) -> str:
+    # Function to format subscripts and superscripts in a LaTeX string
+    # Returns a list of unique variable names
+    def replace_sub(match):
+        return f"{match.group(1)}_{{{match.group(2)}}}"
+
+    def replace_sup(match):
+        superscript = match.group(2)
+        return f"{match.group(1)}^{{{superscript}}}"
+
+    pattern_sub = r"(\S+)_(\S+)"
+    pattern_sup = r"(\S+)\^(\S+)"
+
+    formatted_str = re.sub(pattern_sup, replace_sup, latex_str)
+    formatted_str = re.sub(pattern_sub, replace_sub, formatted_str)
+
+    return formatted_str
+
+
+def replace_greek_with_unicode(input_str):
+    # Function to replace Greek letters and their names with Unicode
+    # Returns the replaced string if replacements were made, otherwise an empty string
+    replaced_str = input_str
+    for gl in greek_letters:
+        replaced_str = replaced_str.replace(gl[0], gl[2])
+        replaced_str = replaced_str.replace(gl[1], gl[2])
+    return replaced_str if replaced_str != input_str else ""
+
+
+def replace_unicode_with_symbol(input_str):
+    # Function to replace Unicode representations with corresponding symbols
+    # Returns the replaced string if replacements were made, otherwise an empty string
+    pattern = r"&#x[A-Fa-f0-9]+;"
+    matches = re.findall(pattern, input_str)
+
+    replaced_str = input_str
+    for match in matches:
+        unicode_char = html.unescape(match)
+        replaced_str = replaced_str.replace(match, unicode_char)
+
+    return replaced_str if replaced_str != input_str else ""
+
+
+def transform_variable(variable: str) -> List[Union[str, List[str]]]:
+    # Function to transform a variable into a list containing different representations
+    # Returns a list containing various representations of the variable
+    if variable.startswith("&#x"):
+        for gl in greek_letters:
+            if variable in gl:
+                return gl
+        return [html.unescape(variable), variable]
+    elif variable.isalpha():
+        if len(variable) == 1:
+            for gl in greek_letters:
+                if variable in gl:
+                    return gl
+            return [variable, "&#x{:04X};".format(ord(variable))]
+        else:
+            return [variable]
+    else:
+        if len(variable) == 1:
+            return [variable, "&#x{:04X};".format(ord(variable))]
+        else:
+            variable_list = [variable, format_subscripts_and_superscripts(variable)]
+            if replace_greek_with_unicode(variable) != "":
+                variable_list.append(replace_greek_with_unicode(variable))
+                variable_list.append(
+                    replace_greek_with_unicode(
+                        format_subscripts_and_superscripts(variable)
+                    )
+                )
+            if replace_unicode_with_symbol(variable) != "":
+                variable_list.append(replace_unicode_with_symbol(variable))
+                variable_list.append(format_subscripts_and_superscripts(variable))
+
+            return variable_list
+
+
+def create_variable_dictionary(
+    variables: List[str],
+) -> Dict[str, List[Union[str, List[str]]]]:
+    # Function to create a dictionary mapping variables to their representations
+    # Returns a dictionary with variables as keys and their representations as values
+    variable_dict = {}
+    for variable in variables:
+        variable_dict[variable] = transform_variable(variable)
+    return variable_dict
+
+
+def generate_variable_dict(mathml_string):
+    # Function to generate a variable dictionary from MathML
+    try:
+        variables = extract_variables_with_subsup(mathml_string)
+        variable_dict = create_variable_dictionary(variables)
+        return variable_dict
+    except:
+        return {}
