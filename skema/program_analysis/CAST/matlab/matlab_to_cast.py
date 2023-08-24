@@ -67,10 +67,11 @@ class MATLAB2CAST(object):
         print('\nTREE_SITTER PARSE TREE:')
         self.traverse_tree(self.tree.root_node, '')
 
+        # The MATLAB grammar creates a tree with empty nodes.  For now the
+        # solution is to clean those from the tree before proceeding.
         clean_tree = Tree
         clean_tree.root_node = self.clean_tree(self.tree.root_node, clean_tree.root_node)
         self.tree = clean_tree
-
         print('\nTREE_SITTER PARSE TREE 2: ')
         self.traverse_tree(self.tree.root_node, '')
 
@@ -82,7 +83,7 @@ class MATLAB2CAST(object):
         self.out_cast = self.generate_cast()
         print('\nCAST objects:')
         for c in self.out_cast: 
-            print(c)
+            print(c.to_json_str())
         print('CAST objects done\n\n')
 
     # Remove empty child nodes from tree
