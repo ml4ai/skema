@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["first_order_ode","flatten_mults","get_FirstOrderODE_vec_from_file","get_term_div","get_term_mult","get_terms","get_terms_add","get_terms_sub"],"struct":["FirstOrderODE","PnTerm"]};
+window.SIDEBAR_ITEMS = {"fn":["first_order_ode","flatten_mults","get_FirstOrderODE_vec_from_file","get_term_div","get_term_mult","get_terms","get_terms_add","get_terms_mult","get_terms_sub"],"struct":["FirstOrderODE","PnTerm"]};
