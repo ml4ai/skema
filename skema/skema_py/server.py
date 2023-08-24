@@ -204,7 +204,7 @@ def fn_supported_file_extensions():
     supported_extensions = response.json()
 
     """
-    return FN_SUPPORTED_FILE_EXTENSIONS
+    return SUPPORTED_FILE_EXTENSIONS
 
 
 @router.post(
