@@ -147,6 +147,10 @@ class SupportedLanguage(BaseModel):
         description="The name of the supported programming language.",
         example="python",
     )
+    extensions: List[str] = Field(
+        ...,
+        description="List of file extensions supported for corresponding language",
+    )
     single: bool = Field(
         ...,
         description="Indicates whether single line comments are supported for this language.",
@@ -169,3 +173,6 @@ class SupportedLanguageResponse(BaseModel):
             {"name": "c", "single": True, "multi": True, "docstring": True},
         ],
     )
+
+
+CodeComments = Union[SingleFileCommentRequest, MultiFileCommentRequest]

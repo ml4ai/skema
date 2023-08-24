@@ -13,17 +13,17 @@ from skema.program_analysis.comment_extractor.model import (
     SupportedLanguageResponse,
 )
 
-SUPPORTED_FILE_EXTENSIONS = [".c", ".cpp", ".py", ".F", ".f", ".f95", ".for", ".m", ".r"]
+
+SUPPORTED_LANGUAGES = comment_service.get_supported_languages()
+SUPPORTED_FILE_EXTENSIONS = [
+    extension
+    for language in SUPPORTED_LANGUAGES.languages
+    for extension in language.extensions
+]
 EXTENSION_TO_LANGUAGE = {
-    ".c": "c",
-    ".cpp": "cpp",
-    ".py": "python",
-    ".F": "fortran",
-    ".f": "fortran",
-    ".f95": "fortran",
-    ".for": "fortran",
-    ".m": "matlab",
-    ".r": "r",
+    extension: language.name
+    for language in SUPPORTED_LANGUAGES.languages
+    for extension in language.extensions
 }
 
 app = FastAPI()
@@ -32,7 +32,7 @@ app = FastAPI()
 @app.get("/comments-get-supported-languages", summary="")
 async def comments_get_supported_languages() -> SupportedLanguageResponse:
     """Endpoint for checking which type of comments are supported for each language."""
-    return comment_service.get_supported_languages()
+    return SUPPORTED_LANGUAGES
 
 
 @app.get("/comments-get-supported-file-extensions")
@@ -59,7 +59,9 @@ async def comments_extract(
 
 
 @app.post("/comments-extract-zip", summary="")
-async def comments_extract_zip(zip_file: UploadFile = File()) -> MultiFileCommentResponse:
+async def comments_extract_zip(
+    zip_file: UploadFile = File(),
+) -> MultiFileCommentResponse:
     """
     Endpoint for extracting comment from a zip archive of arbitrary depth and structure.
     All source files with a supported file extension will be processed as a single GrometFNModuleCollection.
@@ -75,12 +77,12 @@ async def comments_extract_zip(zip_file: UploadFile = File()) -> MultiFileCommen
             file_obj = Path(file)
             file_suffix = file_obj.suffix
 
-            if file_suffix in SUPPORTED_FILE_EXTENSIONS:
+            if file_suffix in EXTENSION_TO_LANGUAGE:
                 request["files"][file] = {
                     "language": EXTENSION_TO_LANGUAGE[file_suffix],
                     "source": zip.open(file).read(),
                 }
-                
+
     return comment_service.extract_comments_multi(
         MultiFileCommentRequest.parse_obj(request)
     )
