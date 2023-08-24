@@ -11,8 +11,7 @@ from fastapi import APIRouter, File, UploadFile
 from starlette.responses import JSONResponse
 
 from skema.img2mml import eqn2mml
-from skema.program_analysis.comments import MultiFileCodeComments
-from skema.rest import comments_proxy, schema, utils
+from skema.rest import schema, utils
 from skema.rest.proxies import SKEMA_RS_ADDESS
 from skema.skema_py import server as code2fn
 
