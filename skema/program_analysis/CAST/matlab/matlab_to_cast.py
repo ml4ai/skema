@@ -64,15 +64,13 @@ class MATLAB2CAST(object):
 
         # Parse the MATLAB source code
         self.tree = parser.parse(bytes(self.source, "utf8"))
-        print('\nTREE_SITTER PARSE TREE:')
-        self.traverse_tree(self.tree.root_node, '')
 
         # The MATLAB grammar creates a tree with empty nodes.  For now the
         # solution is to clean those from the tree before proceeding.
         clean_tree = Tree
         clean_tree.root_node = self.clean_tree(self.tree.root_node, clean_tree.root_node)
         self.tree = clean_tree
-        print('\nTREE_SITTER PARSE TREE 2: ')
+        print('\nTREE_SITTER PARSE TREE: ')
         self.traverse_tree(self.tree.root_node, '')
 
         # Walking data
@@ -83,7 +81,12 @@ class MATLAB2CAST(object):
         self.out_cast = self.generate_cast()
         print('\nCAST objects:')
         for c in self.out_cast: 
-            print(c.to_json_str())
+            j = json.dumps(
+                c.to_json_object(),
+                sort_keys=True,
+                indent=2,
+            )
+            print(j)
         print('CAST objects done\n\n')
 
     # Remove empty child nodes from tree
@@ -667,11 +670,6 @@ class MATLAB2CAST(object):
     def visit_assignment_statement(self, node):
         print('visit_assignment_statement')
         left, _, right = node.children
-
-        # We need to check if the left side is a multidimensional array,
-        # Since tree-sitter incorrectly shows this assignment as a call_expression
-        if left.type == "call_expression":
-            return self._visit_set(node)
 
         return Assignment(
             left=self.visit(left),
