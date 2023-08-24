@@ -2,7 +2,7 @@ from pathlib import Path
 from io import BytesIO
 from zipfile import ZipFile
 from typing import List, Union, Optional
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, APIRouter, File, UploadFile
 
 import skema.program_analysis.comment_extractor.comment_extractor as comment_service
 from skema.program_analysis.comment_extractor.model import (
@@ -26,22 +26,21 @@ EXTENSION_TO_LANGUAGE = {
     for extension in language.extensions
 }
 
-app = FastAPI()
+router = APIRouter()
 
-
-@app.get("/comments-get-supported-languages", summary="")
+@router.get("/comments-get-supported-languages", summary="")
 async def comments_get_supported_languages() -> SupportedLanguageResponse:
     """Endpoint for checking which type of comments are supported for each language."""
     return SUPPORTED_LANGUAGES
 
 
-@app.get("/comments-get-supported-file-extensions")
+@router.get("/comments-get-supported-file-extensions")
 async def comments_get_supported_file_extensions() -> List[str]:
     "Endpoint for checking which file extensions are supported for comment extraction."
     return SUPPORTED_FILE_EXTENSIONS
 
 
-@app.post("/comments-extract", summary="")
+@router.post("/comments-extract", summary="")
 async def comments_extract(
     request: SingleFileCommentRequest,
 ) -> SingleFileCommentResponse:
@@ -58,7 +57,7 @@ async def comments_extract(
     return comment_service.extract_comments_single(request)
 
 
-@app.post("/comments-extract-zip", summary="")
+@router.post("/comments-extract-zip", summary="")
 async def comments_extract_zip(
     zip_file: UploadFile = File(),
 ) -> MultiFileCommentResponse:
@@ -86,3 +85,10 @@ async def comments_extract_zip(
     return comment_service.extract_comments_multi(
         MultiFileCommentRequest.parse_obj(request)
     )
+
+app = FastAPI()
+app.include_router(
+    router,
+    prefix="/comment_service",
+    tags=["comment_service"],
+)
