@@ -13,7 +13,7 @@ object GrounderFactory {
     val prependManualGrounder = config.getBoolean("forceManualGroundings")
     val domain = config.getString("domain")
     val domainConfig = config.getConfig(domain)
-    lazy val manualGrounder = buildManualGrounder(domainConfig)
+    lazy val manualGrounder = buildManualGrounder(domainConfig, processorOpt)
     // Grounding parameters
     engine.toLowerCase match {
         case "miraembeddings" =>
@@ -40,9 +40,14 @@ object GrounderFactory {
       }
   }
 
-  def buildManualGrounder(config:Config): ManualGrounder = {
+  def buildManualGrounder(config:Config, processorOpt: Option[Processor] = None): ManualGrounder = {
     val manualGroundingsResourcePath = config.getString("manualGroundings")
-    val processor = new FastNLPProcessor(withChunks = false, internStrings = false)
+    processorOpt.foreach { processor =>
+      // This check is to ensure former behavior.
+      assert(processor.isInstanceOf[FastNLPProcessor])
+    }
+    // Although not chunking can save time, it will also waste space, so use an existing processor if possible.
+    val processor = processorOpt.getOrElse(new FastNLPProcessor(withChunks = false, internStrings = false))
     ManualGrounder.fromFileOrResource(manualGroundingsResourcePath, processor)
   }
 }

@@ -38,12 +38,12 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   // Make one of each of these now and share it with the pipelines.
   // This will have a FastNLPProcessor.
   val odinEngineOpt = Some(TextReadingPipeline.newOdinEngine())
-  // val fastNlpProcessor = odinEngineOpt.get.proc
+  val fastNlpProcessorOpt = Some(odinEngineOpt.get.proc)
 
-  // Use this one instead of the lazy val in MireEmbeddingsGrounder.
+  // Use this one instead of the lazy val in MireEmbeddingsGrounder or newGrounder.
+  val miraEmbeddingsGrounder = TextReadingPipeline.newGrounder(fastNlpProcessorOpt, chosenEngineOpt = Some("miraembeddings"))
+
   val processorOpt = Some(DocumentByWord.processor)
-  val miraEmbeddingsGrounder = TextReadingPipeline.newGrounder(processorOpt, chosenEngineOpt = Some("miraembeddings"))
-
   // TODO Add the window parameter to the configuration file.
   val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3, processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
   // TODO Add the window parameter to the configuration file.
