@@ -170,7 +170,6 @@ def extract_comments_single(
     parser = Parser()
     parser.set_language(language_obj)
     tree = parser.parse(bytes(request.source, encoding="UTF-8"))
-    print(tree.root_node.sexp())
     captures = language_obj.query(queries_obj[request.language]).captures(
         tree.root_node
     )
