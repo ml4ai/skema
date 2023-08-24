@@ -53,10 +53,6 @@ class MATLAB2CAST(object):
         print('\nSOURCE:')
         print(self.source)
 
-        # self.source = self.source.replace('\n',' ')
-        # print('\nSOURCE 2: ')
-        # print(self.source)
-
         # Create the tree-sitter MATLAB parser
         parser = Parser()
         parser.set_language(
@@ -71,12 +67,12 @@ class MATLAB2CAST(object):
         print('\nTREE_SITTER PARSE TREE:')
         self.traverse_tree(self.tree.root_node, '')
 
-        #  clean_tree = Tree
-        #  clean_tree.root_node = self.clean_tree(self.tree.root_node, clean_tree.root_node)
-        #  self.tree = clean_tree
+        clean_tree = Tree
+        clean_tree.root_node = self.clean_tree(self.tree.root_node, clean_tree.root_node)
+        self.tree = clean_tree
 
-        # print('\nTREE_SITTER PARSE TREE 2: ')
-        # self.traverse_tree(self.tree.root_node, '')
+        print('\nTREE_SITTER PARSE TREE 2: ')
+        self.traverse_tree(self.tree.root_node, '')
 
         # Walking data
         self.variable_context = VariableContext()
@@ -89,15 +85,14 @@ class MATLAB2CAST(object):
             print(c)
         print('CAST objects done\n\n')
 
-    # Remove unwanted nodes from tree
-    # def clean_tree(self, root: Tree, ret: Tree):
-    #     for child in root.children:
-    #         if child.type == '\n': # empty child
-    #             root.children.remove(child)
-    #         else:
-    #             ret.append(child)
-    #             clean_tree(root, ret)
-    #     return ret
+    # Remove empty child nodes from tree
+    def clean_tree(self, root: Tree, ret: Tree):
+        for child in root.children:
+            if child.type == '\n': # empty child
+                root.children.remove(child)
+        for child in root.children:
+            self.clean_tree(child, root)
+        return root
 
     # display the tree-sitter.TREE in pretty format
     def traverse_tree(self, root: Tree, indent):
