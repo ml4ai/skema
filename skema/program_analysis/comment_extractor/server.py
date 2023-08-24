@@ -28,19 +28,19 @@ EXTENSION_TO_LANGUAGE = {
 
 router = APIRouter()
 
-@router.get("/comments-get-supported-languages", summary="")
+@router.get("/comments-get-supported-languages", summary="Endpoint for checking which languages and comment types are supported by comment extractor.")
 async def comments_get_supported_languages() -> SupportedLanguageResponse:
     """Endpoint for checking which type of comments are supported for each language."""
     return SUPPORTED_LANGUAGES
 
 
-@router.get("/comments-get-supported-file-extensions")
+@router.get("/comments-get-supported-file-extensions", summary="Endpoint for checking which files extensions are currently supported by comment extractor.")
 async def comments_get_supported_file_extensions() -> List[str]:
     "Endpoint for checking which file extensions are supported for comment extraction."
     return SUPPORTED_FILE_EXTENSIONS
 
 
-@router.post("/comments-extract", summary="")
+@router.post("/comments-extract", summary="Endpoint for extracting comments from a single file.")
 async def comments_extract(
     request: SingleFileCommentRequest,
 ) -> SingleFileCommentResponse:
@@ -57,7 +57,7 @@ async def comments_extract(
     return comment_service.extract_comments_single(request)
 
 
-@router.post("/comments-extract-zip", summary="")
+@router.post("/comments-extract-zip", summary="Endpoint for extracting comments from a .zip archive.")
 async def comments_extract_zip(
     zip_file: UploadFile = File(),
 ) -> MultiFileCommentResponse:
