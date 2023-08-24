@@ -284,7 +284,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
             file_obj = Path(file)
-            if file_obj.suffix in FN_SUPPORTED_FILE_EXTENSIONS:
+            if file_obj.suffix in SUPPORTED_FILE_EXTENSIONS:
                 files.append(file)
                 blobs.append(zip.open(file).read())
 

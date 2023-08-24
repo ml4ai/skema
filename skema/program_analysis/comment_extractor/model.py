@@ -175,4 +175,4 @@ class SupportedLanguageResponse(BaseModel):
     )
 
 
-CodeComments = Union[SingleFileCommentRequest, MultiFileCommentRequest]
+CodeComments = Union[SingleFileCommentResponse, MultiFileCommentResponse]
