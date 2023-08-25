@@ -493,20 +493,98 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             }
         }
 
+        // first is we need to replace any terms with more than 2 exp_states with subterms, these are simply
+        // terms that need to be distributed (ASSUMPTION, MOST A TRANSTION CAN HAVE IS 2 IN AND 2 OUT)
+        // but first we need to inherit the dynamic state to each sub term
+        let mut composite_term_ind = Vec::<usize>::new();
+        let mut sub_terms = Vec::<PnTerm>::new();
+        for (j, t) in terms.clone().iter().enumerate() {
+            if t.exp_states.len() > 2 && t.sub_terms.is_some() {
+                for (i, _sub_t) in t.sub_terms.clone().unwrap().iter().enumerate() {
+                    terms[j].sub_terms.as_mut().unwrap()[i].dyn_state = t.dyn_state.clone();
+                    sub_terms.push(terms[j].sub_terms.as_mut().unwrap()[i].clone());
+                }
+                composite_term_ind.push(j);
+            }
+        }
+        // delete composite terms we are replacing
+        composite_term_ind.sort();
+        for i in composite_term_ind.iter().rev() {
+            terms.remove(*i);
+        }
+        // replace with subterms
+        terms.append(&mut sub_terms);
+
         // now for polarity pairs of terms we need to construct the transistions
+        let mut paired_term_indices = Vec::<usize>::new();
         let mut transition_pair = Vec::<(PnTerm, PnTerm)>::new();
-        for term1 in terms.clone().iter() {
-            for term2 in terms.clone().iter() {
+        for (i, term1) in terms.clone().iter().enumerate() {
+            for (j, term2) in terms.clone().iter().enumerate() {
                 if term1.polarity != term2.polarity
                     && term1.parameters == term2.parameters
                     && term1.polarity
+                    && term1.exp_states == term2.exp_states
                 {
                     let temp_pair = (term1.clone(), term2.clone());
                     transition_pair.push(temp_pair);
+                    paired_term_indices.push(i);
+                    paired_term_indices.push(j);
                 }
             }
         }
 
+        // delete paired terms from list
+        paired_term_indices.sort();
+        for i in paired_term_indices.iter().rev() {
+            terms.remove(*i);
+        }
+
+        // Now we replace unpaired terms with subterms, by their subterms and repeat the process
+
+        // but first we need to inherit the dynamic state to each sub term
+        let mut composite_term_ind = Vec::<usize>::new();
+        let mut sub_terms = Vec::<PnTerm>::new();
+        for (j, t) in terms.clone().iter().enumerate() {
+            if t.sub_terms.is_some() {
+                for (i, _sub_t) in t.sub_terms.clone().unwrap().iter().enumerate() {
+                    terms[j].sub_terms.as_mut().unwrap()[i].dyn_state = t.dyn_state.clone();
+                    sub_terms.push(terms[j].sub_terms.as_mut().unwrap()[i].clone());
+                }
+                composite_term_ind.push(j);
+            }
+        }
+
+        // delete composite terms
+        composite_term_ind.sort();
+        for i in composite_term_ind.iter().rev() {
+            terms.remove(*i);
+        }
+
+        // replace with subterms
+        terms.append(&mut sub_terms);
+
+        // now we attempt to pair again and delete paired terms again
+        let mut paired_term_indices = Vec::<usize>::new();
+        for (i, term1) in terms.clone().iter().enumerate() {
+            for (j, term2) in terms.clone().iter().enumerate() {
+                if term1.polarity != term2.polarity
+                    && term1.parameters == term2.parameters
+                    && term1.polarity
+                    && term1.exp_states == term2.exp_states
+                {
+                    let temp_pair = (term1.clone(), term2.clone());
+                    transition_pair.push(temp_pair);
+                    paired_term_indices.push(i);
+                    paired_term_indices.push(j);
+                }
+            }
+        }
+        paired_term_indices.sort();
+        for i in paired_term_indices.iter().rev() {
+            terms.remove(*i);
+        }
+
+        // now we construct transitions of all paired terms
         for (i, t) in transition_pair.iter().enumerate() {
             if t.0.exp_states.len() == 1 {
                 // construct transtions for simple transtions
@@ -526,7 +604,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
                 let exp_len = t.0.exp_states.len();
                 for (i, exp) in t.0.exp_states.clone().iter().enumerate() {
-                    if i != exp_len {
+                    if i != exp_len - 1 {
                         expression_string =
                             format!("{}{}*", expression_string.clone(), exp.clone());
                     } else {
@@ -543,7 +621,6 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             } else {
                 // construct transitions for complicated transitions
                 // mainly need to construct the output specially,
-                // run by clay
                 let mut output = [t.0.dyn_state.clone()].to_vec();
 
                 for state in t.0.exp_states.iter() {
@@ -585,7 +662,98 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             }
         }
 
-        // trim duplicate parameters and remove integer parameters
+        // now we construct transitions from unpaired terms, assuming them to be sources and sinks
+        if !terms.is_empty() {
+            for (i, term) in terms.iter().enumerate() {
+                if term.polarity {
+                    let mut input = Vec::<String>::new();
+
+                    let output = [term.dyn_state.clone()].to_vec();
+
+                    for state in term.exp_states.iter() {
+                        input.push(state.clone());
+                    }
+
+                    let transitions = Transition {
+                        id: format!("s{}", i),
+                        input: Some(input.clone()),
+                        output: Some(output.clone()),
+                        ..Default::default()
+                    };
+                    transitions_vec.insert(transitions.clone());
+
+                    let mut expression_string = "".to_string();
+
+                    if !term.exp_states.is_empty() {
+                        let exp_len = term.exp_states.len() - 1;
+                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                            if i != exp_len {
+                                expression_string =
+                                    format!("{}{}*", expression_string.clone(), exp.clone());
+                            } else {
+                                expression_string =
+                                    format!("{}{}", expression_string.clone(), exp.clone());
+                            }
+                        }
+                    }
+
+                    for param in term.parameters.clone().iter() {
+                        expression_string =
+                            format!("{}{}", expression_string.clone(), param.clone());
+                    }
+
+                    let rate = Rate {
+                        target: transitions.id.clone(),
+                        expression: expression_string.clone(), // the second term needs to be the product of the inputs
+                        expression_mathml: Some(term.expression.clone()),
+                    };
+                    rate_vec.push(rate.clone());
+                } else {
+                    let mut input = [term.dyn_state.clone()].to_vec();
+
+                    for state in term.exp_states.iter() {
+                        input.push(state.clone());
+                    }
+
+                    let transitions = Transition {
+                        id: format!("s{}", i),
+                        input: Some(input.clone()),
+                        output: None,
+                        ..Default::default()
+                    };
+                    transitions_vec.insert(transitions.clone());
+
+                    let mut expression_string = "".to_string();
+
+                    if !term.exp_states.is_empty() {
+                        let exp_len = term.exp_states.len() - 1;
+                        for (i, exp) in term.exp_states.clone().iter().enumerate() {
+                            if i != exp_len {
+                                expression_string =
+                                    format!("{}{}*", expression_string.clone(), exp.clone());
+                            } else {
+                                expression_string =
+                                    format!("{}{}", expression_string.clone(), exp.clone());
+                            }
+                        }
+                    }
+
+                    for param in term.parameters.clone().iter() {
+                        expression_string =
+                            format!("{}{}", expression_string.clone(), param.clone());
+                    }
+
+                    let rate = Rate {
+                        target: transitions.id.clone(),
+                        expression: expression_string.clone(), // the second term needs to be the product of the inputs
+                        expression_mathml: Some(term.expression.clone()),
+                    };
+                    rate_vec.push(rate.clone());
+                }
+            }
+        }
+
+        // trim duplicate parameters and (TODO)remove integer parameters
 
         parameter_vec.sort();
         parameter_vec.dedup();
