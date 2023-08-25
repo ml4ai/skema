@@ -982,7 +982,7 @@ class TS2CAST(object):
         if call_expression_node:
             value = self._visit_get(call_expression_node)
         else:
-            # TODO: We shouldn't be accessing get_node directly, since it may not exist in the case of an import.
+            # We shouldn't be accessing get_node directly, since it may not exist in the case of an import.
             # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn't exist.
             value = self.visit(get_first_child_by_type(node, "identifier", recurse=True))
 
