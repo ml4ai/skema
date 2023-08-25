@@ -65,26 +65,20 @@ class MATLAB2CAST(object):
             )
         )
 
-        # The MATLAB parser creates a syntax tree with empty child nodes.  For 
-        # now the solution is to clean those from the tree before proceeding.
-        dirty_tree = parser.parse(bytes(self.source, "utf8"))
+        # The MATLAB parser creates a syntax tree that contains extra empty nodes.
+        tree = parser.parse(bytes(self.source, "utf8"))
 
-        print('\nSYNTAX TREE dirty sexp(): ')
-        print(dirty_tree.root_node.sexp())
-
+        # prune empty nodes from syntax tree
         clean_tree = Tree
         clean_tree.root_node = self.clean_tree(
-            dirty_tree.root_node, 
+            tree.root_node, 
             clean_tree.root_node
         )
-
-        print('\nSYNTAX TREE clean sexp(): ')
-        print(dirty_tree.root_node.sexp())
-
         self.tree = clean_tree
-        print('\nSYNTAX TREE: ')
-        self.traverse_tree(self.tree.root_node, '')
-        print("\n")
+
+        # print('\nSYNTAX TREE: ')
+        # self.traverse_tree(self.tree.root_node, '')
+        # print("\n")
 
         # Walking data
         self.variable_context = VariableContext()
@@ -92,17 +86,18 @@ class MATLAB2CAST(object):
 
         # Create CAST object 
         self.out_cast = self.generate_cast()
-        print('\nCAST objects:')
-        for c in self.out_cast: 
-            j = json.dumps(
-                c.to_json_object(),
-                sort_keys=True,
-                indent=2,
-            )
-            print(j)
-        print('CAST objects done\n\n')
 
-    # Remove empty child nodes from tree
+        # print('\nCAST objects:')
+        # for c in self.out_cast: 
+        #     j = json.dumps(
+        #         c.to_json_object(),
+        #         sort_keys=True,
+        #         indent=2,
+        #     )
+        #     print(j)
+        # print('CAST objects done\n\n')
+
+    # Remove empty nodes from tree
     def clean_tree(self, root: Tree, ret: Tree):
         for child in root.children:
             if child.type == '\n': # empty child
