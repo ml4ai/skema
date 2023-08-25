@@ -62,16 +62,26 @@ class MATLAB2CAST(object):
             )
         )
 
-        # Parse the MATLAB source code
-        self.tree = parser.parse(bytes(self.source, "utf8"))
+        # The MATLAB parser creates a syntax tree with empty child nodes.  For 
+        # now the solution is to clean those from the tree before proceeding.
+        dirty_tree = parser.parse(bytes(self.source, "utf8"))
 
-        # The MATLAB grammar creates a tree with empty nodes.  For now the
-        # solution is to clean those from the tree before proceeding.
+        print('\nSYNTAX TREE dirty sexp(): ')
+        print(dirty_tree.root_node.sexp())
+
         clean_tree = Tree
-        clean_tree.root_node = self.clean_tree(self.tree.root_node, clean_tree.root_node)
+        clean_tree.root_node = self.clean_tree(
+            dirty_tree.root_node, 
+            clean_tree.root_node
+        )
+
+        print('\nSYNTAX TREE clean sexp(): ')
+        print(dirty_tree.root_node.sexp())
+
         self.tree = clean_tree
-        print('\nTREE_SITTER PARSE TREE: ')
+        print('\nSYNTAX TREE: ')
         self.traverse_tree(self.tree.root_node, '')
+        print("\n")
 
         # Walking data
         self.variable_context = VariableContext()
@@ -101,7 +111,7 @@ class MATLAB2CAST(object):
     # display the tree-sitter.TREE in pretty format
     def traverse_tree(self, root: Tree, indent):
         for child in root.children:
-            print(indent + 'child: ' + child.type)
+            print(indent + 'node: ' + child.type)
             self.traverse_tree(child, indent + '  ')
 
     def generate_cast(self) -> List[CAST]:
@@ -127,20 +137,24 @@ class MATLAB2CAST(object):
         # 1. A module body
         # 2. A program body
         # 3. Everything else (defined functions)
-        modules = []
 
-        #contexts = get_children_by_types(root, ["comment"])
-        #print("\nrunning contexts")
-        #for context in contexts:
-        #    print("context")
-        #    modules.append(self.visit(context))
-        #print("running contexts done")
+        # create source_file module for the whole program
+        # contexts = [root]
+        modules = [self.visit_module(root)]
+
+        # contexts = get_children_by_types(root, ["Module", "program"])
+
+        # print("\nrunning contexts")
+        # for context in contexts:
+        #     print("context")
+        #     modules.append(self.visit(context))
+        # print("running contexts done")
 
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.
         # TODO: Research the above
         print("\nNODE VISITS ___________")
-        outer_body_nodes = get_children_by_types(root, ["comment", "assignment"])
+        outer_body_nodes = get_children_by_types(root, ["function", "subroutine"])
         if len(outer_body_nodes) > 0:
             body = []
             for body_node in outer_body_nodes:
@@ -204,7 +218,7 @@ class MATLAB2CAST(object):
         self.variable_context.push_context()
         
         program_body = []
-        for child in node.children[1:-1]:  # Ignore the start and end program statement
+        for child in node.children: 
             child_cast = self.visit(child)
             if isinstance(child_cast, List):
                 program_body.extend(child_cast)
