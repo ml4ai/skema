@@ -497,7 +497,7 @@ def train_model(rank=None,):
     """
     if config["bin_comparison"]:
         print("comparing bin...")
-        from .gitignore.bin_testing import bin_test_dataloader
+        from bin_testing import bin_test_dataloader
 
         test_dataloader = bin_test_dataloader(
             config, vocab, device, start=0, end=50
