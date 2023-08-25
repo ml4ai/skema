@@ -41,6 +41,7 @@ from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
 
 from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
+
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
@@ -64,7 +65,6 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
@@ -102,7 +102,7 @@ class TS2CAST(object):
     
         return modules
 
-    def visit(self, node):
+    def visit(self, node: Node):
         if node.type in ["program", "module"] :
             return self.visit_module(node)
         elif node.type == "internal_procedures":
@@ -138,6 +138,8 @@ class TS2CAST(object):
             return self.visit_do_loop_statement(node)
         elif node.type == "if_statement":
             return self.visit_if_statement(node)
+        elif node.type == "logical_expression":
+            return self.visit_logical_expression(node)
         elif node.type == "derived_type_definition":
             return self.visit_derived_type(node)
         elif node.type == "derived_type_member_expression":
@@ -402,7 +404,6 @@ class TS2CAST(object):
                         source_refs=symbol_source_refs,
                     )
                 )
-
             return imports
 
     def visit_do_loop_statement(self, node) -> Loop:
@@ -555,8 +556,8 @@ class TS2CAST(object):
         #  (else_clause)
         #  (end_if_statement)
 
-        # First we need to identify if this is a componund conditional
-        # We can do this by counting the number of control characters in a relational expression
+        if_condition = self.visit(get_first_child_by_type(node, "parenthesized_expression"))
+
         child_types = [child.type for child in node.children]
 
         try:
@@ -581,10 +582,12 @@ class TS2CAST(object):
             orelse = ModelIf()
             prev = orelse
             for condition in node.children[elseif_index:else_index]:
+                if condition.type == "comment":
+                    continue
                 elseif_expr = self.visit(condition.children[2])
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
 
-                prev.orelse = ModelIf(elseif_expr, elseif_body, None)
+                prev.orelse = ModelIf(elseif_expr, elseif_body, [])
                 prev = prev.orelse
 
         if else_index != -1:
@@ -602,8 +605,36 @@ class TS2CAST(object):
         return ModelIf(
             expr=self.visit(node.children[1]),
             body=[self.visit(child) for child in node.children[3:body_stop_index]],
-            orelse=orelse,
+            orelse=[orelse] if orelse else [],
         )
+
+    def visit_logical_expression(self, node):
+        """Visitior for logical expression (i.e. true and false) which is used in compound conditional"""
+        literal_value_false = LiteralValue("Boolean", False)
+        literal_value_true = LiteralValue("Boolean", True)
+        
+        # AND: Right side goes in body if, left side in condition
+        # OR: Right side goes in body else, left side in condition 
+        left, operator, right = node.children
+        
+        # First we need to check if this is logical and or a logical or
+        # The tehcnical types for these are \.or\. and \.and\. so to simplify things we can use the in keyword
+        is_or = "or" in operator.type 
+        
+        top_if = ModelIf()
+
+        top_if_expr = self.visit(left)
+        top_if.expr = top_if_expr
+        
+        bottom_if_expr = self.visit(right)
+        if is_or:
+            top_if.orelse = [bottom_if_expr]
+            top_if.body = [literal_value_true]
+        else:
+            top_if.orelse = [literal_value_false]
+            top_if.body = [bottom_if_expr]
+
+        return top_if
 
     def visit_assignment_statement(self, node):
         left, _, right = node.children
@@ -951,11 +982,9 @@ class TS2CAST(object):
         if call_expression_node:
             value = self._visit_get(call_expression_node)
         else:
-            value = self.variable_context.get_node(
-                self.node_helper.get_identifier(
-                    get_first_child_by_type(node, "identifier", recurse=True),
-                )
-            )
+            # TODO: We shouldn't be accessing get_node directly, since it may not exist in the case of an import.
+            # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn't exist.
+            value = self.visit(get_first_child_by_type(node, "identifier", recurse=True))
 
         attr = self.node_helper.get_identifier(
             get_first_child_by_type(node, "type_member", recurse=True)
