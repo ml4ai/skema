@@ -698,72 +698,11 @@ class MATLAB2CAST(object):
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
 
-        if literal_type == "number_literal":
-            # Check if this is a real value, or an Integer
-            if "e" in literal_value.lower() or "." in literal_value:
-                return LiteralValue(
-                    value_type="AbstractFloat",
-                    value=literal_value,
-                    source_code_data_type=["Fortran", "Fortran95", "real"],
-                    source_refs=[literal_source_ref],
-                )
-            else:
-                return LiteralValue(
-                    value_type="Integer",
-                    value=literal_value,
-                    source_code_data_type=["Fortran", "Fortran95", "integer"],
-                    source_refs=[literal_source_ref],
-                )
-        elif literal_type == "string_literal":
-            return LiteralValue(
-                value_type="Character",
-                value=literal_value,
-                source_code_data_type=["Fortran", "Fortran95", "character"],
-                source_refs=[literal_source_ref],
-            )
-
-        elif literal_type == "boolean_literal":
-            return LiteralValue(
-                value_type="Boolean",
-                value=literal_value,
-                source_code_data_type=["Fortran", "Fortran95", "logical"],
-                source_refs=[literal_source_ref],
-            )
-
-
-        elif literal_type == "array_literal":
-            # There are a multiple ways to create an array literal. This visitor is for the traditional explicit creation (/ 1,2,3 /)
-            # For the do loop based version, we pass it off to another visitor
-            implied_do_loop_expression_node = get_first_child_by_type(
-                node, "implied_do_loop_expression"
-            )
-            if implied_do_loop_expression_node:
-                return self._visit_implied_do_loop(implied_do_loop_expression_node)
-
-            return LiteralValue(
-                value_type="List",
-                value=[
-                    self.visit(element) for element in get_non_control_children(node)
-                ],
-                source_code_data_type=["Fortran", "Fortran95", "dimension"],
-                source_refs=[literal_source_ref],
-            )
-
-
-
-
-    def visit_literal_old(self, node) -> LiteralValue:
-        print('visit_literal')
-        """Visitor for literals. Returns a LiteralValue"""
-        literal_type = node.type
-        literal_value = self.node_helper.get_identifier(node)
-        literal_source_ref = self.node_helper.get_source_ref(node)
-
         if literal_type == "number":
             # Check if this is a real value, or an Integer
             if "e" in literal_value.lower() or "." in literal_value:
                 return LiteralValue(
-                    value_type="AbstractFloat",
+                    value_type="AbstractFloat",  # TODO verify this value
                     value=literal_value,
                     source_code_data_type=["matlab", "real"],
                     source_refs=[literal_source_ref],
