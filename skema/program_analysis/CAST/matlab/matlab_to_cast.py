@@ -43,6 +43,9 @@ from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
 #from skema.program_analysis.CAST.matlab.preprocessor.preprocess import preprocess
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
+#TODO:  Get from grammar
+MATLAB_VERSION='matlab_version_here'
+
 class MATLAB2CAST(object):
     def __init__(self, source_file_path: str):
         
@@ -128,33 +131,15 @@ class MATLAB2CAST(object):
     def run(self, root) -> List[Module]:
         print("run start")
         print("\nTREE STRUCTURE ___________")
-        print("\nroot: " + root.type)
-        for child in root.children:
-            print("child: " + child.type)
+        # A MATLAB program has a body composed of n statements
 
-        '''Top level visitor function. Will return between 1-3 Module objects.'''
-        # A program can have between 1-3 modules
-        # 1. A module body
-        # 2. A program body
-        # 3. Everything else (defined functions)
-
-        # create source_file module for the whole program
-        # contexts = [root]
-        modules = [self.visit_module(root)]
-
-        # contexts = get_children_by_types(root, ["Module", "program"])
-
-        # print("\nrunning contexts")
-        # for context in contexts:
-        #     print("context")
-        #     modules.append(self.visit(context))
-        # print("running contexts done")
+        modules = []
 
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
         # Other than comments, it is unclear if anything else is allowed.
         # TODO: Research the above
         print("\nNODE VISITS ___________")
-        outer_body_nodes = get_children_by_types(root, ["function", "subroutine"])
+        outer_body_nodes = get_children_by_types(root, ["function", "subroutine", "assignment"])
         if len(outer_body_nodes) > 0:
             body = []
             for body_node in outer_body_nodes:
@@ -396,8 +381,8 @@ class MATLAB2CAST(object):
 
         return Call(
             func=func,
-            source_language="Fortran",
-            source_language_version="2008",
+            source_language="matlab",
+            source_language_version=MATLAB_VERSION,
             arguments=arguments,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
@@ -704,14 +689,14 @@ class MATLAB2CAST(object):
                 return LiteralValue(
                     value_type="AbstractFloat",  # TODO verify this value
                     value=literal_value,
-                    source_code_data_type=["matlab", "real"],
+                    source_code_data_type=["matlab", MATLAB_VERSION, "real"],
                     source_refs=[literal_source_ref],
                 )
             else:
                 return LiteralValue(
                     value_type="Integer",
                     value=literal_value,
-                    source_code_data_type=["matlab", "integer"],
+                    source_code_data_type=["matlab", MATLAB_VERSION, "integer"],
                     source_refs=[literal_source_ref],
                 )
 
@@ -719,7 +704,7 @@ class MATLAB2CAST(object):
             return LiteralValue(
                 value_type="Character",
                 value=literal_value,
-                source_code_data_type=["matlab", "character"],
+                source_code_data_type=["matlab", MATLAB_VERSION, "character"],
                 source_refs=[literal_source_ref],
             )
 
@@ -727,7 +712,7 @@ class MATLAB2CAST(object):
             return LiteralValue(
                 value_type="Boolean",
                 value=literal_value,
-                source_code_data_type=["matlab", "logical"],
+                source_code_data_type=["matlab", MATLAB_VERSION, "logical"],
                 source_refs=[literal_source_ref],
             )
 
@@ -745,7 +730,7 @@ class MATLAB2CAST(object):
                 value=[
                     self.visit(element) for element in get_non_control_children(node)
                 ],
-                source_code_data_type=["Fortran", "Fortran95", "dimension"],
+                source_code_data_type=["matlab", MATLAB_VERSION, "dimension"],
                 source_refs=[literal_source_ref],
             )
 
@@ -924,7 +909,7 @@ class MATLAB2CAST(object):
         return Call(
             func=self.get_gromet_function_node("slice"),
             source_language="matlab",
-            source_language_version="Fortran95",  # matlab version?
+            source_language_version=MATLAB_VERSION,
             arguments=arguments,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
@@ -1082,8 +1067,8 @@ class MATLAB2CAST(object):
 
         return Call(
             func=self.get_gromet_function_node("get"),
-            source_language="Fortran",
-            source_language_version="Fortran95",
+            source_language="matlab",
+            source_language_version=MATLAB_VERSION,
             arguments=arguments,
             source_refs=[self.node_helper.get_source_ref(node)],
         )
