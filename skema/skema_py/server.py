@@ -1,4 +1,5 @@
 import json
+import yaml
 import os
 import tempfile
 import asyncio
@@ -13,19 +14,41 @@ from pydantic import BaseModel, Field
 import skema.skema_py.acsets
 import skema.skema_py.petris
 
+import skema.program_analysis.comment_extractor.server as comment_service
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
 from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from skema.program_analysis.comments import (
+from skema.program_analysis.comment_extractor.model import (
+    SingleFileCommentRequest,
+    SingleFileCommentResponse,
+    MultiFileCommentRequest,
+    MultiFileCommentResponse,
     CodeComments,
-    SingleFileCodeComments,
-    MultiFileCodeComments,
 )
-from skema.rest import comments_proxy
-from skema.rest.schema import CodeSnippet
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    LANGUAGES_YAML_FILEPATH,
+)
 
-FN_SUPPORTED_FILE_EXTENSIONS = [".py", ".f95", ".f"]
+
+def get_supported_languages() -> (List, Dict):
+    """"""
+    # We calculate the supported file extensions and mapping between extension and language by reading the languages.yaml file from tree_sitter_parsers
+    languages_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
+
+    supported_file_extensions = []
+    extension_to_language = {}
+    for language, language_dict in languages_obj.items():
+        if language_dict["supports_fn_extraction"]:
+            supported_file_extensions.extend(language_dict["extensions"])
+            extension_to_language.update(
+                {extension: language for extension in language_dict["extensions"]}
+            )
+
+    return supported_file_extensions, extension_to_language
+
+
+SUPPORTED_FILE_EXTENSIONS, EXTENSION_TO_LANGUAGE = get_supported_languages()
 
 
 class Ports(BaseModel):
@@ -36,12 +59,13 @@ class Ports(BaseModel):
 class System(BaseModel):
     files: List[str] = Field(
         description="The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`",
-        example=["example1.py"],
+        example=["example1.py", "dir/example2.py"],
     )
     blobs: List[str] = Field(
         description="Contents of each file to be analyzed",
         example=[
-                "def sir(\r\n    s: float, i: float, r: float, beta: float, gamma: float, n: float\r\n) -> Tuple[float, float, float]:\r\n    \"\"\"The SIR model, one time step.\"\"\"\r\n    s_n = (-beta * s * i) + s\r\n    i_n = (beta * s * i - gamma * i) + i\r\n    r_n = gamma * i + r\r\n    scale = n \/ (s_n + i_n + r_n)\r\n    return s_n * scale, i_n * scale, r_n * scale\r\n"
+            "greet = lambda: print('howdy!')\ngreet()",
+            "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
         ],
     )
     system_name: Optional[str] = Field(
@@ -60,11 +84,19 @@ class System(BaseModel):
         example={
             "files": {
                 "example-system/dir/example2.py": {
-                    "comments": [
-                        {"contents": "Variable declaration", "line_number": 0},
-                        {"contents": "Function definition", "line_number": 2},
+                    "single": [
+                        {"content": "Variable declaration", "line_number": 0},
+                        {"content": "Function definition", "line_number": 2},
                     ],
-                    "docstrings": {"foo": ["Increment the input variable"]},
+                    "multi": [],
+                    "docstring": [
+                        {
+                            "content": ["Increment the input variable"],
+                            "function_name": "foo",
+                            "start_line_number": 5,
+                            "end_line_number": 6,
+                        }
+                    ],
                 }
             }
         },
@@ -72,30 +104,21 @@ class System(BaseModel):
 
 
 async def system_to_enriched_system(system: System) -> System:
-    """Takes a System as input and enriches it with comments by running the Rust comment extractor."""
-
-    def get_language_from_extension(extension: str) -> str:
-        """Function for converting file extension to language enum used by CodeSnippet"""
-        extension = extension.lower()
-        extension_map = {
-            ".f": "Fortran",
-            ".f95": "Fortran",
-            ".for": "Fortran",
-            ".py": "Python",
-            ".cpp": "CppOrC",
-            ".c": "CppOrC",
-        }
-        return extension_map.get(extension, "")
+    """Takes a System as input and enriches it with comments by running the tree-sitter comment extractor."""
 
     # Instead of making each proxy call seperatly, we will gather them
     coroutines = []
     file_paths = []
     for file, blob in zip(system.files, system.blobs):
         file_path = Path(system.root_name or "") / file
-        snippet = CodeSnippet(
-            code=blob, language=get_language_from_extension(file_path.suffix)
+        if file_path.suffix not in SUPPORTED_FILE_EXTENSIONS:
+            # Since we are enriching a system for unification, we only want to extract comments from source files we can also extract Gromet FN from.
+            continue
+
+        request = SingleFileCommentRequest(
+            source=blob, language=EXTENSION_TO_LANGUAGE[file_path.suffix]
         )
-        coroutines.append(comments_proxy.proxy_extract_comments(snippet))
+        coroutines.append(comment_service.comments_extract(request))
         file_paths.append(file_path)
     results = await asyncio.gather(*coroutines)
 
@@ -104,7 +127,7 @@ async def system_to_enriched_system(system: System) -> System:
     comments = {"files": {}}
     for file_path, result in zip(file_paths, results):
         comments["files"][str(file_path)] = result
-    system.comments = MultiFileCodeComments.parse_obj(comments)
+    system.comments = MultiFileCommentResponse.parse_obj(comments)
 
     return system
 
@@ -181,7 +204,7 @@ def fn_supported_file_extensions():
     supported_extensions = response.json()
 
     """
-    return FN_SUPPORTED_FILE_EXTENSIONS
+    return SUPPORTED_FILE_EXTENSIONS
 
 
 @router.post(
@@ -261,7 +284,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     with ZipFile(BytesIO(zip_file.file.read()), "r") as zip:
         for file in zip.namelist():
             file_obj = Path(file)
-            if file_obj.suffix in FN_SUPPORTED_FILE_EXTENSIONS:
+            if file_obj.suffix in SUPPORTED_FILE_EXTENSIONS:
                 files.append(file)
                 blobs.append(zip.open(file).read())
 
