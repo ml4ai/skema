@@ -60,51 +60,42 @@ paths:
                   items:
                     $ref: "#/components/schemas/GroundingCandidate"
 
-  /runTextReadingPipelineWithContext:
+  /cosmosJsonToMentions:
     post:
       tags:
         - "grounding"
       summary: |
-        run the text reading pipeline with context
+        TODO
       description: |
-        run the text reading pipeline with context
-      parameters:
-        - name: contextWindowSize
-          in: query
-          description: the window size for the context
-          required: false
-          schema:
-            type: integer
-            format: int32
-            default: 3
+        TODO
       requestBody:
-        description: an array of texts, each probably one or more sentences, perhaps entire documents
+        description: TODO
         required: true
         content:
           application/json:
             schema:
               type: array
-              description: one text, probably at least a sentence if not an entire document
+              description: TODO
               items:
                 type: string
               example: |
                 [
-                  "Far out in the uncharted backwaters of the unfashionable end of the western spiral arm of the Galaxy lies a small, unregarded yellow sun.",
-                  "It was a bright cold day in April, and the clocks were striking thirteen.",
-                  "The year 1866 was signalized by a remarkable incident, a mysterious and inexplicable phenomenon, which doubtless no one has yet forgotten."
+                  "TODO",
+                  "TODO",
+                  "TODO"
                 ]
       responses:
         '200':
-          description: output for successful run of the text reading pipeline for the input texts
+          description: TODO
           content:
             application/json:
               schema:
                 type: array
-                description: for each of the input texts, output from the text reading pipeline
+                description: TODO
                 items:
                   $ref: "#/components/schemas/MentionsAndDocuments"
 
-  /cosmosJsonToMentions:
+  /textFileToMentions:
     post:
       tags:
         - "grounding"

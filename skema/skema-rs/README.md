@@ -4,8 +4,6 @@ This workspace contains Rust packages developed for the SKEMA program.
 
 Currently, it has the following members:
 
-- `comment_extraction`: Library and binary for
-  extracting comments from code.
 - `mathml`: Library and binary for parsing MathML.
 - `skema`:
     - Library for working the GroMEt interchange format.

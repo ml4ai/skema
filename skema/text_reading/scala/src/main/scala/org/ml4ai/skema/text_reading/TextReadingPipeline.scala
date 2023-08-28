@@ -3,33 +3,27 @@ package org.ml4ai.skema.text_reading
 import ai.lum.common.ConfigUtils._
 import com.typesafe.config.{Config, ConfigFactory, ConfigValueFactory}
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
-import org.clulab.processors.Document
+import org.clulab.processors.{Document, Processor}
 import org.clulab.utils.Logging
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
-import org.ml4ai.skema.text_reading.grounding.{GrounderFactory, GroundingCandidate}
+import org.ml4ai.skema.text_reading.grounding.{Grounder, GrounderFactory, GroundingCandidate}
 import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
 
 import scala.language.implicitConversions
 import scala.util.matching.Regex
 
-class TextReadingPipeline extends Logging {
+class TextReadingPipeline(processorOpt: Option[Processor] = None, odinEngineOpt: Option[OdinEngine] = None, grounderOpt: Option[Grounder] = None) extends Logging {
   logger.info("Initializing the OdinEngine ...")
 
-  // Read the configuration from the files
-  val generalConfig: Config = ConfigFactory.load()
-  val readerType: String = generalConfig[String]("ReaderType")
-  val defaultConfig: Config = generalConfig[Config](readerType)
-  val config: Config = defaultConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
+  val odinEngine = odinEngineOpt.getOrElse(TextReadingPipeline.newOdinEngine())
+  val grounder = grounderOpt.getOrElse(TextReadingPipeline.newGrounder(processorOpt))
+  val groundingAssignmentThreshold = {
+    val config: Config = ConfigFactory.load()
+    val groundingConfig: Config = config.getConfig("Grounding")
 
-  private val groundingConfig: Config = generalConfig.getConfig("Grounding")
-  private val groundingAssignmentThreshold = groundingConfig.getDouble("assignmentThreshold")
-  private val grounder = GrounderFactory.getInstance(groundingConfig)
+    groundingConfig.getDouble("assignmentThreshold")
+  }
   private val numberPattern: Regex = """^\.?(\d)+([.,]?\d*)*$""".r
-
-  // Odin Engine instantiation
-  private val odinEngine = OdinEngine.fromConfig(config)
-  // Initialize the odin engine
-  odinEngine.annotate("x = 10")
 
   def isGroundable(m:TextBoundMention): Boolean = {
     val isGrounded =
@@ -131,5 +125,26 @@ class TextReadingPipeline extends Logging {
 
     // Return them!
     (doc, groundedNotTextBound ++ ungroundedTextBound  ++ groundedTextBound)
+  }
+}
+
+object TextReadingPipeline {
+
+  def newOdinEngine(): OdinEngine = {
+    val config: Config = ConfigFactory.load()
+    val readerType: String = config[String]("ReaderType")
+    val readerConfig: Config = config[Config](readerType)
+    val odinConfig: Config = readerConfig.withValue("preprocessorType", ConfigValueFactory.fromAnyRef("PassThrough"))
+    val odinEngine = OdinEngine.fromConfig(odinConfig)
+
+    odinEngine.annotate("x = 10")
+    odinEngine
+  }
+
+  def newGrounder(processorOpt: Option[Processor] = None, chosenEngineOpt: Option[String] = None): Grounder = {
+    val config: Config = ConfigFactory.load()
+    val groundingConfig: Config = config.getConfig("Grounding")
+
+    GrounderFactory.getInstance(groundingConfig, processorOpt, chosenEngineOpt)
   }
 }

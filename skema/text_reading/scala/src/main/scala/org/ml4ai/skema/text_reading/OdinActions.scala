@@ -8,7 +8,6 @@ import org.yaml.snakeyaml.Yaml
 import org.yaml.snakeyaml.constructor.Constructor
 import OdinEngine._
 import org.clulab.processors.Document
-import org.clulab.processors.fastnlp.FastNLPProcessor
 import org.clulab.struct.Interval
 import org.clulab.utils.FileUtils
 import org.ml4ai.skema.text_reading.actions.ExpansionHandler
@@ -27,8 +26,6 @@ import scala.util.control.Breaks._
 
 
 class OdinActions(val taxonomy: Taxonomy, expansionHandler: Option[ExpansionHandler], validArgs: List[String], freqWords: Array[String]) extends Actions with LazyLogging {
-
-  val proc = new FastNLPProcessor()
 
   def globalAction(mentions: Seq[Mention], state: State = new State()): Seq[Mention] = {
 

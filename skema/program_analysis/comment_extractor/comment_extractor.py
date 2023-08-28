@@ -19,7 +19,10 @@ from skema.program_analysis.comment_extractor.model import (
 )
 from skema.program_analysis.tree_sitter_parsers.build_parsers import (
     INSTALLED_LANGUAGES_FILEPATH,
+    LANGUAGES_YAML_FILEPATH,
 )
+
+QUERIES_FILEPATH = Path(__file__).parent / "queries.yaml"
 
 
 def get_identifier(node: Node, source: str):
@@ -156,8 +159,7 @@ def extract_comments_single(
     request: SingleFileCommentRequest,
 ) -> SingleFileCommentResponse:
     # Get tree-sitter queries for given language
-    queries_filepath = Path(__file__).parent / "queries.yaml"
-    queries_obj = yaml.safe_load(open(queries_filepath))
+    queries_obj = yaml.safe_load(open(QUERIES_FILEPATH))
     if request.language not in queries_obj:
         return None
     queries = queries_obj[request.language]
@@ -255,9 +257,12 @@ def extract_comments_multi(
 
 def get_supported_languages() -> SupportedLanguageResponse:
     """Return the languages supported for comment extraction"""
-    queries_filepath = Path(__file__).parent / "queries.yaml"
-    queries_obj = yaml.safe_load(open(queries_filepath))
 
+    # To determine the supported file extensions for each language, we need to read the language.yaml file used by the tree-sitter build system.
+    languages_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
+
+    # The other fields can be determined by reading the queries in queries.yaml
+    queries_obj = yaml.safe_load(QUERIES_FILEPATH.read_text())
     languages = []
     for language, query in queries_obj.items():
         single = True if "@single" in query else False
@@ -267,9 +272,14 @@ def get_supported_languages() -> SupportedLanguageResponse:
             if "@docstring_body" in query or "docstring_body_partial" in query
             else False
         )
+        extensions = languages_obj[language]["extensions"]
         languages.append(
             SupportedLanguage(
-                name=language, single=single, multi=multi, docstring=docstring
+                name=language,
+                single=single,
+                multi=multi,
+                docstring=docstring,
+                extensions=extensions,
             )
         )
 
