@@ -76,9 +76,9 @@ class MATLAB2CAST(object):
         )
         self.tree = clean_tree
 
-        # print('\nSYNTAX TREE: ')
-        # self.traverse_tree(self.tree.root_node, '')
-        # print("\n")
+        print('\nSYNTAX TREE: ')
+        self.traverse_tree(self.tree.root_node, '')
+        print("\n")
 
         # Walking data
         self.variable_context = VariableContext()
@@ -87,15 +87,15 @@ class MATLAB2CAST(object):
         # Create CAST object 
         self.out_cast = self.generate_cast()
 
-        # print('\nCAST objects:')
-        # for c in self.out_cast: 
-        #     j = json.dumps(
-        #         c.to_json_object(),
-        #         sort_keys=True,
-        #         indent=2,
-        #     )
-        #     print(j)
-        # print('CAST objects done\n\n')
+        print('\nCAST objects:')
+        for c in self.out_cast: 
+            j = json.dumps(
+                c.to_json_object(),
+                sort_keys=True,
+                indent=2,
+            )
+            print(j)
+        print('CAST objects done\n\n')
 
     # Remove empty nodes from tree
     def clean_tree(self, root: Tree, ret: Tree):
@@ -116,10 +116,10 @@ class MATLAB2CAST(object):
         print("generate_cast")
         '''Interface for generating CAST.'''
         modules = self.run(self.tree.root_node)
-        print('\nmodules:')
+        print('\nMODULES:')
         for m in modules:
             print(m)
-        print("modules done")
+        print("MODULES done")
 
         return [CAST([generate_dummy_source_refs(module)], "matlab") for module in modules]
         
