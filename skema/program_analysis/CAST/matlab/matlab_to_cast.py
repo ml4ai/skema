@@ -57,24 +57,16 @@ class MATLAB2CAST(object):
         print(self.source)
 
         # Create the tree-sitter MATLAB parser
-        parser = Parser()
-        parser.set_language(
+        self.parser = Parser()
+        self.parser.set_language(
             Language(
                 Path(Path(__file__).parent, INSTALLED_LANGUAGES_FILEPATH),
                 "matlab"
             )
         )
 
-        # The MATLAB parser creates a syntax tree that contains extra empty nodes.
-        tree = parser.parse(bytes(self.source, "utf8"))
-
-        # prune empty nodes from syntax tree
-        clean_tree = Tree
-        clean_tree.root_node = self.clean_tree(
-            tree.root_node, 
-            clean_tree.root_node
-        )
-        self.tree = clean_tree
+        # get a tree-sitter tree based on parser and source input
+        self.tree = self.get_tree(self.source)
 
         print('\nSYNTAX TREE: ')
         self.traverse_tree(self.tree.root_node, '')
@@ -96,6 +88,19 @@ class MATLAB2CAST(object):
             )
             print(j)
         print('CAST objects done\n\n')
+
+    # create a syntax tree based on the matlab grammar and an input string
+    def get_tree(self, source: str):
+        # The MATLAB parser creates a syntax tree that contains extra empty nodes.
+        tree = self.parser.parse(bytes(source, "utf8"))
+
+        # prune empty nodes from syntax tree
+        clean_tree = Tree
+        clean_tree.root_node = self.clean_tree(
+            tree.root_node, 
+            clean_tree.root_node
+        )
+        return clean_tree
 
     # Remove empty nodes from tree
     def clean_tree(self, root: Tree, ret: Tree):
