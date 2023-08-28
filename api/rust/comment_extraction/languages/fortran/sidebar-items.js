@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["line_ends_subpgm","line_is_comment","line_is_continuation","line_starts_subpgm"]};

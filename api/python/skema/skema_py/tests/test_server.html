@@ -49,7 +49,7 @@ def test_fn_supported_file_extensions():
     &#34;&#34;&#34;Test case for /code2fn/fn-supported-file-extensions endpoint.&#34;&#34;&#34;
     response = client.get(&#34;/code2fn/fn-supported-file-extensions&#34;)
     assert response.status_code == 200
-    assert len(response.json()) &gt; 0
+    assert response.json() == [&#34;.py&#34;, &#34;.f95&#34;, &#34;.f&#34;]
 
 
 def test_fn_given_filepaths():
@@ -65,20 +65,17 @@ def test_fn_given_filepaths():
         &#34;comments&#34;: {
             &#34;files&#34;: {
                 &#34;example-system/dir/example2.py&#34;: {
-                    &#34;single&#34;: [
-                        {&#34;content&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
-                        {&#34;content&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
+                    &#34;comments&#34;: [
+                        {&#34;contents&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
+                        {&#34;contents&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
                     ],
-                    &#34;multi&#34;: [],
-                    &#34;docstring&#34;: [
-                        {&#34;function_name&#34;: &#34;foo&#34;, &#34;content&#34;: [&#34;Increment the input variable&#34;], &#34;start_line_number&#34;: 4, &#34;end_line_number&#34;: 4}
-                    ]
+                    &#34;docstrings&#34;: {&#34;foo&#34;: [&#34;Increment the input variable&#34;]},
                 }
             }
         },
     }
     response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
-    print(response.json())
+
     assert response.status_code == 200
     assert &#34;modules&#34; in response.json()
 
@@ -171,20 +168,17 @@ def test_get_pyacset():
         &#34;comments&#34;: {
             &#34;files&#34;: {
                 &#34;example-system/dir/example2.py&#34;: {
-                    &#34;single&#34;: [
-                        {&#34;content&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
-                        {&#34;content&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
+                    &#34;comments&#34;: [
+                        {&#34;contents&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
+                        {&#34;contents&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
                     ],
-                    &#34;multi&#34;: [],
-                    &#34;docstring&#34;: [
-                        {&#34;function_name&#34;: &#34;foo&#34;, &#34;content&#34;: [&#34;Increment the input variable&#34;], &#34;start_line_number&#34;: 4, &#34;end_line_number&#34;: 4}
-                    ]
+                    &#34;docstrings&#34;: {&#34;foo&#34;: [&#34;Increment the input variable&#34;]},
                 }
             }
         },
     }
     response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
-    print(response.json())
+
     assert response.status_code == 200
     assert &#34;modules&#34; in response.json()</code></pre>
 </details>
@@ -268,7 +262,7 @@ def test_get_pyacset():
     &#34;&#34;&#34;Test case for /code2fn/fn-supported-file-extensions endpoint.&#34;&#34;&#34;
     response = client.get(&#34;/code2fn/fn-supported-file-extensions&#34;)
     assert response.status_code == 200
-    assert len(response.json()) &gt; 0</code></pre>
+    assert response.json() == [&#34;.py&#34;, &#34;.f95&#34;, &#34;.f&#34;]</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.tests.test_server.test_get_pyacset"><code class="name flex">

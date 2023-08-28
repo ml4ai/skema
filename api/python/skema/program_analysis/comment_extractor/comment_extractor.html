@@ -48,10 +48,7 @@ from skema.program_analysis.comment_extractor.model import (
 )
 from skema.program_analysis.tree_sitter_parsers.build_parsers import (
     INSTALLED_LANGUAGES_FILEPATH,
-    LANGUAGES_YAML_FILEPATH,
 )
-
-QUERIES_FILEPATH = Path(__file__).parent / &#34;queries.yaml&#34;
 
 
 def get_identifier(node: Node, source: str):
@@ -188,7 +185,8 @@ def extract_comments_single(
     request: SingleFileCommentRequest,
 ) -&gt; SingleFileCommentResponse:
     # Get tree-sitter queries for given language
-    queries_obj = yaml.safe_load(open(QUERIES_FILEPATH))
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
     if request.language not in queries_obj:
         return None
     queries = queries_obj[request.language]
@@ -286,12 +284,9 @@ def extract_comments_multi(
 
 def get_supported_languages() -&gt; SupportedLanguageResponse:
     &#34;&#34;&#34;Return the languages supported for comment extraction&#34;&#34;&#34;
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
 
-    # To determine the supported file extensions for each language, we need to read the language.yaml file used by the tree-sitter build system.
-    languages_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
-
-    # The other fields can be determined by reading the queries in queries.yaml
-    queries_obj = yaml.safe_load(QUERIES_FILEPATH.read_text())
     languages = []
     for language, query in queries_obj.items():
         single = True if &#34;@single&#34; in query else False
@@ -301,14 +296,9 @@ def get_supported_languages() -&gt; SupportedLanguageResponse:
             if &#34;@docstring_body&#34; in query or &#34;docstring_body_partial&#34; in query
             else False
         )
-        extensions = languages_obj[language][&#34;extensions&#34;]
         languages.append(
             SupportedLanguage(
-                name=language,
-                single=single,
-                multi=multi,
-                docstring=docstring,
-                extensions=extensions,
+                name=language, single=single, multi=multi, docstring=docstring
             )
         )
 
@@ -358,7 +348,8 @@ def get_supported_languages() -&gt; SupportedLanguageResponse:
     request: SingleFileCommentRequest,
 ) -&gt; SingleFileCommentResponse:
     # Get tree-sitter queries for given language
-    queries_obj = yaml.safe_load(open(QUERIES_FILEPATH))
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
     if request.language not in queries_obj:
         return None
     queries = queries_obj[request.language]
@@ -484,12 +475,9 @@ def get_supported_languages() -&gt; SupportedLanguageResponse:
 </summary>
 <pre><code class="python">def get_supported_languages() -&gt; SupportedLanguageResponse:
     &#34;&#34;&#34;Return the languages supported for comment extraction&#34;&#34;&#34;
+    queries_filepath = Path(__file__).parent / &#34;queries.yaml&#34;
+    queries_obj = yaml.safe_load(open(queries_filepath))
 
-    # To determine the supported file extensions for each language, we need to read the language.yaml file used by the tree-sitter build system.
-    languages_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
-
-    # The other fields can be determined by reading the queries in queries.yaml
-    queries_obj = yaml.safe_load(QUERIES_FILEPATH.read_text())
     languages = []
     for language, query in queries_obj.items():
         single = True if &#34;@single&#34; in query else False
@@ -499,14 +487,9 @@ def get_supported_languages() -&gt; SupportedLanguageResponse:
             if &#34;@docstring_body&#34; in query or &#34;docstring_body_partial&#34; in query
             else False
         )
-        extensions = languages_obj[language][&#34;extensions&#34;]
         languages.append(
             SupportedLanguage(
-                name=language,
-                single=single,
-                multi=multi,
-                docstring=docstring,
-                extensions=extensions,
+                name=language, single=single, multi=multi, docstring=docstring
             )
         )
 

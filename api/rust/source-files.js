@@ -33,6 +33,7 @@ var sourcesIndex = JSON.parse('{\
 "clap":["",[["builder",[],["action.rs","app_settings.rs","arg.rs","arg_group.rs","arg_predicate.rs","arg_settings.rs","command.rs","debug_asserts.rs","mod.rs","os_str.rs","possible_value.rs","range.rs","resettable.rs","str.rs","styled_str.rs","value_hint.rs","value_parser.rs"]],["error",[],["context.rs","format.rs","kind.rs","mod.rs"]],["output",[["textwrap",[],["core.rs","mod.rs"]]],["fmt.rs","help.rs","help_template.rs","mod.rs","usage.rs"]],["parser",[["features",[],["mod.rs","suggestions.rs"]],["matches",[],["any_value.rs","arg_matches.rs","matched_arg.rs","mod.rs","value_source.rs"]]],["arg_matcher.rs","error.rs","mod.rs","parser.rs","validator.rs"]],["util",[],["color.rs","flat_map.rs","flat_set.rs","graph.rs","id.rs","mod.rs","str_to_bool.rs"]]],["derive.rs","lib.rs","macros.rs","mkeymap.rs"]],\
 "clap_derive":["",[["derives",[],["args.rs","into_app.rs","mod.rs","parser.rs","subcommand.rs","value_enum.rs"]],["utils",[],["doc_comments.rs","mod.rs","spanned.rs","ty.rs"]]],["attr.rs","dummies.rs","item.rs","lib.rs"]],\
 "clap_lex":["",[],["lib.rs"]],\
+"comment_extraction":["",[["conventions",[],["dssat.rs"]],["languages",[],["cpp.rs","fortran.rs","python.rs"]]],["comments.rs","conventions.rs","extraction.rs","languages.rs","lib.rs"]],\
 "constant_time_eq":["",[],["lib.rs"]],\
 "convert_case":["",[],["case.rs","lib.rs","words.rs"]],\
 "cookie":["",[],["builder.rs","delta.rs","draft.rs","expiration.rs","jar.rs","lib.rs","parse.rs"]],\
@@ -47,6 +48,7 @@ var sourcesIndex = JSON.parse('{\
 "dyn_clone":["",[],["lib.rs","macros.rs"]],\
 "encoding_rs":["",[],["ascii.rs","big5.rs","data.rs","euc_jp.rs","euc_kr.rs","gb18030.rs","handles.rs","iso_2022_jp.rs","lib.rs","macros.rs","mem.rs","replacement.rs","shift_jis.rs","single_byte.rs","utf_16.rs","utf_8.rs","variant.rs","x_user_defined.rs"]],\
 "env_logger":["",[["filter",[],["mod.rs","regex.rs"]],["fmt",[["humantime",[],["extern_impl.rs","mod.rs"]],["writer",[["termcolor",[],["extern_impl.rs","mod.rs"]]],["atty.rs","mod.rs"]]],["mod.rs"]]],["lib.rs"]],\
+"extract_comments":["",[],["extract_comments.rs"]],\
 "fixedbitset":["",[],["lib.rs","range.rs"]],\
 "flate2":["",[["deflate",[],["bufread.rs","mod.rs","read.rs","write.rs"]],["ffi",[],["mod.rs","rust.rs"]],["gz",[],["bufread.rs","mod.rs","read.rs","write.rs"]],["zlib",[],["bufread.rs","mod.rs","read.rs","write.rs"]]],["bufreader.rs","crc.rs","lib.rs","mem.rs","zio.rs"]],\
 "fnv":["",[],["lib.rs"]],\
@@ -142,7 +144,7 @@ var sourcesIndex = JSON.parse('{\
 "sha2":["",[["sha256",[],["soft.rs","x86.rs"]],["sha512",[],["soft.rs","x86.rs"]]],["consts.rs","core_api.rs","lib.rs","sha256.rs","sha512.rs"]],\
 "shellexpand":["",[],["lib.rs"]],\
 "signal_hook_registry":["",[],["half_lock.rs","lib.rs"]],\
-"skema":["",[["services",[],["gromet.rs","mathml.rs"]]],["config.rs","database.rs","lib.rs","model_extraction.rs","services.rs"]],\
+"skema":["",[["services",[],["comment_extraction.rs","gromet.rs","mathml.rs"]]],["config.rs","database.rs","lib.rs","model_extraction.rs","services.rs"]],\
 "skema_service":["",[],["skema_service.rs"]],\
 "slab":["",[],["builder.rs","lib.rs"]],\
 "smallvec":["",[],["lib.rs"]],\

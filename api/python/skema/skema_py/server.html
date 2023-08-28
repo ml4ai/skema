@@ -28,7 +28,6 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import json
-import yaml
 import os
 import tempfile
 import asyncio
@@ -43,41 +42,19 @@ from pydantic import BaseModel, Field
 import skema.skema_py.acsets
 import skema.skema_py.petris
 
-import skema.program_analysis.comment_extractor.server as comment_service
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
 from skema.program_analysis.fn_unifier import align_full_system
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from skema.program_analysis.comment_extractor.model import (
-    SingleFileCommentRequest,
-    SingleFileCommentResponse,
-    MultiFileCommentRequest,
-    MultiFileCommentResponse,
+from skema.program_analysis.comments import (
     CodeComments,
+    SingleFileCodeComments,
+    MultiFileCodeComments,
 )
-from skema.program_analysis.tree_sitter_parsers.build_parsers import (
-    LANGUAGES_YAML_FILEPATH,
-)
+from skema.rest import comments_proxy
+from skema.rest.schema import CodeSnippet
 
-
-def get_supported_languages() -&gt; (List, Dict):
-    &#34;&#34;&#34;&#34;&#34;&#34;
-    # We calculate the supported file extensions and mapping between extension and language by reading the languages.yaml file from tree_sitter_parsers
-    languages_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
-
-    supported_file_extensions = []
-    extension_to_language = {}
-    for language, language_dict in languages_obj.items():
-        if language_dict[&#34;supports_fn_extraction&#34;]:
-            supported_file_extensions.extend(language_dict[&#34;extensions&#34;])
-            extension_to_language.update(
-                {extension: language for extension in language_dict[&#34;extensions&#34;]}
-            )
-
-    return supported_file_extensions, extension_to_language
-
-
-SUPPORTED_FILE_EXTENSIONS, EXTENSION_TO_LANGUAGE = get_supported_languages()
+FN_SUPPORTED_FILE_EXTENSIONS = [&#34;.py&#34;, &#34;.f95&#34;, &#34;.f&#34;]
 
 
 class Ports(BaseModel):
@@ -88,13 +65,12 @@ class Ports(BaseModel):
 class System(BaseModel):
     files: List[str] = Field(
         description=&#34;The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`&#34;,
-        example=[&#34;example1.py&#34;, &#34;dir/example2.py&#34;],
+        example=[&#34;example1.py&#34;],
     )
     blobs: List[str] = Field(
         description=&#34;Contents of each file to be analyzed&#34;,
         example=[
-            &#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;,
-            &#34;#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    &#39;&#39;&#39;Increment the input variable&#39;&#39;&#39;\n    return x+1&#34;,
+                &#34;def sir(\r\n    s: float, i: float, r: float, beta: float, gamma: float, n: float\r\n) -&gt; Tuple[float, float, float]:\r\n    \&#34;\&#34;\&#34;The SIR model, one time step.\&#34;\&#34;\&#34;\r\n    s_n = (-beta * s * i) + s\r\n    i_n = (beta * s * i - gamma * i) + i\r\n    r_n = gamma * i + r\r\n    scale = n \/ (s_n + i_n + r_n)\r\n    return s_n * scale, i_n * scale, r_n * scale\r\n&#34;
         ],
     )
     system_name: Optional[str] = Field(
@@ -113,19 +89,11 @@ class System(BaseModel):
         example={
             &#34;files&#34;: {
                 &#34;example-system/dir/example2.py&#34;: {
-                    &#34;single&#34;: [
-                        {&#34;content&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
-                        {&#34;content&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
+                    &#34;comments&#34;: [
+                        {&#34;contents&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
+                        {&#34;contents&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
                     ],
-                    &#34;multi&#34;: [],
-                    &#34;docstring&#34;: [
-                        {
-                            &#34;content&#34;: [&#34;Increment the input variable&#34;],
-                            &#34;function_name&#34;: &#34;foo&#34;,
-                            &#34;start_line_number&#34;: 5,
-                            &#34;end_line_number&#34;: 6,
-                        }
-                    ],
+                    &#34;docstrings&#34;: {&#34;foo&#34;: [&#34;Increment the input variable&#34;]},
                 }
             }
         },
@@ -133,21 +101,30 @@ class System(BaseModel):
 
 
 async def system_to_enriched_system(system: System) -&gt; System:
-    &#34;&#34;&#34;Takes a System as input and enriches it with comments by running the tree-sitter comment extractor.&#34;&#34;&#34;
+    &#34;&#34;&#34;Takes a System as input and enriches it with comments by running the Rust comment extractor.&#34;&#34;&#34;
+
+    def get_language_from_extension(extension: str) -&gt; str:
+        &#34;&#34;&#34;Function for converting file extension to language enum used by CodeSnippet&#34;&#34;&#34;
+        extension = extension.lower()
+        extension_map = {
+            &#34;.f&#34;: &#34;Fortran&#34;,
+            &#34;.f95&#34;: &#34;Fortran&#34;,
+            &#34;.for&#34;: &#34;Fortran&#34;,
+            &#34;.py&#34;: &#34;Python&#34;,
+            &#34;.cpp&#34;: &#34;CppOrC&#34;,
+            &#34;.c&#34;: &#34;CppOrC&#34;,
+        }
+        return extension_map.get(extension, &#34;&#34;)
 
     # Instead of making each proxy call seperatly, we will gather them
     coroutines = []
     file_paths = []
     for file, blob in zip(system.files, system.blobs):
         file_path = Path(system.root_name or &#34;&#34;) / file
-        if file_path.suffix not in SUPPORTED_FILE_EXTENSIONS:
-            # Since we are enriching a system for unification, we only want to extract comments from source files we can also extract Gromet FN from.
-            continue
-
-        request = SingleFileCommentRequest(
-            source=blob, language=EXTENSION_TO_LANGUAGE[file_path.suffix]
+        snippet = CodeSnippet(
+            code=blob, language=get_language_from_extension(file_path.suffix)
         )
-        coroutines.append(comment_service.comments_extract(request))
+        coroutines.append(comments_proxy.proxy_extract_comments(snippet))
         file_paths.append(file_path)
     results = await asyncio.gather(*coroutines)
 
@@ -156,7 +133,7 @@ async def system_to_enriched_system(system: System) -&gt; System:
     comments = {&#34;files&#34;: {}}
     for file_path, result in zip(file_paths, results):
         comments[&#34;files&#34;][str(file_path)] = result
-    system.comments = MultiFileCommentResponse.parse_obj(comments)
+    system.comments = MultiFileCodeComments.parse_obj(comments)
 
     return system
 
@@ -233,7 +210,7 @@ def fn_supported_file_extensions():
     supported_extensions = response.json()
 
     &#34;&#34;&#34;
-    return SUPPORTED_FILE_EXTENSIONS
+    return FN_SUPPORTED_FILE_EXTENSIONS
 
 
 @router.post(
@@ -313,7 +290,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     with ZipFile(BytesIO(zip_file.file.read()), &#34;r&#34;) as zip:
         for file in zip.namelist():
             file_obj = Path(file)
-            if file_obj.suffix in SUPPORTED_FILE_EXTENSIONS:
+            if file_obj.suffix in FN_SUPPORTED_FILE_EXTENSIONS:
                 files.append(file)
                 blobs.append(zip.open(file).read())
 
@@ -495,7 +472,7 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
     with ZipFile(BytesIO(zip_file.file.read()), &#34;r&#34;) as zip:
         for file in zip.namelist():
             file_obj = Path(file)
-            if file_obj.suffix in SUPPORTED_FILE_EXTENSIONS:
+            if file_obj.suffix in FN_SUPPORTED_FILE_EXTENSIONS:
                 files.append(file)
                 blobs.append(zip.open(file).read())
 
@@ -541,7 +518,7 @@ def fn_supported_file_extensions():
     supported_extensions = response.json()
 
     &#34;&#34;&#34;
-    return SUPPORTED_FILE_EXTENSIONS</code></pre>
+    return FN_SUPPORTED_FILE_EXTENSIONS</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.get_pyacset"><code class="name flex">
@@ -573,32 +550,6 @@ async def get_pyacset(ports: Ports):
     return petri.write_json()</code></pre>
 </details>
 </dd>
-<dt id="skema.skema_py.server.get_supported_languages"><code class="name flex">
-<span>def <span class="ident">get_supported_languages</span></span>(<span>) ‑> (typing.List, typing.Dict)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def get_supported_languages() -&gt; (List, Dict):
-    &#34;&#34;&#34;&#34;&#34;&#34;
-    # We calculate the supported file extensions and mapping between extension and language by reading the languages.yaml file from tree_sitter_parsers
-    languages_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
-
-    supported_file_extensions = []
-    extension_to_language = {}
-    for language, language_dict in languages_obj.items():
-        if language_dict[&#34;supports_fn_extraction&#34;]:
-            supported_file_extensions.extend(language_dict[&#34;extensions&#34;])
-            extension_to_language.update(
-                {extension: language for extension in language_dict[&#34;extensions&#34;]}
-            )
-
-    return supported_file_extensions, extension_to_language</code></pre>
-</details>
-</dd>
 <dt id="skema.skema_py.server.ping"><code class="name flex">
 <span>def <span class="ident">ping</span></span>(<span>) ‑> int</span>
 </code></dt>
@@ -617,27 +568,36 @@ def ping() -&gt; int:
 <span>async def <span class="ident">system_to_enriched_system</span></span>(<span>system: <a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a>) ‑> <a title="skema.skema_py.server.System" href="#skema.skema_py.server.System">System</a></span>
 </code></dt>
 <dd>
-<div class="desc"><p>Takes a System as input and enriches it with comments by running the tree-sitter comment extractor.</p></div>
+<div class="desc"><p>Takes a System as input and enriches it with comments by running the Rust comment extractor.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">async def system_to_enriched_system(system: System) -&gt; System:
-    &#34;&#34;&#34;Takes a System as input and enriches it with comments by running the tree-sitter comment extractor.&#34;&#34;&#34;
+    &#34;&#34;&#34;Takes a System as input and enriches it with comments by running the Rust comment extractor.&#34;&#34;&#34;
+
+    def get_language_from_extension(extension: str) -&gt; str:
+        &#34;&#34;&#34;Function for converting file extension to language enum used by CodeSnippet&#34;&#34;&#34;
+        extension = extension.lower()
+        extension_map = {
+            &#34;.f&#34;: &#34;Fortran&#34;,
+            &#34;.f95&#34;: &#34;Fortran&#34;,
+            &#34;.for&#34;: &#34;Fortran&#34;,
+            &#34;.py&#34;: &#34;Python&#34;,
+            &#34;.cpp&#34;: &#34;CppOrC&#34;,
+            &#34;.c&#34;: &#34;CppOrC&#34;,
+        }
+        return extension_map.get(extension, &#34;&#34;)
 
     # Instead of making each proxy call seperatly, we will gather them
     coroutines = []
     file_paths = []
     for file, blob in zip(system.files, system.blobs):
         file_path = Path(system.root_name or &#34;&#34;) / file
-        if file_path.suffix not in SUPPORTED_FILE_EXTENSIONS:
-            # Since we are enriching a system for unification, we only want to extract comments from source files we can also extract Gromet FN from.
-            continue
-
-        request = SingleFileCommentRequest(
-            source=blob, language=EXTENSION_TO_LANGUAGE[file_path.suffix]
+        snippet = CodeSnippet(
+            code=blob, language=get_language_from_extension(file_path.suffix)
         )
-        coroutines.append(comment_service.comments_extract(request))
+        coroutines.append(comments_proxy.proxy_extract_comments(snippet))
         file_paths.append(file_path)
     results = await asyncio.gather(*coroutines)
 
@@ -646,7 +606,7 @@ def ping() -&gt; int:
     comments = {&#34;files&#34;: {}}
     for file_path, result in zip(file_paths, results):
         comments[&#34;files&#34;][str(file_path)] = result
-    system.comments = MultiFileCommentResponse.parse_obj(comments)
+    system.comments = MultiFileCodeComments.parse_obj(comments)
 
     return system</code></pre>
 </details>
@@ -857,13 +817,12 @@ allow <code>self</code> as a field name.</p></div>
 <pre><code class="python">class System(BaseModel):
     files: List[str] = Field(
         description=&#34;The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`&#34;,
-        example=[&#34;example1.py&#34;, &#34;dir/example2.py&#34;],
+        example=[&#34;example1.py&#34;],
     )
     blobs: List[str] = Field(
         description=&#34;Contents of each file to be analyzed&#34;,
         example=[
-            &#34;greet = lambda: print(&#39;howdy!&#39;)\ngreet()&#34;,
-            &#34;#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    &#39;&#39;&#39;Increment the input variable&#39;&#39;&#39;\n    return x+1&#34;,
+                &#34;def sir(\r\n    s: float, i: float, r: float, beta: float, gamma: float, n: float\r\n) -&gt; Tuple[float, float, float]:\r\n    \&#34;\&#34;\&#34;The SIR model, one time step.\&#34;\&#34;\&#34;\r\n    s_n = (-beta * s * i) + s\r\n    i_n = (beta * s * i - gamma * i) + i\r\n    r_n = gamma * i + r\r\n    scale = n \/ (s_n + i_n + r_n)\r\n    return s_n * scale, i_n * scale, r_n * scale\r\n&#34;
         ],
     )
     system_name: Optional[str] = Field(
@@ -882,19 +841,11 @@ allow <code>self</code> as a field name.</p></div>
         example={
             &#34;files&#34;: {
                 &#34;example-system/dir/example2.py&#34;: {
-                    &#34;single&#34;: [
-                        {&#34;content&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
-                        {&#34;content&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
+                    &#34;comments&#34;: [
+                        {&#34;contents&#34;: &#34;Variable declaration&#34;, &#34;line_number&#34;: 0},
+                        {&#34;contents&#34;: &#34;Function definition&#34;, &#34;line_number&#34;: 2},
                     ],
-                    &#34;multi&#34;: [],
-                    &#34;docstring&#34;: [
-                        {
-                            &#34;content&#34;: [&#34;Increment the input variable&#34;],
-                            &#34;function_name&#34;: &#34;foo&#34;,
-                            &#34;start_line_number&#34;: 5,
-                            &#34;end_line_number&#34;: 6,
-                        }
-                    ],
+                    &#34;docstrings&#34;: {&#34;foo&#34;: [&#34;Increment the input variable&#34;]},
                 }
             }
         },
@@ -910,7 +861,7 @@ allow <code>self</code> as a field name.</p></div>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="skema.skema_py.server.System.comments"><code class="name">var <span class="ident">comments</span> : Union[skema.program_analysis.comment_extractor.model.SingleFileCommentResponse, skema.program_analysis.comment_extractor.model.MultiFileCommentResponse, None]</code></dt>
+<dt id="skema.skema_py.server.System.comments"><code class="name">var <span class="ident">comments</span> : Union[skema.program_analysis.comments.SingleFileCodeComments, skema.program_analysis.comments.MultiFileCodeComments, None]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -956,7 +907,6 @@ allow <code>self</code> as a field name.</p></div>
 <li><code><a title="skema.skema_py.server.fn_given_filepaths_zip" href="#skema.skema_py.server.fn_given_filepaths_zip">fn_given_filepaths_zip</a></code></li>
 <li><code><a title="skema.skema_py.server.fn_supported_file_extensions" href="#skema.skema_py.server.fn_supported_file_extensions">fn_supported_file_extensions</a></code></li>
 <li><code><a title="skema.skema_py.server.get_pyacset" href="#skema.skema_py.server.get_pyacset">get_pyacset</a></code></li>
-<li><code><a title="skema.skema_py.server.get_supported_languages" href="#skema.skema_py.server.get_supported_languages">get_supported_languages</a></code></li>
 <li><code><a title="skema.skema_py.server.ping" href="#skema.skema_py.server.ping">ping</a></code></li>
 <li><code><a title="skema.skema_py.server.system_to_enriched_system" href="#skema.skema_py.server.system_to_enriched_system">system_to_enriched_system</a></code></li>
 <li><code><a title="skema.skema_py.server.system_to_gromet" href="#skema.skema_py.server.system_to_gromet">system_to_gromet</a></code></li>
