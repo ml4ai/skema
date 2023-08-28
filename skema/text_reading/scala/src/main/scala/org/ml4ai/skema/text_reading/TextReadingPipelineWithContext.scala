@@ -1,13 +1,16 @@
 package org.ml4ai.skema.text_reading
 
 import org.clulab.odin.Mention
+import org.clulab.processors.Processor
+import org.ml4ai.skema.text_reading.grounding.Grounder
 import org.ml4ai.skema.text_reading.scenario_context.{ContextEngine, SentenceIndexOrderer}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
 /**
   * Runs extraction, grounding and context on input string objects
   */
-class TextReadingPipelineWithContext() extends TextReadingPipeline {
+class TextReadingPipelineWithContext(processorOpt: Option[Processor] = None, odinEngineOpt: Option[OdinEngine] = None, grounderOpt: Option[Grounder] = None)
+    extends TextReadingPipeline(processorOpt, odinEngineOpt, grounderOpt) {
 
   /**
     * Extracts mentions and runs the context engine over the extractions

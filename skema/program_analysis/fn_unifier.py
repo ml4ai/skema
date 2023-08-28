@@ -5,10 +5,10 @@
 # 3. Appending all comments from the comments JSON into the respective MetadataCollections for each FN
 
 from skema.program_analysis.JSON2GroMEt.json2gromet import json_to_gromet
-from skema.program_analysis.comments import (
+from skema.program_analysis.comment_extractor.model import (
     CodeComments,
-    SingleFileCodeComments,
-    MultiFileCodeComments,
+    SingleFileCommentResponse,
+    MultiFileCommentResponse,
 )
 from skema.gromet.metadata.source_code_comment import SourceCodeComment
 from skema.gromet.metadata.source_code_reference import SourceCodeReference
@@ -200,19 +200,29 @@ def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComm
     #     in the system to a dictionary containing the comments and docstrings for that file
     # We can check what kind of extracted comments file we have by checking the structure of the dictionary
     
-    # First convert the incoming CodeComment object to a dictionary for processing
-    # TODO: Re-write dictionary logic to work on CodeComment object directly
-    if isinstance(extraction, SingleFileCodeComments):
-        extraction = dict(extraction)
-        for index, comment in enumerate(extraction["comments"]):
-            extraction["comments"][index] = dict(comment)
-    else:
-        extraction = dict(extraction.files)
-        for k,v in extraction.items():
-            extraction[k] = dict(v)
-            for index, comment in enumerate(extraction[k]["comments"]):
-                extraction[k]["comments"][index] = dict(comment)
+    # TODO: Update fn_unifer logic to support tree-sitter comment extractor format
+    def tree_to_rust(comments: CodeComments) -> Dict:
+        """Convert the new tree-sitter style comments to the existing comment style supported by the fn_unifier."""
+        def single_file_to_dict(single_file_comment_obj: SingleFileCommentResponse):
+            output_dict = {"comments": [], "docstrings":{}}
+            for single_comment in single_file_comment_obj.single:
+                single_dict = dict(single_comment)
+                single_dict["contents"] = single_dict["content"]
+                output_dict["comments"].append(single_dict)
         
+            output_dict["docstrings"] = {docstring_comment.function_name: docstring_comment.content for docstring_comment in single_file_comment_obj.docstring }
+
+            return output_dict
+    
+        if isinstance(comments, SingleFileCommentResponse):
+            return single_file_to_dict(comments)
+        else:
+            output_dict = {}
+            for file, single_file_comment_obj in comments.files.items():
+                output_dict[file] = single_file_to_dict(single_file_comment_obj)
+            return output_dict
+    extraction = tree_to_rust(extraction)
+
     if "comments" in extraction.keys() and "docstrings" in extraction.keys():
         # Single file system
         # NOTE: We assume for the moment that if we're aligning a single file that
@@ -237,14 +247,11 @@ def align_full_system(gromet_obj: GrometFNModuleCollection, extraction: CodeComm
         for module in gromet_obj.module_index:
             # Go through each file in the GroMEt FN
             normalized_path = normalize_module_path(module)
-            
             if normalized_path in extraction.keys():
-                
                 # Find the current FN in the collection
                 module_FN = find_fn(gromet_obj.modules, normalized_path)
                 if module_FN != None:
                     file_comments = extraction[normalized_path]
-
                     FN_metadata = module_FN.metadata_collection
                     align_fn(FN_metadata, file_comments, module_FN.fn)
 

@@ -1,17 +1,19 @@
 package org.ml4ai.skema.text_reading.grounding
 
 import com.typesafe.config.Config
+import org.clulab.processors.Processor
 import org.clulab.processors.fastnlp.FastNLPProcessor
+
 import scala.collection.JavaConverters._
 
 object GrounderFactory {
-  def getInstance(config: Config, chosenEngine: Option[String] = None): Grounder = {
+
+  def getInstance(config: Config, processorOpt: Option[Processor] = None, chosenEngine: Option[String] = None): Grounder = {
     val engine = chosenEngine getOrElse config.getString("engine")
     val prependManualGrounder = config.getBoolean("forceManualGroundings")
     val domain = config.getString("domain")
     val domainConfig = config.getConfig(domain)
-
-    lazy val manualGrounder = buildManualGrounder(domainConfig)
+    lazy val manualGrounder = buildManualGrounder(domainConfig, processorOpt)
     // Grounding parameters
     engine.toLowerCase match {
         case "miraembeddings" =>
@@ -20,8 +22,8 @@ object GrounderFactory {
           val lambda = domainConfig.getInt("lambda")
           val alpha = domainConfig.getDouble("alpha").toFloat
           val namespaces = domainConfig.getStringList("relevantNamespaces").asScala.toSet
-          val grounder = MiraEmbeddingsGrounder(ontologyFilePath, embeddingsModelPath, lambda, alpha, namespaces)
-          if(prependManualGrounder)
+          val grounder = MiraEmbeddingsGrounder(ontologyFilePath, embeddingsModelPath, lambda, alpha, namespaces, processorOpt)
+          if (prependManualGrounder)
             new PipelineGrounder(Seq(manualGrounder, grounder))
           else
             grounder
@@ -38,9 +40,14 @@ object GrounderFactory {
       }
   }
 
-  def buildManualGrounder(config:Config): ManualGrounder = {
+  def buildManualGrounder(config:Config, processorOpt: Option[Processor] = None): ManualGrounder = {
     val manualGroundingsResourcePath = config.getString("manualGroundings")
-    val processor = new FastNLPProcessor(withChunks = false, internStrings = false)
+    processorOpt.foreach { processor =>
+      // This check is to ensure former behavior.
+      assert(processor.isInstanceOf[FastNLPProcessor])
+    }
+    // Although not chunking can save time, it will also waste space, so use an existing processor if possible.
+    val processor = processorOpt.getOrElse(new FastNLPProcessor(withChunks = false, internStrings = false))
     ManualGrounder.fromFileOrResource(manualGroundingsResourcePath, processor)
   }
 }

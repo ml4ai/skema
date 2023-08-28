@@ -1,7 +1,7 @@
 use actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
 use clap::Parser;
 use skema::config::Config;
-use skema::services::{comment_extraction, gromet};
+use skema::services::{gromet};
 use std::env;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -57,8 +57,6 @@ async fn main() -> std::io::Result<()> {
             version = "version",
         ),
         paths(
-            comment_extraction::get_comments,
-            comment_extraction::get_comments_from_zipfile,
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
@@ -81,11 +79,6 @@ async fn main() -> std::io::Result<()> {
         ),
         components(
             schemas(
-                comment_extraction::Language,
-                comment_extraction::CommentExtractionRequest,
-                comment_extraction::SingleLineComment,
-                comment_extraction::Docstring,
-                comment_extraction::CommentExtractionResponse,
                 mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::ModelRegNet,
@@ -145,8 +138,6 @@ async fn main() -> std::io::Result<()> {
                 db_host: args.db_host.clone(),
             }))
             .configure(gromet::configure())
-            .service(comment_extraction::get_comments)
-            .service(comment_extraction::get_comments_from_zipfile)
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
             .service(skema::services::mathml::get_content_mathml)
