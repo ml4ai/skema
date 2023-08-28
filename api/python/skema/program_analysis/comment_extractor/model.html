@@ -176,6 +176,10 @@ class SupportedLanguage(BaseModel):
         description=&#34;The name of the supported programming language.&#34;,
         example=&#34;python&#34;,
     )
+    extensions: List[str] = Field(
+        ...,
+        description=&#34;List of file extensions supported for corresponding language&#34;,
+    )
     single: bool = Field(
         ...,
         description=&#34;Indicates whether single line comments are supported for this language.&#34;,
@@ -197,7 +201,10 @@ class SupportedLanguageResponse(BaseModel):
             {&#34;name&#34;: &#34;python&#34;, &#34;single&#34;: True, &#34;multi&#34;: False, &#34;docstring&#34;: True},
             {&#34;name&#34;: &#34;c&#34;, &#34;single&#34;: True, &#34;multi&#34;: True, &#34;docstring&#34;: True},
         ],
-    )</code></pre>
+    )
+
+
+CodeComments = Union[SingleFileCommentResponse, MultiFileCommentResponse]</code></pre>
 </details>
 </section>
 <section>
@@ -979,6 +986,10 @@ allow <code>self</code> as a field name.</p></div>
         description=&#34;The name of the supported programming language.&#34;,
         example=&#34;python&#34;,
     )
+    extensions: List[str] = Field(
+        ...,
+        description=&#34;List of file extensions supported for corresponding language&#34;,
+    )
     single: bool = Field(
         ...,
         description=&#34;Indicates whether single line comments are supported for this language.&#34;,
@@ -998,6 +1009,10 @@ allow <code>self</code> as a field name.</p></div>
 <h3>Class variables</h3>
 <dl>
 <dt id="skema.program_analysis.comment_extractor.model.SupportedLanguage.docstring"><code class="name">var <span class="ident">docstring</span> : bool</code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="skema.program_analysis.comment_extractor.model.SupportedLanguage.extensions"><code class="name">var <span class="ident">extensions</span> : List[str]</code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
@@ -1195,6 +1210,7 @@ allow <code>self</code> as a field name.</p></div>
 <h4><code><a title="skema.program_analysis.comment_extractor.model.SupportedLanguage" href="#skema.program_analysis.comment_extractor.model.SupportedLanguage">SupportedLanguage</a></code></h4>
 <ul class="two-column">
 <li><code><a title="skema.program_analysis.comment_extractor.model.SupportedLanguage.docstring" href="#skema.program_analysis.comment_extractor.model.SupportedLanguage.docstring">docstring</a></code></li>
+<li><code><a title="skema.program_analysis.comment_extractor.model.SupportedLanguage.extensions" href="#skema.program_analysis.comment_extractor.model.SupportedLanguage.extensions">extensions</a></code></li>
 <li><code><a title="skema.program_analysis.comment_extractor.model.SupportedLanguage.model_config" href="#skema.program_analysis.comment_extractor.model.SupportedLanguage.model_config">model_config</a></code></li>
 <li><code><a title="skema.program_analysis.comment_extractor.model.SupportedLanguage.model_fields" href="#skema.program_analysis.comment_extractor.model.SupportedLanguage.model_fields">model_fields</a></code></li>
 <li><code><a title="skema.program_analysis.comment_extractor.model.SupportedLanguage.multi" href="#skema.program_analysis.comment_extractor.model.SupportedLanguage.multi">multi</a></code></li>

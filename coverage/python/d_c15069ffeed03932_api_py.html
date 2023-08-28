@@ -54,18 +54,18 @@
             </div>
         </aside>
         <h2>
-            <span class="text">32 statements &nbsp;</span>
+            <span class="text">33 statements &nbsp;</span>
             <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">0<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">32<span class="text"> missing</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">33<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
             <a id="prevFileLink" class="nav" href="d_c15069ffeed03932___init___py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_comments_proxy_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_integrated_text_reading_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
-            created at 2023-08-25 18:02 +0000
+            created at 2023-08-28 14:15 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -88,11 +88,11 @@
     <p class="pln"><span class="n"><a id="t6" href="#t6">6</a></span><span class="t">    <span class="nam">workflows</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t7" href="#t7">7</a></span><span class="t">    <span class="nam">integrated_text_reading_proxy</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t8" href="#t8">8</a></span><span class="t">    <span class="nam">morae_proxy</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">    <span class="nam">comments_proxy</span><span class="op">,</span> <span class="nam">metal_proxy</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t9" href="#t9">9</a></span><span class="t">    <span class="nam">metal_proxy</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t10" href="#t10">10</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t11" href="#t11">11</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">img2mml</span> <span class="key">import</span> <span class="nam">eqn2mml</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t12" href="#t12">12</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">skema_py</span> <span class="key">import</span> <span class="nam">server</span> <span class="key">as</span> <span class="nam">code2fn</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t13" href="#t13">13</a></span><span class="t"><span class="key">from</span> <span class="nam">skema</span><span class="op">.</span><span class="nam">program_analysis</span><span class="op">.</span><span class="nam">comment_extractor</span> <span class="key">import</span> <span class="nam">server</span> <span class="key">as</span> <span class="nam">comment_service</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t14" href="#t14">14</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t15" href="#t15">15</a></span><span class="t"><span class="nam">VERSION</span><span class="op">:</span> <span class="nam">str</span> <span class="op">=</span> <span class="nam">os</span><span class="op">.</span><span class="nam">environ</span><span class="op">.</span><span class="nam">get</span><span class="op">(</span><span class="str">"APP_VERSION"</span><span class="op">,</span> <span class="str">"????"</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t16" href="#t16">16</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
@@ -181,7 +181,7 @@
     <p class="pln"><span class="n"><a id="t99" href="#t99">99</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t100" href="#t100">100</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t101" href="#t101">101</a></span><span class="t"><span class="nam">app</span><span class="op">.</span><span class="nam">include_router</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
-    <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">    <span class="nam">comments_proxy</span><span class="op">.</span><span class="nam">router</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
+    <p class="pln"><span class="n"><a id="t102" href="#t102">102</a></span><span class="t">    <span class="nam">comment_service</span><span class="op">.</span><span class="nam">router</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t103" href="#t103">103</a></span><span class="t">    <span class="nam">prefix</span><span class="op">=</span><span class="str">"/code2fn"</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t104" href="#t104">104</a></span><span class="t">    <span class="nam">tags</span><span class="op">=</span><span class="op">[</span><span class="str">"code2fn"</span><span class="op">,</span> <span class="str">"skema-rs"</span><span class="op">]</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t105" href="#t105">105</a></span><span class="t"><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -264,10 +264,10 @@
         <p>
             <a id="prevFileLink" class="nav" href="d_c15069ffeed03932___init___py.html">&#xab; prev</a> &nbsp; &nbsp;
             <a id="indexLink" class="nav" href="index.html">&Hat; index</a> &nbsp; &nbsp;
-            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_comments_proxy_py.html">&#xbb; next</a>
+            <a id="nextFileLink" class="nav" href="d_c15069ffeed03932_integrated_text_reading_proxy_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.0">coverage.py v7.3.0</a>,
-            created at 2023-08-25 18:02 +0000
+            created at 2023-08-28 14:15 +0000
         </p>
     </div>
 </footer>

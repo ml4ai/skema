@@ -31,7 +31,7 @@
 from io import BytesIO
 from zipfile import ZipFile
 from typing import List, Union, Optional
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, APIRouter, File, UploadFile
 
 import skema.program_analysis.comment_extractor.comment_extractor as comment_service
 from skema.program_analysis.comment_extractor.model import (
@@ -42,35 +42,34 @@ from skema.program_analysis.comment_extractor.model import (
     SupportedLanguageResponse,
 )
 
-SUPPORTED_FILE_EXTENSIONS = [&#34;.c&#34;, &#34;.cpp&#34;, &#34;.py&#34;, &#34;.F&#34;, &#34;.f&#34;, &#34;.f95&#34;, &#34;.for&#34;, &#34;.m&#34;, &#34;.r&#34;]
+
+SUPPORTED_LANGUAGES = comment_service.get_supported_languages()
+SUPPORTED_FILE_EXTENSIONS = [
+    extension
+    for language in SUPPORTED_LANGUAGES.languages
+    for extension in language.extensions
+]
 EXTENSION_TO_LANGUAGE = {
-    &#34;.c&#34;: &#34;c&#34;,
-    &#34;.cpp&#34;: &#34;cpp&#34;,
-    &#34;.py&#34;: &#34;python&#34;,
-    &#34;.F&#34;: &#34;fortran&#34;,
-    &#34;.f&#34;: &#34;fortran&#34;,
-    &#34;.f95&#34;: &#34;fortran&#34;,
-    &#34;.for&#34;: &#34;fortran&#34;,
-    &#34;.m&#34;: &#34;matlab&#34;,
-    &#34;.r&#34;: &#34;r&#34;,
+    extension: language.name
+    for language in SUPPORTED_LANGUAGES.languages
+    for extension in language.extensions
 }
 
-app = FastAPI()
+router = APIRouter()
 
-
-@app.get(&#34;/comments-get-supported-languages&#34;, summary=&#34;&#34;)
+@router.get(&#34;/comments-get-supported-languages&#34;, summary=&#34;Endpoint for checking which languages and comment types are supported by comment extractor.&#34;)
 async def comments_get_supported_languages() -&gt; SupportedLanguageResponse:
     &#34;&#34;&#34;Endpoint for checking which type of comments are supported for each language.&#34;&#34;&#34;
-    return comment_service.get_supported_languages()
+    return SUPPORTED_LANGUAGES
 
 
-@app.get(&#34;/comments-get-supported-file-extensions&#34;)
+@router.get(&#34;/comments-get-supported-file-extensions&#34;, summary=&#34;Endpoint for checking which files extensions are currently supported by comment extractor.&#34;)
 async def comments_get_supported_file_extensions() -&gt; List[str]:
     &#34;Endpoint for checking which file extensions are supported for comment extraction.&#34;
     return SUPPORTED_FILE_EXTENSIONS
 
 
-@app.post(&#34;/comments-extract&#34;, summary=&#34;&#34;)
+@router.post(&#34;/comments-extract&#34;, summary=&#34;Endpoint for extracting comments from a single file.&#34;)
 async def comments_extract(
     request: SingleFileCommentRequest,
 ) -&gt; SingleFileCommentResponse:
@@ -87,8 +86,10 @@ async def comments_extract(
     return comment_service.extract_comments_single(request)
 
 
-@app.post(&#34;/comments-extract-zip&#34;, summary=&#34;&#34;)
-async def comments_extract_zip(zip_file: UploadFile = File()) -&gt; MultiFileCommentResponse:
+@router.post(&#34;/comments-extract-zip&#34;, summary=&#34;Endpoint for extracting comments from a .zip archive.&#34;)
+async def comments_extract_zip(
+    zip_file: UploadFile = File(),
+) -&gt; MultiFileCommentResponse:
     &#34;&#34;&#34;
     Endpoint for extracting comment from a zip archive of arbitrary depth and structure.
     All source files with a supported file extension will be processed as a single GrometFNModuleCollection.
@@ -104,15 +105,22 @@ async def comments_extract_zip(zip_file: UploadFile = File()) -&gt; MultiFileCom
             file_obj = Path(file)
             file_suffix = file_obj.suffix
 
-            if file_suffix in SUPPORTED_FILE_EXTENSIONS:
+            if file_suffix in EXTENSION_TO_LANGUAGE:
                 request[&#34;files&#34;][file] = {
                     &#34;language&#34;: EXTENSION_TO_LANGUAGE[file_suffix],
                     &#34;source&#34;: zip.open(file).read(),
                 }
-                
+
     return comment_service.extract_comments_multi(
         MultiFileCommentRequest.parse_obj(request)
-    )</code></pre>
+    )
+
+app = FastAPI()
+app.include_router(
+    router,
+    prefix=&#34;/comment_service&#34;,
+    tags=[&#34;comment_service&#34;],
+)</code></pre>
 </details>
 </section>
 <section>
@@ -138,7 +146,7 @@ response = requests.post(URL, json=request)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(&#34;/comments-extract&#34;, summary=&#34;&#34;)
+<pre><code class="python">@router.post(&#34;/comments-extract&#34;, summary=&#34;Endpoint for extracting comments from a single file.&#34;)
 async def comments_extract(
     request: SingleFileCommentRequest,
 ) -&gt; SingleFileCommentResponse:
@@ -169,8 +177,10 @@ requests.post(URL, files=files)</p></div>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.post(&#34;/comments-extract-zip&#34;, summary=&#34;&#34;)
-async def comments_extract_zip(zip_file: UploadFile = File()) -&gt; MultiFileCommentResponse:
+<pre><code class="python">@router.post(&#34;/comments-extract-zip&#34;, summary=&#34;Endpoint for extracting comments from a .zip archive.&#34;)
+async def comments_extract_zip(
+    zip_file: UploadFile = File(),
+) -&gt; MultiFileCommentResponse:
     &#34;&#34;&#34;
     Endpoint for extracting comment from a zip archive of arbitrary depth and structure.
     All source files with a supported file extension will be processed as a single GrometFNModuleCollection.
@@ -186,12 +196,12 @@ async def comments_extract_zip(zip_file: UploadFile = File()) -&gt; MultiFileCom
             file_obj = Path(file)
             file_suffix = file_obj.suffix
 
-            if file_suffix in SUPPORTED_FILE_EXTENSIONS:
+            if file_suffix in EXTENSION_TO_LANGUAGE:
                 request[&#34;files&#34;][file] = {
                     &#34;language&#34;: EXTENSION_TO_LANGUAGE[file_suffix],
                     &#34;source&#34;: zip.open(file).read(),
                 }
-                
+
     return comment_service.extract_comments_multi(
         MultiFileCommentRequest.parse_obj(request)
     )</code></pre>
@@ -206,7 +216,7 @@ async def comments_extract_zip(zip_file: UploadFile = File()) -&gt; MultiFileCom
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(&#34;/comments-get-supported-file-extensions&#34;)
+<pre><code class="python">@router.get(&#34;/comments-get-supported-file-extensions&#34;, summary=&#34;Endpoint for checking which files extensions are currently supported by comment extractor.&#34;)
 async def comments_get_supported_file_extensions() -&gt; List[str]:
     &#34;Endpoint for checking which file extensions are supported for comment extraction.&#34;
     return SUPPORTED_FILE_EXTENSIONS</code></pre>
@@ -221,10 +231,10 @@ async def comments_get_supported_file_extensions() -&gt; List[str]:
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">@app.get(&#34;/comments-get-supported-languages&#34;, summary=&#34;&#34;)
+<pre><code class="python">@router.get(&#34;/comments-get-supported-languages&#34;, summary=&#34;Endpoint for checking which languages and comment types are supported by comment extractor.&#34;)
 async def comments_get_supported_languages() -&gt; SupportedLanguageResponse:
     &#34;&#34;&#34;Endpoint for checking which type of comments are supported for each language.&#34;&#34;&#34;
-    return comment_service.get_supported_languages()</code></pre>
+    return SUPPORTED_LANGUAGES</code></pre>
 </details>
 </dd>
 </dl>

@@ -70,6 +70,7 @@ from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
 
 from skema.program_analysis.CAST.fortran.preprocessor.preprocess import preprocess
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
+
 class TS2CAST(object):
     def __init__(self, source_file_path: str):
         # Prepare source with preprocessor
@@ -93,7 +94,6 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-
     def generate_cast(self) -&gt; List[CAST]:
         &#39;&#39;&#39;Interface for generating CAST.&#39;&#39;&#39;
         modules = self.run(self.tree.root_node)
@@ -131,7 +131,7 @@ class TS2CAST(object):
     
         return modules
 
-    def visit(self, node):
+    def visit(self, node: Node):
         if node.type in [&#34;program&#34;, &#34;module&#34;] :
             return self.visit_module(node)
         elif node.type == &#34;internal_procedures&#34;:
@@ -167,6 +167,8 @@ class TS2CAST(object):
             return self.visit_do_loop_statement(node)
         elif node.type == &#34;if_statement&#34;:
             return self.visit_if_statement(node)
+        elif node.type == &#34;logical_expression&#34;:
+            return self.visit_logical_expression(node)
         elif node.type == &#34;derived_type_definition&#34;:
             return self.visit_derived_type(node)
         elif node.type == &#34;derived_type_member_expression&#34;:
@@ -431,7 +433,6 @@ class TS2CAST(object):
                         source_refs=symbol_source_refs,
                     )
                 )
-
             return imports
 
     def visit_do_loop_statement(self, node) -&gt; Loop:
@@ -584,8 +585,8 @@ class TS2CAST(object):
         #  (else_clause)
         #  (end_if_statement)
 
-        # First we need to identify if this is a componund conditional
-        # We can do this by counting the number of control characters in a relational expression
+        if_condition = self.visit(get_first_child_by_type(node, &#34;parenthesized_expression&#34;))
+
         child_types = [child.type for child in node.children]
 
         try:
@@ -610,10 +611,12 @@ class TS2CAST(object):
             orelse = ModelIf()
             prev = orelse
             for condition in node.children[elseif_index:else_index]:
+                if condition.type == &#34;comment&#34;:
+                    continue
                 elseif_expr = self.visit(condition.children[2])
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
 
-                prev.orelse = ModelIf(elseif_expr, elseif_body, None)
+                prev.orelse = ModelIf(elseif_expr, elseif_body, [])
                 prev = prev.orelse
 
         if else_index != -1:
@@ -631,8 +634,36 @@ class TS2CAST(object):
         return ModelIf(
             expr=self.visit(node.children[1]),
             body=[self.visit(child) for child in node.children[3:body_stop_index]],
-            orelse=orelse,
+            orelse=[orelse] if orelse else [],
         )
+
+    def visit_logical_expression(self, node):
+        &#34;&#34;&#34;Visitior for logical expression (i.e. true and false) which is used in compound conditional&#34;&#34;&#34;
+        literal_value_false = LiteralValue(&#34;Boolean&#34;, False)
+        literal_value_true = LiteralValue(&#34;Boolean&#34;, True)
+        
+        # AND: Right side goes in body if, left side in condition
+        # OR: Right side goes in body else, left side in condition 
+        left, operator, right = node.children
+        
+        # First we need to check if this is logical and or a logical or
+        # The tehcnical types for these are \.or\. and \.and\. so to simplify things we can use the in keyword
+        is_or = &#34;or&#34; in operator.type 
+        
+        top_if = ModelIf()
+
+        top_if_expr = self.visit(left)
+        top_if.expr = top_if_expr
+        
+        bottom_if_expr = self.visit(right)
+        if is_or:
+            top_if.orelse = [bottom_if_expr]
+            top_if.body = [literal_value_true]
+        else:
+            top_if.orelse = [literal_value_false]
+            top_if.body = [bottom_if_expr]
+
+        return top_if
 
     def visit_assignment_statement(self, node):
         left, _, right = node.children
@@ -980,11 +1011,9 @@ class TS2CAST(object):
         if call_expression_node:
             value = self._visit_get(call_expression_node)
         else:
-            value = self.variable_context.get_node(
-                self.node_helper.get_identifier(
-                    get_first_child_by_type(node, &#34;identifier&#34;, recurse=True),
-                )
-            )
+            # We shouldn&#39;t be accessing get_node directly, since it may not exist in the case of an import.
+            # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn&#39;t exist.
+            value = self.visit(get_first_child_by_type(node, &#34;identifier&#34;, recurse=True))
 
         attr = self.node_helper.get_identifier(
             get_first_child_by_type(node, &#34;type_member&#34;, recurse=True)
@@ -1178,7 +1207,6 @@ class TS2CAST(object):
 
         # Start visiting
         self.out_cast = self.generate_cast()
-
     def generate_cast(self) -&gt; List[CAST]:
         &#39;&#39;&#39;Interface for generating CAST.&#39;&#39;&#39;
         modules = self.run(self.tree.root_node)
@@ -1216,7 +1244,7 @@ class TS2CAST(object):
     
         return modules
 
-    def visit(self, node):
+    def visit(self, node: Node):
         if node.type in [&#34;program&#34;, &#34;module&#34;] :
             return self.visit_module(node)
         elif node.type == &#34;internal_procedures&#34;:
@@ -1252,6 +1280,8 @@ class TS2CAST(object):
             return self.visit_do_loop_statement(node)
         elif node.type == &#34;if_statement&#34;:
             return self.visit_if_statement(node)
+        elif node.type == &#34;logical_expression&#34;:
+            return self.visit_logical_expression(node)
         elif node.type == &#34;derived_type_definition&#34;:
             return self.visit_derived_type(node)
         elif node.type == &#34;derived_type_member_expression&#34;:
@@ -1516,7 +1546,6 @@ class TS2CAST(object):
                         source_refs=symbol_source_refs,
                     )
                 )
-
             return imports
 
     def visit_do_loop_statement(self, node) -&gt; Loop:
@@ -1669,8 +1698,8 @@ class TS2CAST(object):
         #  (else_clause)
         #  (end_if_statement)
 
-        # First we need to identify if this is a componund conditional
-        # We can do this by counting the number of control characters in a relational expression
+        if_condition = self.visit(get_first_child_by_type(node, &#34;parenthesized_expression&#34;))
+
         child_types = [child.type for child in node.children]
 
         try:
@@ -1695,10 +1724,12 @@ class TS2CAST(object):
             orelse = ModelIf()
             prev = orelse
             for condition in node.children[elseif_index:else_index]:
+                if condition.type == &#34;comment&#34;:
+                    continue
                 elseif_expr = self.visit(condition.children[2])
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
 
-                prev.orelse = ModelIf(elseif_expr, elseif_body, None)
+                prev.orelse = ModelIf(elseif_expr, elseif_body, [])
                 prev = prev.orelse
 
         if else_index != -1:
@@ -1716,8 +1747,36 @@ class TS2CAST(object):
         return ModelIf(
             expr=self.visit(node.children[1]),
             body=[self.visit(child) for child in node.children[3:body_stop_index]],
-            orelse=orelse,
+            orelse=[orelse] if orelse else [],
         )
+
+    def visit_logical_expression(self, node):
+        &#34;&#34;&#34;Visitior for logical expression (i.e. true and false) which is used in compound conditional&#34;&#34;&#34;
+        literal_value_false = LiteralValue(&#34;Boolean&#34;, False)
+        literal_value_true = LiteralValue(&#34;Boolean&#34;, True)
+        
+        # AND: Right side goes in body if, left side in condition
+        # OR: Right side goes in body else, left side in condition 
+        left, operator, right = node.children
+        
+        # First we need to check if this is logical and or a logical or
+        # The tehcnical types for these are \.or\. and \.and\. so to simplify things we can use the in keyword
+        is_or = &#34;or&#34; in operator.type 
+        
+        top_if = ModelIf()
+
+        top_if_expr = self.visit(left)
+        top_if.expr = top_if_expr
+        
+        bottom_if_expr = self.visit(right)
+        if is_or:
+            top_if.orelse = [bottom_if_expr]
+            top_if.body = [literal_value_true]
+        else:
+            top_if.orelse = [literal_value_false]
+            top_if.body = [bottom_if_expr]
+
+        return top_if
 
     def visit_assignment_statement(self, node):
         left, _, right = node.children
@@ -2065,11 +2124,9 @@ class TS2CAST(object):
         if call_expression_node:
             value = self._visit_get(call_expression_node)
         else:
-            value = self.variable_context.get_node(
-                self.node_helper.get_identifier(
-                    get_first_child_by_type(node, &#34;identifier&#34;, recurse=True),
-                )
-            )
+            # We shouldn&#39;t be accessing get_node directly, since it may not exist in the case of an import.
+            # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn&#39;t exist.
+            value = self.visit(get_first_child_by_type(node, &#34;identifier&#34;, recurse=True))
 
         attr = self.node_helper.get_identifier(
             get_first_child_by_type(node, &#34;type_member&#34;, recurse=True)
@@ -2298,7 +2355,7 @@ class TS2CAST(object):
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit"><code class="name flex">
-<span>def <span class="ident">visit</span></span>(<span>self, node)</span>
+<span>def <span class="ident">visit</span></span>(<span>self, node: tree_sitter.Node)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -2306,7 +2363,7 @@ class TS2CAST(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def visit(self, node):
+<pre><code class="python">def visit(self, node: Node):
     if node.type in [&#34;program&#34;, &#34;module&#34;] :
         return self.visit_module(node)
     elif node.type == &#34;internal_procedures&#34;:
@@ -2342,6 +2399,8 @@ class TS2CAST(object):
         return self.visit_do_loop_statement(node)
     elif node.type == &#34;if_statement&#34;:
         return self.visit_if_statement(node)
+    elif node.type == &#34;logical_expression&#34;:
+        return self.visit_logical_expression(node)
     elif node.type == &#34;derived_type_definition&#34;:
         return self.visit_derived_type(node)
     elif node.type == &#34;derived_type_member_expression&#34;:
@@ -2493,11 +2552,9 @@ class TS2CAST(object):
     if call_expression_node:
         value = self._visit_get(call_expression_node)
     else:
-        value = self.variable_context.get_node(
-            self.node_helper.get_identifier(
-                get_first_child_by_type(node, &#34;identifier&#34;, recurse=True),
-            )
-        )
+        # We shouldn&#39;t be accessing get_node directly, since it may not exist in the case of an import.
+        # Instead, we should visit the identifier node which will add it to the variable context automatically if it doesn&#39;t exist.
+        value = self.visit(get_first_child_by_type(node, &#34;identifier&#34;, recurse=True))
 
     attr = self.node_helper.get_identifier(
         get_first_child_by_type(node, &#34;type_member&#34;, recurse=True)
@@ -2918,8 +2975,8 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     #  (else_clause)
     #  (end_if_statement)
 
-    # First we need to identify if this is a componund conditional
-    # We can do this by counting the number of control characters in a relational expression
+    if_condition = self.visit(get_first_child_by_type(node, &#34;parenthesized_expression&#34;))
+
     child_types = [child.type for child in node.children]
 
     try:
@@ -2944,10 +3001,12 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         orelse = ModelIf()
         prev = orelse
         for condition in node.children[elseif_index:else_index]:
+            if condition.type == &#34;comment&#34;:
+                continue
             elseif_expr = self.visit(condition.children[2])
             elseif_body = [self.visit(child) for child in condition.children[4:]]
 
-            prev.orelse = ModelIf(elseif_expr, elseif_body, None)
+            prev.orelse = ModelIf(elseif_expr, elseif_body, [])
             prev = prev.orelse
 
     if else_index != -1:
@@ -2965,7 +3024,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
     return ModelIf(
         expr=self.visit(node.children[1]),
         body=[self.visit(child) for child in node.children[3:body_stop_index]],
-        orelse=orelse,
+        orelse=[orelse] if orelse else [],
     )</code></pre>
 </details>
 </dd>
@@ -3096,6 +3155,44 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         )</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_logical_expression"><code class="name flex">
+<span>def <span class="ident">visit_logical_expression</span></span>(<span>self, node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Visitior for logical expression (i.e. true and false) which is used in compound conditional</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_logical_expression(self, node):
+    &#34;&#34;&#34;Visitior for logical expression (i.e. true and false) which is used in compound conditional&#34;&#34;&#34;
+    literal_value_false = LiteralValue(&#34;Boolean&#34;, False)
+    literal_value_true = LiteralValue(&#34;Boolean&#34;, True)
+    
+    # AND: Right side goes in body if, left side in condition
+    # OR: Right side goes in body else, left side in condition 
+    left, operator, right = node.children
+    
+    # First we need to check if this is logical and or a logical or
+    # The tehcnical types for these are \.or\. and \.and\. so to simplify things we can use the in keyword
+    is_or = &#34;or&#34; in operator.type 
+    
+    top_if = ModelIf()
+
+    top_if_expr = self.visit(left)
+    top_if.expr = top_if_expr
+    
+    bottom_if_expr = self.visit(right)
+    if is_or:
+        top_if.orelse = [bottom_if_expr]
+        top_if.body = [literal_value_true]
+    else:
+        top_if.orelse = [literal_value_false]
+        top_if.body = [bottom_if_expr]
+
+    return top_if</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_math_expression"><code class="name flex">
 <span>def <span class="ident">visit_math_expression</span></span>(<span>self, node)</span>
 </code></dt>
@@ -3223,7 +3320,6 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
                     source_refs=symbol_source_refs,
                 )
             )
-
         return imports</code></pre>
 </details>
 </dd>
@@ -3380,6 +3476,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_internal_procedures" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_internal_procedures">visit_internal_procedures</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_keyword_statement" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_keyword_statement">visit_keyword_statement</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_literal" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_literal">visit_literal</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_logical_expression" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_logical_expression">visit_logical_expression</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_math_expression" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_math_expression">visit_math_expression</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_module" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_module">visit_module</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_name" href="#skema.program_analysis.CAST.fortran.ts2cast.TS2CAST.visit_name">visit_name</a></code></li>
