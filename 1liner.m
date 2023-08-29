@@ -1,1 +1,1 @@
-foo = 5
+foo = bar * 5
