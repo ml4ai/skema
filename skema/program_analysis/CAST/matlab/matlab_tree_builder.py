@@ -21,9 +21,10 @@ class MATLAB_TREE_BUILDER(object):
 
     # create a syntax tree based on the matlab grammar and an input string
     def get_tree(self, source: str):
-        tree = self.parser.parse(bytes(source, "utf8"))
+        tree: Tree = self.parser.parse(bytes(source, "utf8"))
         # remove empty nodes from syntax tree
         return self.clean_tree(tree)
+        # return tree
 
     # Remove empty children from the node tree
     def clean_nodes(self, node: Node):
@@ -34,18 +35,18 @@ class MATLAB_TREE_BUILDER(object):
                 self.clean_nodes(child)
         return node
 
-    # display the node tree in pretty format
-    def traverse_nodes(self, node: Node, indent = ''):
-        for child in node.children:
-            print(indent + 'node: ' + child.type)
-            self.traverse_nodes(child, indent + '  ')
-
     # Clean the tree starting at the root node
     def clean_tree(self, tree:Tree):
         # prune empty nodes from syntax tree
         foo = Tree
         foo.root_node = self.clean_nodes(tree.root_node )
         return foo
+
+    # display the node tree in pretty format
+    def traverse_nodes(self, node: Node, indent = ''):
+        for child in node.children:
+            print(indent + 'node: ' + child.type)
+            self.traverse_nodes(child, indent + '  ')
 
     # Display the tree starting at the root node
     def traverse_tree(self, tree: Tree, indent = ''):
