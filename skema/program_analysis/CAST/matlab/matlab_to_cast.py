@@ -44,7 +44,6 @@ from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
 #from skema.program_analysis.CAST.matlab.preprocessor.preprocess import preprocess
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
-#TODO:  Get from grammar
 MATLAB_VERSION='matlab_version_here'
 
 class MATLAB2CAST(object):
@@ -62,7 +61,7 @@ class MATLAB2CAST(object):
         self.tree = matlab_tree_builder.get_tree(self.source)
 
         print('\nSYNTAX TREE: ')
-        matlab_tree_builder.traverse_tree(self.tree.root_node, '')
+        matlab_tree_builder.traverse_tree(self.tree)
         print("\n")
 
         # Walking data
