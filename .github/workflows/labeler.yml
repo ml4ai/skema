@@ -1,0 +1,30 @@
+documentation:
+- any: ["docs/**"]
+  all: ["!docs/changes.md"]
+
+integration:
+- any: ["skema/rest/**"]
+
+tests:
+- any: ["skema/rest/tests/**", "skema/program_analysis/tests/**", "skema/img2mml/tests/**", "skema/text_reading/scala/src/test/**", "skema/skema-rs/mathml/tests/**", "skema/skema-rs/skema/tests/**"]
+
+Code2FN:
+- any: ["skema/gromet/**", "skema/program_analysis/**"]
+
+Equations:
+- any: ["skema/img2mml/**"]
+
+lang/Fortran:
+- any: ["skema/program_analysis/CAST/fortran/**"]
+
+lang/Python:
+- any: ["skema/program_analysis/CAST/pythonAST/**"]
+
+MORAE:
+- any: ["skema/skema-rs/**"]
+
+ISA:
+- any: ["skema/isa/**"]
+
+Text Reading:
+- any: ["skema/text_reading/**", "skema/model_assembly/**"]
