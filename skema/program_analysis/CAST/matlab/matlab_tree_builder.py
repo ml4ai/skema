@@ -3,13 +3,9 @@ import os.path
 import pprint
 from pathlib import Path
 from typing import Any, Dict, List, Union
-
 from tree_sitter import Language, Parser, Node, Tree
 
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
-
-#TODO:  Get from grammar
-MATLAB_VERSION='matlab_version_here'
 
 class MATLAB_TREE_BUILDER(object):
     def __init__(self):
@@ -29,22 +25,22 @@ class MATLAB_TREE_BUILDER(object):
         # prune empty nodes from syntax tree
         clean_tree = Tree
         clean_tree.root_node = self.clean_tree(
-            tree.root_node, 
-            clean_tree.root_node
+            tree.root_node 
         )
         return clean_tree
 
-    # Remove empty nodes from tree
-    def clean_tree(self, root: Tree, ret: Tree):
-        for child in root.children:
+    # Remove empty child nodes
+    def clean_tree(self, node: Node):
+        for child in node.children:
             if child.type == '\n': # empty child
-                root.children.remove(child)
-        for child in root.children:
-            self.clean_tree(child, root)
-        return root
+                node.children.remove(child)
+        for child in node.children:
+            self.clean_tree(child)
+        return node
 
-    # display the tree-sitter.TREE in pretty format
-    def traverse_tree(self, root: Tree, indent):
-        for child in root.children:
+    # display the node tree in pretty format
+    def traverse_tree(self, node: Node, indent = ''):
+        for child in node.children:
             print(indent + 'node: ' + child.type)
             self.traverse_tree(child, indent + '  ')
+
