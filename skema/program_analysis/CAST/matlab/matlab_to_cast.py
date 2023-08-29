@@ -28,6 +28,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
 )
 
+from skema.program_analysis.CAST.matlab.matlab_tree_builder import MATLAB_TREE_BUILDER
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
     NodeHelper,
@@ -56,20 +57,12 @@ class MATLAB2CAST(object):
         print('\nSOURCE:')
         print(self.source)
 
-        # Create the tree-sitter MATLAB parser
-        self.parser = Parser()
-        self.parser.set_language(
-            Language(
-                Path(Path(__file__).parent, INSTALLED_LANGUAGES_FILEPATH),
-                "matlab"
-            )
-        )
-
-        # get a tree-sitter tree based on parser and source input
-        self.tree = self.get_tree(self.source)
+        # get a tree-sitter tree based on source input
+        matlab_tree_builder = MATLAB_TREE_BUILDER()
+        self.tree = matlab_tree_builder.get_tree(self.source)
 
         print('\nSYNTAX TREE: ')
-        self.traverse_tree(self.tree.root_node, '')
+        matlab_tree_builder.traverse_tree(self.tree.root_node, '')
         print("\n")
 
         # Walking data
@@ -88,34 +81,6 @@ class MATLAB2CAST(object):
             )
             print(j)
         print('CAST objects done\n\n')
-
-    # create a syntax tree based on the matlab grammar and an input string
-    def get_tree(self, source: str):
-        # The MATLAB parser creates a syntax tree that contains extra empty nodes.
-        tree = self.parser.parse(bytes(source, "utf8"))
-
-        # prune empty nodes from syntax tree
-        clean_tree = Tree
-        clean_tree.root_node = self.clean_tree(
-            tree.root_node, 
-            clean_tree.root_node
-        )
-        return clean_tree
-
-    # Remove empty nodes from tree
-    def clean_tree(self, root: Tree, ret: Tree):
-        for child in root.children:
-            if child.type == '\n': # empty child
-                root.children.remove(child)
-        for child in root.children:
-            self.clean_tree(child, root)
-        return root
-
-    # display the tree-sitter.TREE in pretty format
-    def traverse_tree(self, root: Tree, indent):
-        for child in root.children:
-            print(indent + 'node: ' + child.type)
-            self.traverse_tree(child, indent + '  ')
 
     def generate_cast(self) -> List[CAST]:
         print("generate_cast")

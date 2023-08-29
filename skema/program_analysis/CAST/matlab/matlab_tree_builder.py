@@ -11,8 +11,8 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 #TODO:  Get from grammar
 MATLAB_VERSION='matlab_version_here'
 
-class MATLAB_PARSER(object):
-    def __init__(self, source_file_path: str):
+class MATLAB_TREE_BUILDER(object):
+    def __init__(self):
         
         # Create the tree-sitter MATLAB parser
         self.parser = Parser()
