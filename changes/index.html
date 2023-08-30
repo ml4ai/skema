@@ -7,9 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <meta name="author" content="University of Arizona &amp; Lum AI">
-  <link rel="canonical" href="https://ml4ai.github.io/skema/software/">
+  <link rel="canonical" href="https://ml4ai.github.io/skema/changes/">
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Software - skema</title>
+  <title>Releases - skema</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
 
   <link rel="stylesheet" href="../css/theme.css" />
@@ -19,9 +19,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Software";
-    var mkdocs_page_input_path = "software.md";
-    var mkdocs_page_url = "/skema/software/";
+    var mkdocs_page_name = "Releases";
+    var mkdocs_page_input_path = "changes.md";
+    var mkdocs_page_url = "/skema/changes/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js" defer></script>
@@ -52,12 +52,14 @@
                     <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                     </li>
                 </ul>
-                <ul class="current">
-                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Software</a>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../software/">Software</a>
                     </li>
                 </ul>
-                <ul>
-                    <li class="toctree-l1"><a class="reference internal" href="../changes/">Releases</a>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Releases</a>
+    <ul class="current">
+    </ul>
                     </li>
                 </ul>
                 <p class="caption"><span class="caption-text">About</span></p>
@@ -130,10 +132,10 @@
     
       
     
-    <li>Software</li>
+    <li>Releases</li>
     <li class="wy-breadcrumbs-aside">
       
-        <a href="https://github.com/ml4ai/skema/blob/main/docs/software.md"
+        <a href="https://github.com/ml4ai/skema/blob/main/docs/changes.md"
           class="icon icon-github"> Edit on GitHub</a>
       
     </li>
@@ -145,25 +147,112 @@
           <div role="main">
             <div class="section">
               
-                <p>We are developing a number of open-source software components as part of this
-project. They are listed below:</p>
+                <!-- ## [v1.9.?] (pending)
+## [v1.9.?](https://github.com/ml4ai/skema/releases/tag/v1.9.?)
+
+### Code2FN
+
+### TextReading
+
+### Eqn Reading
+
+### ISA
+
+### MORAE -->
+
+<h1 id="docker-images">Docker images<a class="headerlink" href="#docker-images" title="Permanent link"></a></h1>
+<p>We publish tagged images to dockerhub for each commit made to our primary branch (<code>main</code>), as well as each semver (described below).</p>
+<p><a href="https://hub.docker.com/r/lumai/askem-skema-py"><img alt="Docker lumai/askem-skema-py Image Version (latest by date)" src="https://img.shields.io/docker/v/lumai/askem-skema-py?sort=date&amp;logo=docker&amp;label=lumai%2Faskem-skema-py" /></a><br />
+<a href="https://hub.docker.com/r/lumai/askem-skema-img2mml"><img alt="Docker lumai/askem-skema-img2mml Image Version (latest by date)" src="https://img.shields.io/docker/v/lumai/askem-skema-img2mml?sort=date&amp;logo=docker&amp;label=lumai%2Faskem-skema-img2mml" /></a><br />
+<a href="https://hub.docker.com/r/lumai/askem-skema-rs"><img alt="Docker lumai/askem-skema-rs Image Version (latest by date)" src="https://img.shields.io/docker/v/lumai/askem-skema-rs?sort=date&amp;logo=docker&amp;label=lumai%2Faskem-skema-rs" /></a><br />
+<a href="https://hub.docker.com/r/lumai/askem-skema-text-reading"><img alt="Docker lumai/askem-skema-text-reading Image Version (latest by date)" src="https://img.shields.io/docker/v/lumai/askem-skema-text-reading?sort=date&amp;logo=docker&amp;label=lumai%2Faskem-skema-text-reading" /></a></p>
+<h1 id="changes">Changes<a class="headerlink" href="#changes" title="Permanent link"></a></h1>
+<div class="admonition note">
+<p class="admonition-title">Semantic versioning</p>
+<p>The minor version component of our tags corresponds to a program milestone.  Each increment to the patch version corresponds to changes introduced in a two-week sprint (v1.9.1 -&gt; Changes introduced during the first sprint following the completion of Milestone 9).</p>
+</div>
+<h2 id="v191-pending">v1.9.1 (pending)<a class="headerlink" href="#v191-pending" title="Permanent link"></a></h2>
+<!-- ## [v1.9.1](https://github.com/ml4ai/skema/releases/tag/v1.9.1) -->
+
 <ul>
-<li><a href="https://github.com/ml4ai/skema">https://github.com/ml4ai/skema</a>: This repository contains the code for the
-  following capabilities:<ul>
-<li>Machine reading of scientific literature</li>
-<li>Alignment of metadata</li>
-<li>Comment extraction from source code</li>
-<li>MathML parsing</li>
-<li>Scientific model visualization (MOVIZ)</li>
-<li>Structural alignment of code and equations</li>
-<li>SKEMA web service that exposes many of the above capabilities via a REST
-  API.</li>
+<li><a href="https://github.com/ml4ai/skema/pulls?q=is%3Apr+is%3Amerged+merged%3A2023-08-21..2023-09-03">PRs</a></li>
+<li><a href="https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-08-21..2023-09-03">resolved issues</a></li>
 </ul>
-</li>
-<li><a href="https://github.com/ml4ai/funman">https://github.com/ml4ai/funman</a>: This repository contains the code for the
-  FUNMAN module, which performs functional model analysis on scientific model
-  code.</li>
+<!-- - [bug fixes](https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-08-21..2023-09-03+label%3A%22bug%22)
+- [resolved issues](https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-08-21..2023-09-03+-label%3A%22bug%22+) -->
+
+<!-- is:pr is:merged merged:2023-08-21..2023-09-03 label:"Code2FN"  -->
+<!-- - [PRs](https://github.com/ml4ai/skema/pulls?q=is%3Apr+is%3Amerged+merged%3A2023-08-21..2023-09-03+label%3A%22Code2FN%22) -->
+
+<h2 id="v190"><a href="https://github.com/ml4ai/skema/releases/tag/v1.9.0">v1.9.0</a><a class="headerlink" href="#v190" title="Permanent link"></a></h2>
+<p>Corresponds to ASKEM SKEMA Milestone 9 release.</p>
+<ul>
+<li><a href="https://github.com/ml4ai/skema/pulls?q=is%3Apr+is%3Amerged+merged%3A2023-05-01..2023-07-31">PRs</a></li>
+<li><a href="https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-05-01..2023-07-31+label%3A%22bug%22">bug fixes</a></li>
+<li><a href="https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-05-01..2023-07-31+-label%3A%22bug%22+">resolved issues</a></li>
 </ul>
+<h4 id="code2fn">Code2FN<a class="headerlink" href="#code2fn" title="Permanent link"></a></h4>
+<ul>
+<li>Python idiom support</li>
+<li>nested functions (function closures)</li>
+<li>recursively called functions</li>
+<li>TS2CAST Fortran front-end developments</li>
+<li>preprocessor (id unsupported idioms, identify missing include files, fixing unsupported <code>&amp;</code> line continuation character)</li>
+<li>compiler directives using GCC pre-processor</li>
+<li>derived types (classes/structs) as FN Records</li>
+<li>representing program, module and "outside" code in FN module namespaces</li>
+<li>handling Fortran <code>contains</code></li>
+<li>Initial support for tree-sitter-based MATLAB front-end</li>
+<li>Generalized JSON2GroMEt</li>
+<li>Additional GroMEt ingestion front-end</li>
+<li>source code comment to FN alignment</li>
+<li>bug fixes</li>
+</ul>
+<h4 id="textreading">TextReading<a class="headerlink" href="#textreading" title="Permanent link"></a></h4>
+<ul>
+<li>unified TA-1 metadata extractions library</li>
+<li>unified TA-1 text reading REST API</li>
+<li>updates to TR and Scenario Context extraction with initial support for climate and earth science domain</li>
+<li>added AMR linking utility to text extractions with scenario contexts; includes support for AMR Petri Net and RegNet</li>
+<li>bug fixes</li>
+</ul>
+<h4 id="eqn-reading">Eqn Reading<a class="headerlink" href="#eqn-reading" title="Permanent link"></a></h4>
+<ul>
+<li>new conversion service and REST API</li>
+<li>improvements to pipeline for generating data for training equation extraction model</li>
+<li>evaluation dataset cleanup</li>
+<li>service structure reorganization</li>
+<li>image2MathML model improvements</li>
+<li>service response time improvements</li>
+<li>MathML inspection and annotation GUIs</li>
+<li>new support for interpretation of presentation MathML to generate content MathML</li>
+<li>improvements to DECAPODES interpretation of dynamics equations</li>
+</ul>
+<h3 id="isa">ISA<a class="headerlink" href="#isa" title="Permanent link"></a></h3>
+<ul>
+<li>improved seed selection for seeded graph matching (SGM) algorithm</li>
+<li>variable name similarity measures</li>
+<li>expanded SGM method in graph matching</li>
+</ul>
+<h3 id="morae">MORAE<a class="headerlink" href="#morae" title="Permanent link"></a></h3>
+<ul>
+<li>improved support for model identification and extraction out of FN</li>
+<li>Eqn2PetriNet produces AMR PetriNet</li>
+<li>Eqn2RegNet produces AMR RegNet</li>
+<li>work on ABM representation</li>
+</ul>
+<!-- ## [v1.9.?] (pending)
+## [v1.9.?](https://github.com/ml4ai/skema/releases/tag/v1.9.?)
+
+### Code2FN
+
+### TextReading
+
+### Eqn Reading
+
+### ISA
+
+### MORAE -->
               
             </div>
           </div>
@@ -171,10 +260,10 @@ project. They are listed below:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../changes/" class="btn btn-neutral float-right" title="Releases">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../team/" class="btn btn-neutral float-right" title="Team">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../software/" class="btn btn-neutral" title="Software"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -206,10 +295,10 @@ project. They are listed below:</p>
         </span>
     
     
-      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../software/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../changes/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../team/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

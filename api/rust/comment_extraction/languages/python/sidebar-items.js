@@ -1,1 +1,0 @@
-window.SIDEBAR_ITEMS = {"fn":["get_comments","get_comments_from_string"]};

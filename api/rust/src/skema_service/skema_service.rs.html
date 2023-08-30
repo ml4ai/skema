@@ -156,19 +156,10 @@
 <a href="#156" id="156">156</a>
 <a href="#157" id="157">157</a>
 <a href="#158" id="158">158</a>
-<a href="#159" id="159">159</a>
-<a href="#160" id="160">160</a>
-<a href="#161" id="161">161</a>
-<a href="#162" id="162">162</a>
-<a href="#163" id="163">163</a>
-<a href="#164" id="164">164</a>
-<a href="#165" id="165">165</a>
-<a href="#166" id="166">166</a>
-<a href="#167" id="167">167</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
 <span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>skema::config::Config;
-<span class="kw">use </span>skema::services::{comment_extraction, gromet};
+<span class="kw">use </span>skema::services::{gromet};
 <span class="kw">use </span>std::env;
 <span class="kw">use </span>utoipa::OpenApi;
 <span class="kw">use </span>utoipa_swagger_ui::SwaggerUi;
@@ -224,8 +215,6 @@
             version = <span class="string">&quot;version&quot;</span>,
         ),
         paths(
-            comment_extraction::get_comments,
-            comment_extraction::get_comments_from_zipfile,
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
@@ -248,11 +237,6 @@
         ),
         components(
             schemas(
-                comment_extraction::Language,
-                comment_extraction::CommentExtractionRequest,
-                comment_extraction::SingleLineComment,
-                comment_extraction::Docstring,
-                comment_extraction::CommentExtractionResponse,
                 mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::ModelRegNet,
@@ -312,8 +296,6 @@
                 db_host: args.db_host.clone(),
             }))
             .configure(gromet::configure())
-            .service(comment_extraction::get_comments)
-            .service(comment_extraction::get_comments_from_zipfile)
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
             .service(skema::services::mathml::get_content_mathml)
