@@ -1145,6 +1145,23 @@
 <a href="#1145" id="1145">1145</a>
 <a href="#1146" id="1146">1146</a>
 <a href="#1147" id="1147">1147</a>
+<a href="#1148" id="1148">1148</a>
+<a href="#1149" id="1149">1149</a>
+<a href="#1150" id="1150">1150</a>
+<a href="#1151" id="1151">1151</a>
+<a href="#1152" id="1152">1152</a>
+<a href="#1153" id="1153">1153</a>
+<a href="#1154" id="1154">1154</a>
+<a href="#1155" id="1155">1155</a>
+<a href="#1156" id="1156">1156</a>
+<a href="#1157" id="1157">1157</a>
+<a href="#1158" id="1158">1158</a>
+<a href="#1159" id="1159">1159</a>
+<a href="#1160" id="1160">1160</a>
+<a href="#1161" id="1161">1161</a>
+<a href="#1162" id="1162">1162</a>
+<a href="#1163" id="1163">1163</a>
+<a href="#1164" id="1164">1164</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -1200,11 +1217,7 @@
 // the spec in json format can be found here: https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json
 </span><span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>PetriNet {
-    <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>schema: String,
-    <span class="kw">pub </span>schema_name: String,
-    <span class="kw">pub </span>description: String,
-    <span class="kw">pub </span>model_version: String,
+    <span class="kw">pub </span>header: Header,
     <span class="kw">pub </span>model: ModelPetriNet,
     <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
     </span><span class="kw">pub </span>semantics: <span class="prelude-ty">Option</span>&lt;Semantics&gt;,
@@ -1213,14 +1226,19 @@
 }
 <span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 </span><span class="kw">pub struct </span>RegNet {
+    <span class="kw">pub </span>header: Header,
+    <span class="kw">pub </span>model: ModelRegNet,
+    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;Metadata&gt;,
+}
+
+<span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+</span><span class="kw">pub struct </span>Header {
     <span class="kw">pub </span>name: String,
     <span class="kw">pub </span>schema: String,
     <span class="kw">pub </span>schema_name: String,
     <span class="kw">pub </span>description: String,
     <span class="kw">pub </span>model_version: String,
-    <span class="kw">pub </span>model: ModelRegNet,
-    <span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-    </span><span class="kw">pub </span>metadata: <span class="prelude-ty">Option</span>&lt;Metadata&gt;,
 }
 
 <span class="attr">#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
@@ -1570,16 +1588,20 @@
             metadata: <span class="prelude-val">None</span>,
         };
 
+        <span class="kw">let </span>header = Header {
+            name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
+            schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
+            schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
+            description: <span class="string">&quot;This is a model from mathml equations&quot;</span>.to_string(),
+            model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
+        };
+
         PetriNet {
-        name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
-        schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
-        schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
-        description: <span class="string">&quot;This is a model from mathml equations&quot;</span>.to_string(),
-        model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
-        model,
-        semantics: <span class="prelude-val">Some</span>(semantics),
-        metadata: <span class="prelude-val">None</span>,
-    }
+            header: header,
+            model,
+            semantics: <span class="prelude-val">Some</span>(semantics),
+            metadata: <span class="prelude-val">None</span>,
+        }
     }
 }
 
@@ -1921,16 +1943,20 @@
             metadata: <span class="prelude-val">None</span>,
         };
 
+        <span class="kw">let </span>header = Header {
+            name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
+            schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
+            schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
+            description: <span class="string">&quot;This is a model from mathml equations&quot;</span>.to_string(),
+            model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
+        };
+
         PetriNet {
-        name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
-        schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
-        schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
-        description: <span class="string">&quot;This is a model from mathml equations&quot;</span>.to_string(),
-        model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
-        model,
-        semantics: <span class="prelude-val">Some</span>(semantics),
-        metadata: <span class="prelude-val">None</span>,
-    }
+            header: header,
+            model,
+            semantics: <span class="prelude-val">Some</span>(semantics),
+            metadata: <span class="prelude-val">None</span>,
+        }
     }
 }
 
@@ -2099,12 +2125,16 @@
             parameters: <span class="prelude-val">Some</span>(parameter_vec),
         };
 
-        RegNet {
+        <span class="kw">let </span>header = Header {
             name: <span class="string">&quot;Regnet mathml model&quot;</span>.to_string(),
             schema: <span class="string">&quot;https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json&quot;</span>.to_string(),
             schema_name: <span class="string">&quot;regnet&quot;</span>.to_string(),
             description: <span class="string">&quot;This is a Regnet model from mathml equations&quot;</span>.to_string(),
             model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
+        };
+
+        RegNet {
+            header: header,
             model,
             metadata: <span class="prelude-val">None</span>,
         }
@@ -2259,14 +2289,18 @@
             parameters: <span class="prelude-val">None</span>,
         };
 
+        <span class="kw">let </span>header = Header {
+            name: <span class="string">&quot;Regnet mathml model&quot;</span>.to_string(),
+            schema: <span class="string">&quot;https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json&quot;</span>.to_string(),
+            schema_name: <span class="string">&quot;regnet&quot;</span>.to_string(),
+            description: <span class="string">&quot;This is a Regnet model from mathml equations&quot;</span>.to_string(),
+            model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
+        };
+
         RegNet {
-        name: <span class="string">&quot;Regnet mathml model&quot;</span>.to_string(),
-        schema: <span class="string">&quot;https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json&quot;</span>.to_string(),
-        schema_name: <span class="string">&quot;regnet&quot;</span>.to_string(),
-        description: <span class="string">&quot;This is a Regnet model from mathml equations&quot;</span>.to_string(),
-        model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
-        model,
-        metadata: <span class="prelude-val">None</span>,
+            header: header,
+            model,
+            metadata: <span class="prelude-val">None</span>,
         }
     }
 }
