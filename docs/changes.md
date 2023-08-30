@@ -34,18 +34,10 @@ We publish tagged images to dockerhub for each commit made to our primary branch
 <!-- - [bug fixes](https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-08-21..2023-09-03+label%3A%22bug%22)
 - [resolved issues](https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-08-21..2023-09-03+-label%3A%22bug%22+) -->
 
-#### Code2FN
 
 <!-- is:pr is:merged merged:2023-08-21..2023-09-03 label:"Code2FN"  -->
 <!-- - [PRs](https://github.com/ml4ai/skema/pulls?q=is%3Apr+is%3Amerged+merged%3A2023-08-21..2023-09-03+label%3A%22Code2FN%22) -->
 
-#### TextReading
-
-#### Eqn Reading
-
-#### ISA
-
-#### MORAE
 
 ## [v1.9.0](https://github.com/ml4ai/skema/releases/tag/v1.9.0)
   
