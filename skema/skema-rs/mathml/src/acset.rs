@@ -53,11 +53,7 @@ pub struct ACSet {
 // the spec in json format can be found here: https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 pub struct PetriNet {
-    pub name: String,
-    pub schema: String,
-    pub schema_name: String,
-    pub description: String,
-    pub model_version: String,
+    pub header: Header,
     pub model: ModelPetriNet,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub semantics: Option<Semantics>,
@@ -66,14 +62,19 @@ pub struct PetriNet {
 }
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
 pub struct RegNet {
+    pub header: Header,
+    pub model: ModelRegNet,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub metadata: Option<Metadata>,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
+pub struct Header {
     pub name: String,
     pub schema: String,
     pub schema_name: String,
     pub description: String,
     pub model_version: String,
-    pub model: ModelRegNet,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub metadata: Option<Metadata>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone, Serialize, Deserialize, ToSchema)]
@@ -423,16 +424,20 @@ impl From<ACSet> for PetriNet {
             metadata: None,
         };
 
+        let header = Header {
+            name: "mathml model".to_string(),
+            schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
+            schema_name: "PetriNet".to_string(),
+            description: "This is a model from mathml equations".to_string(),
+            model_version: "0.1".to_string(),
+        };
+
         PetriNet {
-        name: "mathml model".to_string(),
-        schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
-        schema_name: "PetriNet".to_string(),
-        description: "This is a model from mathml equations".to_string(),
-        model_version: "0.1".to_string(),
-        model,
-        semantics: Some(semantics),
-        metadata: None,
-    }
+            header: header,
+            model,
+            semantics: Some(semantics),
+            metadata: None,
+        }
     }
 }
 
@@ -774,16 +779,20 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             metadata: None,
         };
 
+        let header = Header {
+            name: "mathml model".to_string(),
+            schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
+            schema_name: "PetriNet".to_string(),
+            description: "This is a model from mathml equations".to_string(),
+            model_version: "0.1".to_string(),
+        };
+
         PetriNet {
-        name: "mathml model".to_string(),
-        schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
-        schema_name: "PetriNet".to_string(),
-        description: "This is a model from mathml equations".to_string(),
-        model_version: "0.1".to_string(),
-        model,
-        semantics: Some(semantics),
-        metadata: None,
-    }
+            header: header,
+            model,
+            semantics: Some(semantics),
+            metadata: None,
+        }
     }
 }
 
@@ -952,12 +961,16 @@ impl From<Vec<FirstOrderODE>> for RegNet {
             parameters: Some(parameter_vec),
         };
 
-        RegNet {
+        let header = Header {
             name: "Regnet mathml model".to_string(),
             schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
             schema_name: "regnet".to_string(),
             description: "This is a Regnet model from mathml equations".to_string(),
             model_version: "0.1".to_string(),
+        };
+
+        RegNet {
+            header: header,
             model,
             metadata: None,
         }
@@ -1112,14 +1125,18 @@ impl From<Vec<Math>> for RegNet {
             parameters: None,
         };
 
+        let header = Header {
+            name: "Regnet mathml model".to_string(),
+            schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
+            schema_name: "regnet".to_string(),
+            description: "This is a Regnet model from mathml equations".to_string(),
+            model_version: "0.1".to_string(),
+        };
+
         RegNet {
-        name: "Regnet mathml model".to_string(),
-        schema: "https://raw.githubusercontent.com/DARPA-ASKEM/Model-Representations/regnet_v0.1/regnet/regnet_schema.json".to_string(),
-        schema_name: "regnet".to_string(),
-        description: "This is a Regnet model from mathml equations".to_string(),
-        model_version: "0.1".to_string(),
-        model,
-        metadata: None,
+            header: header,
+            model,
+            metadata: None,
         }
     }
 }
