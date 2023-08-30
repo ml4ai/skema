@@ -1,12 +1,19 @@
 documentation:
 - any: ["docs/**"]
-  all: ["!docs/changes.md"]
+#  all: ["!docs/changes.md"]
 
 integration:
 - any: ["skema/rest/**"]
 
 tests:
-- any: ["skema/rest/tests/**", "skema/program_analysis/tests/**", "skema/img2mml/tests/**", "skema/text_reading/scala/src/test/**", "skema/skema-rs/mathml/tests/**", "skema/skema-rs/skema/tests/**"]
+- any:
+  - "skema/rest/tests/**"
+  - "skema/program_analysis/tests/**"
+  - "skema/program_analysis/comment_extractor/tests/**"
+  - "skema/img2mml/tests/**"
+  - "skema/text_reading/scala/src/test/**"
+  - "skema/skema-rs/mathml/tests/**"
+  - "skema/skema-rs/skema/tests/**"
 
 Code2FN:
 - any: ["skema/gromet/**", "skema/program_analysis/**"]
