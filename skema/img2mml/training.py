@@ -500,7 +500,7 @@ def train_model(rank=None,):
         from bin_testing import bin_test_dataloader
 
         test_dataloader = bin_test_dataloader(
-            config, vocab, device, start=0, end=50
+            config, vocab, device, start=50, end=100
         )
 
     test_loss = evaluate(
