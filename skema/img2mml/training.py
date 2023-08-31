@@ -503,6 +503,7 @@ def train_model(rank=None,):
             config, vocab, device, start=50, end=100
         )
 
+
     test_loss = evaluate(
         model,
         model_type,
