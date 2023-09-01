@@ -64,7 +64,14 @@ class My_pad_collate(object):
         )
 
 
-def bin_test_dataloader(config, vocab, device, start=None, end=None):
+def bin_test_dataloader(config, 
+                        vocab, 
+                        device, 
+                        start=None, 
+                        end=None,
+                        length_based_binning=False,
+                        content_based_binning=False,
+):
 
     # reading raw text files
     (
@@ -76,16 +83,27 @@ def bin_test_dataloader(config, vocab, device, start=None, end=None):
     imgs, eqns = df["IMG"], df["EQUATION"]
 
     eqns_arr = list()
-    imgs_arr = list()
-    for i, e in zip(imgs, eqns):
-        if start is not None:
+    imgs_arr = list()    
+    if length_based_binning:
+        for i, e in zip(imgs, eqns):
+            # if start is not None:
             if len(e.split()) > start and len(e.split()) <= end:
                 eqns_arr.append(e)
                 imgs_arr.append(i)
-        else:
-            eqns_arr.append(e)
-            imgs_arr.append(i)
-
+            # else:
+            #     eqns_arr.append(e)
+            #     imgs_arr.append(i)
+    
+    elif content_based_binning:
+        for i, e in zip(imgs, eqns):
+            #if start is not None:
+            if len(e.split()) > start and len(e.split()) <= end:
+                eqns_arr.append(e)
+                imgs_arr.append(i)
+            # else:
+            #     eqns_arr.append(e)
+            #     imgs_arr.append(i)
+    
     raw_mml_data = {
         "IMG": imgs_arr,
         "EQUATION": eqns_arr,
