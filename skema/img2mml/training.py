@@ -505,8 +505,8 @@ def train_model(rank=None,):
             device, 
             start=0, 
             end=50,
-            length_based=config["length_based_binning"], 
-            content_based=config["content_based_binning"],
+            length_based_binning=config["length_based_binning"], 
+            content_based_binning=config["content_based_binning"],
         )
 
     test_loss = evaluate(
