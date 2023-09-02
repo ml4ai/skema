@@ -87,9 +87,9 @@ def bin_test_dataloader(config,
             
     elif content_based_binning:
         df_latex = pd.read_csv(
-        f"{config['data_path']}/latex/test.csv"
+        f"{config['data_path']}/{config['dataset_type']}/latex/test.csv"
         )
-        imgs_latex, eqns_latex = df_latex["IMG"], df_latex["EQUATION"]
+        eqns_latex = df_latex["EQUATION"]
 
         for idx, e in enumerate(eqns_latex):
             if len(e.split()) > start and len(e.split()) <= end:
