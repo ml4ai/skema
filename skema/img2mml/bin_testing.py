@@ -86,8 +86,12 @@ def bin_test_dataloader(config,
                 imgs_arr.append(i)
             
     elif content_based_binning:
+        """
+        first run the latex config and save the csv as
+        test_latex which then be used for reference.
+        """
         df_latex = pd.read_csv(
-        f"{config['data_path']}/{config['dataset_type']}/latex/test.csv"
+        f"{config['data_path']}/{config['dataset_type']}/latex/test_latex.csv"
         )
         eqns_latex = df_latex["EQUATION"]
 
