@@ -71,12 +71,7 @@ def bin_test_dataloader(config,
                         end=None,
                         length_based_binning=False,
                         content_based_binning=False,
-):
-
-    # reading raw text files
-    (
-        f"{config['data_path']}/{config['dataset_type']}/image_tensors"
-    )
+):  
     df = pd.read_csv(
         f"{config['data_path']}/{config['dataset_type']}/test.csv"
     )
@@ -85,25 +80,24 @@ def bin_test_dataloader(config,
     eqns_arr = list()
     imgs_arr = list()    
     if length_based_binning:
-        for i, e in zip(imgs, eqns):
-            # if start is not None:
+        for i, e in zip(imgs, eqns):            
             if len(e.split()) > start and len(e.split()) <= end:
                 eqns_arr.append(e)
                 imgs_arr.append(i)
-            # else:
-            #     eqns_arr.append(e)
-            #     imgs_arr.append(i)
-    
+            
     elif content_based_binning:
-        for i, e in zip(imgs, eqns):
-            #if start is not None:
+        df_latex = pd.read_csv(
+        f"{config['data_path']}/latex/test.csv"
+        )
+        imgs_latex, eqns_latex = df_latex["IMG"], df_latex["EQUATION"]
+
+        for idx, e in enumerate(eqns_latex):
             if len(e.split()) > start and len(e.split()) <= end:
-                eqns_arr.append(e)
-                imgs_arr.append(i)
-            # else:
-            #     eqns_arr.append(e)
-            #     imgs_arr.append(i)
-    
+                eqns_arr.append(eqns[idx])
+                imgs_arr.append(imgs[idx])
+                print(eqns_latex[idx])
+                print(eqns[idx])
+
     raw_mml_data = {
         "IMG": imgs_arr,
         "EQUATION": eqns_arr,
