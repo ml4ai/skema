@@ -503,8 +503,8 @@ def train_model(rank=None,):
             config, 
             vocab, 
             device, 
-            start=0, 
-            end=50,
+            start=config["start_bin"], 
+            end=config["end_bin"],
             length_based_binning=config["length_based_binning"], 
             content_based_binning=config["content_based_binning"],
         )
