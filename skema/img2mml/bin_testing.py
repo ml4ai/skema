@@ -90,6 +90,7 @@ def bin_test_dataloader(config,
         first run the latex config and save the csv as
         test_latex which then be used for reference.
         """
+        
         df_latex = pd.read_csv(
         f"{config['data_path']}/{config['dataset_type']}/latex/test_latex.csv"
         )
