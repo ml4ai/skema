@@ -143,7 +143,7 @@ def process_wisconsin_mml(
             output_file.write(f"{math_id}: {bleu}\n")
 
     avg_bleu = {
-        math_id: sum(scores) / len(scores) for math_id, scores in bleu_scores.items()
+        str(math_id): str(sum(scores) / len(scores)) for math_id, scores in bleu_scores.items()
     }
     return avg_bleu
 
