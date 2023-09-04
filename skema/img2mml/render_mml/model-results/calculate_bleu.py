@@ -8,7 +8,7 @@ from torchtext.data.metrics import bleu_score
 from transformers import PreTrainedTokenizerFast
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
-tokenizer_file = os.path.join(script_directory, "tokenizer.json")
+tokenizer_file = os.path.join(script_directory, "lukas_blecher_tokenizer.json")
 tokenizer = PreTrainedTokenizerFast(tokenizer_file=tokenizer_file)
 
 
@@ -61,33 +61,52 @@ def calculate_test_results(test_results):
 
 
 if __name__ == "__main__":
-    models = {"latex_ocr_model": {}, "singh_model": {}}
+    models = {
+        "lukas_blecher": {
+            "repo_name": "LaTeX-OCR",
+            "url": "https://github.com/lukas-blecher/LaTeX-OCR",
+        },
+        "kingyiusuen": {
+            "repo_name": "image-to-latex",
+            "url": "https://github.com/kingyiusuen/image-to-latex",
+        },
+    }
+    datasets = ["kingyiusuen", "im2latex100k", "lukas_blecher"]
 
     for model in models:
-        print(f"Processing {model}...")
-        print(f"Loading formulae test results for {model}...")
-        models[model]["formulae_set_bleu_score"] = calculate_test_results(
-            load_test_results(
-                os.path.join(script_directory, f"{model}/formulae_test_results.json")
-            )
-        )
-        print(f"Loading formulae test results for {model}...")
-        models[model]["im2latex100k_set_bleu_score"] = calculate_test_results(
-            load_test_results(
-                os.path.join(
-                    script_directory, f"{model}/im2latex100k_test_results.json"
+        print(f"Calculating {model} results")
+
+        for dataset in datasets:
+            print(f"Loading {dataset} test results for {model}...")
+            try:
+                test_results_path = os.path.join(
+                    script_directory, f"{model}/{dataset}_test_results.json"
                 )
-            )
-        )
+                models[model][f"{dataset}_set_bleu_score"] = calculate_test_results(
+                    load_test_results(test_results_path)
+                )
+            except FileNotFoundError:
+                print(f"Test results for {dataset} not found for {model}")
+                print("Skipping...")
+                models[model][f"{dataset}_set_bleu_score"] = None
 
-    print("\n---\n")
+    results = ""
+    results += "### Results"
     for model in models:
-        print(f"Model: {model}")
-        print(
-            f"Formulae set BLEU-4 score: {models[model]['formulae_set_bleu_score']:.2f}"
-        )
-        print(
-            f"Im2Latex100k BLEU-4 score: {models[model]['im2latex100k_set_bleu_score']:.2f}\n"
-        )
-    print("\n---\n")
-    print("Done!")
+        results += f"\n\n - {model}"
+        results += f"   - **Repo**: {models[model]['repo_name']}"
+        results += f"\n   - **URL**: {models[model]['url']}"
+        for dataset in datasets:
+            if models[model][f"{dataset}_set_bleu_score"] is not None:
+                results += f"\n   - **{dataset}** BLEU-4 score: {models[model][f'{dataset}_set_bleu_score']:.2f}"
+            else:
+                results += f"\n   - **{dataset}** BLEU-4 score: N/A"
+
+    results += "\n\n### Datasets"
+    results += "\n\n  - **im2latex100k set**: The processed and cleaned im2latex100k set from https://im2markup.yuntiandeng.com/data/"
+    results += f"\n  - **kingyiusuen set**: An extra preprocessed version of the im2latex100k set from the [{models['kingyiusuen']['repo_name']}]({models['kingyiusuen']['url']}) repository"
+    results += f"\n  - **im2latex100k set**: The im2latex100k set with custom arxiv and wikipedia additions from the [{models['lukas_blecher']['repo_name']}]({models['lukas_blecher']['url']}) repository"
+
+    with open(os.path.join(script_directory, "results.md"), "w") as f:
+        f.write(results)
+        print("Results written to results.md")
