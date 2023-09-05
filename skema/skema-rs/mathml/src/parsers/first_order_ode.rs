@@ -1020,3 +1020,24 @@ fn test_first_order_ode() {
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
 }
+
+#[test]
+fn test_msub_derivative() {
+    test_parser(
+        "<mfrac>
+        <mrow><mi>d</mi><msub><mi>S</mi><mi>v</mi></msub></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>",
+        first_order_derivative_leibniz_notation,
+        (
+            Derivative::new(1, 1),
+            Ci::new(
+                None,
+                Box::new(MathExpression::Msub(
+                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
+                    Box::new(MathExpression::Mi(Mi("v".to_string()))),
+                )),
+            ),
+        ),
+    );
+}
