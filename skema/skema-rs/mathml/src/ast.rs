@@ -36,7 +36,7 @@ pub struct Ci {
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct BoundVariables {
     pub func_var: Ci,
-    pub func_of: Vec<Mi>,
+    pub func_of: Vec<Ci>,
 }
 
 /// The MathExpression enum represents the corresponding element type in MathML 3
@@ -64,7 +64,7 @@ pub enum MathExpression {
     MoLine(String),
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
-    BoundVariables(Ci, Vec<Mi>),
+    BoundVariables(Ci, Vec<Ci>),
     #[default]
     None,
 }

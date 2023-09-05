@@ -28,11 +28,6 @@ pub enum Operator {
     Derivative(Derivative),
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
-    Trig(Trig),
-}
-
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
-pub enum Trig {
     Sin,
     Cos,
     Tan,
@@ -71,18 +66,18 @@ impl fmt::Display for Operator {
             Operator::Exp => write!(f, "Exp"),
             Operator::Power => write!(f, "Power"),
             Operator::Other(op) => write!(f, "{op}"),
-            Operator::Trig(Trig::Sin) => write!(f, "Sin"),
-            Operator::Trig(Trig::Cos) => write!(f, "Cos"),
-            Operator::Trig(Trig::Tan) => write!(f, "Tan"),
-            Operator::Trig(Trig::Sec) => write!(f, "Sec"),
-            Operator::Trig(Trig::Csc) => write!(f, "Csc"),
-            Operator::Trig(Trig::Cot) => write!(f, "Cot"),
-            Operator::Trig(Trig::Arcsin) => write!(f, "Arcsin"),
-            Operator::Trig(Trig::Arccos) => write!(f, "Arccos"),
-            Operator::Trig(Trig::Arctan) => write!(f, "Arctan"),
-            Operator::Trig(Trig::Arcsec) => write!(f, "Arcsec"),
-            Operator::Trig(Trig::Arccsc) => write!(f, "Arccsc"),
-            Operator::Trig(Trig::Arccot) => write!(f, "Arccot"),
+            Operator::Sin => write!(f, "Sin"),
+            Operator::Cos => write!(f, "Cos"),
+            Operator::Tan => write!(f, "Tan"),
+            Operator::Sec => write!(f, "Sec"),
+            Operator::Csc => write!(f, "Csc"),
+            Operator::Cot => write!(f, "Cot"),
+            Operator::Arcsin => write!(f, "Arcsin"),
+            Operator::Arccos => write!(f, "Arccos"),
+            Operator::Arctan => write!(f, "Arctan"),
+            Operator::Arcsec => write!(f, "Arcsec"),
+            Operator::Arccsc => write!(f, "Arccsc"),
+            Operator::Arccot => write!(f, "Arccot"),
         }
     }
 }
