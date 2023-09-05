@@ -181,17 +181,6 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for element in elements {
                     println!("elements[0]={:?}", elements[0]);
-                    /*if elements[0]
-                        == MathExpression::Ci::new(
-                            Some(Type::Function),
-                            Box::new(MathExpression::Mi(Mi("cos".to_string()))),
-                        )
-                    {
-                        println!("cos");
-                    } else {
-                        element.flatten(tokens);
-                    }*/
-
                     if let MathExpression::Ci(x) = element {
                         println!("x.content={:?}", x.content);
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
@@ -204,12 +193,18 @@ impl MathExpression {
                         }
                     } else if let MathExpression::BoundVariables(x, y) = element {
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
-                            println!("cossss");
+                            println!("cossss!!!!");
                             tokens.push(MathExpression::Mo(Operator::Cos));
                         }
-                        /*for comp in y {
-                            comp.flatten(tokens);
-                        }*/
+                        println!("y={:?}", y);
+                        println!("y[0]={:?}", y[0]);
+                        //y.flatten(tokens);
+
+                        for comp in y {
+                            println!("comp={:?}", comp);
+                            comp.content.flatten(tokens);
+                            //tokens.push(comp);
+                        }
                     } else {
                         element.flatten(tokens);
                     }

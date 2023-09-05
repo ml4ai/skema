@@ -9,9 +9,10 @@ use crate::{
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
-            ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
-            ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
-            newtonian_derivative, operator,
+            ci_univariate_func, ci_univariate_with_bounds, ci_univariate_without_bounds,
+            ci_unknown_with_bounds, ci_unknown_without_bounds,
+            first_order_derivative_leibniz_notation, math_expression, newtonian_derivative,
+            operator,
         },
         math_expression_tree::MathExpressionTree,
     },
@@ -60,10 +61,6 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         first_order_derivative_leibniz_notation,
         newtonian_derivative,
     ))(s)?;
-    println!("derivative={:?}", derivative);
-
-    println!("||||||||||||||||||||||||||||||||");
-    println!("binding = {:?}", binding);
     let ci = binding.func_var;
     let parenthesized = binding.func_of;
     let bvar = derivative.bound_var;
@@ -101,7 +98,6 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         map(operator, MathExpression::Mo),
         math_expression,
     )))(s)?;
-    println!("remaining_tokens={:?}", remaining_tokens);
     let (s, _) = etag!("math")(s)?;
 
     let ode = FirstOrderODE {
@@ -118,9 +114,7 @@ impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
             Operator::Derivative(Derivative::new(1, 1, self.with_respect_to.clone())),
-            vec![MathExpressionTree::Atom(MathExpression::
-                //Ci(self.lhs_var.clone(),
-                BoundVariables(
+            vec![MathExpressionTree::Atom(MathExpression::BoundVariables(
                 self.lhs_var.clone(),
                 self.func_of.clone(),
             ))],
@@ -674,6 +668,35 @@ fn test_ci_univariate_func() {
     );
 }
 
+#[test]
+fn test_ci_univariate_func2() {
+    test_parser(
+        "<mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>",
+        ci_univariate_func,
+        (
+            Ci::new(
+                Some(Type::Function),
+                Box::new(MathExpression::Mi(Mi("S".to_string()))),
+            ),
+            vec![Mi("t".to_string())],
+        ),
+    );
+}
+
+#[test]
+fn test_ci_univariate_func3() {
+    test_parser(
+        "<msub><mi>S</mi><mi>t</mi></msub>",
+        ci_univariate_func,
+        (
+            Ci::new(
+                Some(Type::Function),
+                Box::new(MathExpression::Mi(Mi("S".to_string()))),
+            ),
+            vec![Mi("t".to_string())],
+        ),
+    );
+}
 #[test]
 fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() {
     test_parser(
