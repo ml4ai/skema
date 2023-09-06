@@ -20,9 +20,7 @@ assignment_right_hand:
   "
   MATCH (n)-[r]->(m)
   WHERE (m:Primitive or m:Literal or m:Expression) and id(n)=$ID
-  RETURN r,m
-  ORDER BY r.index
-  LIMIT 1
+  RETURN m
   "
 ordered_expressions:
   "
@@ -43,7 +41,7 @@ named_opos:
 primitive_operands:
   "
   MATCH (n)-[r]->(m)
-  WHERE m:Literal or m:Expression and id(n)=$ID
-  RETURN n,r
+  WHERE (m:Literal or m:Expression or m:Primitive) and id(n)=$ID
+  RETURN r, m
   ORDER BY r.index
   "

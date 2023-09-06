@@ -44,7 +44,7 @@ class ExecutionEngine():
         self.execute(module=True)
 
         # Extract the initial values from the symbol map
-        #self.symbol_map
+        return self.symbol_table.get_initial_values()
 
     def visit(self, node):
         node_types = node._labels
@@ -52,11 +52,15 @@ class ExecutionEngine():
             self.visit_module(node)
         if "Expression" in node_types:
             self.visit_expression(node)
+        if "Function" in node_types:
+            self.visit_function(node)
         if "Opo" in node_types:
             return self.visit_opo(node)
+        if "Opi" in node_types:
+            return self.visit_opi(node)
         if "Literal" in node_types:
             return self.visit_literal(node)
-        if "Primtive" in node_types:
+        if "Primitive" in node_types:
             return self.visit_primitive(node)
 
     def visit_module(self, node):
@@ -71,17 +75,37 @@ class ExecutionEngine():
         left_hand_side = self.query_runner.run_query("assignment_left_hand", id=node_id)
         right_hand_side = self.query_runner.run_query("assignment_right_hand", id=node_id)
         
+        # The lefthand side represents the Opo of the variable we are assigning to
+        # TODO: What if we have multiple assignment x,y = 1,2
+        # TODO: Does an expression always correspond to an assingment?
         symbol = self.visit(left_hand_side[0])
-        value = self.visit(right_hand_side[0])
         
+        # The right hand side can be either a LiteralValue, an Expression, or a Primitive
+        # A Literal
+        index = {"Primitive":1, "Expression": 1, "Literal": 2} 
+        right_hand_side = sorted(right_hand_side, key=lambda node: index[list(node._labels)[0]])
+        value = self.visit(right_hand_side[0])
         if not self.symbol_table.get_symbol(symbol):
             self.symbol_table.add_symbol(symbol, value, None)
-            print(self.symbol_table.get_all_symbols())
         else:
             self.symbol_table.update_symbol(symbol, value, None)
     
+    def visit_function(self, node):
+        """Visitor for :Opi node type"""
+
+        # First, we need to get all opi symbols and their values
+
+        self.symbol_table.push_function_call()
+        self.visit() for node in None
+        self.symbol_table.pop_function_call()
+        pass
+
     def visit_opo(self, node):
         "Visitor for :Opo node type"
+        return node.name
+    
+    def visit_opi(self, node):
+        """Visitor for :Opi node type"""
         return node.name
     
     def visit_literal(self, node):
