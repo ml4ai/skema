@@ -88,6 +88,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
             r#type: Some(Type::Function),
             content,
         }),
+        ci_subscript,
     )))(s)?;
     let (s, _) = tuple((
         etag!("mrow"),
