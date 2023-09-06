@@ -56,9 +56,9 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "."
+  context = "./skema/text_reading/scala/"
   tags = tag("skema-text-reading", "", "")
-  dockerfile = "./skema/text_reading/scala/Dockerfile"
+  dockerfile = "Dockerfile"
 }
 
 target "skema-py" {
