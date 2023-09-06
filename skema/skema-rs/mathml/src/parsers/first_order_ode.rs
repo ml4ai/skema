@@ -4,7 +4,7 @@ use crate::parsers::math_expression_tree::MathExpressionTree::Cons;
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        BoundVariables, Ci, MathExpression, Mi, Type,
+        BoundVariables, Ci, MathExpression, Type,
     },
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
@@ -19,20 +19,22 @@ use crate::{
 };
 
 use derive_new::new;
+use nom::error::context;
 use nom::{
     branch::alt,
     bytes::complete::tag,
     combinator::map,
-    error::Error,
     multi::{many0, many1},
     sequence::{delimited, tuple},
 };
+use std::convert::TryInto;
+
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::str::FromStr;
 
 #[cfg(test)]
-use crate::parsers::generic_mathml::test_parser;
+use crate::{ast::Mi, parsers::generic_mathml::test_parser};
 
 /// First order ordinary differential equation.
 /// This assumes that the left hand side of the equation consists solely of a derivative expressed
@@ -47,11 +49,9 @@ pub struct FirstOrderODE {
     pub func_of: Vec<Ci>,
 
     pub with_respect_to: Ci,
-
     /// An expression tree corresponding to the RHS of the ODE.
     pub rhs: MathExpressionTree,
 }
-
 /// Parse a first order ODE with a single derivative term on the LHS.
 pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     let (s, _) = stag!("math")(input)?;
@@ -109,7 +109,6 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     Ok((s, ode))
 }
-
 impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
@@ -128,17 +127,19 @@ impl FirstOrderODE {
 }
 
 impl FromStr for FirstOrderODE {
-    type Err = Error<String>;
+    type Err = String;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let ode = first_order_ode(s.into()).unwrap().1;
-        Ok(ode)
+        first_order_ode(s.into())
+            .map(|(_, ode)| ode)
+            .map_err(|err| err.to_string())
     }
 }
 
 //--------------------------------------
 // Methods for extraction of PN AMR from ODE's
 //--------------------------------------
+#[allow(non_snake_case)]
 pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
     let f = File::open(filepath).unwrap();
     let lines = BufReader::new(f).lines();
@@ -153,16 +154,7 @@ pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
             let mut ode = line
                 .parse::<FirstOrderODE>()
                 .unwrap_or_else(|_| panic!("Unable to parse line {}!", line));
-            println!(
-                "ode_line rhs string below: {:?}\n",
-                ode.rhs.to_string().clone()
-            );
             ode.rhs = flatten_mults(ode.rhs.clone());
-            println!(
-                "ode_line rhs string after: {:?}\n",
-                ode.rhs.to_string().clone()
-            );
-            println!("ode_line rhs object: {:?}\n", ode.rhs.clone());
             ode_vec.push(ode);
         }
     }
@@ -173,12 +165,15 @@ pub fn get_FirstOrderODE_vec_from_file(filepath: &str) -> Vec<FirstOrderODE> {
 #[derive(Debug, Default, PartialEq, Eq, Clone, PartialOrd, Ord)]
 pub struct PnTerm {
     pub dyn_state: String,
-    pub exp_states: Vec<String>, // list of state variables in term
-    pub polarity: bool,          // polarity of term
-    pub expression: String,      // content mathml for the expression
-    pub parameters: Vec<String>, // list of parameters in term
+    pub exp_states: Vec<String>,        // list of state variables in term
+    pub polarity: bool,                 // polarity of term
+    pub expression: String,             // content mathml for the expression
+    pub parameters: Vec<String>,        // list of parameters in term
+    pub sub_terms: Option<Vec<PnTerm>>, // This is to handle when we need to distribute or not for terms.
+    pub math_vec: Option<MathExpressionTree>, // This is to allows for easy distribution using our current frame work
 }
 
+// refactored
 // this function takes in one ode equations and returns a vector of the terms in it
 pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
     let mut terms = Vec::<PnTerm>::new();
@@ -188,319 +183,37 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
     let dyn_state = ode.lhs_var.to_string();
 
     match ode.rhs {
-        Cons(ref x, ref y) => {
-            match &x {
-                Multiply => {
-                    let mut temp_term = get_term_mult(sys_states, y.clone());
-                    temp_term.dyn_state = dyn_state;
-                    terms.push(temp_term.clone());
-                    println!("mult temp_term: {:?}\n", temp_term)
-                }
-                Subtract => {
-                    /* found multiple terms */
-                    if y.len() == 1 {
-                        // unary sub, so much be mult inside
-                        match &y[0] {
-                            Cons(_x1, ref y1) => {
-                                let mut temp_term = get_term_mult(sys_states, y1.clone());
-                                temp_term.dyn_state = dyn_state;
-                                if temp_term.polarity {
-                                    temp_term.polarity = false;
-                                } else {
-                                    temp_term.polarity = true;
-                                }
-                                terms.push(temp_term.clone());
-                                println!("Unary Sub temp_term: {:?}\n", temp_term)
-                            }
-                            Atom(_x1) => {
-                                println!("Not valid term in PN")
-                            }
-                        }
-                    } else {
-                        /* this is the same as Add, but with a polarity swap on the second term */
-                        /* this actually need to support an entire binary sub inside it again :( */
-                        match &y[0] {
-                            Cons(x1, ref y1) => match &x1 {
-                                Multiply => {
-                                    let mut temp_term =
-                                        get_term_mult(sys_states.clone(), y1.clone());
-                                    temp_term.dyn_state = dyn_state.clone();
-                                    terms.push(temp_term.clone());
-                                    println!("binary sub1 mult temp_term: {:?}\n", temp_term)
-                                }
-                                Subtract => {
-                                    match &y1[0] {
-                                        Cons(x2, ref y2) => {
-                                            if y2.len() == 1 {
-                                                let mut temp_term =
-                                                    get_term_mult(sys_states.clone(), y2.clone());
-                                                temp_term.dyn_state = dyn_state.clone();
-                                                if temp_term.polarity {
-                                                    temp_term.polarity = false;
-                                                } else {
-                                                    temp_term.polarity = true;
-                                                }
-                                                terms.push(temp_term.clone());
-                                                println!(
-                                                    "binary sub1 unarysub temp_term: {:?}\n",
-                                                    temp_term
-                                                )
-                                            } else {
-                                                match &x2 {
-                                                    Subtract => {
-                                                        println!("to do")
-                                                    }
-                                                    Add => {
-                                                        println!("to do")
-                                                    }
-                                                    Divide => {
-                                                        println!("to do")
-                                                    }
-                                                    Multiply => {
-                                                        let mut temp_term = get_term_mult(
-                                                            sys_states.clone(),
-                                                            y2.clone(),
-                                                        );
-                                                        temp_term.dyn_state = dyn_state.clone();
-                                                        terms.push(temp_term.clone());
-                                                        println!("binary sub1 binary sub1 mult temp_term: {:?}\n", temp_term)
-                                                    }
-                                                    _ => println!("Not supported equation type"),
-                                                }
-                                            }
-                                        }
-                                        _ => {
-                                            println!("Not valid term for PN")
-                                        }
-                                    }
-                                    match &y1[1] {
-                                        Cons(x2, ref y2) => {
-                                            if y2.len() == 1 {
-                                                let mut temp_term =
-                                                    get_term_mult(sys_states.clone(), y2.clone());
-                                                temp_term.dyn_state = dyn_state.clone();
-                                                terms.push(temp_term.clone());
-                                                println!(
-                                                    "binary sub1 unarysub temp_term: {:?}\n",
-                                                    temp_term
-                                                )
-                                            } else {
-                                                match &x2 {
-                                                    Subtract => {
-                                                        println!("to do")
-                                                    }
-                                                    Add => {
-                                                        println!("to do")
-                                                    }
-                                                    Divide => {
-                                                        println!("to do")
-                                                    }
-                                                    Multiply => {
-                                                        let mut temp_term = get_term_mult(
-                                                            sys_states.clone(),
-                                                            y2.clone(),
-                                                        );
-                                                        temp_term.dyn_state = dyn_state.clone();
-                                                        if temp_term.polarity {
-                                                            temp_term.polarity = false;
-                                                        } else {
-                                                            temp_term.polarity = true;
-                                                        }
-                                                        terms.push(temp_term.clone());
-                                                        println!("binary sub1 binary sub2 mult temp_term: {:?}\n", temp_term)
-                                                    }
-                                                    _ => println!("Not supported equation type"),
-                                                }
-                                            }
-                                        }
-                                        _ => {
-                                            println!("Not valid term for PN")
-                                        }
-                                    }
-                                }
-                                // new edge case to handle
-                                Divide => match &y1[0] {
-                                    Cons(_x2, ref y2) => {
-                                        let mut temp_term =
-                                            get_term_mult(sys_states.clone(), y2.clone());
-                                        temp_term.dyn_state = dyn_state.clone();
-                                        temp_term.parameters.push(y1[1].to_string());
-                                        temp_term.expression =
-                                            MathExpressionTree::Cons(Divide, y1.clone()).to_cmml();
-                                        terms.push(temp_term.clone());
-                                        println!(
-                                            "binary sub1 div temp_term: {:?}\n",
-                                            temp_term.clone()
-                                        )
-                                    }
-                                    _ => {
-                                        println!("dont support this")
-                                    }
-                                },
-                                _ => {
-                                    println!("Error unsupported operation")
-                                }
-                            },
-                            Atom(_x1) => {
-                                println!("Not valid term for PN")
-                            }
-                        }
-                        match &y[1] {
-                            Cons(x1, ref y1) => match x1 {
-                                Multiply => {
-                                    let mut temp_term = get_term_mult(sys_states, y1.clone());
-                                    temp_term.dyn_state = dyn_state;
-                                    if temp_term.polarity {
-                                        temp_term.polarity = false;
-                                    } else {
-                                        temp_term.polarity = true;
-                                    }
-                                    terms.push(temp_term.clone());
-                                    println!("binary sub2 mult temp_term: {:?}\n", temp_term)
-                                }
-                                Subtract => match &y1[0] {
-                                    Cons(_x2, ref y2) => {
-                                        let mut temp_term = get_term_mult(sys_states, y2.clone());
-                                        temp_term.dyn_state = dyn_state;
-                                        terms.push(temp_term.clone());
-                                        println!(
-                                            "binary sub2 unarysub temp_term: {:?}\n",
-                                            temp_term
-                                        )
-                                    }
-                                    _ => {
-                                        println!("Not valid term for PN")
-                                    }
-                                },
-                                _ => {
-                                    println!("Error unsupported operation")
-                                }
-                            },
-                            Atom(_x1) => {
-                                println!("Not valid term for PN")
-                            }
-                        }
-                    }
-                } // unary or binary
-                Add => {
-                    /* found multiple terms */
-                    match &y[0] {
-                        Cons(x1, ref y1) => match x1 {
-                            Multiply => {
-                                let mut temp_term = get_term_mult(sys_states.clone(), y1.clone());
-                                temp_term.dyn_state = dyn_state.clone();
-                                terms.push(temp_term);
-                            }
-                            Subtract => match &y1[0] {
-                                Cons(_x2, ref y2) => {
-                                    let mut temp_term =
-                                        get_term_mult(sys_states.clone(), y2.clone());
-                                    temp_term.dyn_state = dyn_state.clone();
-                                    if temp_term.polarity {
-                                        temp_term.polarity = false;
-                                    } else {
-                                        temp_term.polarity = true;
-                                    }
-                                    terms.push(temp_term);
-                                }
-                                _ => {
-                                    println!("Not valid term for PN")
-                                }
-                            },
-                            _ => {
-                                println!("Error unsupported operation")
-                            }
-                        },
-                        Atom(_x1) => {
-                            println!("Not valid term for PN")
-                        }
-                    }
-                    match &y[1] {
-                        Cons(x1, ref y1) => match x1 {
-                            Multiply => {
-                                let mut temp_term = get_term_mult(sys_states, y1.clone());
-                                temp_term.dyn_state = dyn_state;
-                                terms.push(temp_term);
-                            }
-                            Subtract => match &y1[0] {
-                                Cons(_x2, ref y2) => {
-                                    let mut temp_term = get_term_mult(sys_states, y2.clone());
-                                    temp_term.dyn_state = dyn_state;
-                                    if temp_term.polarity {
-                                        temp_term.polarity = false;
-                                    } else {
-                                        temp_term.polarity = true;
-                                    }
-                                    terms.push(temp_term);
-                                }
-                                _ => {
-                                    println!("Not valid term for PN")
-                                }
-                            },
-                            _ => {
-                                println!("Error unsupported operation")
-                            }
-                        },
-                        Atom(_x1) => {
-                            println!("Not valid term for PN")
-                        }
-                    }
-                }
-                Divide => match &y[0] {
-                    Cons(x1, ref y1) => match &x1 {
-                        Multiply => {
-                            let mut temp_term = get_term_mult(sys_states, y1.clone());
-                            temp_term.dyn_state = dyn_state;
-                            temp_term.parameters.push(y[1].to_string());
-                            temp_term.expression =
-                                MathExpressionTree::Cons(Divide, y.clone()).to_cmml();
-                            terms.push(temp_term.clone())
-                        }
-                        Subtract => {
-                            /* now to support unary subtract as numerator y[0] */
-                            match &y1[0] {
-                                Cons(_x2, ref y2) => {
-                                    /* unary to mult */
-                                    /* This has to be a unary sub into a mult (unless really stupid equation) */
-                                    let mut temp_term = get_term_mult(sys_states, y2.clone());
-                                    // swap polarity of temp term
-                                    if temp_term.polarity {
-                                        temp_term.polarity = false;
-                                    } else {
-                                        temp_term.polarity = true;
-                                    }
-                                    temp_term.parameters.push(y[1].to_string());
-                                    temp_term.expression =
-                                        MathExpressionTree::Cons(Divide, y.clone()).to_cmml();
-                                    terms.push(temp_term.clone())
-                                }
-                                Atom(_x2) => {
-                                    /* This is only the case of a parameter being 1/param and the top being a
-                                    negative of the state variable, since no mult */
-                                    let temp_term = PnTerm {
-                                        dyn_state,
-                                        exp_states: [y1[0].to_string()].to_vec(),
-                                        polarity: false,
-                                        expression: ode.rhs.clone().to_cmml(),
-                                        parameters: [y[1].to_string()].to_vec(),
-                                    };
-                                    terms.push(temp_term)
-                                }
-                            }
-                        }
-                        _ => {
-                            println!("Error expected only Multiply or Unary subtract for numerator")
-                        }
-                    },
-                    Atom(_x1) => {
-                        println!("Error, expected numerator terms to be a Multiplication")
-                    }
-                }, // divide seem to be in front of mult always, will make that assumption.
-                _ => {
-                    println!("Warning unsupported operator on expression")
+        Cons(ref x, ref y) => match &x {
+            Multiply => {
+                let mut temp_term = get_terms_mult(sys_states, y.clone());
+                temp_term.dyn_state = dyn_state;
+                terms.push(temp_term);
+            }
+            Divide => {
+                let mut temp_term = get_term_div(sys_states, y.clone());
+                temp_term.dyn_state = dyn_state;
+                terms.push(temp_term);
+            }
+            Add => {
+                let temp_terms = get_terms_add(sys_states, y.clone());
+                for term in temp_terms.iter() {
+                    let mut t_term = term.clone();
+                    t_term.dyn_state = dyn_state.clone();
+                    terms.push(t_term.clone());
                 }
             }
-        }
+            Subtract => {
+                let temp_terms = get_terms_sub(sys_states, y.clone());
+                for term in temp_terms.iter() {
+                    let mut t_term = term.clone();
+                    t_term.dyn_state = dyn_state.clone();
+                    terms.push(t_term.clone());
+                }
+            }
+            _ => {
+                println!("Warning unsupported case");
+            }
+        },
         Atom(_x) => {
             println!("Warning unexpected RHS structure")
         }
@@ -508,15 +221,335 @@ pub fn get_terms(sys_states: Vec<String>, ode: FirstOrderODE) -> Vec<PnTerm> {
     terms
 }
 
-// this takes in the arguments of a multiply term and returns the PnTerm for it
-// we do expect at most only one unary subtraction
-pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
-    let _terms = Vec::<PnTerm>::new();
+// this takes in the arguments of a closer to root level add operator and returns the PnTerms for it's subgraphs
+// we do expect at most multiplication, subtraction, division, or addition
+pub fn get_terms_add(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Vec<PnTerm> {
+    let mut terms = Vec::<PnTerm>::new();
+
+    /* found multiple terms */
+
+    for arg in eq.iter() {
+        match &arg {
+            Cons(x1, ref y1) => match x1 {
+                Multiply => {
+                    let mut temp_term = get_terms_mult(sys_states.clone(), y1.clone());
+                    temp_term.math_vec = Some(arg.clone());
+                    terms.push(temp_term);
+                }
+                Divide => {
+                    let mut temp_term = get_term_div(sys_states.clone(), y1.clone());
+                    temp_term.math_vec = Some(arg.clone());
+                    terms.push(temp_term);
+                }
+                Subtract => {
+                    let temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                    for term in temp_terms.iter() {
+                        terms.push(term.clone());
+                    }
+                }
+                Add => {
+                    let temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                    for term in temp_terms.iter() {
+                        terms.push(term.clone());
+                    }
+                }
+                _ => {
+                    println!("Error unsupported operation")
+                }
+            },
+            Atom(ref x) => {
+                // also need to construct a partial term here to handle distribution of just a parameter
+                let mut is_state = false;
+                for state in sys_states.iter() {
+                    if x.to_string() == *state {
+                        is_state = true;
+                    }
+                }
+                if is_state {
+                    let temp_term = PnTerm {
+                        dyn_state: "temp".to_string(),
+                        exp_states: [x.to_string().clone()].to_vec(),
+                        polarity: true,
+                        expression: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml(),
+                        parameters: Vec::<String>::new(),
+                        sub_terms: None,
+                        math_vec: Some(arg.clone()),
+                    };
+                    terms.push(temp_term.clone());
+                } else {
+                    let temp_term = PnTerm {
+                        dyn_state: "temp".to_string(),
+                        exp_states: Vec::<String>::new(),
+                        polarity: true,
+                        expression: MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml(),
+                        parameters: [x.to_string().clone()].to_vec(),
+                        sub_terms: None,
+                        math_vec: Some(arg.clone()),
+                    };
+                    terms.push(temp_term.clone());
+                }
+            }
+        }
+    }
+    terms
+}
+
+// this takes in the arguments of a closer to root level sub operator and returns the PnTerms for it's subgraphs
+// we do expect at most multiplication, subtraction, division, or addition
+pub fn get_terms_sub(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Vec<PnTerm> {
+    let mut terms = Vec::<PnTerm>::new();
+
+    /* found multiple terms */
+    /* similar to get_terms_add, but need to swap polarity on term from second arg
+    and handle unary subtraction too */
+
+    let arg_len = eq.len();
+
+    // if unary subtraction
+    if arg_len == 1 {
+        match &eq[0] {
+            Cons(x1, ref y1) => match x1 {
+                Multiply => {
+                    let mut temp_term = get_terms_mult(sys_states, y1.clone());
+                    temp_term.polarity = !temp_term.polarity;
+                    if temp_term.sub_terms.is_some() {
+                        for (i, sub_term) in temp_term.sub_terms.clone().unwrap().iter().enumerate()
+                        {
+                            temp_term.sub_terms.as_mut().unwrap()[i].polarity = !sub_term.polarity;
+                        }
+                    }
+                    temp_term.math_vec = Some(eq[0].clone());
+                    terms.push(temp_term);
+                }
+                Divide => {
+                    let mut temp_term = get_term_div(sys_states, y1.clone());
+                    temp_term.polarity = !temp_term.polarity;
+                    if temp_term.sub_terms.is_some() {
+                        for (i, sub_term) in temp_term.sub_terms.clone().unwrap().iter().enumerate()
+                        {
+                            temp_term.sub_terms.as_mut().unwrap()[i].polarity = !sub_term.polarity;
+                        }
+                    }
+                    temp_term.math_vec = Some(eq[0].clone());
+                    terms.push(temp_term);
+                }
+                Subtract => {
+                    let temp_terms = get_terms_sub(sys_states, y1.clone());
+                    for term in temp_terms.iter() {
+                        // swap polarity of temp term
+                        let mut t_term = term.clone();
+                        t_term.polarity = !t_term.polarity;
+                        if t_term.sub_terms.is_some() {
+                            for (i, sub_term) in
+                                t_term.sub_terms.clone().unwrap().iter().enumerate()
+                            {
+                                t_term.sub_terms.as_mut().unwrap()[i].polarity = !sub_term.polarity;
+                            }
+                        }
+                        terms.push(t_term.clone());
+                    }
+                }
+                Add => {
+                    let temp_terms = get_terms_add(sys_states, y1.clone());
+                    for term in temp_terms.iter() {
+                        // swap polarity of temp term
+                        let mut t_term = term.clone();
+                        t_term.polarity = !t_term.polarity;
+                        if t_term.sub_terms.is_some() {
+                            for (i, sub_term) in
+                                t_term.sub_terms.clone().unwrap().iter().enumerate()
+                            {
+                                t_term.sub_terms.as_mut().unwrap()[i].polarity = !sub_term.polarity;
+                            }
+                        }
+                        terms.push(t_term.clone());
+                    }
+                }
+                _ => {
+                    println!("Not valid term for PN")
+                }
+            },
+            Atom(ref x1) => {
+                // is either only a state or only a parameter
+                let mut expression_term = false;
+                for state in sys_states.iter() {
+                    if *state == x1.to_string() {
+                        expression_term = true;
+                    }
+                }
+
+                if expression_term {
+                    let temp_term = PnTerm {
+                        dyn_state: "temp".to_string(),
+                        exp_states: [x1.to_string()].to_vec(),
+                        polarity: false,
+                        expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
+                            .to_cmml(),
+                        parameters: Vec::<String>::new(),
+                        sub_terms: None,
+                        math_vec: Some(eq[0].clone()),
+                    };
+                    terms.push(temp_term);
+                } else {
+                    let temp_term = PnTerm {
+                        dyn_state: "temp".to_string(),
+                        exp_states: Vec::<String>::new(),
+                        polarity: false,
+                        expression: MathExpressionTree::Cons(Subtract, [eq[0].clone()].to_vec())
+                            .to_cmml(),
+                        parameters: [x1.to_string()].to_vec(),
+                        sub_terms: None,
+                        math_vec: Some(eq[0].clone()),
+                    };
+                    terms.push(temp_term);
+                }
+            }
+        }
+    } else {
+        // need to treat second term with polarity swap
+        for (i, arg) in eq.iter().enumerate() {
+            match &arg {
+                Cons(x1, ref y1) => match x1 {
+                    Multiply => {
+                        let mut temp_term = get_terms_mult(sys_states.clone(), y1.clone());
+                        if i == 1 {
+                            // swap polarity of temp term
+                            temp_term.polarity = !temp_term.polarity;
+                            if temp_term.sub_terms.is_some() {
+                                for (i, sub_term) in
+                                    temp_term.sub_terms.clone().unwrap().iter().enumerate()
+                                {
+                                    temp_term.sub_terms.as_mut().unwrap()[i].polarity =
+                                        !sub_term.polarity;
+                                }
+                            }
+                            temp_term.math_vec = Some(arg.clone());
+                            terms.push(temp_term);
+                        } else {
+                            temp_term.math_vec = Some(arg.clone());
+                            terms.push(temp_term);
+                        }
+                    }
+                    Divide => {
+                        let mut temp_term = get_term_div(sys_states.clone(), y1.clone());
+                        if i == 1 {
+                            // swap polarity of temp term
+                            temp_term.polarity = !temp_term.polarity;
+                            if temp_term.sub_terms.is_some() {
+                                for (i, sub_term) in
+                                    temp_term.sub_terms.clone().unwrap().iter().enumerate()
+                                {
+                                    temp_term.sub_terms.as_mut().unwrap()[i].polarity =
+                                        !sub_term.polarity;
+                                }
+                            }
+                            temp_term.math_vec = Some(arg.clone());
+                            terms.push(temp_term);
+                        } else {
+                            temp_term.math_vec = Some(arg.clone());
+                            terms.push(temp_term);
+                        }
+                    }
+                    Subtract => {
+                        let temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                        for term in temp_terms.iter() {
+                            let mut t_term = term.clone();
+                            if i == 1 {
+                                // swap polarity of temp term
+                                t_term.polarity = !t_term.polarity;
+                                if t_term.sub_terms.is_some() {
+                                    for (i, sub_term) in
+                                        t_term.sub_terms.clone().unwrap().iter().enumerate()
+                                    {
+                                        t_term.sub_terms.as_mut().unwrap()[i].polarity =
+                                            !sub_term.polarity;
+                                    }
+                                }
+                                terms.push(t_term.clone());
+                            } else {
+                                terms.push(t_term.clone());
+                            }
+                        }
+                    }
+                    Add => {
+                        let temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                        for term in temp_terms.iter() {
+                            let mut t_term = term.clone();
+                            if i == 1 {
+                                // swap polarity of temp term
+                                t_term.polarity = !t_term.polarity;
+                                if t_term.sub_terms.is_some() {
+                                    for (i, sub_term) in
+                                        t_term.sub_terms.clone().unwrap().iter().enumerate()
+                                    {
+                                        t_term.sub_terms.as_mut().unwrap()[i].polarity =
+                                            !sub_term.polarity;
+                                    }
+                                }
+                                terms.push(t_term.clone());
+                            } else {
+                                terms.push(t_term.clone());
+                            }
+                        }
+                    }
+                    _ => {
+                        println!("Error unsupported operation")
+                    }
+                },
+                Atom(ref x) => {
+                    // also need to construct a partial term here to handle distribution of just a parameter
+                    let mut is_state = false;
+                    let mut polarity = true;
+                    let mut expression =
+                        MathExpressionTree::Cons(Add, [arg.clone()].to_vec()).to_cmml();
+                    if i == 1 {
+                        polarity = false;
+                        expression =
+                            MathExpressionTree::Cons(Subtract, [arg.clone()].to_vec()).to_cmml()
+                    }
+                    for state in sys_states.iter() {
+                        if x.to_string() == *state {
+                            is_state = true;
+                        }
+                    }
+                    if is_state {
+                        let temp_term = PnTerm {
+                            dyn_state: "temp".to_string(),
+                            exp_states: [x.to_string().clone()].to_vec(),
+                            polarity,
+                            expression,
+                            parameters: Vec::<String>::new(),
+                            sub_terms: None,
+                            math_vec: Some(arg.clone()),
+                        };
+                        terms.push(temp_term.clone());
+                    } else {
+                        let temp_term = PnTerm {
+                            dyn_state: "temp".to_string(),
+                            exp_states: Vec::<String>::new(),
+                            polarity,
+                            expression,
+                            parameters: [x.to_string().clone()].to_vec(),
+                            sub_terms: None,
+                            math_vec: Some(arg.clone()),
+                        };
+                        terms.push(temp_term.clone());
+                    }
+                }
+            }
+        }
+    }
+    terms
+}
+
+// this takes in the arguments of a div operator and returns the PnTerm for it
+// we do expect at most multiplication, subtraction, or addition
+pub fn get_term_div(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
     let mut variables = Vec::<String>::new();
     let mut exp_states = Vec::<String>::new();
-    let mut parameters = Vec::<String>::new();
     let mut polarity = true;
 
+    // this walks the tree and composes a vector of all variable and polarity changes
     for obj in eq.iter() {
         match obj {
             Cons(x, y) => {
@@ -531,26 +564,21 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
                             }
                         }
                     }
-                    Divide => {
-                        match &y[0] {
-                            Cons(_x1, y1) => {
-                                // assumption only unary sub is possible
-                                polarity = false;
-                                variables.push(y1[0].to_string())
-                            }
-                            Atom(_x) => variables.push(y[0].to_string()),
-                        }
-                        match &y[1] {
-                            Cons(_x1, y1) => {
-                                // assumption only unary sub is possible
-                                polarity = false;
-                                variables.push(y1[1].to_string())
-                            }
-                            Atom(_x) => variables.push(y[1].to_string()),
-                        }
+                    Multiply => {
+                        // call mult function to get a partial term
+                        let mut temp_term = get_term_mult(sys_states.clone(), y.clone());
+
+                        // parse term polarity
+                        polarity = temp_term.polarity;
+
+                        // parse term parameters and expression states
+                        // need to do both to populate both later
+                        variables.append(&mut temp_term.parameters);
+                        variables.append(&mut temp_term.exp_states);
                     }
                     Add => {
                         if y.len() == 1 {
+                            // really should need to support unary addition, but oh well
                             variables.push(y[0].to_string());
                         } else {
                             for var in y.iter() {
@@ -567,6 +595,7 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
         }
     }
 
+    // this compiles the vector of expression states for the term
     let mut ind = Vec::<usize>::new();
     for (i, var) in variables.iter().enumerate() {
         for sys_var in sys_states.iter() {
@@ -577,20 +606,291 @@ pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> Pn
         }
     }
 
+    // this removes the expression states from the variable vector
     for i in ind.iter().rev() {
         variables.remove(*i);
     }
 
-    for var in variables.iter() {
-        parameters.push(var.clone());
-    }
+    // now to dedup variables and exp_states
+    variables.sort();
+    variables.dedup();
+    exp_states.sort();
+    exp_states.dedup();
 
     PnTerm {
         dyn_state: "temp".to_string(),
         exp_states,
         polarity,
         expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
-        parameters,
+        parameters: variables,
+        sub_terms: None,
+        math_vec: None,
+    }
+}
+
+// When we hit a multiplication inference is needed on if it is a complicated single transition
+// or if we need to distribute over the multiplication and thus get multiple terms out. We will collect
+// both here for now and leave the inference to the PN construction phase since only then can we infer
+pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
+    let mut variables = Vec::<String>::new();
+    let mut exp_states = Vec::<String>::new();
+    let mut polarity = true;
+    let mut terms = Vec::<PnTerm>::new();
+    let mut arg_terms = Vec::<(i32, PnTerm)>::new();
+
+    // determine if we need to distribute or if simply mult we can just make term from
+    let mut distribution = false;
+    for arg in eq.iter() {
+        if let Cons(_x1, _y1) = arg {
+            distribution = true;
+        }
+    }
+
+    if !distribution {
+        // simple mult, simple term
+        get_term_mult(sys_states, eq)
+    } else {
+        for (i, arg) in eq.iter().enumerate() {
+            match &arg {
+                Cons(x1, ref y1) => match x1 {
+                    Multiply => {
+                        // this actually shouldn't be reachable if mults are flattened properly
+                        let mut temp_term = get_terms_mult(sys_states.clone(), y1.clone());
+                        temp_term.math_vec = Some(arg.clone());
+                        arg_terms.push((i.try_into().unwrap(), temp_term.clone()));
+                        // we now need to parse the term to constuct the large full term
+                        variables.append(&mut temp_term.parameters.clone());
+                        exp_states.append(&mut temp_term.exp_states.clone());
+                    }
+                    Divide => {
+                        let mut temp_term = get_term_div(sys_states.clone(), y1.clone());
+                        temp_term.math_vec = Some(arg.clone());
+                        arg_terms.push((i.try_into().unwrap(), temp_term.clone()));
+                        // we now need to parse the term to constuct the large full term
+                        variables.append(&mut temp_term.parameters.clone());
+                        exp_states.append(&mut temp_term.exp_states.clone());
+                    }
+                    Subtract => {
+                        let temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
+                        // if there is a unary subtraction (single term) we do get a polarity flip
+                        if temp_terms.len() == 1 {
+                            if polarity {
+                                polarity = false;
+                            } else {
+                                polarity = true;
+                            }
+                        }
+                        for term in temp_terms.iter() {
+                            arg_terms.push((i.try_into().unwrap(), term.clone()));
+                            // we now need to parse the term to constuct the large full term
+                            variables.append(&mut term.parameters.clone());
+                            exp_states.append(&mut term.exp_states.clone());
+                        }
+                    }
+                    Add => {
+                        let temp_terms = get_terms_add(sys_states.clone(), y1.clone());
+                        for term in temp_terms.iter() {
+                            arg_terms.push((i.try_into().unwrap(), term.clone()));
+                            // we now need to parse the term to constuct the large full term
+                            variables.append(&mut term.parameters.clone());
+                            exp_states.append(&mut term.exp_states.clone());
+                        }
+                    }
+                    _ => {
+                        println!("Error unsupported operation")
+                    }
+                },
+                Atom(ref x) => {
+                    variables.push(x.to_string());
+                    // also need to construct a partial term here to handle distribution of just a parameter
+                    let mut is_state = false;
+                    for state in sys_states.iter() {
+                        if x.to_string() == *state {
+                            is_state = true;
+                        }
+                    }
+                    if is_state {
+                        let temp_term = PnTerm {
+                            dyn_state: "temp".to_string(),
+                            exp_states: [x.to_string().clone()].to_vec(),
+                            polarity: true,
+                            expression: "temp".to_string(),
+                            parameters: Vec::<String>::new(),
+                            sub_terms: None,
+                            math_vec: Some(arg.clone()),
+                        };
+                        arg_terms.push((i.try_into().unwrap(), temp_term.clone()));
+                    } else {
+                        let temp_term = PnTerm {
+                            dyn_state: "temp".to_string(),
+                            exp_states: Vec::<String>::new(),
+                            polarity: true,
+                            expression: "temp".to_string(),
+                            parameters: [x.to_string().clone()].to_vec(),
+                            sub_terms: None,
+                            math_vec: Some(arg.clone()),
+                        };
+                        arg_terms.push((i.try_into().unwrap(), temp_term.clone()));
+                    }
+                }
+            }
+        }
+
+        // now to construct the sub terms vector, this will involve distributing the multiplication and
+        // filling in the vector itself
+        let mut lhs_vec = Vec::<PnTerm>::new();
+        let mut rhs_vec = Vec::<PnTerm>::new();
+
+        for arg in arg_terms.iter() {
+            if arg.0 == 0 {
+                lhs_vec.push(arg.1.clone());
+            } else {
+                rhs_vec.push(arg.1.clone());
+            }
+        }
+
+        for lhs_term in lhs_vec.iter() {
+            for rhs_term in rhs_vec.iter() {
+                // construct distributed term
+                let temp_term = Cons(
+                    Multiply,
+                    [
+                        lhs_term.math_vec.clone().unwrap(),
+                        rhs_term.math_vec.clone().unwrap(),
+                    ]
+                    .to_vec(),
+                );
+                let flat_temp_term = flatten_mults(temp_term.clone());
+                let mut arg_vec = Vec::<MathExpressionTree>::new();
+                if let Cons(Multiply, y) = flat_temp_term {
+                    arg_vec.append(&mut y.clone());
+                }
+                let mut sub_term = get_term_mult(sys_states.clone(), arg_vec.clone());
+                if lhs_term.polarity != rhs_term.polarity {
+                    sub_term.polarity = !sub_term.polarity;
+                }
+                terms.push(sub_term.clone());
+            }
+        }
+
+        // now for cleaning up the big term
+        // this compiles the vector of expression states for the term
+        let mut ind = Vec::<usize>::new();
+        for (i, var) in variables.iter().enumerate() {
+            for sys_var in sys_states.iter() {
+                if var == sys_var {
+                    exp_states.push(var.clone());
+                    ind.push(i);
+                }
+            }
+        }
+
+        // this removes the expression states from the variable vector
+        for i in ind.iter().rev() {
+            variables.remove(*i);
+        }
+
+        // now to dedup variables and exp_states
+        variables.sort();
+        variables.dedup();
+        exp_states.sort();
+        exp_states.dedup();
+
+        PnTerm {
+            dyn_state: "temp".to_string(),
+            exp_states,
+            polarity,
+            expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
+            parameters: variables,
+            sub_terms: Some(terms),
+            math_vec: None,
+        }
+    }
+}
+
+// this takes in the arguments of a multiply operator and returns the PnTerm for it
+// we do expect at most division, subtraction, or addition
+pub fn get_term_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> PnTerm {
+    let mut variables = Vec::<String>::new();
+    let mut exp_states = Vec::<String>::new();
+    let mut polarity = true;
+
+    // this walks the tree and composes a vector of all variable and polarity changes
+    for obj in eq.iter() {
+        match obj {
+            Cons(x, y) => {
+                match &x {
+                    Subtract => {
+                        if y.len() == 1 {
+                            polarity = false;
+                            variables.push(y[0].to_string());
+                        } else {
+                            for var in y.iter() {
+                                variables.push(var.to_string().clone());
+                            }
+                        }
+                    }
+                    Divide => {
+                        // call mult function to get a partial term
+                        let mut temp_term = get_term_div(sys_states.clone(), y.clone());
+
+                        // parse term polarity
+                        polarity = temp_term.polarity;
+
+                        // parse term parameters and expression states
+                        // need to do both to populate both later
+                        variables.append(&mut temp_term.parameters);
+                        variables.append(&mut temp_term.exp_states);
+                    }
+                    Add => {
+                        if y.len() == 1 {
+                            // really should need to support unary addition, but oh well
+                            variables.push(y[0].to_string());
+                        } else {
+                            for var in y.iter() {
+                                variables.push(var.to_string().clone());
+                            }
+                        }
+                    }
+                    _ => {
+                        println!("Not expected operation inside Multiply")
+                    }
+                }
+            }
+            Atom(x) => variables.push(x.to_string()),
+        }
+    }
+
+    // this compiles the vector of expression states for the term
+    let mut ind = Vec::<usize>::new();
+    for (i, var) in variables.iter().enumerate() {
+        for sys_var in sys_states.iter() {
+            if var == sys_var {
+                exp_states.push(var.clone());
+                ind.push(i);
+            }
+        }
+    }
+
+    // this removes the expression states from the variable vector
+    for i in ind.iter().rev() {
+        variables.remove(*i);
+    }
+
+    // now to dedup variables and exp_states
+    variables.sort();
+    variables.dedup();
+    exp_states.sort();
+    exp_states.dedup();
+
+    PnTerm {
+        dyn_state: "temp".to_string(),
+        exp_states,
+        polarity,
+        expression: MathExpressionTree::Cons(Multiply, eq).to_cmml(),
+        parameters: variables,
+        sub_terms: None,
+        math_vec: None,
     }
 }
 
@@ -649,7 +949,6 @@ pub fn flatten_mults(mut equation: MathExpressionTree) -> MathExpressionTree {
     }
     equation
 }
-
 #[test]
 fn test_ci_univariate_func() {
     test_parser(
@@ -822,4 +1121,38 @@ fn test_first_order_ode() {
     //assert_eq!(func_of.to_string(), "");
     assert_eq!(with_respect_to.to_string(), "");
     assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
+}
+
+#[test]
+fn test_msub_derivative() {
+    test_parser(
+        "<mfrac>
+        <mrow><mi>d</mi><msub><mi>S</mi><mi>v</mi></msub></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>",
+        first_order_derivative_leibniz_notation,
+        (
+            Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(Mi("t".to_string()))),
+                ),
+            ),
+            BoundVariables::new(
+                Ci::new(
+                    None,
+                    Box::new(MathExpression::Msub(
+                        Box::new(MathExpression::Mi(Mi("S".to_string()))),
+                        Box::new(MathExpression::Mi(Mi("v".to_string()))),
+                    )),
+                ),
+                vec![Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(Mi("".to_string()))),
+                )],
+            ),
+        ),
+    );
 }
