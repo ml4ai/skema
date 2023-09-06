@@ -28,11 +28,11 @@ function "check_suffix" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 group "prod" {
-  targets = ["skema-py", "skema-rs"]
+  targets = ["skema-py", "skema-rs", "skema-text-reading"]
 }
 
 group "default" {
-  targets = ["skema-py-base", "skema-rs-base"]
+  targets = ["skema-py-base", "skema-rs-base", "skema-text-reading-base"]
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -55,10 +55,20 @@ target "skema-rs-base" {
   dockerfile = "Dockerfile.skema-rs"
 }
 
+target "skema-text-reading-base" {
+  context = "."
+  tags = tag("skema-text-reading", "", "")
+  dockerfile = "./skema/text_reading/scala"
+}
+
 target "skema-py" {
   inherits = ["_platforms", "skema-py-base"]
 }
 
 target "skema-rs" {
   inherits = ["_platforms", "skema-rs-base"]
+}
+
+target "skema-text-reading" {
+  inherits = ["_platforms", "skema-text-reading-base"]
 }
