@@ -195,28 +195,28 @@ jobs:
     ########################################
     # lumai/askem-skema-text-reading
     ########################################
-#    - name: Tags for image
-#      id: tags
-#      # see https://github.com/docker/metadata-action
-#      uses: docker/metadata-action@v4
-#      with:
-#        images: lumai/askem-skema-text-reading
-#        tags: |
-#          # latest
-#          type=raw,value=latest
-#          # version
-#          type=semver,pattern={{version}}
-#          # other tags
-#          type=ref,event=tag
-#          # short commit hash
-#          type=sha
-#
-#    - name: Build and push image
-#      # see https://github.com/docker/build-push-action
-#      uses: docker/build-push-action@v4
-#      with:
-#        context: ./skema/text_reading/scala
-#        platforms: linux/amd64
-#        push: ${{ github.event_name != 'pull_request' }}
-#        # references `tags` step in steps for current job
-#        tags: ${{ steps.tags.outputs.tags }}
+    - name: Tags for image
+      id: tags
+      # see https://github.com/docker/metadata-action
+      uses: docker/metadata-action@v4
+      with:
+        images: lumai/askem-skema-text-reading
+        tags: |
+          # latest
+          type=raw,value=latest
+          # version
+          type=semver,pattern={{version}}
+          # other tags
+          type=ref,event=tag
+          # short commit hash
+          type=sha
+
+    - name: Build and push image
+      # see https://github.com/docker/build-push-action
+      uses: docker/build-push-action@v4
+      with:
+        context: ./skema/text_reading/scala
+        platforms: linux/amd64
+        push: ${{ github.event_name != 'pull_request' }}
+        # references `tags` step in steps for current job
+        tags: ${{ steps.tags.outputs.tags }}
