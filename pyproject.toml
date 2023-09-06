@@ -51,7 +51,7 @@ isa = [
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
-img2mml = ["torch", "torchvision","lxml==4.9.3"]
+img2mml = ["torch", "torchvision","lxml==4.9.3", "pillow"]
 
 # dependencies for METAL utilities.
 metal = ["fire==0.5.0",
@@ -98,7 +98,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
 readme = {file = ["README.md"], content-type = "text/markdown"}
 # runnables
 [project.scripts]
-#skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.TS2CAST.build_tree_sitter_fortran:main"
+#skema-tree-sitter-build-fortran-grammar = "skema.program_analysis.CAST.fortran.build_tree_sitter_fortran:main"
 link_amr = "skema.metal.model_linker.link_amr:main"
 #parquet2json = "skema.text_reading.cosmos_integration:main"
 

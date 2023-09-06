@@ -1,8 +1,8 @@
-use actix_web::{get, web::Data, App, http::header::ContentType, HttpResponse, HttpServer};
-use skema::config::Config;
-use skema::services::{comment_extraction, gromet};
-use std::env;
+use actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
 use clap::Parser;
+use skema::config::Config;
+use skema::services::{gromet};
+use std::env;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
@@ -32,7 +32,6 @@ pub async fn ping() -> HttpResponse {
     HttpResponse::Ok().body("The SKEMA Rust web services are running.")
 }
 
-
 /// This endpoint can be used to check the version of the service.
 #[utoipa::path(
     responses(
@@ -42,7 +41,9 @@ pub async fn ping() -> HttpResponse {
 #[get("/version")]
 pub async fn version() -> HttpResponse {
     let end_version = env::var("APP_VERSION").unwrap_or("?????".to_string());
-    HttpResponse::Ok().content_type(ContentType::plaintext()).body(end_version)
+    HttpResponse::Ok()
+        .content_type(ContentType::plaintext())
+        .body(end_version)
 }
 
 #[actix_web::main]
@@ -56,8 +57,6 @@ async fn main() -> std::io::Result<()> {
             version = "version",
         ),
         paths(
-            comment_extraction::get_comments,
-            comment_extraction::get_comments_from_zipfile,
             skema::services::mathml::get_ast_graph,
             skema::services::mathml::get_math_exp_graph,
             skema::services::mathml::get_acset,
@@ -80,11 +79,6 @@ async fn main() -> std::io::Result<()> {
         ),
         components(
             schemas(
-                comment_extraction::Language,
-                comment_extraction::CommentExtractionRequest,
-                comment_extraction::SingleLineComment,
-                comment_extraction::Docstring,
-                comment_extraction::CommentExtractionResponse,
                 mathml::acset::AMRmathml,
                 mathml::acset::RegNet,
                 mathml::acset::ModelRegNet,
@@ -144,8 +138,6 @@ async fn main() -> std::io::Result<()> {
                 db_host: args.db_host.clone(),
             }))
             .configure(gromet::configure())
-            .service(comment_extraction::get_comments)
-            .service(comment_extraction::get_comments_from_zipfile)
             .service(skema::services::mathml::get_ast_graph)
             .service(skema::services::mathml::get_math_exp_graph)
             .service(skema::services::mathml::get_content_mathml)

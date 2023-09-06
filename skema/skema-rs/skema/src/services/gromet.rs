@@ -24,7 +24,7 @@ pub fn configure() -> impl FnOnce(&mut ServiceConfig) {
             .service(get_subgraph);
     }
 }
-
+#[allow(non_snake_case)]
 pub fn model_to_RN(gromet: ModuleCollection, host: &str) -> Result<RegNet, MgError> {
     let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
@@ -35,6 +35,7 @@ pub fn model_to_RN(gromet: ModuleCollection, host: &str) -> Result<RegNet, MgErr
 }
 
 // this is updated to mathexpressiontrees
+#[allow(non_snake_case)]
 pub fn model_to_PN(gromet: ModuleCollection, host: &str) -> Result<PetriNet, MgError> {
     let module_id = push_model_to_db(gromet, host); // pushes model to db and gets id
     let ref_module_id1 = module_id.as_ref();
@@ -307,6 +308,7 @@ pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 }
 
 /// This retrieves a PetriNet AMR based on model id.
+#[allow(non_snake_case)]
 #[utoipa::path(
     responses(
         (
@@ -322,6 +324,7 @@ pub async fn get_model_PN(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 }
 
 /// This retrieves a RegNet AMR based on model id.
+#[allow(non_snake_case)]
 #[utoipa::path(
     responses(
         (
@@ -337,6 +340,7 @@ pub async fn get_model_RN(path: web::Path<i64>, config: web::Data<Config>) -> Ht
 }
 
 /// This returns a PetriNet AMR from a gromet.
+#[allow(non_snake_case)]
 #[utoipa::path(
     request_body = ModuleCollection,
     responses(
@@ -357,6 +361,7 @@ pub async fn model2PN(
 }
 
 /// This returns a RegNet AMR from a gromet.
+#[allow(non_snake_case)]
 #[utoipa::path(
     request_body = ModuleCollection,
     responses(

@@ -1,0 +1,63 @@
+---
+c:
+  '
+  (comment) @single
+  (
+    (comment) @multi
+    (#match? @multi "/[*](.|\n)*?[*]/")
+  )
+  ( (comment)@docstring_body . (declaration declarator: (function_declarator declarator: (identifier)@docstring_name)) )
+  (function_definition declarator: (function_declarator declarator: (identifier)@docstring_name) body: (compound_statement . (comment) @docstring_body))
+  '
+cpp: 
+  '
+  (comment) @single
+  (
+    (comment) @multi
+    (#match? @multi "/[*](.|\n)*?[*]/")
+  )
+  ( (comment)@docstring_body . (declaration declarator: (function_declarator declarator: (identifier)@docstring_name)) )
+  (function_definition declarator: (function_declarator declarator: (identifier)@docstring_name) body: (compound_statement . (comment) @docstring_body))
+  '
+fortran:
+  '
+  (comment) @single
+  (
+    (comment) @multi_partial . (comment)+ @multi_partial 
+  )
+  (
+    (comment) @docstring_body
+    .
+    [(subroutine (subroutine_statement name: (name) @docstring_name)) (function (function_statement name: (name) @docstring_name))] 
+  )
+  (
+    (comment)@docstring_body_partial . (comment)+ @docstring_body_partial 
+    .
+    [(subroutine (subroutine_statement name: (name) @docstring_name)) (function (function_statement name: (name) @docstring_name))] 
+  )
+  '
+matlab:
+  '
+  (comment) @single
+  (
+    (comment) @multi
+    (#match? @multi "/[*](.|\n)*?[*]/")
+  )
+  (function_definition)
+  '
+python:
+  '
+  (comment) @single
+  (expression_statement (string) @multi) 
+  (function_definition name: (identifier) @docstring_name body: (block (expression_statement (string) @docstring_body)))
+  '
+r:
+  '
+  (comment) @single
+  (
+    (comment) @multi_partial . (comment)+ @multi_partial
+  )
+  (
+    (function_definition (brace_list (comment) @docstring_body))
+  )
+  '
