@@ -461,7 +461,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             };
             let initials = Initial {
                 target: ode.lhs_var.to_string().clone(),
-                expression: format!("{}", ode.lhs_var.to_string().clone()),
+                expression: format!("{}0", ode.lhs_var.to_string().clone()),
                 ..Default::default()
             };
             let parameters = Parameter {
