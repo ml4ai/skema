@@ -233,8 +233,8 @@ jobs:
     - name: Generate Dockerfile (TR)
       working-directory: ./skema/text_reading/scala
       env:
-        #APP_VERSION=${{needs.app_version.outputs.app_version}}
-        APP_VERSION=${{needs.app_version.outputs.commit}}
+        #APP_VERSION: ${{needs.app_version.outputs.app_version}}
+        APP_VERSION: ${{needs.app_version.outputs.commit}}
       run: |
         sbt "webapp/docker:stage"
     - name: Tags for image (TR)
