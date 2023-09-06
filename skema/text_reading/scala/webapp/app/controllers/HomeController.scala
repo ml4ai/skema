@@ -1,5 +1,7 @@
 package controllers
 
+import ai.lum.common.ConfigUtils._
+import com.typesafe.config.{Config, ConfigFactory}
 import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention}
 import org.clulab.pdf2txt.document.logical.DocumentByWord
 import org.clulab.processors.{Document, Sentence}
@@ -51,6 +53,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
 
   logger.info("Completed Initialization ...")
 
+
+  // config
+  val config = ConfigFactory.load()
+  val appVersion: String = config[String]("skema.version")
+
   // -----------------------------------------------------------------
   // Home page
   // -----------------------------------------------------------------
@@ -58,6 +65,11 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   def index() = Action { implicit request: Request[AnyContent] =>
     Ok(views.html.index())
   }
+
+  /**
+   * Returns the App version using the APP_VERSION ENV variable.
+   */
+  def version() = Action { Ok(appVersion) }
 
   def parseSentence(sent: String, showEverything: Boolean) = Action {
     val (doc, eidosMentions) = processPlayText(sent)
