@@ -51,7 +51,7 @@ class PetriNetLinker(AMRLinker):
                         for desc in descs:
                             ret[f&#34;{val[&#39;name&#39;].strip()}: {desc}&#34;] = val
                     ret[val[&#39;name&#39;].strip()] = val
-            elif name == &#34;parameters&#34;:
+            elif name == &#34;parameters&#34; and &#39;id&#39; in val:
                 ret[val[&#39;id&#39;].strip()] = val
             # elif name == &#34;transitions&#34;:
             #     if &#34;description&#34; in val:
@@ -101,7 +101,7 @@ inheritance.</p></div>
                         for desc in descs:
                             ret[f&#34;{val[&#39;name&#39;].strip()}: {desc}&#34;] = val
                     ret[val[&#39;name&#39;].strip()] = val
-            elif name == &#34;parameters&#34;:
+            elif name == &#34;parameters&#34; and &#39;id&#39; in val:
                 ret[val[&#39;id&#39;].strip()] = val
             # elif name == &#34;transitions&#34;:
             #     if &#34;description&#34; in val:
