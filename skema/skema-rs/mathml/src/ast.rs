@@ -31,6 +31,7 @@ pub enum Type {
 pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
+    //pub func_of: Option<Vec<Ci>>,
 }
 
 #[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
