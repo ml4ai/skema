@@ -1,4 +1,4 @@
-from skema.program_analysis.PyAST2CAST.builtin_map import(
+from skema.program_analysis.CAST.pythonAST.builtin_map import(
     build_map,
     dump_map
 )

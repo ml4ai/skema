@@ -65,6 +65,7 @@ pub fn get_line_span(
     }
 }
 
+#[allow(non_snake_case)]
 pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE> {
     let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
@@ -117,6 +118,7 @@ pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
 
 // this function finds the core dynamics and returns a vector of
 // node id's that meet the criteria for identification
+#[allow(clippy::if_same_then_else)]
 pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     let graph = subgraph2petgraph(module_id, host);
     // 1. find each function node
@@ -173,6 +175,7 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     core_id
 }
 
+#[allow(non_snake_case)]
 pub fn subgrapg2_core_dyn_MET_ast(
     root_node_id: i64,
     host: &str,
@@ -320,7 +323,6 @@ pub fn subgraph2_core_dyn_ast(
 
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
-        println!("expr: {:?}", expr.clone());
         for node_index in expr.clone().node_indices() {
             if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
@@ -336,18 +338,19 @@ pub fn subgraph2_core_dyn_ast(
     Ok((core_dynamics, metadata_map))
 }
 
+#[allow(non_snake_case)]
 fn tree_2_MET_ast(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
 ) -> Result<FirstOrderODE, MgError> {
     let mut fo_eq_vec = Vec::<FirstOrderODE>::new();
-    let mut math_vec = Vec::<MathExpressionTree>::new();
+    let _math_vec = Vec::<MathExpressionTree>::new();
     let mut lhs = Vec::<Ci>::new();
     if graph[root_node].labels == ["Opo"] {
         // we first construct the derivative of the first node
         let deriv_name: &str = &graph[root_node].properties["name"].to_string();
         // this will let us know if additional trimming is needed to handle the code implementation of the equations
-        let mut step_impl = false;
+        // let mut step_impl = false; this will be used for step implementaion for later
         // This is very bespoke right now
         // this check is for if it's leibniz notation or not, will need to expand as more cases are creating,
         // currently we convert to leibniz form
@@ -358,7 +361,7 @@ fn tree_2_MET_ast(
             };
             lhs.push(deriv);
         } else {
-            step_impl = true;
+            // step_impl = true; this will be used for step implementaion for later
             let deriv = Ci {
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
@@ -369,7 +372,7 @@ fn tree_2_MET_ast(
             if graph[node].labels == ["Primitive"] {
                 let operate = get_operator_MET(graph.clone(), node); // output -> Operator
                 let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
-                let mut rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
+                let rhs = MathExpressionTree::Cons(operate, rhs_arg); // MathExpressionTree
                 let rhs_flat = flatten_mults(rhs.clone());
                 let fo_eq = FirstOrderODE {
                     lhs_var: lhs[0].clone(),
@@ -385,14 +388,21 @@ fn tree_2_MET_ast(
     Ok(fo_eq_vec[0].clone())
 }
 
+#[allow(non_snake_case)]
 pub fn get_args_MET(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
 ) -> Vec<MathExpressionTree> {
     let mut args = Vec::<MathExpressionTree>::new();
+    let mut arg_order = Vec::<i64>::new();
 
-    // first need to check for operator
+    // idea construct a vector of edge labels for the arguments
+    // construct vector of math expressions
+    // reorganize based on edge labels vector
+
+    // construct vecs
     for node in graph.neighbors_directed(root_node, Outgoing) {
+        // first need to check for operator
         if graph[node].labels == ["Primitive"] {
             let operate = get_operator_MET(graph.clone(), node); // output -> Operator
             let rhs_arg = get_args_MET(graph.clone(), node); // output -> Vec<MathExpressionTree>
@@ -403,15 +413,34 @@ pub fn get_args_MET(
             let temp_string = graph[node].properties["name"].to_string().clone();
             let arg2 = MathExpressionTree::Atom(MathExpression::Mi(Mi(graph[node].properties
                 ["name"]
-                .to_string()[1..(temp_string.len() - 1 as usize)]
+                .to_string()[1..(temp_string.len() - 1_usize)]
                 .to_string())));
             args.push(arg2.clone());
         }
+        // construct order of args
+        if let rsmgclient::Value::Int(x) = graph
+            .edge_weight(graph.find_edge(root_node, node).unwrap())
+            .unwrap()
+            .clone()
+            .properties["index"]
+        {
+            arg_order.push(x);
+        }
     }
-    args
+
+    // fix order of args
+    let mut ordered_args = args.clone();
+    for (i, ind) in arg_order.iter().enumerate() {
+        // the ind'th element of order_args is the ith element of the unordered args
+        let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
+    }
+
+    ordered_args
 }
 
 // this gets the operator from the node name
+#[allow(non_snake_case)]
+#[allow(clippy::if_same_then_else)]
 pub fn get_operator_MET(
     graph: petgraph::Graph<rsmgclient::Node, rsmgclient::Relationship>,
     root_node: NodeIndex,
@@ -675,9 +704,8 @@ fn distribute_args(
     mut arg2: Vec<MathExpression>,
 ) -> Vec<MathExpression> {
     let mut arg_dist = Vec::<MathExpression>::new();
-    let mut arg2_term_ind = Vec::<i32>::new();
 
-    arg2_term_ind = terms_indicies(arg2.clone());
+    let arg2_term_ind = terms_indicies(arg2.clone());
 
     // check if need to swap operator signs
     /* Is this running properly, not removing Mo(Other("'USub'")) in I equation in SIR */
@@ -933,7 +961,7 @@ fn trim_un_named(
                     bypass[0],
                     bypass[1],
                     graph
-                        .edge_weight(graph.find_edge(node_index, bypass[1]).unwrap())
+                        .edge_weight(graph.find_edge(bypass[0], node_index).unwrap())
                         .unwrap()
                         .clone(),
                 );
@@ -949,7 +977,7 @@ fn trim_un_named(
                         bypass[i],
                         bypass[end_node_idx],
                         graph
-                            .edge_weight(graph.find_edge(node_index, bypass[end_node_idx]).unwrap())
+                            .edge_weight(graph.find_edge(bypass[i], node_index).unwrap())
                             .unwrap()
                             .clone(),
                     );

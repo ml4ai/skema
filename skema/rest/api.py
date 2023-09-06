@@ -1,15 +1,16 @@
 from fastapi import FastAPI, Response, status
+from fastapi.responses import PlainTextResponse
 import os
 from skema.rest import (
     schema,
     workflows,
     integrated_text_reading_proxy,
     morae_proxy,
-    comments_proxy, metal_proxy,
+    metal_proxy,
 )
 from skema.img2mml import eqn2mml
 from skema.skema_py import server as code2fn
-
+from skema.program_analysis.comment_extractor import server as comment_service
 
 VERSION: str = os.environ.get("APP_VERSION", "????")
 
@@ -98,7 +99,7 @@ app.include_router(
 )
 
 app.include_router(
-    comments_proxy.router,
+    comment_service.router,
     prefix="/code2fn",
     tags=["code2fn", "skema-rs"],
 )
@@ -124,7 +125,7 @@ app.include_router(
 
 @app.get("/version", tags=["core"], summary="API version")
 async def version() -> str:
-    return VERSION
+    return PlainTextResponse(VERSION)
 
 
 @app.get(

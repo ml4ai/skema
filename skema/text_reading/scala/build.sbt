@@ -17,6 +17,7 @@ libraryDependencies ++= {
     "org.scalanlp"               %% "breeze-natives"                      % breezeVer,
     "org.scalanlp"               %% "breeze-viz"                          % breezeVer,
     "ai.lum"                     %% "common"                              % "0.0.10",
+    "org.clulab"                  % "climatechange-model-unigram-ser"     % "1.0.0",
     "org.clulab"                 %% "epidemiology-embeddings-model-ser"   % "1.0.0",
     "org.clulab"                  % "spaceweather-model-unigram-ser"      % "1.0.0",
     "org.clulab"                  % "glove-840b-300d"                     % "0.1.0" % Test,

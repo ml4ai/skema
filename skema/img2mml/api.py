@@ -10,6 +10,8 @@ from typing import Tuple, List, Any, Dict
 from logging import info
 from skema.img2mml.translate import define_model
 import json
+from PIL import Image
+from io import BytesIO
 
 
 def retrieve_model(model_path=None) -> str:
@@ -180,9 +182,42 @@ class Image2MathML:
         # Load the image2mathml model
         MODEL_PATH = retrieve_model(model_path=model_path)
         img2mml_model: Image2MathML_Xfmer = load_model(
-            model_path=MODEL_PATH, config=self.config, vocab=self.vocab, device=self.device
+            model_path=MODEL_PATH,
+            config=self.config,
+            vocab=self.vocab,
+            device=self.device,
         )
         return img2mml_model
+
+
+def replace_transparent_background(image_bytes: bytes) -> bytes:
+    """
+    Replace transparent background with white if the image has transparency.
+
+    Args:
+        image_bytes (bytes): Bytes of the input image.
+
+    Returns:
+        bytes: Bytes of the processed image with replaced background.
+    """
+    # Open the image using PIL
+    image = Image.open(BytesIO(image_bytes))
+
+    # Check if the image has an alpha (transparency) channel
+    if image.mode in ("RGBA", "LA") and image.getchannel("A"):
+        # Create a new image with white background
+        new_image = Image.new("RGB", image.size, (255, 255, 255))
+        new_image.paste(
+            image, mask=image.split()[3]
+        )  # Paste the original image on the new image with alpha mask
+        # Save the new image to bytes
+        output_bytes = BytesIO()
+        new_image.save(output_bytes, format="PNG")
+        return output_bytes.getvalue()
+    else:
+        # If the image does not have transparency, return the original image data
+        return image_bytes
+
 
 def get_mathml_from_bytes(
     data: bytes,
@@ -202,6 +237,8 @@ def get_mathml_from_bytes(
     Returns:
         str: The MathML representation of the input image.
     """
+    # replace transparent background with white if the image has transparency
+    data = replace_transparent_background(data)
     # convert png image to tensor
     imagetensor = convert_to_torch_tensor(data, image2mathml_db.config)
 
@@ -209,7 +246,13 @@ def get_mathml_from_bytes(
     # to (1, C_in, H, w) [batch =1]
     imagetensor = imagetensor.unsqueeze(0)
 
-    return render_mml(image2mathml_db.model, image2mathml_db.vocab_itos, image2mathml_db.vocab_stoi, imagetensor, image2mathml_db.device)
+    return render_mml(
+        image2mathml_db.model,
+        image2mathml_db.vocab_itos,
+        image2mathml_db.vocab_stoi,
+        imagetensor,
+        image2mathml_db.device,
+    )
 
 
 def get_mathml_from_file(filepath) -> str:

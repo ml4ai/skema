@@ -2,17 +2,18 @@ package org.ml4ai.skema.text_reading.grounding
 
 import breeze.linalg.DenseVector
 import MiraEmbeddingsGrounder.generateNormalizedEmbedding
+import org.clulab.processors.Processor
+import org.clulab.processors.clu.CluProcessor
 
 import scala.collection.mutable
 // to import all packages in linalg
 import org.clulab.embeddings.{CompactWordEmbeddingMap, ExplicitWordEmbeddingMap, WordEmbeddingMap}
-import org.clulab.processors.clu.CluProcessor
 import org.clulab.utils.{FileUtils, InputStreamer, MED, Serializer}
 import ujson.Arr
 
 import java.io.File
 
-class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, alpha: Float) extends Grounder {
+class MiraEmbeddingsGrounder(processor: Processor, groundingConcepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, alpha: Float) extends Grounder {
 
   /**
    * Returns an ordered sequence with the top k grounding candidates for the input
@@ -24,7 +25,7 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
   override def groundingCandidates(texts: Seq[String], k: Int = 5): Seq[Seq[GroundingCandidate]] = texts map {
     text =>
       // Generate the embedding of text
-      val queryEmbedding = generateNormalizedEmbedding(text, embeddingsModel)
+      val queryEmbedding = generateNormalizedEmbedding(processor, text, embeddingsModel)
       // Normalize the query embedding to speed up the cosine similarity computation
       WordEmbeddingMap.norm(queryEmbedding)
 
@@ -75,7 +76,11 @@ class MiraEmbeddingsGrounder(groundingConcepts:Seq[GroundingConcept], embeddings
 
 object MiraEmbeddingsGrounder{
 
-  val processor = new CluProcessor()
+  // This is held in reserve and only created if necessary.
+  lazy val processor = {
+    new CluProcessor()
+  }
+
   /**
    * Parse the MIRA json file into our indexed sequence of GroundingConcepts
    * @param path to the json file with the ontology
@@ -136,9 +141,11 @@ object MiraEmbeddingsGrounder{
   def loadWordEmbeddingsFromResource(resourcePath:String): WordEmbeddingMap = {
     val inputStreamer = new InputStreamer(this)
     val inputStream = inputStreamer.getResourceAsStream(resourcePath)
-    val buildType = CompactWordEmbeddingMap.loadSer(inputStream)
+    val buildType: CompactWordEmbeddingMap.BuildType = CompactWordEmbeddingMap.loadSer(inputStream)
+    //  val wordEmbeddingsMap = new CompactWordEmbeddingMap(buildType)
+    val wordEmbeddingsMap = new MemoryMappedWordEmbeddingMap(buildType)
 
-    new CompactWordEmbeddingMap(buildType)
+    wordEmbeddingsMap
   }
 
 
@@ -147,8 +154,9 @@ object MiraEmbeddingsGrounder{
    * @param ontologyFile file containing the json file with MIRA concepts
    * @param wordEmbeddingsFile file containing the word embedding model
    */
-  def apply(ontologyPath: String, embeddingsModelResourcePath:String, lambda : Float, alpha : Float, relevantNamespaces:Set[String]): MiraEmbeddingsGrounder = {
-
+  def apply(ontologyPath: String, embeddingsModelResourcePath:String, lambda : Float, alpha : Float, relevantNamespaces:Set[String],
+      processorOpt: Option[Processor] = None): MiraEmbeddingsGrounder = {
+    val processor = processorOpt.getOrElse(this.processor)
     val embeddingsModel = loadWordEmbeddingsFromResource(embeddingsModelResourcePath)
 
     val ontology =
@@ -161,14 +169,14 @@ object MiraEmbeddingsGrounder{
         val json = FileUtils.getTextFromResource(ontologyPath)
         val ontology = filterRelevantTerms(parseMiraJson(json), relevantNamespaces)
 
-        val ontologyWithEmbeddings = createOntologyEmbeddings(ontology, embeddingsModel, lambda)
+        val ontologyWithEmbeddings = createOntologyEmbeddings(processor, ontology, embeddingsModel, lambda)
 //        val newFileName = ontologyPath.getAbsolutePath + ".ser"
 //        Serializer.save(ontologyWithEmbeddings, newFileName)
         ontologyWithEmbeddings
       }
 
 
-    new MiraEmbeddingsGrounder(ontology, embeddingsModel, alpha)
+    new MiraEmbeddingsGrounder(processor, ontology, embeddingsModel, alpha)
   }
 
   def averageEmbeddings(wordEmbeddings: Array[Array[Float]]): Array[Float] = {
@@ -177,7 +185,7 @@ object MiraEmbeddingsGrounder{
     embeddingsSum.map(_ / size)
   }
 
-  def generateNormalizedEmbedding(name: String, embeddings: WordEmbeddingMap): Array[Float] = {
+  def generateNormalizedEmbedding(processor: Processor, name: String, embeddings: WordEmbeddingMap): Array[Float] = {
     // Tokenize the string
     val tokens = processor.mkDocument(name.toLowerCase).sentences.head.words
 
@@ -191,17 +199,17 @@ object MiraEmbeddingsGrounder{
     averageEmbeddings(wordEmbeddings)
   }
 
-  def addEmbeddingToConcept(concept: GroundingConcept, embeddingsModel: WordEmbeddingMap, lambda : Float): GroundingConcept = {
+  def addEmbeddingToConcept(processor: Processor, concept: GroundingConcept, embeddingsModel: WordEmbeddingMap, lambda : Float): GroundingConcept = {
 
-    val embedding = generateNormalizedEmbedding(concept.name.toLowerCase, embeddingsModel)
+    val embedding = generateNormalizedEmbedding(processor, concept.name.toLowerCase, embeddingsModel)
 
     val descEmbeddings = concept.description match {
-      case Some(description) => List(generateNormalizedEmbedding(description.toLowerCase, embeddingsModel))
+      case Some(description) => List(generateNormalizedEmbedding(processor, description.toLowerCase, embeddingsModel))
       case None => Nil
     }
 
     val synEmbeddings = concept.synonyms match {
-      case Some(synonyms) => synonyms.map(s => generateNormalizedEmbedding(s.toLowerCase, embeddingsModel))
+      case Some(synonyms) => synonyms.map(s => generateNormalizedEmbedding(processor, s.toLowerCase, embeddingsModel))
       case None => Nil
     }
 
@@ -222,7 +230,7 @@ object MiraEmbeddingsGrounder{
     )
   }
 
-  def createOntologyEmbeddings(concepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, lambda : Float):Seq[GroundingConcept] = {
-    concepts.map(concept => addEmbeddingToConcept(concept, embeddingsModel, lambda))
+  def createOntologyEmbeddings(processor: Processor, concepts:Seq[GroundingConcept], embeddingsModel:WordEmbeddingMap, lambda : Float):Seq[GroundingConcept] = {
+    concepts.map(concept => addEmbeddingToConcept(processor, concept, embeddingsModel, lambda))
   }
 }

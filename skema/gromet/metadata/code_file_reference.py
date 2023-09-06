@@ -30,20 +30,23 @@ class CodeFileReference(object):
     swagger_types = {
         'uid': 'str',
         'name': 'str',
-        'path': 'str'
+        'path': 'str',
+        'source_string' : 'str'
     }
 
     attribute_map = {
         'uid': 'uid',
         'name': 'name',
-        'path': 'path'
+        'path': 'path',
+        'source_string' : 'source_string'
     }
 
-    def __init__(self, uid=None, name=None, path=None):  # noqa: E501
+    def __init__(self, uid=None, name=None, path=None, source_string=None):  # noqa: E501
         """CodeFileReference - a model defined in Swagger"""  # noqa: E501
         self._uid = None
         self._name = None
         self._path = None
+        self._source_string = None
         self.discriminator = None
         if uid is not None:
             self.uid = uid
@@ -51,6 +54,8 @@ class CodeFileReference(object):
             self.name = name
         if path is not None:
             self.path = path
+        if source_string is not None:
+            self._source_string = source_string
 
     @property
     def uid(self):
@@ -120,6 +125,29 @@ class CodeFileReference(object):
         """
 
         self._path = path
+
+    @property
+    def source_string(self):
+        """Gets the source_string of this CodeFileReference.  # noqa: E501
+
+        source_string for CodeFileReference  # noqa: E501
+
+        :return: The source_string of this CodeFileReference.  # noqa: E501
+        :rtype: str
+        """
+        return self._source_string
+
+    @source_string.setter
+    def source_string(self, source_string):
+        """Sets the source_string of this CodeFileReference.
+
+        source_string for CodeFileReference  # noqa: E501
+
+        :param source_string: The source_string of this CodeFileReference.  # noqa: E501
+        :type: str
+        """
+
+        self._source_string = source_string
 
     def to_dict(self):
         """Returns the model properties as a dict"""

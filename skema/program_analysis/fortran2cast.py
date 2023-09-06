@@ -8,7 +8,7 @@ from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
 
-from skema.program_analysis.TS2CAST.ts2cast import TS2CAST
+from skema.program_analysis.CAST.fortran.ts2cast import TS2CAST
 
 from typing import Optional
 
