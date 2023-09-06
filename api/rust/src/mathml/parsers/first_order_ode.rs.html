@@ -1020,6 +1020,27 @@
 <a href="#1020" id="1020">1020</a>
 <a href="#1021" id="1021">1021</a>
 <a href="#1022" id="1022">1022</a>
+<a href="#1023" id="1023">1023</a>
+<a href="#1024" id="1024">1024</a>
+<a href="#1025" id="1025">1025</a>
+<a href="#1026" id="1026">1026</a>
+<a href="#1027" id="1027">1027</a>
+<a href="#1028" id="1028">1028</a>
+<a href="#1029" id="1029">1029</a>
+<a href="#1030" id="1030">1030</a>
+<a href="#1031" id="1031">1031</a>
+<a href="#1032" id="1032">1032</a>
+<a href="#1033" id="1033">1033</a>
+<a href="#1034" id="1034">1034</a>
+<a href="#1035" id="1035">1035</a>
+<a href="#1036" id="1036">1036</a>
+<a href="#1037" id="1037">1037</a>
+<a href="#1038" id="1038">1038</a>
+<a href="#1039" id="1039">1039</a>
+<a href="#1040" id="1040">1040</a>
+<a href="#1041" id="1041">1041</a>
+<a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::operator::Operator::{Add, Divide, Multiply, Subtract};
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Atom;
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Cons;
@@ -2041,5 +2062,26 @@
 
     <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">&quot;S&quot;</span>);
     <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(/ (* (* (- β) I) S) N)&quot;</span>);
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_msub_derivative() {
+    test_parser(
+        <span class="string">&quot;&lt;mfrac&gt;
+        &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;msub&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;/msub&gt;&lt;/mrow&gt;
+        &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;
+        &lt;/mfrac&gt;&quot;</span>,
+        first_order_derivative_leibniz_notation,
+        (
+            Derivative::new(<span class="number">1</span>, <span class="number">1</span>),
+            Ci::new(
+                <span class="prelude-val">None</span>,
+                Box::new(MathExpression::Msub(
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;v&quot;</span>.to_string()))),
+                )),
+            ),
+        ),
+    );
 }
 </code></pre></div></section></main></body></html>

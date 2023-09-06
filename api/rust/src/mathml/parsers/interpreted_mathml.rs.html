@@ -178,6 +178,7 @@
 <a href="#178" id="178">178</a>
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -268,6 +269,7 @@
             r#type: <span class="prelude-val">Some</span>(Type::Function),
             content,
         }),
+        ci_subscript,
     )))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((
         <span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>),
