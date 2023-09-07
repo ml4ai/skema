@@ -2,7 +2,7 @@ import NativePackagerHelper._
 import com.typesafe.sbt.packager.MappingsHelper.directory
 import com.typesafe.sbt.packager.docker.{Cmd, CmdLike, DockerChmodType, DockerPermissionStrategy}
 
-val topDir = "/skema/webapp"
+val topDir = "/skema/text_reading/webapp"
 val appDir = topDir + "/app"
 val binDir = appDir + "/bin/" // The second half is determined by the plug-in.  Don't change.
 val app = binDir + "webapp"
@@ -24,7 +24,10 @@ Docker / mappings := (Docker / mappings).value.filter { case (_, string) =>
 Docker / packageName := "skema-webapp"
 Docker / version := tag
 // set our version based on our env variable
-dockerEnvVars ++= Map(("APP_VERSION", scala.util.Properties.envOrElse("APP_VERSION", "???")))
+dockerEnvVars ++= Map(
+  "APP_VERSION" -> scala.util.Properties.envOrElse("APP_VERSION", "???"),
+  "APPLICATION_SECRET" -> "this-is-not-a-secure-key-please-change-me"
+)
 dockerAdditionalPermissions += (DockerChmodType.UserGroupPlusExecute, app)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
 // dockerCmd := Seq(s"-Dhttp.port=$port")
