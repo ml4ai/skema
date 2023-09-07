@@ -252,6 +252,18 @@ jobs:
           type=ref,event=tag
           # short commit hash
           type=sha
+    # The TR image is huge.
+    # We need to fee up every last bit of space we can.
+    - name: Free Disk Space
+      uses: jlumbroso/free-disk-space@v1.2.0
+      with:
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+        tool-cache: false
     - name: Build and push image (TR)
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
