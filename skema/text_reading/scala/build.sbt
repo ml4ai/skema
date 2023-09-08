@@ -19,7 +19,7 @@ libraryDependencies ++= {
     "ai.lum"                     %% "common"                              % "0.0.10",
     "org.clulab"                  % "climatechange-model-unigram-ser"     % "1.0.0",
     "org.clulab"                 %% "epidemiology-embeddings-model-ser"   % "1.0.0",
-    "org.clulab"                  % "spaceweather-model-unigram-ser"      % "1.0.0",
+//    "org.clulab"                  % "spaceweather-model-unigram-ser"      % "1.0.0",
     "org.clulab"                  % "glove-840b-300d"                     % "0.1.0" % Test,
     "org.clulab"                 %% "pdf2txt"                             % "1.1.3",
     "com.typesafe.play"          %% "play-json"                           % "2.9.3",
