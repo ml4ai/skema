@@ -179,6 +179,9 @@
 <a href="#179" id="179">179</a>
 <a href="#180" id="180">180</a>
 <a href="#181" id="181">181</a>
+<a href="#182" id="182">182</a>
+<a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -199,7 +202,7 @@
 <span class="kw">use </span>nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::{map, opt},
+    combinator::{map, opt, value},
     multi::{many0, many1},
     sequence::{delimited, pair, preceded, terminated, tuple},
 };
@@ -286,9 +289,12 @@
     <span class="comment">// Get number of dots to recognize the order of the derivative
     </span><span class="kw">let </span>n_dots = delimited(
         <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
-        map(many1(nom::character::complete::char(<span class="string">&#39;˙&#39;</span>)), |x| {
-            x.len() <span class="kw">as </span>u8
-        }),
+        alt((
+            map(many1(nom::character::complete::char(<span class="string">&#39;˙&#39;</span>)), |x| {
+                x.len() <span class="kw">as </span>u8
+            }),
+            value(<span class="number">1_u8</span>, tag(<span class="string">&quot;&amp;#x02D9;&quot;</span>)),
+        )),
         <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
     );
 
