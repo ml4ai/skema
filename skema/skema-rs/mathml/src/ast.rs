@@ -31,15 +31,15 @@ pub enum Type {
 pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
-    //pub func_of: Option<Vec<Ci>>,
+    pub func_of: Option<Vec<Ci>>,
 }
 
-#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+/*#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
 pub struct BoundVariables {
     pub func_var: Ci,
     pub func_of: Vec<Ci>,
 }
-
+*/
 /// The MathExpression enum represents the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
@@ -65,7 +65,7 @@ pub enum MathExpression {
     MoLine(String),
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
-    BoundVariables(Ci, Vec<Ci>),
+    //  BoundVariables(Ci, Vec<Ci>),
     #[default]
     None,
 }
@@ -74,7 +74,19 @@ impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             MathExpression::Mi(Mi(identifier)) => write!(f, "{}", identifier),
-            MathExpression::Ci(Ci { r#type: _, content }) => write!(f, "{}", content),
+            MathExpression::Ci(Ci {
+                r#type: _,
+                content,
+                func_of,
+            }) => {
+                write!(f, "{}", content);
+                for vec in func_of {
+                    for v in vec {
+                        write!(f, "{}", v.content);
+                    }
+                }
+                Ok(())
+            }
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
                 write!(f, "{base}^{{{superscript}}}")
