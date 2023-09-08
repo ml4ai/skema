@@ -183,9 +183,10 @@ impl MathExpression {
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
                             println!("cossss");
                             tokens.push(MathExpression::Mo(Operator::Cos));
-                            for vec in x.func_of {
+                            for vec in x.func_of.clone() {
                                 for v in vec {
-                                    v.flatten(tokens);
+                                    tokens.push(MathExpression::Ci(v));
+                                    //v.flatten(tokens);
                                 }
                             }
                         } else if x.content == Box::new(MathExpression::Mi(Mi("sin".to_string()))) {
