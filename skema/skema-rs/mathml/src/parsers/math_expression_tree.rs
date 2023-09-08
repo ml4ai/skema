@@ -30,17 +30,18 @@ impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
-                write!(f, "{}", x.content);
-                write!(f, "(")?;
+                write!(f, "{}", x.content)?;
                 for func in x.func_of.iter() {
+                    write!(f, "(")?;
                     for (i, v) in func.iter().enumerate() {
                         if i > 0 {
                             write!(f, ",")?;
                         }
                         write!(f, "{}", v.content)?
                     }
+                    write!(f, ")")?;
                 }
-                write!(f, ")")
+                Ok(())
             }
             MathExpressionTree::Atom(i) => write!(f, "{}", i),
             MathExpressionTree::Cons(head, rest) => {

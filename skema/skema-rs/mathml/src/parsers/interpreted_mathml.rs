@@ -70,6 +70,8 @@ pub fn ci_univariate_with_bounds(input: Span) -> IResult<Ci> {
     ))
 }
 
+/// Parse content identifiers
+/// Example: S
 pub fn ci_univariate_without_bounds(input: Span) -> IResult<Ci> {
     let (s, Mi(x)) = mi(input)?;
     Ok((
@@ -83,6 +85,7 @@ pub fn ci_univariate_without_bounds(input: Span) -> IResult<Ci> {
 }
 
 /// Parse identifiers corresponding to univariate functions for ordinary derivatives
+/// such that it can identify content identifiers with and without parenthesis identifiers.
 pub fn ci_univariate_func(input: Span) -> IResult<Ci> {
     let (s, (x, bound_vars)) =
         tuple((mi, alt((parenthesized_identifier, empty_parenthesis))))(input)?;
@@ -142,12 +145,14 @@ pub fn ci_unknown_with_bounds(input: Span) -> IResult<Ci> {
 }
 
 /// Parse a content identifier of unknown type.
+/// Example: S
 pub fn ci_unknown_without_bounds(input: Span) -> IResult<Ci> {
     let (s, x) = mi(input)?;
     Ok((s, Ci::new(None, Box::new(MathExpression::Mi(x)), None)))
 }
 
-/// Parse a content identifier of unknown type for ordinary derivatives..
+/// Parse a content identifier of unknown type for ordinary derivatives.
+/// such that it can identify content identifiers with and without parenthesis identifiers.
 pub fn ci_unknown(input: Span) -> IResult<Ci> {
     println!(".....input={:?}", input);
     let (s, (x, bound_vars)) = pair(mi, alt((parenthesized_identifier, empty_parenthesis)))(input)?;
@@ -370,18 +375,13 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        map(
-            ci_unknown_without_bounds,
-            |Ci {
-                 content, func_of, ..
-             }| {
-                MathExpression::Ci(Ci {
-                    r#type: Some(Type::Real),
-                    content,
-                    func_of: None,
-                })
-            },
-        ),
+        map(ci_unknown_without_bounds, |Ci { content, .. }| {
+            MathExpression::Ci(Ci {
+                r#type: Some(Type::Real),
+                content,
+                func_of: None,
+            })
+        }),
         map(operator, MathExpression::Mo),
         mn,
         superscript,

@@ -45,7 +45,7 @@ pub struct FirstOrderODE {
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
 
-    pub func_of: Option<Vec<Ci>>,
+    pub func_of: Vec<Ci>, //Option<Vec<Ci>>,
 
     pub with_respect_to: Ci,
     /// An expression tree corresponding to the RHS of the ODE.
@@ -61,7 +61,18 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         newtonian_derivative,
     ))(s)?;
     //let ci = binding.content;
-    let parenthesized = ci.func_of.clone();
+    //let parenthesized = ci.func_of.clone();
+    let mut parenthesized: Vec<Ci> = Vec::new();
+    for ci_vec in ci.func_of.clone().iter() {
+        //for bvar in ci_vec.clone().iter() {
+        if let Some(bounds) = Some(ci_vec.clone()) {
+            for bvar in bounds {
+                parenthesized.push(bvar);
+            }
+        }
+        //}
+    }
+
     let bvar = derivative.bound_var;
 
     // Recognize equals sign
@@ -977,7 +988,7 @@ fn test_ci_univariate_func2() {
         "<mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>",
         ci_unknown_with_bounds,
         Ci::new(
-            Some(Type::Function),
+            None,
             Box::new(MathExpression::Mi(Mi("S".to_string()))),
             Some(vec![Ci::new(
                 Some(Type::Real),
@@ -1077,11 +1088,12 @@ fn test_first_order_ode() {
     println!(">>>>>>>>>rhs={:?}", rhs);
     println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
     //println!(">>>>>>>>>lhs_var.1={:?}", lhs_var);
-    //println!(">>>>>>>>>func_of={:?}", func_of[0]);
+    println!(">>>>>>>>>func_of[0]={:?}", func_of[0]);
+    println!(">>>>>>>>>func_of={:?}", func_of);
     println!(">>>>>>>>>with_respect_to={:?}", with_respect_to);
     println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
-    //assert_eq!(func_of, "t");
+    assert_eq!(func_of[0].to_string(), "t");
     assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 
