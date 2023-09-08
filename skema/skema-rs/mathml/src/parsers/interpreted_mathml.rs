@@ -7,7 +7,7 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        BoundVariables, Ci, Math, MathExpression, Mi, Mrow, Type,
+        Ci, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
         add, attribute, comma, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup,
@@ -18,9 +18,9 @@ use crate::{
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::{map, map_opt, opt},
+    combinator::{map, opt},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, terminated, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -132,7 +132,7 @@ pub fn ci_unknown_with_bounds(input: Span) -> IResult<Ci> {
     let (s, (x, bound_vars)) = pair(mi, parenthesized_identifier)(input)?;
     let mut ci_func_of: Vec<Ci> = Vec::new();
     for bvar in bound_vars {
-        let mut b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
+        let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
     Ok((
@@ -153,7 +153,7 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
     let (s, (x, bound_vars)) = pair(mi, alt((parenthesized_identifier, empty_parenthesis)))(input)?;
     let mut ci_func_of: Vec<Ci> = Vec::new();
     for bvar in bound_vars {
-        let mut b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
+        let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
     Ok((
@@ -194,12 +194,13 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
         );
         ci_func_of.push(b.clone());
     }*/
-    let ci_func_of = func.func_of;
     //let binding = BoundVariables::new(func, ci_func_of);
     for ci_vec in func.func_of.iter() {
         for (indx, bvar) in ci_vec.iter().enumerate() {
             println!("indx={}, bvar = {:?}", indx, bvar);
-            if Some(bvar.content) == Some(Box::new(MathExpression::Mi(with_respect_to))) {
+            if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
+            {
                 println!("Match successful");
 
                 return Ok((
@@ -218,32 +219,37 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                     ),
                 ));
             }
+            //}
+            //}
+            else if Some(bvar.content.clone())
+                == Some(Box::new(MathExpression::Mi(Mi("".to_string()))))
+            {
+                return Ok((
+                    s,
+                    (
+                        Derivative::new(
+                            1,
+                            1,
+                            Ci::new(
+                                Some(Type::Real),
+                                Box::new(MathExpression::Mi(with_respect_to)),
+                                None,
+                            ),
+                        ),
+                        func,
+                    ),
+                ));
+            }
         }
     }
 
-    /*if func.func_of[0] == Mi("".to_string()) {
-        return Ok((
-            s,
-            (
-                Derivative::new(
-                    1,
-                    1,
-                    Ci::new(
-                        Some(Type::Real),
-                        Box::new(MathExpression::Mi(with_respect_to)),
-                    ),
-                ),
-                binding,
-            ),
-        ));
-    }*/
     Err(nom::Err::Error(ParseError::new(
         "Unable to match  function_of  with with_respect_to".to_string(),
         input,
     )))
 }
 
-pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, BoundVariables)> {
+pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     // Get number of dots to recognize the order of the derivative
     let n_dots = delimited(
         stag!("mo"),
@@ -253,7 +259,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, BoundVariables)
         etag!("mo"),
     );
 
-    let (s, (x, order)) = delimited(
+    let (s, (func, order)) = delimited(
         stag!("mover"),
         pair(
             map(
@@ -272,14 +278,29 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, BoundVariables)
         ),
         etag!("mover"),
     )(input)?;
-    let (s, func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)?;
+    let (s, mi_func_of) = alt((parenthesized_identifier, empty_parenthesis))(s)?;
     let mut ci_func_of: Vec<Ci> = Vec::new();
-    for bvar in func_of {
-        let mut b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)));
+    for bvar in mi_func_of {
+        let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
-    let binding = BoundVariables::new(x, ci_func_of);
-    let mut new_with_respect_to = with_respect_to[0].clone();
+    //let binding = BoundVariables::new(x, ci_func_of);
+    let mut new_with_respect_to: Box<MathExpression> = Box::new(MathExpression::Ci(Ci {
+        r#type: None,
+        content: Box::new(MathExpression::Mi(Mi("".to_string()))),
+        func_of: None,
+    }));
+    //if let Some(with_respect_to) = Some(func.func_of) {
+
+    for ci_vec in func.func_of.iter() {
+        for (indx, bvar) in ci_vec.iter().enumerate() {
+            println!("indx={}, bvar = {:?}", indx, bvar);
+            if let Some(with_respect_to) = Some(bvar.content.clone()) {
+                println!("Match successful");
+                let new_with_respect_to = with_respect_to;
+            }
+        }
+    }
     Ok((
         s,
         (
@@ -288,10 +309,12 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, BoundVariables)
                 1,
                 Ci::new(
                     Some(Type::Real),
-                    Box::new(MathExpression::Mi(new_with_respect_to)),
+                    //Box::new(MathExpression::Mi(new_with_respect_to)),
+                    new_with_respect_to,
+                    None,
                 ),
             ),
-            binding,
+            func,
         ),
     ))
 }
@@ -321,32 +344,44 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        map(ci_univariate_with_bounds, |(Ci { content, .. }, vars)| {
-            MathExpression::BoundVariables(
-                Ci {
+        map(
+            ci_univariate_with_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
                     r#type: Some(Type::Real),
                     content,
-                },
-                vars,
-            )
-        }),
+                    func_of,
+                })
+            },
+        ),
         map(ci_univariate_without_bounds, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
-        map(ci_unknown_with_bounds, |(Ci { content, .. }, vars)| {
-            MathExpression::BoundVariables(
-                Ci {
+        map(
+            ci_unknown_with_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
                     r#type: Some(Type::Real),
                     content,
-                },
-                vars,
-            )
-        }),
-        map(ci_unknown_without_bounds, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(Type::Real),
-                content,
-            })
-        }),
+                    func_of,
+                })
+            },
+        ),
+        map(
+            ci_unknown_without_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
+                    r#type: Some(Type::Real),
+                    content,
+                    func_of: None,
+                })
+            },
+        ),
         map(operator, MathExpression::Mo),
         mn,
         superscript,

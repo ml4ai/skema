@@ -3,9 +3,9 @@
 
 use crate::ast::{
     operator::{Derivative, Operator},
-    MathExpression,
+    Ci, MathExpression,
     MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msub},
-    Mi,
+    Mi, Type,
 };
 use crate::petri_net::{Polarity, Var};
 
@@ -40,6 +40,7 @@ pub fn recognize_leibniz_differential_operator<'a>(
         }
     }
 
+    let mut denom_var = String::new();
     if let MathExpression::Mrow(denom_expressions) = denominator {
         // Check if first element of denominator is an mi
         if let MathExpression::Mi(Mi(denom_id)) = &denom_expressions.0[0] {
@@ -51,13 +52,24 @@ pub fn recognize_leibniz_differential_operator<'a>(
                 denominator_contains_partial = true;
             }
         }
+        if let MathExpression::Mi(Mi(with_respect_to)) = &denom_expressions.0[1] {
+            denom_var.push_str(with_respect_to);
+        }
     }
 
     if (numerator_contains_d && denominator_contains_d)
         || (numerator_contains_partial && denominator_contains_partial)
     {
         Ok((
-            Operator::new_derivative(Derivative::new(1, 1)),
+            Operator::new_derivative(Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
+                    None,
+                ),
+            )),
             function_candidate.unwrap(),
         ))
     } else {

@@ -4,15 +4,14 @@ use crate::parsers::math_expression_tree::MathExpressionTree::Cons;
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        BoundVariables, Ci, MathExpression, Type,
+        Ci, MathExpression, Type,
     },
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
-            ci_univariate_func, ci_univariate_with_bounds, ci_univariate_without_bounds,
-            ci_unknown_with_bounds, ci_unknown_without_bounds,
-            first_order_derivative_leibniz_notation, math_expression, newtonian_derivative,
-            operator,
+            ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
+            ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
+            newtonian_derivative, operator,
         },
         math_expression_tree::MathExpressionTree,
     },
@@ -46,7 +45,7 @@ pub struct FirstOrderODE {
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
 
-    pub func_of: Vec<Ci>,
+    pub func_of: Option<Vec<Ci>>,
 
     pub with_respect_to: Ci,
     /// An expression tree corresponding to the RHS of the ODE.
@@ -57,12 +56,12 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     let (s, _) = stag!("math")(input)?;
 
     // Recognize LHS derivative
-    let (s, (derivative, binding)) = alt((
+    let (s, (derivative, ci)) = alt((
         first_order_derivative_leibniz_notation,
         newtonian_derivative,
     ))(s)?;
-    let ci = binding.func_var;
-    let parenthesized = binding.func_of;
+    //let ci = binding.content;
+    let parenthesized = ci.func_of.clone();
     let bvar = derivative.bound_var;
 
     // Recognize equals sign
@@ -70,31 +69,38 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
 
     // Recognize other tokens
     let (s, remaining_tokens) = many1(alt((
-        map(ci_univariate_with_bounds, |(Ci { content, .. }, vars)| {
-            MathExpression::BoundVariables(
-                Ci {
+        map(
+            ci_univariate_with_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
                     r#type: Some(Type::Function),
                     content,
-                },
-                vars,
-            )
-        }),
+                    func_of,
+                })
+            },
+        ),
         map(ci_univariate_without_bounds, MathExpression::Ci),
         map(ci_unknown_without_bounds, |Ci { content, .. }| {
             MathExpression::Ci(Ci {
                 r#type: Some(Type::Function),
                 content,
+                func_of: None,
             })
         }),
-        map(ci_unknown_with_bounds, |(Ci { content, .. }, vars)| {
-            MathExpression::BoundVariables(
-                Ci {
+        map(
+            ci_unknown_with_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
                     r#type: Some(Type::Function),
                     content,
-                },
-                vars,
-            )
-        }),
+                    func_of,
+                })
+            },
+        ),
         map(operator, MathExpression::Mo),
         math_expression,
     )))(s)?;
@@ -113,9 +119,8 @@ impl FirstOrderODE {
     pub fn to_cmml(&self) -> String {
         let lhs_expression_tree = MathExpressionTree::Cons(
             Operator::Derivative(Derivative::new(1, 1, self.with_respect_to.clone())),
-            vec![MathExpressionTree::Atom(MathExpression::BoundVariables(
+            vec![MathExpressionTree::Atom(MathExpression::Ci(
                 self.lhs_var.clone(),
-                self.func_of.clone(),
             ))],
         );
         let combined = MathExpressionTree::Cons(
@@ -954,15 +959,14 @@ fn test_ci_univariate_func() {
     test_parser(
         "<mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>",
         ci_univariate_with_bounds,
-        (
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi("S".to_string()))),
-            ),
-            vec![Ci::new(
+        Ci::new(
+            Some(Type::Function),
+            Box::new(MathExpression::Mi(Mi("S".to_string()))),
+            Some(vec![Ci::new(
                 Some(Type::Real),
                 Box::new(MathExpression::Mi(Mi("t".to_string()))),
-            )],
+                None,
+            )]),
         ),
     );
 }
@@ -971,31 +975,19 @@ fn test_ci_univariate_func() {
 fn test_ci_univariate_func2() {
     test_parser(
         "<mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>",
-        ci_univariate_func,
-        (
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi("S".to_string()))),
-            ),
-            vec![Mi("t".to_string())],
+        ci_unknown_with_bounds,
+        Ci::new(
+            Some(Type::Function),
+            Box::new(MathExpression::Mi(Mi("S".to_string()))),
+            Some(vec![Ci::new(
+                Some(Type::Real),
+                Box::new(MathExpression::Mi(Mi("t".to_string()))),
+                None,
+            )]),
         ),
     );
 }
 
-#[test]
-fn test_ci_univariate_func3() {
-    test_parser(
-        "<msub><mi>S</mi><mi>t</mi></msub>",
-        ci_univariate_func,
-        (
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi("S".to_string()))),
-            ),
-            vec![Mi("t".to_string())],
-        ),
-    );
-}
 #[test]
 fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() {
     test_parser(
@@ -1011,18 +1003,18 @@ fn test_first_order_derivative_leibniz_notation_with_implicit_time_dependence() 
                 Ci::new(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
+                    None,
                 ),
             ),
-            BoundVariables::new(
-                Ci::new(
-                    Some(Type::Function),
-                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
-                ),
+            Ci::new(
+                Some(Type::Function),
+                Box::new(MathExpression::Mi(Mi("S".to_string()))),
                 //vec![Mi("".to_string())],
-                vec![Ci::new(
+                Some(vec![Ci::new(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
-                )],
+                    None,
+                )]),
             ),
         ),
     );
@@ -1043,17 +1035,17 @@ fn test_first_order_derivative_leibniz_notation_with_explicit_time_dependence() 
                 Ci::new(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
+                    None,
                 ),
             ),
-            BoundVariables::new(
-                Ci::new(
-                    Some(Type::Function),
-                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
-                ),
-                vec![Ci::new(
+            Ci::new(
+                Some(Type::Function),
+                Box::new(MathExpression::Mi(Mi("S".to_string()))),
+                Some(vec![Ci::new(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
-                )],
+                    None,
+                )]),
             ),
         ),
     );
@@ -1085,7 +1077,7 @@ fn test_first_order_ode() {
     println!(">>>>>>>>>rhs={:?}", rhs);
     println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
     //println!(">>>>>>>>>lhs_var.1={:?}", lhs_var);
-    println!(">>>>>>>>>func_of={:?}", func_of[0]);
+    //println!(">>>>>>>>>func_of={:?}", func_of[0]);
     println!(">>>>>>>>>with_respect_to={:?}", with_respect_to);
     println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
@@ -1114,7 +1106,7 @@ fn test_first_order_ode() {
 
     println!(">>>>>>>>>rhs={:?}", rhs);
     println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
-    println!(">>>>>>>>>func_of={:?}", func_of[0]);
+    //println!(">>>>>>>>>func_of={:?}", func_of[0]);
     println!(">>>>>>>>>with_respect_to={:?}", with_respect_to);
     println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
@@ -1138,20 +1130,20 @@ fn test_msub_derivative() {
                 Ci::new(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("t".to_string()))),
+                    None,
                 ),
             ),
-            BoundVariables::new(
-                Ci::new(
-                    None,
-                    Box::new(MathExpression::Msub(
-                        Box::new(MathExpression::Mi(Mi("S".to_string()))),
-                        Box::new(MathExpression::Mi(Mi("v".to_string()))),
-                    )),
-                ),
-                vec![Ci::new(
+            Ci::new(
+                None,
+                Box::new(MathExpression::Msub(
+                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
+                    Box::new(MathExpression::Mi(Mi("v".to_string()))),
+                )),
+                Some(vec![Ci::new(
                     Some(Type::Real),
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
-                )],
+                    None,
+                )]),
             ),
         ),
     );

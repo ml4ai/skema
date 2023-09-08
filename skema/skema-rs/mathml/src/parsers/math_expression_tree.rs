@@ -30,16 +30,15 @@ impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
-                write!(f, "{}", x.content)
-            }
-            MathExpressionTree::Atom(MathExpression::BoundVariables(ci_comp, vec_ci)) => {
-                write!(f, "{}", ci_comp.content)?;
+                write!(f, "{}", x.content);
                 write!(f, "(")?;
-                for (i, v) in vec_ci.iter().enumerate() {
-                    if i > 0 {
-                        write!(f, ",")?;
+                for func in x.func_of.iter() {
+                    for (i, v) in func.iter().enumerate() {
+                        if i > 0 {
+                            write!(f, ",")?;
+                        }
+                        write!(f, "{}", v.content)?
                     }
-                    write!(f, "{}", v.content)?
                 }
                 write!(f, ")")
             }
@@ -63,13 +62,11 @@ impl MathExpressionTree {
             MathExpressionTree::Atom(i) => match i {
                 MathExpression::Ci(x) => {
                     content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
-                }
-                MathExpression::BoundVariables(ci_comp, vec_ci) => {
-                    println!("---------------------------");
-                    //if let MathExpression::Ci(x) = ci_comp {
-                    content_mathml.push_str(&format!("<ci>{}</ci>", ci_comp.content));
-                    for vec in vec_ci {
-                        content_mathml.push_str(&format!("<ci>{}</ci>", vec.content));
+
+                    for func in x.func_of.iter() {
+                        for v in func {
+                            content_mathml.push_str(&format!("<ci>{}</ci>", v.content));
+                        }
                     }
                     //}
                     //println!("ci{:?}", ci);
@@ -186,24 +183,15 @@ impl MathExpression {
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
                             println!("cossss");
                             tokens.push(MathExpression::Mo(Operator::Cos));
+                            for vec in x.func_of {
+                                for v in vec {
+                                    v.flatten(tokens);
+                                }
+                            }
                         } else if x.content == Box::new(MathExpression::Mi(Mi("sin".to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Sin));
                         } else {
                             element.flatten(tokens);
-                        }
-                    } else if let MathExpression::BoundVariables(x, y) = element {
-                        if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
-                            println!("cossss!!!!");
-                            tokens.push(MathExpression::Mo(Operator::Cos));
-                        }
-                        println!("y={:?}", y);
-                        println!("y[0]={:?}", y[0]);
-                        //y.flatten(tokens);
-
-                        for comp in y {
-                            println!("comp={:?}", comp);
-                            comp.content.flatten(tokens);
-                            //tokens.push(comp);
                         }
                     } else {
                         element.flatten(tokens);
@@ -495,7 +483,7 @@ fn test_conversion() {
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
-    println!("func_of[0]={:?}", func_of[0]);
+    //println!("func_of[0]={:?}", func_of[0]);
     //assert_eq!(func_of[0].to_string(), "");
     assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
