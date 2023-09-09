@@ -18,7 +18,7 @@ use crate::{
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    combinator::{map, opt},
+    combinator::{map, opt, value},
     multi::{many0, many1},
     sequence::{delimited, pair, preceded, terminated, tuple},
 };
@@ -105,9 +105,12 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     // Get number of dots to recognize the order of the derivative
     let n_dots = delimited(
         stag!("mo"),
-        map(many1(nom::character::complete::char('˙')), |x| {
-            x.len() as u8
-        }),
+        alt((
+            map(many1(nom::character::complete::char('˙')), |x| {
+                x.len() as u8
+            }),
+            value(1_u8, tag("&#x02D9;")),
+        )),
         etag!("mo"),
     );
 

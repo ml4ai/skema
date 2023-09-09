@@ -1041,3 +1041,18 @@ fn test_msub_derivative() {
         ),
     );
 }
+
+#[test]
+fn test_unicode_newtonian_derivative() {
+    test_parser(
+        "<mover><mi>S</mi><mo>&#x02D9;</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo>",
+        newtonian_derivative,
+        (
+            Derivative::new(1, 1),
+            Ci::new(
+                Some(Type::Function),
+                Box::new(MathExpression::Mi(Mi("S".to_string()))),
+            ),
+        ),
+    );
+}
