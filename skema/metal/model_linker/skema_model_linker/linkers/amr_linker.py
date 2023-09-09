@@ -4,7 +4,7 @@ from collections import defaultdict
 from typing import Iterable, Dict, List, Any, Tuple, Optional, Union
 
 import torch
-from askem_extractions.data_model import Attribute, AnchoredExtraction, AttributeCollection, AttributeType
+from askem_extractions.data_model import Attribute, AnchoredEntity, AttributeCollection, AttributeType
 from sentence_transformers import SentenceTransformer, util
 
 from ..walkers import JsonNode, JsonDictWalker
@@ -46,13 +46,13 @@ class Linker(ABC):
 
         return ret
 
-    def _generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredExtraction]]:
+    def _generate_linking_targets(self, extractions: Iterable[Attribute]) -> Dict[str, List[AnchoredEntity]]:
         """ Will generate candidate texts to link to model elements """
         ret = defaultdict(list)
         for ex in extractions:
-            for name in ex.payload.names:
-                if len(ex.payload.descriptions) > 0:
-                    for desc in ex.payload.descriptions:
+            for name in ex.payload.mentions:
+                if len(ex.payload.text_description) > 0:
+                    for desc in ex.payload.text_description:
                         ret[f"{name.name.strip()}: {desc.source.strip()}"].append(ex)
                         ret[desc.source.strip()].append(ex)
                 else:
