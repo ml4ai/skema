@@ -103,12 +103,12 @@ def load_model(
         else:
             if not torch.cuda.is_available():
                 info("CUDA is not available, falling back to using the CPU.")
-                new_model = dict()
-                for key, value in torch.load(model_path, map_location=device).items():
-                    new_model[key[7:]] = value
-                    model.load_state_dict(new_model, strict=False)
-            else:
-                model.load_state_dict(torch.load(model_path))
+
+            new_model = dict()
+            for key, value in torch.load(model_path, map_location=device).items():
+                new_model[key[7:]] = value
+                model.load_state_dict(new_model, strict=False)
+
     except FileNotFoundError:
         raise FileNotFoundError(f"Model state dictionary file not found: {model_path}")
     except Exception as e:
