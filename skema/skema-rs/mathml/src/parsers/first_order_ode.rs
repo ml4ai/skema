@@ -1129,11 +1129,7 @@ fn test_first_order_ode() {
 
 #[test]
 fn test_msub_derivative() {
-    test_parser(
-        "<mfrac>
-        <mrow><mi>d</mi><msub><mi>S</mi><mi>v</mi></msub></mrow>
-        <mrow><mi>d</mi><mi>t</mi></mrow>
-        </mfrac>",
+    test_parser("<mfrac><mrow><mi>d</mi><msub><mi>S</mi><mi>v</mi></msub></mrow><mrow><mi>d</mi><mi>t</mi></mrow></mfrac>",
         first_order_derivative_leibniz_notation,
         (
             Derivative::new(
@@ -1146,7 +1142,7 @@ fn test_msub_derivative() {
                 ),
             ),
             Ci::new(
-                None,
+                Some(Type::Function),
                 Box::new(MathExpression::Msub(
                     Box::new(MathExpression::Mi(Mi("S".to_string()))),
                     Box::new(MathExpression::Mi(Mi("v".to_string()))),

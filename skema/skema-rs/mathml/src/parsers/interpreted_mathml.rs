@@ -110,6 +110,22 @@ pub fn ci_subscript(input: Span) -> IResult<Ci> {
     Ok((s, Ci::new(None, Box::new(x), None)))
 }
 
+/// Parse contest identifier for Msub corresponding to univariate functions for ordinary
+/// derivatives
+pub fn ci_subscript_func(input: Span) -> IResult<Ci> {
+    let (s, (x, bound_vars)) =
+        tuple((msub, alt((parenthesized_identifier, empty_parenthesis))))(input)?;
+    let mut ci_func_of: Vec<Ci> = Vec::new();
+    for bvar in bound_vars {
+        let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
+        ci_func_of.push(b.clone());
+    }
+    Ok((
+        s,
+        Ci::new(Some(Type::Function), Box::new(x), Some(ci_func_of)),
+    ))
+}
+
 /// Parse content identifier for Msup
 pub fn superscript(input: Span) -> IResult<MathExpression> {
     let (s, x) = msup(input)?;
@@ -184,6 +200,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                 }
             },
         ),
+        ci_subscript_func,
     )))(s)?;
     let (s, with_respect_to) = delimited(
         tuple((etag!("mrow"), stag!("mrow"), d)),
@@ -201,6 +218,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
     }*/
     //let binding = BoundVariables::new(func, ci_func_of);
     for ci_vec in func.func_of.iter() {
+        println!("---------");
         for (indx, bvar) in ci_vec.iter().enumerate() {
             println!("indx={}, bvar = {:?}", indx, bvar);
             if Some(bvar.content.clone())
@@ -223,10 +241,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                         func,
                     ),
                 ));
-            }
-            //}
-            //}
-            else if Some(bvar.content.clone())
+            } else if Some(bvar.content.clone())
                 == Some(Box::new(MathExpression::Mi(Mi("".to_string()))))
             {
                 return Ok((
