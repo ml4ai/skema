@@ -80,16 +80,18 @@ class Linker(ABC):
         ret = defaultdict(list)
         for ex in extractions:
             for name in ex.payload.mentions:
-                if len(ex.payload.text_description) &gt; 0:
-                    for desc in ex.payload.text_description:
-                        ret[f&#34;{name.name.strip()}: {desc.source.strip()}&#34;].append(ex)
-                        ret[desc.source.strip()].append(ex)
+                if len(ex.payload.text_descriptions) &gt; 0:
+                    for desc in ex.payload.text_descriptions:
+                        ret[f&#34;{name.name.strip()}: {desc.description.strip()}&#34;].append(ex)
+                        ret[desc.description.strip()].append(ex)
                 else:
                     candidate_text = f&#34;{name.name.strip()}&#34;
                     ret[candidate_text].append(ex)
         return ret
+
     @abc.abstractmethod
-    def link_model_to_text_extractions(self, data: Union[Any,Dict[str, Any]], extractions: AttributeCollection) -&gt; Dict[str, Any]:
+    def link_model_to_text_extractions(self, data: Union[Any, Dict[str, Any]], extractions: AttributeCollection) -&gt; \
+    Dict[str, Any]:
         pass
 
 
@@ -101,7 +103,7 @@ class AMRLinker(Linker, ABC):
         data = {**data}
 
         targets = self._generate_linking_targets(
-            e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
+            e for e in extractions.attributes if e.type == AttributeType.anchored_entity)
 
         walker = self._build_walker(data)
 
@@ -119,7 +121,7 @@ class AMRLinker(Linker, ABC):
                 t.amr_element_id = source[&#39;id&#39;]
 
         # Serialize the attribute collection to json, after alignment
-        attribute_dict = extractions.dict(exclude_unset=True)
+        attribute_dict = extractions.model_dump(exclude_unset=True)
         data[&#34;metadata&#34;] = attribute_dict
 
         return data</code></pre>
@@ -153,7 +155,7 @@ inheritance.</p></div>
         data = {**data}
 
         targets = self._generate_linking_targets(
-            e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
+            e for e in extractions.attributes if e.type == AttributeType.anchored_entity)
 
         walker = self._build_walker(data)
 
@@ -171,7 +173,7 @@ inheritance.</p></div>
                 t.amr_element_id = source[&#39;id&#39;]
 
         # Serialize the attribute collection to json, after alignment
-        attribute_dict = extractions.dict(exclude_unset=True)
+        attribute_dict = extractions.model_dump(exclude_unset=True)
         data[&#34;metadata&#34;] = attribute_dict
 
         return data</code></pre>
@@ -203,7 +205,7 @@ inheritance.</p></div>
     data = {**data}
 
     targets = self._generate_linking_targets(
-        e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
+        e for e in extractions.attributes if e.type == AttributeType.anchored_entity)
 
     walker = self._build_walker(data)
 
@@ -221,7 +223,7 @@ inheritance.</p></div>
             t.amr_element_id = source[&#39;id&#39;]
 
     # Serialize the attribute collection to json, after alignment
-    attribute_dict = extractions.dict(exclude_unset=True)
+    attribute_dict = extractions.model_dump(exclude_unset=True)
     data[&#34;metadata&#34;] = attribute_dict
 
     return data</code></pre>
@@ -281,16 +283,18 @@ inheritance.</p></div>
         ret = defaultdict(list)
         for ex in extractions:
             for name in ex.payload.mentions:
-                if len(ex.payload.text_description) &gt; 0:
-                    for desc in ex.payload.text_description:
-                        ret[f&#34;{name.name.strip()}: {desc.source.strip()}&#34;].append(ex)
-                        ret[desc.source.strip()].append(ex)
+                if len(ex.payload.text_descriptions) &gt; 0:
+                    for desc in ex.payload.text_descriptions:
+                        ret[f&#34;{name.name.strip()}: {desc.description.strip()}&#34;].append(ex)
+                        ret[desc.description.strip()].append(ex)
                 else:
                     candidate_text = f&#34;{name.name.strip()}&#34;
                     ret[candidate_text].append(ex)
         return ret
+
     @abc.abstractmethod
-    def link_model_to_text_extractions(self, data: Union[Any,Dict[str, Any]], extractions: AttributeCollection) -&gt; Dict[str, Any]:
+    def link_model_to_text_extractions(self, data: Union[Any, Dict[str, Any]], extractions: AttributeCollection) -&gt; \
+    Dict[str, Any]:
         pass</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -313,7 +317,8 @@ inheritance.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@abc.abstractmethod
-def link_model_to_text_extractions(self, data: Union[Any,Dict[str, Any]], extractions: AttributeCollection) -&gt; Dict[str, Any]:
+def link_model_to_text_extractions(self, data: Union[Any, Dict[str, Any]], extractions: AttributeCollection) -&gt; \
+Dict[str, Any]:
     pass</code></pre>
 </details>
 </dd>

@@ -93,7 +93,7 @@ inheritance.</p></div>
         data = {**data}
 
         targets = self._generate_linking_targets(
-            e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
+            e for e in extractions.attributes if e.type == AttributeType.anchored_entity)
 
         walker = self._build_walker(data)
 
@@ -111,7 +111,7 @@ inheritance.</p></div>
                 t.amr_element_id = source[&#39;id&#39;]
 
         # Serialize the attribute collection to json, after alignment
-        attribute_dict = extractions.dict(exclude_unset=True)
+        attribute_dict = extractions.model_dump(exclude_unset=True)
         data[&#34;metadata&#34;] = attribute_dict
 
         return data</code></pre>
@@ -143,7 +143,7 @@ inheritance.</p></div>
     data = {**data}
 
     targets = self._generate_linking_targets(
-        e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
+        e for e in extractions.attributes if e.type == AttributeType.anchored_entity)
 
     walker = self._build_walker(data)
 
@@ -161,7 +161,7 @@ inheritance.</p></div>
             t.amr_element_id = source[&#39;id&#39;]
 
     # Serialize the attribute collection to json, after alignment
-    attribute_dict = extractions.dict(exclude_unset=True)
+    attribute_dict = extractions.model_dump(exclude_unset=True)
     data[&#34;metadata&#34;] = attribute_dict
 
     return data</code></pre>
