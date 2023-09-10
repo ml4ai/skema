@@ -99,6 +99,22 @@ def copy_image(img_src, img_dst):
     except:
         return False
 
+def areAligned(mml, latex):
+    # checking if mml and latex represents same image
+    begin = mml.find('alttext=') + len("alttext=") + 2
+    end = mml.find('>') - 2
+    _mml = mml[begin:end].strip()
+    _mml = _mml.replace("\\\\", "\\")
+    _latex = latex.strip()
+
+    flag = False
+    if _mml.replace(" ", "") != _latex.replace(" ",""):
+        if abs(len(_mml.split()) - len(_latex.split())) <= 10:
+            flag = True
+    else:
+        flag = True
+
+    return flag
 
 def prepare_dataset(args):
     i, ap = args
@@ -107,33 +123,40 @@ def prepare_dataset(args):
         root,
         f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
     )
-
+    latex_path = os.path.join(
+        root,
+        f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+    )
     mml = open(mml_path).readlines()[0]
-    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
-        mml
-    )
+    latex = open(latex_path).readlines()[0]
 
-    cwd = os.getcwd()
-    cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
-    output = subprocess.Popen(
-        cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-    )
-    my_timer = Timer(5, kill, [output])
+    if areAligned(mml, latex):
+        open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
+            mml
+        )
 
-    try:
-        my_timer.start()
-        stdout, stderr = output.communicate()
+        cwd = os.getcwd()
+        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
+        output = subprocess.Popen(
+            cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+        )
+        my_timer = Timer(5, kill, [output])
 
-    except:
-        if verbose:
-            lock.acquire()
-            print("current status: ", counter_dist_dict)
-            print(f"taking too long time. skipping {ap} equation...")
-            lock.release()
+        try:
+            my_timer.start()
+            stdout, stderr = output.communicate()
 
-    finally:
-        my_timer.cancel()
+        except:
+            if verbose:
+                lock.acquire()
+                print("current status: ", counter_dist_dict)
+                print(f"taking too long time. skipping {ap} equation...")
+                lock.release()
 
+        finally:
+            my_timer.cancel()
+    else:
+        pass
 
 def get_bin(af):
     try:
