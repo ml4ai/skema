@@ -93,21 +93,13 @@ def load_model(
             cwd / "trained_models" / "arxiv_im2mml_with_fonts_with_boldface_best.pt"
         )
     try:
-        # if state_dict keys has "module.<key_name>"
-        # we need to remove the "module." from key_names
-        if config["clean_state_dict"]:
-            new_model = dict()
-            for key, value in torch.load(model_path, map_location=device).items():
-                new_model[key[7:]] = value
-                model.load_state_dict(new_model, strict=False)
-        else:
-            if not torch.cuda.is_available():
-                info("CUDA is not available, falling back to using the CPU.")
+        if not torch.cuda.is_available():
+            info("CUDA is not available, falling back to using the CPU.")
 
-            new_model = dict()
-            for key, value in torch.load(model_path, map_location=device).items():
-                new_model[key[7:]] = value
-                model.load_state_dict(new_model, strict=False)
+        new_model = dict()
+        for key, value in torch.load(model_path, map_location=device).items():
+            new_model[key[7:]] = value
+            model.load_state_dict(new_model, strict=False)
 
     except FileNotFoundError:
         raise FileNotFoundError(f"Model state dictionary file not found: {model_path}")
