@@ -270,7 +270,7 @@ def restart_mathjax_server():
 def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
     global lock, pause_event
     lock.acquire()
-    print(mml_path + f"/{file_name}.xml")
+    # print(mml_path + f"/{file_name}.xml")
     # Open the file for reading
     with open("statistical_results.txt", "r") as f:
         # Read the first line and split it into a list of strings
