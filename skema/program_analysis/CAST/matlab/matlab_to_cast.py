@@ -59,6 +59,7 @@ class MATLAB2CAST(object):
         # get a tree-sitter tree based on source input
         matlab_tree_builder = MATLAB_TREE_BUILDER()
         self.tree = matlab_tree_builder.get_tree(self.source)
+        self.tree.root_node = matlab_tree_builder.clean_nodes(self.tree.root_node)
 
         print('\nSYNTAX TREE: ')
         matlab_tree_builder.traverse_tree(self.tree)
