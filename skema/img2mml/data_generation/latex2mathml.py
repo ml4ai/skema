@@ -429,7 +429,7 @@ def mjxmml(file_name, folder, eqn, type_of_folder, mml_path):
 
     # To avoid the buffer issue from MathJax, 
     # restart the service once processing 1000 equations
-    if equation_counter.value % 1000 == 0:
+    if equation_counter.value % 10000 == 0:
         pause_event.clear()
         restart_mathjax_server()
         time.sleep(3)

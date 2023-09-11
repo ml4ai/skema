@@ -101,8 +101,6 @@ def copy_image(img_src, img_dst):
 
 def areAligned(mml, latex):
     # checking if mml and latex represents same image
-    begin = mml.find('alttext=') + len("alttext=") + 2
-    end = mml.find('>') - 2
     _mml = mml[begin:end].strip()
     _mml = _mml.replace("\\\\", "\\")
     _latex = latex.strip()
