@@ -1085,13 +1085,7 @@ fn test_first_order_ode() {
         with_respect_to,
         rhs,
     } = input.parse::<FirstOrderODE>().unwrap();
-    println!(">>>>>>>>>rhs={:?}", rhs);
-    println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
-    //println!(">>>>>>>>>lhs_var.1={:?}", lhs_var);
-    println!(">>>>>>>>>func_of[0]={:?}", func_of[0]);
-    println!(">>>>>>>>>func_of={:?}", func_of);
-    println!(">>>>>>>>>with_respect_to={:?}", with_respect_to);
-    println!(">>>>>>>>>rhs={:?}", rhs.to_string());
+
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(func_of[0].to_string(), "t");
     assert_eq!(with_respect_to.to_string(), "t");
@@ -1116,13 +1110,8 @@ fn test_first_order_ode() {
         rhs,
     } = input.parse::<FirstOrderODE>().unwrap();
 
-    println!(">>>>>>>>>rhs={:?}", rhs);
-    println!(">>>>>>>>>lhs_var={:?}", lhs_var.to_string());
-    //println!(">>>>>>>>>func_of={:?}", func_of[0]);
-    println!(">>>>>>>>>with_respect_to={:?}", with_respect_to);
-    println!(">>>>>>>>>rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "S");
-    //assert_eq!(func_of.to_string(), "");
+    assert_eq!(func_of[0].to_string(), "");
     assert_eq!(with_respect_to.to_string(), "");
     assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 }

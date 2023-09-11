@@ -86,9 +86,6 @@ impl MathExpressionTree {
                             }
                         }
                     }
-                    //}
-                    //println!("ci{:?}", ci);
-                    //println!("vec_mi{:?}", vec_mi);
                 }
                 MathExpression::Mi(Mi(id)) => {
                     content_mathml.push_str(&format!("<ci>{}</ci>", id));
@@ -195,16 +192,13 @@ impl MathExpression {
             MathExpression::Mrow(Mrow(elements)) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for element in elements {
-                    println!("elements[0]={:?}", elements[0]);
                     if let MathExpression::Ci(x) = element {
-                        println!("x.content={:?}", x.content);
+                        // Handles cos and sin as operators
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
-                            println!("cossss");
                             tokens.push(MathExpression::Mo(Operator::Cos));
                             for vec in x.func_of.clone() {
                                 for v in vec {
                                     tokens.push(MathExpression::Ci(v));
-                                    //v.flatten(tokens);
                                 }
                             }
                         } else if x.content == Box::new(MathExpression::Mi(Mi("sin".to_string()))) {
@@ -217,7 +211,6 @@ impl MathExpression {
                     }
                 }
                 tokens.push(MathExpression::Mo(Operator::Rparen));
-                println!("-----tokens = {:?}", tokens);
             }
             // Insert implicit division operators, and wrap numerators and denominators in
             // parentheses for the Pratt parsing algorithm.
@@ -233,7 +226,6 @@ impl MathExpression {
             MathExpression::Msup(base, superscript) => {
                 if let MathExpression::Mi(b) = &**base {
                     if b == &Mi("e".to_string()) {
-                        println!("------ b = {:?}", b);
                         tokens.push(MathExpression::Mo(Operator::Exp));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
                         superscript.flatten(tokens);
@@ -267,14 +259,12 @@ impl Lexer {
         // Flatten mrows and mfracs
         let tokens = input.iter().fold(vec![], |mut acc, x| {
             x.flatten(&mut acc);
-            println!("1111----acc={:?}", acc);
             acc
         });
 
         // Insert implicit multiplication operators.
         let tokens = tokens.iter().fold(vec![], |mut acc, x| {
             if acc.is_empty() {
-                println!("x={:?}", x);
                 acc.push(x);
             } else {
                 match x {
@@ -288,13 +278,11 @@ impl Lexer {
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
                         acc.push(x);
-                        println!("----acc={:?}", acc);
                     }
 
                     // Handle other types of operators.
                     MathExpression::Mo(_) => {
                         acc.push(x);
-                        println!(".... acc={:?}", acc);
                     }
                     // Handle other types of MathExpression objects.
                     t => {
@@ -319,7 +307,6 @@ impl Lexer {
                     }
                 }
             }
-            println!("acc={:?}", acc);
             acc
         });
 
@@ -357,7 +344,6 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
 impl From<Vec<MathExpression>> for MathExpressionTree {
     fn from(input: Vec<MathExpression>) -> Self {
         let x = expr(input);
-        println!(".......expr(input)={:?}", x);
         x
     }
 }
@@ -365,7 +351,6 @@ impl From<Vec<MathExpression>> for MathExpressionTree {
 impl From<Math> for MathExpressionTree {
     fn from(input: Math) -> Self {
         let x = expr(input.content);
-        println!("----------expr(input.content)={:?}", x);
         x
     }
 }
@@ -700,13 +685,11 @@ fn test_content_hackathon2_scenario1_eq8() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let cmml = exp.to_cmml();
-    println!("cmml={:?}", cmml);
-    /*assert_eq!(
+    assert_eq!(
         cmml,
-        "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
-    );*/
+        "<apply><eq/><apply><ci>β</ci></apply><ci>t</ci><apply><times/><ci>κ</ci><apply><ci>m</ci></apply><ci>t</ci></apply></apply>"
+    );
 }
 
 #[test]

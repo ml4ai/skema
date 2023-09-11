@@ -170,7 +170,6 @@ pub fn ci_unknown_without_bounds(input: Span) -> IResult<Ci> {
 /// Parse a content identifier of unknown type for ordinary derivatives.
 /// such that it can identify content identifiers with and without parenthesis identifiers.
 pub fn ci_unknown(input: Span) -> IResult<Ci> {
-    println!(".....input={:?}", input);
     let (s, (x, bound_vars)) = pair(mi, alt((parenthesized_identifier, empty_parenthesis)))(input)?;
     let mut ci_func_of: Vec<Ci> = Vec::new();
     for bvar in bound_vars {
@@ -207,20 +206,9 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
-    //let mut ci_func_of: Vec<Ci> = Vec::new();
-    /*for bvar in func.func_of.iter() {
-        let b = Ci::new(
-            Some(Type::Real),
-            Box::new(MathExpression::Mi(bvar.clone())),
-            None,
-        );
-        ci_func_of.push(b.clone());
-    }*/
-    //let binding = BoundVariables::new(func, ci_func_of);
+
     for ci_vec in func.func_of.iter() {
-        println!("---------");
         for (indx, bvar) in ci_vec.iter().enumerate() {
-            println!("indx={}, bvar = {:?}", indx, bvar);
             if Some(bvar.content.clone())
                 == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
             {
@@ -304,20 +292,17 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
         let b = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(bvar)), None);
         ci_func_of.push(b.clone());
     }
-    //let binding = BoundVariables::new(x, ci_func_of);
-    let mut new_with_respect_to: Box<MathExpression> = Box::new(MathExpression::Ci(Ci {
+    let new_with_respect_to: Box<MathExpression> = Box::new(MathExpression::Ci(Ci {
         r#type: None,
         content: Box::new(MathExpression::Mi(Mi("".to_string()))),
         func_of: None,
     }));
-    //if let Some(with_respect_to) = Some(func.func_of) {
 
+    // Loop over vector of `func_of` of type Ci
     for ci_vec in func.func_of.iter() {
-        for (indx, bvar) in ci_vec.iter().enumerate() {
-            println!("indx={}, bvar = {:?}", indx, bvar);
+        for (_, bvar) in ci_vec.iter().enumerate() {
             if let Some(with_respect_to) = Some(bvar.content.clone()) {
-                println!("Match successful");
-                let new_with_respect_to = with_respect_to;
+                let _new_with_respect_to = with_respect_to;
             }
         }
     }
@@ -327,12 +312,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
             Derivative::new(
                 order,
                 1,
-                Ci::new(
-                    Some(Type::Real),
-                    //Box::new(MathExpression::Mi(new_with_respect_to)),
-                    new_with_respect_to,
-                    None,
-                ),
+                Ci::new(Some(Type::Real), new_with_respect_to, None),
             ),
             func,
         ),
