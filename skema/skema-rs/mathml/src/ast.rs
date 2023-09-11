@@ -72,10 +72,10 @@ impl fmt::Display for MathExpression {
                 content,
                 func_of,
             }) => {
-                write!(f, "{}", content);
+                write!(f, "{}", content)?;
                 for vec in func_of {
                     for v in vec {
-                        write!(f, "{}", v.content);
+                        write!(f, "{}", v.content)?;
                     }
                 }
                 Ok(())
