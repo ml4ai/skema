@@ -20,7 +20,7 @@ jobs:
     outputs:
       image-tag: ${{ steps.generate.outputs.tag }}
     steps:
-      - name: Generate apprropriate tag
+      - name: Generate appropriate tag
         id: generate
         run: |
           if [[ '${{ github.ref_type }}' == 'branch' && '${{ github.ref_name }}' == 'main' ]]; then
@@ -39,6 +39,21 @@ jobs:
 
       - name: Show Generated Tag
         run: echo ${{ steps.generate.outputs.tag }}
+
+      - name: Setup JDK (w/ SBT)
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 11
+
+      - name: Generate Dockerfile (Text Reading)
+        working-directory: ./skema/text_reading/scala
+        env:
+          # Use this to set your desired tag;
+          # Alternatively, set this env variable when building the image
+          APP_VERSION: steps.generate.outputs.tag
+        run: |
+          sbt "webapp/docker:stage"
   bake:
     needs:
       - tag-generator

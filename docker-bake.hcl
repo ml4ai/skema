@@ -38,7 +38,7 @@ group "default" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 target "_platforms" {
-  # Currently skema-rs fails to compile on arm64 so we build only for amd at the moment
+  # Currently skema-rs and skema-text-reading fails to compile on arm64 so we build only for amd at the moment
   # platforms = ["linux/amd64", "linux/arm64"]
   platforms = ["linux/amd64"]
 }
@@ -56,7 +56,7 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "./skema/text_reading/scala/"
+  context = "./skema/text_reading/scala/webapp/target/docker/stage/"
   tags = tag("skema-text-reading", "", "")
   dockerfile = "Dockerfile"
 }
