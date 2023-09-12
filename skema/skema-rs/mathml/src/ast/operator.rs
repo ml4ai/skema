@@ -26,8 +26,6 @@ pub enum Operator {
     Power,
     Comma,
     Derivative(Derivative),
-    // Catchall for operators we haven't explicitly defined as enum variants yet.
-    Other(String),
     Sin,
     Cos,
     Tan,
@@ -40,6 +38,8 @@ pub enum Operator {
     Arcsec,
     Arccsc,
     Arccot,
+    // Catchall for operators we haven't explicitly defined as enum variants yet.
+    Other(String),
 }
 
 impl fmt::Display for Operator {
