@@ -39,15 +39,13 @@ jobs:
 
       - name: Show Generated Tag
         run: echo ${{ steps.generate.outputs.tag }}
-
       - name: Setup JDK (w/ SBT)
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
-
       - name: Generate Dockerfile (Text Reading)
-        working-directory: ./skema/text_reading/scala
+        working-directory: text_reading/scala
         env:
           # Use this to set your desired tag;
           # Alternatively, set this env variable when building the image
