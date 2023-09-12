@@ -128,31 +128,31 @@ def prepare_dataset(args):
     mml = open(mml_path).readlines()[0]
     latex = open(latex_path).readlines()[0]
 
-    # if areAligned(mml, latex):
-    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
-        mml
-    )
+    if areAligned(mml, latex):
+        open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
+            mml
+        )
 
-    cwd = os.getcwd()
-    cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
-    output = subprocess.Popen(
-        cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
-    )
-    my_timer = Timer(5, kill, [output])
+        cwd = os.getcwd()
+        cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
+        output = subprocess.Popen(
+            cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE
+        )
+        my_timer = Timer(5, kill, [output])
 
-    try:
-        my_timer.start()
-        stdout, stderr = output.communicate()
+        try:
+            my_timer.start()
+            stdout, stderr = output.communicate()
 
-    except:
-        if verbose:
-            lock.acquire()
-            print("current status: ", counter_dist_dict)
-            print(f"taking too long time. skipping {ap} equation...")
-            lock.release()
+        except:
+            if verbose:
+                lock.acquire()
+                print("current status: ", counter_dist_dict)
+                print(f"taking too long time. skipping {ap} equation...")
+                lock.release()
 
-    finally:
-        my_timer.cancel()
+        finally:
+            my_timer.cancel()
     # else:
     #     pass
 
