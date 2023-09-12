@@ -31,7 +31,7 @@ impl fmt::Display for MathExpressionTree {
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
                 write!(f, "{}", x.content)?;
-                for func in x.func_of.iter() {
+                if let Some(ref func) = x.func_of {
                     write!(f, "(")?;
                     for (i, v) in func.iter().enumerate() {
                         if i > 0 {
@@ -64,21 +64,18 @@ impl MathExpressionTree {
                 MathExpression::Ci(x) => {
                     if x.func_of == None {
                         content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
-                    } else {
-                        for func in x.func_of.iter() {
-                            for v in func {
-                                if v.content == Box::new(MathExpression::Mi(Mi("".to_string()))) {
-                                    content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
-                                } else {
-                                    content_mathml.push_str(&format!(
-                                        "<apply><ci>{}</ci></apply>",
-                                        x.content
-                                    ));
-                                }
+                    } else if let Some(ref func) = x.func_of {
+                        for v in func {
+                            if v.content == Box::new(MathExpression::Mi(Mi("".to_string()))) {
+                                content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
+                            } else {
+                                content_mathml
+                                    .push_str(&format!("<apply><ci>{}</ci></apply>", x.content));
                             }
                         }
                     }
-                    for func in x.func_of.iter() {
+
+                    if let Some(ref func) = x.func_of {
                         for v in func {
                             if v.content == Box::new(MathExpression::Mi(Mi("".to_string()))) {
                             } else {
@@ -343,15 +340,13 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
 
 impl From<Vec<MathExpression>> for MathExpressionTree {
     fn from(input: Vec<MathExpression>) -> Self {
-        let x = expr(input);
-        x
+        expr(input)
     }
 }
 
 impl From<Math> for MathExpressionTree {
     fn from(input: Math) -> Self {
-        let x = expr(input.content);
-        x
+        expr(input.content)
     }
 }
 
@@ -487,8 +482,7 @@ fn test_conversion() {
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
-    //println!("func_of[0]={:?}", func_of[0]);
-    //assert_eq!(func_of[0].to_string(), "");
+    assert_eq!(func_of[0].to_string(), "");
     assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
@@ -507,6 +501,7 @@ fn test_conversion() {
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(func_of[0].to_string(), "t");
     assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
@@ -550,7 +545,14 @@ fn test_content_hackathon2_scenario1_eq1() {
     println!("ode={:?}", ode);
     let cmml = ode.to_cmml();
     println!("cmml={:?}", cmml);
-    // assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
+    let FirstOrderODE {
+        lhs_var,
+        func_of,
+        with_respect_to,
+        rhs,
+    } = first_order_ode(input.into()).unwrap().1;
+    println!("rhs = {:?}", rhs.to_string());
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><apply><ci>S</ci></apply><ci>t</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><apply><ci>I</ci></apply><ci>t</ci></apply><apply><ci>S</ci></apply><ci>t</ci></apply><ci>N</ci></apply></apply>");
 }
 
 #[test]
@@ -711,6 +713,7 @@ fn test_expression2() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let math = exp.to_infix_expression();
+    println!("math = {:?}", math);
     assert_eq!(math, "((α*ρ)*I)");
 }
 

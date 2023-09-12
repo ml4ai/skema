@@ -18,7 +18,6 @@ use crate::{
 };
 
 use derive_new::new;
-use nom::error::context;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -45,7 +44,7 @@ pub struct FirstOrderODE {
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
 
-    pub func_of: Vec<Ci>, //Option<Vec<Ci>>,
+    pub func_of: Vec<Ci>,
 
     pub with_respect_to: Ci,
     /// An expression tree corresponding to the RHS of the ODE.
@@ -63,7 +62,7 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
     //let ci = binding.content;
     //let parenthesized = ci.func_of.clone();
     let mut parenthesized: Vec<Ci> = Vec::new();
-    for ci_vec in ci.func_of.clone().iter() {
+    if let Some(ref ci_vec) = ci.func_of {
         //for bvar in ci_vec.clone().iter() {
         if let Some(bounds) = Some(ci_vec.clone()) {
             for bvar in bounds {
@@ -1141,42 +1140,6 @@ fn test_msub_derivative() {
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
                     None,
                 )]),
-            ),
-        ),
-    );
-}
-
-#[test]
-fn test_msub_derivative() {
-    test_parser(
-        "<mfrac>
-        <mrow><mi>d</mi><msub><mi>S</mi><mi>v</mi></msub></mrow>
-        <mrow><mi>d</mi><mi>t</mi></mrow>
-        </mfrac>",
-        first_order_derivative_leibniz_notation,
-        (
-            Derivative::new(1, 1),
-            Ci::new(
-                None,
-                Box::new(MathExpression::Msub(
-                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
-                    Box::new(MathExpression::Mi(Mi("v".to_string()))),
-                )),
-            ),
-        ),
-    );
-}
-
-#[test]
-fn test_unicode_newtonian_derivative() {
-    test_parser(
-        "<mover><mi>S</mi><mo>&#x02D9;</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo>",
-        newtonian_derivative,
-        (
-            Derivative::new(1, 1),
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
         ),
     );
