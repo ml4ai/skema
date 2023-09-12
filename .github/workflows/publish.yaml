@@ -46,11 +46,17 @@ jobs:
     needs:
       - tag-generator
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+
       - name: Setup JDK (w/ SBT)
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
+
       - name: Generate Dockerfile (Text Reading)
         working-directory: ./skema/text_reading/scala
         env:
