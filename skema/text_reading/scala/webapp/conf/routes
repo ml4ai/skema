@@ -7,6 +7,9 @@
 GET     /                                  controllers.HomeController.index
 GET     /parseSentence                     controllers.HomeController.parseSentence(sent: String, showEverything: Boolean)
 
+# Utils
+GET    /version                            controllers.HomeController.version
+
 # Provide API functions
 POST    /cosmosJsonToMentions              controllers.HomeController.cosmosJsonToMentions
 # This should be documented in the API
