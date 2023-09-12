@@ -39,13 +39,20 @@ jobs:
 
       - name: Show Generated Tag
         run: echo ${{ steps.generate.outputs.tag }}
+
+  make-dockerfile:
+    name: Create skema-text-reading Dockerfile
+    runs-on: ubuntu-22.04
+    needs:
+      - tag-generator
+    steps:
       - name: Setup JDK (w/ SBT)
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
       - name: Generate Dockerfile (Text Reading)
-        working-directory: text_reading/scala
+        working-directory: ./skema/text_reading/scala
         env:
           # Use this to set your desired tag;
           # Alternatively, set this env variable when building the image
@@ -55,6 +62,7 @@ jobs:
   bake:
     needs:
       - tag-generator
+      - make-dockerfile
     uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
     with:
       file: 'docker-bake.hcl'
