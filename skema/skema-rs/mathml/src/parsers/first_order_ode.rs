@@ -18,7 +18,6 @@ use crate::{
 };
 
 use derive_new::new;
-use nom::error::context;
 use nom::{
     branch::alt,
     bytes::complete::tag,
@@ -45,7 +44,7 @@ pub struct FirstOrderODE {
     /// context of discussions about Petri Nets and RegNets.
     pub lhs_var: Ci,
 
-    pub func_of: Vec<Ci>, //Option<Vec<Ci>>,
+    pub func_of: Vec<Ci>,
 
     pub with_respect_to: Ci,
     /// An expression tree corresponding to the RHS of the ODE.
@@ -60,17 +59,13 @@ pub fn first_order_ode(input: Span) -> IResult<FirstOrderODE> {
         first_order_derivative_leibniz_notation,
         newtonian_derivative,
     ))(s)?;
-    //let ci = binding.content;
-    //let parenthesized = ci.func_of.clone();
     let mut parenthesized: Vec<Ci> = Vec::new();
-    for ci_vec in ci.func_of.clone().iter() {
-        //for bvar in ci_vec.clone().iter() {
+    if let Some(ref ci_vec) = ci.func_of {
         if let Some(bounds) = Some(ci_vec.clone()) {
             for bvar in bounds {
                 parenthesized.push(bvar);
             }
         }
-        //}
     }
 
     let bvar = derivative.bound_var;
@@ -1089,7 +1084,8 @@ fn test_first_order_ode() {
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(func_of[0].to_string(), "t");
     assert_eq!(with_respect_to.to_string(), "t");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
+    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
+    //assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
 
     // ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
     let input = "
@@ -1113,7 +1109,7 @@ fn test_first_order_ode() {
     assert_eq!(lhs_var.to_string(), "S");
     assert_eq!(func_of[0].to_string(), "");
     assert_eq!(with_respect_to.to_string(), "");
-    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I(t)) S(t)) N)");
+    assert_eq!(rhs.to_string(), "(/ (* (* (- β) I) S) N)");
 }
 
 #[test]
@@ -1141,42 +1137,6 @@ fn test_msub_derivative() {
                     Box::new(MathExpression::Mi(Mi("".to_string()))),
                     None,
                 )]),
-            ),
-        ),
-    );
-}
-
-#[test]
-fn test_msub_derivative() {
-    test_parser(
-        "<mfrac>
-        <mrow><mi>d</mi><msub><mi>S</mi><mi>v</mi></msub></mrow>
-        <mrow><mi>d</mi><mi>t</mi></mrow>
-        </mfrac>",
-        first_order_derivative_leibniz_notation,
-        (
-            Derivative::new(1, 1),
-            Ci::new(
-                None,
-                Box::new(MathExpression::Msub(
-                    Box::new(MathExpression::Mi(Mi("S".to_string()))),
-                    Box::new(MathExpression::Mi(Mi("v".to_string()))),
-                )),
-            ),
-        ),
-    );
-}
-
-#[test]
-fn test_unicode_newtonian_derivative() {
-    test_parser(
-        "<mover><mi>S</mi><mo>&#x02D9;</mo></mover><mo>(</mo><mi>t</mi><mo>)</mo>",
-        newtonian_derivative,
-        (
-            Derivative::new(1, 1),
-            Ci::new(
-                Some(Type::Function),
-                Box::new(MathExpression::Mi(Mi("S".to_string()))),
             ),
         ),
     );

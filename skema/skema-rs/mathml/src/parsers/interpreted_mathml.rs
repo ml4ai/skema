@@ -207,7 +207,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
 
-    for ci_vec in func.func_of.iter() {
+    if let Some(ref ci_vec) = func.func_of {
         for (indx, bvar) in ci_vec.iter().enumerate() {
             if Some(bvar.content.clone())
                 == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
@@ -302,7 +302,7 @@ pub fn newtonian_derivative(input: Span) -> IResult<(Derivative, Ci)> {
     }));
 
     // Loop over vector of `func_of` of type Ci
-    for ci_vec in func.func_of.iter() {
+    if let Some(ref ci_vec) = func.func_of {
         for (_, bvar) in ci_vec.iter().enumerate() {
             if let Some(with_respect_to) = Some(bvar.content.clone()) {
                 let _new_with_respect_to = with_respect_to;
