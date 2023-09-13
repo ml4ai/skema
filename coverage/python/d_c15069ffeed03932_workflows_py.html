@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_7f155e5a1b03c261___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.1">coverage.py v7.3.1</a>,
-            created at 2023-09-10 21:13 +0000
+            created at 2023-09-13 19:34 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -129,7 +129,7 @@
     <p class="pln"><span class="n"><a id="t47" href="#t47">47</a></span><span class="t"><span class="str">    r = requests.post(f"{url}/workflows/images/base64/equations-to-amr", json={"images": images_b64, "model": "regnet"})</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t48" href="#t48">48</a></span><span class="t"><span class="str">    r.json()</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t49" href="#t49">49</a></span><span class="t"><span class="str">    """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="nam">mml</span><span class="op">:</span> <span class="nam">List</span><span class="op">[</span><span class="nam">str</span><span class="op">]</span> <span class="op">=</span> <span class="op">[</span><span class="nam">eqn2mml</span><span class="op">.</span><span class="nam">b64_image_to_mml</span><span class="op">(</span><span class="nam">img</span><span class="op">)</span> <span class="key">for</span> <span class="nam">img</span> <span class="key">in</span> <span class="nam">data</span><span class="op">.</span><span class="nam">images</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
+    <p class="mis show_mis"><span class="n"><a id="t50" href="#t50">50</a></span><span class="t">    <span class="nam">mml</span><span class="op">:</span> <span class="nam">List</span><span class="op">[</span><span class="nam">str</span><span class="op">]</span> <span class="op">=</span> <span class="op">[</span><span class="nam">utils</span><span class="op">.</span><span class="nam">clean_mml</span><span class="op">(</span><span class="nam">eqn2mml</span><span class="op">.</span><span class="nam">b64_image_to_mml</span><span class="op">(</span><span class="nam">img</span><span class="op">)</span><span class="op">)</span> <span class="key">for</span> <span class="nam">img</span> <span class="key">in</span> <span class="nam">data</span><span class="op">.</span><span class="nam">images</span><span class="op">]</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t51" href="#t51">51</a></span><span class="t">    <span class="nam">payload</span> <span class="op">=</span> <span class="op">{</span><span class="str">"mathml"</span><span class="op">:</span> <span class="nam">mml</span><span class="op">,</span> <span class="str">"model"</span><span class="op">:</span> <span class="nam">data</span><span class="op">.</span><span class="nam">model</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t52" href="#t52">52</a></span><span class="t">    <span class="com"># FIXME: why is this a PUT?</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t53" href="#t53">53</a></span><span class="t">    <span class="nam">res</span> <span class="op">=</span> <span class="nam">requests</span><span class="op">.</span><span class="nam">put</span><span class="op">(</span><span class="str">f"{SKEMA_RS_ADDESS}/mathml/amr"</span><span class="op">,</span> <span class="nam">json</span><span class="op">=</span><span class="nam">payload</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
@@ -272,7 +272,7 @@
             <a id="nextFileLink" class="nav" href="d_7f155e5a1b03c261___init___py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.1">coverage.py v7.3.1</a>,
-            created at 2023-09-10 21:13 +0000
+            created at 2023-09-13 19:34 +0000
         </p>
     </div>
 </footer>

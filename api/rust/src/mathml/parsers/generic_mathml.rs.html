@@ -596,6 +596,11 @@
 <a href="#596" id="596">596</a>
 <a href="#597" id="597">597</a>
 <a href="#598" id="598">598</a>
+<a href="#599" id="599">599</a>
+<a href="#600" id="600">600</a>
+<a href="#601" id="601">601</a>
+<a href="#602" id="602">602</a>
+<a href="#603" id="603">603</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -797,12 +802,17 @@
 }
 
 <span class="kw">pub fn </span>lparen(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Lparen, ws(tag(<span class="string">&quot;(&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Lparen, alt((ws(tag(<span class="string">&quot;(&quot;</span>)), ws(tag(<span class="string">&quot;[&quot;</span>)))))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
 <span class="kw">pub fn </span>rparen(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = value(Operator::Rparen, ws(tag(<span class="string">&quot;)&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = value(Operator::Rparen, alt((ws(tag(<span class="string">&quot;)&quot;</span>)), ws(tag(<span class="string">&quot;]&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, op))
+}
+
+<span class="kw">pub fn </span>comma(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, op) = value(Operator::Comma, ws(tag(<span class="string">&quot;,&quot;</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 

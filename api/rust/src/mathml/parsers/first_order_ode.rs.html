@@ -1056,6 +1056,95 @@
 <a href="#1056" id="1056">1056</a>
 <a href="#1057" id="1057">1057</a>
 <a href="#1058" id="1058">1058</a>
+<a href="#1059" id="1059">1059</a>
+<a href="#1060" id="1060">1060</a>
+<a href="#1061" id="1061">1061</a>
+<a href="#1062" id="1062">1062</a>
+<a href="#1063" id="1063">1063</a>
+<a href="#1064" id="1064">1064</a>
+<a href="#1065" id="1065">1065</a>
+<a href="#1066" id="1066">1066</a>
+<a href="#1067" id="1067">1067</a>
+<a href="#1068" id="1068">1068</a>
+<a href="#1069" id="1069">1069</a>
+<a href="#1070" id="1070">1070</a>
+<a href="#1071" id="1071">1071</a>
+<a href="#1072" id="1072">1072</a>
+<a href="#1073" id="1073">1073</a>
+<a href="#1074" id="1074">1074</a>
+<a href="#1075" id="1075">1075</a>
+<a href="#1076" id="1076">1076</a>
+<a href="#1077" id="1077">1077</a>
+<a href="#1078" id="1078">1078</a>
+<a href="#1079" id="1079">1079</a>
+<a href="#1080" id="1080">1080</a>
+<a href="#1081" id="1081">1081</a>
+<a href="#1082" id="1082">1082</a>
+<a href="#1083" id="1083">1083</a>
+<a href="#1084" id="1084">1084</a>
+<a href="#1085" id="1085">1085</a>
+<a href="#1086" id="1086">1086</a>
+<a href="#1087" id="1087">1087</a>
+<a href="#1088" id="1088">1088</a>
+<a href="#1089" id="1089">1089</a>
+<a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
+<a href="#1097" id="1097">1097</a>
+<a href="#1098" id="1098">1098</a>
+<a href="#1099" id="1099">1099</a>
+<a href="#1100" id="1100">1100</a>
+<a href="#1101" id="1101">1101</a>
+<a href="#1102" id="1102">1102</a>
+<a href="#1103" id="1103">1103</a>
+<a href="#1104" id="1104">1104</a>
+<a href="#1105" id="1105">1105</a>
+<a href="#1106" id="1106">1106</a>
+<a href="#1107" id="1107">1107</a>
+<a href="#1108" id="1108">1108</a>
+<a href="#1109" id="1109">1109</a>
+<a href="#1110" id="1110">1110</a>
+<a href="#1111" id="1111">1111</a>
+<a href="#1112" id="1112">1112</a>
+<a href="#1113" id="1113">1113</a>
+<a href="#1114" id="1114">1114</a>
+<a href="#1115" id="1115">1115</a>
+<a href="#1116" id="1116">1116</a>
+<a href="#1117" id="1117">1117</a>
+<a href="#1118" id="1118">1118</a>
+<a href="#1119" id="1119">1119</a>
+<a href="#1120" id="1120">1120</a>
+<a href="#1121" id="1121">1121</a>
+<a href="#1122" id="1122">1122</a>
+<a href="#1123" id="1123">1123</a>
+<a href="#1124" id="1124">1124</a>
+<a href="#1125" id="1125">1125</a>
+<a href="#1126" id="1126">1126</a>
+<a href="#1127" id="1127">1127</a>
+<a href="#1128" id="1128">1128</a>
+<a href="#1129" id="1129">1129</a>
+<a href="#1130" id="1130">1130</a>
+<a href="#1131" id="1131">1131</a>
+<a href="#1132" id="1132">1132</a>
+<a href="#1133" id="1133">1133</a>
+<a href="#1134" id="1134">1134</a>
+<a href="#1135" id="1135">1135</a>
+<a href="#1136" id="1136">1136</a>
+<a href="#1137" id="1137">1137</a>
+<a href="#1138" id="1138">1138</a>
+<a href="#1139" id="1139">1139</a>
+<a href="#1140" id="1140">1140</a>
+<a href="#1141" id="1141">1141</a>
+<a href="#1142" id="1142">1142</a>
+<a href="#1143" id="1143">1143</a>
+<a href="#1144" id="1144">1144</a>
+<a href="#1145" id="1145">1145</a>
+<a href="#1146" id="1146">1146</a>
+<a href="#1147" id="1147">1147</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::operator::Operator::{Add, Divide, Multiply, Subtract};
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Atom;
 <span class="kw">use </span><span class="kw">crate</span>::parsers::math_expression_tree::MathExpressionTree::Cons;
@@ -1067,15 +1156,15 @@
     parsers::{
         generic_mathml::{attribute, equals, etag, stag, ws, IResult, Span},
         interpreted_mathml::{
-            ci_univariate_func, ci_unknown, first_order_derivative_leibniz_notation,
-            math_expression, newtonian_derivative, operator,
+            ci_univariate_with_bounds, ci_univariate_without_bounds, ci_unknown_with_bounds,
+            ci_unknown_without_bounds, first_order_derivative_leibniz_notation, math_expression,
+            newtonian_derivative, operator,
         },
         math_expression_tree::MathExpressionTree,
     },
 };
 
 <span class="kw">use </span>derive_new::new;
-<span class="kw">use </span>nom::error::context;
 <span class="kw">use </span>nom::{
     branch::alt,
     bytes::complete::tag,
@@ -1102,59 +1191,91 @@
     /// context of discussions about Petri Nets and RegNets.
     </span><span class="kw">pub </span>lhs_var: Ci,
 
+    <span class="kw">pub </span>func_of: Vec&lt;Ci&gt;,
+
+    <span class="kw">pub </span>with_respect_to: Ci,
     <span class="doccomment">/// An expression tree corresponding to the RHS of the ODE.
     </span><span class="kw">pub </span>rhs: MathExpressionTree,
 }
-
 <span class="doccomment">/// Parse a first order ODE with a single derivative term on the LHS.
 </span><span class="kw">pub fn </span>first_order_ode(input: Span) -&gt; IResult&lt;FirstOrderODE&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = context(<span class="string">&quot;MISSING STARTING &lt;math&gt; TAG.&quot;</span>, <span class="macro">stag!</span>(<span class="string">&quot;math&quot;</span>))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = <span class="macro">stag!</span>(<span class="string">&quot;math&quot;</span>)(input)<span class="question-mark">?</span>;
 
     <span class="comment">// Recognize LHS derivative
-    </span><span class="kw">let </span>(s, (<span class="kw">_</span>, ci)) = context(
-        <span class="string">&quot;INVALID LHS DERIVATIVE.&quot;</span>,
-        alt((
-            first_order_derivative_leibniz_notation,
-            newtonian_derivative,
-        )),
-    )(s)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>(s, (derivative, ci)) = alt((
+        first_order_derivative_leibniz_notation,
+        newtonian_derivative,
+    ))(s)<span class="question-mark">?</span>;
+    <span class="comment">//let ci = binding.content;
+    //let parenthesized = ci.func_of.clone();
+    </span><span class="kw">let </span><span class="kw-2">mut </span>parenthesized: Vec&lt;Ci&gt; = Vec::new();
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>ci_vec) = ci.func_of {
+        <span class="comment">//for bvar in ci_vec.clone().iter() {
+        </span><span class="kw">if let </span><span class="prelude-val">Some</span>(bounds) = <span class="prelude-val">Some</span>(ci_vec.clone()) {
+            <span class="kw">for </span>bvar <span class="kw">in </span>bounds {
+                parenthesized.push(bvar);
+            }
+        }
+        <span class="comment">//}
+    </span>}
+
+    <span class="kw">let </span>bvar = derivative.bound_var;
 
     <span class="comment">// Recognize equals sign
-    </span><span class="kw">let </span>(s, <span class="kw">_</span>) = context(
-        <span class="string">&quot;MISSING EQUALS SIGN.&quot;</span>,
-        delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), equals, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>)),
-    )(s)<span class="question-mark">?</span>;
+    </span><span class="kw">let </span>(s, <span class="kw">_</span>) = delimited(<span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>), equals, <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>))(s)<span class="question-mark">?</span>;
 
     <span class="comment">// Recognize other tokens
-    </span><span class="kw">let </span>(s, remaining_tokens) = context(
-        <span class="string">&quot;INVALID RHS.&quot;</span>,
-        many1(alt((
-            map(ci_univariate_func, MathExpression::Ci),
-            map(ci_unknown, |Ci { content, .. }| {
+    </span><span class="kw">let </span>(s, remaining_tokens) = many1(alt((
+        map(
+            ci_univariate_with_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
                 MathExpression::Ci(Ci {
                     r#type: <span class="prelude-val">Some</span>(Type::Function),
                     content,
+                    func_of,
                 })
-            }),
-            map(operator, MathExpression::Mo),
-            math_expression,
-        ))),
-    )(s)<span class="question-mark">?</span>;
-
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = context(<span class="string">&quot;INVALID ENDING MATH TAG&quot;</span>, <span class="macro">etag!</span>(<span class="string">&quot;math&quot;</span>))(s)<span class="question-mark">?</span>;
+            },
+        ),
+        map(ci_univariate_without_bounds, MathExpression::Ci),
+        map(ci_unknown_without_bounds, |Ci { content, .. }| {
+            MathExpression::Ci(Ci {
+                r#type: <span class="prelude-val">Some</span>(Type::Function),
+                content,
+                func_of: <span class="prelude-val">None</span>,
+            })
+        }),
+        map(
+            ci_unknown_with_bounds,
+            |Ci {
+                 content, func_of, ..
+             }| {
+                MathExpression::Ci(Ci {
+                    r#type: <span class="prelude-val">Some</span>(Type::Function),
+                    content,
+                    func_of,
+                })
+            },
+        ),
+        map(operator, MathExpression::Mo),
+        math_expression,
+    )))(s)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = <span class="macro">etag!</span>(<span class="string">&quot;math&quot;</span>)(s)<span class="question-mark">?</span>;
 
     <span class="kw">let </span>ode = FirstOrderODE {
         lhs_var: ci,
+        func_of: parenthesized,
+        with_respect_to: bvar,
         rhs: MathExpressionTree::from(remaining_tokens),
     };
 
     <span class="prelude-val">Ok</span>((s, ode))
 }
-
 <span class="kw">impl </span>FirstOrderODE {
     <span class="kw">pub fn </span>to_cmml(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; String {
         <span class="kw">let </span>lhs_expression_tree = MathExpressionTree::Cons(
-            Operator::Derivative(Derivative::new(<span class="number">1</span>, <span class="number">1</span>)),
+            Operator::Derivative(Derivative::new(<span class="number">1</span>, <span class="number">1</span>, <span class="self">self</span>.with_respect_to.clone())),
             <span class="macro">vec!</span>[MathExpressionTree::Atom(MathExpression::Ci(
                 <span class="self">self</span>.lhs_var.clone(),
             ))],
@@ -1990,15 +2111,36 @@
     }
     equation
 }
-
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_ci_univariate_func() {
     test_parser(
         <span class="string">&quot;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&quot;</span>,
-        ci_univariate_func,
+        ci_univariate_with_bounds,
         Ci::new(
             <span class="prelude-val">Some</span>(Type::Function),
             Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Ci::new(
+                <span class="prelude-val">Some</span>(Type::Real),
+                Box::new(MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string()))),
+                <span class="prelude-val">None</span>,
+            )]),
+        ),
+    );
+}
+
+<span class="attr">#[test]
+</span><span class="kw">fn </span>test_ci_univariate_func2() {
+    test_parser(
+        <span class="string">&quot;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&quot;</span>,
+        ci_unknown_with_bounds,
+        Ci::new(
+            <span class="prelude-val">None</span>,
+            Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
+            <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Ci::new(
+                <span class="prelude-val">Some</span>(Type::Real),
+                Box::new(MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string()))),
+                <span class="prelude-val">None</span>,
+            )]),
         ),
     );
 }
@@ -2012,10 +2154,24 @@
         &lt;/mfrac&gt;&quot;</span>,
         first_order_derivative_leibniz_notation,
         (
-            Derivative::new(<span class="number">1</span>, <span class="number">1</span>),
+            Derivative::new(
+                <span class="number">1</span>,
+                <span class="number">1</span>,
+                Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string()))),
+                    <span class="prelude-val">None</span>,
+                ),
+            ),
             Ci::new(
                 <span class="prelude-val">Some</span>(Type::Function),
                 Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
+                <span class="comment">//vec![Mi(&quot;&quot;.to_string())],
+                </span><span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;&quot;</span>.to_string()))),
+                    <span class="prelude-val">None</span>,
+                )]),
             ),
         ),
     );
@@ -2030,10 +2186,23 @@
         &lt;/mfrac&gt;&quot;</span>,
         first_order_derivative_leibniz_notation,
         (
-            Derivative::new(<span class="number">1</span>, <span class="number">1</span>),
+            Derivative::new(
+                <span class="number">1</span>,
+                <span class="number">1</span>,
+                Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string()))),
+                    <span class="prelude-val">None</span>,
+                ),
+            ),
             Ci::new(
                 <span class="prelude-val">Some</span>(Type::Function),
                 Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string()))),
+                    <span class="prelude-val">None</span>,
+                )]),
             ),
         ),
     );
@@ -2056,12 +2225,20 @@
     &lt;/math&gt;
     &quot;</span>;
 
-    <span class="kw">let </span>FirstOrderODE { lhs_var, rhs } = input.parse::&lt;FirstOrderODE&gt;().unwrap();
+    <span class="kw">let </span>FirstOrderODE {
+        lhs_var,
+        func_of,
+        with_respect_to,
+        rhs,
+    } = input.parse::&lt;FirstOrderODE&gt;().unwrap();
 
     <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">&quot;S&quot;</span>);
+    <span class="macro">assert_eq!</span>(func_of[<span class="number">0</span>].to_string(), <span class="string">&quot;t&quot;</span>);
+    <span class="macro">assert_eq!</span>(with_respect_to.to_string(), <span class="string">&quot;t&quot;</span>);
     <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(/ (* (* (- β) I) S) N)&quot;</span>);
+    <span class="comment">//assert_eq!(rhs.to_string(), &quot;(/ (* (* (- β) I(t)) S(t)) N)&quot;);
 
-    <span class="comment">// ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
+    // ASKEM Hackathon 2, scenario 1, equation 1, but with Newtonian derivative notation.
     </span><span class="kw">let </span>input = <span class="string">&quot;
     &lt;math&gt;
         &lt;mover&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;˙&lt;/mo&gt;&lt;/mover&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;
@@ -2073,43 +2250,44 @@
     &lt;/math&gt;
     &quot;</span>;
 
-    <span class="kw">let </span>FirstOrderODE { lhs_var, rhs } = input.parse::&lt;FirstOrderODE&gt;().unwrap();
+    <span class="kw">let </span>FirstOrderODE {
+        lhs_var,
+        func_of,
+        with_respect_to,
+        rhs,
+    } = input.parse::&lt;FirstOrderODE&gt;().unwrap();
 
     <span class="macro">assert_eq!</span>(lhs_var.to_string(), <span class="string">&quot;S&quot;</span>);
+    <span class="macro">assert_eq!</span>(func_of[<span class="number">0</span>].to_string(), <span class="string">&quot;&quot;</span>);
+    <span class="macro">assert_eq!</span>(with_respect_to.to_string(), <span class="string">&quot;&quot;</span>);
     <span class="macro">assert_eq!</span>(rhs.to_string(), <span class="string">&quot;(/ (* (* (- β) I) S) N)&quot;</span>);
 }
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_msub_derivative() {
-    test_parser(
-        <span class="string">&quot;&lt;mfrac&gt;
-        &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;msub&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;/msub&gt;&lt;/mrow&gt;
-        &lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;
-        &lt;/mfrac&gt;&quot;</span>,
+    test_parser(<span class="string">&quot;&lt;mfrac&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;msub&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mi&gt;v&lt;/mi&gt;&lt;/msub&gt;&lt;/mrow&gt;&lt;mrow&gt;&lt;mi&gt;d&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;/mrow&gt;&lt;/mfrac&gt;&quot;</span>,
         first_order_derivative_leibniz_notation,
         (
-            Derivative::new(<span class="number">1</span>, <span class="number">1</span>),
+            Derivative::new(
+                <span class="number">1</span>,
+                <span class="number">1</span>,
+                Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;t&quot;</span>.to_string()))),
+                    <span class="prelude-val">None</span>,
+                ),
+            ),
             Ci::new(
-                <span class="prelude-val">None</span>,
+                <span class="prelude-val">Some</span>(Type::Function),
                 Box::new(MathExpression::Msub(
                     Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
                     Box::new(MathExpression::Mi(Mi(<span class="string">&quot;v&quot;</span>.to_string()))),
                 )),
-            ),
-        ),
-    );
-}
-
-<span class="attr">#[test]
-</span><span class="kw">fn </span>test_unicode_newtonian_derivative() {
-    test_parser(
-        <span class="string">&quot;&lt;mover&gt;&lt;mi&gt;S&lt;/mi&gt;&lt;mo&gt;&amp;#x02D9;&lt;/mo&gt;&lt;/mover&gt;&lt;mo&gt;(&lt;/mo&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mo&gt;)&lt;/mo&gt;&quot;</span>,
-        newtonian_derivative,
-        (
-            Derivative::new(<span class="number">1</span>, <span class="number">1</span>),
-            Ci::new(
-                <span class="prelude-val">Some</span>(Type::Function),
-                Box::new(MathExpression::Mi(Mi(<span class="string">&quot;S&quot;</span>.to_string()))),
+                <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(<span class="string">&quot;&quot;</span>.to_string()))),
+                    <span class="prelude-val">None</span>,
+                )]),
             ),
         ),
     );

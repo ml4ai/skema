@@ -1196,6 +1196,10 @@
 <a href="#1196" id="1196">1196</a>
 <a href="#1197" id="1197">1197</a>
 <a href="#1198" id="1198">1198</a>
+<a href="#1199" id="1199">1199</a>
+<a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{operator::Operator, Math};
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -1556,6 +1560,7 @@
             <span class="kw">let </span>deriv = Ci {
                 r#type: <span class="prelude-val">Some</span>(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[<span class="number">2</span>..<span class="number">3</span>].to_string()))),
+                func_of: <span class="prelude-val">None</span>,
             };
             lhs.push(deriv);
         } <span class="kw">else </span>{
@@ -1563,6 +1568,7 @@
             </span><span class="kw">let </span>deriv = Ci {
                 r#type: <span class="prelude-val">Some</span>(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[<span class="number">1</span>..<span class="number">2</span>].to_string()))),
+                func_of: <span class="prelude-val">None</span>,
             };
             lhs.push(deriv);
         }
@@ -1574,7 +1580,9 @@
                 </span><span class="kw">let </span>rhs_flat = flatten_mults(rhs.clone());
                 <span class="kw">let </span>fo_eq = FirstOrderODE {
                     lhs_var: lhs[<span class="number">0</span>].clone(),
-                    rhs: rhs_flat,
+                    func_of: [lhs[<span class="number">0</span>].clone()].to_vec(), <span class="comment">// just place holders for construction
+                    </span>with_respect_to: lhs[<span class="number">0</span>].clone(),    <span class="comment">// just place holders for construction
+                    </span>rhs: rhs_flat,
                 };
                 fo_eq_vec.push(fo_eq);
             } <span class="kw">else </span>{

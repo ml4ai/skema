@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["ci_subscript","ci_univariate_func","ci_unknown","first_order_derivative_leibniz_notation","interpreted_math","math_expression","mfrac","mrow","newtonian_derivative","operator"]};
+window.SIDEBAR_ITEMS = {"fn":["ci_subscript","ci_subscript_func","ci_univariate_func","ci_univariate_with_bounds","ci_univariate_without_bounds","ci_unknown","ci_unknown_with_bounds","ci_unknown_without_bounds","first_order_derivative_leibniz_notation","interpreted_math","math_expression","mfrac","mrow","newtonian_derivative","operator","superscript"]};

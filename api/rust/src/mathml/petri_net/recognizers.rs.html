@@ -145,14 +145,26 @@
 <a href="#145" id="145">145</a>
 <a href="#146" id="146">146</a>
 <a href="#147" id="147">147</a>
+<a href="#148" id="148">148</a>
+<a href="#149" id="149">149</a>
+<a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains functions for predicate testing of MathML elements, as well as extracting
 //! semantically-meaningful objects from MathML expressions.
 
 </span><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::{Derivative, Operator},
-    MathExpression,
+    Ci, MathExpression,
     MathExpression::{Mfrac, Mn, Mo, Mover, Mrow, Msub},
-    Mi,
+    Mi, Type,
 };
 <span class="kw">use </span><span class="kw">crate</span>::petri_net::{Polarity, Var};
 
@@ -187,6 +199,7 @@
         }
     }
 
+    <span class="kw">let </span><span class="kw-2">mut </span>denom_var = String::new();
     <span class="kw">if let </span>MathExpression::Mrow(denom_expressions) = denominator {
         <span class="comment">// Check if first element of denominator is an mi
         </span><span class="kw">if let </span>MathExpression::Mi(Mi(denom_id)) = <span class="kw-2">&amp;</span>denom_expressions.<span class="number">0</span>[<span class="number">0</span>] {
@@ -198,13 +211,24 @@
                 denominator_contains_partial = <span class="bool-val">true</span>;
             }
         }
+        <span class="kw">if let </span>MathExpression::Mi(Mi(with_respect_to)) = <span class="kw-2">&amp;</span>denom_expressions.<span class="number">0</span>[<span class="number">1</span>] {
+            denom_var.push_str(with_respect_to);
+        }
     }
 
     <span class="kw">if </span>(numerator_contains_d &amp;&amp; denominator_contains_d)
         || (numerator_contains_partial &amp;&amp; denominator_contains_partial)
     {
         <span class="prelude-val">Ok</span>((
-            Operator::new_derivative(Derivative::new(<span class="number">1</span>, <span class="number">1</span>)),
+            Operator::new_derivative(Derivative::new(
+                <span class="number">1</span>,
+                <span class="number">1</span>,
+                Ci::new(
+                    <span class="prelude-val">Some</span>(Type::Real),
+                    Box::new(MathExpression::Mi(Mi(denom_var.trim().to_string()))),
+                    <span class="prelude-val">None</span>,
+                ),
+            )),
             function_candidate.unwrap(),
         ))
     } <span class="kw">else </span>{
