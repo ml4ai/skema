@@ -9,8 +9,8 @@ variable "VERSION" {
 }
 
 # See ./github/workflows/publish.yaml
-variable "ARTIFACT_PATH" {
-  default = "./artifact"
+variable "ARTIFACT" {
+  default = "artifacts/Dockerfile"
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -61,9 +61,9 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "${ARTIFACT_PATH}"
+  context = "."
   tags = tag("skema-text-reading", "", "")
-  dockerfile = "Dockerfile"
+  dockerfile = "${ARTIFACT}"
 }
 
 target "skema-py" {
