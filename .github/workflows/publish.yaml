@@ -77,6 +77,9 @@ jobs:
           path: docker-tmp/Dockerfile
 
   bake:
+    needs:
+      - tag-generator
+      - make-dockerfile
     steps:
       - uses: actions/checkout@v3
 
@@ -92,9 +95,6 @@ jobs:
 
 
       - name: Run bake
-        needs:
-          - tag-generator
-          - make-dockerfile
         uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
         with:
           file: 'docker-bake.hcl'
