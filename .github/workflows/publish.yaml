@@ -68,7 +68,8 @@ jobs:
           mkdir -p $GITHUB_WORKSPACE/docker-tmp
           cp webapp/target/docker/stage/Dockerfile $GITHUB_WORKSPACE/docker-tmp
           echo "Generated Dockerfile copied successfully to $GITHUB_WORKSPACE/docker-tmp."
-          echo "SKEMA_DOCKERFILE_PATH=$GITHUB_WORKSPACE/docker-tmp" >> ${GITHUB_ENV}
+          echo "SKEMA_TEXT_READING_DOCKERFILE_PATH=$GITHUB_WORKSPACE/docker-tmp" >> ${GITHUB_ENV}
+          echo "Dockerfile path saved in SKEMA_TEXT_READING_DOCKERFILE_PATH env variable."
 
   bake:
     needs:

@@ -7,7 +7,9 @@ variable "DOCKER_ORG" {
 variable "VERSION" {
   default = "local"
 }
-variable "SKEMA_DOCKERFILE_PATH"
+variable "SKEMA_TEXT_READING_DOCKERFILE_PATH" {
+  default = "."
+}
 
 # ----------------------------------------------------------------------------------------------------------------------
 
