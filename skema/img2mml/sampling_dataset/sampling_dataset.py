@@ -123,12 +123,12 @@ def prepare_dataset(args):
         root,
         f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
     )
-    latex_path = os.path.join(
-        root,
-        f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-    )
+    # latex_path = os.path.join(
+    #     root,
+    #     f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
+    # )
     mml = open(mml_path).readlines()[0]
-    latex = open(latex_path).readlines()[0]
+    # latex = open(latex_path).readlines()[0]
 
     # if areAligned(mml, latex):
     open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(
