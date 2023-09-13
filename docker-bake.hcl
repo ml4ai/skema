@@ -59,7 +59,7 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "${SKEMA_DOCKERFILE_PATH}"
+  context = "${SKEMA_TEXT_READING_DOCKERFILE_PATH}"
   tags = tag("skema-text-reading", "", "")
   dockerfile = "Dockerfile"
 }
