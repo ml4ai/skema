@@ -10,6 +10,8 @@ variable "VERSION" {
 
 # See ./github/workflows/publish.yaml
 variable "ARTIFACT" {
+  # See darpa-askem/.github/.github/workflows/bake-publish.yaml@main
+  # Artifact by default are saved in the artifacts/ path
   default = "artifacts/Dockerfile"
 }
 

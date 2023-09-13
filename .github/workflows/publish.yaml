@@ -67,7 +67,6 @@ jobs:
       - name: After generating the Dockerfile, save it as an artifact
         uses: actions/upload-artifact@v3
         with:
-          name: dockerfile
           path: webapp/target/docker/stage/Dockerfile
 
   bake:
@@ -76,6 +75,7 @@ jobs:
       - make-dockerfile
     uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
     with:
+      # Tell bake-publish.yaml that this is the Dockerfile to use
       artifact: 'Dockerfile'
       file: 'docker-bake.hcl'
       group: 'prod'
