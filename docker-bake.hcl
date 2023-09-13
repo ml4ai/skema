@@ -56,9 +56,9 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "$GITHUB_WORKSPACE/docker-context"
+  context = "."
   tags = tag("skema-text-reading", "", "")
-  dockerfile = "Dockerfile"
+  dockerfile = "$GITHUB_WORKSPACE/docker-tmp/Dockerfile"
 }
 
 target "skema-py" {
