@@ -65,23 +65,43 @@ jobs:
           APP_VERSION: steps.generate.outputs.tag
         run: |
           sbt "webapp/docker:stage"
-          mkdir -p $GITHUB_WORKSPACE/docker-tmp
-          cp webapp/target/docker/stage/Dockerfile $GITHUB_WORKSPACE/docker-tmp
-          echo "Generated Dockerfile copied successfully to $GITHUB_WORKSPACE/docker-tmp."
-          echo "SKEMA_TEXT_READING_DOCKERFILE_PATH=$GITHUB_WORKSPACE/docker-tmp" >> ${GITHUB_ENV}
-          echo "Dockerfile path saved in SKEMA_TEXT_READING_DOCKERFILE_PATH env variable."
+          mkdir -p docker-tmp
+          cp webapp/target/docker/stage/Dockerfile docker-tmp
+          echo "Generated Dockerfile copied successfully to docker-tmp/."
+
+      # After generating the Dockerfile, save it as an artifact
+      - name: Save Dockerfile as Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dockerfile
+          path: docker-tmp/Dockerfile
 
   bake:
-    needs:
-      - tag-generator
-      - make-dockerfile
-    uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
-    with:
-      file: 'docker-bake.hcl'
-      group: 'prod'
-      registry: 'ghcr.io'
-      organization: ${{ github.repository_owner }}
-      tag: ${{ needs.tag-generator.outputs.image-tag }}
-    secrets:
-      username: ${{ github.repository_owner }}
-      password: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download Dockerfile Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dockerfile
+          path: docker-tmp/Dockerfile
+
+      - run: |
+          echo "SKEMA_TEXT_READING_DOCKERFILE_PATH=docker-tmp" >> ${GITHUB_ENV}
+          echo "Dockerfile path saved in SKEMA_TEXT_READING_DOCKERFILE_PATH env variable."
+
+
+      - name: Run bake
+        needs:
+          - tag-generator
+          - make-dockerfile
+        uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
+        with:
+          file: 'docker-bake.hcl'
+          group: 'prod'
+          registry: 'ghcr.io'
+          organization: ${{ github.repository_owner }}
+          tag: ${{ needs.tag-generator.outputs.image-tag }}
+        secrets:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}

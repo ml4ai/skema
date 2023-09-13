@@ -8,7 +8,7 @@ variable "VERSION" {
   default = "local"
 }
 variable "SKEMA_TEXT_READING_DOCKERFILE_PATH" {
-  default = "."
+  default = "docker-tmp"
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
