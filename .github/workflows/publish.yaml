@@ -67,7 +67,7 @@ jobs:
           sbt "webapp/docker:stage"
           echo "Move Generated DockerFile to GitHub Env."
           mkdir -p $GITHUB_WORKSPACE/docker-context
-          ls webapp/target/docker/stage/ | grep Dockerfile | echo
+          ls webapp/target/docker/stage | grep Dockerfile
           cp webapp/target/docker/stage/Dockerfile $GITHUB_WORKSPACE/docker-context
           echo "Dockerfile copied successfully."
 
