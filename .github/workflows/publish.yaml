@@ -60,48 +60,28 @@ jobs:
       - name: Generate Dockerfile (Text Reading)
         working-directory: ./skema/text_reading/scala
         env:
-          # Use this to set your desired tag;
-          # Alternatively, set this env variable when building the image
           APP_VERSION: steps.generate.outputs.tag
         run: |
           sbt "webapp/docker:stage"
-          mkdir -p docker-tmp
-          cp webapp/target/docker/stage/Dockerfile docker-tmp
-          echo "Generated Dockerfile copied successfully to docker-tmp/."
 
-      # After generating the Dockerfile, save it as an artifact
-      - name: Save Dockerfile as Artifact
+      - name: After generating the Dockerfile, save it as an artifact
         uses: actions/upload-artifact@v3
         with:
           name: dockerfile
-          path: docker-tmp/Dockerfile
+          path: webapp/target/docker/stage/Dockerfile
 
   bake:
     needs:
       - tag-generator
       - make-dockerfile
     uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Download Dockerfile Artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: dockerfile
-          path: docker-tmp/Dockerfile
-
-      - run: |
-          echo "SKEMA_TEXT_READING_DOCKERFILE_PATH=docker-tmp" >> ${GITHUB_ENV}
-          echo "Dockerfile path saved in SKEMA_TEXT_READING_DOCKERFILE_PATH env variable."
-
-      - name: Run bake
-
-        with:
-          file: 'docker-bake.hcl'
-          group: 'prod'
-          registry: 'ghcr.io'
-          organization: ${{ github.repository_owner }}
-          tag: ${{ needs.tag-generator.outputs.image-tag }}
-        secrets:
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      artifact: 'Dockerfile'
+      file: 'docker-bake.hcl'
+      group: 'prod'
+      registry: 'ghcr.io'
+      organization: ${{ github.repository_owner }}
+      tag: ${{ needs.tag-generator.outputs.image-tag }}
+    secrets:
+      username: ${{ github.repository_owner }}
+      password: ${{ secrets.GITHUB_TOKEN }}

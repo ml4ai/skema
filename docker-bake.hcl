@@ -7,8 +7,10 @@ variable "DOCKER_ORG" {
 variable "VERSION" {
   default = "local"
 }
-variable "SKEMA_TEXT_READING_DOCKERFILE_PATH" {
-  default = "docker-tmp"
+
+# See ./github/workflows/publish.yaml
+variable "ARTIFACT_PATH" {
+  default = "./artifact"
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -59,7 +61,7 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "${SKEMA_TEXT_READING_DOCKERFILE_PATH}"
+  context = "${ARTIFACT_PATH}"
   tags = tag("skema-text-reading", "", "")
   dockerfile = "Dockerfile"
 }
