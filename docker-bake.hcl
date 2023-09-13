@@ -7,6 +7,7 @@ variable "DOCKER_ORG" {
 variable "VERSION" {
   default = "local"
 }
+variable "SKEMA_DOCKERFILE_PATH"
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -56,9 +57,9 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "."
+  context = "${SKEMA_DOCKERFILE_PATH}"
   tags = tag("skema-text-reading", "", "")
-  dockerfile = "$GITHUB_WORKSPACE/docker-tmp/Dockerfile"
+  dockerfile = "Dockerfile"
 }
 
 target "skema-py" {
