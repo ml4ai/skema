@@ -80,6 +80,7 @@ jobs:
     needs:
       - tag-generator
       - make-dockerfile
+    uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
     steps:
       - uses: actions/checkout@v3
 
@@ -93,9 +94,8 @@ jobs:
           echo "SKEMA_TEXT_READING_DOCKERFILE_PATH=docker-tmp" >> ${GITHUB_ENV}
           echo "Dockerfile path saved in SKEMA_TEXT_READING_DOCKERFILE_PATH env variable."
 
-
       - name: Run bake
-        uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
+
         with:
           file: 'docker-bake.hcl'
           group: 'prod'
