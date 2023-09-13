@@ -56,7 +56,7 @@ target "skema-rs-base" {
 }
 
 target "skema-text-reading-base" {
-  context = "./skema/text_reading/scala/webapp/target/docker/stage/"
+  context = "$GITHUB_WORKSPACE/docker-context"
   tags = tag("skema-text-reading", "", "")
   dockerfile = "Dockerfile"
 }
