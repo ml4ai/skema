@@ -30,18 +30,7 @@ impl fmt::Display for MathExpressionTree {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
-                write!(f, "{}", x.content)?;
-                if let Some(ref func) = x.func_of {
-                    write!(f, "(")?;
-                    for (i, v) in func.iter().enumerate() {
-                        if i > 0 {
-                            write!(f, ",")?;
-                        }
-                        write!(f, "{}", v.content)?
-                    }
-                    write!(f, ")")?;
-                }
-                Ok(())
+                write!(f, "{}", x.content)
             }
             MathExpressionTree::Atom(i) => write!(f, "{}", i),
             MathExpressionTree::Cons(head, rest) => {
@@ -193,7 +182,7 @@ impl MathExpression {
                         // Handles cos and sin as operators
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Cos));
-                            for vec in x.func_of.clone() {
+                            if let Some(vec) = x.func_of.clone() {
                                 for v in vec {
                                     tokens.push(MathExpression::Ci(v));
                                 }
