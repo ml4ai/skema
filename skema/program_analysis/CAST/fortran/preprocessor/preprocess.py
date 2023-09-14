@@ -152,25 +152,6 @@ def search_for_unsupported_idioms(source: str, idioms_regex_path: str):
     return log
 
 
-''' TODO: Deprecated, replaced by fixed2free.py
-def fix_unsupported_idioms(source: str):
-    """
-    Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
-    1. Replaces the first occurrence of '|' with '&' if it is the first non-whitespace character in the line.
-    2. Adds an additional '&' to the previous line
-    """
-    processed_lines = []
-    for i, line in enumerate(source.splitlines()):
-        if line.lstrip().startswith("|"):
-            line = line.replace("|", "&", 1)
-            processed_lines[-1] += "&"
-        processed_lines.append(line)
-    source = "\n".join(processed_lines)
-
-    return source
-'''
-
-
 def fix_include_directives(source: str) -> str:
     """There are a few corrections we need to make to the include statements
     1. Convert system level includes to local includes
@@ -201,18 +182,25 @@ def run_c_preprocessor(source: str, include_base_path: Path) -> str:
 def convert_to_free_form(source: str) -> str:
     """If fixed-form Fortran source, convert to free-form"""
 
+    def validate_parse_tree(source: str) -> bool:
+        """Parse source with tree-sitter and check if an error is returned."""
+        language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
+        parser = Parser()
+        parser.set_language(language)
+        tree = parser.parse(bytes(source, encoding="utf-8"))
+        return "ERROR" not in tree.root_node.sexp()
+
     # We don't know for sure if a source is meant to be fixed-form or free-form
-    # So, we will run the parser
-    language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
-    parser = Parser()
-    parser.set_language(language)
-    
-    tree = parser.parse(bytes(source, encoding="utf-8"))
-    if "ERROR" not in tree.root_node.sexp():
+    # So, we will run the parser first to check
+    if validate_parse_tree(source):
         return source
     else:
         # convertToFree takes a stream as input and returns a generator
-        source = "".join([line for line in convertToFree(source.splitlines(keepends=True))])
+        free_source = "".join(
+            [line for line in convertToFree(source.splitlines(keepends=True))]
+        )
+        if validate_parse_tree(free_source):
+            return free_source
 
     return source
 
