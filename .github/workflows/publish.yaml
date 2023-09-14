@@ -67,7 +67,8 @@ jobs:
       - name: After generating the Dockerfile, save it as an artifact
         uses: actions/upload-artifact@v3
         with:
-          path: webapp/target/docker/stage/Dockerfile
+          path: ./skema/text_reading/scala/webapp/target/docker/stage/Dockerfile
+          if-no-files-found: error
 
   bake:
     needs:
