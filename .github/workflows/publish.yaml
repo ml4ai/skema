@@ -8,12 +8,6 @@ on:
     branches: ['main']
     tags: ['*']
 
-env:
-  REGISTRY: ghcr.io
-  OWNER: ${{ github.repository_owner }}
-  BAKE_FILE: docker-bake.hcl
-  ARTIFACT_FILENAME: Dockerfile
-
 jobs:
   tag-generator:
     name: Determine image tag
@@ -68,7 +62,7 @@ jobs:
       - name: Save the generated Dockerfile as an artifact
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.ARTIFACT_FILENAME }}
+          name: 'Dockerfile'
           path: ./skema/text_reading/scala/webapp/target/docker/stage/Dockerfile
           if-no-files-found: error
 
@@ -79,7 +73,7 @@ jobs:
     uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@yohannparis/add-artifacts
     with:
       # Tell bake-publish.yaml that this is the Dockerfile to use
-      artifact: ${{ env.ARTIFACT_FILENAME }}
+      artifact: 'Dockerfile'
       file: 'docker-bake.hcl'
       group: 'prod'
       registry: 'ghcr.io'
