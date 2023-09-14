@@ -34,6 +34,9 @@ python fixed2free2.py file.f > file.f90
 # TODO:
 # *) Improve command line usage
 
+# Modifications by vincentraymond-ua
+# Convert tab-form lines that have been changed to a single space by GCC to free-form before processing
+
 from __future__ import print_function
 import sys
 
