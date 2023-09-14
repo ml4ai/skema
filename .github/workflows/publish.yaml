@@ -64,7 +64,7 @@ jobs:
         run: |
           sbt "webapp/docker:stage"
 
-      - name: After generating the Dockerfile, save it as an artifact
+      - name: Save the generated Dockerfile as an artifact
         uses: actions/upload-artifact@v3
         with:
           path: ./skema/text_reading/scala/webapp/target/docker/stage/Dockerfile
