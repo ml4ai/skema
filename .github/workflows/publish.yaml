@@ -42,29 +42,25 @@ jobs:
       - tag-generator
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
-
       - name: Setup JDK (w/ SBT)
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
-
-      - name: Generate Dockerfile (Text Reading)
+      - name: Generate and Push to main the Text Reading app and its Dockerfile
         working-directory: ./skema/text_reading/scala
         env:
           APP_VERSION: steps.generate.outputs.tag
         run: |
-          sbt "webapp/docker:stage"
-
-      - name: Save the generated Dockerfile as an artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: 'Dockerfile'
-          path: ./skema/text_reading/scala/webapp/target/docker/stage/Dockerfile
-          if-no-files-found: error
+          sbt "webapp/docker/stage"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add .
+          git commit -m "generated text-reading"
+          git push
 
   bake:
     needs:
