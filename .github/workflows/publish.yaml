@@ -70,7 +70,7 @@ jobs:
     needs:
       - tag-generator
       - make-dockerfile
-    uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@yohannparis/add-artifacts
+    uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
     with:
       # Tell bake-publish.yaml that this is the Dockerfile to use
       artifact: 'Dockerfile'
