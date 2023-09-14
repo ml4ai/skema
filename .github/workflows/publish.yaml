@@ -45,11 +45,13 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.workflow_run.head_branch }}
+
       - name: Setup JDK (w/ SBT)
         uses: actions/setup-java@v3
         with:
           distribution: temurin
           java-version: 11
+          
       - name: Generate and Push to main the Text Reading app and its Dockerfile
         working-directory: ./skema/text_reading/scala
         env:
@@ -68,8 +70,6 @@ jobs:
       - make-dockerfile
     uses: darpa-askem/.github/.github/workflows/bake-publish.yaml@main
     with:
-      # Tell bake-publish.yaml that this is the Dockerfile to use
-      artifact: 'Dockerfile'
       file: 'docker-bake.hcl'
       group: 'prod'
       registry: 'ghcr.io'
