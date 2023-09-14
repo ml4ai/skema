@@ -21,10 +21,21 @@ def build_parsers(languages: List[str]) -> None:
 
     language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
     for language, language_dict in language_yaml_obj.items():
+        language_clone_directory = language_build_dir / language_dict["tree_sitter_name"]
         if language in languages:
+            # Clone the repository if it doesn't exist
             subprocess.run(
                 ["git", "clone", language_dict["clone_url"]], cwd=language_build_dir
             )
+            # Update the repository to pull any new commits
+            subprocess.run(
+                ["git", "pull"], cwd=language_clone_directory
+            )
+            # Checkout the correct commit if commit_sha is specified
+            if language_dict.get("commit_sha"):
+                subprocess.run(
+                    ["git", "checkout", language_dict["commit_sha"]], cwd=language_clone_directory
+                )
 
     # We can set pass the cwd for subprocess as an argument to run().
     # However, Language.build_library requires the cwd to be set to the build directory
