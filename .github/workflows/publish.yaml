@@ -61,6 +61,7 @@ jobs:
 
       - name: Push to main
         run: |
+          cd /home/runner/work/skema/skema
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add --all
