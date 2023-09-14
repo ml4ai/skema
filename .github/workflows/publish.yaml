@@ -61,10 +61,10 @@ jobs:
 
       - name: Push to main
         run: |
+          cd ${{ GITHUB_WORKSPACE }}
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git add --all
-          git commit -m "generated text-reading"
+          git commit -am "generated text-reading"
           git push
 
   bake:
