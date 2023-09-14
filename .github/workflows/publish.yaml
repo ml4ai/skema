@@ -51,13 +51,13 @@ jobs:
         with:
           distribution: temurin
           java-version: 11
-          
+
       - name: Generate and Push to main the Text Reading app and its Dockerfile
         working-directory: ./skema/text_reading/scala
         env:
           APP_VERSION: steps.generate.outputs.tag
         run: |
-          sbt "webapp/docker/stage"
+          sbt "webapp/docker:stage"
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add .
