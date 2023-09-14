@@ -96,7 +96,7 @@ class ExecutionEngine():
         # First, we need to get all opi symbols and their values
 
         self.symbol_table.push_function_call()
-        self.visit() for node in None
+        #self.visit() for node in None
         self.symbol_table.pop_function_call()
         pass
 
@@ -127,83 +127,6 @@ class ExecutionEngine():
         inputs = [self.visit(result) for result in results]
         primative = retrieve_operator(node.name)
         return execute(primative, inputs)
-
-
-def get_defined_constants(query_runner, file_name: str) -> List:
-    def backtrack(node):
-        """Backtrack over the graph to determine the original value"""
-        node_types = node._labels
-        node_id = node._id
-        if "Opo" in node_types:
-            # If this is the top level Opo, we need to get the Expression first
-            query = f"""
-            MATCH (n)-[r]->(m)
-            WHERE id(m)={node_id} and n:Expression
-            return n
-            """
-            results = list(memgraph.execute_and_fetch(query))
-            if len(results) == 1:
-                return backtrack(results[0]["n"])
-    
-        elif "Opi" in node_types:
-            # If this is an Opi, we need to pass through to the adjavent Opo
-            query = f"""
-            MATCH (n)-[r]->(m)
-            WHERE id(n)={node_id} and m:Opo
-            return m
-            """
-            results = list(memgraph.execute_and_fetch(query))
-            return backtrack(results[0]["m"])
-        elif "Expression" in node_types:
-            # If this is an Expression, we need to get the relevent expression nodes for execution.
-            # This will be the Primative, Literal, and OPO? nodes 
-            query = f"""
-            MATCH (n)-[r]->(m)
-            WHERE id(n)={node_id} and (m:Literal or m:Primitive or m:Opi)
-            RETURN m
-            """
-            results = list(memgraph.execute_and_fetch(query))
-            literals = [backtrack(result["m"]) for result in results if "Literal" in result["m"]._labels]
-            primatives = [backtrack(result["m"]) for result in results if "Primitive" in result["m"]._labels]
-            opis = [backtrack(result["m"]) for result in results if "Opi" in result["m"]._labels]
-            arguments = literals + opis
-            # An expression will either be a single assignment (x=y) or an operation (x=y+1)
-            # We can determine this by counting the number of primitve nodes
-            if len(primatives)==0:
-                return arguments[0]
-            else:
-                # We need to return the top level primative
-                # TODO: Is this the last one?
-                return primatives[-1]
-            
-        elif "Literal" in node_types:
-            # Convert to Tensor for execution
-
-            # The LiteralValue is stored as a str in the Memgraph database
-            # So we have to convert it to tokens to parse
-            value_tokens = node.value.split()
-            value_type = value_tokens[3].replace("\"", "").replace(",", "")
-            value = value_tokens[5].replace("\"", "").replace(",", "")
-
-            if value_type == "Integer":
-                return torch.tensor(int(value), dtype=torch.int)
-
-        elif "Primitive" in node_types:
-            results = query_runner.run_query("primitive_operands" , id=node_id)
-            inputs = [backtrack(result) for result in results]
-            primative = retrieve_operator(node.name)
-            return execute(primative, inputs)
-    
-    # First we want to get all the named symbol nodes
-    query = f"""
-    MATCH (n)-[r*]->(m)
-    WHERE n.filename='{file_name}'
-    MATCH (m:Opo) WHERE NOT m.name = 'un-named'
-    RETURN m
-    """
-   
-    results = query_runner.run_query("named_opos" ,filename=file_name)
-    return {result.name : backtrack(result) for result in results}
 
 if __name__ == "__main__":
     engine = ExecutionEngine("localhost", 7687, "simple_test")
