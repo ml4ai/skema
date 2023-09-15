@@ -38,6 +38,7 @@ pub enum Operator {
     Arcsec,
     Arccsc,
     Arccot,
+    Mean,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -78,6 +79,7 @@ impl fmt::Display for Operator {
             Operator::Arcsec => write!(f, "Arcsec"),
             Operator::Arccsc => write!(f, "Arccsc"),
             Operator::Arccot => write!(f, "Arccot"),
+            Operator::Mean => write!(f, "Mean"),
         }
     }
 }
