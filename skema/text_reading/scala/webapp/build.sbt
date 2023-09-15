@@ -8,3 +8,6 @@ libraryDependencies ++= Seq(
   "org.clulab"                 %% "model-streamed-trigram-ser"   % "1.0.0",
   guice
 )
+
+// Enable longer timeouts on the webservice controllers (40 min)
+PlayKeys.devSettings += "play.server.http.idleTimeout" -> "2400 seconds"
