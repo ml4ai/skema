@@ -235,6 +235,14 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
+            MathExpression::Mover(base, over) => {
+                if MathExpression::Mo(Operator::Mean) == **over {
+                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    base.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
+                    over.flatten(tokens);
+                }
+            }
             t => tokens.push(t.clone()),
         }
     }
@@ -398,11 +406,11 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
-        Operator::Exp => ((), 17),
-        Operator::Cos => ((), 18),
-        Operator::Sin => ((), 19),
-        Operator::Tan => ((), 20),
-        Operator::Derivative(Derivative { .. }) => ((), 21),
+        Operator::Exp => ((), 19),
+        Operator::Cos => ((), 20),
+        Operator::Sin => ((), 21),
+        Operator::Tan => ((), 22),
+        Operator::Derivative(Derivative { .. }) => ((), 24),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -411,6 +419,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
 fn postfix_binding_power(op: &Operator) -> Option<(u8, ())> {
     let res = match op {
         Operator::Factorial => (11, ()),
+        Operator::Mean => (12, ()),
         _ => return None,
     };
     Some(res)
@@ -800,6 +809,20 @@ fn test_trig_another_cos() {
         <mi>x</mi>
         <mo>)</mo>
         </mrow>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_mover_mean() {
+    let input = "
+    <math>
+        <mover>
+        <mi>T</mi>
+        <mo>¯</mo>
+        </mover>
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
