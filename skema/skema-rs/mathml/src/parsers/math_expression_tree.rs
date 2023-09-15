@@ -51,27 +51,7 @@ impl MathExpressionTree {
         match self {
             MathExpressionTree::Atom(i) => match i {
                 MathExpression::Ci(x) => {
-                    if x.func_of == None {
-                        content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
-                    } else if let Some(ref func) = x.func_of {
-                        for v in func {
-                            if v.content == Box::new(MathExpression::Mi(Mi("".to_string()))) {
-                                content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
-                            } else {
-                                content_mathml
-                                    .push_str(&format!("<apply><ci>{}</ci></apply>", x.content));
-                            }
-                        }
-                    }
-
-                    if let Some(ref func) = x.func_of {
-                        for v in func {
-                            if v.content == Box::new(MathExpression::Mi(Mi("".to_string()))) {
-                            } else {
-                                content_mathml.push_str(&format!("<ci>{}</ci>", v.content));
-                            }
-                        }
-                    }
+                    content_mathml.push_str(&format!("<ci>{}</ci>", x.content));
                 }
                 MathExpression::Mi(Mi(id)) => {
                     content_mathml.push_str(&format!("<ci>{}</ci>", id));
@@ -688,7 +668,7 @@ fn test_content_hackathon2_scenario1_eq8() {
     let cmml = exp.to_cmml();
     assert_eq!(
         cmml,
-        "<apply><eq/><apply><ci>β</ci></apply><ci>t</ci><apply><times/><ci>κ</ci><apply><ci>m</ci></apply><ci>t</ci></apply></apply>"
+        "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
     );
 }
 
