@@ -66,6 +66,7 @@ jobs:
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
     - name: "Free disk space"
       run: |
+        sudo apt-get update
         sudo apt clean
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
