@@ -71,15 +71,7 @@ impl fmt::Display for MathExpression {
                 r#type: _,
                 content,
                 func_of,
-            }) => {
-                write!(f, "{}", content)?;
-                for vec in func_of {
-                    for v in vec {
-                        write!(f, "{}", v.content)?;
-                    }
-                }
-                Ok(())
-            }
+            }) => write!(f, "{}", content),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
                 write!(f, "{base}^{{{superscript}}}")

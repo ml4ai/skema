@@ -358,6 +358,7 @@ fn tree_2_MET_ast(
             let deriv = Ci {
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[2..3].to_string()))),
+                func_of: None,
             };
             lhs.push(deriv);
         } else {
@@ -365,6 +366,7 @@ fn tree_2_MET_ast(
             let deriv = Ci {
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
+                func_of: None,
             };
             lhs.push(deriv);
         }
@@ -376,6 +378,8 @@ fn tree_2_MET_ast(
                 let rhs_flat = flatten_mults(rhs.clone());
                 let fo_eq = FirstOrderODE {
                     lhs_var: lhs[0].clone(),
+                    func_of: [lhs[0].clone()].to_vec(), // just place holders for construction
+                    with_respect_to: lhs[0].clone(),    // just place holders for construction
                     rhs: rhs_flat,
                 };
                 fo_eq_vec.push(fo_eq);
