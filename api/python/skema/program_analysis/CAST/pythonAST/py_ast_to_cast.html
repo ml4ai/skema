@@ -115,6 +115,23 @@ def construct_unique_name(attr_name, var_name):
     &#34;&#34;&#34;
     return f&#34;{attr_name}.{var_name}&#34;
 
+def check_expr_str(ast_node):
+    &#34;&#34;&#34;
+        Checks if this node is an Expr node
+        with a string value
+        This is added to remove multi-line comments
+        that otherwise don&#39;t do anything
+
+        Current cases for multi-line comments
+        - FunctionDef
+        - Module level
+        - ClassDef level
+    &#34;&#34;&#34;
+
+    if isinstance(ast_node, ast.Expr):
+        return isinstance(ast_node.value, ast.Constant) and isinstance(ast_node.value.value, str)
+    return False
+
 
 def get_node_name(ast_node):
     if isinstance(ast_node, ast.Assign):
@@ -2475,9 +2492,15 @@ class PyASTToCAST:
                 # These asserts will keep us from visiting them from now
                 # assert not isinstance(piece, ast.Import)
                 # assert not isinstance(piece, ast.ImportFrom)
-                to_add = self.visit(
-                    piece, prev_scope_id_dict, curr_scope_id_dict
-                )
+                
+                # Check if the current node is a string literal
+                # which means that it&#39;s a docstring and we don&#39;t need it
+                if not check_expr_str(piece):
+                    to_add = self.visit(
+                        piece, prev_scope_id_dict, curr_scope_id_dict
+                    )
+                else:
+                    to_add = None
 
                 # TODO: Find the case where &#34;__getitem__&#34; is used
                 if hasattr(to_add, &#34;__iter__&#34;) or hasattr(
@@ -3468,7 +3491,6 @@ class PyASTToCAST:
         merge_dicts(self.global_identifier_dict, curr_scope_id_dict)
         merge_dicts(curr_scope_id_dict, prev_scope_id_dict)
         for piece in node.body:
-            # Defer visiting function defs until all global vars are processed
             if isinstance(piece, ast.FunctionDef):
                 unique_name = construct_unique_name(
                     self.filenames[-1], piece.name
@@ -3477,10 +3499,13 @@ class PyASTToCAST:
                 prev_scope_id_dict[unique_name] = curr_scope_id_dict[
                     unique_name
                 ]
-                #funcs.append(piece)
-                #continue
 
-            to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+            # If the current node is literally just a string literal
+            # then that means it&#39;s a docstring and we don&#39;t need it here
+            if not check_expr_str(piece):
+                to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+            else: 
+                to_add = []
 
             # Global variables (which come about from assignments at the module level)
             # need to have their identifier names set correctly so they can be
@@ -4295,6 +4320,40 @@ class PyASTToCAST:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
+<dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.check_expr_str"><code class="name flex">
+<span>def <span class="ident">check_expr_str</span></span>(<span>ast_node)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Checks if this node is an Expr node
+with a string value
+This is added to remove multi-line comments
+that otherwise don't do anything</p>
+<p>Current cases for multi-line comments
+- FunctionDef
+- Module level
+- ClassDef level</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def check_expr_str(ast_node):
+    &#34;&#34;&#34;
+        Checks if this node is an Expr node
+        with a string value
+        This is added to remove multi-line comments
+        that otherwise don&#39;t do anything
+
+        Current cases for multi-line comments
+        - FunctionDef
+        - Module level
+        - ClassDef level
+    &#34;&#34;&#34;
+
+    if isinstance(ast_node, ast.Expr):
+        return isinstance(ast_node.value, ast.Constant) and isinstance(ast_node.value.value, str)
+    return False</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.construct_unique_name"><code class="name flex">
 <span>def <span class="ident">construct_unique_name</span></span>(<span>attr_name, var_name)</span>
 </code></dt>
@@ -6836,9 +6895,15 @@ and lambda functions
                 # These asserts will keep us from visiting them from now
                 # assert not isinstance(piece, ast.Import)
                 # assert not isinstance(piece, ast.ImportFrom)
-                to_add = self.visit(
-                    piece, prev_scope_id_dict, curr_scope_id_dict
-                )
+                
+                # Check if the current node is a string literal
+                # which means that it&#39;s a docstring and we don&#39;t need it
+                if not check_expr_str(piece):
+                    to_add = self.visit(
+                        piece, prev_scope_id_dict, curr_scope_id_dict
+                    )
+                else:
+                    to_add = None
 
                 # TODO: Find the case where &#34;__getitem__&#34; is used
                 if hasattr(to_add, &#34;__iter__&#34;) or hasattr(
@@ -7829,7 +7894,6 @@ and lambda functions
         merge_dicts(self.global_identifier_dict, curr_scope_id_dict)
         merge_dicts(curr_scope_id_dict, prev_scope_id_dict)
         for piece in node.body:
-            # Defer visiting function defs until all global vars are processed
             if isinstance(piece, ast.FunctionDef):
                 unique_name = construct_unique_name(
                     self.filenames[-1], piece.name
@@ -7838,10 +7902,13 @@ and lambda functions
                 prev_scope_id_dict[unique_name] = curr_scope_id_dict[
                     unique_name
                 ]
-                #funcs.append(piece)
-                #continue
 
-            to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+            # If the current node is literally just a string literal
+            # then that means it&#39;s a docstring and we don&#39;t need it here
+            if not check_expr_str(piece):
+                to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+            else: 
+                to_add = []
 
             # Global variables (which come about from assignments at the module level)
             # need to have their identifier names set correctly so they can be
@@ -11559,9 +11626,15 @@ def visit_FunctionDef(
             # These asserts will keep us from visiting them from now
             # assert not isinstance(piece, ast.Import)
             # assert not isinstance(piece, ast.ImportFrom)
-            to_add = self.visit(
-                piece, prev_scope_id_dict, curr_scope_id_dict
-            )
+            
+            # Check if the current node is a string literal
+            # which means that it&#39;s a docstring and we don&#39;t need it
+            if not check_expr_str(piece):
+                to_add = self.visit(
+                    piece, prev_scope_id_dict, curr_scope_id_dict
+                )
+            else:
+                to_add = None
 
             # TODO: Find the case where &#34;__getitem__&#34; is used
             if hasattr(to_add, &#34;__iter__&#34;) or hasattr(
@@ -12680,7 +12753,6 @@ def visit_Module(
     merge_dicts(self.global_identifier_dict, curr_scope_id_dict)
     merge_dicts(curr_scope_id_dict, prev_scope_id_dict)
     for piece in node.body:
-        # Defer visiting function defs until all global vars are processed
         if isinstance(piece, ast.FunctionDef):
             unique_name = construct_unique_name(
                 self.filenames[-1], piece.name
@@ -12689,10 +12761,13 @@ def visit_Module(
             prev_scope_id_dict[unique_name] = curr_scope_id_dict[
                 unique_name
             ]
-            #funcs.append(piece)
-            #continue
 
-        to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+        # If the current node is literally just a string literal
+        # then that means it&#39;s a docstring and we don&#39;t need it here
+        if not check_expr_str(piece):
+            to_add = self.visit(piece, prev_scope_id_dict, curr_scope_id_dict)
+        else: 
+            to_add = []
 
         # Global variables (which come about from assignments at the module level)
         # need to have their identifier names set correctly so they can be
@@ -13730,6 +13805,7 @@ def visit_Yield(
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
+<li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.check_expr_str" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.check_expr_str">check_expr_str</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.construct_unique_name" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.construct_unique_name">construct_unique_name</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_node_name" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_node_name">get_node_name</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_op" href="#skema.program_analysis.CAST.pythonAST.py_ast_to_cast.get_op">get_op</a></code></li>
