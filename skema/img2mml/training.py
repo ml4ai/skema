@@ -204,7 +204,8 @@ def train_model(rank=None,):
     optimizer_type = config["optimizer_type"]
     learning_rate = config["learning_rate"]
     weight_decay = config["weight_decay"]
-    use_scheduler = config["use_scheduler"]
+    step_scheduler = config["step_scheduler"]
+    exponential_scheduler = config["exponential_scheduler"]
     starting_lr = config["starting_lr"]
     step_size = config["step_size"]
     gamma = config["gamma"]
@@ -341,9 +342,18 @@ def train_model(rank=None,):
             weight_decay=weight_decay,
             momentum=momentum,
         )
-    if use_scheduler:
-        torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=step_size, gamma=gamma
+    if step_scheduler:
+        optimizer = torch.optim.lr_scheduler.StepLR(
+            optimizer, 
+            step_size=step_size, 
+            gamma=gamma,
+        )
+    elif exponential_scheduler:
+        optimizer = torch.optim.lr_scheduler.ExponentialLR(
+            optimizer, 
+            gamma=gamma, 
+            last_epoch=-1, 
+            verbose=False,
         )
 
     best_valid_loss = float("inf")
