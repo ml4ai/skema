@@ -326,8 +326,10 @@ def train_model(rank=None,):
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
+    isScheduler = False
     if step_scheduler or exponential_scheduler:
         _lr = starting_lr 
+        isScheduler = True
     else:
         _lr = learning_rate
 
@@ -345,14 +347,15 @@ def train_model(rank=None,):
             weight_decay=weight_decay,
             momentum=momentum,
         )
+    # which scheduler, if using
     if step_scheduler:
-        optimizer = torch.optim.lr_scheduler.StepLR(
+        scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer, 
             step_size=step_size, 
             gamma=gamma,
         )
     elif exponential_scheduler:
-        optimizer = torch.optim.lr_scheduler.ExponentialLR(
+        scheduler = torch.optim.lr_scheduler.ExponentialLR(
             optimizer, 
             gamma=gamma, 
             last_epoch=-1, 
@@ -429,6 +432,9 @@ def train_model(rank=None,):
                             model.state_dict(),
                             f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
                         )
+
+                if isScheduler:
+                    scheduler.step()
 
                 elif early_stopping:
                     count_es += 1
