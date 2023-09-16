@@ -326,7 +326,10 @@ def train_model(rank=None,):
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
-    _lr = starting_lr if use_scheduler else learning_rate
+    if step_scheduler or exponential_scheduler:
+        _lr = starting_lr 
+    else:
+        _lr = learning_rate
 
     if optimizer_type == "Adam":
         optimizer = torch.optim.Adam(
