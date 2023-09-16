@@ -413,6 +413,9 @@ def train_model(rank=None,):
                     g2p=g2p,
                 )
 
+                if isScheduler:
+                    scheduler.step()
+
                 end_time = time.time()
                 # total time spent on training an epoch
                 epoch_mins, epoch_secs = epoch_time(start_time, end_time)
@@ -432,9 +435,6 @@ def train_model(rank=None,):
                             model.state_dict(),
                             f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
                         )
-
-                if isScheduler:
-                    scheduler.step()
 
                 elif early_stopping:
                     count_es += 1
