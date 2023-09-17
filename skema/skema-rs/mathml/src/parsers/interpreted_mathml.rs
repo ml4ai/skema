@@ -129,14 +129,20 @@ pub fn ci_subscript_func(input: Span) -> IResult<Ci> {
 
 /// Parse content identifier for Msup
 pub fn superscript(input: Span) -> IResult<MathExpression> {
-    let (s, x) = msup(input)?;
-    Ok((s, x))
+    let (s, sup) = ws(map(
+        tag_parser!("msup", pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
+    ))(input)?;
+    Ok((s, sup))
 }
 
 /// Parse Mover
 pub fn over_term(input: Span) -> IResult<MathExpression> {
-    let (s, x) = mover(input)?;
-    Ok((s, x))
+    let (s, over) = ws(map(
+        tag_parser!("mover", pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Mover(Box::new(x), Box::new(y)),
+    ))(input)?;
+    Ok((s, over))
 }
 
 /// Parse the identifier 'd'
@@ -392,7 +398,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         superscript,
         msup,
         over_term,
-        mover,
         msub,
         msqrt,
         mfrac,
