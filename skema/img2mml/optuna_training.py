@@ -230,7 +230,7 @@ def objective(
 
     EPOCHS = config["epochs"]
     batch_size = config["batch_size"]
-    use_scheduler = config["use_scheduler"]
+    # use_scheduler = config["use_scheduler"]
     starting_lr = config["starting_lr"]
     step_size = config["step_size"]
     gamma = config["gamma"]
@@ -335,7 +335,8 @@ def objective(
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
-    _lr = starting_lr if use_scheduler else learning_rate
+    # _lr = starting_lr if use_scheduler else learning_rate
+    _lr = learning_rate
 
     if optimizer_type == "Adam":
         optimizer = torch.optim.Adam(
@@ -351,10 +352,10 @@ def objective(
             weight_decay=weight_decay,
             momentum=momentum,
         )
-    if use_scheduler:
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, step_size=step_size, gamma=gamma
-        )
+    # if use_scheduler:
+    #     scheduler = torch.optim.lr_scheduler.StepLR(
+    #         optimizer, step_size=step_size, gamma=gamma
+    #     )
 
     best_valid_loss = float("inf")
     trg_pad_idx = vocab.stoi["<pad>"]
