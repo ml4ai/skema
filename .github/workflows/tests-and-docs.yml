@@ -60,23 +60,23 @@ jobs:
 
     # docs (API)
     # generate python docs using pdoc
-    - name: "Create documentation for Python components (API docs)"
-      run: |
+    #- name: "Create documentation for Python components (API docs)"
+    #  run: |
         # FIXME: once issues with text reading submodule resolved, top command will be sufficient
         #pdoc --html -c latex_math=True --force --output-dir docs/api/python skema
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.img2mml
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.isa
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.skema_py
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
-        pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.metal.model_linker
+    #    pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.img2mml
+    #    pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.isa
+    #    pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.skema_py
+    #    pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.gromet
+    #    pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.program_analysis
+    #    pdoc --html -c latex_math=True --force --output-dir docs/api/python skema.metal.model_linker
     # generate Rust docs using cargo doc
-    - name: "Create documentation for Rust components (API docs)"
-      working-directory: ./skema/skema-rs
-      run: |
-        cargo doc
-        mkdir -p $GITHUB_WORKSPACE/docs/api/rust
-        mv target/doc/* $GITHUB_WORKSPACE/docs/api/rust/
+    #- name: "Create documentation for Rust components (API docs)"
+    #  working-directory: ./skema/skema-rs
+    #  run: |
+    #    cargo doc
+    #    mkdir -p $GITHUB_WORKSPACE/docs/api/rust
+    #    mv target/doc/* $GITHUB_WORKSPACE/docs/api/rust/
 
     # generate Scala docs using sbt doc
     # FIXME: downloading project deps is far too slow and too large to cache (3+ GB) to include this step in our CI
