@@ -122,22 +122,14 @@ def load_model(
             cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_best.pt&#34;
         )
     try:
-        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
-        # we need to remove the &#34;module.&#34; from key_names
-        if config[&#34;clean_state_dict&#34;]:
-            new_model = dict()
-            for key, value in torch.load(model_path, map_location=device).items():
-                new_model[key[7:]] = value
-                model.load_state_dict(new_model, strict=False)
-        else:
-            if not torch.cuda.is_available():
-                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-                new_model = dict()
-                for key, value in torch.load(model_path, map_location=device).items():
-                    new_model[key[7:]] = value
-                    model.load_state_dict(new_model, strict=False)
-            else:
-                model.load_state_dict(torch.load(model_path))
+        if not torch.cuda.is_available():
+            info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+
+        new_model = dict()
+        for key, value in torch.load(model_path, map_location=device).items():
+            new_model[key[7:]] = value
+            model.load_state_dict(new_model, strict=False)
+
     except FileNotFoundError:
         raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
     except Exception as e:
@@ -551,22 +543,14 @@ if present.</p>
             cwd / &#34;trained_models&#34; / &#34;arxiv_im2mml_with_fonts_with_boldface_best.pt&#34;
         )
     try:
-        # if state_dict keys has &#34;module.&lt;key_name&gt;&#34;
-        # we need to remove the &#34;module.&#34; from key_names
-        if config[&#34;clean_state_dict&#34;]:
-            new_model = dict()
-            for key, value in torch.load(model_path, map_location=device).items():
-                new_model[key[7:]] = value
-                model.load_state_dict(new_model, strict=False)
-        else:
-            if not torch.cuda.is_available():
-                info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
-                new_model = dict()
-                for key, value in torch.load(model_path, map_location=device).items():
-                    new_model[key[7:]] = value
-                    model.load_state_dict(new_model, strict=False)
-            else:
-                model.load_state_dict(torch.load(model_path))
+        if not torch.cuda.is_available():
+            info(&#34;CUDA is not available, falling back to using the CPU.&#34;)
+
+        new_model = dict()
+        for key, value in torch.load(model_path, map_location=device).items():
+            new_model[key[7:]] = value
+            model.load_state_dict(new_model, strict=False)
+
     except FileNotFoundError:
         raise FileNotFoundError(f&#34;Model state dictionary file not found: {model_path}&#34;)
     except Exception as e:
