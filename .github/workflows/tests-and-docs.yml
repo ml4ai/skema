@@ -96,6 +96,9 @@ jobs:
     #     sbt coverageReport
     #     sbt coverageAggregate
     # code coverage (Python)
+    - name: "Run ls"
+      run: ls
+      
     - name: "Code coverage reports for Python components"
       run: |
         pytest skema/skema_py/tests
