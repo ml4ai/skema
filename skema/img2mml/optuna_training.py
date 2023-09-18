@@ -223,10 +223,10 @@ def objective(
         beta_2 = trial.suggest_float("beta2", low=0.5, high=0.99, step=0.1)
 
     # transformers params
-    DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=512, high=2048, step=512)#config["dim_feedforward_for_xfmer"]
-    N_HEADS = trial.suggest_int("n_heads", low=4, high=8, step=4)#config["n_xfmer_heads"]
-    N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=4, high=10, step=2)#config["n_xfmer_encoder_layers"]
-    N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=4, high=10, step=2)#config["n_xfmer_decoder_layers"]
+    DIM_FEEDFWD =256 #trial.suggest_int("dim_ff_xfmer", low=512, high=2048, step=512)#config["dim_feedforward_for_xfmer"]
+    N_HEADS = 4#trial.suggest_int("n_heads", low=4, high=8, step=4)#config["n_xfmer_heads"]
+    N_XFMER_ENCODER_LAYERS = 3#trial.suggest_int("n_enc_layer", low=4, high=10, step=2)#config["n_xfmer_encoder_layers"]
+    N_XFMER_DECODER_LAYERS = 3#trial.suggest_int("n_dec_layer", low=4, high=10, step=2)#config["n_xfmer_decoder_layers"]
 
     EPOCHS = config["epochs"]
     batch_size = config["batch_size"]
