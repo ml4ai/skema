@@ -566,7 +566,7 @@ def ddp_main():
 if __name__ == "__main__":
     if config["DDP"]:
         os.environ["MASTER_ADDR"] = "localhost"
-        os.environ["MASTER_PORT"] = "29500"
+        os.environ["MASTER_PORT"] = "29890"
         ddp_main()
     else:
         train_model()
