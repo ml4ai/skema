@@ -12,8 +12,8 @@ description = "Scientific Knowledge Extraction and Model Analysis"
 version = "0.1.0"
 dependencies=[
     "Cython",
-    "dill",
-    "networkx",
+    "dill==0.3.7",
+    "networkx==3.1",
     "PyYAML",
     "tree-sitter",
     "requests",
@@ -46,20 +46,20 @@ demo = ["jupyter==1.0.0"]
 isa = [
   "pydot", 
   "graphviz",
-  "graspologic", # NOTE: this depends on rust when installing on an M1/ARM64 machine
-  "Levenshtein"
+  "graspologic==3.2.0", # NOTE: this depends on rust when installing on an M1/ARM64 machine
+  "Levenshtein==0.21.1"
 ]
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
-img2mml = ["torch", "torchvision","lxml==4.9.3", "pillow"]
+img2mml = ["torch==2.0.1", "torchvision==0.15.2","lxml==4.9.3", "Pillow==10.0.1"]
 
 # dependencies for METAL utilities.
 metal = ["fire==0.5.0",
-      "torch",
-      "pyarrow",
-      "transformers==4.33.1",
-      "sentence_transformers",
+      "torch==2.0.1",
+      "pyarrow==13.0.0",
+      "transformers==4.33.2",
+      "sentence_transformers==2.2.2",
       "mock",
       "askem_extractions[all]@git+https://github.com/ml4ai/ASKEM-TA1-DataModel"]
 
