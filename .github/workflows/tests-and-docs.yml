@@ -98,7 +98,7 @@ jobs:
     #     sbt coverageAggregate
     # code coverage (Python)
     - name: "Run ls"
-      run: ls -R
+      run: ls /opt/hostedtoolcache/Python/3.8.18/x64/lib/python3.8/site-packages/skema -R
 
     - name: "Code coverage reports for Python components"
       run: |
