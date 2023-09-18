@@ -199,12 +199,17 @@ pub fn equals(input: Span) -> IResult<Operator> {
 }
 
 pub fn lparen(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Lparen, ws(tag("(")))(input)?;
+    let (s, op) = value(Operator::Lparen, alt((ws(tag("(")), ws(tag("[")))))(input)?;
     Ok((s, op))
 }
 
 pub fn rparen(input: Span) -> IResult<Operator> {
-    let (s, op) = value(Operator::Rparen, ws(tag(")")))(input)?;
+    let (s, op) = value(Operator::Rparen, alt((ws(tag(")")), ws(tag("]")))))(input)?;
+    Ok((s, op))
+}
+
+pub fn comma(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Comma, ws(tag(",")))(input)?;
     Ok((s, op))
 }
 
