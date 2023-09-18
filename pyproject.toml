@@ -58,8 +58,8 @@ ml = ["torch==2.0.1", "torchvision==0.15.2", "beartype==0.15.0"]
 img2mml = ["skema[ml]", "lxml==4.9.3", "Pillow==10.0.1"]
 
 # dependencies for METAL utilities.
-metal = ["fire==0.5.0",
-      "torch==2.0.1",
+metal = ["skema[ml]", 
+      "fire==0.5.0",
       "pyarrow==13.0.0",
       "transformers==4.33.2",
       "sentence_transformers==2.2.2",
