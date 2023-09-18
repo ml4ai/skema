@@ -66,6 +66,7 @@ jobs:
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
     - name: "Free disk space"
       run: |
+        sudo apt-get update
         sudo apt clean
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
@@ -257,7 +258,8 @@ jobs:
     # The TR image is huge.
     # We need to free up every last bit of space we can.
     - name: Free disk space (aggressively)
-      uses: jlumbroso/free-disk-space@v1.2.0
+      # use fork with fix to https://github.com/jlumbroso/free-disk-space/issues/9
+      uses: kfir4444/free-disk-space@main
       with:
         android: true
         dotnet: true

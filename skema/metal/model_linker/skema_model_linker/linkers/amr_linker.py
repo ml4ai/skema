@@ -51,16 +51,18 @@ class Linker(ABC):
         ret = defaultdict(list)
         for ex in extractions:
             for name in ex.payload.mentions:
-                if len(ex.payload.text_description) > 0:
-                    for desc in ex.payload.text_description:
-                        ret[f"{name.name.strip()}: {desc.source.strip()}"].append(ex)
-                        ret[desc.source.strip()].append(ex)
+                if len(ex.payload.text_descriptions) > 0:
+                    for desc in ex.payload.text_descriptions:
+                        ret[f"{name.name.strip()}: {desc.description.strip()}"].append(ex)
+                        ret[desc.description.strip()].append(ex)
                 else:
                     candidate_text = f"{name.name.strip()}"
                     ret[candidate_text].append(ex)
         return ret
+
     @abc.abstractmethod
-    def link_model_to_text_extractions(self, data: Union[Any,Dict[str, Any]], extractions: AttributeCollection) -> Dict[str, Any]:
+    def link_model_to_text_extractions(self, data: Union[Any, Dict[str, Any]], extractions: AttributeCollection) -> \
+    Dict[str, Any]:
         pass
 
 
@@ -72,7 +74,7 @@ class AMRLinker(Linker, ABC):
         data = {**data}
 
         targets = self._generate_linking_targets(
-            e for e in extractions.attributes if e.type == AttributeType.anchored_extraction)
+            e for e in extractions.attributes if e.type == AttributeType.anchored_entity)
 
         walker = self._build_walker(data)
 
@@ -90,9 +92,7 @@ class AMRLinker(Linker, ABC):
                 t.amr_element_id = source['id']
 
         # Serialize the attribute collection to json, after alignment
-        attribute_dict = extractions.dict(exclude_unset=True)
+        attribute_dict = extractions.model_dump(exclude_unset=True)
         data["metadata"] = attribute_dict
 
         return data
-
-
