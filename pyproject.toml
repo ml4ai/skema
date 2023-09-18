@@ -50,9 +50,12 @@ isa = [
   "Levenshtein==0.21.1"
 ]
 
+# shared ML dependencies
+ml = ["torch==2.0.1", "torchvision==0.15.2", "beartype==0.15.0"]
+
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
-img2mml = ["torch==2.0.1", "torchvision==0.15.2","lxml==4.9.3", "Pillow==10.0.1"]
+img2mml = ["skema[ml]", "lxml==4.9.3", "Pillow==10.0.1"]
 
 # dependencies for METAL utilities.
 metal = ["fire==0.5.0",
@@ -64,9 +67,9 @@ metal = ["fire==0.5.0",
       "askem_extractions[all]@git+https://github.com/ml4ai/ASKEM-TA1-DataModel"]
 
 # dependencies for text reading utilities.
-tr = ["pyarrow",
+tr = ["skema[ml]", "pyarrow==13.0.0",
       "tqdm",
-      "pandas"]
+      "pandas==2.0.3"]
 
 # project documentation generation
 doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-git-revision-date-localized-plugin==0.11.1", "mkdocs-git-authors-plugin==0.6.3", "mkdocs-rtd-dropdown==1.0.2", "jinja2<3.1.0"]
