@@ -98,7 +98,7 @@ jobs:
     # code coverage (Python)
     - name: "Code coverage reports for Python components"
       run: |
-        pytest
+        pytest skema/skema_py/tests
 
     - name: "Unit tests for Rust components"
       working-directory: ./skema/skema-rs
