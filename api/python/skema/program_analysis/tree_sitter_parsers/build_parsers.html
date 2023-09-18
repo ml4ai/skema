@@ -50,10 +50,21 @@ def build_parsers(languages: List[str]) -&gt; None:
 
     language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
     for language, language_dict in language_yaml_obj.items():
+        language_clone_directory = language_build_dir / language_dict[&#34;tree_sitter_name&#34;]
         if language in languages:
+            # Clone the repository if it doesn&#39;t exist
             subprocess.run(
                 [&#34;git&#34;, &#34;clone&#34;, language_dict[&#34;clone_url&#34;]], cwd=language_build_dir
             )
+            # Update the repository to pull any new commits
+            subprocess.run(
+                [&#34;git&#34;, &#34;pull&#34;], cwd=language_clone_directory
+            )
+            # Checkout the correct commit if commit_sha is specified
+            if language_dict.get(&#34;commit_sha&#34;):
+                subprocess.run(
+                    [&#34;git&#34;, &#34;checkout&#34;, language_dict[&#34;commit_sha&#34;]], cwd=language_clone_directory
+                )
 
     # We can set pass the cwd for subprocess as an argument to run().
     # However, Language.build_library requires the cwd to be set to the build directory
@@ -114,10 +125,21 @@ if __name__ == &#34;__main__&#34;:
 
     language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
     for language, language_dict in language_yaml_obj.items():
+        language_clone_directory = language_build_dir / language_dict[&#34;tree_sitter_name&#34;]
         if language in languages:
+            # Clone the repository if it doesn&#39;t exist
             subprocess.run(
                 [&#34;git&#34;, &#34;clone&#34;, language_dict[&#34;clone_url&#34;]], cwd=language_build_dir
             )
+            # Update the repository to pull any new commits
+            subprocess.run(
+                [&#34;git&#34;, &#34;pull&#34;], cwd=language_clone_directory
+            )
+            # Checkout the correct commit if commit_sha is specified
+            if language_dict.get(&#34;commit_sha&#34;):
+                subprocess.run(
+                    [&#34;git&#34;, &#34;checkout&#34;, language_dict[&#34;commit_sha&#34;]], cwd=language_clone_directory
+                )
 
     # We can set pass the cwd for subprocess as an argument to run().
     # However, Language.build_library requires the cwd to be set to the build directory

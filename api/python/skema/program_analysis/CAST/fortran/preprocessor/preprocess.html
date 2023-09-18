@@ -38,6 +38,12 @@ from subprocess import run, PIPE
 
 from tree_sitter import Parser, Node, Language, Tree
 
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH,
+)
+from skema.program_analysis.CAST.fortran.preprocessor.fixed2free import convertToFree
+
+
 def preprocess(
     source_path: Path,
     out_dir=None,
@@ -45,7 +51,7 @@ def preprocess(
     out_missing_includes=False,
     out_gcc=False,
     out_unsupported=False,
-    out_corrected=False,
+    out_free=False,
 ) -&gt; str:
     &#34;&#34;&#34;Run the full preprocessing pipeline for Fortran-&gt;Tree-Sitter-&gt;CAST
     Takes the original source as input and will return the tree-sitter parse tree as output
@@ -53,7 +59,7 @@ def preprocess(
     1. A log of missing files that are included by preprocessor directives in the source code
     2. The intermediary product from running the c-preprocessor
     3. A log of unsupported idioms
-    4. The source code with unsupported idioms corrected
+    4. The source code converted to free-form
     &#34;&#34;&#34;
     # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
 
@@ -61,7 +67,7 @@ def preprocess(
 
     # Get paths for intermediate products
     if out_dir:
-        if not (out_missing_includes or out_gcc or out_unsupported or out_corrected):
+        if not (out_missing_includes or out_gcc or out_unsupported or out_free):
             logging.warning(&#34;out_dir is specified, but no out flags are set&#34;)
 
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -69,7 +75,7 @@ def preprocess(
         missing_includes_path = Path(out_dir, &#34;missing_includes.txt&#34;)
         gcc_path = Path(out_dir, &#34;gcc.F&#34;)
         unsupported_path = Path(out_dir, &#34;unsupported_idioms.txt&#34;)
-        corrected_path = Path(out_dir, &#34;corrected.F&#34;)
+        free_path = Path(out_dir, &#34;corrected.F&#34;)
         parse_path = Path(out_dir, &#34;parse_tree.txt&#34;)
 
     # Step 1: Check for missing included files
@@ -107,10 +113,10 @@ def preprocess(
             &#34;\n&#34;.join(search_for_unsupported_idioms(source, &#34;idioms_regex.txt&#34;))
         )
 
-    # Step 6 : Fix unsupported idioms
-    source = fix_unsupported_idioms(source)
-    if out_corrected:
-        corrected_path.write_text(source)
+    # Step 6 : Convert to free-form for tree-sitter parsing
+    source = convert_to_free_form(source)
+    if out_free:
+        free_path.write_text(source)
 
     return source
 
@@ -175,23 +181,6 @@ def search_for_unsupported_idioms(source: str, idioms_regex_path: str):
     return log
 
 
-def fix_unsupported_idioms(source: str):
-    &#34;&#34;&#34;
-    Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
-    1. Replaces the first occurrence of &#39;|&#39; with &#39;&amp;&#39; if it is the first non-whitespace character in the line.
-    2. Adds an additional &#39;&amp;&#39; to the previous line
-    &#34;&#34;&#34;
-    processed_lines = []
-    for i, line in enumerate(source.splitlines()):
-        if line.lstrip().startswith(&#34;|&#34;):
-            line = line.replace(&#34;|&#34;, &#34;&amp;&#34;, 1)
-            processed_lines[-1] += &#34;&amp;&#34;
-        processed_lines.append(line)
-    source = &#34;\n&#34;.join(processed_lines)
-
-    return source
-
-
 def fix_include_directives(source: str) -&gt; str:
     &#34;&#34;&#34;There are a few corrections we need to make to the include statements
     1. Convert system level includes to local includes
@@ -217,6 +206,32 @@ def run_c_preprocessor(source: str, include_base_path: Path) -&gt; str:
         cwd=include_base_path,
     )
     return result.stdout
+
+
+def convert_to_free_form(source: str) -&gt; str:
+    &#34;&#34;&#34;If fixed-form Fortran source, convert to free-form&#34;&#34;&#34;
+
+    def validate_parse_tree(source: str) -&gt; bool:
+        &#34;&#34;&#34;Parse source with tree-sitter and check if an error is returned.&#34;&#34;&#34;
+        language = Language(INSTALLED_LANGUAGES_FILEPATH, &#34;fortran&#34;)
+        parser = Parser()
+        parser.set_language(language)
+        tree = parser.parse(bytes(source, encoding=&#34;utf-8&#34;))
+        return &#34;ERROR&#34; not in tree.root_node.sexp()
+
+    # We don&#39;t know for sure if a source is meant to be fixed-form or free-form
+    # So, we will run the parser first to check
+    if validate_parse_tree(source):
+        return source
+    else:
+        # convertToFree takes a stream as input and returns a generator
+        free_source = &#34;&#34;.join(
+            [line for line in convertToFree(source.splitlines(keepends=True))]
+        )
+        if validate_parse_tree(free_source):
+            return free_source
+
+    return source
 
 
 def main():
@@ -246,7 +261,7 @@ def main():
         help=&#34;Output unsupported idioms log&#34;,
     )
     parser.add_argument(
-        &#34;--out_corrected&#34;,
+        &#34;--out_free&#34;,
         action=&#34;store_true&#34;,
         help=&#34;Output source after fixing unsupported idioms&#34;,
     )
@@ -259,7 +274,7 @@ def main():
         args.out_missing_includes,
         args.out_gcc,
         args.out_unsupported,
-        args.out_corrected,
+        args.out_free,
     )
 
 
@@ -315,6 +330,41 @@ if __name__ == &#34;__main__&#34;:
     return missing_files</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_to_free_form"><code class="name flex">
+<span>def <span class="ident">convert_to_free_form</span></span>(<span>source: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If fixed-form Fortran source, convert to free-form</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def convert_to_free_form(source: str) -&gt; str:
+    &#34;&#34;&#34;If fixed-form Fortran source, convert to free-form&#34;&#34;&#34;
+
+    def validate_parse_tree(source: str) -&gt; bool:
+        &#34;&#34;&#34;Parse source with tree-sitter and check if an error is returned.&#34;&#34;&#34;
+        language = Language(INSTALLED_LANGUAGES_FILEPATH, &#34;fortran&#34;)
+        parser = Parser()
+        parser.set_language(language)
+        tree = parser.parse(bytes(source, encoding=&#34;utf-8&#34;))
+        return &#34;ERROR&#34; not in tree.root_node.sexp()
+
+    # We don&#39;t know for sure if a source is meant to be fixed-form or free-form
+    # So, we will run the parser first to check
+    if validate_parse_tree(source):
+        return source
+    else:
+        # convertToFree takes a stream as input and returns a generator
+        free_source = &#34;&#34;.join(
+            [line for line in convertToFree(source.splitlines(keepends=True))]
+        )
+        if validate_parse_tree(free_source):
+            return free_source
+
+    return source</code></pre>
+</details>
+</dd>
 <dt id="skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_include_directives"><code class="name flex">
 <span>def <span class="ident">fix_include_directives</span></span>(<span>source: str) ‑> str</span>
 </code></dt>
@@ -333,34 +383,6 @@ if __name__ == &#34;__main__&#34;:
     for i, line in enumerate(source.splitlines()):
         if &#34;#include&#34; in line:
             line = line.replace(&#34;&lt;&#34;, &#39;&#34;&#39;).replace(&#34;&gt;&#34;, &#39;&#34;&#39;)
-        processed_lines.append(line)
-    source = &#34;\n&#34;.join(processed_lines)
-
-    return source</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_unsupported_idioms"><code class="name flex">
-<span>def <span class="ident">fix_unsupported_idioms</span></span>(<span>source: str)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
-1. Replaces the first occurrence of '|' with '&amp;' if it is the first non-whitespace character in the line.
-2. Adds an additional '&amp;' to the previous line</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def fix_unsupported_idioms(source: str):
-    &#34;&#34;&#34;
-    Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
-    1. Replaces the first occurrence of &#39;|&#39; with &#39;&amp;&#39; if it is the first non-whitespace character in the line.
-    2. Adds an additional &#39;&amp;&#39; to the previous line
-    &#34;&#34;&#34;
-    processed_lines = []
-    for i, line in enumerate(source.splitlines()):
-        if line.lstrip().startswith(&#34;|&#34;):
-            line = line.replace(&#34;|&#34;, &#34;&amp;&#34;, 1)
-            processed_lines[-1] += &#34;&amp;&#34;
         processed_lines.append(line)
     source = &#34;\n&#34;.join(processed_lines)
 
@@ -403,7 +425,7 @@ if __name__ == &#34;__main__&#34;:
         help=&#34;Output unsupported idioms log&#34;,
     )
     parser.add_argument(
-        &#34;--out_corrected&#34;,
+        &#34;--out_free&#34;,
         action=&#34;store_true&#34;,
         help=&#34;Output source after fixing unsupported idioms&#34;,
     )
@@ -416,12 +438,12 @@ if __name__ == &#34;__main__&#34;:
         args.out_missing_includes,
         args.out_gcc,
         args.out_unsupported,
-        args.out_corrected,
+        args.out_free,
     )</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.fortran.preprocessor.preprocess.preprocess"><code class="name flex">
-<span>def <span class="ident">preprocess</span></span>(<span>source_path: pathlib.Path, out_dir=None, overwrite=False, out_missing_includes=False, out_gcc=False, out_unsupported=False, out_corrected=False) ‑> str</span>
+<span>def <span class="ident">preprocess</span></span>(<span>source_path: pathlib.Path, out_dir=None, overwrite=False, out_missing_includes=False, out_gcc=False, out_unsupported=False, out_free=False) ‑> str</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Run the full preprocessing pipeline for Fortran-&gt;Tree-Sitter-&gt;CAST
@@ -430,7 +452,7 @@ An intermediary directory will also be created containing:
 1. A log of missing files that are included by preprocessor directives in the source code
 2. The intermediary product from running the c-preprocessor
 3. A log of unsupported idioms
-4. The source code with unsupported idioms corrected</p></div>
+4. The source code converted to free-form</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -442,7 +464,7 @@ An intermediary directory will also be created containing:
     out_missing_includes=False,
     out_gcc=False,
     out_unsupported=False,
-    out_corrected=False,
+    out_free=False,
 ) -&gt; str:
     &#34;&#34;&#34;Run the full preprocessing pipeline for Fortran-&gt;Tree-Sitter-&gt;CAST
     Takes the original source as input and will return the tree-sitter parse tree as output
@@ -450,7 +472,7 @@ An intermediary directory will also be created containing:
     1. A log of missing files that are included by preprocessor directives in the source code
     2. The intermediary product from running the c-preprocessor
     3. A log of unsupported idioms
-    4. The source code with unsupported idioms corrected
+    4. The source code converted to free-form
     &#34;&#34;&#34;
     # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
 
@@ -458,7 +480,7 @@ An intermediary directory will also be created containing:
 
     # Get paths for intermediate products
     if out_dir:
-        if not (out_missing_includes or out_gcc or out_unsupported or out_corrected):
+        if not (out_missing_includes or out_gcc or out_unsupported or out_free):
             logging.warning(&#34;out_dir is specified, but no out flags are set&#34;)
 
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -466,7 +488,7 @@ An intermediary directory will also be created containing:
         missing_includes_path = Path(out_dir, &#34;missing_includes.txt&#34;)
         gcc_path = Path(out_dir, &#34;gcc.F&#34;)
         unsupported_path = Path(out_dir, &#34;unsupported_idioms.txt&#34;)
-        corrected_path = Path(out_dir, &#34;corrected.F&#34;)
+        free_path = Path(out_dir, &#34;corrected.F&#34;)
         parse_path = Path(out_dir, &#34;parse_tree.txt&#34;)
 
     # Step 1: Check for missing included files
@@ -504,10 +526,10 @@ An intermediary directory will also be created containing:
             &#34;\n&#34;.join(search_for_unsupported_idioms(source, &#34;idioms_regex.txt&#34;))
         )
 
-    # Step 6 : Fix unsupported idioms
-    source = fix_unsupported_idioms(source)
-    if out_corrected:
-        corrected_path.write_text(source)
+    # Step 6 : Convert to free-form for tree-sitter parsing
+    source = convert_to_free_form(source)
+    if out_free:
+        free_path.write_text(source)
 
     return source</code></pre>
 </details>
@@ -599,8 +621,8 @@ An intermediary directory will also be created containing:
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.check_for_missing_includes" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.check_for_missing_includes">check_for_missing_includes</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_to_free_form" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.convert_to_free_form">convert_to_free_form</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_include_directives" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_include_directives">fix_include_directives</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_unsupported_idioms" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.fix_unsupported_idioms">fix_unsupported_idioms</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.main" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.main">main</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.preprocess" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.preprocess">preprocess</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.fortran.preprocessor.preprocess.produce_include_summary" href="#skema.program_analysis.CAST.fortran.preprocessor.preprocess.produce_include_summary">produce_include_summary</a></code></li>
