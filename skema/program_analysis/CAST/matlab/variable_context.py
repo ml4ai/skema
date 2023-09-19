@@ -6,6 +6,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 class VariableContext(object):
     def __init__(self):
+        """Docstring"""
         self.context = [{}]  # Stack of context dictionaries
         self.context_return_values = [set()]  # Stack of context return values
         self.all_symbols = {}
@@ -77,9 +78,11 @@ class VariableContext(object):
         return symbol in self.all_symbols
 
     def get_node(self, symbol: str) -> Dict:
+        """Docstring"""
         return self.all_symbols[symbol]["node"]
 
     def get_type(self, symbol: str) -> str:
+        """Docstring"""
         return self.all_symbols[symbol]["type"]
 
     def update_type(self, symbol: str, type: str):
@@ -89,18 +92,22 @@ class VariableContext(object):
         self.all_symbols[full_symbol_name]["type"] = type
 
     def add_return_value(self, symbol):
+        """Docstring"""
         self.context_return_values[-1].add(symbol)
 
     def remove_return_value(self, symbol):
+        """Docstring"""
         self.context_return_values[-1].discard(symbol)
 
     def generate_iterator(self):
+        """Docstring"""
         symbol = f"generated_iter_{self.iterator_id}"
         self.iterator_id += 1
 
         return self.add_variable(symbol, "iterator", None)
 
     def generate_stop_condition(self):
+        """Docstring"""
         symbol = f"sc_{self.stop_condition_id}"
         self.stop_condition_id += 1
 
@@ -115,8 +122,9 @@ class VariableContext(object):
         self.prefix.pop()
 
     def set_internal(self):
-        '''Set the internal flag, meaning, all '''
+        """Set the internal flag, meaning, all """
         self.internal = True
 
     def unset_internal(self):
+        """Docstring"""
         self.internal = False
