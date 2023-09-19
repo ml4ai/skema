@@ -72,10 +72,7 @@ def preprocess_dataset(config):
 
     # reading raw text files
     mml_path = f"{config['data_path']}/{config['dataset_type']}/{config['markup']}.lst"
-    (
-        f"{config['data_path']}/{config['dataset_type']}/image_tensors"
-    )
-    mml_txt = open(mml_path).read().split("\n")[:-1]
+    mml_txt = open(mml_path).read().split("\n")[:30000]
     image_num = range(0, len(mml_txt))
 
     # split the image_num into train, test, validate

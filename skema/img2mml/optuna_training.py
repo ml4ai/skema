@@ -412,7 +412,7 @@ def objective(
 
     time.sleep(3)
 
-    return bs
+    return val_loss
 
 
 def tune(rank=None,):
@@ -431,8 +431,8 @@ def tune(rank=None,):
         trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
     )
 
-    study = optuna.create_study(direction="maximize")
-    study.optimize(func, n_trials=15)
+    study = optuna.create_study(direction="minimize")
+    study.optimize(func, n_trials=20)
 
     pruned_trials = study.get_trials(
         deepcopy=False, states=[TrialState.PRUNED]
@@ -459,13 +459,13 @@ def tune(rank=None,):
 # for DDP
 def ddp_main():
     world_size = config["world_size"]
-    # os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
+    os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
     mp.spawn(tune, args=(), nprocs=world_size, join=True)
 
 if __name__ == "__main__":
     if config["DDP"]:
         os.environ["MASTER_ADDR"] = "localhost"
-        os.environ["MASTER_PORT"] = "29500"
+        os.environ["MASTER_PORT"] = "29870"
         ddp_main()
     else:
         tune()
