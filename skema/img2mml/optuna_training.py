@@ -400,7 +400,6 @@ def objective(
 
         # calculate bleu score
         print("epoch: ", epoch)
-        bs = calculate_bleu_score()
         trial.report(val_loss, epoch)
 
         # Handle pruning based on the intermediate value.
@@ -411,6 +410,8 @@ def objective(
         dist.destroy_process_group()
 
     time.sleep(3)
+    
+    bs = calculate_bleu_score()
 
     return bs
 
