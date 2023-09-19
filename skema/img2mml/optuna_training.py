@@ -412,7 +412,7 @@ def objective(
 
     time.sleep(3)
 
-    return val_loss
+    return bs
 
 
 def tune(rank=None,):
@@ -431,7 +431,7 @@ def tune(rank=None,):
         trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
     )
 
-    study = optuna.create_study(direction="minimize")
+    study = optuna.create_study(direction="maximize")
     study.optimize(func, n_trials=20)
 
     pruned_trials = study.get_trials(
