@@ -62,8 +62,8 @@ class CastToAnnotatedCastVisitor:
     def visit(self, node: AstNode) -> AnnCastNode:
         # print current node being visited.
         # this can be useful for debugging
-        class_name = node.__class__.__name__
-        print(f"\nProcessing node type {class_name}")
+        # class_name = node.__class__.__name__
+        # print(f"\nProcessing node type {class_name}")
         return self._visit(node)
 
     @singledispatchmethod
