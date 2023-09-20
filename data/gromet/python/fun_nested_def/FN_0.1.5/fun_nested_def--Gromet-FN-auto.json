@@ -1,0 +1,84 @@
+{
+            "schema": "FN",
+            "schema_version": "0.1.5",
+            "name": "fun_nested_def",
+            "fn": {
+                "b": [{"function_type":"MODULE","name":"module","metadata":2}],
+                "bf": [
+                    {"function_type":"FUNCTION","contents":1,"name":"module.foo_0","metadata":3},
+                    {"function_type":"FUNCTION","contents":2,"name":"module.bar_0","metadata":4}
+                ]
+            },
+            "attributes": [
+                {
+                    "type": "FN",
+                    "value": {
+                        "b": [{"function_type":"FUNCTION","name":"foo","metadata":8}],
+                        "bf": [
+                            {"function_type":"FUNCTION","contents":2,"name":"module.foo_id0.bar_1","metadata":9},
+                            {"function_type":"FUNCTION","contents":2,"name":"module.foo_id0.bar_2","metadata":10}
+                        ]
+                    }
+                },
+                {
+                    "type": "FN",
+                    "value": {
+                        "b": [{"function_type":"FUNCTION","name":"bar","metadata":11}],
+                        "bf": [
+                            {"function_type":"PRIMITIVE","name":"print"},
+                            {"function_type":"LITERAL","value":{"value_type":"List","value":"module.bar()"},"metadata":7},
+                            {"function_type":"PRIMITIVE","name":"print"},
+                            {"function_type":"LITERAL","value":{"value_type":"List","value":"module.foo.bar()"},"metadata":13}
+                        ],
+                        "pif": [{"id":1,"box":1},{"id":1,"box":3}],
+                        "pof": [{"id":1,"box":2},{"id":1,"box":4}],
+                        "wff": [{"src":1,"tgt":1},{"src":2,"tgt":2}]
+                    }
+                }
+            ],
+            "metadata_collection": [
+                [
+                    {"metadata_type":"source_code_collection","name":"","global_reference_id":"","files":[{"uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","name":"fun_nested_def.py","path":""}],"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.752864"}},
+                    {"metadata_type":"gromet_creation","gromet_version":"0.1.2","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.752885"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":1,"line_end":11,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.752920"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":10,"line_end":10,"col_begin":0,"col_end":5,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.752970"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":11,"line_end":11,"col_begin":0,"col_end":5,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753107"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":1,"line_end":2,"col_begin":0,"col_end":25,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753195"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":2,"line_end":2,"col_begin":4,"col_end":25,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753307"}}
+                ],
+                [
+                    {"metadata_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'str'>","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753347"}},
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":2,"line_end":2,"col_begin":10,"col_end":24,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753339"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":4,"line_end":8,"col_begin":0,"col_end":9,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753412"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":5,"line_end":5,"col_begin":4,"col_end":9,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753434"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":8,"line_end":8,"col_begin":4,"col_end":9,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753468"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":6,"line_end":7,"col_begin":4,"col_end":33,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753500"}}
+                ],
+                [
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":7,"line_end":7,"col_begin":8,"col_end":33,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753535"}}
+                ],
+                [
+                    {"metadata_type":"source_code_data_type","source_language":"Python","source_language_version":"3.8","data_type":"<class 'str'>","provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753570"}},
+                    {"metadata_type":"source_code_reference","code_file_reference_uid":"61f3f85d-3fa6-4d11-b5fd-daab437e6b84","line_begin":7,"line_end":7,"col_begin":14,"col_end":32,"provenance":{"method":"skema_code2fn_program_analysis","timestamp":"2023-01-16 11:13:02.753561"}}
+                ]
+            ],
+            "metadata": 1
+        }

@@ -1,0 +1,25 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# https://www.playframework.com/documentation/latest/ScalaRouting
+# ~~~~
+
+# Support the home page
+GET     /                                  controllers.HomeController.index
+GET     /parseSentence                     controllers.HomeController.parseSentence(sent: String, showEverything: Boolean)
+
+# Utils
+GET    /version                            controllers.HomeController.version
+
+# Provide API functions
+POST    /cosmosJsonToMentions              controllers.HomeController.cosmosJsonToMentions
+# This should be documented in the API
+POST    /textFileToMentions                controllers.HomeController.textFileToMentions
+POST    /groundStringsToMira               controllers.HomeController.groundStringsToMira(k: Int)
+
+# Show the Swagger pages
+GET     /api/skema                         controllers.HomeController.openAPI(version = "v1")
+GET     /api/skema/:version                controllers.HomeController.openAPI(version: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /favicon.ico                       controllers.Assets.at(file="/images/favicon.ico")
+GET     /assets/*file                      controllers.Assets.at(file)

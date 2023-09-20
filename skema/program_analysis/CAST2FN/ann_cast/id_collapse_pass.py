@@ -104,7 +104,7 @@ class IdCollapsePass:
         assert (
             isinstance(node.left, AnnCastVar)
             or (isinstance(node.left, AnnCastLiteralValue) and (node.left.value_type == StructureType.TUPLE))
-            or isinstance(node.left, AnnCastAttribute)
+            or isinstance(node.left, AnnCastAttribute) or isinstance(node.left, AnnCastCall)
         ), f"id_collapse: visit_assigment: node.left is {type(node.left)}"
         self.visit(node.left, at_module_scope)
 

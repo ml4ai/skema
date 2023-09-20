@@ -4,8 +4,8 @@ import typing
 from skema.program_analysis.CAST2FN.cast import CAST
 
 from skema.program_analysis.CAST2FN.model.cast import (
-    AstNode,
     Assignment,
+    AstNode,
     Attribute,
     Call,
     FunctionDef,

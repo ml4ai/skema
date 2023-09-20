@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OCR Verify</title>
+
+    <!-- Bootstrap -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- JQuery DataTable -->
+    <link
+      href="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-1.13.5/sc-2.2.0/datatables.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.datatables.net/v/bs5/jq-3.7.0/dt-1.13.5/sc-2.2.0/datatables.min.js"></script>
+
+    <link rel="stylesheet" href="/static/css/ocr_verify.css" />
+  </head>
+  <body>
+    <div class="container-fluid">
+      <h4 class="text-center">OCR Verify</h4>
+      <table id="model-results-table" class="table table-bordered">
+        <thead class="table-dark">
+          <tr>
+            <th>Id</th>
+            <th>Source Image</th>
+            <th>Predicted MathML</th>
+            <th>Edit MathML</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="edit-mathml-modal"
+      tabindex="-1"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5">Edit MathML</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="container-fluid">
+              <input type="hidden" id="edit-modal-image-id" value="" readonly />
+              <h5 class="pb-1 m-0 text-center">Source Image</h5>
+              <div class="row p-3 border border-dark">
+                <img id="edit-modal-src-img" />
+              </div>
+              <h5 class="pt-3 pb-1 m-0 text-center">Rendered MathML</h5>
+              <div id="mathml-render" class="row p-3 border border-dark">
+                Mathml
+              </div>
+              <h5 class="pt-3 pb-1 m-0 text-center overflow-auto">
+                Edit MathML
+              </h5>
+              <div class="row">
+                <textarea
+                  class="p-3 border border-dark"
+                  id="mathml-code"
+                  cols="30"
+                  rows="10"
+                ></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button
+              type="submit"
+              id="save-mathml-code"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+            >
+              Save changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="/static/js/ocr_verify.js" defer></script>
+  </body>
+</html>
