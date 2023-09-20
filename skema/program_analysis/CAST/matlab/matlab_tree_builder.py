@@ -13,12 +13,7 @@ class MatlabTreeBuilder(object):
         
         # Create the tree-sitter MATLAB parser
         self.parser = Parser()
-        self.parser.set_language(
-            Language(
-                Path(Path(__file__).parent, INSTALLED_LANGUAGES_FILEPATH),
-                "matlab"
-            )
-        )
+        self.parser.set_language(Language(INSTALLED_LANGUAGES_FILEPATH, "matlab"))
 
     # create a syntax tree based on the matlab grammar and an input string
     def get_tree(self, source: str):
