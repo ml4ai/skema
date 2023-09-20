@@ -55,6 +55,3 @@ def test_parse_tiegcm():
         print(f"preprocess: {preprocess_parsable}")
 
         assert parsable or preprocess_parsable
-
-
-test_parse_tiegcm()
