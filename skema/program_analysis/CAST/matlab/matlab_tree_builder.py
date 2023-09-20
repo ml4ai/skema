@@ -7,7 +7,7 @@ from tree_sitter import Language, Parser, Node, Tree
 
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
-class MATLAB_TREE_BUILDER(object):
+class MatlabTreeBuilder(object):
     def __init__(self):
         """Docstring"""
         

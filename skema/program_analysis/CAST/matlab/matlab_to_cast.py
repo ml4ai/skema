@@ -28,7 +28,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
 )
 
-from skema.program_analysis.CAST.matlab.matlab_tree_builder import MATLAB_TREE_BUILDER
+from skema.program_analysis.CAST.matlab.matlab_tree_builder import MatlabTreeBuilder
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
     NodeHelper,
@@ -44,7 +44,7 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 
 MATLAB_VERSION='matlab_version_here'
 
-class MATLAB2CAST(object):
+class MatlabToCast(object):
     def __init__(self, source_file_path: str):
         """docstring"""
         
@@ -56,7 +56,7 @@ class MATLAB2CAST(object):
         print(self.source)
 
         # get a tree-sitter tree based on source input
-        matlab_tree_builder = MATLAB_TREE_BUILDER()
+        matlab_tree_builder = MatlabTreeBuilder()
         self.tree = matlab_tree_builder.get_tree(self.source)
         self.tree.root_node = matlab_tree_builder.clean_nodes(self.tree.root_node)
 

@@ -8,7 +8,7 @@ from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
 
-from skema.program_analysis.CAST.matlab.matlab_to_cast import MATLAB2CAST
+from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 
 from typing import Optional
 
@@ -61,7 +61,7 @@ def matlab_to_cast(
     """
     
 
-    out_cast = MATLAB2CAST(input_path).out_cast
+    out_cast = MatlabToCast(input_path).out_cast
 
     file_name = os.path.basename(input_path)
     if agraph:
