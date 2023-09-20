@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>skema.program_analysis.CAST.matlab.variable_context API documentation</title>
+<meta name="description" content="" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS_CHTML" integrity="sha256-kZafAc6mZvK3W3v1pHOcUix30OHQN6pU/NO2oFkqZVw=" crossorigin></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>skema.program_analysis.CAST.matlab.variable_context</code></h1>
+</header>
+<section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from typing import List, Dict, Set
+from skema.program_analysis.CAST2FN.model.cast import (
+    Var,
+    Name,
+)
+
+class VariableContext(object):
+    def __init__(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.context = [{}]  # Stack of context dictionaries
+        self.context_return_values = [set()]  # Stack of context return values
+        self.all_symbols = {}
+        self.record_definitions = {}
+
+        # The prefix is used to handle adding Record types to the variable context.
+        # This gives each symbol a unqique name. For example &#34;a&#34; would become &#34;type_name.a&#34;
+        # For nested type definitions (derived type in a module), multiple prefixes can be added.
+        self.prefix = []
+
+        # Flag neccessary to declare if a function is internal or external
+        self.internal = False
+
+        self.variable_id = 0
+        self.iterator_id = 0
+        self.stop_condition_id = 0
+
+    def push_context(self):
+        &#34;&#34;&#34;Create a new variable context and add it to the stack&#34;&#34;&#34;
+        
+        # TODO: Could this add unwanted variables to the context or overwrite existing variables
+        # If the internal flag is set, then all new scopes will use the top-level context
+        if self.internal:
+            return None
+
+        self.context.append({})
+        self.context_return_values.append(set())
+
+    def pop_context(self):
+        &#34;&#34;&#34;Pop the current variable context off of the stack and remove any references to those symbols.&#34;&#34;&#34;
+        
+        # If the internal flag is set, then all new scopes will use the top-level context
+        if self.internal:
+            return None
+        
+        context = self.context.pop()
+
+        # Remove symbols from all_symbols variable
+        for symbol in context:
+            self.all_symbols.pop(symbol)
+
+        self.context_return_values.pop()
+
+    def add_variable(self, symbol: str, type: str, source_refs: List) -&gt; Name:
+        &#34;&#34;&#34;Add a variable to the current variable context&#34;&#34;&#34;
+        # Generate the full symbol name using the prefix
+        full_symbol_name = &#34;.&#34;.join(self.prefix + [symbol])
+
+        cast_name = Name(source_refs=source_refs)
+        cast_name.name = symbol
+        cast_name.id = self.variable_id
+
+        # Update variable id
+        self.variable_id += 1
+
+        # Add the node to the variable context
+        self.context[-1][full_symbol_name] = {
+            &#34;node&#34;: cast_name,
+            &#34;type&#34;: type,
+        }
+
+        # Add reference to all_symbols
+        self.all_symbols[full_symbol_name] = self.context[-1][full_symbol_name]
+
+        return cast_name
+
+    def is_variable(self, symbol: str) -&gt; bool:
+        &#34;&#34;&#34;Check if a symbol exists in any context&#34;&#34;&#34;
+        return symbol in self.all_symbols
+
+    def get_node(self, symbol: str) -&gt; Dict:
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        return self.all_symbols[symbol][&#34;node&#34;]
+
+    def get_type(self, symbol: str) -&gt; str:
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        return self.all_symbols[symbol][&#34;type&#34;]
+
+    def update_type(self, symbol: str, type: str):
+        &#34;&#34;&#34;Update the type associated with a given symbol&#34;&#34;&#34;
+        # Generate the full symbol name using the prefix
+        full_symbol_name = &#34;.&#34;.join(self.prefix + [symbol])
+        self.all_symbols[full_symbol_name][&#34;type&#34;] = type
+
+    def add_return_value(self, symbol):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.context_return_values[-1].add(symbol)
+
+    def remove_return_value(self, symbol):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.context_return_values[-1].discard(symbol)
+
+    def generate_iterator(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        symbol = f&#34;generated_iter_{self.iterator_id}&#34;
+        self.iterator_id += 1
+
+        return self.add_variable(symbol, &#34;iterator&#34;, None)
+
+    def generate_stop_condition(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        symbol = f&#34;sc_{self.stop_condition_id}&#34;
+        self.stop_condition_id += 1
+
+        return self.add_variable(symbol, &#34;boolean&#34;, None)
+
+    def enter_record_definition(self, name: str):
+        &#34;&#34;&#34;Enter a record definition. Updates the prefix to the name of the record&#34;&#34;&#34;
+        self.prefix.append(name)
+
+    def exit_record_definition(self):
+        &#34;&#34;&#34;Exit a record definition. Resets the prefix to the empty string&#34;&#34;&#34;
+        self.prefix.pop()
+
+    def set_internal(self):
+        &#34;&#34;&#34;Set the internal flag, meaning, all &#34;&#34;&#34;
+        self.internal = True
+
+    def unset_internal(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.internal = False</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext"><code class="flex name class">
+<span>class <span class="ident">VariableContext</span></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VariableContext(object):
+    def __init__(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.context = [{}]  # Stack of context dictionaries
+        self.context_return_values = [set()]  # Stack of context return values
+        self.all_symbols = {}
+        self.record_definitions = {}
+
+        # The prefix is used to handle adding Record types to the variable context.
+        # This gives each symbol a unqique name. For example &#34;a&#34; would become &#34;type_name.a&#34;
+        # For nested type definitions (derived type in a module), multiple prefixes can be added.
+        self.prefix = []
+
+        # Flag neccessary to declare if a function is internal or external
+        self.internal = False
+
+        self.variable_id = 0
+        self.iterator_id = 0
+        self.stop_condition_id = 0
+
+    def push_context(self):
+        &#34;&#34;&#34;Create a new variable context and add it to the stack&#34;&#34;&#34;
+        
+        # TODO: Could this add unwanted variables to the context or overwrite existing variables
+        # If the internal flag is set, then all new scopes will use the top-level context
+        if self.internal:
+            return None
+
+        self.context.append({})
+        self.context_return_values.append(set())
+
+    def pop_context(self):
+        &#34;&#34;&#34;Pop the current variable context off of the stack and remove any references to those symbols.&#34;&#34;&#34;
+        
+        # If the internal flag is set, then all new scopes will use the top-level context
+        if self.internal:
+            return None
+        
+        context = self.context.pop()
+
+        # Remove symbols from all_symbols variable
+        for symbol in context:
+            self.all_symbols.pop(symbol)
+
+        self.context_return_values.pop()
+
+    def add_variable(self, symbol: str, type: str, source_refs: List) -&gt; Name:
+        &#34;&#34;&#34;Add a variable to the current variable context&#34;&#34;&#34;
+        # Generate the full symbol name using the prefix
+        full_symbol_name = &#34;.&#34;.join(self.prefix + [symbol])
+
+        cast_name = Name(source_refs=source_refs)
+        cast_name.name = symbol
+        cast_name.id = self.variable_id
+
+        # Update variable id
+        self.variable_id += 1
+
+        # Add the node to the variable context
+        self.context[-1][full_symbol_name] = {
+            &#34;node&#34;: cast_name,
+            &#34;type&#34;: type,
+        }
+
+        # Add reference to all_symbols
+        self.all_symbols[full_symbol_name] = self.context[-1][full_symbol_name]
+
+        return cast_name
+
+    def is_variable(self, symbol: str) -&gt; bool:
+        &#34;&#34;&#34;Check if a symbol exists in any context&#34;&#34;&#34;
+        return symbol in self.all_symbols
+
+    def get_node(self, symbol: str) -&gt; Dict:
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        return self.all_symbols[symbol][&#34;node&#34;]
+
+    def get_type(self, symbol: str) -&gt; str:
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        return self.all_symbols[symbol][&#34;type&#34;]
+
+    def update_type(self, symbol: str, type: str):
+        &#34;&#34;&#34;Update the type associated with a given symbol&#34;&#34;&#34;
+        # Generate the full symbol name using the prefix
+        full_symbol_name = &#34;.&#34;.join(self.prefix + [symbol])
+        self.all_symbols[full_symbol_name][&#34;type&#34;] = type
+
+    def add_return_value(self, symbol):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.context_return_values[-1].add(symbol)
+
+    def remove_return_value(self, symbol):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.context_return_values[-1].discard(symbol)
+
+    def generate_iterator(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        symbol = f&#34;generated_iter_{self.iterator_id}&#34;
+        self.iterator_id += 1
+
+        return self.add_variable(symbol, &#34;iterator&#34;, None)
+
+    def generate_stop_condition(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        symbol = f&#34;sc_{self.stop_condition_id}&#34;
+        self.stop_condition_id += 1
+
+        return self.add_variable(symbol, &#34;boolean&#34;, None)
+
+    def enter_record_definition(self, name: str):
+        &#34;&#34;&#34;Enter a record definition. Updates the prefix to the name of the record&#34;&#34;&#34;
+        self.prefix.append(name)
+
+    def exit_record_definition(self):
+        &#34;&#34;&#34;Exit a record definition. Resets the prefix to the empty string&#34;&#34;&#34;
+        self.prefix.pop()
+
+    def set_internal(self):
+        &#34;&#34;&#34;Set the internal flag, meaning, all &#34;&#34;&#34;
+        self.internal = True
+
+    def unset_internal(self):
+        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+        self.internal = False</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.add_return_value"><code class="name flex">
+<span>def <span class="ident">add_return_value</span></span>(<span>self, symbol)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_return_value(self, symbol):
+    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+    self.context_return_values[-1].add(symbol)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.add_variable"><code class="name flex">
+<span>def <span class="ident">add_variable</span></span>(<span>self, symbol: str, type: str, source_refs: List[~T]) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.name.Name" href="../../CAST2FN/model/cast/name.html#skema.program_analysis.CAST2FN.model.cast.name.Name">Name</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a variable to the current variable context</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_variable(self, symbol: str, type: str, source_refs: List) -&gt; Name:
+    &#34;&#34;&#34;Add a variable to the current variable context&#34;&#34;&#34;
+    # Generate the full symbol name using the prefix
+    full_symbol_name = &#34;.&#34;.join(self.prefix + [symbol])
+
+    cast_name = Name(source_refs=source_refs)
+    cast_name.name = symbol
+    cast_name.id = self.variable_id
+
+    # Update variable id
+    self.variable_id += 1
+
+    # Add the node to the variable context
+    self.context[-1][full_symbol_name] = {
+        &#34;node&#34;: cast_name,
+        &#34;type&#34;: type,
+    }
+
+    # Add reference to all_symbols
+    self.all_symbols[full_symbol_name] = self.context[-1][full_symbol_name]
+
+    return cast_name</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.enter_record_definition"><code class="name flex">
+<span>def <span class="ident">enter_record_definition</span></span>(<span>self, name: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Enter a record definition. Updates the prefix to the name of the record</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def enter_record_definition(self, name: str):
+    &#34;&#34;&#34;Enter a record definition. Updates the prefix to the name of the record&#34;&#34;&#34;
+    self.prefix.append(name)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.exit_record_definition"><code class="name flex">
+<span>def <span class="ident">exit_record_definition</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Exit a record definition. Resets the prefix to the empty string</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def exit_record_definition(self):
+    &#34;&#34;&#34;Exit a record definition. Resets the prefix to the empty string&#34;&#34;&#34;
+    self.prefix.pop()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.generate_iterator"><code class="name flex">
+<span>def <span class="ident">generate_iterator</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_iterator(self):
+    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+    symbol = f&#34;generated_iter_{self.iterator_id}&#34;
+    self.iterator_id += 1
+
+    return self.add_variable(symbol, &#34;iterator&#34;, None)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.generate_stop_condition"><code class="name flex">
+<span>def <span class="ident">generate_stop_condition</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def generate_stop_condition(self):
+    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+    symbol = f&#34;sc_{self.stop_condition_id}&#34;
+    self.stop_condition_id += 1
+
+    return self.add_variable(symbol, &#34;boolean&#34;, None)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.get_node"><code class="name flex">
+<span>def <span class="ident">get_node</span></span>(<span>self, symbol: str) ‑> Dict[~KT, ~VT]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_node(self, symbol: str) -&gt; Dict:
+    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+    return self.all_symbols[symbol][&#34;node&#34;]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.get_type"><code class="name flex">
+<span>def <span class="ident">get_type</span></span>(<span>self, symbol: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_type(self, symbol: str) -&gt; str:
+    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+    return self.all_symbols[symbol][&#34;type&#34;]</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.is_variable"><code class="name flex">
+<span>def <span class="ident">is_variable</span></span>(<span>self, symbol: str) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if a symbol exists in any context</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def is_variable(self, symbol: str) -&gt; bool:
+    &#34;&#34;&#34;Check if a symbol exists in any context&#34;&#34;&#34;
+    return symbol in self.all_symbols</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.pop_context"><code class="name flex">
+<span>def <span class="ident">pop_context</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Pop the current variable context off of the stack and remove any references to those symbols.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def pop_context(self):
+    &#34;&#34;&#34;Pop the current variable context off of the stack and remove any references to those symbols.&#34;&#34;&#34;
+    
+    # If the internal flag is set, then all new scopes will use the top-level context
+    if self.internal:
+        return None
+    
+    context = self.context.pop()
+
+    # Remove symbols from all_symbols variable
+    for symbol in context:
+        self.all_symbols.pop(symbol)
+
+    self.context_return_values.pop()</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.push_context"><code class="name flex">
+<span>def <span class="ident">push_context</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Create a new variable context and add it to the stack</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def push_context(self):
+    &#34;&#34;&#34;Create a new variable context and add it to the stack&#34;&#34;&#34;
+    
+    # TODO: Could this add unwanted variables to the context or overwrite existing variables
+    # If the internal flag is set, then all new scopes will use the top-level context
+    if self.internal:
+        return None
+
+    self.context.append({})
+    self.context_return_values.append(set())</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.remove_return_value"><code class="name flex">
+<span>def <span class="ident">remove_return_value</span></span>(<span>self, symbol)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_return_value(self, symbol):
+    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+    self.context_return_values[-1].discard(symbol)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.set_internal"><code class="name flex">
+<span>def <span class="ident">set_internal</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Set the internal flag, meaning, all</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def set_internal(self):
+    &#34;&#34;&#34;Set the internal flag, meaning, all &#34;&#34;&#34;
+    self.internal = True</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.unset_internal"><code class="name flex">
+<span>def <span class="ident">unset_internal</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Docstring</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unset_internal(self):
+    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
+    self.internal = False</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.variable_context.VariableContext.update_type"><code class="name flex">
+<span>def <span class="ident">update_type</span></span>(<span>self, symbol: str, type: str)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Update the type associated with a given symbol</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def update_type(self, symbol: str, type: str):
+    &#34;&#34;&#34;Update the type associated with a given symbol&#34;&#34;&#34;
+    # Generate the full symbol name using the prefix
+    full_symbol_name = &#34;.&#34;.join(self.prefix + [symbol])
+    self.all_symbols[full_symbol_name][&#34;type&#34;] = type</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="skema.program_analysis.CAST.matlab" href="index.html">skema.program_analysis.CAST.matlab</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext">VariableContext</a></code></h4>
+<ul class="">
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.add_return_value" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.add_return_value">add_return_value</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.add_variable" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.add_variable">add_variable</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.enter_record_definition" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.enter_record_definition">enter_record_definition</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.exit_record_definition" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.exit_record_definition">exit_record_definition</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.generate_iterator" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.generate_iterator">generate_iterator</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.generate_stop_condition" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.generate_stop_condition">generate_stop_condition</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.get_node" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.get_node">get_node</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.get_type" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.get_type">get_type</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.is_variable" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.is_variable">is_variable</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.pop_context" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.pop_context">pop_context</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.push_context" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.push_context">push_context</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.remove_return_value" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.remove_return_value">remove_return_value</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.set_internal" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.set_internal">set_internal</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.unset_internal" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.unset_internal">unset_internal</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.variable_context.VariableContext.update_type" href="#skema.program_analysis.CAST.matlab.variable_context.VariableContext.update_type">update_type</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
