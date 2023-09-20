@@ -9,7 +9,7 @@ from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 
 # test for existence of shared grammar object
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
-if INSTALLED_LANGUAGES_FILEPATH.exists()
+if INSTALLED_LANGUAGES_FILEPATH.exists():
     print('Shared object at: ' + str(INSTALLED_LANGUAGES_FILEPATH))
 else:  
     # If not found, create it
