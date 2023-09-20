@@ -25,7 +25,7 @@ There being a second function call of the same function which contains an expres
 #[allow(clippy::all)] // this is temporary until I refactor this code
 use crate::FunctionType;
 use crate::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
-use crate::{FunctionNet, GrometBox};
+use crate::{FunctionNet, GrometBox, ValueL};
 use rsmgclient::{ConnectParams, Connection, MgError};
 
 #[derive(Debug, Clone)]
@@ -57,7 +57,7 @@ pub struct MetadataNode {
 #[derive(Debug, Clone)]
 pub struct Node {
     pub n_type: String,
-    pub value: Option<String>,
+    pub value: Option<ValueL>,
     pub name: Option<String>,
     pub node_id: String,
     pub out_idx: Option<Vec<u32>>, // opo or pof index, directly matching the wire src/tgt notation
@@ -850,12 +850,14 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         if node.value.is_none() {
             value = String::from("");
         } else {
-            value = node.value.as_ref().unwrap().to_string();
+            value = String::from("");
+            //value = node.value.as_ref().unwrap().to_string();
         }
         let node_query = format!(
             "{} ({}:{} {{name:{:?},value:{:?},order_box:{:?},order_att:{:?}}})",
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
+        println!("{}", node_query);
         queries.push(node_query);
     }
     for node in meta_nodes.iter() {
@@ -903,9 +905,15 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                         po_idx += 1;
                     }
                 }
+
+                // TODO: LITERAL
+                //let new_value = format!(
+                //    "{{value_type: \"{}\",value: {}}}",
+                //    boxf.value.as_ref().unwrap().value_type, boxf.value.as_ref().unwrap().value 
+                //);
                 let n1 = Node {
                     n_type: String::from("Literal"),
-                    value: Some(format!("{:?}", boxf.value.clone().as_ref().unwrap())),
+                    value: Some(boxf.value.clone().unwrap()), //Some(format!("{:?}", boxf.value.clone().as_ref().unwrap())),
                     name: Some("Literal".to_string()),
                     node_id: format!("n{}", start),
                     out_idx: Some(pof),
@@ -1513,14 +1521,22 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             name = node.name.as_ref().unwrap().to_string();
         }
         if node.value.is_none() {
-            value = String::from("");
+            // value is no longer formatted with :?, so we need to explicity represent an empty strig
+            value = String::from("\"\""); 
         } else {
-            value = node.value.as_ref().unwrap().to_string();
+            value = format!(
+                "{{ value_type:{:?}, value:{:?} }}",
+                node.value.as_ref().unwrap().value_type, node.value.as_ref().unwrap().value
+            );
         }
+
+        // NOTE: The format of value has changed to represent a literal Cypher map {field:value}. 
+        // We no longer need to format value with the debug :? parameter
         let node_query = format!(
-            "{} ({}:{} {{name:{:?},value:{:?},order_box:{:?},order_att:{:?}}})",
+            "{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})",
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
+        println!("{}", node_query);
         queries.push(node_query);
     }
     for node in meta_nodes.iter() {
@@ -3546,9 +3562,14 @@ pub fn create_att_literal(
     }
     // now make the node with the port information
     let mut metadata_idx = 0;
+    // TODO: Create properly formatted value
+    let new_value = format!(
+        "{{ value_type:{}, value:{} }}",
+        sboxf.value.as_ref().unwrap().value_type, sboxf.value.as_ref().unwrap().value 
+    );
     let n3 = Node {
         n_type: String::from("Literal"),
-        value: Some(format!("{:?}", sboxf.value.as_ref().unwrap())),
+        value: Some(sboxf.value.clone().unwrap()), //Some(format!("{:?}", sboxf.value.as_ref().unwrap())),
         name: None,
         node_id: format!("n{}", start),
         out_idx: Some(pof),
