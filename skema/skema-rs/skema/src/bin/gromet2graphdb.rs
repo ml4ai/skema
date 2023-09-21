@@ -42,7 +42,6 @@ fn main() {
         fs::write("debug.txt", full_query.clone()).expect("Unable to write file");
     }
 
-    println!("{}", full_query);
     execute_query(&full_query, &args.db_host).unwrap(); // The properties need to have quotes!!
                                                         // writing output to file, since too long for std out now.
 }
