@@ -11,7 +11,7 @@ client = TestClient(app)
 
 def test_comments_get_supported_languages():
     '''Test case for /comments-get-supported-languages endpoint.'''
-    response = client.get("/comments-get-supported-languages")
+    response = client.get("/comment_service/comments-get-supported-languages")
     assert response.status_code == 200
     
     languages = comment_service.SupportedLanguageResponse.parse_obj(response.json())
@@ -21,7 +21,7 @@ def test_comments_get_supported_languages():
 
 def test_comments_get_supprted_file_extensions():
     '''Test cast for /comments-get-supported-file-extensions'''
-    response = client.get("/comments-get-supported-file-extensions")
+    response = client.get("/comment_service/comments-get-supported-file-extensions")
     assert response.status_code == 200
     
     extensions = response.json()
@@ -34,7 +34,7 @@ def test_comments_extract():
         "source": "# Simple comment extraction example",
         "language": "python"
     }
-    response = client.post("/comments-extract", json=request)
+    response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200
 
     comments = comment_service.SingleFileCommentResponse.parse_obj(response.json())
@@ -67,7 +67,7 @@ def test_comments_extract_zip():
         shutil.make_archive(input_path, "zip", input_path)
 
         response = client.post(
-            "/comments-extract-zip",
+            "/comment_service/comments-extract-zip",
             files={"zip_file": open(output_path, "rb")},
         )
         assert response.status_code == 200
