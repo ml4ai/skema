@@ -18,7 +18,7 @@ else:
     build_parsers(["matlab"])
     
 
-TEST_DATA_PATH = 'data'
+TEST_DATA_PATH = Path(__file__).parent / "data"
 
 
 def test_parse_matlab_files():
@@ -26,8 +26,8 @@ def test_parse_matlab_files():
     Tests whether each matlab file 
     produces a single CAST parse
     """
-    for filename in os.listdir(TEST_DATA_PATH):
-        if (filename.endswith('.m')):
-            parser = MatlabToCast(Path.join(TEST_DATA_PATH, filename))
+    for filename in TEST_DATA_PATH.iterdir():
+        if (filename.name.endswith(".m")):
+            parser = MatlabToCast(filename)
             cast = parser.out_cast
             assert len(cast) == 1
