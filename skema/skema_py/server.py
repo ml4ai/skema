@@ -59,29 +59,29 @@ class Ports(BaseModel):
 class System(BaseModel):
     files: List[str] = Field(
         description="The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`",
-        example=["example1.py", "dir/example2.py"],
+        examples=[["example1.py", "dir/example2.py"]],
     )
     blobs: List[str] = Field(
         description="Contents of each file to be analyzed",
-        example=[
+        examples=[[
             "greet = lambda: print('howdy!')\ngreet()",
             "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
-        ],
+        ]],
     )
     system_name: Optional[str] = Field(
         default=None,
         description="A model name to associate with the provided code",
-        example="example-system",
+        examples=["example-system"],
     )
     root_name: Optional[str] = Field(
         default=None,
         description="The name of the code system's root directory.",
-        example="example-system",
+        examples=["example-system"],
     )
     comments: Optional[CodeComments] = Field(
         default=None,
         description="A CodeComments object representing the comments extracted from the source code in 'blobs'. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)",
-        example={
+        examples=[{
             "files": {
                 "example-system/dir/example2.py": {
                     "single": [
@@ -99,7 +99,7 @@ class System(BaseModel):
                     ],
                 }
             }
-        },
+        }],
     )
 
 
