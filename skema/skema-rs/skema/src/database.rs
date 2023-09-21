@@ -841,21 +841,16 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
-        let mut value = String::from("b");
         if node.name.is_none() {
             name = node.n_type.clone();
         } else {
             name = node.name.as_ref().unwrap().to_string();
         }
-        if node.value.is_none() {
-            // value is no longer formatted with :?, so we need to explicity represent an empty strig
-            value = String::from("\"\""); 
-        } else {
-            value = format!(
-                "{{ value_type:{:?}, value:{:?} }}",
-                node.value.as_ref().unwrap().value_type, node.value.as_ref().unwrap().value
-            );
-        }
+        let value = match &node.value {
+            Some(val) => format!("{{ value_type:{:?}, value:{:?} }}", val.value_type, val.value),
+            None => String:: from("\"\""),
+        };
+
         // NOTE: The format of value has changed to represent a literal Cypher map {field:value}. 
         // We no longer need to format value with the debug :? parameter
         let node_query = format!(
@@ -1513,21 +1508,15 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
-        let mut value = String::from("b");
         if node.name.is_none() {
             name = node.n_type.clone();
         } else {
             name = node.name.as_ref().unwrap().to_string();
         }
-        if node.value.is_none() {
-            // value is no longer formatted with :?, so we need to explicity represent an empty strig
-            value = String::from("\"\""); 
-        } else {
-            value = format!(
-                "{{ value_type:{:?}, value:{:?} }}",
-                node.value.as_ref().unwrap().value_type, node.value.as_ref().unwrap().value
-            );
-        }
+        let value = match &node.value {
+            Some(val) => format!("{{ value_type:{:?}, value:{:?} }}", val.value_type, val.value),
+            None => String:: from("\"\""),
+        };
 
         // NOTE: The format of value has changed to represent a literal Cypher map {field:value}. 
         // We no longer need to format value with the debug :? parameter
