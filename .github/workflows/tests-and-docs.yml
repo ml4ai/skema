@@ -60,7 +60,7 @@ jobs:
     # Install tree-sitter parser (for Python component unit tests)
     - name: Install tree-sitter parsers
       working-directory: .
-      run: python skema/program_analysis/tree_sitter_parsers/build_parsers.py --c --cpp --fortran --python --matlab --r
+      run: python skema/program_analysis/tree_sitter_parsers/build_parsers.py --all
       
     # docs (API)
     # generate python docs using pdoc
