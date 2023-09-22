@@ -3185,7 +3185,6 @@ pub fn create_att_primitive(
             pi_idx += 1;
         }
     }
-    println!("pif: {:?}", pif.clone());
     // now make the node with the port information
     let mut metadata_idx = 0;
     let n3 = Node {
