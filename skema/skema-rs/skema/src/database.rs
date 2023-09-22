@@ -822,7 +822,19 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
         c_args.att_idx = 0; // reset incase we hit a function and then literal for example
                             // construct the sub module level boxes along with their metadata and connection to module
         c_args.parent_node = temp_node.clone(); // for if overwritten in function constructor
+        c_args.att_box = gromet.modules[0].r#fn.clone(); // incase over written
         match boxf.function_type {
+            FunctionType::Primitive => {
+                c_args.att_idx = boxf.contents.unwrap() as usize;
+                create_att_primitive(
+                    &gromet,    // gromet for metadata
+                    &mut nodes, // nodes
+                    &mut edges,
+                    &mut meta_nodes,
+                    &mut start,
+                    c_args.clone(),
+                );
+            }
             FunctionType::Literal => {
                 create_att_literal(
                     &gromet,    // gromet for metadata
@@ -835,6 +847,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             }
             FunctionType::Predicate => {
                 c_args.att_idx = boxf.contents.unwrap() as usize;
+                c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
                 create_att_predicate(
                     &gromet,    // gromet for metadata
                     &mut nodes, // nodes
@@ -846,6 +859,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             }
             FunctionType::Expression => {
                 c_args.att_idx = boxf.contents.unwrap() as usize;
+                c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
                 create_att_expression(
                     &gromet,    // gromet for metadata
                     &mut nodes, // nodes
@@ -859,7 +873,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 // in order to have less repetition for multiple function calls and to setup support for recursive functions
                 // We check if the function node and thus contents were already made, and not duplicate the contents if already made
                 c_args.att_idx = boxf.contents.unwrap() as usize;
-
+                c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
                 let mut function_call_repeat = false;
                 let mut original_bf = bf_counter;
                 for node in nodes.clone() {
@@ -3083,10 +3097,17 @@ pub fn create_att_literal(
     if att_box.pof.is_some() {
         let mut po_idx: u32 = 1;
         for port in att_box.pof.unwrap().iter() {
-            if port.r#box == c_args.box_counter as u8 {
-                pof.push(po_idx);
+            if c_args.box_counter != 0 {
+                if port.r#box == c_args.box_counter as u8 {
+                    pof.push(po_idx);
+                }
+                po_idx += 1;
+            } else {
+                if port.r#box == c_args.bf_counter as u8 {
+                    pof.push(po_idx);
+                }
+                po_idx += 1;
             }
-            po_idx += 1;
         }
     }
     // now make the node with the port information
@@ -3164,6 +3185,7 @@ pub fn create_att_primitive(
             pi_idx += 1;
         }
     }
+    println!("pif: {:?}", pif.clone());
     // now make the node with the port information
     let mut metadata_idx = 0;
     let n3 = Node {
@@ -3513,8 +3535,8 @@ pub fn wff_wiring(
     eboxf: FunctionNet,
     nodes: &mut Vec<Node>,
     edges: &mut Vec<Edge>,
-    idx: u32,
-    bf_counter: u8,
+    idx: u32,       // att_idx
+    bf_counter: u8, // bf_counter
 ) -> () {
     // iterate through all wires of type
     for wire in eboxf.wff.unwrap().iter() {
@@ -3544,7 +3566,7 @@ pub fn wff_wiring(
                 // make sure only looking in current attribute nodes for srcs and tgts
                 if src_att == node.contents as u32 {
                     // matche the box
-                    if (src_box as u32) == node.att_bf_idx as u32 {
+                    if (src_box as u32) == node.box_counter as u32 {
                         // only include nodes with pifs
                         if node.in_indx.is_some() {
                             // exclude opo's
@@ -3570,7 +3592,7 @@ pub fn wff_wiring(
                 // make sure only looking in current attribute nodes for srcs and tgts
                 if tgt_att == node.contents as u32 {
                     // match internal box
-                    if (tgt_box as u32) == node.att_bf_idx as u32 {
+                    if (tgt_box as u32) == node.box_counter as u32 {
                         // only include nodes with pofs
                         if node.out_idx.is_some() {
                             // exclude opo's
@@ -4449,7 +4471,9 @@ pub fn external_wiring(
                             }
                         }
                     }
-                } else if (node.n_type == "Literal" || node.n_type == "Import")
+                } else if (node.n_type == "Literal"
+                    || node.n_type == "Import"
+                    || node.n_type == "Primitive")
                     && !tgt_found
                     && node.nbox == tgt_box as usize
                 {
@@ -4461,8 +4485,6 @@ pub fn external_wiring(
                     }
                 }
             }
-            println!("{:?}", wff_src_tgt.clone());
-            println!("{:?}", tgt_found);
             if wff_src_tgt.len() == 2 {
                 let e9 = Edge {
                     src: wff_src_tgt[0].clone(),
