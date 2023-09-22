@@ -907,7 +907,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
 
                 let n1 = Node {
                     n_type: String::from("Literal"),
-                    value: Some(boxf.value.clone().unwrap()), //Some(format!("{:?}", boxf.value.clone().as_ref().unwrap())),
+                    value: Some(boxf.value.clone().unwrap()),
                     name: Some("Literal".to_string()),
                     node_id: format!("n{}", start),
                     out_idx: Some(pof),

@@ -53,7 +53,6 @@ pub struct ValueL {
     pub gromet_type: Option<String>,
 }
 
-
 #[derive(Deserialize, Serialize, Clone, Debug, ToSchema)]
 pub struct GrometBox {
     pub function_type: FunctionType,
