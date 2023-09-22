@@ -847,7 +847,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             name = node.name.as_ref().unwrap().to_string();
         }
         let value = match &node.value {
-            Some(val) => format!("{{ value_type:{:?}, value:{:?} }}", val.value_type, val.value),
+            Some(val) => format!("{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}", val.value_type, val.value, val.gromet_type.as_ref().unwrap()),
             None => String:: from("\"\""),
         };
 
@@ -1514,7 +1514,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             name = node.name.as_ref().unwrap().to_string();
         }
         let value = match &node.value {
-            Some(val) => format!("{{ value_type:{:?}, value:{:?} }}", val.value_type, val.value),
+            Some(val) => format!("{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}", val.value_type, val.value, val.gromet_type.as_ref().unwrap()),
             None => String:: from("\"\""),
         };
 
