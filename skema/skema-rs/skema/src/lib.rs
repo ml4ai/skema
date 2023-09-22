@@ -1,7 +1,6 @@
 // Inclusion of additional modules
 pub mod config;
 pub mod database;
-pub mod database_new;
 pub mod model_extraction;
 pub mod services;
 
