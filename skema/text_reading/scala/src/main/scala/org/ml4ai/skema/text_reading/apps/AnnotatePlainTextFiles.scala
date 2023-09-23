@@ -38,10 +38,23 @@ object AnnotatePlainTextFiles extends App with Logging{
           if(inputFile.exists()){
             val outputFile = new File(config.outDir, "extractions_" + inputFile.getName)
             logger.info(s"Extraction mentions from ${inputFile.getAbsolutePath}")
-            val jsonContents = textReadingPipeline.extractMentionsFromTextFileAndSerialize(inputFile.getAbsolutePath)
+            val extractions = textReadingPipeline.extractMentionsFromTextFile(inputFile.getAbsolutePath)
+            val jsonContents = textReadingPipeline.serializeExtractions(extractions)
+//            val jsonContents = textReadingPipeline.extractMentionsFromTextFileAndSerialize(inputFile.getAbsolutePath)
             Using(FileUtils.printWriterFromFile(outputFile)) { printWriter =>
               printWriter.println(jsonContents)
               logger.info(s"Wrote output to ${outputFile.getAbsolutePath}")
+            }
+
+            // Output the grounding annotation files
+            if (config.annotateGrounding) {
+              val groundingAnnotations = textReadingPipeline.serializeExtractionsForGrounding(extractions)
+              val groundingOutputFile = textReadingPipeline.generateGroundingOutputFilename(outputFile)
+              Using(FileUtils.printWriterFromFile(groundingOutputFile.getAbsolutePath)) {
+                printWriter =>
+                  groundingAnnotations.foreach(printWriter.println)
+                  logger.info(s"Wrote annotation file to ${groundingOutputFile.getAbsolutePath}")
+              }
             }
           }
           else
