@@ -4905,6 +4905,9 @@
 <a href="#4905" id="4905">4905</a>
 <a href="#4906" id="4906">4906</a>
 <a href="#4907" id="4907">4907</a>
+<a href="#4908" id="4908">4908</a>
+<a href="#4909" id="4909">4909</a>
+<a href="#4910" id="4910">4910</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -4932,7 +4935,7 @@ There being a second function call of the same function which contains an expres
 </span><span class="attr">#[allow(clippy::all)] </span><span class="comment">// this is temporary until I refactor this code
 </span><span class="kw">use </span><span class="kw">crate</span>::FunctionType;
 <span class="kw">use crate</span>::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
-<span class="kw">use crate</span>::{FunctionNet, GrometBox};
+<span class="kw">use crate</span>::{FunctionNet, GrometBox, ValueL};
 <span class="kw">use </span>rsmgclient::{ConnectParams, Connection, MgError};
 
 <span class="attr">#[derive(Debug, Clone)]
@@ -4964,7 +4967,7 @@ There being a second function call of the same function which contains an expres
 <span class="attr">#[derive(Debug, Clone)]
 </span><span class="kw">pub struct </span>Node {
     <span class="kw">pub </span>n_type: String,
-    <span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;String&gt;,
+    <span class="kw">pub </span>value: <span class="prelude-ty">Option</span>&lt;ValueL&gt;,
     <span class="kw">pub </span>name: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>node_id: String,
     <span class="kw">pub </span>out_idx: <span class="prelude-ty">Option</span>&lt;Vec&lt;u32&gt;&gt;, <span class="comment">// opo or pof index, directly matching the wire src/tgt notation
@@ -5748,19 +5751,20 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">let </span>create = String::from(<span class="string">&quot;CREATE&quot;</span>);
     <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
         <span class="kw">let </span><span class="kw-2">mut </span>name = String::from(<span class="string">&quot;a&quot;</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>value = String::from(<span class="string">&quot;b&quot;</span>);
         <span class="kw">if </span>node.name.is_none() {
             name = node.n_type.clone();
         } <span class="kw">else </span>{
             name = node.name.as_ref().unwrap().to_string();
         }
-        <span class="kw">if </span>node.value.is_none() {
-            value = String::from(<span class="string">&quot;&quot;</span>);
-        } <span class="kw">else </span>{
-            value = node.value.as_ref().unwrap().to_string();
-        }
-        <span class="kw">let </span>node_query = <span class="macro">format!</span>(
-            <span class="string">&quot;{} ({}:{} {{name:{:?},value:{:?},order_box:{:?},order_att:{:?}}})&quot;</span>,
+        <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>node.value {
+            <span class="prelude-val">Some</span>(val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;</span>, val.value_type, val.value, val.gromet_type.as_ref().unwrap()),
+            <span class="prelude-val">None </span>=&gt; String:: from(<span class="string">&quot;\&quot;\&quot;&quot;</span>),
+        };
+
+        <span class="comment">// NOTE: The format of value has changed to represent a literal Cypher map {field:value}. 
+        // We no longer need to format value with the debug :? parameter
+        </span><span class="kw">let </span>node_query = <span class="macro">format!</span>(
+            <span class="string">&quot;{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})&quot;</span>,
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
         queries.push(node_query);
@@ -5810,9 +5814,10 @@ There being a second function call of the same function which contains an expres
                         po_idx += <span class="number">1</span>;
                     }
                 }
+
                 <span class="kw">let </span>n1 = Node {
                     n_type: String::from(<span class="string">&quot;Literal&quot;</span>),
-                    value: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, boxf.value.clone().as_ref().unwrap())),
+                    value: <span class="prelude-val">Some</span>(boxf.value.clone().unwrap()),
                     name: <span class="prelude-val">Some</span>(<span class="string">&quot;Literal&quot;</span>.to_string()),
                     node_id: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
                     out_idx: <span class="prelude-val">Some</span>(pof),
@@ -6413,19 +6418,20 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">let </span>create = String::from(<span class="string">&quot;CREATE&quot;</span>);
     <span class="kw">for </span>node <span class="kw">in </span>nodes.iter() {
         <span class="kw">let </span><span class="kw-2">mut </span>name = String::from(<span class="string">&quot;a&quot;</span>);
-        <span class="kw">let </span><span class="kw-2">mut </span>value = String::from(<span class="string">&quot;b&quot;</span>);
         <span class="kw">if </span>node.name.is_none() {
             name = node.n_type.clone();
         } <span class="kw">else </span>{
             name = node.name.as_ref().unwrap().to_string();
         }
-        <span class="kw">if </span>node.value.is_none() {
-            value = String::from(<span class="string">&quot;&quot;</span>);
-        } <span class="kw">else </span>{
-            value = node.value.as_ref().unwrap().to_string();
-        }
-        <span class="kw">let </span>node_query = <span class="macro">format!</span>(
-            <span class="string">&quot;{} ({}:{} {{name:{:?},value:{:?},order_box:{:?},order_att:{:?}}})&quot;</span>,
+        <span class="kw">let </span>value = <span class="kw">match </span><span class="kw-2">&amp;</span>node.value {
+            <span class="prelude-val">Some</span>(val) =&gt; <span class="macro">format!</span>(<span class="string">&quot;{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}&quot;</span>, val.value_type, val.value, val.gromet_type.as_ref().unwrap()),
+            <span class="prelude-val">None </span>=&gt; String:: from(<span class="string">&quot;\&quot;\&quot;&quot;</span>),
+        };
+
+        <span class="comment">// NOTE: The format of value has changed to represent a literal Cypher map {field:value}. 
+        // We no longer need to format value with the debug :? parameter
+        </span><span class="kw">let </span>node_query = <span class="macro">format!</span>(
+            <span class="string">&quot;{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})&quot;</span>,
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
         queries.push(node_query);
@@ -8455,7 +8461,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">let </span><span class="kw-2">mut </span>metadata_idx = <span class="number">0</span>;
     <span class="kw">let </span>n3 = Node {
         n_type: String::from(<span class="string">&quot;Literal&quot;</span>),
-        value: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{:?}&quot;</span>, sboxf.value.as_ref().unwrap())),
+        value: <span class="prelude-val">Some</span>(sboxf.value.clone().unwrap()),
         name: <span class="prelude-val">None</span>,
         node_id: <span class="macro">format!</span>(<span class="string">&quot;n{}&quot;</span>, start),
         out_idx: <span class="prelude-val">Some</span>(pof),
