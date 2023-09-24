@@ -210,8 +210,8 @@ def objective(
 
     # parameters
     optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
-    learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-1)
-    weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-4)
+    learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-2)
+    weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-3)
     DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
     EMB_DIM = 256 # trial.suggest_int("EMB_DIM", low=128, high=1024, step=128)
     ENC_DIM = 512  # trial.suggest_int("ENC_DIM", low=128, high=1024, step=128)
@@ -220,7 +220,7 @@ def objective(
     )
     if optimizer_type == "Adam":
         beta_1 = trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
-        beta_2 = trial.suggest_float("beta2", low=0.5, high=0.99, step=0.1)
+        beta_2 = trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
 
     # transformers params
     DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=512, high=2048, step=512)#config["dim_feedforward_for_xfmer"]
