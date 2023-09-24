@@ -811,3 +811,23 @@ fn test_mover_mean() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
 }
+
+#[test]
+fn test_one_dimensional_ebm() {
+    let input = "
+    <math>
+        <mi>C</mi>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>∂</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+    </math>
+    ";
+    //let exp = input.parse::<MathExpressionTree>().unwrap();
+    //println!("exp={:?}", exp);
+}
