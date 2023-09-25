@@ -24,7 +24,7 @@ There being a second function call of the same function which contains an expres
 */
 use crate::FunctionType;
 use crate::{Files, Grounding, ModuleCollection, Provenance, TextExtraction, ValueMeta};
-use crate::{FunctionNet, GrometBox};
+use crate::{FunctionNet, GrometBox, ValueL};
 use rsmgclient::{ConnectParams, Connection, MgError};
 
 #[derive(Debug, Clone)]
@@ -55,8 +55,8 @@ pub struct MetadataNode {
 
 #[derive(Debug, Clone)]
 pub struct Node {
-    pub n_type: String, // name of type of node, function or expression
-    pub value: Option<String>,
+    pub n_type: String,
+    pub value: Option<ValueL>,
     pub name: Option<String>,
     pub node_id: String,
     pub out_idx: Option<Vec<u32>>, // opo or pof index, directly matching the wire src/tgt notation
@@ -744,19 +744,20 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
-        let mut value = String::from("b");
         if node.name.is_none() {
             name = node.n_type.clone();
         } else {
             name = node.name.as_ref().unwrap().to_string();
         }
-        if node.value.is_none() {
-            value = String::from("");
-        } else {
-            value = node.value.as_ref().unwrap().to_string();
-        }
+        let value = match &node.value {
+            Some(val) => format!("{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}", val.value_type, val.value, val.gromet_type.as_ref().unwrap()),
+            None => String:: from("\"\""),
+        };
+
+        // NOTE: The format of value has changed to represent a literal Cypher map {field:value}. 
+        // We no longer need to format value with the debug :? parameter
         let node_query = format!(
-            "{} ({}:{} {{name:{:?},value:{:?},order_box:{:?},order_att:{:?}}})",
+            "{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})",
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
         queries.push(node_query);
@@ -1201,19 +1202,20 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     let create = String::from("CREATE");
     for node in nodes.iter() {
         let mut name = String::from("a");
-        let mut value = String::from("b");
         if node.name.is_none() {
             name = node.n_type.clone();
         } else {
             name = node.name.as_ref().unwrap().to_string();
         }
-        if node.value.is_none() {
-            value = String::from("");
-        } else {
-            value = node.value.as_ref().unwrap().to_string();
-        }
+        let value = match &node.value {
+            Some(val) => format!("{{ value_type:{:?}, value:{:?}, gromet_type:{:?} }}", val.value_type, val.value, val.gromet_type.as_ref().unwrap()),
+            None => String:: from("\"\""),
+        };
+
+        // NOTE: The format of value has changed to represent a literal Cypher map {field:value}. 
+        // We no longer need to format value with the debug :? parameter
         let node_query = format!(
-            "{} ({}:{} {{name:{:?},value:{:?},order_box:{:?},order_att:{:?}}})",
+            "{} ({}:{} {{name:{:?},value:{},order_box:{:?},order_att:{:?}}})",
             create, node.node_id, node.n_type, name, value, node.nbox, node.contents
         );
         queries.push(node_query);
@@ -3114,7 +3116,7 @@ pub fn create_att_literal(
     let mut metadata_idx = 0;
     let n3 = Node {
         n_type: String::from("Literal"),
-        value: Some(format!("{:?}", lit_box.value.as_ref().unwrap())),
+        value: Some(lit_box.value.clone().unwrap()),
         name: None,
         node_id: format!("n{}", start),
         out_idx: Some(pof),

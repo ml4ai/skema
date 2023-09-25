@@ -47,7 +47,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
     r = requests.post(f"{url}/workflows/images/base64/equations-to-amr", json={"images": images_b64, "model": "regnet"})
     r.json()
     """
-    mml: List[str] = [eqn2mml.b64_image_to_mml(img) for img in data.images]
+    mml: List[str] = [utils.clean_mml(eqn2mml.b64_image_to_mml(img)) for img in data.images]
     payload = {"mathml": mml, "model": data.model}
     # FIXME: why is this a PUT?
     res = requests.put(f"{SKEMA_RS_ADDESS}/mathml/amr", json=payload)

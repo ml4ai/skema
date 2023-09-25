@@ -11,8 +11,9 @@ authors = [
 description = "Scientific Knowledge Extraction and Model Analysis"
 version = "0.1.0"
 dependencies=[
-    "dill",
-    "networkx",
+    "Cython",
+    "dill==0.3.7",
+    "networkx==3.1",
     "PyYAML",
     "tree-sitter",
     "requests",
@@ -45,27 +46,30 @@ demo = ["jupyter==1.0.0"]
 isa = [
   "pydot", 
   "graphviz",
-  "graspologic", # NOTE: this depends on rust when installing on an M1/ARM64 machine
-  "Levenshtein"
+  "graspologic==3.2.0", # NOTE: this depends on rust when installing on an M1/ARM64 machine
+  "Levenshtein==0.21.1"
 ]
+
+# shared ML dependencies
+ml = ["torch==2.0.1", "torchvision==0.15.2", "beartype==0.15.0"]
 
 # Im2MML dependencies. The img2mml service converts equation images to MathML.
 # See the skema/img2mml directory.
-img2mml = ["torch", "torchvision","lxml==4.9.3", "pillow"]
+img2mml = ["skema[ml]", "lxml==4.9.3", "Pillow==10.0.1"]
 
 # dependencies for METAL utilities.
-metal = ["fire==0.5.0",
-      "torch",
-      "pyarrow",
-      "transformers",
-      "sentence_transformers",
+metal = ["skema[ml]", 
+      "fire==0.5.0",
+      "pyarrow==13.0.0",
+      "transformers==4.33.2",
+      "sentence_transformers==2.2.2",
       "mock",
       "askem_extractions[all]@git+https://github.com/ml4ai/ASKEM-TA1-DataModel"]
 
 # dependencies for text reading utilities.
-tr = ["pyarrow",
+tr = ["skema[ml]", "pyarrow==13.0.0",
       "tqdm",
-      "pandas"]
+      "pandas==2.0.3"]
 
 # project documentation generation
 doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-git-revision-date-localized-plugin==0.11.1", "mkdocs-git-authors-plugin==0.6.3", "mkdocs-rtd-dropdown==1.0.2", "jinja2<3.1.0"]
@@ -112,9 +116,16 @@ build-backend = "setuptools.build_meta"
 minversion = "7.0"
 addopts = "--cov=skema --cov-report html:docs/coverage/python"
 testpaths = [
-    "skema/program_analysis/tests",
     "skema/img2mml/tests",
-    "skema/rest/tests"
+    "skema/program_analysis/tests",
+    # FIXME: these tests are failing
+    #"skema/program_analysis/comment_extractor/tests",
+    "skema/program_analysis/CAST/fortran/tests",
+    "skema/program_analysis/CAST/matlab/tests",
+    "skema/rest/tests",
+    # FIXME: skema_py is not being tested
+    # and should probably be removed
+    #"skema/skema_py/tests"
 ]
 
 # Configuration for Black.

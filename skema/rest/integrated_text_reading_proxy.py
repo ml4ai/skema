@@ -254,12 +254,12 @@ def cosmos_client(name: str, data: BinaryIO):
 
         for retry_num in range(200):
             time.sleep(3)  # Retry in ten seconds
-            poll = requests.get(f"{COSMOS_ADDRESS}{callback_endpoints['status_endpoint']}")
+            poll = requests.get(f"{callback_endpoints['status_endpoint']}")
             if poll.status_code == status.HTTP_200_OK:
                 poll_results = poll.json()
                 # If the job is completed, fetch the results
                 if poll_results['job_completed']:
-                    cosmos_response = requests.get(f"{COSMOS_ADDRESS}{callback_endpoints['result_endpoint']}")
+                    cosmos_response = requests.get(f"{callback_endpoints['result_endpoint']}")
                     if cosmos_response.status_code == status.HTTP_200_OK:
                         data = cosmos_response.content
                         with ZipFile(io.BytesIO(data)) as z:

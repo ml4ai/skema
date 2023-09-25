@@ -22,7 +22,7 @@ class PetriNetLinker(AMRLinker):
                         for desc in descs:
                             ret[f"{val['name'].strip()}: {desc}"] = val
                     ret[val['name'].strip()] = val
-            elif name == "parameters":
+            elif name == "parameters" and 'id' in val:
                 ret[val['id'].strip()] = val
             # elif name == "transitions":
             #     if "description" in val:
