@@ -13,7 +13,7 @@ from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
 
-from skema.program_analysis.CAST.python.pts2cast import PyTS2CAST
+from skema.program_analysis.CAST.python.ts2cast import TS2CAST
 
 from typing import Optional
 
@@ -130,7 +130,7 @@ def python_to_cast(
         out_cast = cast.CAST([C], "python")
     else:
         file_name = pyfile_path.split("/")[-1]
-        out_cast = PyTS2CAST(pyfile_path).out_cast
+        out_cast = TS2CAST(pyfile_path).out_cast
 
     if agraph:
         V = CASTToAGraphVisitor(out_cast)

@@ -38,13 +38,19 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 
 PYTHON_VERSION = "3.10"
 
-class PyTS2CAST(object):
-    def __init__(self, source_file_path: str):
-        self.path = Path(source_file_path)
-        self.source_file_name = self.path.name
-        
-        # Python doesn't have a preprocessing step like fortran
-        self.source = self.path.read_text()
+class TS2CAST(object):
+    def __init__(self, source_file_path: str, from_file = True):
+        # from_file flag is used for testing purposes, when we don't have actual files
+        if from_file:
+            self.path = Path(source_file_path)
+            self.source_file_name = self.path.name
+            
+            # Python doesn't have a preprocessing step like fortran
+            self.source = self.path.read_text()
+        else:
+            self.path = "None"
+            self.source_file_name = "Temp"
+            self.source = source_file_path
 
         # Run tree-sitter preprocessor output to generate parse tree
         parser = Parser()
@@ -75,8 +81,6 @@ class PyTS2CAST(object):
         return self.visit(root)
 
     def visit(self, node: Node):
-        print(f"Visiting node type {node.type}")
-
         if node.type == "module":
             return self.visit_module(node)
         elif node.type == "expression_statement":
