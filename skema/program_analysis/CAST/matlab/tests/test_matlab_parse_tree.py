@@ -1,9 +1,6 @@
-import requests
 import os
 
-from tree_sitter import Language, Parser
-
-# test parser
+# parser to be tested
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 
 TEST_DATA_PATH = 'data'
@@ -20,6 +17,5 @@ def test_parse_matlab_files():
             parser = MatlabToCast(filepath)
             cast = parser.out_cast
             assert len(cast) == 1  
-
 
 test_parse_matlab_files()
