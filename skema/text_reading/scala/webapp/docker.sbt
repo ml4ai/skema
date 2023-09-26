@@ -28,7 +28,8 @@ dockerEnvVars ++= Map(
   "APP_VERSION" -> scala.util.Properties.envOrElse("APP_VERSION", "???"),
   "APPLICATION_SECRET" -> "this-is-not-a-secure-key-please-change-me",
   // NOTE: the expected min. RAM requirements
-  "_JAVA_OPTIONS" -> "-Xmx6g -Xms6g -Dfile.encoding=UTF-8"
+  // FIXME: reduce RAM consumption $\le 8GB$
+  "_JAVA_OPTIONS" -> "-Xmx10g -Xms10g -Dfile.encoding=UTF-8"
 )
 dockerAdditionalPermissions += (DockerChmodType.UserGroupPlusExecute, app)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
