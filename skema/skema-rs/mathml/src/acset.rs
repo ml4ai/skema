@@ -433,7 +433,7 @@ impl From<ACSet> for PetriNet {
         };
 
         PetriNet {
-            header: header,
+            header,
             model,
             semantics: Some(semantics),
             metadata: None,
@@ -788,7 +788,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         };
 
         PetriNet {
-            header: header,
+            header,
             model,
             semantics: Some(semantics),
             metadata: None,
@@ -970,7 +970,7 @@ impl From<Vec<FirstOrderODE>> for RegNet {
         };
 
         RegNet {
-            header: header,
+            header,
             model,
             metadata: None,
         }
@@ -1134,7 +1134,7 @@ impl From<Vec<Math>> for RegNet {
         };
 
         RegNet {
-            header: header,
+            header,
             model,
             metadata: None,
         }
