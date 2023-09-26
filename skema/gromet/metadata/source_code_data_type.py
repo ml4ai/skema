@@ -29,7 +29,7 @@ class SourceCodeDataType(Metadata):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'metadata_type': 'str',
+        'gromet_type': 'str',
         'source_language': 'str',
         'source_language_version': 'str',
         'data_type': 'str'
@@ -38,7 +38,7 @@ class SourceCodeDataType(Metadata):
         swagger_types.update(Metadata.swagger_types)
 
     attribute_map = {
-        'metadata_type': 'metadata_type',
+        'gromet_type': 'gromet_type',
         'source_language': 'source_language',
         'source_language_version': 'source_language_version',
         'data_type': 'data_type'
@@ -46,15 +46,15 @@ class SourceCodeDataType(Metadata):
     if hasattr(Metadata, "attribute_map"):
         attribute_map.update(Metadata.attribute_map)
 
-    def __init__(self, metadata_type='SourceCodeDataType', source_language=None, source_language_version=None, data_type=None, *args, **kwargs):  # noqa: E501
+    def __init__(self, gromet_type='SourceCodeDataType', source_language=None, source_language_version=None, data_type=None, *args, **kwargs):  # noqa: E501
         """SourceCodeDataType - a model defined in Swagger"""  # noqa: E501
-        self._metadata_type = None
+        self._gromet_type = None
         self._source_language = None
         self._source_language_version = None
         self._data_type = None
         self.discriminator = None
-        if metadata_type is not None:
-            self.metadata_type = metadata_type
+        if gromet_type is not None:
+            self.gromet_type = gromet_type
         if source_language is not None:
             self.source_language = source_language
         if source_language_version is not None:
@@ -64,25 +64,25 @@ class SourceCodeDataType(Metadata):
         Metadata.__init__(self, *args, **kwargs)
 
     @property
-    def metadata_type(self):
-        """Gets the metadata_type of this SourceCodeDataType.  # noqa: E501
+    def gromet_type(self):
+        """Gets the gromet_type of this SourceCodeDataType.  # noqa: E501
 
 
-        :return: The metadata_type of this SourceCodeDataType.  # noqa: E501
+        :return: The gromet_type of this SourceCodeDataType.  # noqa: E501
         :rtype: str
         """
-        return self._metadata_type
+        return self._gromet_type
 
-    @metadata_type.setter
-    def metadata_type(self, metadata_type):
-        """Sets the metadata_type of this SourceCodeDataType.
+    @gromet_type.setter
+    def gromet_type(self, gromet_type):
+        """Sets the gromet_type of this SourceCodeDataType.
 
 
-        :param metadata_type: The metadata_type of this SourceCodeDataType.  # noqa: E501
+        :param gromet_type: The gromet_type of this SourceCodeDataType.  # noqa: E501
         :type: str
         """
 
-        self._metadata_type = metadata_type
+        self._gromet_type = gromet_type
 
     @property
     def source_language(self):
