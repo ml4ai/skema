@@ -54,7 +54,7 @@ GROMET_VERSION_CANONICAL_DEFINITION = "skema/gromet/__init__.py"
 def update_canonical_gromet_version(new_version):
     path = os.path.join('..', GROMET_VERSION_CANONICAL_DEFINITION)
     with open(path, 'r') as gv:
-        file_contents = re.sub(r"\s*GROMET_VERSION\s*=\s+\"[\d.]+\"",
+        file_contents = re.sub(r"\s*GROMET_VERSION\s*=\s+\".*?$",
                                f'''GROMET_VERSION = "{new_version}"''',
                                gv.read())
     with open(path, 'w') as gv_out:
