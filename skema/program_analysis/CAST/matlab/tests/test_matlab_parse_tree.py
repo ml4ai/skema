@@ -1,6 +1,5 @@
 import requests
 import os
-from pathlib import Path
 
 from tree_sitter import Language, Parser
 
@@ -16,6 +15,11 @@ def test_parse_matlab_files():
     """
     for filename in os.listdir(TEST_DATA_PATH):
         if (filename.endswith('.m')):
-            parser = MatlabToCast(Path.join(TEST_DATA_PATH, filename))
+            filepath = os.path.join(TEST_DATA_PATH, filename)
+            print('Testing parse tree for ' + str(filepath))
+            parser = MatlabToCast(filepath)
             cast = parser.out_cast
-            assert len(cast) == 1
+            assert len(cast) == 1  
+
+
+test_parse_matlab_files()
