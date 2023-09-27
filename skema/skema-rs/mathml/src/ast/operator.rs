@@ -38,6 +38,7 @@ pub enum Operator {
     Arcsec,
     Arccsc,
     Arccot,
+    Mean,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
 }
@@ -63,8 +64,8 @@ impl fmt::Display for Operator {
             }) => {
                 write!(f, "D({order}, {var_index}, {bound_var})")
             }
-            Operator::Exp => write!(f, "Exp"),
-            Operator::Power => write!(f, "Power"),
+            Operator::Exp => write!(f, "exp"),
+            Operator::Power => write!(f, "^"),
             Operator::Other(op) => write!(f, "{op}"),
             Operator::Sin => write!(f, "Sin"),
             Operator::Cos => write!(f, "Cos"),
@@ -78,6 +79,7 @@ impl fmt::Display for Operator {
             Operator::Arcsec => write!(f, "Arcsec"),
             Operator::Arccsc => write!(f, "Arccsc"),
             Operator::Arccot => write!(f, "Arccot"),
+            Operator::Mean => write!(f, "Mean"),
         }
     }
 }
