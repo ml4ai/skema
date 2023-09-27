@@ -181,6 +181,24 @@ class TextReadingDocumentResults(BaseModel):
         )
 
 
+class TextReadingEvaluationResults(BaseModel):
+    """ Evaluation results of the SKEMA TR extractions against manual annotations """
+    num_manual_annotations: int = Field(
+        description="Number of manual annotations in the reference document"
+    ),
+    yield_: int = Field(
+        name="yield",
+        description="Total number of extractions detected in the current document",
+    ),
+    correct_extractions: int = Field(
+        name="correct_extractions",
+        description="Number of extractions matched in the ground-truth annotations"
+    ),
+    precision: float = Field(
+        description="Ratio of correct extractions against manual annotations"
+    )
+
+
 class TextReadingAnnotationsOutput(BaseModel):
     """Contains the TR document results for all the documents submitted for annotation"""
 
