@@ -89,7 +89,6 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
 # re-map skema/text_reading/python to skema.text_reading
 #"skema.text_reading" = "skema/text_reading/python"
 "skema.metal.model_linker" = "skema/metal/model_linker/skema_model_linker"
-"skema.data" = "skema/data"
 
 # [tool.setuptools.packages]
 # find = {}  # Scan the project directory with the default parameters
@@ -114,13 +113,14 @@ build-backend = "setuptools.build_meta"
 # pytest
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "--cov=skema --cov-report html:docs/coverage/python"
+addopts = "-v --cov=skema --cov-report html:docs/coverage/python"
 testpaths = [
     "skema/img2mml/tests",
     "skema/program_analysis/tests",
-    # FIXME: these tests are failing
-    #"skema/program_analysis/comment_extractor/tests",
-    "skema/program_analysis/CAST/fortran/tests",
+    "skema/program_analysis/comment_extractor/tests",
+    "skema/program_analysis/tree_sitter_parsers/tests",
+    # TODO: Fix fortran tests
+    #"skema/program_analysis/CAST/fortran/tests",
     "skema/program_analysis/CAST/matlab/tests",
     "skema/rest/tests",
     # FIXME: skema_py is not being tested
