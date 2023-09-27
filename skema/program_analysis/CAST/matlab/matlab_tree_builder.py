@@ -45,7 +45,7 @@ class MatlabTreeBuilder(object):
     def traverse_nodes(self, node: Node, indent = ''):
         """Docstring"""
         for child in node.children:
-            print(indent + 'node: ' + child.type)
+            # print(indent + 'node: ' + child.type)
             self.traverse_nodes(child, indent + '  ')
 
     # Display the tree starting at the root node
