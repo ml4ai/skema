@@ -10,8 +10,9 @@ use crate::{
         Ci, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup,
-        msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+        add, attribute, comma, elem_many0, equals, etag, lparen, mean, mi, mn, msqrt, msub,
+        msubsup, msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        ParseError, Span,
     },
 };
 
@@ -28,7 +29,7 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((add, subtract, equals, lparen, rparen, comma)),
+        alt((add, subtract, equals, lparen, rparen, comma, mean)),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -77,7 +78,7 @@ pub fn ci_univariate_without_bounds(input: Span) -> IResult<Ci> {
     Ok((
         s,
         Ci::new(
-            Some(Type::Function),
+            None,
             Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
             None,
         ),
@@ -128,8 +129,20 @@ pub fn ci_subscript_func(input: Span) -> IResult<Ci> {
 
 /// Parse content identifier for Msup
 pub fn superscript(input: Span) -> IResult<MathExpression> {
-    let (s, x) = msup(input)?;
-    Ok((s, x))
+    let (s, sup) = ws(map(
+        tag_parser!("msup", pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
+    ))(input)?;
+    Ok((s, sup))
+}
+
+/// Parse Mover
+pub fn over_term(input: Span) -> IResult<MathExpression> {
+    let (s, over) = ws(map(
+        tag_parser!("mover", pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Mover(Box::new(x), Box::new(y)),
+    ))(input)?;
+    Ok((s, over))
 }
 
 /// Parse the identifier 'd'
@@ -384,6 +397,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         mn,
         superscript,
         msup,
+        over_term,
         msub,
         msqrt,
         mfrac,
