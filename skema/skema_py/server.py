@@ -9,12 +9,15 @@ from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
 from fastapi import APIRouter, FastAPI, Body, File, UploadFile
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
 import skema.skema_py.petris
 
 import skema.program_analysis.comment_extractor.server as comment_service
+from skema.gromet.fn.gromet_fn_module_collection import GrometFNModuleCollection
+from skema.gromet.metadata.debug import Debug
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
 from skema.program_analysis.fn_unifier import align_full_system
@@ -29,7 +32,6 @@ from skema.program_analysis.comment_extractor.model import (
 from skema.program_analysis.tree_sitter_parsers.build_parsers import (
     LANGUAGES_YAML_FILEPATH,
 )
-
 
 def get_supported_languages() -> (List, Dict):
     """"""
@@ -59,29 +61,29 @@ class Ports(BaseModel):
 class System(BaseModel):
     files: List[str] = Field(
         description="The relative file path from the directory specified by `root_name`, corresponding to each entry in `blobs`",
-        examples=[["example1.py", "dir/example2.py"]],
+        example=["example1.py", "dir/example2.py"],
     )
     blobs: List[str] = Field(
         description="Contents of each file to be analyzed",
-        examples=[[
+        example=[
             "greet = lambda: print('howdy!')\ngreet()",
             "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",
-        ]],
+        ],
     )
     system_name: Optional[str] = Field(
         default=None,
         description="A model name to associate with the provided code",
-        examples=["example-system"],
+        example="example-system",
     )
     root_name: Optional[str] = Field(
         default=None,
         description="The name of the code system's root directory.",
-        examples=["example-system"],
+        example="example-system",
     )
     comments: Optional[CodeComments] = Field(
         default=None,
         description="A CodeComments object representing the comments extracted from the source code in 'blobs'. Can provide comments for a single file (SingleFileCodeComments) or multiple files (MultiFileCodeComments)",
-        examples=[{
+        example={
             "files": {
                 "example-system/dir/example2.py": {
                     "single": [
@@ -99,7 +101,7 @@ class System(BaseModel):
                     ],
                 }
             }
-        }],
+        },
     )
 
 
@@ -135,6 +137,33 @@ async def system_to_enriched_system(system: System) -> System:
 async def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
+    # We maintain a log of warnings and error to pass back to the user.
+    # This allows us to warn the user about unsupported file extensions.
+    server_log = []
+
+    # Check for unsupported files before processing. They will be removed and the user will be warned.
+    unsupported_files = [file for file in system.files if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS]
+    for file in unsupported_files:
+        system.files.remove(file)
+        unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
+        server_log.append(unsupported_file_str)
+        print(unsupported_file_str)
+
+
+    # If there are no supported files, then we will return an empty GrometFNModuleCollection with a top-level Debug metadata
+    if len(system.files) == 0:
+        no_supported_file_str = "ERROR: The system does not contain any files with supported file extensions. All files will be skipped."
+        gromet_collection = GrometFNModuleCollection(metadata=0)
+        gromet_collection.metadata_collection.append(
+            Debug(
+                debug_type="code2fn",
+                severity="Error",
+                message=no_supported_file_str
+            )
+        )
+        print(no_supported_file_str)
+        return gromet_collection.to_dict()
+
     # The CODE2FN Pipeline requires a file path as input.
     # We are receiving a serialized version of the code system as input, so we must store the file in a temporary directory.
     # This temp directory only persists during execution of the CODE2FN pipeline.
@@ -164,7 +193,9 @@ async def system_to_gromet(system: System):
 
     # If comments are included in request or added in the enriching process, run the unifier to add them to the Gromet
     if system.comments:
-        align_full_system(gromet_collection, system.comments)
+        # TODO: UNCOMMENT THIS
+        pass
+        #align_full_system(gromet_collection, system.comments)
 
     # Explicitly call to_dict on any metadata object
     # NOTE: Only required because of fault in swagger-codegen
@@ -175,8 +206,22 @@ async def system_to_gromet(system: System):
                     k
                 ] = metadata.to_dict()
 
+
+   
+
+    # Add debug Metadata to Gromet objects
+    metadata_collection = gromet_collection.metadata_collection
+    
+  
+    for log in server_log:
+        Debug(
+            debug_type="code2fn",
+            severity="Warning",
+            message=log
+        )
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
+
 
 
 router = APIRouter()
@@ -240,7 +285,7 @@ async def fn_given_filepaths(system: System):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
     gromet_json = response.json()
     """
-
+    
     return await system_to_gromet(system)
 
 
