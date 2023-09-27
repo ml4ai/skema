@@ -517,9 +517,9 @@ fn test_content_hackathon2_scenario1_eq1() {
     let cmml = ode.to_cmml();
     println!("cmml={:?}", cmml);
     let FirstOrderODE {
-        lhs_var,
-        func_of,
-        with_respect_to,
+        lhs_var: _,
+        func_of: _,
+        with_respect_to: _,
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
     println!("rhs = {:?}", rhs.to_string());
