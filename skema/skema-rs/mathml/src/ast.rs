@@ -70,7 +70,7 @@ impl fmt::Display for MathExpression {
             MathExpression::Ci(Ci {
                 r#type: _,
                 content,
-                func_of,
+                func_of: _,
             }) => write!(f, "{}", content),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
