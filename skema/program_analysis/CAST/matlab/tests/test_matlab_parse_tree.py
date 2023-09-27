@@ -1,7 +1,7 @@
-import os
-
 # parser to be tested
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
+from pathlib import Path
+import os
 
 TEST_DATA_PATH = Path(__file__).parent / "data"
 
