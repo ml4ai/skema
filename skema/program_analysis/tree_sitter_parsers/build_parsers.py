@@ -62,11 +62,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     language_yaml_obj = yaml.safe_load(open(LANGUAGES_YAML_FILEPATH))
+    parser.add_argument("--all", action="store_true", help="Build all tree-sitter parsers")
     for language, language_dict in language_yaml_obj.items():
         flag = f"--{language}"
         help_text = f"Include {language} language"
         parser.add_argument(flag, action="store_true", help=help_text)
-
     args = parser.parse_args()
-    selected_languages = [language for language, value in vars(args).items() if value]
+
+    if args.all:
+        selected_languages = [language for language in yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())]
+    else:
+        selected_languages = [language for language, value in vars(args).items() if value]
+    
     build_parsers(selected_languages)
