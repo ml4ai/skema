@@ -74,7 +74,7 @@ class MatlabTreeBuilder(object):
     def traverse_nodes(self, node: Node, indent = &#39;&#39;):
         &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         for child in node.children:
-            print(indent + &#39;node: &#39; + child.type)
+            # print(indent + &#39;node: &#39; + child.type)
             self.traverse_nodes(child, indent + &#39;  &#39;)
 
     # Display the tree starting at the root node
@@ -139,7 +139,7 @@ class MatlabTreeBuilder(object):
     def traverse_nodes(self, node: Node, indent = &#39;&#39;):
         &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         for child in node.children:
-            print(indent + &#39;node: &#39; + child.type)
+            # print(indent + &#39;node: &#39; + child.type)
             self.traverse_nodes(child, indent + &#39;  &#39;)
 
     # Display the tree starting at the root node
@@ -214,7 +214,7 @@ class MatlabTreeBuilder(object):
 <pre><code class="python">def traverse_nodes(self, node: Node, indent = &#39;&#39;):
     &#34;&#34;&#34;Docstring&#34;&#34;&#34;
     for child in node.children:
-        print(indent + &#39;node: &#39; + child.type)
+        # print(indent + &#39;node: &#39; + child.type)
         self.traverse_nodes(child, indent + &#39;  &#39;)</code></pre>
 </details>
 </dd>
