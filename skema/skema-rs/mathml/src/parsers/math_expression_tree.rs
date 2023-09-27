@@ -160,14 +160,11 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for element in elements {
                     if let MathExpression::Ci(x) = element {
-                        println!("x={:?}", x);
                         // Handles cos and sin as operators
                         if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
                             tokens.push(MathExpression::Mo(Operator::Cos));
                             if let Some(vec) = x.func_of.clone() {
-                                println!("vec={:?}", vec);
                                 for v in vec {
-                                    println!("v ={:?}", v);
                                     tokens.push(MathExpression::Ci(v));
                                 }
                             }
@@ -830,4 +827,6 @@ fn test_one_dimensional_ebm() {
     ";
     //let exp = input.parse::<MathExpressionTree>().unwrap();
     //println!("exp={:?}", exp);
+    //let ode = input.parse::<FirstOrderODE>().unwrap();
+    //println!("ode ={:?}", ode);
 }

@@ -193,6 +193,11 @@ pub fn subtract(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn multiply(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Multiply, alt((ws(tag("*")), ws(tag("&#x2217;")))))(input)?;
+    Ok((s, op))
+}
+
 pub fn equals(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
     Ok((s, op))
@@ -225,7 +230,16 @@ fn operator_other(input: Span) -> IResult<Operator> {
 }
 
 pub fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((add, subtract, equals, lparen, rparen, mean, operator_other))(input)?;
+    let (s, op) = alt((
+        add,
+        subtract,
+        equals,
+        lparen,
+        rparen,
+        mean,
+        multiply,
+        operator_other,
+    ))(input)?;
     Ok((s, op))
 }
 

@@ -360,7 +360,6 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        map(ci_univariate_without_bounds, MathExpression::Ci),
         map(
             ci_univariate_with_bounds,
             |Ci {
@@ -373,14 +372,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
+        map(ci_univariate_without_bounds, MathExpression::Ci),
         map(ci_subscript, MathExpression::Ci),
-        map(ci_unknown_without_bounds, |Ci { content, .. }| {
-            MathExpression::Ci(Ci {
-                r#type: Some(Type::Real),
-                content,
-                func_of: None,
-            })
-        }),
         map(
             ci_unknown_with_bounds,
             |Ci {
@@ -393,6 +386,13 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
+        map(ci_unknown_without_bounds, |Ci { content, .. }| {
+            MathExpression::Ci(Ci {
+                r#type: Some(Type::Real),
+                content,
+                func_of: None,
+            })
+        }),
         map(operator, MathExpression::Mo),
         mn,
         superscript,
