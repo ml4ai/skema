@@ -35,10 +35,6 @@ dockerAdditionalPermissions += (DockerChmodType.UserGroupPlusExecute, app)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
 // dockerCmd := Seq(s"-Dhttp.port=$port")
 dockerEntrypoint := Seq(app)
-// This is now delegated to skema-webapp.env.
-// dockerEnvVars := Map(
-//   "_JAVA_OPTIONS" -> "-Xmx16g -Xms16g -Dfile.encoding=UTF-8"
-// )
 dockerPermissionStrategy := DockerPermissionStrategy.MultiStage
 dockerUpdateLatest := true
 
