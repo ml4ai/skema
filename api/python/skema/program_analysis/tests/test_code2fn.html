@@ -28,10 +28,16 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import json
+import requests
+import zipfile
+import io
 from pathlib import Path
+from tempfile import TemporaryFile, TemporaryDirectory
+
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.gromet.fn import GrometFNModuleCollection
 
+BUCKY_ZIP_URL = &#34;https://artifacts.askem.lum.ai/askem/data/models/zip-archives/Bucky.zip&#34;
 
 def test_code2fn():
     &#34;&#34;&#34;This is simply a smokescreen test to see if the PA pipeline runs to
@@ -42,12 +48,26 @@ def test_code2fn():
     flag or postprocessing function to be able to compare two GroMEts modulo
     their random components.&#34;&#34;&#34;
 
-    data_dir = Path(__file__).parents[3] / &#34;data&#34;
-    module_collection: GrometFNModuleCollection = process_file_system(
-        &#34;chime_penn&#34;,
-        str(data_dir / &#34;epidemiology/Bucky/code/bucky_v2&#34;),
-        str(data_dir / &#34;epidemiology/Bucky/code/system_filepaths.txt&#34;),
-    )</code></pre>
+    response = requests.get(BUCKY_ZIP_URL)
+    zip = zipfile.ZipFile(io.BytesIO(response.content))
+
+    with TemporaryDirectory() as temp:
+        system_filepaths_path = Path(temp) / &#34;system_filepaths.txt&#34;
+        system_filepaths_path.write_text(&#34;\n&#34;.join([file.filename for file in zip.filelist]))
+
+        for file in zip.filelist:
+            file_path = Path(temp) / file.filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(str(zip.open(file, &#34;r&#34;).read(), encoding=&#34;utf-8&#34;))
+
+        module_collection: GrometFNModuleCollection = process_file_system(
+            &#34;chime_penn&#34;,
+            str(temp),
+            str(system_filepaths_path),
+        )
+
+    # If we&#39;ve made it this far the Gromet pipeline has run without crashing
+    assert True</code></pre>
 </details>
 </section>
 <section>
@@ -80,12 +100,26 @@ their random components.</p></div>
     flag or postprocessing function to be able to compare two GroMEts modulo
     their random components.&#34;&#34;&#34;
 
-    data_dir = Path(__file__).parents[3] / &#34;data&#34;
-    module_collection: GrometFNModuleCollection = process_file_system(
-        &#34;chime_penn&#34;,
-        str(data_dir / &#34;epidemiology/Bucky/code/bucky_v2&#34;),
-        str(data_dir / &#34;epidemiology/Bucky/code/system_filepaths.txt&#34;),
-    )</code></pre>
+    response = requests.get(BUCKY_ZIP_URL)
+    zip = zipfile.ZipFile(io.BytesIO(response.content))
+
+    with TemporaryDirectory() as temp:
+        system_filepaths_path = Path(temp) / &#34;system_filepaths.txt&#34;
+        system_filepaths_path.write_text(&#34;\n&#34;.join([file.filename for file in zip.filelist]))
+
+        for file in zip.filelist:
+            file_path = Path(temp) / file.filename
+            file_path.parent.mkdir(parents=True, exist_ok=True)
+            file_path.write_text(str(zip.open(file, &#34;r&#34;).read(), encoding=&#34;utf-8&#34;))
+
+        module_collection: GrometFNModuleCollection = process_file_system(
+            &#34;chime_penn&#34;,
+            str(temp),
+            str(system_filepaths_path),
+        )
+
+    # If we&#39;ve made it this far the Gromet pipeline has run without crashing
+    assert True</code></pre>
 </details>
 </dd>
 </dl>

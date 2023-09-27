@@ -850,7 +850,7 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_simple_sir_v1() {
-    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt&quot;</span>);
+    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;tests/mml2pn_inputs/simple_sir_v1/mml_list.txt&quot;</span>);
     <span class="kw">let </span>acset_2: acset::ACSet =
         serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/simple_sir_v1_acset.json&quot;</span>).unwrap())
             .unwrap();
@@ -859,7 +859,7 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_simple_sir_v2() {
-    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;../../../data/mml2pn_inputs/simple_sir_v2/mml_list.txt&quot;</span>);
+    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;tests/mml2pn_inputs/simple_sir_v2/mml_list.txt&quot;</span>);
     <span class="kw">let </span>acset_2: acset::ACSet =
         serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/simple_sir_v2_acset.json&quot;</span>).unwrap())
             .unwrap();
@@ -868,7 +868,7 @@
 
 <span class="attr">#[test]
 </span><span class="kw">fn </span>test_simple_sir_v3() {
-    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;../../../data/mml2pn_inputs/simple_sir_v3/mml_list.txt&quot;</span>);
+    <span class="kw">let </span>acset_1 = acset::ACSet::from_file(<span class="string">&quot;tests/mml2pn_inputs/simple_sir_v3/mml_list.txt&quot;</span>);
     <span class="kw">let </span>acset_2: acset::ACSet =
         serde_json::from_str(<span class="kw-2">&amp;</span>std::fs::read_to_string(<span class="string">&quot;tests/simple_sir_v3_acset.json&quot;</span>).unwrap())
             .unwrap();

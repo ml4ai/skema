@@ -34,7 +34,7 @@ Data models used by REST endpoints for eqn2mml, img2mml, and latex2mml
 &#34;&#34;&#34;
 
 from typing_extensions import Annotated
-from pydantic import BaseModel, Field
+from pydantic import ConfigDict, BaseModel, Field
 from fastapi import File
 
 
@@ -54,26 +54,25 @@ ImageBytes = Annotated[
 
 class LatexEquation(BaseModel):
     tex_src: str = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
-    class Config:
-        json_schema_extra = {
-            &#34;example&#34;: {
-                &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;,
+    model_config = ConfigDict(json_schema_extra={
+        &#34;example&#34;: {
+            &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;,
+        },
+        &#34;examples&#34;: [
+            {
+              &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;
             },
-            &#34;examples&#34;: [
-                {
-                  &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;
-                },
-                {
-                  &#34;tex_src&#34;: &#34;\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}&#34;
-                },
-                {
-                  &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
-                },
-                {
-                  &#34;tex_src&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
-                }
-            ]
-        }</code></pre>
+            {
+              &#34;tex_src&#34;: &#34;\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}&#34;
+            },
+            {
+              &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
+            },
+            {
+              &#34;tex_src&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
+            }
+        ]
+    })</code></pre>
 </details>
 </section>
 <section>
@@ -144,26 +143,25 @@ allow <code>self</code> as a field name.</p></div>
 </summary>
 <pre><code class="python">class LatexEquation(BaseModel):
     tex_src: str = Field(title=&#34;LaTeX equation&#34;, description=&#34;The LaTeX equation to process&#34;)
-    class Config:
-        json_schema_extra = {
-            &#34;example&#34;: {
-                &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;,
+    model_config = ConfigDict(json_schema_extra={
+        &#34;example&#34;: {
+            &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;,
+        },
+        &#34;examples&#34;: [
+            {
+              &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;
             },
-            &#34;examples&#34;: [
-                {
-                  &#34;tex_src&#34;: &#34;\\frac{\\partial x}{\\partial t} = {\\alpha x} - {\\beta x y}&#34;
-                },
-                {
-                  &#34;tex_src&#34;: &#34;\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}&#34;
-                },
-                {
-                  &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
-                },
-                {
-                  &#34;tex_src&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
-                }
-            ]
-        }</code></pre>
+            {
+              &#34;tex_src&#34;: &#34;\\frac{\\partial y}{\\partial t} = {\\alpha x y} - {\\gamma y}&#34;
+            },
+            {
+              &#34;tex_src&#34;: &#34;E = mc^{2}&#34;,
+            },
+            {
+              &#34;tex_src&#34;: &#34;\\frac{P(\\textrm{a } | \\textrm{ b}) \\times P(\\textrm{b})}{P(\\textrm{a})}&#34;,
+            }
+        ]
+    })</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -171,10 +169,6 @@ allow <code>self</code> as a field name.</p></div>
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="skema.img2mml.schema.LatexEquation.Config"><code class="name">var <span class="ident">Config</span></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
 <dt id="skema.img2mml.schema.LatexEquation.model_config"><code class="name">var <span class="ident">model_config</span></code></dt>
 <dd>
 <div class="desc"></div>
@@ -208,7 +202,6 @@ allow <code>self</code> as a field name.</p></div>
 <li>
 <h4><code><a title="skema.img2mml.schema.LatexEquation" href="#skema.img2mml.schema.LatexEquation">LatexEquation</a></code></h4>
 <ul class="">
-<li><code><a title="skema.img2mml.schema.LatexEquation.Config" href="#skema.img2mml.schema.LatexEquation.Config">Config</a></code></li>
 <li><code><a title="skema.img2mml.schema.LatexEquation.model_config" href="#skema.img2mml.schema.LatexEquation.model_config">model_config</a></code></li>
 <li><code><a title="skema.img2mml.schema.LatexEquation.model_fields" href="#skema.img2mml.schema.LatexEquation.model_fields">model_fields</a></code></li>
 <li><code><a title="skema.img2mml.schema.LatexEquation.tex_src" href="#skema.img2mml.schema.LatexEquation.tex_src">tex_src</a></code></li>

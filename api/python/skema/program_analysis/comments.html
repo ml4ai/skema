@@ -39,23 +39,23 @@ class SingleLineComment(BaseModel):
 class SingleFileCodeComments(BaseModel):
     docstrings: Dict[str, List[str]] = Field(
         description=&#34;A dictionary mapping a function name (str) to its associated docstring (List[str])&#34;,
-        example={&#34;fun1&#34;: [&#34;Inputs: x,y&#34;, &#34;Outputs: z&#34;]},
+        examples=[{&#34;fun1&#34;: [&#34;Inputs: x,y&#34;, &#34;Outputs: z&#34;]}],
     )
     comments: List[SingleLineComment] = Field(
         description=&#34;A list of comments, where each comment has a &#39;line_number&#39; (int) and &#39;contents&#39; (str) field&#34;,
-        example={&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0},
+        examples=[{&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0}],
     )
 
 
 class MultiFileCodeComments(BaseModel):
     files: Dict[str, SingleFileCodeComments] = Field(
         description=&#34;Dictionary mapping file name (str) to extracted comments (SingleFileCodeComments)&#34;,
-        example={
+        examples=[{
             &#34;file1.py&#34;: {
                 &#34;comments&#34;: [{&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0}],
                 &#34;docstrings&#34;: {&#34;fun1&#34;: [&#34;Inputs: x,y&#34;, &#34;Outputs: z&#34;]},
             }
-        },
+        }],
     )
 
 
@@ -131,12 +131,12 @@ allow <code>self</code> as a field name.</p></div>
 <pre><code class="python">class MultiFileCodeComments(BaseModel):
     files: Dict[str, SingleFileCodeComments] = Field(
         description=&#34;Dictionary mapping file name (str) to extracted comments (SingleFileCodeComments)&#34;,
-        example={
+        examples=[{
             &#34;file1.py&#34;: {
                 &#34;comments&#34;: [{&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0}],
                 &#34;docstrings&#34;: {&#34;fun1&#34;: [&#34;Inputs: x,y&#34;, &#34;Outputs: z&#34;]},
             }
-        },
+        }],
     )</code></pre>
 </details>
 <h3>Ancestors</h3>
@@ -219,11 +219,11 @@ allow <code>self</code> as a field name.</p></div>
 <pre><code class="python">class SingleFileCodeComments(BaseModel):
     docstrings: Dict[str, List[str]] = Field(
         description=&#34;A dictionary mapping a function name (str) to its associated docstring (List[str])&#34;,
-        example={&#34;fun1&#34;: [&#34;Inputs: x,y&#34;, &#34;Outputs: z&#34;]},
+        examples=[{&#34;fun1&#34;: [&#34;Inputs: x,y&#34;, &#34;Outputs: z&#34;]}],
     )
     comments: List[SingleLineComment] = Field(
         description=&#34;A list of comments, where each comment has a &#39;line_number&#39; (int) and &#39;contents&#39; (str) field&#34;,
-        example={&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0},
+        examples=[{&#34;contents&#34;: &#34;Hello World!&#34;, &#34;line_number&#34;: 0}],
     )</code></pre>
 </details>
 <h3>Ancestors</h3>

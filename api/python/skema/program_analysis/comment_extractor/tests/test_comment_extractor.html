@@ -44,7 +44,7 @@ def test_extract_c():
         &#34;language&#34;: &#34;c&#34;,
         &#34;source&#34;: c_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200
 
 
@@ -54,7 +54,7 @@ def test_extract_cpp():
         &#34;language&#34;: &#34;cpp&#34;,
         &#34;source&#34;: cpp_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200
 
 def test_extract_fortran():
@@ -63,7 +63,7 @@ def test_extract_fortran():
         &#34;language&#34;: &#34;fortran&#34;,
         &#34;source&#34;: fortran_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200
 
 def test_extract_matlab():
@@ -72,7 +72,7 @@ def test_extract_matlab():
         &#34;language&#34;: &#34;matlab&#34;,
         &#34;source&#34;: matlab_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200
 
 def test_extract_python():
@@ -81,7 +81,7 @@ def test_extract_python():
         &#34;language&#34;: &#34;python&#34;,
         &#34;source&#34;: python_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200
 
 def test_extract_r():
@@ -90,7 +90,7 @@ def test_extract_r():
         &#34;language&#34;: &#34;r&#34;,
         &#34;source&#34;: r_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200</code></pre>
 </details>
 </section>
@@ -116,7 +116,7 @@ def test_extract_r():
         &#34;language&#34;: &#34;c&#34;,
         &#34;source&#34;: c_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
@@ -135,7 +135,7 @@ def test_extract_r():
         &#34;language&#34;: &#34;cpp&#34;,
         &#34;source&#34;: cpp_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
@@ -154,7 +154,7 @@ def test_extract_r():
         &#34;language&#34;: &#34;fortran&#34;,
         &#34;source&#34;: fortran_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
@@ -173,7 +173,7 @@ def test_extract_r():
         &#34;language&#34;: &#34;matlab&#34;,
         &#34;source&#34;: matlab_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
@@ -192,7 +192,7 @@ def test_extract_r():
         &#34;language&#34;: &#34;python&#34;,
         &#34;source&#34;: python_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
@@ -211,7 +211,7 @@ def test_extract_r():
         &#34;language&#34;: &#34;r&#34;,
         &#34;source&#34;: r_source_path.read_text()
     }
-    response = client.post(&#34;/comments-extract&#34;, json=request)
+    response = client.post(&#34;/comment_service/comments-extract&#34;, json=request)
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
