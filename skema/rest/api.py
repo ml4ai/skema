@@ -101,7 +101,7 @@ app.include_router(
 app.include_router(
     comment_service.router,
     prefix="/code2fn",
-    tags=["code2fn", "skema-rs"],
+    tags=["code2fn"],
 )
 
 app.include_router(

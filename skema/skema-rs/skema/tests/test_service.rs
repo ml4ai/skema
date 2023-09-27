@@ -1,7 +1,5 @@
 use actix_web::{http::header::ContentType, test, App};
-use skema::services::{
-    mathml::get_amr,
-};
+use skema::services::mathml::get_amr;
 use std::fs;
 
 #[actix_web::test]

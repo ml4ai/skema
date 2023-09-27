@@ -689,11 +689,7 @@ pub fn get_terms_mult(sys_states: Vec<String>, eq: Vec<MathExpressionTree>) -> P
                         let temp_terms = get_terms_sub(sys_states.clone(), y1.clone());
                         // if there is a unary subtraction (single term) we do get a polarity flip
                         if temp_terms.len() == 1 {
-                            if polarity {
-                                polarity = false;
-                            } else {
-                                polarity = true;
-                            }
+                            polarity = !polarity;
                         }
                         for term in temp_terms.iter() {
                             arg_terms.push((i.try_into().unwrap(), term.clone()));

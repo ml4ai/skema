@@ -8,7 +8,9 @@ import org.clulab.utils.Logging
 import org.ml4ai.skema.text_reading.attachments.GroundingAttachment
 import org.ml4ai.skema.text_reading.grounding.{Grounder, GrounderFactory, GroundingCandidate}
 import org.ml4ai.skema.text_reading.mentions.CrossSentenceEventMention
+import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
 
+import java.io.File
 import scala.language.implicitConversions
 import scala.util.matching.Regex
 
@@ -53,7 +55,7 @@ class TextReadingPipeline(processorOpt: Option[Processor] = None, odinEngineOpt:
     val candidatesToGround = fetchNestedArguments(mentions).filter(isGroundable).distinct
 
     // Do batch grounding
-    val mentionsGroundings = grounder.groundingCandidates(candidatesToGround.map(_.text), k=5).map{
+    val mentionsGroundings = grounder.groundingCandidates(candidatesToGround.map(_.text), k=15).map{
       gs => gs.filter(_.score >= groundingAssignmentThreshold)
     }
 
@@ -126,6 +128,78 @@ class TextReadingPipeline(processorOpt: Option[Processor] = None, odinEngineOpt:
     // Return them!
     (doc, groundedNotTextBound ++ ungroundedTextBound  ++ groundedTextBound)
   }
+
+  def generateGroundingOutputFilename(file:File): File = {
+    val dir = file.getAbsoluteFile.getParent
+    val oldName = file.getName.split("\\.").dropRight(1).mkString(".")
+    val newName = s"grounding_$oldName.tsv"
+    new File(dir, newName)
+  }
+  def serializeExtractionsForGrounding(extractions:Seq[Mention]): Seq[String] = {
+    def getArgs(m:Mention):Option[Map[String, Seq[Mention]]] = m match {
+      case e:EventMention =>
+        Some(e.arguments)
+      case r:RelationMention =>
+        Some(r.arguments)
+      case _ => None
+    }
+    // Just keep events and relations relevant to us
+    val relevant = extractions.filter{
+      case _:TextBoundMention => false
+      case _ => true
+    }
+    // Header
+    val header = Seq("Text", "Role", "Context", "Candidate ID", "Candidate Text", "Score", "Annotation").mkString("\t")
+    // Compute the annotation chunks for each argument of each event
+    val chunks =
+      relevant.flatMap{
+        event => {
+          val context = event.sentenceObj.getSentenceText // Updated this to contain the whole sentence instead of just the event
+          getArgs(event) match {
+            case Some(args) =>
+              args.flatMap {
+                case (role, ms) =>
+                  ms flatMap {
+                    m =>
+                      val text = m.text
+                      val candidates =
+                        m.attachments
+                          .toSeq
+                          .filter(_.isInstanceOf[GroundingAttachment])
+                          .flatMap(_.asInstanceOf[GroundingAttachment].candidates map {
+                              c => Seq(c.concept.id, c.concept.name, c.score.toString)
+                            }
+                          )
+
+                      val x =
+                      candidates.zipWithIndex.map {
+                        case (c, ix) =>
+                          c match {
+                            case Seq(id, name, score) =>
+                              if (ix == 0)
+                                Seq(text, role, context, id, name, score, "").mkString("\t")
+                              else
+                                Seq("", "", "", id, name, score, "").mkString("\t")
+                            case _ => ""
+                          }
+                      }
+
+                    x
+                  }
+              }
+            case None => Seq.empty[String]
+          }
+        }
+      }
+    header::chunks.toList
+  }
+
+  /**
+    * Serializes the extractions into a string
+    * @param extractions
+    * @return JSON string that represents the extractions serialized
+    */
+  def serializeExtractions(extractions:Seq[Mention]):String = ujson.write(SkemaJSONSerializer.serializeMentions(extractions))
 }
 
 object TextReadingPipeline {
