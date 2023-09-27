@@ -81,6 +81,8 @@
 <a href="#81" id="81">81</a>
 <a href="#82" id="82">82</a>
 <a href="#83" id="83">83</a>
+<a href="#84" id="84">84</a>
+<a href="#85" id="85">85</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
@@ -121,6 +123,7 @@
     Arcsec,
     Arccsc,
     Arccot,
+    Mean,
     <span class="comment">// Catchall for operators we haven&#39;t explicitly defined as enum variants yet.
     </span>Other(String),
 }
@@ -146,8 +149,8 @@
             }) =&gt; {
                 <span class="macro">write!</span>(f, <span class="string">&quot;D({order}, {var_index}, {bound_var})&quot;</span>)
             }
-            Operator::Exp =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Exp&quot;</span>),
-            Operator::Power =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Power&quot;</span>),
+            Operator::Exp =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;exp&quot;</span>),
+            Operator::Power =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;^&quot;</span>),
             Operator::Other(op) =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{op}&quot;</span>),
             Operator::Sin =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Sin&quot;</span>),
             Operator::Cos =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Cos&quot;</span>),
@@ -161,6 +164,7 @@
             Operator::Arcsec =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Arcsec&quot;</span>),
             Operator::Arccsc =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Arccsc&quot;</span>),
             Operator::Arccot =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Arccot&quot;</span>),
+            Operator::Mean =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Mean&quot;</span>),
         }
     }
 }

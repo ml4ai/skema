@@ -398,6 +398,20 @@
 <a href="#398" id="398">398</a>
 <a href="#399" id="399">399</a>
 <a href="#400" id="400">400</a>
+<a href="#401" id="401">401</a>
+<a href="#402" id="402">402</a>
+<a href="#403" id="403">403</a>
+<a href="#404" id="404">404</a>
+<a href="#405" id="405">405</a>
+<a href="#406" id="406">406</a>
+<a href="#407" id="407">407</a>
+<a href="#408" id="408">408</a>
+<a href="#409" id="409">409</a>
+<a href="#410" id="410">410</a>
+<a href="#411" id="411">411</a>
+<a href="#412" id="412">412</a>
+<a href="#413" id="413">413</a>
+<a href="#414" id="414">414</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -410,8 +424,9 @@
         Ci, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, elem_many0, equals, etag, lparen, mi, mn, msqrt, msub, msubsup,
-        msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult, ParseError, Span,
+        add, attribute, comma, elem_many0, equals, etag, lparen, mean, mi, mn, msqrt, msub,
+        msubsup, msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
+        ParseError, Span,
     },
 };
 
@@ -428,7 +443,7 @@
 </span><span class="kw">pub fn </span>operator(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
-        alt((add, subtract, equals, lparen, rparen, comma)),
+        alt((add, subtract, equals, lparen, rparen, comma, mean)),
         <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
@@ -477,7 +492,7 @@
     <span class="prelude-val">Ok</span>((
         s,
         Ci::new(
-            <span class="prelude-val">Some</span>(Type::Function),
+            <span class="prelude-val">None</span>,
             Box::new(MathExpression::Mi(Mi(x.trim().to_string()))),
             <span class="prelude-val">None</span>,
         ),
@@ -528,8 +543,20 @@
 
 <span class="doccomment">/// Parse content identifier for Msup
 </span><span class="kw">pub fn </span>superscript(input: Span) -&gt; IResult&lt;MathExpression&gt; {
-    <span class="kw">let </span>(s, x) = msup(input)<span class="question-mark">?</span>;
-    <span class="prelude-val">Ok</span>((s, x))
+    <span class="kw">let </span>(s, sup) = ws(map(
+        <span class="macro">tag_parser!</span>(<span class="string">&quot;msup&quot;</span>, pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
+    ))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, sup))
+}
+
+<span class="doccomment">/// Parse Mover
+</span><span class="kw">pub fn </span>over_term(input: Span) -&gt; IResult&lt;MathExpression&gt; {
+    <span class="kw">let </span>(s, over) = ws(map(
+        <span class="macro">tag_parser!</span>(<span class="string">&quot;mover&quot;</span>, pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Mover(Box::new(x), Box::new(y)),
+    ))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, over))
 }
 
 <span class="doccomment">/// Parse the identifier &#39;d&#39;
@@ -784,6 +811,7 @@
         mn,
         superscript,
         msup,
+        over_term,
         msub,
         msqrt,
         mfrac,

@@ -601,6 +601,27 @@
 <a href="#601" id="601">601</a>
 <a href="#602" id="602">602</a>
 <a href="#603" id="603">603</a>
+<a href="#604" id="604">604</a>
+<a href="#605" id="605">605</a>
+<a href="#606" id="606">606</a>
+<a href="#607" id="607">607</a>
+<a href="#608" id="608">608</a>
+<a href="#609" id="609">609</a>
+<a href="#610" id="610">610</a>
+<a href="#611" id="611">611</a>
+<a href="#612" id="612">612</a>
+<a href="#613" id="613">613</a>
+<a href="#614" id="614">614</a>
+<a href="#615" id="615">615</a>
+<a href="#616" id="616">616</a>
+<a href="#617" id="617">617</a>
+<a href="#618" id="618">618</a>
+<a href="#619" id="619">619</a>
+<a href="#620" id="620">620</a>
+<a href="#621" id="621">621</a>
+<a href="#622" id="622">622</a>
+<a href="#623" id="623">623</a>
+<a href="#624" id="624">624</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::{
     operator::Operator,
     Math, MathExpression,
@@ -796,6 +817,11 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
+<span class="kw">pub fn </span>multiply(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, op) = value(Operator::Multiply, alt((ws(tag(<span class="string">&quot;*&quot;</span>)), ws(tag(<span class="string">&quot;&amp;#x2217;&quot;</span>)))))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, op))
+}
+
 <span class="kw">pub fn </span>equals(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = value(Operator::Equals, ws(tag(<span class="string">&quot;=&quot;</span>)))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
@@ -816,6 +842,11 @@
     <span class="prelude-val">Ok</span>((s, op))
 }
 
+<span class="kw">pub fn </span>mean(input: Span) -&gt; IResult&lt;Operator&gt; {
+    <span class="kw">let </span>(s, op) = value(Operator::Mean, ws(tag(<span class="string">&quot;¯&quot;</span>)))(input)<span class="question-mark">?</span>;
+    <span class="prelude-val">Ok</span>((s, op))
+}
+
 <span class="kw">fn </span>operator_other(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, consumed) = ws(recognize(not_line_ending))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>op = Operator::Other(consumed.to_string());
@@ -823,7 +854,16 @@
 }
 
 <span class="kw">pub fn </span>operator(input: Span) -&gt; IResult&lt;Operator&gt; {
-    <span class="kw">let </span>(s, op) = alt((add, subtract, equals, lparen, rparen, operator_other))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, op) = alt((
+        add,
+        subtract,
+        equals,
+        lparen,
+        rparen,
+        mean,
+        multiply,
+        operator_other,
+    ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
 }
 
@@ -1083,8 +1123,9 @@
         mover,
         Mover(
             Box::new(MathExpression::Mi(Mi(<span class="string">&quot;x&quot;</span>.to_string()))),
-            Box::new(Mo(Operator::Other(<span class="string">&quot;¯&quot;</span>.to_string()))),
-        ),
+            Box::new(Mo(Operator::Mean)),
+            <span class="comment">//Box::new(Mo(Operator::Other(&quot;¯&quot;.to_string()))),
+        </span>),
     )
 }
 
@@ -1173,8 +1214,9 @@
                 Msup(
                     Box::new(MathExpression::Mrow(Mrow(<span class="macro">vec!</span>[Mover(
                         Box::new(MathExpression::Mi(Mi(<span class="string">&quot;x&quot;</span>.to_string()))),
-                        Box::new(Mo(Operator::Other(<span class="string">&quot;¯&quot;</span>.to_string()))),
-                    )]))),
+                        Box::new(Mo(Operator::Mean)),
+                        <span class="comment">//Box::new(Mo(Operator::Other(&quot;¯&quot;.to_string()))),
+                    </span>)]))),
                     Box::new(MathExpression::Mi(Mi(<span class="string">&quot;a&quot;</span>.to_string()))),
                 ),
                 Msub(
