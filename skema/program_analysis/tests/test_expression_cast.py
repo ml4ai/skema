@@ -66,10 +66,3 @@ def test_exp1():
     assert isinstance(asg_node.right, LiteralValue)
     assert asg_node.right.value_type == "Integer"
     assert asg_node.right.value == '3'
-
-
-def test_expression():
-    test_exp0()
-    test_exp1()
-
-    return

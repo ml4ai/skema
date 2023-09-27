@@ -105,7 +105,7 @@ class TS2CAST(object):
             if isinstance(child_cast, List):
                 body.extend(child_cast)
             elif isinstance(child_cast, AstNode):
-                body.extend(child_cast)
+                body.append(child_cast)
 
         self.variable_context.pop_context()
         

@@ -93,9 +93,7 @@ def python_to_cast(
         # Count the number of lines in the file
         with open(pyfile_path) as f:
             file_list = f.readlines()
-            line_count = 0
-            for l in file_list:
-                line_count += 1
+            line_count = len(file_list)
 
         # Create a PyASTToCAST Object
         if legacy:
