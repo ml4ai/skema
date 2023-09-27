@@ -10,7 +10,7 @@ use crate::{
         Ci, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, elem_many0, equals, etag, lparen, mean, mi, mn, mover, msqrt, msub,
+        add, attribute, comma, elem_many0, equals, etag, lparen, mean, mi, mn, msqrt, msub,
         msubsup, msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
         ParseError, Span,
     },
