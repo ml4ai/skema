@@ -1,3 +1,4 @@
+# FIXME: should this be integrated into the skema library?
 import pprint
 import json
 from dataclasses import dataclass, field
@@ -38,12 +39,11 @@ Revisit Bucky dynamics
 
 
 # -----------------------------------------------------------------------------
-
-data_dir = (Path(__file__).absolute() / "../../data/mml2pn_inputs").resolve()
-V1 = data_dir / "simple_sir_v1/mml_list.txt"
-V2 = data_dir / "simple_sir_v2/mml_list.txt"
-V3 = data_dir / "simple_sir_v3/mml_list.txt"
-V4 = data_dir / "simple_sir_v4/mml_list.txt"
+data_dir = (Path(__file__).absolute().parents[1] / "skema" / "skema-rs" / "tests" / "mml2pn_inputs").resolve()
+V1 = data_dir / "simple_sir_v1" / "mml_list.txt"
+V2 = data_dir / "simple_sir_v2" / "mml_list.txt"
+V3 = data_dir / "simple_sir_v3" / "mml_list.txt"
+V4 = data_dir / "simple_sir_v4" / "mml_list.txt"
 
 
 # -----------------------------------------------------------------------------
