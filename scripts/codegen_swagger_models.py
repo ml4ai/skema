@@ -6,6 +6,7 @@ import datetime
 import shutil
 from typing import List, Tuple
 import argparse
+import re
 
 
 # -----------------------------------------------------------------------------
@@ -22,7 +23,7 @@ import argparse
 
 # Current highest versions
 CAST_VERSION = "1.2.2"
-GROMET_VERSION = "0.1.6"
+GROMET_VERSION = "0.1.8"
 
 RELATIVE_AUTOMATES_ROOT = '../'
 
@@ -35,14 +36,30 @@ SWAGGER_COMMAND = ["swagger-codegen", "generate", "-l", "python", "-o", "./clien
 GENERATED_MODEL_ROOT = "client/swagger_client/models"
 GENERATED_MODEL_IMPORT_PATH = "swagger_client.models"
 
-MODEL_ROOT_CAST = "skema/program_analysis/CAST2GrFN/model/cast"
-IMPORT_PATH_CAST = "skema.program_analysis.CAST2GrFN.model.cast"
+MODEL_ROOT_CAST = "skema/program_analysis/CAST2FN/model/cast"
+IMPORT_PATH_CAST = "skema.program_analysis.CAST2FN.model.cast"
 
 MODEL_ROOT_GROMET = "skema/gromet/fn"
 IMPORT_PATH_GROMET = "skema.gromet.fn"
 
 MODEL_ROOT_METADATA = "skema/gromet/metadata"
 IMPORT_PATH_METADATA = "skema.gromet.metadata"
+
+GROMET_VERSION_CANONICAL_DEFINITION = "skema/gromet/__init__.py"
+
+
+# -----------------------------------------------------------------------------
+# Update Canonical GROMET_VERSION
+# -----------------------------------------------------------------------------
+
+def update_canonical_gromet_version(new_version):
+    path = os.path.join('..', GROMET_VERSION_CANONICAL_DEFINITION)
+    with open(path, 'r') as gv:
+        file_contents = re.sub(r"\s*GROMET_VERSION\s*=\s+\".*?$",
+                               f'''GROMET_VERSION = "{new_version}"''',
+                               gv.read())
+    with open(path, 'w') as gv_out:
+        gv_out.write(file_contents)
 
 
 # -----------------------------------------------------------------------------
@@ -228,6 +245,7 @@ def process(model_type: str, model_version: str, verbose: bool = True):
         copy_readme = True
         import_path = IMPORT_PATH_GROMET
         ignore = ['metadata.py']
+        update_canonical_gromet_version(GROMET_VERSION)  # UPDATE Canonical GROMET_VERSION
     elif model_type == 'METADATA':
         model_root = os.path.join(RELATIVE_AUTOMATES_ROOT, MODEL_ROOT_METADATA)
         model_url = get_url(URL_BASE_METADATA_MODEL, model_version)
@@ -266,8 +284,9 @@ def main():
     # parser.add_argument()
     # process('CAST', CAST_VERSION)
     process('GROMET', GROMET_VERSION)
-    # process('METADATA', GROMET_VERSION)
+    process('METADATA', GROMET_VERSION)
 
 
 if __name__ == "__main__":
     main()
+
