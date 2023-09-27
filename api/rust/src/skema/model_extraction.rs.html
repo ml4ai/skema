@@ -1367,9 +1367,9 @@
     <span class="comment">// 4. get the id of functions with enough expressions
     </span><span class="kw">let </span><span class="kw-2">mut </span>core_id = Vec::&lt;i64&gt;::new();
     <span class="kw">for </span>c_func <span class="kw">in </span>core_func.iter() {
-        <span class="kw">for </span>node <span class="kw">in </span>functions[(<span class="kw-2">*</span>c_func)].clone().node_indices() {
-            <span class="kw">if </span>functions[(<span class="kw-2">*</span>c_func)][node].labels == [<span class="string">&quot;Function&quot;</span>] {
-                core_id.push(functions[(<span class="kw-2">*</span>c_func)][node].id);
+        <span class="kw">for </span>node <span class="kw">in </span>functions[<span class="kw-2">*</span>c_func].clone().node_indices() {
+            <span class="kw">if </span>functions[<span class="kw-2">*</span>c_func][node].labels == [<span class="string">&quot;Function&quot;</span>] {
+                core_id.push(functions[<span class="kw-2">*</span>c_func][node].id);
             }
         }
     }
@@ -1920,8 +1920,8 @@
         </span><span class="macro">println!</span>(<span class="string">&quot;Entry 1&quot;</span>); <span class="comment">// operator starts at begining of arg2
         </span><span class="kw">if </span>arg2_term_ind[<span class="number">0</span>] == <span class="number">0 </span>{
             <span class="kw">for </span>(i, ind) <span class="kw">in </span>arg2_term_ind.iter().enumerate() {
-                <span class="kw">if </span>arg2[(<span class="kw-2">*</span>ind <span class="kw">as </span>usize)] == Mo(Operator::Add) {
-                    arg2[(<span class="kw-2">*</span>ind <span class="kw">as </span>usize)] = Mo(Operator::Subtract);
+                <span class="kw">if </span>arg2[<span class="kw-2">*</span>ind <span class="kw">as </span>usize] == Mo(Operator::Add) {
+                    arg2[<span class="kw-2">*</span>ind <span class="kw">as </span>usize] = Mo(Operator::Subtract);
                     <span class="kw">if </span>(i + <span class="number">1</span>) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             <span class="kw-2">&amp;</span>arg2.clone()
@@ -1939,7 +1939,7 @@
                         arg_dist.extend_from_slice(<span class="kw-2">&amp;</span>arg1.clone()[<span class="number">1</span>..vec_len1]);
                     }
                 } <span class="kw">else </span>{
-                    arg2[(<span class="kw-2">*</span>ind <span class="kw">as </span>usize)] = Mo(Operator::Add);
+                    arg2[<span class="kw-2">*</span>ind <span class="kw">as </span>usize] = Mo(Operator::Add);
                     <span class="kw">if </span>(i + <span class="number">1</span>) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             <span class="kw-2">&amp;</span>arg2.clone()
@@ -1966,8 +1966,8 @@
             </span><span class="kw">let </span>vec_len1 = arg1.clone().len() - <span class="number">1</span>;
             arg_dist.extend_from_slice(<span class="kw-2">&amp;</span>arg1[<span class="number">1</span>..vec_len1]);
             <span class="kw">for </span>(i, ind) <span class="kw">in </span>arg2_term_ind.iter().enumerate() {
-                <span class="kw">if </span>arg2[(<span class="kw-2">*</span>ind <span class="kw">as </span>usize)] == Mo(Operator::Add) {
-                    arg2[(<span class="kw-2">*</span>ind <span class="kw">as </span>usize)] = Mo(Operator::Subtract);
+                <span class="kw">if </span>arg2[<span class="kw-2">*</span>ind <span class="kw">as </span>usize] == Mo(Operator::Add) {
+                    arg2[<span class="kw-2">*</span>ind <span class="kw">as </span>usize] = Mo(Operator::Subtract);
                     <span class="kw">if </span>(i + <span class="number">1</span>) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             <span class="kw-2">&amp;</span>arg2.clone()
@@ -1984,7 +1984,7 @@
                         arg_dist.extend_from_slice(<span class="kw-2">&amp;</span>arg1.clone()[<span class="number">1</span>..vec_len1]);
                     }
                 } <span class="kw">else </span>{
-                    arg2[(<span class="kw-2">*</span>ind <span class="kw">as </span>usize)] = Mo(Operator::Add);
+                    arg2[<span class="kw-2">*</span>ind <span class="kw">as </span>usize] = Mo(Operator::Add);
                     <span class="kw">if </span>(i + <span class="number">1</span>) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             <span class="kw-2">&amp;</span>arg2.clone()
@@ -2008,7 +2008,7 @@
         </span><span class="kw">if </span>arg2_term_ind[<span class="number">0</span>] == <span class="number">0 </span>{
             <span class="macro">println!</span>(<span class="string">&quot;Entry 3&quot;</span>);
             <span class="kw">for </span>(i, ind) <span class="kw">in </span>arg2_term_ind.iter().enumerate() {
-                <span class="kw">if </span>arg2[(<span class="kw-2">*</span>ind <span class="kw">as </span>usize)] == Mo(Operator::Add) {
+                <span class="kw">if </span>arg2[<span class="kw-2">*</span>ind <span class="kw">as </span>usize] == Mo(Operator::Add) {
                     <span class="kw">if </span>(i + <span class="number">1</span>) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             <span class="kw-2">&amp;</span>arg2.clone()
