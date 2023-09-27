@@ -1,7 +1,7 @@
 use actix_web::{get, http::header::ContentType, web::Data, App, HttpResponse, HttpServer};
 use clap::Parser;
 use skema::config::Config;
-use skema::services::{gromet};
+use skema::services::gromet;
 use std::env;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
