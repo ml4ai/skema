@@ -1,6 +1,6 @@
 import yaml
 from pathlib import Path
-from gqlalchemy import Memgraph, match
+from gqlalchemy import Memgraph
 
 QUERIES_PATH = Path(__file__).parent / "queries.yaml"
 
