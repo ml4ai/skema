@@ -30,7 +30,6 @@
 <pre><code class="python">import os
 import sys
 import ast
-from skema.program_analysis import astpp
 import json
 import argparse
 
@@ -50,9 +49,6 @@ from typing import Optional
 def get_args():
     parser = argparse.ArgumentParser(
         &#34;Runs Python to CAST pipeline on input Python source file.&#34;
-    )
-    parser.add_argument(
-        &#34;--astpp&#34;, help=&#34;Dumps Python AST to stdout&#34;, action=&#34;store_true&#34;
     )
     parser.add_argument(
         &#34;--rawjson&#34;,
@@ -99,7 +95,6 @@ def python_to_cast(
     Args:
         pyfile_path: Path to the Python source file
         agraph: If true, a PDF visualization of the graph is created.
-        astprint: View the AST using the astpp module.
         std_out: If true, the CAST JSON is printed to stdout instead
                  of written to a file.
         rawjson: If true, the raw JSON contents are printed to stdout.
@@ -129,11 +124,6 @@ def python_to_cast(
             convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
         else:
             convert = py_ast_to_cast.PyASTToCAST(file_name)
-
-        # Additional option to allow us to view the PyAST
-        # using the astpp module
-        if astprint:
-            astpp.parseprint(file_contents)
 
         # &#39;Root&#39; the current working directory so that it&#39;s where the
         # Source file we&#39;re generating CAST for is (for Import statements)
@@ -193,7 +183,6 @@ if __name__ == &#34;__main__&#34;:
     python_to_cast(
         args.pyfile_path,
         args.agraph,
-        args.astpp,
         args.stdout,
         args.rawjson,
         args.legacy,
@@ -220,9 +209,6 @@ if __name__ == &#34;__main__&#34;:
 <pre><code class="python">def get_args():
     parser = argparse.ArgumentParser(
         &#34;Runs Python to CAST pipeline on input Python source file.&#34;
-    )
-    parser.add_argument(
-        &#34;--astpp&#34;, help=&#34;Dumps Python AST to stdout&#34;, action=&#34;store_true&#34;
     )
     parser.add_argument(
         &#34;--rawjson&#34;,
@@ -265,8 +251,6 @@ if __name__ == &#34;__main__&#34;:
 <dd>Path to the Python source file</dd>
 <dt><strong><code>agraph</code></strong></dt>
 <dd>If true, a PDF visualization of the graph is created.</dd>
-<dt><strong><code>astprint</code></strong></dt>
-<dd>View the AST using the astpp module.</dd>
 <dt><strong><code>std_out</code></strong></dt>
 <dd>If true, the CAST JSON is printed to stdout instead
 of written to a file.</dd>
@@ -300,7 +284,6 @@ returns None.</p></div>
     Args:
         pyfile_path: Path to the Python source file
         agraph: If true, a PDF visualization of the graph is created.
-        astprint: View the AST using the astpp module.
         std_out: If true, the CAST JSON is printed to stdout instead
                  of written to a file.
         rawjson: If true, the raw JSON contents are printed to stdout.
@@ -330,11 +313,6 @@ returns None.</p></div>
             convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
         else:
             convert = py_ast_to_cast.PyASTToCAST(file_name)
-
-        # Additional option to allow us to view the PyAST
-        # using the astpp module
-        if astprint:
-            astpp.parseprint(file_contents)
 
         # &#39;Root&#39; the current working directory so that it&#39;s where the
         # Source file we&#39;re generating CAST for is (for Import statements)
