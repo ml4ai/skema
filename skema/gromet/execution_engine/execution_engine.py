@@ -109,6 +109,11 @@ class ExecutionEngine():
     
     def visit_opi(self, node):
         """Visitor for :Opi node type"""
+        node_id = node._id
+        # If un-named, we need to get the name from the attached Opo
+        if node.name == "un-named":
+            return self.visit(self.query_runner.run_query("assignment_left_hand", id=node_id)[0])
+
         return node.name
     
     def visit_literal(self, node):
@@ -134,11 +139,15 @@ class ExecutionEngine():
         node_id = node._id
         results = self.query_runner.run_query("primitive_operands" , id=node_id)
         inputs = [self.visit(result) for result in results]
+        print(inputs)
+        # Some inputs may be symbol names, so we need to access the value from the symbol map
+        inputs = [self.symbol_table.get_symbol(input)["current_value"] if isinstance(input, str) else input for input in inputs]
+        print(inputs)
         primative = retrieve_operator(node.name)
         return execute(primative, inputs)
 
 if __name__ == "__main__":
-    engine = ExecutionEngine("localhost", 7687, "literal_test")
+    engine = ExecutionEngine("localhost", 7687, "variable_test")
     print(engine.parameter_extraction())
     exit()
     parser = argparse.ArgumentParser(description="Parameter Extraction Script")

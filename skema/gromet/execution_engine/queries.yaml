@@ -42,7 +42,7 @@ named_opos:
 primitive_operands:
   "
   MATCH (n)-[r]->(m)
-  WHERE (m:Literal or m:Expression or m:Primitive) and id(n)=$ID
+  WHERE (m:Literal or m:Expression or m:Opi or m:Primitive) and id(n)=$ID
   RETURN r, m
   ORDER BY r.index
   "
