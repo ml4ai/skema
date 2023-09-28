@@ -14,6 +14,8 @@ def train(
     device,
     ddp=False,
     rank=None,
+    isScheduler=False,
+    scheduler=None,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
@@ -51,5 +53,8 @@ def train(
 
         epoch_loss += loss.item()
 
+        if isScheduler:
+            scheduler.step()
+    
     net_loss = epoch_loss / len(train_dataloader)
     return net_loss

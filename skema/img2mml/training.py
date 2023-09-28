@@ -327,6 +327,7 @@ def train_model(rank=None,):
 
     # optimizer
     isScheduler = False
+    scheduler = None
     if step_scheduler or exponential_scheduler:
         _lr = starting_lr 
         isScheduler = True
@@ -397,6 +398,8 @@ def train_model(rank=None,):
                     device,
                     ddp=ddp,
                     rank=rank,
+                    isScheduler=isScheduler,
+                    scheduler=scheduler,
                 )
 
                 val_loss = evaluate(
@@ -412,9 +415,6 @@ def train_model(rank=None,):
                     rank=rank,
                     g2p=g2p,
                 )
-
-                if isScheduler:
-                    scheduler.step()
 
                 end_time = time.time()
                 # total time spent on training an epoch
