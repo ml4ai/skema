@@ -163,7 +163,7 @@ async def system_to_gromet(system: System):
         )
         print(no_supported_file_str)
         return gromet_collection.to_dict()
-
+    
     # The CODE2FN Pipeline requires a file path as input.
     # We are receiving a serialized version of the code system as input, so we must store the file in a temporary directory.
     # This temp directory only persists during execution of the CODE2FN pipeline.
@@ -193,9 +193,7 @@ async def system_to_gromet(system: System):
 
     # If comments are included in request or added in the enriching process, run the unifier to add them to the Gromet
     if system.comments:
-        # TODO: UNCOMMENT THIS
-        pass
-        #align_full_system(gromet_collection, system.comments)
+        align_full_system(gromet_collection, system.comments)
 
     # Explicitly call to_dict on any metadata object
     # NOTE: Only required because of fault in swagger-codegen
@@ -214,10 +212,12 @@ async def system_to_gromet(system: System):
     
   
     for log in server_log:
-        Debug(
-            debug_type="code2fn",
-            severity="Warning",
-            message=log
+        metadata_collection.append(
+            Debug(
+                debug_type="code2fn",
+                severity="Warning",
+                message=log
+            )
         )
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
