@@ -1,7 +1,6 @@
 import os
 import sys
 import ast
-from skema.program_analysis import astpp
 import json
 import argparse
 
@@ -21,9 +20,6 @@ from typing import Optional
 def get_args():
     parser = argparse.ArgumentParser(
         "Runs Python to CAST pipeline on input Python source file."
-    )
-    parser.add_argument(
-        "--astpp", help="Dumps Python AST to stdout", action="store_true"
     )
     parser.add_argument(
         "--rawjson",
@@ -70,7 +66,6 @@ def python_to_cast(
     Args:
         pyfile_path: Path to the Python source file
         agraph: If true, a PDF visualization of the graph is created.
-        astprint: View the AST using the astpp module.
         std_out: If true, the CAST JSON is printed to stdout instead
                  of written to a file.
         rawjson: If true, the raw JSON contents are printed to stdout.
@@ -100,11 +95,6 @@ def python_to_cast(
             convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
         else:
             convert = py_ast_to_cast.PyASTToCAST(file_name)
-
-        # Additional option to allow us to view the PyAST
-        # using the astpp module
-        if astprint:
-            astpp.parseprint(file_contents)
 
         # 'Root' the current working directory so that it's where the
         # Source file we're generating CAST for is (for Import statements)
@@ -164,7 +154,6 @@ if __name__ == "__main__":
     python_to_cast(
         args.pyfile_path,
         args.agraph,
-        args.astpp,
         args.stdout,
         args.rawjson,
         args.legacy,

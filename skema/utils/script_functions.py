@@ -3,8 +3,6 @@ import dill
 import os.path
 import json
 
-# import astpp
-
 from skema.gromet.fn import (
     GrometFNModuleCollection,
 )
@@ -145,13 +143,6 @@ def python_to_cast(
         convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
     else:
         convert = py_ast_to_cast.PyASTToCAST(file_name)
-
-    # Additional option to allow us to view the PyAST
-    # using the astpp module
-    if astprint:
-        # astpp.parseprint(file_contents)
-        print("AST Printing Currently Disabled")
-        pass
 
     # 'Root' the current working directory so that it's where the
     # Source file we're generating CAST for is (for Import statements)
