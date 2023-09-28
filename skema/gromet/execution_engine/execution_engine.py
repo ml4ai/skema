@@ -9,7 +9,7 @@ from gqlalchemy import Memgraph
 
 from skema.program_analysis.CAST.pythonAST.builtin_map import retrieve_operator
 from skema.gromet.execution_engine.execute import execute_primitive
-from skema.rest.workflows import code_snippets_to_pn_amr
+#TODO: Broken import: from skema.rest.workflows import code_snippets_to_pn_amr
 from skema.skema_py.server import System
 from skema.gromet.execution_engine.query_runner import QueryRunner
 from skema.gromet.execution_engine.symbol_table import SymbolTable
@@ -72,9 +72,12 @@ class ExecutionEngine():
 
     def visit_expression(self, node):
         node_id = node._id
+
+        # Only the left hand side is directly connected to the expression.
+        # (Expression) -> (Opo) -> (Primitive | Literal | Opo)
         left_hand_side = self.query_runner.run_query("assignment_left_hand", id=node_id)
-        right_hand_side = self.query_runner.run_query("assignment_right_hand", id=node_id)
-        
+        right_hand_side = self.query_runner.run_query("assignment_right_hand", id=left_hand_side[0]._id)
+       
         # The lefthand side represents the Opo of the variable we are assigning to
         # TODO: What if we have multiple assignment x,y = 1,2
         # TODO: Does an expression always correspond to an assingment?
@@ -111,14 +114,20 @@ class ExecutionEngine():
     def visit_literal(self, node):
         # Convert to Tensor for execution
 
-        # The LiteralValue is stored as a str in the Memgraph database
-        # So we have to convert it to tokens to parse
-        value_tokens = node.value.split()
-        value_type = value_tokens[3].replace("\"", "").replace(",", "")
-        value = value_tokens[5].replace("\"", "").replace(",", "")
+        # TODO: Update LiteralValue to remove wrapping "" characters 
+        value = node.value["value"].strip("\"")
+        value_type = node.value["value_type"]
 
         if value_type == "Integer":
             return torch.tensor(int(value), dtype=torch.int)
+        elif value_type == "AbstractFloat":
+            return torch.tensor(float(value), dtype=torch.float)
+        elif value_type == "Boolean":
+            return torch.tensor(value=="True", dtype=torch.bool)
+        elif value_type == "List":
+            pass
+        elif value_type == "Map":
+            pass
         
     def visit_primitive(self, node):
         """Visitor for :Primitive node type"""
@@ -129,7 +138,7 @@ class ExecutionEngine():
         return execute(primative, inputs)
 
 if __name__ == "__main__":
-    engine = ExecutionEngine("localhost", 7687, "simple_test")
+    engine = ExecutionEngine("localhost", 7687, "literal_test")
     print(engine.parameter_extraction())
     exit()
     parser = argparse.ArgumentParser(description="Parameter Extraction Script")

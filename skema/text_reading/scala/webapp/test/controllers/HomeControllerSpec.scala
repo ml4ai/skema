@@ -6,6 +6,8 @@ import play.api.mvc.{Action, AnyContent}
 import play.api.test._
 import play.api.test.Helpers._
 
+import java.io.File
+
 /**
  * Add your spec here.
  * You can mock out a whole application including requests, plugins etc.
@@ -76,6 +78,18 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
       find(json, "groundingConcept") mustBe (12)
       find(json, "score") mustBe (12)
       find(json, "id") mustBe (12)
+    }
+  }
+
+  "The brat libraries" should {
+
+    "not be lost" in {
+      // The assets do not appear to be available to the router in test mode, so
+      // this just makes sure the file is available in the development environment.
+      val filename = "./public/brat/client/lib/head.load.min.js"
+      val file = new File(filename)
+
+      file must exist
     }
   }
 }

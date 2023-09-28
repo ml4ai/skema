@@ -165,9 +165,9 @@ pub fn find_pn_dynamics(module_id: i64, host: &str) -> Vec<i64> {
     // 4. get the id of functions with enough expressions
     let mut core_id = Vec::<i64>::new();
     for c_func in core_func.iter() {
-        for node in functions[(*c_func)].clone().node_indices() {
-            if functions[(*c_func)][node].labels == ["Function"] {
-                core_id.push(functions[(*c_func)][node].id);
+        for node in functions[*c_func].clone().node_indices() {
+            if functions[*c_func][node].labels == ["Function"] {
+                core_id.push(functions[*c_func][node].id);
             }
         }
     }
@@ -358,6 +358,7 @@ fn tree_2_MET_ast(
             let deriv = Ci {
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[2..3].to_string()))),
+                func_of: None,
             };
             lhs.push(deriv);
         } else {
@@ -365,6 +366,7 @@ fn tree_2_MET_ast(
             let deriv = Ci {
                 r#type: Some(Function),
                 content: Box::new(MathExpression::Mi(Mi(deriv_name[1..2].to_string()))),
+                func_of: None,
             };
             lhs.push(deriv);
         }
@@ -376,6 +378,8 @@ fn tree_2_MET_ast(
                 let rhs_flat = flatten_mults(rhs.clone());
                 let fo_eq = FirstOrderODE {
                     lhs_var: lhs[0].clone(),
+                    func_of: [lhs[0].clone()].to_vec(), // just place holders for construction
+                    with_respect_to: lhs[0].clone(),    // just place holders for construction
                     rhs: rhs_flat,
                 };
                 fo_eq_vec.push(fo_eq);
@@ -714,8 +718,8 @@ fn distribute_args(
         println!("Entry 1"); // operator starts at begining of arg2
         if arg2_term_ind[0] == 0 {
             for (i, ind) in arg2_term_ind.iter().enumerate() {
-                if arg2[(*ind as usize)] == Mo(Operator::Add) {
-                    arg2[(*ind as usize)] = Mo(Operator::Subtract);
+                if arg2[*ind as usize] == Mo(Operator::Add) {
+                    arg2[*ind as usize] = Mo(Operator::Subtract);
                     if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
@@ -733,7 +737,7 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
                     }
                 } else {
-                    arg2[(*ind as usize)] = Mo(Operator::Add);
+                    arg2[*ind as usize] = Mo(Operator::Add);
                     if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
@@ -760,8 +764,8 @@ fn distribute_args(
             let vec_len1 = arg1.clone().len() - 1;
             arg_dist.extend_from_slice(&arg1[1..vec_len1]);
             for (i, ind) in arg2_term_ind.iter().enumerate() {
-                if arg2[(*ind as usize)] == Mo(Operator::Add) {
-                    arg2[(*ind as usize)] = Mo(Operator::Subtract);
+                if arg2[*ind as usize] == Mo(Operator::Add) {
+                    arg2[*ind as usize] = Mo(Operator::Subtract);
                     if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
@@ -778,7 +782,7 @@ fn distribute_args(
                         arg_dist.extend_from_slice(&arg1.clone()[1..vec_len1]);
                     }
                 } else {
-                    arg2[(*ind as usize)] = Mo(Operator::Add);
+                    arg2[*ind as usize] = Mo(Operator::Add);
                     if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()
@@ -802,7 +806,7 @@ fn distribute_args(
         if arg2_term_ind[0] == 0 {
             println!("Entry 3");
             for (i, ind) in arg2_term_ind.iter().enumerate() {
-                if arg2[(*ind as usize)] == Mo(Operator::Add) {
+                if arg2[*ind as usize] == Mo(Operator::Add) {
                     if (i + 1) != arg2_term_ind.len() {
                         arg_dist.extend_from_slice(
                             &arg2.clone()

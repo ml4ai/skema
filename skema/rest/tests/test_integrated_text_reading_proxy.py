@@ -38,39 +38,41 @@ def test_text_integrated_extractions():
         assert output.errors is None, f"Document {ix + 1} reported errors"
 
 
-def test_integrated_pdf_extraction():
-    """ Tests the pdf endpoint """
-    params = {
-        "annotate_skema": True,
-        "annotate_mit": False
-    }
-
-    path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
-    with path.open("rb") as pdf:
-        files = [
-            ("pdfs", ("CHIME_SVIIvR_model.pdf", pdf, "application/pdf"))
-        ]
-
-        response = client.post(f"/integrated-pdf-extractions", params=params, files=files)
-
-    assert response.status_code == 200
-
-    results = TextReadingAnnotationsOutput(**response.json())
-    assert len(results.outputs) == 1, "The inputs doesn't have outputs"
-    assert results.generalized_errors is None, f"Generalized TR errors"
-    for ix, output in enumerate(results.outputs):
-        assert output.data is not None, f"Document {ix + 1} didn't generate AttributeCollection"
-        assert len(output.data.attributes) > 0, f"Document {ix + 1} generated an empty attribute collection"
-        assert output.errors is None, f"Document {ix + 1} reported errors"
+## EN: Comment this out until we can mock the cosmos endpoint to decouple our unit test from the status of their service
+# def test_integrated_pdf_extraction():
+#     """ Tests the pdf endpoint """
+#     params = {
+#         "annotate_skema": True,
+#         "annotate_mit": False
+#     }
+#
+#     path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
+#     with path.open("rb") as pdf:
+#         files = [
+#             ("pdfs", ("CHIME_SVIIvR_model.pdf", pdf, "application/pdf"))
+#         ]
+#
+#         response = client.post(f"/integrated-pdf-extractions", params=params, files=files)
+#
+#     assert response.status_code == 200
+#
+#     results = TextReadingAnnotationsOutput(**response.json())
+#     assert len(results.outputs) == 1, "The inputs doesn't have outputs"
+#     assert results.generalized_errors is None, f"Generalized TR errors"
+#     for ix, output in enumerate(results.outputs):
+#         assert output.data is not None, f"Document {ix + 1} didn't generate AttributeCollection"
+#         assert len(output.data.attributes) > 0, f"Document {ix + 1} generated an empty attribute collection"
+#         assert output.errors is None, f"Document {ix + 1} reported errors"
 
 
 # Test the cosmos endpoint
-def test_cosmos():
-    """Test that we are able to fetch COSMOS data correctly"""
-    path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
-    with path.open("rb") as pdf:
-        ret = cosmos_client(path.name, pdf)
-    assert ret is not None and len(ret) > 0
+# EN: Commented this out as we don't control it (UWisc)
+# def test_cosmos():
+#     """Test that we are able to fetch COSMOS data correctly"""
+#     path = Path(__file__).parents[0] / "data" / "integrated_text_reading" / "CHIME_SVIIvR_model.pdf"
+#     with path.open("rb") as pdf:
+#         ret = cosmos_client(path.name, pdf)
+#     assert ret is not None and len(ret) > 0
 
 
 def test_mira_grounding():

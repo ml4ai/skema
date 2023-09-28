@@ -20,8 +20,9 @@ from skema.rest.schema import (
     TextReadingInputDocuments,
     TextReadingAnnotationsOutput,
     TextReadingDocumentResults,
-    TextReadingError, MiraGroundingInputs, MiraGroundingOutputItem,
+    TextReadingError, MiraGroundingInputs, MiraGroundingOutputItem, TextReadingEvaluationResults,
 )
+from skema.rest.utils import compute_text_reading_evaluation
 
 router = APIRouter()
 
@@ -254,12 +255,12 @@ def cosmos_client(name: str, data: BinaryIO):
 
         for retry_num in range(200):
             time.sleep(3)  # Retry in ten seconds
-            poll = requests.get(f"{COSMOS_ADDRESS}{callback_endpoints['status_endpoint']}")
+            poll = requests.get(f"{callback_endpoints['status_endpoint']}")
             if poll.status_code == status.HTTP_200_OK:
                 poll_results = poll.json()
                 # If the job is completed, fetch the results
                 if poll_results['job_completed']:
-                    cosmos_response = requests.get(f"{COSMOS_ADDRESS}{callback_endpoints['result_endpoint']}")
+                    cosmos_response = requests.get(f"{callback_endpoints['result_endpoint']}")
                     if cosmos_response.status_code == status.HTTP_200_OK:
                         data = cosmos_response.content
                         with ZipFile(io.BytesIO(data)) as z:
@@ -346,8 +347,6 @@ def merge_pipelines_results(
         outputs=results,
         generalized_errors=generalized_errors if generalized_errors else None
     )
-
-
 
 
 def integrated_extractions(
@@ -572,8 +571,9 @@ async def get_model_card(text_file: UploadFile, code_file: UploadFile, response:
     response.status_code = inner_response.status_code
     return inner_response.json()
 
+
 @router.post("/cards/get_data_card")
-async def get_data_card(smart:bool, csv_file: UploadFile, doc_file: UploadFile, response: Response):
+async def get_data_card(smart: bool, csv_file: UploadFile, doc_file: UploadFile, response: Response):
     """
         Calls the data card endpoint from MIT's pipeline.
         Smart run provides better results but may result in slow response times as a consequence of extra GPT calls.
@@ -606,6 +606,8 @@ async def get_data_card(smart:bool, csv_file: UploadFile, doc_file: UploadFile, 
 
     response.status_code = inner_response.status_code
     return inner_response.json()
+
+
 ####
 
 
@@ -655,6 +657,20 @@ def healthcheck() -> int:
         else status.HTTP_500_INTERNAL_SERVER_ERROR
     )
     return status_code
+
+
+@router.get("/eval", response_model=TextReadingEvaluationResults, status_code=200)
+def quantitative_eval() -> TextReadingEvaluationResults:
+    """ Compares the SIDARTHE paper extractions against ground truth extractions """
+
+    # Read ground truth annotations
+    with (Path(__file__).parents[0] / "data" / "sidarthe_annotations.json").open() as f:
+        gt_data = json.load(f)
+
+    # Read the SKEMA extractions
+    extractions = AttributeCollection.from_json(Path(__file__).parents[0] / "data" / "extractions_sidarthe_skema.json")
+
+    return compute_text_reading_evaluation(gt_data, extractions)
 
 
 app = FastAPI()

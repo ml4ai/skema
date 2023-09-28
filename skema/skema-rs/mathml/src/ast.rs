@@ -31,6 +31,7 @@ pub enum Type {
 pub struct Ci {
     pub r#type: Option<Type>,
     pub content: Box<MathExpression>,
+    pub func_of: Option<Vec<Ci>>,
 }
 
 /// The MathExpression enum represents the corresponding element type in MathML 3
@@ -66,7 +67,11 @@ impl fmt::Display for MathExpression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             MathExpression::Mi(Mi(identifier)) => write!(f, "{}", identifier),
-            MathExpression::Ci(Ci { r#type: _, content }) => write!(f, "{}", content),
+            MathExpression::Ci(Ci {
+                r#type: _,
+                content,
+                func_of: _,
+            }) => write!(f, "{}", content),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
                 write!(f, "{base}^{{{superscript}}}")

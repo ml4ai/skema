@@ -412,7 +412,7 @@ fn test_acset_equality(mut acset_1: ACSet, mut acset_2: ACSet) -> bool {
 
 #[test]
 fn test_simple_sir_v1() {
-    let acset_1 = acset::ACSet::from_file("../../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
+    let acset_1 = acset::ACSet::from_file("tests/mml2pn_inputs/simple_sir_v1/mml_list.txt");
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v1_acset.json").unwrap())
             .unwrap();
@@ -421,7 +421,7 @@ fn test_simple_sir_v1() {
 
 #[test]
 fn test_simple_sir_v2() {
-    let acset_1 = acset::ACSet::from_file("../../../data/mml2pn_inputs/simple_sir_v2/mml_list.txt");
+    let acset_1 = acset::ACSet::from_file("tests/mml2pn_inputs/simple_sir_v2/mml_list.txt");
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v2_acset.json").unwrap())
             .unwrap();
@@ -430,7 +430,7 @@ fn test_simple_sir_v2() {
 
 #[test]
 fn test_simple_sir_v3() {
-    let acset_1 = acset::ACSet::from_file("../../../data/mml2pn_inputs/simple_sir_v3/mml_list.txt");
+    let acset_1 = acset::ACSet::from_file("tests/mml2pn_inputs/simple_sir_v3/mml_list.txt");
     let acset_2: acset::ACSet =
         serde_json::from_str(&std::fs::read_to_string("tests/simple_sir_v3_acset.json").unwrap())
             .unwrap();

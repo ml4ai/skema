@@ -22,6 +22,7 @@ assignment_right_hand:
   WHERE (m:Primitive or m:Literal or m:Expression) and id(n)=$ID
   RETURN m
   "
+
 ordered_expressions:
   "
   MATCH (n)-[r]->(m)

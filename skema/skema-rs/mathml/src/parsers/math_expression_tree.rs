@@ -72,10 +72,15 @@ impl MathExpressionTree {
                     Operator::Multiply => content_mathml.push_str("<times/>"),
                     Operator::Equals => content_mathml.push_str("<eq/>"),
                     Operator::Divide => content_mathml.push_str("<divide/>"),
-                    Operator::Derivative(Derivative { order, var_index })
-                        if (*order, *var_index) == (1_u8, 1_u8) =>
-                    {
-                        content_mathml.push_str("<diff/>")
+                    Operator::Power => content_mathml.push_str("<power/>"),
+                    Operator::Exp => content_mathml.push_str("<exp/>"),
+                    Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }) if (*order, *var_index) == (1_u8, 1_u8) => {
+                        content_mathml.push_str("<diff/>");
+                        content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
                     }
                     _ => {}
                 }
@@ -117,6 +122,7 @@ impl MathExpressionTree {
                     Operator::Multiply => operation.push('*'),
                     Operator::Equals => operation.push('='),
                     Operator::Divide => operation.push('/'),
+                    Operator::Exp => operation.push_str("exp"),
                     _ => {}
                 }
                 let mut component = Vec::new();
@@ -153,7 +159,23 @@ impl MathExpression {
             MathExpression::Mrow(Mrow(elements)) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for element in elements {
-                    element.flatten(tokens);
+                    if let MathExpression::Ci(x) = element {
+                        // Handles cos and sin as operators
+                        if x.content == Box::new(MathExpression::Mi(Mi("cos".to_string()))) {
+                            tokens.push(MathExpression::Mo(Operator::Cos));
+                            if let Some(vec) = x.func_of.clone() {
+                                for v in vec {
+                                    tokens.push(MathExpression::Ci(v));
+                                }
+                            }
+                        } else if x.content == Box::new(MathExpression::Mi(Mi("sin".to_string()))) {
+                            tokens.push(MathExpression::Mo(Operator::Sin));
+                        } else {
+                            element.flatten(tokens);
+                        }
+                    } else {
+                        element.flatten(tokens);
+                    }
                 }
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
@@ -167,6 +189,32 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 denominator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
+            MathExpression::Msup(base, superscript) => {
+                if let MathExpression::Ci(x) = &**base {
+                    if x.content == Box::new(MathExpression::Mi(Mi("e".to_string()))) {
+                        tokens.push(MathExpression::Mo(Operator::Exp));
+                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        superscript.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                    } else {
+                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        base.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                        tokens.push(MathExpression::Mo(Operator::Power));
+                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        superscript.flatten(tokens);
+                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                    }
+                }
+            }
+            MathExpression::Mover(base, over) => {
+                if MathExpression::Mo(Operator::Mean) == **over {
+                    tokens.push(MathExpression::Mo(Operator::Mean));
+                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    base.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
+                }
             }
             t => tokens.push(t.clone()),
         }
@@ -331,7 +379,12 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
-        Operator::Derivative(Derivative { .. }) => ((), 15),
+        Operator::Exp => ((), 18),
+        Operator::Cos => ((), 19),
+        Operator::Sin => ((), 21),
+        Operator::Tan => ((), 22),
+        Operator::Mean => ((), 23),
+        Operator::Derivative(Derivative { .. }) => ((), 24),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -352,6 +405,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Add | Operator::Subtract => (5, 6),
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
+        Operator::Power => (16, 15),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -392,8 +446,15 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
+    let FirstOrderODE {
+        lhs_var,
+        func_of,
+        with_respect_to,
+        rhs,
+    } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(func_of[0].to_string(), "");
+    assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
 
@@ -404,8 +465,15 @@ fn test_conversion() {
         </math>
         ";
     println!("Input: {input}");
-    let FirstOrderODE { lhs_var, rhs } = first_order_ode(input.into()).unwrap().1;
+    let FirstOrderODE {
+        lhs_var,
+        func_of,
+        with_respect_to,
+        rhs,
+    } = first_order_ode(input.into()).unwrap().1;
     assert_eq!(lhs_var.to_string(), "S");
+    assert_eq!(func_of[0].to_string(), "t");
+    assert_eq!(with_respect_to.to_string(), "t");
     assert_eq!(rhs.to_string(), "(* (* (- β) S) I)");
     println!("Output: {s}\n");
 }
@@ -426,7 +494,7 @@ fn test_to_content_mathml_example2() {
         ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>S</ci></apply><ci>I</ci></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>S</ci></apply><ci>I</ci></apply></apply>");
 }
 
 #[test]
@@ -445,8 +513,17 @@ fn test_content_hackathon2_scenario1_eq1() {
     </math>
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
+    println!("ode={:?}", ode);
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
+    println!("cmml={:?}", cmml);
+    let FirstOrderODE {
+        lhs_var: _,
+        func_of: _,
+        with_respect_to: _,
+        rhs,
+    } = first_order_ode(input.into()).unwrap().1;
+    println!("rhs = {:?}", rhs.to_string());
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
 }
 
 #[test]
@@ -467,7 +544,7 @@ fn test_content_hackathon2_scenario1_eq2() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml,"<apply><eq/><apply><diff/><ci>E</ci></apply><apply><minus/><apply><divide/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
+    assert_eq!(cmml,"<apply><eq/><apply><diff/><bvar>t</bar><ci>E</ci></apply><apply><minus/><apply><divide/><apply><times/><apply><times/><ci>β</ci><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>δ</ci><ci>E</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -488,7 +565,7 @@ fn test_content_hackathon2_scenario1_eq3() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>I</ci></apply><apply><minus/><apply><minus/><apply><times/><ci>δ</ci><ci>E</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -505,7 +582,7 @@ fn test_content_hackathon2_scenario1_eq4() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>R</ci></apply><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply></apply>");
 }
 
 #[test]
@@ -524,7 +601,7 @@ fn test_content_hackathon2_scenario1_eq5() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>D</ci></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>D</ci></apply><apply><times/><apply><times/><ci>α</ci><ci>ρ</ci></apply><ci>I</ci></apply></apply>");
 }
 
 #[test]
@@ -547,7 +624,7 @@ fn test_content_hackathon2_scenario1_eq6() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>S</ci></apply><apply><plus/><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><plus/><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -567,7 +644,7 @@ fn test_content_hackathon2_scenario1_eq7() {
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
     let cmml = ode.to_cmml();
-    assert_eq!(cmml, "<apply><eq/><apply><diff/><ci>R</ci></apply><apply><minus/><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
+    assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>R</ci></apply><apply><minus/><apply><times/><apply><times/><apply><minus/><cn>1</cn><ci>α</ci></apply><ci>γ</ci></apply><ci>I</ci></apply><apply><times/><ci>ϵ</ci><ci>R</ci></apply></apply></apply>");
 }
 
 #[test]
@@ -607,6 +684,7 @@ fn test_expression2() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let math = exp.to_infix_expression();
+    println!("math = {:?}", math);
     assert_eq!(math, "((α*ρ)*I)");
 }
 
@@ -622,6 +700,7 @@ fn test_expression3() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     let math = exp.to_infix_expression();
     assert_eq!(math, "((((β*I)*S)/N)-(δ*E))")
 }
@@ -639,4 +718,115 @@ fn test_expression4() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     let math = exp.to_infix_expression();
     assert_eq!(math, "((((1-α)*γ)*I)-(ϵ*R))")
+}
+
+#[test]
+fn test_mfrac() {
+    let input = "
+    <math>
+        <mfrac><mi>S</mi><mi>N</mi></mfrac>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let math = exp.to_infix_expression();
+    println!("math={:?}", math);
+}
+
+#[test]
+fn test_superscript() {
+    let input = "
+    <math>
+        <msup>
+        <mi>x</mi>
+        <mn>3</mn>
+        </msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
+}
+
+#[test]
+fn test_msup_exp() {
+    let input = "
+    <math>
+        <msup>
+        <mi>e</mi>
+        <mrow><mo>-</mo><mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>γ</mi><mi>I</mi></mrow>
+        </msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
+}
+
+#[test]
+fn test_trig_cos() {
+    let input = "
+    <math>
+        <mrow>
+        <mi>cos</mi>
+        <mi>x</mi>
+        </mrow>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_trig_another_cos() {
+    let input = "
+    <math>
+        <mrow>
+        <mi>cos</mi>
+        <mo>(</mo>
+        <mi>x</mi>
+        <mo>)</mo>
+        </mrow>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_mover_mean() {
+    let input = "
+    <math>
+        <mover>
+        <mi>T</mi>
+        <mo>¯</mo>
+        </mover>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_one_dimensional_ebm() {
+    let input = "
+    <math>
+        <mi>C</mi>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>∂</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+    </math>
+    ";
+    //let exp = input.parse::<MathExpressionTree>().unwrap();
+    //println!("exp={:?}", exp);
+    //let ode = input.parse::<FirstOrderODE>().unwrap();
+    //println!("ode ={:?}", ode);
 }
