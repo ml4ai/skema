@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import torch
+from tqdm.auto import tqdm
 from skema.img2mml.utils.utils import *
 
 
@@ -21,8 +22,9 @@ def train(
     model.train()
 
     epoch_loss = 0
-
-    for i, (img, mml) in enumerate(train_dataloader):
+    tset = tqdm(iter(train_dataloader))
+    # for i, (img, mml) in enumerate(train_dataloader):
+    for i, (img, mml) in enumerate(tset):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
         mml.shape[0]
@@ -55,6 +57,8 @@ def train(
 
         if isScheduler:
             scheduler.step()
-    
+
+        tset.set_description('Loss: %.4f' % loss.item())
+
     net_loss = epoch_loss / len(train_dataloader)
     return net_loss
