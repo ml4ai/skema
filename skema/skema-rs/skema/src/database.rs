@@ -1145,21 +1145,20 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     // match contents field to box field on wff entries
     external_wiring(gromet, &mut nodes.clone(), &mut edges);
 
+    let c_args_other = ConstructorArgs {
+        att_box: gromet.modules[0].r#fn.clone(),
+        cur_box: gromet.modules[0].r#fn.bf.as_ref().unwrap()[0].clone(),
+        parent_node: temp_node.clone(),
+        att_idx: 0,
+        bf_counter: 0,
+        att_bf_idx: 0,
+        box_counter: 0,
+    };
+
+
     // make conditionals if they exist
     if gromet.modules[0].r#fn.bc.as_ref().is_some() {
         let mut cond_counter = 0;
-        let _temp_mod_node = Node {
-            n_type: String::from("module"),
-            value: None,
-            name: None, // I think this naming will get messed up if there are multiple ports...
-            node_id: "mod".to_string(),
-            out_idx: None,
-            in_indx: None,
-            contents: 0,
-            nbox: 0,
-            att_bf_idx: 0,
-            box_counter: 0,
-        };
         for _cond in gromet.modules[0].r#fn.bc.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
             create_conditional(
@@ -1168,7 +1167,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 &mut edges,
                 &mut meta_nodes,
                 &mut start,
-                c_args.clone(),
+                c_args_other.clone(),
                 cond_counter,
             );
             cond_counter += 1;
@@ -1177,18 +1176,6 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     // make loops if they exist
     if gromet.modules[0].r#fn.bl.as_ref().is_some() {
         let mut while_counter = 0;
-        let _temp_mod_node = Node {
-            n_type: String::from("module"),
-            value: None,
-            name: None, // I think this naming will get messed up if there are multiple ports...
-            node_id: "mod".to_string(),
-            out_idx: None,
-            in_indx: None,
-            contents: 0,
-            nbox: 0,
-            att_bf_idx: 0,
-            box_counter: 0,
-        };
         for _while_l in gromet.modules[0].r#fn.bl.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
             create_while_loop(
@@ -1197,7 +1184,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 &mut edges,
                 &mut meta_nodes,
                 &mut start,
-                c_args.clone(),
+                c_args_other.clone(),
                 while_counter,
             );
             while_counter += 1;
@@ -1676,9 +1663,6 @@ pub fn create_conditional(
     // Now let's create the edges for the conditional condition and it's bodies
     // find the nodes
     // the contents is the node's attribute reference, so need to pull off of box's contents value
-    let mut condition_id = String::from("temp");
-    let mut body_if_id = String::from("temp");
-    let mut body_else_id = String::from("temp");
     let cond_box = function_net.bc.as_ref().unwrap()[cond_counter as usize]
         .condition
         .unwrap();
@@ -1696,11 +1680,18 @@ pub fn create_conditional(
     let else_att_box = gromet.modules[0].attributes[(body_else_box - 1) as usize].clone();
 
     let mut new_c_args = c_args.clone();
+    new_c_args.parent_node = n1.clone();
     // creating the conditional
     new_c_args.att_box = cond_att_box.clone();
     new_c_args.att_idx = cond_box as usize;
     create_att_predicate(gromet, nodes, edges, meta_nodes, start, new_c_args.clone());
     *start += 1;
+
+    for edge in edges.iter_mut() {
+        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+            edge.e_type = "Condition".to_string();
+        }
+    }
 
     // creating the if body
     new_c_args.att_box = if_att_box.clone();
@@ -1708,59 +1699,24 @@ pub fn create_conditional(
     create_function(gromet, nodes, edges, meta_nodes, start, new_c_args.clone());
     *start += 1;
 
+    for edge in edges.iter_mut() {
+        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+            edge.e_type = "if_body".to_string();
+        }
+    }
+
     // creating the else body
     new_c_args.att_box = else_att_box.clone();
     new_c_args.att_idx = body_else_box as usize;
     create_function(gromet, nodes, edges, meta_nodes, start, new_c_args.clone());
     *start += 1;
 
-    for node in nodes.clone() {
-        // make sure the node is in the same attribute as conditional
-        if node.contents == cond_box as usize {
-            // make sure box matches correctly
-            // make sure we don't pick up ports by only getting the predicate
-            if node.n_type == *"Predicate" {
-                condition_id = node.node_id.clone();
-            }
-        }
-        if node.contents == body_if_box as usize {
-            // make sure box matches correctly
-            // make sure we don't pick up ports by only getting the predicate
-            if node.n_type == *"Function" {
-                body_if_id = node.node_id.clone();
-            }
-        }
-        if node.contents == body_else_box as usize {
-            // make sure box matches correctly
-            // make sure we don't pick up ports by only getting the predicate
-            if node.n_type == *"Function" {
-                body_else_id = node.node_id.clone();
-            }
+    for edge in edges.iter_mut() {
+        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+            edge.e_type = "else_body".to_string();
         }
     }
 
-    // now we construct the edges
-    let e7 = Edge {
-        src: n1.node_id.clone(),
-        tgt: condition_id,
-        e_type: String::from("Condition"),
-        prop: None,
-    };
-    edges.push(e7);
-    let e8 = Edge {
-        src: n1.node_id.clone(),
-        tgt: body_if_id,
-        e_type: String::from("Body_if"),
-        prop: None,
-    };
-    edges.push(e8);
-    let e9 = Edge {
-        src: n1.node_id,
-        tgt: body_else_id,
-        e_type: String::from("Body_else"),
-        prop: None,
-    };
-    edges.push(e9);
 
     // Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
     for wire in function_net.wfc.as_ref().unwrap().iter() {
@@ -2136,7 +2092,57 @@ pub fn create_while_loop(
 
     *start += 1;
 
-    // now we make the pic and poc ports and connect them to the conditional node
+    // now we construct the condition and body of the loop, assumption: condition is predicate, and body if a function
+
+    let condition_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
+    .condition
+    .unwrap();
+    let body_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
+    .body
+    .unwrap();
+    let mut new_c_args = c_args.clone();
+
+    // first the condition
+    new_c_args.att_box = gromet.modules[0].attributes[(condition_att - 1) as usize].clone();
+    new_c_args.parent_node = n1.clone();
+    new_c_args.att_idx = condition_att as usize;
+    create_att_predicate(
+        gromet,    // gromet for metadata
+        nodes, // nodes
+        edges,
+        meta_nodes,
+        start,
+        new_c_args.clone(),
+    );
+    // we need to rename the contains edge to be a condition edge
+    for edge in edges.iter_mut() {
+        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+            edge.e_type = "Condition".to_string();
+        }
+    }
+    *start += 1;
+
+    // now we construct the body
+    new_c_args.att_box = gromet.modules[0].attributes[(body_att - 1) as usize].clone();
+    new_c_args.att_idx = body_att as usize;
+    create_function(
+        gromet,    // gromet for metadata
+        nodes, // nodes
+        edges,
+        meta_nodes,
+        start,
+        new_c_args.clone(),
+    );
+
+    // now we need to rename the contains edge for the body to body
+    for edge in edges.iter_mut() {
+        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+            edge.e_type = "Body".to_string();
+        }
+    }
+    *start += 1;
+
+    // now we make the pil and pol ports and connect them to the conditional node
     if function_net.pil.is_some() {
         let mut port_count = 1;
         for pic in function_net.pil.as_ref().unwrap().iter() {
@@ -2243,69 +2249,8 @@ pub fn create_while_loop(
         }
     }
 
-    // Now let's create the edges for the conditional condition and it's bodies
-    // find the nodes
-    // the contents is the node's attribute reference, so need to pull off of box's contents value
-    let mut condition_id = String::from("temp");
-    let mut body_if_id = String::from("temp");
-    let cond_box = function_net.bl.as_ref().unwrap()[cond_counter as usize]
-        .condition
-        .unwrap();
-    let body_if_box = function_net.bl.as_ref().unwrap()[cond_counter as usize]
-        .body
-        .unwrap();
-
-    let cond_att_box = gromet.modules[0].attributes[(cond_box - 1) as usize].clone();
-    let body_att_box = gromet.modules[0].attributes[(body_if_box - 1) as usize].clone();
-
-    let mut new_c_args = c_args.clone();
-    // creating the conditional
-    new_c_args.att_box = cond_att_box.clone();
-    new_c_args.att_idx = cond_box as usize;
-    create_att_predicate(gromet, nodes, edges, meta_nodes, start, new_c_args.clone());
-    *start += 1;
-
-    // creating the if body
-    new_c_args.att_box = body_att_box.clone();
-    new_c_args.att_idx = body_if_box as usize;
-    create_function(gromet, nodes, edges, meta_nodes, start, new_c_args.clone());
-    *start += 1;
-
-    for node in nodes.clone() {
-        // make sure the node is in the same attribute as conditional
-        // make sure box matches correctly
-        if node.contents == cond_box as usize {
-            // make sure we don't pick up ports by only getting the predicate
-            if node.n_type == *"Predicate" {
-                condition_id = node.node_id.clone();
-            }
-        }
-        // make sure box matches correctly
-        if node.contents == body_if_box as usize {
-            // make sure we don't pick up ports by only getting the predicate
-            if node.n_type == *"Function" {
-                body_if_id = node.node_id.clone();
-            }
-        }
-    }
-
-    // now we construct the edges
-    let e7 = Edge {
-        src: n1.node_id.clone(),
-        tgt: condition_id,
-        e_type: String::from("Condition"),
-        prop: None,
-    };
-    edges.push(e7);
-    let e8 = Edge {
-        src: n1.node_id,
-        tgt: body_if_id,
-        e_type: String::from("Body"),
-        prop: None,
-    };
-    edges.push(e8);
-
-    // Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
+    // Now we start to wire these objects together there are one unique wire types and implicit wires that need to be made
+    // blow is the unique one
     for wire in function_net.wfl.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         let src_idx = wire.src; // port index
@@ -2373,6 +2318,10 @@ pub fn create_while_loop(
             edges.push(e8);
         }
     }
+
+    // now to perform the implicit wiring:
+
+
     // now to perform the wl_cargs wiring which is a connection from the condition's pif/opi to the pic
     /*for wire in function_net.wl_cargs.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
@@ -2684,12 +2633,14 @@ pub fn create_att_expression(
                 }
             }
         } else {
-            for port in gromet.modules[0].r#fn.pof.as_ref().unwrap().iter() {
-                if port.r#box == c_args.bf_counter as u8 {
-                    if port.name.is_some() {
-                        opo_name.push(port.name.as_ref().unwrap().clone());
-                    } else {
-                        opo_name.push(String::from("un-named"));
+            if gromet.modules[0].r#fn.pof.is_some() {
+                for port in gromet.modules[0].r#fn.pof.as_ref().unwrap().iter() {
+                    if port.r#box == c_args.bf_counter as u8 {
+                        if port.name.is_some() {
+                            opo_name.push(port.name.as_ref().unwrap().clone());
+                        } else {
+                            opo_name.push(String::from("un-named"));
+                        }
                     }
                 }
             }
