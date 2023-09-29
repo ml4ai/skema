@@ -7,7 +7,7 @@
     Ix: <a class="trait" href="../graph/trait.IndexType.html" title="trait petgraph::graph::IndexType">IndexType</a>,
     E: <a class="trait" href="https://doc.rust-lang.org/1.72.1/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a>,
     N: <a class="trait" href="https://doc.rust-lang.org/1.72.1/core/clone/trait.Clone.html" title="trait core::clone::Clone">Clone</a>,</span></code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>[Generic] complement of the graph</p>
-<p>Computes the graph complement of the input Graphand stores it
+<p>Computes the graph complement of the input Graph and stores it
 in the provided empty output Graph.</p>
 <p>The function does not create self-loops.</p>
 <p>Computes in <strong>O(|V|^2*log(|V|))</strong> time (average).</p>
@@ -30,8 +30,7 @@ graph.extend_with_edges(<span class="kw-2">&amp;</span>[
 ]);
 <span class="comment">// a ----&gt; b ----&gt; c ----&gt; d
 
-</span>graph.extend_with_edges(<span class="kw-2">&amp;</span>[(a, b), (b, c), (c, d)]);
-<span class="kw">let </span><span class="kw-2">mut </span>output: Graph&lt;(), (), Directed&gt; = Graph::new();
+</span><span class="kw">let </span><span class="kw-2">mut </span>output: Graph&lt;(), (), Directed&gt; = Graph::new();
 
 complement(<span class="kw-2">&amp;</span>graph, <span class="kw-2">&amp;mut </span>output, ());
 

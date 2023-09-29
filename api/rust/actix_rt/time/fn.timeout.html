@@ -8,8 +8,8 @@ does not yield during execution then it is possible for the future to complete
 and exceed the timeout <em>without</em> returning an error.</p>
 <p>This function returns a future whose return type is <a href="https://doc.rust-lang.org/1.72.1/core/result/enum.Result.html" title="enum core::result::Result"><code>Result</code></a><code>&lt;T,</code><a href="../../tokio/time/error/struct.Elapsed.html" title="struct tokio::time::error::Elapsed"><code>Elapsed</code></a><code>&gt;</code>, where <code>T</code> is the
 return type of the provided future.</p>
-<p>If the provided future completes immediatelly, then the future returned from
-this function is guaranteed to complete immediatelly with an <a href="https://doc.rust-lang.org/1.72.1/core/result/enum.Result.html#variant.Ok" title="variant core::result::Result::Ok"><code>Ok</code></a> variant
+<p>If the provided future completes immediately, then the future returned from
+this function is guaranteed to complete immediately with an <a href="https://doc.rust-lang.org/1.72.1/core/result/enum.Result.html#variant.Ok" title="variant core::result::Result::Ok"><code>Ok</code></a> variant
 no matter the provided duration.</p>
 <h2 id="cancellation"><a href="#cancellation">Cancellation</a></h2>
 <p>Cancelling a timeout is done by dropping the future. No additional cleanup

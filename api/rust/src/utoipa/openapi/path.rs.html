@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.0.3/src/openapi/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/path.rs`."><title>path.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -672,10 +672,94 @@
 <a href="#672" id="672">672</a>
 <a href="#673" id="673">673</a>
 <a href="#674" id="674">674</a>
+<a href="#675" id="675">675</a>
+<a href="#676" id="676">676</a>
+<a href="#677" id="677">677</a>
+<a href="#678" id="678">678</a>
+<a href="#679" id="679">679</a>
+<a href="#680" id="680">680</a>
+<a href="#681" id="681">681</a>
+<a href="#682" id="682">682</a>
+<a href="#683" id="683">683</a>
+<a href="#684" id="684">684</a>
+<a href="#685" id="685">685</a>
+<a href="#686" id="686">686</a>
+<a href="#687" id="687">687</a>
+<a href="#688" id="688">688</a>
+<a href="#689" id="689">689</a>
+<a href="#690" id="690">690</a>
+<a href="#691" id="691">691</a>
+<a href="#692" id="692">692</a>
+<a href="#693" id="693">693</a>
+<a href="#694" id="694">694</a>
+<a href="#695" id="695">695</a>
+<a href="#696" id="696">696</a>
+<a href="#697" id="697">697</a>
+<a href="#698" id="698">698</a>
+<a href="#699" id="699">699</a>
+<a href="#700" id="700">700</a>
+<a href="#701" id="701">701</a>
+<a href="#702" id="702">702</a>
+<a href="#703" id="703">703</a>
+<a href="#704" id="704">704</a>
+<a href="#705" id="705">705</a>
+<a href="#706" id="706">706</a>
+<a href="#707" id="707">707</a>
+<a href="#708" id="708">708</a>
+<a href="#709" id="709">709</a>
+<a href="#710" id="710">710</a>
+<a href="#711" id="711">711</a>
+<a href="#712" id="712">712</a>
+<a href="#713" id="713">713</a>
+<a href="#714" id="714">714</a>
+<a href="#715" id="715">715</a>
+<a href="#716" id="716">716</a>
+<a href="#717" id="717">717</a>
+<a href="#718" id="718">718</a>
+<a href="#719" id="719">719</a>
+<a href="#720" id="720">720</a>
+<a href="#721" id="721">721</a>
+<a href="#722" id="722">722</a>
+<a href="#723" id="723">723</a>
+<a href="#724" id="724">724</a>
+<a href="#725" id="725">725</a>
+<a href="#726" id="726">726</a>
+<a href="#727" id="727">727</a>
+<a href="#728" id="728">728</a>
+<a href="#729" id="729">729</a>
+<a href="#730" id="730">730</a>
+<a href="#731" id="731">731</a>
+<a href="#732" id="732">732</a>
+<a href="#733" id="733">733</a>
+<a href="#734" id="734">734</a>
+<a href="#735" id="735">735</a>
+<a href="#736" id="736">736</a>
+<a href="#737" id="737">737</a>
+<a href="#738" id="738">738</a>
+<a href="#739" id="739">739</a>
+<a href="#740" id="740">740</a>
+<a href="#741" id="741">741</a>
+<a href="#742" id="742">742</a>
+<a href="#743" id="743">743</a>
+<a href="#744" id="744">744</a>
+<a href="#745" id="745">745</a>
+<a href="#746" id="746">746</a>
+<a href="#747" id="747">747</a>
+<a href="#748" id="748">748</a>
+<a href="#749" id="749">749</a>
+<a href="#750" id="750">750</a>
+<a href="#751" id="751">751</a>
+<a href="#752" id="752">752</a>
+<a href="#753" id="753">753</a>
+<a href="#754" id="754">754</a>
+<a href="#755" id="755">755</a>
+<a href="#756" id="756">756</a>
+<a href="#757" id="757">757</a>
+<a href="#758" id="758">758</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements [OpenAPI Path Object][paths] types.
 //!
 //! [paths]: https://spec.openapis.org/oas/latest.html#paths-object
-</span><span class="kw">use </span>std::{collections::BTreeMap, iter};
+</span><span class="kw">use </span>std::iter;
 
 <span class="kw">use </span>serde::{Deserialize, Serialize};
 <span class="kw">use </span>serde_json::Value;
@@ -686,6 +770,11 @@
     response::{Response, Responses},
     set_value, Deprecated, ExternalDocs, RefOr, Required, Schema, SecurityRequirement, Server,
 };
+
+<span class="attr">#[cfg(not(feature = <span class="string">&quot;preserve_path_order&quot;</span>))]
+</span><span class="kw">type </span>PathsMap&lt;K, V&gt; = std::collections::BTreeMap&lt;K, V&gt;;
+<span class="attr">#[cfg(feature = <span class="string">&quot;preserve_path_order&quot;</span>)]
+</span><span class="kw">type </span>PathsMap&lt;K, V&gt; = indexmap::IndexMap&lt;K, V&gt;;
 
 <span class="macro">builder! </span>{
     PathsBuilder;
@@ -702,7 +791,7 @@
     </span><span class="kw">pub struct </span>Paths {
         <span class="doccomment">/// Map of relative paths with [`PathItem`]s holding [`Operation`]s matching
         /// api endpoints.
-        </span><span class="kw">pub </span>paths: BTreeMap&lt;String, PathItem&gt;,
+        </span><span class="kw">pub </span>paths: PathsMap&lt;String, PathItem&gt;,
     }
 }
 
@@ -754,10 +843,12 @@
 <span class="kw">impl </span>PathsBuilder {
     <span class="doccomment">/// Append [`PathItem`] with path to map of paths. If path already exists it will merge [`Operation`]s of
     /// [`PathItem`] with already found path item operations.
-    </span><span class="kw">pub fn </span>path&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, path: I, <span class="kw-2">mut </span>item: PathItem) -&gt; <span class="self">Self </span>{
+    </span><span class="kw">pub fn </span>path&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, path: I, item: PathItem) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>path_string = path.into();
         <span class="kw">if let </span><span class="prelude-val">Some</span>(existing_item) = <span class="self">self</span>.paths.get_mut(<span class="kw-2">&amp;</span>path_string) {
-            existing_item.operations.append(<span class="kw-2">&amp;mut </span>item.operations);
+            existing_item
+                .operations
+                .extend(<span class="kw-2">&amp;mut </span>item.operations.into_iter());
         } <span class="kw">else </span>{
             <span class="self">self</span>.paths.insert(path_string, item);
         }
@@ -801,14 +892,14 @@
         <span class="doccomment">/// Map of operations in this [`PathItem`]. Operations can hold only one operation
         /// per [`PathItemType`].
         </span><span class="attr">#[serde(flatten)]
-        </span><span class="kw">pub </span>operations: BTreeMap&lt;PathItemType, Operation&gt;,
+        </span><span class="kw">pub </span>operations: PathsMap&lt;PathItemType, Operation&gt;,
     }
 }
 
 <span class="kw">impl </span>PathItem {
     <span class="doccomment">/// Construct a new [`PathItem`] with provided [`Operation`] mapped to given [`PathItemType`].
     </span><span class="kw">pub fn </span>new&lt;O: Into&lt;Operation&gt;&gt;(path_item_type: PathItemType, operation: O) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>operations = BTreeMap::from_iter(iter::once((path_item_type, operation.into())));
+        <span class="kw">let </span>operations = PathsMap::from_iter(iter::once((path_item_type, operation.into())));
 
         <span class="self">Self </span>{
             operations,
@@ -1301,7 +1392,84 @@
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::{Operation, OperationBuilder};
-    <span class="kw">use </span><span class="kw">crate</span>::openapi::{security::SecurityRequirement, server::Server};
+    <span class="kw">use </span><span class="kw">crate</span>::openapi::{
+        security::SecurityRequirement, server::Server, PathItem, PathItemType, PathsBuilder,
+    };
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_path_order() {
+        <span class="kw">let </span>paths_list = PathsBuilder::new()
+            .path(
+                <span class="string">&quot;/todo&quot;</span>,
+                PathItem::new(PathItemType::Get, OperationBuilder::new()),
+            )
+            .path(
+                <span class="string">&quot;/todo&quot;</span>,
+                PathItem::new(PathItemType::Post, OperationBuilder::new()),
+            )
+            .path(
+                <span class="string">&quot;/todo/{id}&quot;</span>,
+                PathItem::new(PathItemType::Delete, OperationBuilder::new()),
+            )
+            .path(
+                <span class="string">&quot;/todo/{id}&quot;</span>,
+                PathItem::new(PathItemType::Get, OperationBuilder::new()),
+            )
+            .path(
+                <span class="string">&quot;/todo/{id}&quot;</span>,
+                PathItem::new(PathItemType::Put, OperationBuilder::new()),
+            )
+            .path(
+                <span class="string">&quot;/todo/search&quot;</span>,
+                PathItem::new(PathItemType::Get, OperationBuilder::new()),
+            )
+            .build();
+
+        <span class="kw">let </span>actual_value = paths_list
+            .paths
+            .iter()
+            .flat_map(|(path, path_item)| {
+                path_item.operations.iter().fold(
+                    Vec::&lt;(<span class="kw-2">&amp;</span>str, <span class="kw-2">&amp;</span>PathItemType)&gt;::with_capacity(paths_list.paths.len()),
+                    |<span class="kw-2">mut </span>acc, (method, <span class="kw">_</span>)| {
+                        acc.push((path.as_str(), method));
+                        acc
+                    },
+                )
+            })
+            .collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;();
+
+        <span class="kw">let </span>get = PathItemType::Get;
+        <span class="kw">let </span>post = PathItemType::Post;
+        <span class="kw">let </span>put = PathItemType::Put;
+        <span class="kw">let </span>delete = PathItemType::Delete;
+
+        <span class="attr">#[cfg(not(feature = <span class="string">&quot;preserve_path_order&quot;</span>))]
+        </span>{
+            <span class="kw">let </span>expected_value = <span class="macro">vec!</span>[
+                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>post),
+                (<span class="string">&quot;/todo/search&quot;</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>put),
+                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>delete),
+            ];
+            <span class="macro">assert_eq!</span>(actual_value, expected_value);
+        }
+
+        <span class="attr">#[cfg(feature = <span class="string">&quot;preserve_path_order&quot;</span>)]
+        </span>{
+            <span class="kw">let </span>expected_value = <span class="macro">vec!</span>[
+                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">&quot;/todo&quot;</span>, <span class="kw-2">&amp;</span>post),
+                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>delete),
+                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>get),
+                (<span class="string">&quot;/todo/{id}&quot;</span>, <span class="kw-2">&amp;</span>put),
+                (<span class="string">&quot;/todo/search&quot;</span>, <span class="kw-2">&amp;</span>get),
+            ];
+            <span class="macro">assert_eq!</span>(actual_value, expected_value);
+        }
+    }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>operation_new() {

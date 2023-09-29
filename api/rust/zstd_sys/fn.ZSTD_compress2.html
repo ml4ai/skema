@@ -11,7 +11,8 @@ Should cctx hold data from a previously unfinished frame, everything about it is
 <ul>
 <li>Compression parameters are pushed into CCtx before starting compression, using ZSTD_CCtx_set*()</li>
 <li>The function is always blocking, returns when compression is completed.
-Hint : compression runs faster if <code>dstCapacity</code> &gt;=  <code>ZSTD_compressBound(srcSize)</code>.
+NOTE: Providing <code>dstCapacity &gt;= ZSTD_compressBound(srcSize)</code> guarantees that zstd will have
+enough space to successfully compress the data, though it is possible it fails for other reasons.
 @return : compressed size written into <code>dst</code> (&lt;= `dstCapacity),
 or an error code if it fails (which can be tested using ZSTD_isError()).</li>
 </ul>

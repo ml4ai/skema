@@ -9,11 +9,11 @@ data from an underlying stream and emit a stream of compressed data.</p>
 
 <span class="comment">// Return a vector containing the Deflate compressed version of hello world
 </span><span class="kw">fn </span>deflateencoder_read_hello_world() -&gt; io::Result&lt;Vec&lt;u8&gt;&gt; {
-   <span class="kw">let </span><span class="kw-2">mut </span>ret_vec = [<span class="number">0</span>;<span class="number">100</span>];
+   <span class="kw">let </span><span class="kw-2">mut </span>ret_vec = Vec::new();
    <span class="kw">let </span>c = <span class="string">b&quot;hello world&quot;</span>;
    <span class="kw">let </span><span class="kw-2">mut </span>deflater = DeflateEncoder::new(<span class="kw-2">&amp;</span>c[..], Compression::fast());
-   <span class="kw">let </span>count = deflater.read(<span class="kw-2">&amp;mut </span>ret_vec)<span class="question-mark">?</span>;
-   <span class="prelude-val">Ok</span>(ret_vec[<span class="number">0</span>..count].to_vec())
+   deflater.read_to_end(<span class="kw-2">&amp;mut </span>ret_vec)<span class="question-mark">?</span>;
+   <span class="prelude-val">Ok</span>(ret_vec)
 }</code></pre></div>
 </div></details><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor">§</a></h2><div id="implementations-list"><details class="toggle implementors-toggle" open><summary><section id="impl-DeflateEncoder%3CR%3E" class="impl"><a class="srclink rightside" href="../../src/flate2/deflate/read.rs.html#40-48">source</a><a href="#impl-DeflateEncoder%3CR%3E" class="anchor">§</a><h3 class="code-header">impl&lt;R: <a class="trait" href="https://doc.rust-lang.org/1.72.1/std/io/trait.Read.html" title="trait std::io::Read">Read</a>&gt; <a class="struct" href="struct.DeflateEncoder.html" title="struct flate2::read::DeflateEncoder">DeflateEncoder</a>&lt;R&gt;</h3></section></summary><div class="impl-items"><details class="toggle method-toggle" open><summary><section id="method.new" class="method"><a class="srclink rightside" href="../../src/flate2/deflate/read.rs.html#43-47">source</a><h4 class="code-header">pub fn <a href="#method.new" class="fn">new</a>(r: R, level: <a class="struct" href="../struct.Compression.html" title="struct flate2::Compression">Compression</a>) -&gt; <a class="struct" href="struct.DeflateEncoder.html" title="struct flate2::read::DeflateEncoder">DeflateEncoder</a>&lt;R&gt; <a href="#" class="tooltip" data-notable-ty="DeflateEncoder&lt;R&gt;">ⓘ</a></h4></section></summary><div class="docblock"><p>Creates a new encoder which will read uncompressed data from the given
 stream and emit the compressed stream.</p>

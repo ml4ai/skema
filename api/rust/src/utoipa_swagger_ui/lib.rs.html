@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-swagger-ui-3.0.2/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_swagger_ui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../utoipa_swagger_ui/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-swagger-ui-3.1.5/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_swagger_ui" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../utoipa_swagger_ui/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1562,6 +1562,106 @@
 <a href="#1562" id="1562">1562</a>
 <a href="#1563" id="1563">1563</a>
 <a href="#1564" id="1564">1564</a>
+<a href="#1565" id="1565">1565</a>
+<a href="#1566" id="1566">1566</a>
+<a href="#1567" id="1567">1567</a>
+<a href="#1568" id="1568">1568</a>
+<a href="#1569" id="1569">1569</a>
+<a href="#1570" id="1570">1570</a>
+<a href="#1571" id="1571">1571</a>
+<a href="#1572" id="1572">1572</a>
+<a href="#1573" id="1573">1573</a>
+<a href="#1574" id="1574">1574</a>
+<a href="#1575" id="1575">1575</a>
+<a href="#1576" id="1576">1576</a>
+<a href="#1577" id="1577">1577</a>
+<a href="#1578" id="1578">1578</a>
+<a href="#1579" id="1579">1579</a>
+<a href="#1580" id="1580">1580</a>
+<a href="#1581" id="1581">1581</a>
+<a href="#1582" id="1582">1582</a>
+<a href="#1583" id="1583">1583</a>
+<a href="#1584" id="1584">1584</a>
+<a href="#1585" id="1585">1585</a>
+<a href="#1586" id="1586">1586</a>
+<a href="#1587" id="1587">1587</a>
+<a href="#1588" id="1588">1588</a>
+<a href="#1589" id="1589">1589</a>
+<a href="#1590" id="1590">1590</a>
+<a href="#1591" id="1591">1591</a>
+<a href="#1592" id="1592">1592</a>
+<a href="#1593" id="1593">1593</a>
+<a href="#1594" id="1594">1594</a>
+<a href="#1595" id="1595">1595</a>
+<a href="#1596" id="1596">1596</a>
+<a href="#1597" id="1597">1597</a>
+<a href="#1598" id="1598">1598</a>
+<a href="#1599" id="1599">1599</a>
+<a href="#1600" id="1600">1600</a>
+<a href="#1601" id="1601">1601</a>
+<a href="#1602" id="1602">1602</a>
+<a href="#1603" id="1603">1603</a>
+<a href="#1604" id="1604">1604</a>
+<a href="#1605" id="1605">1605</a>
+<a href="#1606" id="1606">1606</a>
+<a href="#1607" id="1607">1607</a>
+<a href="#1608" id="1608">1608</a>
+<a href="#1609" id="1609">1609</a>
+<a href="#1610" id="1610">1610</a>
+<a href="#1611" id="1611">1611</a>
+<a href="#1612" id="1612">1612</a>
+<a href="#1613" id="1613">1613</a>
+<a href="#1614" id="1614">1614</a>
+<a href="#1615" id="1615">1615</a>
+<a href="#1616" id="1616">1616</a>
+<a href="#1617" id="1617">1617</a>
+<a href="#1618" id="1618">1618</a>
+<a href="#1619" id="1619">1619</a>
+<a href="#1620" id="1620">1620</a>
+<a href="#1621" id="1621">1621</a>
+<a href="#1622" id="1622">1622</a>
+<a href="#1623" id="1623">1623</a>
+<a href="#1624" id="1624">1624</a>
+<a href="#1625" id="1625">1625</a>
+<a href="#1626" id="1626">1626</a>
+<a href="#1627" id="1627">1627</a>
+<a href="#1628" id="1628">1628</a>
+<a href="#1629" id="1629">1629</a>
+<a href="#1630" id="1630">1630</a>
+<a href="#1631" id="1631">1631</a>
+<a href="#1632" id="1632">1632</a>
+<a href="#1633" id="1633">1633</a>
+<a href="#1634" id="1634">1634</a>
+<a href="#1635" id="1635">1635</a>
+<a href="#1636" id="1636">1636</a>
+<a href="#1637" id="1637">1637</a>
+<a href="#1638" id="1638">1638</a>
+<a href="#1639" id="1639">1639</a>
+<a href="#1640" id="1640">1640</a>
+<a href="#1641" id="1641">1641</a>
+<a href="#1642" id="1642">1642</a>
+<a href="#1643" id="1643">1643</a>
+<a href="#1644" id="1644">1644</a>
+<a href="#1645" id="1645">1645</a>
+<a href="#1646" id="1646">1646</a>
+<a href="#1647" id="1647">1647</a>
+<a href="#1648" id="1648">1648</a>
+<a href="#1649" id="1649">1649</a>
+<a href="#1650" id="1650">1650</a>
+<a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a>
+<a href="#1655" id="1655">1655</a>
+<a href="#1656" id="1656">1656</a>
+<a href="#1657" id="1657">1657</a>
+<a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
 </pre></div><pre class="rust"><code><span class="attr">#![cfg_attr(doc_cfg, feature(doc_cfg))]
 </span><span class="doccomment">//! This crate implements necessary boiler plate code to serve Swagger UI via web server. It
 //! works as a bridge for serving the OpenAPI documentation created with [`utoipa`][utoipa] library in the
@@ -1572,7 +1672,7 @@
 //! **Currently implemented boiler plate for:**
 //!
 //! * **actix-web** `version &gt;= 4`
-//! * **rocket** `version &gt;=0.5.0-rc.2`
+//! * **rocket** `version &gt;=0.5.0-rc.3`
 //! * **axum** `version &gt;=0.6`
 //!
 //! Serving Swagger UI is framework independent thus this crate also supports serving the Swagger UI with
@@ -1598,8 +1698,8 @@
 //! ```toml
 //! [dependencies]
 //! utoipa-swagger-ui = &quot;3&quot;
-//!
 //! ```
+//!
 //! Enable actix-web framework with Swagger UI you could define the dependency as follows.
 //! ```toml
 //! [dependencies]
@@ -1624,7 +1724,7 @@
 //!         App::new()
 //!             .service(
 //!                 SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
-//!                     .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi()),
+//!                     .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi()),
 //!             )
 //!     })
 //!     .bind((Ipv4Addr::UNSPECIFIED, 8989)).unwrap()
@@ -1648,7 +1748,7 @@
 //!         .mount(
 //!             &quot;/&quot;,
 //!             SwaggerUi::new(&quot;/swagger-ui/&lt;_..&gt;&quot;)
-//!                 .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi()),
+//!                 .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi()),
 //!         )
 //! }
 //! ```
@@ -1670,7 +1770,7 @@
 //!# {
 //! let app = Router::&lt;S, B&gt;::new()
 //!     .merge(SwaggerUi::new(&quot;/swagger-ui&quot;)
-//!         .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi()));
+//!         .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi()));
 //!# }
 //! ```
 </span><span class="kw">use </span>std::{borrow::Cow, error::Error, mem, sync::Arc};
@@ -1702,7 +1802,7 @@
 /// # #[openapi()]
 /// # struct ApiDoc;
 /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
-///     .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi());
+///     .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi());
 /// ```
 ///
 /// Create a new [`SwaggerUi`] with custom [`Config`] and [`oauth::Config`].
@@ -1713,13 +1813,14 @@
 /// # #[openapi()]
 /// # struct ApiDoc;
 /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
-///     .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi())
+///     .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi())
 ///     .config(Config::default().try_it_out_enabled(true).filter(true))
 ///     .oauth(oauth::Config::new());
 /// ```
 ///
 </span><span class="attr">#[non_exhaustive]
 #[derive(Clone)]
+#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
 #[cfg(any(feature = <span class="string">&quot;actix-web&quot;</span>, feature = <span class="string">&quot;rocket&quot;</span>, feature = <span class="string">&quot;axum&quot;</span>))]
 #[cfg_attr(
     doc_cfg,
@@ -1729,6 +1830,7 @@
     path: Cow&lt;<span class="lifetime">&#39;static</span>, str&gt;,
     urls: Vec&lt;(Url&lt;<span class="lifetime">&#39;static</span>&gt;, OpenApi)&gt;,
     config: <span class="prelude-ty">Option</span>&lt;Config&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    external_urls: Vec&lt;(Url&lt;<span class="lifetime">&#39;static</span>&gt;, serde_json::Value)&gt;,
 }
 
 <span class="attr">#[cfg(any(feature = <span class="string">&quot;actix-web&quot;</span>, feature = <span class="string">&quot;rocket&quot;</span>, feature = <span class="string">&quot;axum&quot;</span>))]
@@ -1755,6 +1857,7 @@
             path: path.into(),
             urls: Vec::new(),
             config: <span class="prelude-val">None</span>,
+            external_urls: Vec::new(),
         }
     }
 
@@ -1771,7 +1874,7 @@
     /// ```rust
     /// # use utoipa_swagger_ui::SwaggerUi;
     /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
-    ///     .url(&quot;/api-doc/openapi.json&quot;, utoipa::openapi::OpenApi::new(
+    ///     .url(&quot;/api-docs/openapi.json&quot;, utoipa::openapi::OpenApi::new(
     ///        utoipa::openapi::Info::new(&quot;my application&quot;, &quot;0.1.0&quot;),
     ///        utoipa::openapi::Paths::new(),
     /// ));
@@ -1785,7 +1888,7 @@
     /// # #[openapi()]
     /// # struct ApiDoc;
     /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
-    ///     .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi());
+    ///     .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi());
     /// ```
     </span><span class="kw">pub fn </span>url&lt;U: Into&lt;Url&lt;<span class="lifetime">&#39;static</span>&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, url: U, openapi: OpenApi) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.urls.push((url.into(), openapi));
@@ -1815,13 +1918,86 @@
     /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
     ///     .urls(
     ///       vec![
-    ///          (Url::with_primary(&quot;api doc 1&quot;, &quot;/api-doc/openapi.json&quot;, true), ApiDoc::openapi()),
-    ///          (Url::new(&quot;api doc 2&quot;, &quot;/api-doc/openapi2.json&quot;), ApiDoc2::openapi())
+    ///          (Url::with_primary(&quot;api doc 1&quot;, &quot;/api-docs/openapi.json&quot;, true), ApiDoc::openapi()),
+    ///          (Url::new(&quot;api doc 2&quot;, &quot;/api-docs/openapi2.json&quot;), ApiDoc2::openapi())
     ///     ]
     /// );
     /// ```
     </span><span class="kw">pub fn </span>urls(<span class="kw-2">mut </span><span class="self">self</span>, urls: Vec&lt;(Url&lt;<span class="lifetime">&#39;static</span>&gt;, OpenApi)&gt;) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.urls = urls;
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Add external API doc to the [`SwaggerUi`].
+    ///
+    /// This operation is unchecked and so it does not check any validity of provided content.
+    /// Users are required to do their own check if any regarding validity of the external
+    /// OpenAPI document.
+    ///
+    /// Method accepts two arguments, one is [`Url`] the API doc is served at and the second one is
+    /// the [`serde_json::Value`] of the OpenAPI doc to be served.
+    ///
+    /// # Examples
+    ///
+    /// Add external API doc to the [`SwaggerUi`].
+    ///```rust
+    /// # use utoipa_swagger_ui::{SwaggerUi, Url};
+    /// # use utoipa::OpenApi;
+    /// # use serde_json::json;
+    /// let external_openapi = json!({&quot;openapi&quot;: &quot;3.0.0&quot;});
+    ///
+    /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
+    ///     .external_url_unchecked(&quot;/api-docs/openapi.json&quot;, external_openapi);
+    ///```
+    </span><span class="kw">pub fn </span>external_url_unchecked&lt;U: Into&lt;Url&lt;<span class="lifetime">&#39;static</span>&gt;&gt;&gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        url: U,
+        openapi: serde_json::Value,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.external_urls.push((url.into(), openapi));
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Add external API docs to the [`SwaggerUi`] from iterator.
+    ///
+    /// This operation is unchecked and so it does not check any validity of provided content.
+    /// Users are required to do their own check if any regarding validity of the external
+    /// OpenAPI documents.
+    ///
+    /// Method accepts one argument, an `iter` of [`Url`] and [`serde_json::Value`] tuples. The
+    /// [`Url`] will point to location the OpenAPI document is served and the [`serde_json::Value`]
+    /// is the OpenAPI document to be served.
+    ///
+    /// # Examples
+    ///
+    /// Add external API docs to the [`SwaggerUi`].
+    ///```rust
+    /// # use utoipa_swagger_ui::{SwaggerUi, Url};
+    /// # use utoipa::OpenApi;
+    /// # use serde_json::json;
+    /// let external_openapi = json!({&quot;openapi&quot;: &quot;3.0.0&quot;});
+    /// let external_openapi2 = json!({&quot;openapi&quot;: &quot;3.0.0&quot;});
+    ///
+    /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
+    ///     .external_urls_from_iter_unchecked([
+    ///         (&quot;/api-docs/openapi.json&quot;, external_openapi),
+    ///         (&quot;/api-docs/openapi2.json&quot;, external_openapi2)
+    ///     ]);
+    ///```
+    </span><span class="kw">pub fn </span>external_urls_from_iter_unchecked&lt;
+        I: IntoIterator&lt;Item = (U, serde_json::Value)&gt;,
+        U: Into&lt;Url&lt;<span class="lifetime">&#39;static</span>&gt;&gt;,
+    &gt;(
+        <span class="kw-2">mut </span><span class="self">self</span>,
+        external_urls: I,
+    ) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.external_urls.extend(
+            external_urls
+                .into_iter()
+                .map(|(url, doc)| (url.into(), doc)),
+        );
 
         <span class="self">self
     </span>}
@@ -1840,7 +2016,7 @@
     /// # #[openapi()]
     /// # struct ApiDoc;
     /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
-    ///     .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi())
+    ///     .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi())
     ///     .oauth(oauth::Config::new()
     ///         .client_id(&quot;client-id&quot;)
     ///         .scopes(vec![String::from(&quot;openid&quot;)])
@@ -1870,7 +2046,7 @@
     /// # #[openapi()]
     /// # struct ApiDoc;
     /// let swagger = SwaggerUi::new(&quot;/swagger-ui/{_:.*}&quot;)
-    ///     .url(&quot;/api-doc/openapi.json&quot;, ApiDoc::openapi())
+    ///     .url(&quot;/api-docs/openapi.json&quot;, ApiDoc::openapi())
     ///     .config(Config::default().try_it_out_enabled(true).filter(true));
     /// ```
     </span><span class="kw">pub fn </span>config(<span class="kw-2">mut </span><span class="self">self</span>, config: Config&lt;<span class="lifetime">&#39;static</span>&gt;) -&gt; <span class="self">Self </span>{
@@ -1882,7 +2058,8 @@
 
 <span class="doccomment">/// Rust type for Swagger UI url configuration object.
 </span><span class="attr">#[non_exhaustive]
-#[derive(Default, Serialize, Clone, Debug)]
+#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[derive(Default, Serialize, Clone)]
 </span><span class="kw">pub struct </span>Url&lt;<span class="lifetime">&#39;a</span>&gt; {
     name: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
     url: Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;,
@@ -1901,7 +2078,7 @@
     ///
     /// ```rust
     /// # use utoipa_swagger_ui::Url;
-    /// let url = Url::new(&quot;My Api&quot;, &quot;/api-doc/openapi.json&quot;);
+    /// let url = Url::new(&quot;My Api&quot;, &quot;/api-docs/openapi.json&quot;);
     /// ```
     </span><span class="kw">pub fn </span>new(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, url: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -1926,7 +2103,7 @@
     /// Set &quot;My Api&quot; as primary.
     /// ```rust
     /// # use utoipa_swagger_ui::Url;
-    /// let url = Url::with_primary(&quot;My Api&quot;, &quot;/api-doc/openapi.json&quot;, true);
+    /// let url = Url::with_primary(&quot;My Api&quot;, &quot;/api-docs/openapi.json&quot;, true);
     /// ```
     </span><span class="kw">pub fn </span>with_primary(name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, url: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str, primary: bool) -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
@@ -1983,15 +2160,15 @@
 /// If there is multiple api docs to serve config can be also directly created with [`Config::new`]
 /// ```rust
 /// # use utoipa_swagger_ui::Config;
-/// let config = Config::new([&quot;/api-doc/openapi1.json&quot;, &quot;/api-doc/openapi2.json&quot;]);
+/// let config = Config::new([&quot;/api-docs/openapi1.json&quot;, &quot;/api-docs/openapi2.json&quot;]);
 /// ```
 ///
 /// Or same as above but more verbose syntax.
 /// ```rust
 /// # use utoipa_swagger_ui::{Config, Url};
 /// let config = Config::new([
-///     Url::new(&quot;api1&quot;, &quot;/api-doc/openapi1.json&quot;),
-///     Url::new(&quot;api2&quot;, &quot;/api-doc/openapi2.json&quot;)
+///     Url::new(&quot;api1&quot;, &quot;/api-docs/openapi1.json&quot;),
+///     Url::new(&quot;api2&quot;, &quot;/api-docs/openapi2.json&quot;)
 /// ]);
 /// ```
 ///
@@ -1999,12 +2176,13 @@
 /// ```rust
 /// # use utoipa_swagger_ui::{Config, oauth};
 /// let config = Config::with_oauth_config(
-///     [&quot;/api-doc/openapi1.json&quot;, &quot;/api-doc/openapi2.json&quot;],
+///     [&quot;/api-docs/openapi1.json&quot;, &quot;/api-docs/openapi2.json&quot;],
 ///     oauth::Config::new(),
 /// );
 /// ```
 </span><span class="attr">#[non_exhaustive]
 #[derive(Serialize, Clone)]
+#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
 #[serde(rename_all = <span class="string">&quot;camelCase&quot;</span>)]
 </span><span class="kw">pub struct </span>Config&lt;<span class="lifetime">&#39;a</span>&gt; {
     <span class="doccomment">/// Url to fetch external configuration from.
@@ -2199,7 +2377,7 @@
     /// Create new config with 2 api doc urls.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi1.json&quot;, &quot;/api-doc/openapi2.json&quot;]);
+    /// let config = Config::new([&quot;/api-docs/openapi1.json&quot;, &quot;/api-docs/openapi2.json&quot;]);
     /// ```
     </span><span class="kw">pub fn </span>new&lt;I: IntoIterator&lt;Item = U&gt;, U: Into&lt;Url&lt;<span class="lifetime">&#39;a</span>&gt;&gt;&gt;(urls: I) -&gt; <span class="self">Self </span>{
         <span class="self">Self</span>::new_(urls, <span class="prelude-val">None</span>)
@@ -2212,7 +2390,7 @@
     /// ```rust
     /// # use utoipa_swagger_ui::{Config, oauth};
     /// let config = Config::with_oauth_config(
-    ///     [&quot;/api-doc/openapi1.json&quot;, &quot;/api-doc/openapi2.json&quot;],
+    ///     [&quot;/api-docs/openapi1.json&quot;, &quot;/api-docs/openapi2.json&quot;],
     ///     oauth::Config::new(),
     /// );
     /// ```
@@ -2261,7 +2439,7 @@
     /// Set external config url.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .config_url(&quot;http://url.to.external.config&quot;);
     /// ```
     </span><span class="kw">pub fn </span>config_url&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, config_url: S) -&gt; <span class="self">Self </span>{
@@ -2279,7 +2457,7 @@
     /// Set custom dom id where the Swagger UI will place it&#39;s content.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;]).dom_id(&quot;#my-id&quot;);
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;]).dom_id(&quot;#my-id&quot;);
     /// ```
     </span><span class="kw">pub fn </span>dom_id&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, dom_id: S) -&gt; <span class="self">Self </span>{
         <span class="self">self</span>.dom_id = <span class="prelude-val">Some</span>(dom_id.into());
@@ -2297,7 +2475,7 @@
     /// Enable query config.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .query_config_enabled(true);
     /// ```
     </span><span class="kw">pub fn </span>query_config_enabled(<span class="kw-2">mut </span><span class="self">self</span>, query_config_enabled: bool) -&gt; <span class="self">Self </span>{
@@ -2319,7 +2497,7 @@
     /// Disable the deep linking.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .deep_linking(false);
     /// ```
     </span><span class="kw">pub fn </span>deep_linking(<span class="kw-2">mut </span><span class="self">self</span>, deep_linking: bool) -&gt; <span class="self">Self </span>{
@@ -2337,7 +2515,7 @@
     /// Allow operation id to be shown.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .display_operation_id(true);
     /// ```
     </span><span class="kw">pub fn </span>display_operation_id(<span class="kw-2">mut </span><span class="self">self</span>, display_operation_id: bool) -&gt; <span class="self">Self </span>{
@@ -2355,7 +2533,7 @@
     /// Configure Swagger to use Base Layout instead of Standalone
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .use_base_layout();
     /// ```
     </span><span class="kw">pub fn </span>use_base_layout(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; <span class="self">Self </span>{
@@ -2373,7 +2551,7 @@
     /// Hide all the models.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .default_models_expand_depth(-1);
     /// ```
     </span><span class="kw">pub fn </span>default_models_expand_depth(<span class="kw-2">mut </span><span class="self">self</span>, default_models_expand_depth: isize) -&gt; <span class="self">Self </span>{
@@ -2388,7 +2566,7 @@
     ///
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .default_model_expand_depth(1);
     /// ```
     </span><span class="kw">pub fn </span>default_model_expand_depth(<span class="kw-2">mut </span><span class="self">self</span>, default_model_expand_depth: isize) -&gt; <span class="self">Self </span>{
@@ -2408,7 +2586,7 @@
     ///
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .default_model_rendering(r#&quot;[&quot;example&quot;*, &quot;model&quot;]&quot;#);
     /// ```
     </span><span class="kw">pub fn </span>default_model_rendering&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, default_model_rendering: S) -&gt; <span class="self">Self </span>{
@@ -2425,7 +2603,7 @@
     /// Enable request duration of the _**&#39;Try it out&#39;**_ requests.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .display_request_duration(true);
     /// ```
     </span><span class="kw">pub fn </span>display_request_duration(<span class="kw-2">mut </span><span class="self">self</span>, display_request_duration: bool) -&gt; <span class="self">Self </span>{
@@ -2444,7 +2622,7 @@
     ///
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .doc_expansion(r#&quot;[&quot;list&quot;*, &quot;full&quot;, &quot;none&quot;]&quot;#);
     /// ```
     </span><span class="kw">pub fn </span>doc_expansion&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, doc_expansion: S) -&gt; <span class="self">Self </span>{
@@ -2465,7 +2643,7 @@
     /// Enable filtering.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .filter(true);
     /// ```
     </span><span class="kw">pub fn </span>filter(<span class="kw-2">mut </span><span class="self">self</span>, filter: bool) -&gt; <span class="self">Self </span>{
@@ -2483,7 +2661,7 @@
     /// Display only 4 operations.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .max_displayed_tags(4);
     /// ```
     </span><span class="kw">pub fn </span>max_displayed_tags(<span class="kw-2">mut </span><span class="self">self</span>, max_displayed_tags: usize) -&gt; <span class="self">Self </span>{
@@ -2500,7 +2678,7 @@
     /// Show vendor extensions.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .show_extensions(true);
     /// ```
     </span><span class="kw">pub fn </span>show_extensions(<span class="kw-2">mut </span><span class="self">self</span>, show_extensions: bool) -&gt; <span class="self">Self </span>{
@@ -2518,7 +2696,7 @@
     /// Show common extensions.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .show_common_extensions(true);
     /// ```
     </span><span class="kw">pub fn </span>show_common_extensions(<span class="kw-2">mut </span><span class="self">self</span>, show_common_extensions: bool) -&gt; <span class="self">Self </span>{
@@ -2536,7 +2714,7 @@
     /// Enable _**&#39;Try it out&#39;**_ section by default.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .try_it_out_enabled(true);
     /// ```
     </span><span class="kw">pub fn </span>try_it_out_enabled(<span class="kw-2">mut </span><span class="self">self</span>, try_it_out_enabled: bool) -&gt; <span class="self">Self </span>{
@@ -2556,7 +2734,7 @@
     /// Enable request snippets section.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .request_snippets_enabled(true);
     /// ```
     </span><span class="kw">pub fn </span>request_snippets_enabled(<span class="kw-2">mut </span><span class="self">self</span>, request_snippets_enabled: bool) -&gt; <span class="self">Self </span>{
@@ -2572,7 +2750,7 @@
     /// Add oauth redirect url.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .oauth2_redirect_url(&quot;http://my.oauth2.redirect.url&quot;);
     /// ```
     </span><span class="kw">pub fn </span>oauth2_redirect_url&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, oauth2_redirect_url: S) -&gt; <span class="self">Self </span>{
@@ -2590,7 +2768,7 @@
     /// Use request after `requestInterceptor` to produce the curl command.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .show_mutated_request(true);
     /// ```
     </span><span class="kw">pub fn </span>show_mutated_request(<span class="kw-2">mut </span><span class="self">self</span>, show_mutated_request: bool) -&gt; <span class="self">Self </span>{
@@ -2613,14 +2791,14 @@
     /// Set allowed http methods explicitly.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .supported_submit_methods([&quot;get&quot;, &quot;put&quot;, &quot;post&quot;, &quot;delete&quot;, &quot;options&quot;, &quot;head&quot;, &quot;patch&quot;, &quot;trace&quot;]);
     /// ```
     ///
     /// Allow _**&#39;Try it out&#39;**_ for only GET operations.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .supported_submit_methods([&quot;get&quot;]);
     /// ```
     </span><span class="kw">pub fn </span>supported_submit_methods&lt;I: IntoIterator&lt;Item = S&gt;, S: Into&lt;String&gt;&gt;(
@@ -2650,7 +2828,7 @@
     /// Disable the validator.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .validator_url(&quot;none&quot;);
     /// ```
     </span><span class="kw">pub fn </span>validator_url&lt;S: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, validator_url: S) -&gt; <span class="self">Self </span>{
@@ -2672,7 +2850,7 @@
     /// Enable passing credentials to CORS requests.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .with_credentials(true);
     /// ```
     </span><span class="kw">pub fn </span>with_credentials(<span class="kw-2">mut </span><span class="self">self</span>, with_credentials: bool) -&gt; <span class="self">Self </span>{
@@ -2691,7 +2869,7 @@
     /// Persists authorization throughout browser close and refresh.
     /// ```rust
     /// # use utoipa_swagger_ui::Config;
-    /// let config = Config::new([&quot;/api-doc/openapi.json&quot;])
+    /// let config = Config::new([&quot;/api-docs/openapi.json&quot;])
     ///     .persist_authorization(true);
     /// ```
     </span><span class="kw">pub fn </span>persist_authorization(<span class="kw-2">mut </span><span class="self">self</span>, persist_authorization: bool) -&gt; <span class="self">Self </span>{
@@ -2854,6 +3032,28 @@
     </span><span class="prelude-val">Ok</span>(file.replace(<span class="string">&quot;{{config}}&quot;</span>, <span class="kw-2">&amp;</span>config_json[<span class="number">2</span>..<span class="kw-2">&amp;</span>config_json.len() - <span class="number">2</span>]))
 }
 
+<span class="doccomment">/// Is used to provide general way to deliver multiple types of OpenAPI docs via `utoipa-swagger-ui`.
+</span><span class="attr">#[cfg(any(feature = <span class="string">&quot;actix-web&quot;</span>, feature = <span class="string">&quot;rocket&quot;</span>, feature = <span class="string">&quot;axum&quot;</span>))]
+#[derive(Clone)]
+</span><span class="kw">enum </span>ApiDoc {
+    Utoipa(utoipa::openapi::OpenApi),
+    Value(serde_json::Value),
+}
+
+<span class="comment">// Delegate serde&#39;s `Serialize` to the variant itself.
+</span><span class="attr">#[cfg(any(feature = <span class="string">&quot;actix-web&quot;</span>, feature = <span class="string">&quot;rocket&quot;</span>, feature = <span class="string">&quot;axum&quot;</span>))]
+</span><span class="kw">impl </span>Serialize <span class="kw">for </span>ApiDoc {
+    <span class="kw">fn </span>serialize&lt;S&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, serializer: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+    <span class="kw">where
+        </span>S: serde::Serializer,
+    {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="self">Self</span>::Value(value) =&gt; value.serialize(serializer),
+            <span class="self">Self</span>::Utoipa(utoipa) =&gt; utoipa.serialize(serializer),
+        }
+    }
+}
+
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
     <span class="kw">use </span>similar::TextDiff;
@@ -2881,7 +3081,7 @@ window.ui = SwaggerUIBundle({
     <span class="attr">#[test]
     </span><span class="kw">fn </span>format_swagger_config_json_single_url() {
         <span class="kw">let </span>formatted_config = <span class="kw">match </span>format_config(
-            <span class="kw-2">&amp;</span>Config::new([<span class="string">&quot;/api-doc/openapi1.json&quot;</span>]),
+            <span class="kw-2">&amp;</span>Config::new([<span class="string">&quot;/api-docs/openapi1.json&quot;</span>]),
             String::from(TEST_INITIAL_CONFIG),
         ) {
             <span class="prelude-val">Ok</span>(file) =&gt; file,
@@ -2891,7 +3091,7 @@ window.ui = SwaggerUIBundle({
         <span class="kw">const </span>EXPECTED: <span class="kw-2">&amp;</span>str = <span class="string">r###&quot;
 window.ui = SwaggerUIBundle({
     &quot;dom_id&quot;: &quot;#swagger-ui&quot;,
-  &quot;url&quot;: &quot;/api-doc/openapi1.json&quot;,
+  &quot;url&quot;: &quot;/api-docs/openapi1.json&quot;,
   &quot;deepLinking&quot;: true,
   &quot;layout&quot;: &quot;StandaloneLayout&quot;,
   presets: [
@@ -2909,7 +3109,7 @@ window.ui = SwaggerUIBundle({
     <span class="attr">#[test]
     </span><span class="kw">fn </span>format_swagger_config_json_single_url_with_name() {
         <span class="kw">let </span>formatted_config = <span class="kw">match </span>format_config(
-            <span class="kw-2">&amp;</span>Config::new([Url::new(<span class="string">&quot;api-doc1&quot;</span>, <span class="string">&quot;/api-doc/openapi1.json&quot;</span>)]),
+            <span class="kw-2">&amp;</span>Config::new([Url::new(<span class="string">&quot;api-doc1&quot;</span>, <span class="string">&quot;/api-docs/openapi1.json&quot;</span>)]),
             String::from(TEST_INITIAL_CONFIG),
         ) {
             <span class="prelude-val">Ok</span>(file) =&gt; file,
@@ -2922,7 +3122,7 @@ window.ui = SwaggerUIBundle({
   &quot;urls&quot;: [
     {
       &quot;name&quot;: &quot;api-doc1&quot;,
-      &quot;url&quot;: &quot;/api-doc/openapi1.json&quot;
+      &quot;url&quot;: &quot;/api-docs/openapi1.json&quot;
     }
   ],
   &quot;deepLinking&quot;: true,
@@ -2944,7 +3144,7 @@ window.ui = SwaggerUIBundle({
         <span class="kw">let </span>formatted_config = <span class="kw">match </span>format_config(
             <span class="kw-2">&amp;</span>Config::new([Url::with_primary(
                 <span class="string">&quot;api-doc1&quot;</span>,
-                <span class="string">&quot;/api-doc/openapi1.json&quot;</span>,
+                <span class="string">&quot;/api-docs/openapi1.json&quot;</span>,
                 <span class="bool-val">true</span>,
             )]),
             String::from(TEST_INITIAL_CONFIG),
@@ -2960,7 +3160,7 @@ window.ui = SwaggerUIBundle({
   &quot;urls&quot;: [
     {
       &quot;name&quot;: &quot;api-doc1&quot;,
-      &quot;url&quot;: &quot;/api-doc/openapi1.json&quot;
+      &quot;url&quot;: &quot;/api-docs/openapi1.json&quot;
     }
   ],
   &quot;deepLinking&quot;: true,
@@ -2981,8 +3181,8 @@ window.ui = SwaggerUIBundle({
     </span><span class="kw">fn </span>format_swagger_config_multiple_urls_with_primary() {
         <span class="kw">let </span>formatted_config = <span class="kw">match </span>format_config(
             <span class="kw-2">&amp;</span>Config::new([
-                Url::with_primary(<span class="string">&quot;api-doc1&quot;</span>, <span class="string">&quot;/api-doc/openapi1.json&quot;</span>, <span class="bool-val">true</span>),
-                Url::new(<span class="string">&quot;api-doc2&quot;</span>, <span class="string">&quot;/api-doc/openapi2.json&quot;</span>),
+                Url::with_primary(<span class="string">&quot;api-doc1&quot;</span>, <span class="string">&quot;/api-docs/openapi1.json&quot;</span>, <span class="bool-val">true</span>),
+                Url::new(<span class="string">&quot;api-doc2&quot;</span>, <span class="string">&quot;/api-docs/openapi2.json&quot;</span>),
             ]),
             String::from(TEST_INITIAL_CONFIG),
         ) {
@@ -2997,11 +3197,11 @@ window.ui = SwaggerUIBundle({
   &quot;urls&quot;: [
     {
       &quot;name&quot;: &quot;api-doc1&quot;,
-      &quot;url&quot;: &quot;/api-doc/openapi1.json&quot;
+      &quot;url&quot;: &quot;/api-docs/openapi1.json&quot;
     },
     {
       &quot;name&quot;: &quot;api-doc2&quot;,
-      &quot;url&quot;: &quot;/api-doc/openapi2.json&quot;
+      &quot;url&quot;: &quot;/api-docs/openapi2.json&quot;
     }
   ],
   &quot;deepLinking&quot;: true,
@@ -3021,7 +3221,7 @@ window.ui = SwaggerUIBundle({
     <span class="attr">#[test]
     </span><span class="kw">fn </span>format_swagger_config_multiple_urls() {
         <span class="kw">let </span>formatted_config = <span class="kw">match </span>format_config(
-            <span class="kw-2">&amp;</span>Config::new([<span class="string">&quot;/api-doc/openapi1.json&quot;</span>, <span class="string">&quot;/api-doc/openapi2.json&quot;</span>]),
+            <span class="kw-2">&amp;</span>Config::new([<span class="string">&quot;/api-docs/openapi1.json&quot;</span>, <span class="string">&quot;/api-docs/openapi2.json&quot;</span>]),
             String::from(TEST_INITIAL_CONFIG),
         ) {
             <span class="prelude-val">Ok</span>(file) =&gt; file,
@@ -3033,12 +3233,12 @@ window.ui = SwaggerUIBundle({
     &quot;dom_id&quot;: &quot;#swagger-ui&quot;,
   &quot;urls&quot;: [
     {
-      &quot;name&quot;: &quot;/api-doc/openapi1.json&quot;,
-      &quot;url&quot;: &quot;/api-doc/openapi1.json&quot;
+      &quot;name&quot;: &quot;/api-docs/openapi1.json&quot;,
+      &quot;url&quot;: &quot;/api-docs/openapi1.json&quot;
     },
     {
-      &quot;name&quot;: &quot;/api-doc/openapi2.json&quot;,
-      &quot;url&quot;: &quot;/api-doc/openapi2.json&quot;
+      &quot;name&quot;: &quot;/api-docs/openapi2.json&quot;,
+      &quot;url&quot;: &quot;/api-docs/openapi2.json&quot;
     }
   ],
   &quot;deepLinking&quot;: true,
@@ -3058,7 +3258,7 @@ window.ui = SwaggerUIBundle({
     <span class="attr">#[test]
     </span><span class="kw">fn </span>format_swagger_config_with_multiple_fields() {
         <span class="kw">let </span>formatted_config = <span class="kw">match </span>format_config(
-            <span class="kw-2">&amp;</span>Config::new([<span class="string">&quot;/api-doc/openapi1.json&quot;</span>])
+            <span class="kw-2">&amp;</span>Config::new([<span class="string">&quot;/api-docs/openapi1.json&quot;</span>])
                 .deep_linking(<span class="bool-val">false</span>)
                 .dom_id(<span class="string">&quot;#another-el&quot;</span>)
                 .default_model_expand_depth(-<span class="number">1</span>)
@@ -3090,7 +3290,7 @@ window.ui = SwaggerUIBundle({
         <span class="kw">const </span>EXPECTED: <span class="kw-2">&amp;</span>str = <span class="string">r###&quot;
 window.ui = SwaggerUIBundle({
     &quot;dom_id&quot;: &quot;#another-el&quot;,
-  &quot;url&quot;: &quot;/api-doc/openapi1.json&quot;,
+  &quot;url&quot;: &quot;/api-docs/openapi1.json&quot;,
   &quot;queryConfigEnabled&quot;: true,
   &quot;deepLinking&quot;: false,
   &quot;displayOperationId&quot;: true,

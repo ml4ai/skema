@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde_yaml-0.9.17/src/de.rs`."><title>de.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serde_yaml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../serde_yaml/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/serde_yaml-0.9.25/src/de.rs`."><title>de.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="serde_yaml" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../serde_yaml/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1844,9 +1844,6 @@
 <a href="#1844" id="1844">1844</a>
 <a href="#1845" id="1845">1845</a>
 <a href="#1846" id="1846">1846</a>
-<a href="#1847" id="1847">1847</a>
-<a href="#1848" id="1848">1848</a>
-<a href="#1849" id="1849">1849</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::error::{<span class="self">self</span>, Error, ErrorImpl};
 <span class="kw">use </span><span class="kw">crate</span>::libyaml::error::Mark;
 <span class="kw">use </span><span class="kw">crate</span>::libyaml::parser::{MappingStart, Scalar, ScalarStyle, SequenceStart};
@@ -2912,7 +2909,7 @@
     from_str_radix(scalar, <span class="number">10</span>).ok()
 }
 
-<span class="kw">fn </span>parse_f64(scalar: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>parse_f64(scalar: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;f64&gt; {
     <span class="kw">let </span>unpositive = <span class="kw">if let </span><span class="prelude-val">Some</span>(unpositive) = scalar.strip_prefix(<span class="string">&#39;+&#39;</span>) {
         <span class="kw">if </span>unpositive.starts_with([<span class="string">&#39;+&#39;</span>, <span class="string">&#39;-&#39;</span>]) {
             <span class="kw">return </span><span class="prelude-val">None</span>;
@@ -2938,14 +2935,14 @@
     <span class="prelude-val">None
 </span>}
 
-<span class="kw">fn </span>digits_but_not_number(scalar: <span class="kw-2">&amp;</span>str) -&gt; bool {
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>digits_but_not_number(scalar: <span class="kw-2">&amp;</span>str) -&gt; bool {
     <span class="comment">// Leading zero(s) followed by numeric characters is a string according to
     // the YAML 1.2 spec. https://yaml.org/spec/1.2/spec.html#id2761292
     </span><span class="kw">let </span>scalar = scalar.strip_prefix([<span class="string">&#39;-&#39;</span>, <span class="string">&#39;+&#39;</span>]).unwrap_or(scalar);
     scalar.len() &gt; <span class="number">1 </span>&amp;&amp; scalar.starts_with(<span class="string">&#39;0&#39;</span>) &amp;&amp; scalar[<span class="number">1</span>..].bytes().all(|b| b.is_ascii_digit())
 }
 
-<span class="kw">fn </span>visit_int&lt;<span class="lifetime">&#39;de</span>, V&gt;(visitor: V, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Result</span>&lt;V::Value&gt;, V&gt;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn </span>visit_int&lt;<span class="lifetime">&#39;de</span>, V&gt;(visitor: V, v: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Result</span>&lt;<span class="prelude-ty">Result</span>&lt;V::Value&gt;, V&gt;
 <span class="kw">where
     </span>V: Visitor&lt;<span class="lifetime">&#39;de</span>&gt;,
 {
@@ -3039,6 +3036,18 @@
     }
 }
 
+<span class="kw">fn </span>parse_tag(libyaml_tag: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;Tag&gt;) -&gt; <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span>str&gt; {
+    <span class="kw">let </span><span class="kw-2">mut </span>bytes: <span class="kw-2">&amp;</span>[u8] = libyaml_tag.as_ref()<span class="question-mark">?</span>;
+    <span class="kw">if let </span>(<span class="string">b&#39;!&#39;</span>, rest) = bytes.split_first()<span class="question-mark">? </span>{
+        <span class="kw">if </span>!rest.is_empty() {
+            bytes = rest;
+        }
+        str::from_utf8(bytes).ok()
+    } <span class="kw">else </span>{
+        <span class="prelude-val">None
+    </span>}
+}
+
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;document</span>&gt; de::Deserializer&lt;<span class="lifetime">&#39;de</span>&gt; <span class="kw">for </span><span class="kw-2">&amp;mut </span>DeserializerFromEvents&lt;<span class="lifetime">&#39;de</span>, <span class="lifetime">&#39;document</span>&gt; {
     <span class="kw">type </span>Error = Error;
 
@@ -3052,11 +3061,7 @@
             <span class="kw">if </span>tagged_already {
                 <span class="kw">return </span><span class="prelude-val">None</span>;
             }
-            <span class="kw">if let </span>(<span class="string">b&#39;!&#39;</span>, tag) = tag.as_ref()<span class="question-mark">?</span>.split_first()<span class="question-mark">? </span>{
-                str::from_utf8(tag).ok()
-            } <span class="kw">else </span>{
-                <span class="prelude-val">None
-            </span>}
+            parse_tag(tag)
         }
         <span class="kw">loop </span>{
             <span class="kw">match </span>next {
@@ -3096,7 +3101,7 @@
                 }
                 Event::SequenceEnd =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unexpected end of sequence&quot;</span>),
                 Event::MappingEnd =&gt; <span class="macro">panic!</span>(<span class="string">&quot;unexpected end of mapping&quot;</span>),
-                Event::Void =&gt; <span class="kw">break </span><span class="prelude-val">Err</span>(error::new(ErrorImpl::EndOfStream)),
+                Event::Void =&gt; <span class="kw">break </span>visitor.visit_none(),
             }
         }
         <span class="comment">// The de::Error impl creates errors with unknown line and column. Fill
@@ -3580,45 +3585,34 @@
                         </span>.deserialize_enum(name, variants, visitor)
                 }
                 Event::Scalar(scalar) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="string">b&#39;!&#39;</span>, tag)) = scalar.tag.as_ref().and_then(|tag| tag.split_first())
-                    {
-                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(tag) = str::from_utf8(tag) {
-                            <span class="kw">return </span>visitor.visit_enum(EnumAccess {
-                                de: <span class="self">self</span>,
-                                name: <span class="prelude-val">Some</span>(name),
-                                tag,
-                            });
-                        }
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(tag) = parse_tag(<span class="kw-2">&amp;</span>scalar.tag) {
+                        <span class="kw">return </span>visitor.visit_enum(EnumAccess {
+                            de: <span class="self">self</span>,
+                            name: <span class="prelude-val">Some</span>(name),
+                            tag,
+                        });
                     }
                     visitor.visit_enum(UnitVariantAccess { de: <span class="self">self </span>})
                 }
                 Event::MappingStart(mapping) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="string">b&#39;!&#39;</span>, tag)) =
-                        mapping.tag.as_ref().and_then(|tag| tag.split_first())
-                    {
-                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(tag) = str::from_utf8(tag) {
-                            <span class="kw">return </span>visitor.visit_enum(EnumAccess {
-                                de: <span class="self">self</span>,
-                                name: <span class="prelude-val">Some</span>(name),
-                                tag,
-                            });
-                        }
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(tag) = parse_tag(<span class="kw-2">&amp;</span>mapping.tag) {
+                        <span class="kw">return </span>visitor.visit_enum(EnumAccess {
+                            de: <span class="self">self</span>,
+                            name: <span class="prelude-val">Some</span>(name),
+                            tag,
+                        });
                     }
                     <span class="kw">let </span>err =
                         de::Error::invalid_type(Unexpected::Map, <span class="kw-2">&amp;</span><span class="string">&quot;a YAML tag starting with &#39;!&#39;&quot;</span>);
                     <span class="prelude-val">Err</span>(error::fix_mark(err, mark, <span class="self">self</span>.path))
                 }
                 Event::SequenceStart(sequence) =&gt; {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>((<span class="string">b&#39;!&#39;</span>, tag)) =
-                        sequence.tag.as_ref().and_then(|tag| tag.split_first())
-                    {
-                        <span class="kw">if let </span><span class="prelude-val">Ok</span>(tag) = str::from_utf8(tag) {
-                            <span class="kw">return </span>visitor.visit_enum(EnumAccess {
-                                de: <span class="self">self</span>,
-                                name: <span class="prelude-val">Some</span>(name),
-                                tag,
-                            });
-                        }
+                    <span class="kw">if let </span><span class="prelude-val">Some</span>(tag) = parse_tag(<span class="kw-2">&amp;</span>sequence.tag) {
+                        <span class="kw">return </span>visitor.visit_enum(EnumAccess {
+                            de: <span class="self">self</span>,
+                            name: <span class="prelude-val">Some</span>(name),
+                            tag,
+                        });
                     }
                     <span class="kw">let </span>err =
                         de::Error::invalid_type(Unexpected::Seq, <span class="kw-2">&amp;</span><span class="string">&quot;a YAML tag starting with &#39;!&#39;&quot;</span>);

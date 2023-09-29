@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.0.3/src/openapi/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-3.5.0/src/openapi/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1649,6 +1649,365 @@
 <a href="#1649" id="1649">1649</a>
 <a href="#1650" id="1650">1650</a>
 <a href="#1651" id="1651">1651</a>
+<a href="#1652" id="1652">1652</a>
+<a href="#1653" id="1653">1653</a>
+<a href="#1654" id="1654">1654</a>
+<a href="#1655" id="1655">1655</a>
+<a href="#1656" id="1656">1656</a>
+<a href="#1657" id="1657">1657</a>
+<a href="#1658" id="1658">1658</a>
+<a href="#1659" id="1659">1659</a>
+<a href="#1660" id="1660">1660</a>
+<a href="#1661" id="1661">1661</a>
+<a href="#1662" id="1662">1662</a>
+<a href="#1663" id="1663">1663</a>
+<a href="#1664" id="1664">1664</a>
+<a href="#1665" id="1665">1665</a>
+<a href="#1666" id="1666">1666</a>
+<a href="#1667" id="1667">1667</a>
+<a href="#1668" id="1668">1668</a>
+<a href="#1669" id="1669">1669</a>
+<a href="#1670" id="1670">1670</a>
+<a href="#1671" id="1671">1671</a>
+<a href="#1672" id="1672">1672</a>
+<a href="#1673" id="1673">1673</a>
+<a href="#1674" id="1674">1674</a>
+<a href="#1675" id="1675">1675</a>
+<a href="#1676" id="1676">1676</a>
+<a href="#1677" id="1677">1677</a>
+<a href="#1678" id="1678">1678</a>
+<a href="#1679" id="1679">1679</a>
+<a href="#1680" id="1680">1680</a>
+<a href="#1681" id="1681">1681</a>
+<a href="#1682" id="1682">1682</a>
+<a href="#1683" id="1683">1683</a>
+<a href="#1684" id="1684">1684</a>
+<a href="#1685" id="1685">1685</a>
+<a href="#1686" id="1686">1686</a>
+<a href="#1687" id="1687">1687</a>
+<a href="#1688" id="1688">1688</a>
+<a href="#1689" id="1689">1689</a>
+<a href="#1690" id="1690">1690</a>
+<a href="#1691" id="1691">1691</a>
+<a href="#1692" id="1692">1692</a>
+<a href="#1693" id="1693">1693</a>
+<a href="#1694" id="1694">1694</a>
+<a href="#1695" id="1695">1695</a>
+<a href="#1696" id="1696">1696</a>
+<a href="#1697" id="1697">1697</a>
+<a href="#1698" id="1698">1698</a>
+<a href="#1699" id="1699">1699</a>
+<a href="#1700" id="1700">1700</a>
+<a href="#1701" id="1701">1701</a>
+<a href="#1702" id="1702">1702</a>
+<a href="#1703" id="1703">1703</a>
+<a href="#1704" id="1704">1704</a>
+<a href="#1705" id="1705">1705</a>
+<a href="#1706" id="1706">1706</a>
+<a href="#1707" id="1707">1707</a>
+<a href="#1708" id="1708">1708</a>
+<a href="#1709" id="1709">1709</a>
+<a href="#1710" id="1710">1710</a>
+<a href="#1711" id="1711">1711</a>
+<a href="#1712" id="1712">1712</a>
+<a href="#1713" id="1713">1713</a>
+<a href="#1714" id="1714">1714</a>
+<a href="#1715" id="1715">1715</a>
+<a href="#1716" id="1716">1716</a>
+<a href="#1717" id="1717">1717</a>
+<a href="#1718" id="1718">1718</a>
+<a href="#1719" id="1719">1719</a>
+<a href="#1720" id="1720">1720</a>
+<a href="#1721" id="1721">1721</a>
+<a href="#1722" id="1722">1722</a>
+<a href="#1723" id="1723">1723</a>
+<a href="#1724" id="1724">1724</a>
+<a href="#1725" id="1725">1725</a>
+<a href="#1726" id="1726">1726</a>
+<a href="#1727" id="1727">1727</a>
+<a href="#1728" id="1728">1728</a>
+<a href="#1729" id="1729">1729</a>
+<a href="#1730" id="1730">1730</a>
+<a href="#1731" id="1731">1731</a>
+<a href="#1732" id="1732">1732</a>
+<a href="#1733" id="1733">1733</a>
+<a href="#1734" id="1734">1734</a>
+<a href="#1735" id="1735">1735</a>
+<a href="#1736" id="1736">1736</a>
+<a href="#1737" id="1737">1737</a>
+<a href="#1738" id="1738">1738</a>
+<a href="#1739" id="1739">1739</a>
+<a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
+<a href="#1755" id="1755">1755</a>
+<a href="#1756" id="1756">1756</a>
+<a href="#1757" id="1757">1757</a>
+<a href="#1758" id="1758">1758</a>
+<a href="#1759" id="1759">1759</a>
+<a href="#1760" id="1760">1760</a>
+<a href="#1761" id="1761">1761</a>
+<a href="#1762" id="1762">1762</a>
+<a href="#1763" id="1763">1763</a>
+<a href="#1764" id="1764">1764</a>
+<a href="#1765" id="1765">1765</a>
+<a href="#1766" id="1766">1766</a>
+<a href="#1767" id="1767">1767</a>
+<a href="#1768" id="1768">1768</a>
+<a href="#1769" id="1769">1769</a>
+<a href="#1770" id="1770">1770</a>
+<a href="#1771" id="1771">1771</a>
+<a href="#1772" id="1772">1772</a>
+<a href="#1773" id="1773">1773</a>
+<a href="#1774" id="1774">1774</a>
+<a href="#1775" id="1775">1775</a>
+<a href="#1776" id="1776">1776</a>
+<a href="#1777" id="1777">1777</a>
+<a href="#1778" id="1778">1778</a>
+<a href="#1779" id="1779">1779</a>
+<a href="#1780" id="1780">1780</a>
+<a href="#1781" id="1781">1781</a>
+<a href="#1782" id="1782">1782</a>
+<a href="#1783" id="1783">1783</a>
+<a href="#1784" id="1784">1784</a>
+<a href="#1785" id="1785">1785</a>
+<a href="#1786" id="1786">1786</a>
+<a href="#1787" id="1787">1787</a>
+<a href="#1788" id="1788">1788</a>
+<a href="#1789" id="1789">1789</a>
+<a href="#1790" id="1790">1790</a>
+<a href="#1791" id="1791">1791</a>
+<a href="#1792" id="1792">1792</a>
+<a href="#1793" id="1793">1793</a>
+<a href="#1794" id="1794">1794</a>
+<a href="#1795" id="1795">1795</a>
+<a href="#1796" id="1796">1796</a>
+<a href="#1797" id="1797">1797</a>
+<a href="#1798" id="1798">1798</a>
+<a href="#1799" id="1799">1799</a>
+<a href="#1800" id="1800">1800</a>
+<a href="#1801" id="1801">1801</a>
+<a href="#1802" id="1802">1802</a>
+<a href="#1803" id="1803">1803</a>
+<a href="#1804" id="1804">1804</a>
+<a href="#1805" id="1805">1805</a>
+<a href="#1806" id="1806">1806</a>
+<a href="#1807" id="1807">1807</a>
+<a href="#1808" id="1808">1808</a>
+<a href="#1809" id="1809">1809</a>
+<a href="#1810" id="1810">1810</a>
+<a href="#1811" id="1811">1811</a>
+<a href="#1812" id="1812">1812</a>
+<a href="#1813" id="1813">1813</a>
+<a href="#1814" id="1814">1814</a>
+<a href="#1815" id="1815">1815</a>
+<a href="#1816" id="1816">1816</a>
+<a href="#1817" id="1817">1817</a>
+<a href="#1818" id="1818">1818</a>
+<a href="#1819" id="1819">1819</a>
+<a href="#1820" id="1820">1820</a>
+<a href="#1821" id="1821">1821</a>
+<a href="#1822" id="1822">1822</a>
+<a href="#1823" id="1823">1823</a>
+<a href="#1824" id="1824">1824</a>
+<a href="#1825" id="1825">1825</a>
+<a href="#1826" id="1826">1826</a>
+<a href="#1827" id="1827">1827</a>
+<a href="#1828" id="1828">1828</a>
+<a href="#1829" id="1829">1829</a>
+<a href="#1830" id="1830">1830</a>
+<a href="#1831" id="1831">1831</a>
+<a href="#1832" id="1832">1832</a>
+<a href="#1833" id="1833">1833</a>
+<a href="#1834" id="1834">1834</a>
+<a href="#1835" id="1835">1835</a>
+<a href="#1836" id="1836">1836</a>
+<a href="#1837" id="1837">1837</a>
+<a href="#1838" id="1838">1838</a>
+<a href="#1839" id="1839">1839</a>
+<a href="#1840" id="1840">1840</a>
+<a href="#1841" id="1841">1841</a>
+<a href="#1842" id="1842">1842</a>
+<a href="#1843" id="1843">1843</a>
+<a href="#1844" id="1844">1844</a>
+<a href="#1845" id="1845">1845</a>
+<a href="#1846" id="1846">1846</a>
+<a href="#1847" id="1847">1847</a>
+<a href="#1848" id="1848">1848</a>
+<a href="#1849" id="1849">1849</a>
+<a href="#1850" id="1850">1850</a>
+<a href="#1851" id="1851">1851</a>
+<a href="#1852" id="1852">1852</a>
+<a href="#1853" id="1853">1853</a>
+<a href="#1854" id="1854">1854</a>
+<a href="#1855" id="1855">1855</a>
+<a href="#1856" id="1856">1856</a>
+<a href="#1857" id="1857">1857</a>
+<a href="#1858" id="1858">1858</a>
+<a href="#1859" id="1859">1859</a>
+<a href="#1860" id="1860">1860</a>
+<a href="#1861" id="1861">1861</a>
+<a href="#1862" id="1862">1862</a>
+<a href="#1863" id="1863">1863</a>
+<a href="#1864" id="1864">1864</a>
+<a href="#1865" id="1865">1865</a>
+<a href="#1866" id="1866">1866</a>
+<a href="#1867" id="1867">1867</a>
+<a href="#1868" id="1868">1868</a>
+<a href="#1869" id="1869">1869</a>
+<a href="#1870" id="1870">1870</a>
+<a href="#1871" id="1871">1871</a>
+<a href="#1872" id="1872">1872</a>
+<a href="#1873" id="1873">1873</a>
+<a href="#1874" id="1874">1874</a>
+<a href="#1875" id="1875">1875</a>
+<a href="#1876" id="1876">1876</a>
+<a href="#1877" id="1877">1877</a>
+<a href="#1878" id="1878">1878</a>
+<a href="#1879" id="1879">1879</a>
+<a href="#1880" id="1880">1880</a>
+<a href="#1881" id="1881">1881</a>
+<a href="#1882" id="1882">1882</a>
+<a href="#1883" id="1883">1883</a>
+<a href="#1884" id="1884">1884</a>
+<a href="#1885" id="1885">1885</a>
+<a href="#1886" id="1886">1886</a>
+<a href="#1887" id="1887">1887</a>
+<a href="#1888" id="1888">1888</a>
+<a href="#1889" id="1889">1889</a>
+<a href="#1890" id="1890">1890</a>
+<a href="#1891" id="1891">1891</a>
+<a href="#1892" id="1892">1892</a>
+<a href="#1893" id="1893">1893</a>
+<a href="#1894" id="1894">1894</a>
+<a href="#1895" id="1895">1895</a>
+<a href="#1896" id="1896">1896</a>
+<a href="#1897" id="1897">1897</a>
+<a href="#1898" id="1898">1898</a>
+<a href="#1899" id="1899">1899</a>
+<a href="#1900" id="1900">1900</a>
+<a href="#1901" id="1901">1901</a>
+<a href="#1902" id="1902">1902</a>
+<a href="#1903" id="1903">1903</a>
+<a href="#1904" id="1904">1904</a>
+<a href="#1905" id="1905">1905</a>
+<a href="#1906" id="1906">1906</a>
+<a href="#1907" id="1907">1907</a>
+<a href="#1908" id="1908">1908</a>
+<a href="#1909" id="1909">1909</a>
+<a href="#1910" id="1910">1910</a>
+<a href="#1911" id="1911">1911</a>
+<a href="#1912" id="1912">1912</a>
+<a href="#1913" id="1913">1913</a>
+<a href="#1914" id="1914">1914</a>
+<a href="#1915" id="1915">1915</a>
+<a href="#1916" id="1916">1916</a>
+<a href="#1917" id="1917">1917</a>
+<a href="#1918" id="1918">1918</a>
+<a href="#1919" id="1919">1919</a>
+<a href="#1920" id="1920">1920</a>
+<a href="#1921" id="1921">1921</a>
+<a href="#1922" id="1922">1922</a>
+<a href="#1923" id="1923">1923</a>
+<a href="#1924" id="1924">1924</a>
+<a href="#1925" id="1925">1925</a>
+<a href="#1926" id="1926">1926</a>
+<a href="#1927" id="1927">1927</a>
+<a href="#1928" id="1928">1928</a>
+<a href="#1929" id="1929">1929</a>
+<a href="#1930" id="1930">1930</a>
+<a href="#1931" id="1931">1931</a>
+<a href="#1932" id="1932">1932</a>
+<a href="#1933" id="1933">1933</a>
+<a href="#1934" id="1934">1934</a>
+<a href="#1935" id="1935">1935</a>
+<a href="#1936" id="1936">1936</a>
+<a href="#1937" id="1937">1937</a>
+<a href="#1938" id="1938">1938</a>
+<a href="#1939" id="1939">1939</a>
+<a href="#1940" id="1940">1940</a>
+<a href="#1941" id="1941">1941</a>
+<a href="#1942" id="1942">1942</a>
+<a href="#1943" id="1943">1943</a>
+<a href="#1944" id="1944">1944</a>
+<a href="#1945" id="1945">1945</a>
+<a href="#1946" id="1946">1946</a>
+<a href="#1947" id="1947">1947</a>
+<a href="#1948" id="1948">1948</a>
+<a href="#1949" id="1949">1949</a>
+<a href="#1950" id="1950">1950</a>
+<a href="#1951" id="1951">1951</a>
+<a href="#1952" id="1952">1952</a>
+<a href="#1953" id="1953">1953</a>
+<a href="#1954" id="1954">1954</a>
+<a href="#1955" id="1955">1955</a>
+<a href="#1956" id="1956">1956</a>
+<a href="#1957" id="1957">1957</a>
+<a href="#1958" id="1958">1958</a>
+<a href="#1959" id="1959">1959</a>
+<a href="#1960" id="1960">1960</a>
+<a href="#1961" id="1961">1961</a>
+<a href="#1962" id="1962">1962</a>
+<a href="#1963" id="1963">1963</a>
+<a href="#1964" id="1964">1964</a>
+<a href="#1965" id="1965">1965</a>
+<a href="#1966" id="1966">1966</a>
+<a href="#1967" id="1967">1967</a>
+<a href="#1968" id="1968">1968</a>
+<a href="#1969" id="1969">1969</a>
+<a href="#1970" id="1970">1970</a>
+<a href="#1971" id="1971">1971</a>
+<a href="#1972" id="1972">1972</a>
+<a href="#1973" id="1973">1973</a>
+<a href="#1974" id="1974">1974</a>
+<a href="#1975" id="1975">1975</a>
+<a href="#1976" id="1976">1976</a>
+<a href="#1977" id="1977">1977</a>
+<a href="#1978" id="1978">1978</a>
+<a href="#1979" id="1979">1979</a>
+<a href="#1980" id="1980">1980</a>
+<a href="#1981" id="1981">1981</a>
+<a href="#1982" id="1982">1982</a>
+<a href="#1983" id="1983">1983</a>
+<a href="#1984" id="1984">1984</a>
+<a href="#1985" id="1985">1985</a>
+<a href="#1986" id="1986">1986</a>
+<a href="#1987" id="1987">1987</a>
+<a href="#1988" id="1988">1988</a>
+<a href="#1989" id="1989">1989</a>
+<a href="#1990" id="1990">1990</a>
+<a href="#1991" id="1991">1991</a>
+<a href="#1992" id="1992">1992</a>
+<a href="#1993" id="1993">1993</a>
+<a href="#1994" id="1994">1994</a>
+<a href="#1995" id="1995">1995</a>
+<a href="#1996" id="1996">1996</a>
+<a href="#1997" id="1997">1997</a>
+<a href="#1998" id="1998">1998</a>
+<a href="#1999" id="1999">1999</a>
+<a href="#2000" id="2000">2000</a>
+<a href="#2001" id="2001">2001</a>
+<a href="#2002" id="2002">2002</a>
+<a href="#2003" id="2003">2003</a>
+<a href="#2004" id="2004">2004</a>
+<a href="#2005" id="2005">2005</a>
+<a href="#2006" id="2006">2006</a>
+<a href="#2007" id="2007">2007</a>
+<a href="#2008" id="2008">2008</a>
+<a href="#2009" id="2009">2009</a>
+<a href="#2010" id="2010">2010</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Implements [OpenAPI Schema Object][schema] types which can be
 //! used to define field properties, enum values, array or object types.
 //!
@@ -1688,6 +2047,7 @@
 </span><span class="kw">pub fn </span>empty() -&gt; Schema {
     Schema::Object(
         ObjectBuilder::new()
+            .schema_type(SchemaType::Value)
             .nullable(<span class="bool-val">true</span>)
             .default(<span class="prelude-val">Some</span>(serde_json::Value::Null))
             .into(),
@@ -1906,10 +2266,15 @@
     /// [composite]: https://spec.openapis.org/oas/latest.html#components-object
     </span>OneOf(OneOf),
 
-    <span class="doccomment">/// Creates a _AnyOf_ type [composite Object][composite] schema.
+    <span class="doccomment">/// Creates a _AllOf_ type [composite Object][composite] schema.
     ///
     /// [composite]: https://spec.openapis.org/oas/latest.html#components-object
     </span>AllOf(AllOf),
+
+    <span class="doccomment">/// Creates a _AnyOf_ type [composite Object][composite] schema.
+    ///
+    /// [composite]: https://spec.openapis.org/oas/latest.html#components-object
+    </span>AnyOf(AnyOf),
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>Schema {
@@ -1964,6 +2329,10 @@
         </span><span class="attr">#[serde(rename = <span class="string">&quot;oneOf&quot;</span>)]
         </span><span class="kw">pub </span>items: Vec&lt;RefOr&lt;Schema&gt;&gt;,
 
+        <span class="doccomment">/// Changes the [`OneOf`] title.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
         <span class="doccomment">/// Description of the [`OneOf`]. Markdown syntax is supported.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
         </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
@@ -1971,7 +2340,6 @@
         <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
         </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
-
 
         <span class="doccomment">/// Example shown in UI of the value for richer documentation.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -2025,6 +2393,11 @@
 
         <span class="self">self
     </span>}
+
+    <span class="doccomment">/// Add or change the title of the [`OneOf`].
+    </span><span class="kw">pub fn </span>title&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="prelude-ty">Option</span>&lt;I&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>title title.map(|title| title.into()))
+    }
 
     <span class="doccomment">/// Add or change optional description for `OneOf` component.
     </span><span class="kw">pub fn </span>description&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="prelude-ty">Option</span>&lt;I&gt;) -&gt; <span class="self">Self </span>{
@@ -2083,6 +2456,10 @@
         <span class="doccomment">/// Components of _AllOf_ component.
         </span><span class="attr">#[serde(rename = <span class="string">&quot;allOf&quot;</span>)]
         </span><span class="kw">pub </span>items: Vec&lt;RefOr&lt;Schema&gt;&gt;,
+
+        <span class="doccomment">/// Changes the [`AllOf`] title.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
 
         <span class="doccomment">/// Description of the [`AllOf`]. Markdown syntax is supported.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -2145,6 +2522,11 @@
         <span class="self">self
     </span>}
 
+    <span class="doccomment">/// Add or change the title of the [`AllOf`].
+    </span><span class="kw">pub fn </span>title&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="prelude-ty">Option</span>&lt;I&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>title title.map(|title| title.into()))
+    }
+
     <span class="doccomment">/// Add or change optional description for `AllOf` component.
     </span><span class="kw">pub fn </span>description&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="prelude-ty">Option</span>&lt;I&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">set_value!</span>(<span class="self">self </span>description description.map(|description| description.into()))
@@ -2187,6 +2569,125 @@
 
 <span class="macro">component_from_builder!</span>(AllOfBuilder);
 
+<span class="macro">builder! </span>{
+    AnyOfBuilder;
+
+    <span class="doccomment">/// AnyOf [Composite Object][anyof] component holds
+    /// multiple components together where API endpoint will return a combination of one or more of them.
+    ///
+    /// See [`Schema::AnyOf`] for more details.
+    ///
+    /// [anyof]: https://spec.openapis.org/oas/latest.html#components-object
+    </span><span class="attr">#[derive(Serialize, Deserialize, Clone, Default, PartialEq)]
+    #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+    </span><span class="kw">pub struct </span>AnyOf {
+        <span class="doccomment">/// Components of _AnyOf component.
+        </span><span class="attr">#[serde(rename = <span class="string">&quot;anyOf&quot;</span>)]
+        </span><span class="kw">pub </span>items: Vec&lt;RefOr&lt;Schema&gt;&gt;,
+
+        <span class="doccomment">/// Description of the [`AnyOf`]. Markdown syntax is supported.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>description: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
+        <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
+
+        <span class="doccomment">/// Example shown in UI of the value for richer documentation.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
+
+        <span class="doccomment">/// Optional discriminator field can be used to aid deserialization, serialization and validation of a
+        /// specific schema.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>discriminator: <span class="prelude-ty">Option</span>&lt;Discriminator&gt;,
+
+        <span class="doccomment">/// Set `true` to allow `&quot;null&quot;` to be used as value for given type.
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        </span><span class="kw">pub </span>nullable: bool,
+    }
+}
+
+<span class="kw">impl </span>AnyOf {
+    <span class="doccomment">/// Construct a new [`AnyOf`] component.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            ..Default::default()
+        }
+    }
+
+    <span class="doccomment">/// Construct a new [`AnyOf`] component with given capacity.
+    ///
+    /// AnyOf component is then able to contain number of components without
+    /// reallocating.
+    ///
+    /// # Examples
+    ///
+    /// Create [`AnyOf`] component with initial capacity of 5.
+    /// ```rust
+    /// # use utoipa::openapi::schema::AnyOf;
+    /// let one_of = AnyOf::with_capacity(5);
+    /// ```
+    </span><span class="kw">pub fn </span>with_capacity(capacity: usize) -&gt; <span class="self">Self </span>{
+        <span class="self">Self </span>{
+            items: Vec::with_capacity(capacity),
+            ..Default::default()
+        }
+    }
+}
+
+<span class="kw">impl </span>AnyOfBuilder {
+    <span class="doccomment">/// Adds a given [`Schema`] to [`AnyOf`] [Composite Object][composite]
+    ///
+    /// [composite]: https://spec.openapis.org/oas/latest.html#components-object
+    </span><span class="kw">pub fn </span>item&lt;I: Into&lt;RefOr&lt;Schema&gt;&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, component: I) -&gt; <span class="self">Self </span>{
+        <span class="self">self</span>.items.push(component.into());
+
+        <span class="self">self
+    </span>}
+
+    <span class="doccomment">/// Add or change optional description for `AnyOf` component.
+    </span><span class="kw">pub fn </span>description&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="prelude-ty">Option</span>&lt;I&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>description description.map(|description| description.into()))
+    }
+
+    <span class="doccomment">/// Add or change default value for the object which is provided when user has not provided the input in Swagger UI.
+    </span><span class="kw">pub fn </span>default(<span class="kw-2">mut </span><span class="self">self</span>, default: <span class="prelude-ty">Option</span>&lt;Value&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>default default)
+    }
+
+    <span class="doccomment">/// Add or change example shown in UI of the value for richer documentation.
+    </span><span class="kw">pub fn </span>example(<span class="kw-2">mut </span><span class="self">self</span>, example: <span class="prelude-ty">Option</span>&lt;Value&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>example example)
+    }
+
+    <span class="doccomment">/// Add or change discriminator field of the composite [`AnyOf`] type.
+    </span><span class="kw">pub fn </span>discriminator(<span class="kw-2">mut </span><span class="self">self</span>, discriminator: <span class="prelude-ty">Option</span>&lt;Discriminator&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>discriminator discriminator)
+    }
+
+    <span class="doccomment">/// Add or change nullable flag for [`AnyOf`].
+    </span><span class="kw">pub fn </span>nullable(<span class="kw-2">mut </span><span class="self">self</span>, nullable: bool) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>nullable nullable)
+    }
+
+    <span class="macro">to_array_builder!</span>();
+}
+
+<span class="kw">impl </span>From&lt;AnyOf&gt; <span class="kw">for </span>Schema {
+    <span class="kw">fn </span>from(any_of: AnyOf) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::AnyOf(any_of)
+    }
+}
+
+<span class="kw">impl </span>From&lt;AnyOfBuilder&gt; <span class="kw">for </span>RefOr&lt;Schema&gt; {
+    <span class="kw">fn </span>from(any_of: AnyOfBuilder) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::T(Schema::AnyOf(any_of.build()))
+    }
+}
+
+<span class="macro">component_from_builder!</span>(AnyOfBuilder);
+
 <span class="attr">#[cfg(not(feature = <span class="string">&quot;preserve_order&quot;</span>))]
 </span><span class="kw">type </span>ObjectPropertiesMap&lt;K, V&gt; = BTreeMap&lt;K, V&gt;;
 <span class="attr">#[cfg(feature = <span class="string">&quot;preserve_order&quot;</span>)]
@@ -2208,7 +2709,7 @@
     </span><span class="kw">pub struct </span>Object {
         <span class="doccomment">/// Type of [`Object`] e.g. [`SchemaType::Object`] for `object` and [`SchemaType::String`] for
         /// `string` types.
-        </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
+        </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>, skip_serializing_if=<span class="string">&quot;SchemaType::is_value&quot;</span>)]
         </span><span class="kw">pub </span>schema_type: SchemaType,
 
         <span class="doccomment">/// Changes the [`Object`] title.
@@ -2247,7 +2748,7 @@
 
         <span class="doccomment">/// Additional [`Schema`] for non specified fields (Useful for typed maps).
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
-        </span><span class="kw">pub </span>additional_properties: <span class="prelude-ty">Option</span>&lt;Box&lt;RefOr&lt;Schema&gt;&gt;&gt;,
+        </span><span class="kw">pub </span>additional_properties: <span class="prelude-ty">Option</span>&lt;Box&lt;AdditionalProperties&lt;Schema&gt;&gt;&gt;,
 
         <span class="doccomment">/// Changes the [`Object`] deprecated status.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -2275,27 +2776,27 @@
 
         <span class="doccomment">/// Must be a number strictly greater than `0`. Numeric value is considered valid if value
         /// divided by the _`multiple_of`_ value results an integer.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
         </span><span class="kw">pub </span>multiple_of: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
         <span class="doccomment">/// Specify inclusive upper limit for the [`Object`]&#39;s value. Number is considered valid if
         /// it is equal or less than the _`maximum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
         </span><span class="kw">pub </span>maximum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
         <span class="doccomment">/// Specify inclusive lower limit for the [`Object`]&#39;s value. Number value is considered
         /// valid if it is equal or greater than the _`minimum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
         </span><span class="kw">pub </span>minimum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
         <span class="doccomment">/// Specify exclusive upper limit for the [`Object`]&#39;s value. Number value is considered
         /// valid if it is strictly less than _`exclusive_maximum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
         </span><span class="kw">pub </span>exclusive_maximum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
         <span class="doccomment">/// Specify exclusive lower limit for the [`Object`]&#39;s value. Number value is considered
         /// valid if it is strictly above the _`exclusive_minimum`_.
-        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>, serialize_with = <span class="string">&quot;omit_decimal_zero&quot;</span>)]
         </span><span class="kw">pub </span>exclusive_minimum: <span class="prelude-ty">Option</span>&lt;f64&gt;,
 
         <span class="doccomment">/// Specify maximum length for `string` values. _`max_length`_ cannot be a negative integer
@@ -2386,7 +2887,7 @@
         <span class="self">self
     </span>}
 
-    <span class="kw">pub fn </span>additional_properties&lt;I: Into&lt;RefOr&lt;Schema&gt;&gt;&gt;(
+    <span class="kw">pub fn </span>additional_properties&lt;I: Into&lt;AdditionalProperties&lt;Schema&gt;&gt;&gt;(
         <span class="kw-2">mut </span><span class="self">self</span>,
         additional_properties: <span class="prelude-ty">Option</span>&lt;I&gt;,
     ) -&gt; <span class="self">Self </span>{
@@ -2515,6 +3016,43 @@
     }
 }
 
+<span class="doccomment">/// AdditionalProperties is used to define values of map fields of the [`Schema`].
+///
+/// The value can either be [`RefOr`] or _`bool`_.
+</span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+#[serde(untagged)]
+</span><span class="kw">pub enum </span>AdditionalProperties&lt;T&gt; {
+    <span class="doccomment">/// Use when value type of the map is a known [`Schema`] or [`Ref`] to the [`Schema`].
+    </span>RefOr(RefOr&lt;T&gt;),
+    <span class="doccomment">/// Use _`AdditionalProperties::FreeForm(true)`_ when any value is allowed in the map.
+    </span>FreeForm(bool),
+}
+
+<span class="kw">impl</span>&lt;T&gt; From&lt;RefOr&lt;T&gt;&gt; <span class="kw">for </span>AdditionalProperties&lt;T&gt; {
+    <span class="kw">fn </span>from(value: RefOr&lt;T&gt;) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::RefOr(value)
+    }
+}
+
+<span class="kw">impl </span>From&lt;ObjectBuilder&gt; <span class="kw">for </span>AdditionalProperties&lt;Schema&gt; {
+    <span class="kw">fn </span>from(value: ObjectBuilder) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::RefOr(RefOr::T(Schema::Object(value.build())))
+    }
+}
+
+<span class="kw">impl </span>From&lt;Ref&gt; <span class="kw">for </span>AdditionalProperties&lt;Schema&gt; {
+    <span class="kw">fn </span>from(value: Ref) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::RefOr(RefOr::Ref(value))
+    }
+}
+
+<span class="kw">impl </span>From&lt;Schema&gt; <span class="kw">for </span>AdditionalProperties&lt;Schema&gt; {
+    <span class="kw">fn </span>from(value: Schema) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::RefOr(RefOr::T(value))
+    }
+}
+
 <span class="doccomment">/// Implements [OpenAPI Reference Object][reference] that can be used to reference
 /// reusable components such as [`Schema`]s or [`Response`]s.
 ///
@@ -2584,6 +3122,21 @@
     }
 }
 
+<span class="kw">fn </span>omit_decimal_zero&lt;S&gt;(maybe_value: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;f64&gt;, s: S) -&gt; <span class="prelude-ty">Result</span>&lt;S::Ok, S::Error&gt;
+<span class="kw">where
+    </span>S: serde::Serializer,
+{
+    <span class="kw">if let </span><span class="prelude-val">Some</span>(v) = maybe_value {
+        <span class="kw">if </span>v.fract() == <span class="number">0.0 </span>&amp;&amp; <span class="kw-2">*</span>v &gt;= i64::MIN <span class="kw">as </span>f64 &amp;&amp; <span class="kw-2">*</span>v &lt;= i64::MAX <span class="kw">as </span>f64 {
+            s.serialize_i64(v.trunc() <span class="kw">as </span>i64)
+        } <span class="kw">else </span>{
+            s.serialize_f64(<span class="kw-2">*</span>v)
+        }
+    } <span class="kw">else </span>{
+        s.serialize_none()
+    }
+}
+
 <span class="macro">builder! </span>{
     ArrayBuilder;
 
@@ -2599,6 +3152,10 @@
         </span><span class="attr">#[serde(rename = <span class="string">&quot;type&quot;</span>)]
         </span><span class="kw">pub </span>schema_type: SchemaType,
 
+        <span class="doccomment">/// Changes the [`Array`] title.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>title: <span class="prelude-ty">Option</span>&lt;String&gt;,
+
         <span class="doccomment">/// Schema representing the array items type.
         </span><span class="kw">pub </span>items: Box&lt;RefOr&lt;Schema&gt;&gt;,
 
@@ -2613,6 +3170,10 @@
         <span class="doccomment">/// Example shown in UI of the value for richer documentation.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
         </span><span class="kw">pub </span>example: <span class="prelude-ty">Option</span>&lt;Value&gt;,
+
+        <span class="doccomment">/// Default value which is provided when user has not provided the input in Swagger UI.
+        </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
+        </span><span class="kw">pub </span>default: <span class="prelude-ty">Option</span>&lt;Value&gt;,
 
         <span class="doccomment">/// Max length of the array.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
@@ -2630,21 +3191,28 @@
         <span class="doccomment">/// Xml format of the array.
         </span><span class="attr">#[serde(skip_serializing_if = <span class="string">&quot;Option::is_none&quot;</span>)]
         </span><span class="kw">pub </span>xml: <span class="prelude-ty">Option</span>&lt;Xml&gt;,
+
+        <span class="doccomment">/// Set `true` to allow `&quot;null&quot;` to be used as value for given type.
+        </span><span class="attr">#[serde(default, skip_serializing_if = <span class="string">&quot;is_false&quot;</span>)]
+        </span><span class="kw">pub </span>nullable: bool,
     }
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>Array {
     <span class="kw">fn </span>default() -&gt; <span class="self">Self </span>{
         <span class="self">Self </span>{
+            title: Default::default(),
             schema_type: SchemaType::Array,
             unique_items: bool::default(),
             items: Default::default(),
             description: Default::default(),
             deprecated: Default::default(),
             example: Default::default(),
+            default: Default::default(),
             max_items: Default::default(),
             min_items: Default::default(),
             xml: Default::default(),
+            nullable: Default::default(),
         }
     }
 }
@@ -2673,6 +3241,11 @@
         <span class="macro">set_value!</span>(<span class="self">self </span>items Box::new(component.into()))
     }
 
+    <span class="doccomment">/// Add or change the title of the [`Array`].
+    </span><span class="kw">pub fn </span>title&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, title: <span class="prelude-ty">Option</span>&lt;I&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>title title.map(|title| title.into()))
+    }
+
     <span class="doccomment">/// Add or change description of the property. Markdown syntax is supported.
     </span><span class="kw">pub fn </span>description&lt;I: Into&lt;String&gt;&gt;(<span class="kw-2">mut </span><span class="self">self</span>, description: <span class="prelude-ty">Option</span>&lt;I&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">set_value!</span>(<span class="self">self </span>description description.map(|description| description.into()))
@@ -2686,6 +3259,11 @@
     <span class="doccomment">/// Add or change example shown in UI of the value for richer documentation.
     </span><span class="kw">pub fn </span>example(<span class="kw-2">mut </span><span class="self">self</span>, example: <span class="prelude-ty">Option</span>&lt;Value&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">set_value!</span>(<span class="self">self </span>example example)
+    }
+
+    <span class="doccomment">/// Add or change default value for the object which is provided when user has not provided the input in Swagger UI.
+    </span><span class="kw">pub fn </span>default(<span class="kw-2">mut </span><span class="self">self</span>, default: <span class="prelude-ty">Option</span>&lt;Value&gt;) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>default default)
     }
 
     <span class="doccomment">/// Set maximum allowed length for [`Array`].
@@ -2706,6 +3284,11 @@
     <span class="doccomment">/// Set [`Xml`] formatting for [`Array`].
     </span><span class="kw">pub fn </span>xml(<span class="kw-2">mut </span><span class="self">self</span>, xml: <span class="prelude-ty">Option</span>&lt;Xml&gt;) -&gt; <span class="self">Self </span>{
         <span class="macro">set_value!</span>(<span class="self">self </span>xml xml)
+    }
+
+    <span class="doccomment">/// Add or change nullable flag for [`Object`].
+    </span><span class="kw">pub fn </span>nullable(<span class="kw-2">mut </span><span class="self">self</span>, nullable: bool) -&gt; <span class="self">Self </span>{
+        <span class="macro">set_value!</span>(<span class="self">self </span>nullable nullable)
     }
 
     <span class="macro">to_array_builder!</span>();
@@ -2745,6 +3328,9 @@
     <span class="doccomment">/// Used with [`Object`] and [`ObjectBuilder`]. Objects always have
     /// _schema_type_ [`SchemaType::Object`].
     </span>Object,
+    <span class="doccomment">/// Indicates generic JSON content. Used with [`Object`] and [`ObjectBuilder`] on a field
+    /// of any valid JSON type.
+    </span>Value,
     <span class="doccomment">/// Indicates string type of content. Used with [`Object`] and [`ObjectBuilder`] on a `string`
     /// field.
     </span>String,
@@ -2759,6 +3345,11 @@
     </span>Boolean,
     <span class="doccomment">/// Used with [`Array`] and [`ArrayBuilder`]. Indicates array type of content.
     </span>Array,
+}
+<span class="kw">impl </span>SchemaType {
+    <span class="kw">fn </span>is_value(type_: <span class="kw-2">&amp;</span>SchemaType) -&gt; bool {
+        <span class="kw-2">*</span>type_ == SchemaType::Value
+    }
 }
 
 <span class="kw">impl </span>Default <span class="kw">for </span>SchemaType {
@@ -2775,18 +3366,46 @@
 #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
 #[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>, untagged)]
 </span><span class="kw">pub enum </span>SchemaFormat {
-    KnownFormat(KnownFormat),
-    Custom(String),
+    <span class="doccomment">/// Use to define additional detail about the value.
+    </span>KnownFormat(KnownFormat),
+    <span class="doccomment">/// Can be used to provide additional detail about the value when [`SchemaFormat::KnownFormat`]
+    /// is not suitable.
+    </span>Custom(String),
 }
 
-<span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
+<span class="doccomment">/// Known schema format modifier property to provide fine detail of the primitive type.
+</span><span class="attr">#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
 #[serde(rename_all = <span class="string">&quot;lowercase&quot;</span>)]
 </span><span class="kw">pub enum </span>KnownFormat {
+    <span class="doccomment">/// 8 bit integer.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span>Int8,
+    <span class="doccomment">/// 16 bit integer.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span>Int16,
     <span class="doccomment">/// 32 bit integer.
     </span>Int32,
     <span class="doccomment">/// 64 bit integer.
     </span>Int64,
+    <span class="doccomment">/// 8 bit unsigned integer.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span>UInt8,
+    <span class="doccomment">/// 16 bit unsigned integer.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span>UInt16,
+    <span class="doccomment">/// 32 bit unsigned integer.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span>UInt32,
+    <span class="doccomment">/// 64 bit unsigned integer.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;non_strict_integers&quot;</span>)))]
+    </span>UInt64,
     <span class="doccomment">/// floating point number.
     </span>Float,
     <span class="doccomment">/// double (floating point) number.
@@ -2808,6 +3427,12 @@
     </span><span class="attr">#[cfg(feature = <span class="string">&quot;uuid&quot;</span>)]
     #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;uuid&quot;</span>)))]
     </span>Uuid,
+    <span class="doccomment">/// Used with [`String`] values to indicate value is in ULID format.
+    ///
+    /// **ulid** feature need to be enabled.
+    </span><span class="attr">#[cfg(feature = <span class="string">&quot;ulid&quot;</span>)]
+    #[cfg_attr(doc_cfg, doc(cfg(feature = <span class="string">&quot;ulid&quot;</span>)))]
+    </span>Ulid,
 }
 
 <span class="attr">#[cfg(test)]
@@ -3035,7 +3660,7 @@
     }
 
     <span class="kw">fn </span>get_json_path&lt;<span class="lifetime">&#39;a</span>&gt;(value: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value, path: <span class="kw-2">&amp;</span>str) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Value {
-        path.split(<span class="string">&#39;.&#39;</span>).into_iter().fold(value, |acc, fragment| {
+        path.split(<span class="string">&#39;.&#39;</span>).fold(value, |acc, fragment| {
             acc.get(fragment).unwrap_or(<span class="kw-2">&amp;</span>serde_json::value::Value::Null)
         })
     }
@@ -3253,6 +3878,47 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>serialize_deserialize_any_of_of_within_ref_or_t_object_builder() {
+        <span class="kw">let </span>ref_or_schema = RefOr::T(Schema::Object(
+            ObjectBuilder::new()
+                .property(
+                    <span class="string">&quot;test&quot;</span>,
+                    RefOr::T(Schema::AnyOf(
+                        AnyOfBuilder::new()
+                            .item(Schema::Array(
+                                ArrayBuilder::new()
+                                    .items(RefOr::T(Schema::Object(
+                                        ObjectBuilder::new()
+                                            .property(<span class="string">&quot;element&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/test&quot;</span>)))
+                                            .build(),
+                                    )))
+                                    .build(),
+                            ))
+                            .item(RefOr::T(Schema::Object(
+                                ObjectBuilder::new()
+                                    .property(<span class="string">&quot;foobar&quot;</span>, RefOr::Ref(Ref::new(<span class="string">&quot;#/foobar&quot;</span>)))
+                                    .build(),
+                            )))
+                            .build(),
+                    )),
+                )
+                .build(),
+        ));
+
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>ref_or_schema).expect(<span class="string">&quot;&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
+
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+        <span class="macro">assert!</span>(json_str.contains(<span class="string">&quot;\&quot;anyOf\&quot;&quot;</span>));
+        <span class="macro">assert_eq!</span>(json_str, json_de_str);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>serialize_deserialize_schema_array_ref_or_t() {
         <span class="kw">let </span>ref_or_schema = RefOr::T(Schema::Array(
             ArrayBuilder::new()
@@ -3294,6 +3960,58 @@
         <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).expect(<span class="string">&quot;&quot;</span>);
 
         <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).expect(<span class="string">&quot;&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+
+        <span class="macro">assert_eq!</span>(json_str, json_de_str);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>serialize_deserialize_schema_with_additional_properties() {
+        <span class="kw">let </span>schema = Schema::Object(
+            ObjectBuilder::new()
+                .property(
+                    <span class="string">&quot;map&quot;</span>,
+                    ObjectBuilder::new()
+                        .additional_properties(<span class="prelude-val">Some</span>(AdditionalProperties::FreeForm(<span class="bool-val">true</span>))),
+                )
+                .build(),
+        );
+
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>schema).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).unwrap();
+
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
+
+        <span class="macro">assert_eq!</span>(json_str, json_de_str);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>serialize_deserialize_schema_with_additional_properties_object() {
+        <span class="kw">let </span>schema = Schema::Object(
+            ObjectBuilder::new()
+                .property(
+                    <span class="string">&quot;map&quot;</span>,
+                    ObjectBuilder::new().additional_properties(<span class="prelude-val">Some</span>(
+                        ObjectBuilder::new()
+                            .property(<span class="string">&quot;name&quot;</span>, Object::with_type(SchemaType::String)),
+                    )),
+                )
+                .build(),
+        );
+
+        <span class="kw">let </span>json_str = serde_json::to_string(<span class="kw-2">&amp;</span>schema).unwrap();
+        <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
+        <span class="macro">println!</span>(<span class="string">&quot;{json_str}&quot;</span>);
+
+        <span class="kw">let </span>deserialized: RefOr&lt;Schema&gt; = serde_json::from_str(<span class="kw-2">&amp;</span>json_str).unwrap();
+
+        <span class="kw">let </span>json_de_str = serde_json::to_string(<span class="kw-2">&amp;</span>deserialized).unwrap();
         <span class="macro">println!</span>(<span class="string">&quot;----------------------------&quot;</span>);
         <span class="macro">println!</span>(<span class="string">&quot;{json_de_str}&quot;</span>);
 

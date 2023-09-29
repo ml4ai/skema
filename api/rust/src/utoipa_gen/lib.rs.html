@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.0.3/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../utoipa_gen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/lib.rs`."><title>lib.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../" data-static-root-path="../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../source-files.js"></script><script defer src="../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../utoipa_gen/index.html"><img class="rust-logo" src="../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -2598,6 +2598,243 @@
 <a href="#2598" id="2598">2598</a>
 <a href="#2599" id="2599">2599</a>
 <a href="#2600" id="2600">2600</a>
+<a href="#2601" id="2601">2601</a>
+<a href="#2602" id="2602">2602</a>
+<a href="#2603" id="2603">2603</a>
+<a href="#2604" id="2604">2604</a>
+<a href="#2605" id="2605">2605</a>
+<a href="#2606" id="2606">2606</a>
+<a href="#2607" id="2607">2607</a>
+<a href="#2608" id="2608">2608</a>
+<a href="#2609" id="2609">2609</a>
+<a href="#2610" id="2610">2610</a>
+<a href="#2611" id="2611">2611</a>
+<a href="#2612" id="2612">2612</a>
+<a href="#2613" id="2613">2613</a>
+<a href="#2614" id="2614">2614</a>
+<a href="#2615" id="2615">2615</a>
+<a href="#2616" id="2616">2616</a>
+<a href="#2617" id="2617">2617</a>
+<a href="#2618" id="2618">2618</a>
+<a href="#2619" id="2619">2619</a>
+<a href="#2620" id="2620">2620</a>
+<a href="#2621" id="2621">2621</a>
+<a href="#2622" id="2622">2622</a>
+<a href="#2623" id="2623">2623</a>
+<a href="#2624" id="2624">2624</a>
+<a href="#2625" id="2625">2625</a>
+<a href="#2626" id="2626">2626</a>
+<a href="#2627" id="2627">2627</a>
+<a href="#2628" id="2628">2628</a>
+<a href="#2629" id="2629">2629</a>
+<a href="#2630" id="2630">2630</a>
+<a href="#2631" id="2631">2631</a>
+<a href="#2632" id="2632">2632</a>
+<a href="#2633" id="2633">2633</a>
+<a href="#2634" id="2634">2634</a>
+<a href="#2635" id="2635">2635</a>
+<a href="#2636" id="2636">2636</a>
+<a href="#2637" id="2637">2637</a>
+<a href="#2638" id="2638">2638</a>
+<a href="#2639" id="2639">2639</a>
+<a href="#2640" id="2640">2640</a>
+<a href="#2641" id="2641">2641</a>
+<a href="#2642" id="2642">2642</a>
+<a href="#2643" id="2643">2643</a>
+<a href="#2644" id="2644">2644</a>
+<a href="#2645" id="2645">2645</a>
+<a href="#2646" id="2646">2646</a>
+<a href="#2647" id="2647">2647</a>
+<a href="#2648" id="2648">2648</a>
+<a href="#2649" id="2649">2649</a>
+<a href="#2650" id="2650">2650</a>
+<a href="#2651" id="2651">2651</a>
+<a href="#2652" id="2652">2652</a>
+<a href="#2653" id="2653">2653</a>
+<a href="#2654" id="2654">2654</a>
+<a href="#2655" id="2655">2655</a>
+<a href="#2656" id="2656">2656</a>
+<a href="#2657" id="2657">2657</a>
+<a href="#2658" id="2658">2658</a>
+<a href="#2659" id="2659">2659</a>
+<a href="#2660" id="2660">2660</a>
+<a href="#2661" id="2661">2661</a>
+<a href="#2662" id="2662">2662</a>
+<a href="#2663" id="2663">2663</a>
+<a href="#2664" id="2664">2664</a>
+<a href="#2665" id="2665">2665</a>
+<a href="#2666" id="2666">2666</a>
+<a href="#2667" id="2667">2667</a>
+<a href="#2668" id="2668">2668</a>
+<a href="#2669" id="2669">2669</a>
+<a href="#2670" id="2670">2670</a>
+<a href="#2671" id="2671">2671</a>
+<a href="#2672" id="2672">2672</a>
+<a href="#2673" id="2673">2673</a>
+<a href="#2674" id="2674">2674</a>
+<a href="#2675" id="2675">2675</a>
+<a href="#2676" id="2676">2676</a>
+<a href="#2677" id="2677">2677</a>
+<a href="#2678" id="2678">2678</a>
+<a href="#2679" id="2679">2679</a>
+<a href="#2680" id="2680">2680</a>
+<a href="#2681" id="2681">2681</a>
+<a href="#2682" id="2682">2682</a>
+<a href="#2683" id="2683">2683</a>
+<a href="#2684" id="2684">2684</a>
+<a href="#2685" id="2685">2685</a>
+<a href="#2686" id="2686">2686</a>
+<a href="#2687" id="2687">2687</a>
+<a href="#2688" id="2688">2688</a>
+<a href="#2689" id="2689">2689</a>
+<a href="#2690" id="2690">2690</a>
+<a href="#2691" id="2691">2691</a>
+<a href="#2692" id="2692">2692</a>
+<a href="#2693" id="2693">2693</a>
+<a href="#2694" id="2694">2694</a>
+<a href="#2695" id="2695">2695</a>
+<a href="#2696" id="2696">2696</a>
+<a href="#2697" id="2697">2697</a>
+<a href="#2698" id="2698">2698</a>
+<a href="#2699" id="2699">2699</a>
+<a href="#2700" id="2700">2700</a>
+<a href="#2701" id="2701">2701</a>
+<a href="#2702" id="2702">2702</a>
+<a href="#2703" id="2703">2703</a>
+<a href="#2704" id="2704">2704</a>
+<a href="#2705" id="2705">2705</a>
+<a href="#2706" id="2706">2706</a>
+<a href="#2707" id="2707">2707</a>
+<a href="#2708" id="2708">2708</a>
+<a href="#2709" id="2709">2709</a>
+<a href="#2710" id="2710">2710</a>
+<a href="#2711" id="2711">2711</a>
+<a href="#2712" id="2712">2712</a>
+<a href="#2713" id="2713">2713</a>
+<a href="#2714" id="2714">2714</a>
+<a href="#2715" id="2715">2715</a>
+<a href="#2716" id="2716">2716</a>
+<a href="#2717" id="2717">2717</a>
+<a href="#2718" id="2718">2718</a>
+<a href="#2719" id="2719">2719</a>
+<a href="#2720" id="2720">2720</a>
+<a href="#2721" id="2721">2721</a>
+<a href="#2722" id="2722">2722</a>
+<a href="#2723" id="2723">2723</a>
+<a href="#2724" id="2724">2724</a>
+<a href="#2725" id="2725">2725</a>
+<a href="#2726" id="2726">2726</a>
+<a href="#2727" id="2727">2727</a>
+<a href="#2728" id="2728">2728</a>
+<a href="#2729" id="2729">2729</a>
+<a href="#2730" id="2730">2730</a>
+<a href="#2731" id="2731">2731</a>
+<a href="#2732" id="2732">2732</a>
+<a href="#2733" id="2733">2733</a>
+<a href="#2734" id="2734">2734</a>
+<a href="#2735" id="2735">2735</a>
+<a href="#2736" id="2736">2736</a>
+<a href="#2737" id="2737">2737</a>
+<a href="#2738" id="2738">2738</a>
+<a href="#2739" id="2739">2739</a>
+<a href="#2740" id="2740">2740</a>
+<a href="#2741" id="2741">2741</a>
+<a href="#2742" id="2742">2742</a>
+<a href="#2743" id="2743">2743</a>
+<a href="#2744" id="2744">2744</a>
+<a href="#2745" id="2745">2745</a>
+<a href="#2746" id="2746">2746</a>
+<a href="#2747" id="2747">2747</a>
+<a href="#2748" id="2748">2748</a>
+<a href="#2749" id="2749">2749</a>
+<a href="#2750" id="2750">2750</a>
+<a href="#2751" id="2751">2751</a>
+<a href="#2752" id="2752">2752</a>
+<a href="#2753" id="2753">2753</a>
+<a href="#2754" id="2754">2754</a>
+<a href="#2755" id="2755">2755</a>
+<a href="#2756" id="2756">2756</a>
+<a href="#2757" id="2757">2757</a>
+<a href="#2758" id="2758">2758</a>
+<a href="#2759" id="2759">2759</a>
+<a href="#2760" id="2760">2760</a>
+<a href="#2761" id="2761">2761</a>
+<a href="#2762" id="2762">2762</a>
+<a href="#2763" id="2763">2763</a>
+<a href="#2764" id="2764">2764</a>
+<a href="#2765" id="2765">2765</a>
+<a href="#2766" id="2766">2766</a>
+<a href="#2767" id="2767">2767</a>
+<a href="#2768" id="2768">2768</a>
+<a href="#2769" id="2769">2769</a>
+<a href="#2770" id="2770">2770</a>
+<a href="#2771" id="2771">2771</a>
+<a href="#2772" id="2772">2772</a>
+<a href="#2773" id="2773">2773</a>
+<a href="#2774" id="2774">2774</a>
+<a href="#2775" id="2775">2775</a>
+<a href="#2776" id="2776">2776</a>
+<a href="#2777" id="2777">2777</a>
+<a href="#2778" id="2778">2778</a>
+<a href="#2779" id="2779">2779</a>
+<a href="#2780" id="2780">2780</a>
+<a href="#2781" id="2781">2781</a>
+<a href="#2782" id="2782">2782</a>
+<a href="#2783" id="2783">2783</a>
+<a href="#2784" id="2784">2784</a>
+<a href="#2785" id="2785">2785</a>
+<a href="#2786" id="2786">2786</a>
+<a href="#2787" id="2787">2787</a>
+<a href="#2788" id="2788">2788</a>
+<a href="#2789" id="2789">2789</a>
+<a href="#2790" id="2790">2790</a>
+<a href="#2791" id="2791">2791</a>
+<a href="#2792" id="2792">2792</a>
+<a href="#2793" id="2793">2793</a>
+<a href="#2794" id="2794">2794</a>
+<a href="#2795" id="2795">2795</a>
+<a href="#2796" id="2796">2796</a>
+<a href="#2797" id="2797">2797</a>
+<a href="#2798" id="2798">2798</a>
+<a href="#2799" id="2799">2799</a>
+<a href="#2800" id="2800">2800</a>
+<a href="#2801" id="2801">2801</a>
+<a href="#2802" id="2802">2802</a>
+<a href="#2803" id="2803">2803</a>
+<a href="#2804" id="2804">2804</a>
+<a href="#2805" id="2805">2805</a>
+<a href="#2806" id="2806">2806</a>
+<a href="#2807" id="2807">2807</a>
+<a href="#2808" id="2808">2808</a>
+<a href="#2809" id="2809">2809</a>
+<a href="#2810" id="2810">2810</a>
+<a href="#2811" id="2811">2811</a>
+<a href="#2812" id="2812">2812</a>
+<a href="#2813" id="2813">2813</a>
+<a href="#2814" id="2814">2814</a>
+<a href="#2815" id="2815">2815</a>
+<a href="#2816" id="2816">2816</a>
+<a href="#2817" id="2817">2817</a>
+<a href="#2818" id="2818">2818</a>
+<a href="#2819" id="2819">2819</a>
+<a href="#2820" id="2820">2820</a>
+<a href="#2821" id="2821">2821</a>
+<a href="#2822" id="2822">2822</a>
+<a href="#2823" id="2823">2823</a>
+<a href="#2824" id="2824">2824</a>
+<a href="#2825" id="2825">2825</a>
+<a href="#2826" id="2826">2826</a>
+<a href="#2827" id="2827">2827</a>
+<a href="#2828" id="2828">2828</a>
+<a href="#2829" id="2829">2829</a>
+<a href="#2830" id="2830">2830</a>
+<a href="#2831" id="2831">2831</a>
+<a href="#2832" id="2832">2832</a>
+<a href="#2833" id="2833">2833</a>
+<a href="#2834" id="2834">2834</a>
+<a href="#2835" id="2835">2835</a>
+<a href="#2836" id="2836">2836</a>
+<a href="#2837" id="2837">2837</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This is **private** utoipa codegen library and is not used alone.
 //!
 //! The library contains macro implementations for utoipa library. Content
@@ -2616,14 +2853,16 @@
 <span class="kw">use </span>ext::{PathOperationResolver, PathOperations, PathResolver};
 <span class="kw">use </span>openapi::OpenApi;
 <span class="kw">use </span>proc_macro::TokenStream;
-<span class="kw">use </span>proc_macro_error::{proc_macro_error, OptionExt, ResultExt};
+<span class="kw">use </span>proc_macro_error::{abort, proc_macro_error};
 <span class="kw">use </span>quote::{quote, ToTokens, TokenStreamExt};
 
-<span class="kw">use </span>proc_macro2::{Group, Ident, Punct, TokenStream <span class="kw">as </span>TokenStream2};
+<span class="kw">use </span>proc_macro2::{Group, Ident, Punct, Span, TokenStream <span class="kw">as </span>TokenStream2};
 <span class="kw">use </span>syn::{
+    bracketed,
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
-    DeriveInput, ExprPath, ItemFn, Lit, LitStr, Token,
+    token::Bracket,
+    DeriveInput, ExprPath, ItemFn, Lit, LitStr, Member, Token,
 };
 
 <span class="kw">mod </span>component;
@@ -2636,7 +2875,13 @@
 
 <span class="kw">use </span><span class="kw">crate</span>::path::{Path, PathAttr};
 
-<span class="kw">use </span><span class="self">self</span>::path::response::derive::{IntoResponses, ToResponse};
+<span class="kw">use </span><span class="self">self</span>::{
+    component::{
+        features::{<span class="self">self</span>, Feature},
+        ComponentSchema, ComponentSchemaProps, TypeTree,
+    },
+    path::response::derive::{IntoResponses, ToResponse},
+};
 
 <span class="attr">#[proc_macro_error]
 #[proc_macro_derive(ToSchema, attributes(schema, aliases))]
@@ -2681,7 +2926,12 @@
 /// * `as = ...` Can be used to define alternative path and name for the schema what will be used in
 ///   the OpenAPI. E.g _`as = path::to::Pet`_. This would make the schema appear in the generated
 ///   OpenAPI spec as _`path.to.Pet`_.
-///
+/// * `default` Can be used to populate default values on all fields using the struct&#39;s
+///   [`Default`](std::default::Default) implementation.
+/// * `deprecated` Can be used to mark all fields as deprecated in the generated OpenAPI spec but
+///   not in the code. If you&#39;d like to mark the fields as deprecated in the code as well use
+///   Rust&#39;s own `#[deprecated]` attribute instead.
+
 /// # Enum Optional Configuration Options for `#[schema(...)]`
 /// * `example = ...` Can be method reference or _`json!(...)`_.
 /// * `default = ...` Can be method reference or _`json!(...)`_.
@@ -2694,6 +2944,9 @@
 /// * `as = ...` Can be used to define alternative path and name for the schema what will be used in
 ///   the OpenAPI. E.g _`as = path::to::Pet`_. This would make the schema appear in the generated
 ///   OpenAPI spec as _`path.to.Pet`_.
+/// * `deprecated` Can be used to mark the enum as deprecated in the generated OpenAPI spec but
+///   not in the code. If you&#39;d like to mark the enum as deprecated in the code as well use
+///   Rust&#39;s own `#[deprecated]` attribute instead.
 ///
 /// # Enum Variant Optional Configuration Options for `#[schema(...)]`
 /// Supports all variant specific configuration options e.g. if variant is _`UnnamedStruct`_ then
@@ -2705,21 +2958,28 @@
 ///
 /// # Unnamed Field Struct Optional Configuration Options for `#[schema(...)]`
 /// * `example = ...` Can be method reference or _`json!(...)`_.
-/// * `default = ...` Can be method reference or _`json!(...)`_.
+/// * `default = ...` Can be method reference or _`json!(...)`_. If no value is specified, and the struct has
+///   only one field, the field&#39;s default value in the schema will be set from the struct&#39;s
+///   [`Default`](std::default::Default) implementation.
 /// * `format = ...` May either be variant of the [`KnownFormat`][known_format] enum, or otherwise
 ///   an open value as a string. By default the format is derived from the type of the property
 ///   according OpenApi spec.
 /// * `value_type = ...` Can be used to override default type derived from type of the field used in OpenAPI spec.
 ///   This is useful in cases where the default type does not correspond to the actual type e.g. when
 ///   any third-party types are used which are not [`ToSchema`][to_schema]s nor [`primitive` types][primitive].
-///    Value can be any Rust type what normally could be used to serialize to JSON or custom type such as _`Object`_.
-///    _`Object`_ will be rendered as generic OpenAPI object _(`type: object`)_.
+///   The value can be any Rust type what normally could be used to serialize to JSON or either virtual type _`Object`_
+///   or _`Value`_, or an alias defined using `#[aliases(..)]`.
+///   _`Object`_ will be rendered as generic OpenAPI object _(`type: object`)_.
+///   _`Value`_ will be rendered as any OpenAPI value (i.e. no `type` restriction).
 /// * `title = ...` Literal string value. Can be used to define title for struct in OpenAPI
 ///   document. Some OpenAPI code generation libraries also use this field as a name for the
 ///   struct.
 /// * `as = ...` Can be used to define alternative path and name for the schema what will be used in
 ///   the OpenAPI. E.g _`as = path::to::Pet`_. This would make the schema appear in the generated
 ///   OpenAPI spec as _`path.to.Pet`_.
+/// * `deprecated` Can be used to mark the field as deprecated in the generated OpenAPI spec but
+///   not in the code. If you&#39;d like to mark the field as deprecated in the code as well use
+///   Rust&#39;s own `#[deprecated]` attribute instead.
 ///
 /// # Named Fields Optional Configuration Options for `#[schema(...)]`
 /// * `example = ...` Can be method reference or _`json!(...)`_.
@@ -2734,10 +2994,14 @@
 /// * `value_type = ...` Can be used to override default type derived from type of the field used in OpenAPI spec.
 ///   This is useful in cases where the default type does not correspond to the actual type e.g. when
 ///   any third-party types are used which are not [`ToSchema`][to_schema]s nor [`primitive` types][primitive].
-///    Value can be any Rust type what normally could be used to serialize to JSON or custom type such as _`Object`_.
-///    _`Object`_ will be rendered as generic OpenAPI object _(`type: object`)_.
+///   The value can be any Rust type what normally could be used to serialize to JSON, or either virtual type _`Object`_
+///   or _`Value`_, or an alias defined using `#[aliases(..)]`.
+///   _`Object`_ will be rendered as generic OpenAPI object _(`type: object`)_.
+///   _`Value`_ will be rendered as any OpenAPI value (i.e. no `type` restriction).
 /// * `inline` If the type of this field implements [`ToSchema`][to_schema], then the schema definition
 ///   will be inlined. **warning:** Don&#39;t use this for recursive data types!
+/// * `required = ...` Can be used to enforce required status for the field. [See
+///   rules][derive@ToSchema#field-nullability-and-required-rules]
 /// * `nullable` Defines property is nullable (note this is different to non-required).
 /// * `rename = ...` Supports same syntax as _serde_ _`rename`_ attribute. Will rename field
 ///   accordingly. If both _serde_ `rename` and _schema_ _`rename`_ are defined __serde__ will take
@@ -2755,11 +3019,29 @@
 ///   be non-negative integer.
 /// * `min_items = ...` Can be used to define minimum items allowed for `array` fields. Value must
 ///   be non-negative integer.
-/// * `with_schema = ...` Use _`schema`_ created by provided function reference instead of the
+/// * `schema_with = ...` Use _`schema`_ created by provided function reference instead of the
 ///   default derived _`schema`_. The function must match to `fn() -&gt; Into&lt;RefOr&lt;Schema&gt;&gt;`. It does
 ///   not accept arguments and must return anything that can be converted into `RefOr&lt;Schema&gt;`.
+/// * `additional_properties = ...` Can be used to define free form types for maps such as
+///   [`HashMap`](std::collections::HashMap) and [`BTreeMap`](std::collections::BTreeMap).
+///   Free form type enables use of arbitrary types within map values.
+///   Supports formats _`additional_properties`_ and _`additional_properties = true`_.
+/// * `deprecated` Can be used to mark the field as deprecated in the generated OpenAPI spec but
+///   not in the code. If you&#39;d like to mark the field as deprecated in the code as well use
+///   Rust&#39;s own `#[deprecated]` attribute instead.
 ///
-/// # Xml attribute Configuration Options
+/// #### Field nullability and required rules
+///
+/// Field is considered _`required`_ if
+/// * it is not `Option` field
+/// * and it does not have _`skip_serializing_if`_ property
+/// * and it does not have _`serde_with`_ _[`double_option`](https://docs.rs/serde_with/latest/serde_with/rust/double_option/index.html)_
+/// * and it does not have default value provided with serde _`default`_
+///   attribute
+///
+/// Field is considered _`nullable`_ when field type is _`Option`_.
+///
+/// ## Xml attribute Configuration Options
 ///
 /// * `xml(name = &quot;...&quot;)` Will set name for property or type.
 /// * `xml(namespace = &quot;...&quot;)` Will set namespace for xml element which needs to be valid uri.
@@ -2780,6 +3062,9 @@
 /// * `rename = &quot;...&quot;` Supported **only** at the field or variant level.
 /// * `skip = &quot;...&quot;` Supported  **only** at the field or variant level.
 /// * `skip_serializing = &quot;...&quot;` Supported  **only** at the field or variant level.
+/// * `skip_deserializing = &quot;...&quot;` Supported  **only** at the field or variant level.
+/// * `skip_serializing_if = &quot;...&quot;` Supported  **only** at the field level.
+/// * `with = ...` Supported **only at field level.**
 /// * `tag = &quot;...&quot;` Supported at the container level. `tag` attribute works as a [discriminator field][discriminator] for an enum.
 /// * `content = &quot;...&quot;` Supported at the container level, allows [adjacently-tagged enums](https://serde.rs/enum-representations.html#adjacently-tagged).
 ///   This attribute requires that a `tag` is present, otherwise serde will trigger a compile-time
@@ -2794,6 +3079,10 @@
 /// **Note!** `tag` attribute has some limitations like it cannot be used
 /// with **unnamed field structs** and **tuple types**.  See more at
 /// [enum representation docs](https://serde.rs/enum-representations.html).
+///
+/// **Note!** `with` attribute is used in tandem with [serde_with](https://github.com/jonasbb/serde_with) to recognize
+/// _[`double_option`](https://docs.rs/serde_with/latest/serde_with/rust/double_option/index.html)_ from **field value**.
+/// _`double_option`_ is **only** supported attribute from _`serde_with`_ crate.
 ///
 /// ```rust
 /// # use serde::Serialize;
@@ -2901,7 +3190,7 @@
 /// where super type declares common code for type aliases.
 ///
 /// In this example we have common `Status` type which accepts one generic type. It is then defined
-/// with `#[aliases(...)]` that it is going to be used with [`std::string::String`] and [`i32`] values.
+/// with `#[aliases(...)]` that it is going to be used with [`String`](std::string::String) and [`i32`] values.
 /// The generic argument could also be another [`ToSchema`][to_schema] as well.
 /// ```rust
 /// # use utoipa::{ToSchema, OpenApi};
@@ -3216,7 +3505,7 @@
 /// * `operation` _**Must be first parameter!**_ Accepted values are known http operations such as
 ///   _`get, post, put, delete, head, options, connect, patch, trace`_.
 ///
-/// * `path = &quot;...&quot;` Must be OpenAPI format compatible str with arguments withing curly braces. E.g _`{id}`_
+/// * `path = &quot;...&quot;` Must be OpenAPI format compatible str with arguments within curly braces. E.g _`{id}`_
 ///
 /// * `operation_id = ...` Unique operation id for the endpoint. By default this is mapped to function name.
 ///   The operation_id can be any valid expression (e.g. string literals, macro invocations, variables) so long
@@ -3451,7 +3740,7 @@
 ///
 /// * `style = ...` Defines how parameters are serialized by [`ParameterStyle`][style]. Default values are based on _`in`_ attribute.
 ///
-/// * `explode` Defines whether new _`parameter=value`_ is created for each parameter withing _`object`_ or _`array`_.
+/// * `explode` Defines whether new _`parameter=value`_ is created for each parameter within _`object`_ or _`array`_.
 ///
 /// * `allow_reserved` Defines whether reserved characters _`:/?#[]@!$&amp;&#39;()*+,;=`_ is allowed within value.
 ///
@@ -3835,12 +4124,12 @@
 /// }
 ///```
 ///
-/// [in_enum]: utoipa/openapi/path/enum.ParameterIn.html
+/// [in_enum]: openapi/path/enum.ParameterIn.html
 /// [path]: trait.Path.html
 /// [to_schema]: trait.ToSchema.html
 /// [openapi]: derive.OpenApi.html
 /// [security]: openapi/security/struct.SecurityRequirement.html
-/// [security_schema]: openapi/security/struct.SecuritySchema.html
+/// [security_schema]: openapi/security/enum.SecurityScheme.html
 /// [primitive]: https://doc.rust-lang.org/std/primitive/index.html
 /// [into_params]: trait.IntoParams.html
 /// [style]: openapi/path/enum.ParameterStyle.html
@@ -3856,15 +4145,22 @@
     <span class="attr">#[cfg(any(
         feature = <span class="string">&quot;actix_extras&quot;</span>,
         feature = <span class="string">&quot;rocket_extras&quot;</span>,
-        feature = <span class="string">&quot;axum_extras&quot;
+        feature = <span class="string">&quot;axum_extras&quot;</span>,
+        feature = <span class="string">&quot;auto_into_responses&quot;
     </span>))]
     </span><span class="kw">let </span><span class="kw-2">mut </span>path_attribute = path_attribute;
 
     <span class="kw">let </span>ast_fn = syn::parse::&lt;ItemFn&gt;(item).unwrap_or_abort();
     <span class="kw">let </span>fn_name = <span class="kw-2">&amp;*</span>ast_fn.sig.ident.to_string();
 
-    <span class="kw">let </span><span class="kw-2">mut </span>resolved_operation = PathOperations::resolve_operation(<span class="kw-2">&amp;</span>ast_fn);
+    <span class="attr">#[cfg(feature = <span class="string">&quot;auto_into_responses&quot;</span>)]
+    </span>{
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(responses) = ext::auto_types::parse_fn_operation_responses(<span class="kw-2">&amp;</span>ast_fn) {
+            path_attribute.responses_from_into_responses(responses);
+        };
+    }
 
+    <span class="kw">let </span><span class="kw-2">mut </span>resolved_operation = PathOperations::resolve_operation(<span class="kw-2">&amp;</span>ast_fn);
     <span class="kw">let </span>resolved_path = PathOperations::resolve_path(
         <span class="kw-2">&amp;</span>resolved_operation
             .as_mut()
@@ -3886,12 +4182,24 @@
     </span>))]
     </span>{
         <span class="kw">use </span>ext::ArgumentResolver;
+        <span class="kw">use </span>path::parameter::Parameter;
         <span class="kw">let </span>args = resolved_path.as_mut().map(|path| mem::take(<span class="kw-2">&amp;mut </span>path.args));
-        <span class="kw">let </span>(arguments, into_params_types) =
-            PathOperations::resolve_arguments(<span class="kw-2">&amp;</span>ast_fn.sig.inputs, args);
+        <span class="kw">let </span>body = resolved_operation
+            .as_mut()
+            .map(|path| mem::take(<span class="kw-2">&amp;mut </span>path.body))
+            .unwrap_or_default();
 
-        path_attribute.update_parameters(arguments);
-        path_attribute.update_parameters_parameter_in(into_params_types);
+        <span class="kw">let </span>(arguments, into_params_types, body) =
+            PathOperations::resolve_arguments(<span class="kw-2">&amp;</span>ast_fn.sig.inputs, args, body);
+
+        <span class="kw">let </span>parameters = arguments
+            .into_iter()
+            .flatten()
+            .map(Parameter::from)
+            .chain(into_params_types.into_iter().flatten().map(Parameter::from));
+        path_attribute.update_parameters_ext(parameters);
+
+        path_attribute.update_request_body(body);
     }
 
     <span class="kw">let </span>path = Path::new(path_attribute, fn_name)
@@ -3899,7 +4207,8 @@
         .path(|| resolved_path.map(|path| path.path))
         .doc_comments(CommentAttributes::from_attributes(<span class="kw-2">&amp;</span>ast_fn.attrs).<span class="number">0</span>)
         .deprecated(ast_fn.attrs.iter().find_map(|attr| {
-            <span class="kw">if </span>!<span class="macro">matches!</span>(attr.path.get_ident(), <span class="prelude-val">Some</span>(ident) <span class="kw">if </span><span class="kw-2">&amp;*</span>ident.to_string() == <span class="string">&quot;deprecated&quot;</span>)
+
+            <span class="kw">if </span>!<span class="macro">matches!</span>(attr.path().get_ident(), <span class="prelude-val">Some</span>(ident) <span class="kw">if </span><span class="kw-2">&amp;*</span>ident.to_string() == <span class="string">&quot;deprecated&quot;</span>)
             {
                 <span class="prelude-val">None
             </span>} <span class="kw">else </span>{
@@ -3975,7 +4284,7 @@
 /// * `url = ...` Define the url for server. It can be literal string.
 /// * `description = ...` Define description for the server. It can be literal string.
 /// * `variables(...)` Can be used to define variables for the url.
-///     * `name = ...` Is the first argument withing parentheses. It must be literal string.
+///     * `name = ...` Is the first argument within parentheses. It must be literal string.
 ///     * `default = ...` Defines a default value for the variable if nothing else will be
 ///       provided. If _`enum_values`_ is defined the _`default`_ must be found within the enum
 ///       options. It can be a literal string.
@@ -4132,7 +4441,7 @@
 ///
 /// Typically path parameters need to be defined within [`#[utoipa::path(...params(...))]`][path_params] section
 /// for the endpoint. But this trait eliminates the need for that when [`struct`][struct]s are used to define parameters.
-/// Still [`std::primitive`] and [`String`] path parameters or [`tuple`] style path parameters need to be defined
+/// Still [`std::primitive`] and [`String`](std::string::String) path parameters or [`tuple`] style path parameters need to be defined
 /// within `params(...)` section if description or other than default configuration need to be given.
 ///
 /// You can use the Rust&#39;s own `#[deprecated]` attribute on field to mark it as
@@ -4167,13 +4476,31 @@
 ///    [`IntoParams::into_params()`](trait.IntoParams.html#tymethod.into_params).
 /// * `rename_all = ...` Can be provided to alternatively to the serde&#39;s `rename_all` attribute. Effectively provides same functionality.
 ///
+/// Use `names` to define name for single unnamed argument.
+/// ```rust
+/// # use utoipa::IntoParams;
+/// #
+/// #[derive(IntoParams)]
+/// #[into_params(names(&quot;id&quot;))]
+/// struct Id(u64);
+/// ```
+///
+/// Use `names` to define names for multiple unnamed arguments.
+/// ```rust
+/// # use utoipa::IntoParams;
+/// #
+/// #[derive(IntoParams)]
+/// #[into_params(names(&quot;id&quot;, &quot;name&quot;))]
+/// struct IdAndName(u64, String);
+/// ```
+///
 /// # IntoParams Field Attributes for `#[param(...)]`
 ///
 /// The following attributes are available for use in the `#[param(...)]` on struct fields:
 ///
 /// * `style = ...` Defines how the parameter is serialized by [`ParameterStyle`][style]. Default values are based on _`parameter_in`_ attribute.
 ///
-/// * `explode` Defines whether new _`parameter=value`_ pair is created for each parameter withing _`object`_ or _`array`_.
+/// * `explode` Defines whether new _`parameter=value`_ pair is created for each parameter within _`object`_ or _`array`_.
 ///
 /// * `allow_reserved` Defines whether reserved characters _`:/?#[]@!$&amp;&#39;()*+,;=`_ is allowed within value.
 ///
@@ -4183,8 +4510,10 @@
 /// * `value_type = ...` Can be used to override default type derived from type of the field used in OpenAPI spec.
 ///   This is useful in cases where the default type does not correspond to the actual type e.g. when
 ///   any third-party types are used which are not [`ToSchema`][to_schema]s nor [`primitive` types][primitive].
-///    Value can be any Rust type what normally could be used to serialize to JSON or custom type such as _`Object`_.
-///    _`Object`_ will be rendered as generic OpenAPI object.
+///   The value can be any Rust type what normally could be used to serialize to JSON, or either virtual type _`Object`_
+///   or _`Value`_, or an alias defined using `#[aliases(..)]`.
+///   _`Object`_ will be rendered as generic OpenAPI object _(`type: object`)_.
+///   _`Value`_ will be rendered as any OpenAPI value (i.e. no `type` restriction).
 ///
 /// * `inline` If set, the schema for this field&#39;s type needs to be a [`ToSchema`][to_schema], and
 ///   the schema definition will be inlined.
@@ -4203,6 +4532,9 @@
 ///    See configuration options at xml attributes of [`ToSchema`][to_schema_xml]
 ///
 /// * `nullable` Defines property is nullable (note this is different to non-required).
+///
+/// * `required = ...` Can be used to enforce required status for the parameter. [See
+///    rules][derive@IntoParams#field-nullability-and-required-rules]
 ///
 /// * `rename = ...` Can be provided to alternatively to the serde&#39;s `rename` attribute. Effectively provides same functionality.
 ///
@@ -4229,38 +4561,33 @@
 /// * `min_items = ...` Can be used to define minimum items allowed for `array` fields. Value must
 ///   be non-negative integer.
 ///
-/// * `with_schema = ...` Use _`schema`_ created by provided function reference instead of the
+/// * `schema_with = ...` Use _`schema`_ created by provided function reference instead of the
 ///   default derived _`schema`_. The function must match to `fn() -&gt; Into&lt;RefOr&lt;Schema&gt;&gt;`. It does
 ///   not accept arguments and must return anything that can be converted into `RefOr&lt;Schema&gt;`.
 ///
-/// **Note!** `#[into_params(...)]` is only supported on unnamed struct types to declare names for the arguments.
+/// * `additional_properties = ...` Can be used to define free form types for maps such as
+///   [`HashMap`](std::collections::HashMap) and [`BTreeMap`](std::collections::BTreeMap).
+///   Free form type enables use of arbitrary types within map values.
+///   Supports formats _`additional_properties`_ and _`additional_properties = true`_.
 ///
-/// Use `names` to define name for single unnamed argument.
-/// ```rust
-/// # use utoipa::IntoParams;
-/// #
-/// #[derive(IntoParams)]
-/// #[into_params(names(&quot;id&quot;))]
-/// struct Id(u64);
-/// ```
+/// #### Field nullability and required rules
 ///
-/// Use `names` to define names for multiple unnamed arguments.
-/// ```rust
-/// # use utoipa::IntoParams;
-/// #
-/// #[derive(IntoParams)]
-/// #[into_params(names(&quot;id&quot;, &quot;name&quot;))]
-/// struct IdAndName(u64, String);
-/// ```
+/// Same rules for nullability and required status apply for _`IntoParams`_ field attributes as for
+/// _`ToSchema`_ field attributes. [See the rules][`derive@ToSchema#field-nullability-and-required-rules`].
 ///
 /// # Partial `#[serde(...)]` attributes support
 ///
 /// IntoParams derive has partial support for [serde attributes]. These supported attributes will reflect to the
-/// generated OpenAPI doc. The following attributes are currently supported :
+/// generated OpenAPI doc. The following attributes are currently supported:
 ///
 /// * `rename_all = &quot;...&quot;` Supported at the container level.
 /// * `rename = &quot;...&quot;` Supported **only** at the field level.
 /// * `default` Supported at the container level and field level according to [serde attributes].
+/// * `skip_serializing_if = &quot;...&quot;` Supported  **only** at the field level.
+/// * `with = ...` Supported **only** at field level.
+/// * `skip_serializing = &quot;...&quot;` Supported  **only** at the field or variant level.
+/// * `skip_deserializing = &quot;...&quot;` Supported  **only** at the field or variant level.
+/// * `skip = &quot;...&quot;` Supported  **only** at the field level.
 ///
 /// Other _`serde`_ attributes will impact the serialization but will not be reflected on the generated OpenAPI doc.
 ///
@@ -4447,7 +4774,7 @@
 /// [path_params]: attr.path.html#params-attributes
 /// [struct]: https://doc.rust-lang.org/std/keyword.struct.html
 /// [style]: openapi/path/enum.ParameterStyle.html
-/// [in_enum]: utoipa/openapi/path/enum.ParameterIn.html
+/// [in_enum]: openapi/path/enum.ParameterIn.html
 /// [primitive]: https://doc.rust-lang.org/std/primitive/index.html
 /// [serde attributes]: https://serde.rs/attributes.html
 /// [to_schema_xml]: macro@ToSchema#xml-attribute-configuration-options
@@ -4876,6 +5203,96 @@
     into_responses.to_token_stream().into()
 }
 
+<span class="doccomment">/// Create OpenAPI Schema from arbitrary type.
+///
+/// This macro provides a quick way to render arbitrary types as OpenAPI Schema Objects. It
+/// supports two call formats.
+/// 1. With type only
+/// 2. With _`#[inline]`_ attribute to inline the referenced schemas.
+///
+/// By default the macro will create references `($ref)` for non primitive types like _`Pet`_.
+/// However when used with _`#[inline]`_ the non [`primitive`][primitive] type schemas will
+/// be inlined to the schema output.
+///
+/// ```rust
+/// # #[derive(utoipa::ToSchema)]
+/// # struct Pet {id: i32};
+/// let schema = utoipa::schema!(Vec&lt;Pet&gt;);
+///
+/// // with inline
+/// let schema = utoipa::schema!(#[inline] Vec&lt;Pet&gt;);
+/// ```
+///
+/// # Examples
+///
+/// _**Create vec of pets schema.**_
+/// ```rust
+/// # use utoipa::openapi::schema::{Schema, Array, Object, ObjectBuilder, SchemaFormat,
+/// # KnownFormat, SchemaType};
+/// # use utoipa::openapi::RefOr;
+/// #[derive(utoipa::ToSchema)]
+/// struct Pet {
+///     id: i32,
+///     name: String,
+/// }
+///
+/// let schema: RefOr&lt;Schema&gt; = utoipa::schema!(#[inline] Vec&lt;Pet&gt;).into();
+/// // will output
+/// let generated = RefOr::T(Schema::Array(
+///     Array::new(
+///         ObjectBuilder::new()
+///             .property(&quot;id&quot;, ObjectBuilder::new()
+///                 .schema_type(SchemaType::Integer)
+///                 .format(Some(SchemaFormat::KnownFormat(KnownFormat::Int32)))
+///                 .build())
+///             .required(&quot;id&quot;)
+///             .property(&quot;name&quot;, Object::with_type(SchemaType::String))
+///             .required(&quot;name&quot;)
+///     )
+/// ));
+/// # assert_json_diff::assert_json_eq!(serde_json::to_value(&amp;schema).unwrap(), serde_json::to_value(&amp;generated).unwrap());
+/// ```
+///
+/// [primitive]: https://doc.rust-lang.org/std/primitive/index.html
+</span><span class="attr">#[proc_macro]
+</span><span class="kw">pub fn </span>schema(input: TokenStream) -&gt; TokenStream {
+    <span class="kw">struct </span>Schema {
+        inline: bool,
+        ty: syn::Type,
+    }
+    <span class="kw">impl </span>Parse <span class="kw">for </span>Schema {
+        <span class="kw">fn </span>parse(input: ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
+            <span class="kw">let </span>inline = <span class="kw">if </span>input.peek(<span class="macro">Token!</span>[#]) &amp;&amp; input.peek2(Bracket) {
+                input.parse::&lt;<span class="macro">Token!</span>[#]&gt;()<span class="question-mark">?</span>;
+
+                <span class="kw">let </span>inline;
+                <span class="macro">bracketed!</span>(inline <span class="kw">in </span>input);
+                <span class="kw">let </span>i = inline.parse::&lt;Ident&gt;()<span class="question-mark">?</span>;
+                i == <span class="string">&quot;inline&quot;
+            </span>} <span class="kw">else </span>{
+                <span class="bool-val">false
+            </span>};
+
+            <span class="kw">let </span>ty = input.parse()<span class="question-mark">?</span>;
+
+            <span class="prelude-val">Ok</span>(<span class="self">Self </span>{ inline, ty })
+        }
+    }
+
+    <span class="kw">let </span>schema = <span class="macro">syn::parse_macro_input!</span>(input <span class="kw">as </span>Schema);
+    <span class="kw">let </span>type_tree = TypeTree::from_type(<span class="kw-2">&amp;</span>schema.ty);
+
+    <span class="kw">let </span>schema = ComponentSchema::new(ComponentSchemaProps {
+        features: <span class="prelude-val">Some</span>(<span class="macro">vec!</span>[Feature::Inline(schema.inline.into())]),
+        type_tree: <span class="kw-2">&amp;</span>type_tree,
+        deprecated: <span class="prelude-val">None</span>,
+        description: <span class="prelude-val">None</span>,
+        object_name: <span class="string">&quot;&quot;</span>,
+    });
+
+    schema.to_token_stream().into()
+}
+
 <span class="doccomment">/// Tokenizes slice or Vec of tokenizable items as array either with reference (`&amp;[...]`)
 /// or without correctly to OpenAPI JSON.
 </span><span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
@@ -4962,7 +5379,8 @@
     }
 }
 
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+<span class="attr">#[derive(PartialEq, Eq)]
+#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
 </span><span class="kw">enum </span>Required {
     True,
     False,
@@ -4975,6 +5393,13 @@
         } <span class="kw">else </span>{
             <span class="self">Self</span>::False
         }
+    }
+}
+
+<span class="kw">impl </span>From&lt;features::Required&gt; <span class="kw">for </span>Required {
+    <span class="kw">fn </span>from(value: features::Required) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>features::Required(required) = value;
+        <span class="kw">crate</span>::Required::from(required)
     }
 }
 
@@ -5049,6 +5474,10 @@
 </span><span class="kw">pub</span>(<span class="self">self</span>) <span class="kw">enum </span>AnyValue {
     String(TokenStream2),
     Json(TokenStream2),
+    DefaultTrait {
+        struct_ident: Ident,
+        field_ident: Member,
+    },
 }
 
 <span class="kw">impl </span>AnyValue {
@@ -5103,6 +5532,13 @@
             <span class="prelude-val">Ok</span>(AnyValue::Json(parse_utils::parse_json_token_stream(input)<span class="question-mark">?</span>))
         }
     }
+
+    <span class="kw">fn </span>new_default_trait(struct_ident: Ident, field_ident: Member) -&gt; <span class="self">Self </span>{
+        <span class="self">Self</span>::DefaultTrait {
+            struct_ident,
+            field_ident,
+        }
+    }
 }
 
 <span class="kw">impl </span>ToTokens <span class="kw">for </span>AnyValue {
@@ -5112,14 +5548,50 @@
                 <span class="macro">serde_json::json!</span>(#json)
             }),
             <span class="self">Self</span>::String(string) =&gt; string.to_tokens(tokens),
+            <span class="self">Self</span>::DefaultTrait {
+                struct_ident,
+                field_ident,
+            } =&gt; tokens.extend(<span class="macro">quote! </span>{
+                serde_json::to_value(#struct_ident::default().#field_ident).unwrap()
+            }),
         }
+    }
+}
+
+<span class="kw">trait </span>ResultExt&lt;T&gt; {
+    <span class="kw">fn </span>unwrap_or_abort(<span class="self">self</span>) -&gt; T;
+    <span class="kw">fn </span>expect_or_abort(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T;
+}
+
+<span class="kw">impl</span>&lt;T&gt; ResultExt&lt;T&gt; <span class="kw">for </span><span class="prelude-ty">Result</span>&lt;T, syn::Error&gt; {
+    <span class="kw">fn </span>unwrap_or_abort(<span class="self">self</span>) -&gt; T {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="prelude-val">Ok</span>(value) =&gt; value,
+            <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">abort!</span>(error.span(), <span class="macro">format!</span>(<span class="string">&quot;{error}&quot;</span>)),
+        }
+    }
+
+    <span class="kw">fn </span>expect_or_abort(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T {
+        <span class="kw">match </span><span class="self">self </span>{
+            <span class="prelude-val">Ok</span>(value) =&gt; value,
+            <span class="prelude-val">Err</span>(error) =&gt; <span class="macro">abort!</span>(error.span(), <span class="macro">format!</span>(<span class="string">&quot;{error}: {message}&quot;</span>)),
+        }
+    }
+}
+
+<span class="kw">trait </span>OptionExt&lt;T&gt; {
+    <span class="kw">fn </span>expect_or_abort(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T;
+}
+
+<span class="kw">impl</span>&lt;T&gt; OptionExt&lt;T&gt; <span class="kw">for </span><span class="prelude-ty">Option</span>&lt;T&gt; {
+    <span class="kw">fn </span>expect_or_abort(<span class="self">self</span>, message: <span class="kw-2">&amp;</span>str) -&gt; T {
+        <span class="self">self</span>.unwrap_or_else(|| <span class="macro">abort!</span>(Span::call_site(), message))
     }
 }
 
 <span class="doccomment">/// Parsing utils
 </span><span class="kw">mod </span>parse_utils {
     <span class="kw">use </span>proc_macro2::{Group, Ident, TokenStream};
-    <span class="kw">use </span>proc_macro_error::ResultExt;
     <span class="kw">use </span>syn::{
         parenthesized,
         parse::{Parse, ParseStream},
@@ -5127,6 +5599,8 @@
         token::Comma,
         Error, LitBool, LitStr, Token,
     };
+
+    <span class="kw">use </span><span class="kw">crate</span>::ResultExt;
 
     <span class="kw">pub fn </span>parse_next&lt;T: Sized&gt;(input: ParseStream, next: <span class="kw">impl </span>FnOnce() -&gt; T) -&gt; T {
         input

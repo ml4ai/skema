@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.0.3/src/component/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa_gen/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/schema.rs`."><title>schema.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa_gen/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -1557,175 +1557,21 @@
 <a href="#1557" id="1557">1557</a>
 <a href="#1558" id="1558">1558</a>
 <a href="#1559" id="1559">1559</a>
-<a href="#1560" id="1560">1560</a>
-<a href="#1561" id="1561">1561</a>
-<a href="#1562" id="1562">1562</a>
-<a href="#1563" id="1563">1563</a>
-<a href="#1564" id="1564">1564</a>
-<a href="#1565" id="1565">1565</a>
-<a href="#1566" id="1566">1566</a>
-<a href="#1567" id="1567">1567</a>
-<a href="#1568" id="1568">1568</a>
-<a href="#1569" id="1569">1569</a>
-<a href="#1570" id="1570">1570</a>
-<a href="#1571" id="1571">1571</a>
-<a href="#1572" id="1572">1572</a>
-<a href="#1573" id="1573">1573</a>
-<a href="#1574" id="1574">1574</a>
-<a href="#1575" id="1575">1575</a>
-<a href="#1576" id="1576">1576</a>
-<a href="#1577" id="1577">1577</a>
-<a href="#1578" id="1578">1578</a>
-<a href="#1579" id="1579">1579</a>
-<a href="#1580" id="1580">1580</a>
-<a href="#1581" id="1581">1581</a>
-<a href="#1582" id="1582">1582</a>
-<a href="#1583" id="1583">1583</a>
-<a href="#1584" id="1584">1584</a>
-<a href="#1585" id="1585">1585</a>
-<a href="#1586" id="1586">1586</a>
-<a href="#1587" id="1587">1587</a>
-<a href="#1588" id="1588">1588</a>
-<a href="#1589" id="1589">1589</a>
-<a href="#1590" id="1590">1590</a>
-<a href="#1591" id="1591">1591</a>
-<a href="#1592" id="1592">1592</a>
-<a href="#1593" id="1593">1593</a>
-<a href="#1594" id="1594">1594</a>
-<a href="#1595" id="1595">1595</a>
-<a href="#1596" id="1596">1596</a>
-<a href="#1597" id="1597">1597</a>
-<a href="#1598" id="1598">1598</a>
-<a href="#1599" id="1599">1599</a>
-<a href="#1600" id="1600">1600</a>
-<a href="#1601" id="1601">1601</a>
-<a href="#1602" id="1602">1602</a>
-<a href="#1603" id="1603">1603</a>
-<a href="#1604" id="1604">1604</a>
-<a href="#1605" id="1605">1605</a>
-<a href="#1606" id="1606">1606</a>
-<a href="#1607" id="1607">1607</a>
-<a href="#1608" id="1608">1608</a>
-<a href="#1609" id="1609">1609</a>
-<a href="#1610" id="1610">1610</a>
-<a href="#1611" id="1611">1611</a>
-<a href="#1612" id="1612">1612</a>
-<a href="#1613" id="1613">1613</a>
-<a href="#1614" id="1614">1614</a>
-<a href="#1615" id="1615">1615</a>
-<a href="#1616" id="1616">1616</a>
-<a href="#1617" id="1617">1617</a>
-<a href="#1618" id="1618">1618</a>
-<a href="#1619" id="1619">1619</a>
-<a href="#1620" id="1620">1620</a>
-<a href="#1621" id="1621">1621</a>
-<a href="#1622" id="1622">1622</a>
-<a href="#1623" id="1623">1623</a>
-<a href="#1624" id="1624">1624</a>
-<a href="#1625" id="1625">1625</a>
-<a href="#1626" id="1626">1626</a>
-<a href="#1627" id="1627">1627</a>
-<a href="#1628" id="1628">1628</a>
-<a href="#1629" id="1629">1629</a>
-<a href="#1630" id="1630">1630</a>
-<a href="#1631" id="1631">1631</a>
-<a href="#1632" id="1632">1632</a>
-<a href="#1633" id="1633">1633</a>
-<a href="#1634" id="1634">1634</a>
-<a href="#1635" id="1635">1635</a>
-<a href="#1636" id="1636">1636</a>
-<a href="#1637" id="1637">1637</a>
-<a href="#1638" id="1638">1638</a>
-<a href="#1639" id="1639">1639</a>
-<a href="#1640" id="1640">1640</a>
-<a href="#1641" id="1641">1641</a>
-<a href="#1642" id="1642">1642</a>
-<a href="#1643" id="1643">1643</a>
-<a href="#1644" id="1644">1644</a>
-<a href="#1645" id="1645">1645</a>
-<a href="#1646" id="1646">1646</a>
-<a href="#1647" id="1647">1647</a>
-<a href="#1648" id="1648">1648</a>
-<a href="#1649" id="1649">1649</a>
-<a href="#1650" id="1650">1650</a>
-<a href="#1651" id="1651">1651</a>
-<a href="#1652" id="1652">1652</a>
-<a href="#1653" id="1653">1653</a>
-<a href="#1654" id="1654">1654</a>
-<a href="#1655" id="1655">1655</a>
-<a href="#1656" id="1656">1656</a>
-<a href="#1657" id="1657">1657</a>
-<a href="#1658" id="1658">1658</a>
-<a href="#1659" id="1659">1659</a>
-<a href="#1660" id="1660">1660</a>
-<a href="#1661" id="1661">1661</a>
-<a href="#1662" id="1662">1662</a>
-<a href="#1663" id="1663">1663</a>
-<a href="#1664" id="1664">1664</a>
-<a href="#1665" id="1665">1665</a>
-<a href="#1666" id="1666">1666</a>
-<a href="#1667" id="1667">1667</a>
-<a href="#1668" id="1668">1668</a>
-<a href="#1669" id="1669">1669</a>
-<a href="#1670" id="1670">1670</a>
-<a href="#1671" id="1671">1671</a>
-<a href="#1672" id="1672">1672</a>
-<a href="#1673" id="1673">1673</a>
-<a href="#1674" id="1674">1674</a>
-<a href="#1675" id="1675">1675</a>
-<a href="#1676" id="1676">1676</a>
-<a href="#1677" id="1677">1677</a>
-<a href="#1678" id="1678">1678</a>
-<a href="#1679" id="1679">1679</a>
-<a href="#1680" id="1680">1680</a>
-<a href="#1681" id="1681">1681</a>
-<a href="#1682" id="1682">1682</a>
-<a href="#1683" id="1683">1683</a>
-<a href="#1684" id="1684">1684</a>
-<a href="#1685" id="1685">1685</a>
-<a href="#1686" id="1686">1686</a>
-<a href="#1687" id="1687">1687</a>
-<a href="#1688" id="1688">1688</a>
-<a href="#1689" id="1689">1689</a>
-<a href="#1690" id="1690">1690</a>
-<a href="#1691" id="1691">1691</a>
-<a href="#1692" id="1692">1692</a>
-<a href="#1693" id="1693">1693</a>
-<a href="#1694" id="1694">1694</a>
-<a href="#1695" id="1695">1695</a>
-<a href="#1696" id="1696">1696</a>
-<a href="#1697" id="1697">1697</a>
-<a href="#1698" id="1698">1698</a>
-<a href="#1699" id="1699">1699</a>
-<a href="#1700" id="1700">1700</a>
-<a href="#1701" id="1701">1701</a>
-<a href="#1702" id="1702">1702</a>
-<a href="#1703" id="1703">1703</a>
-<a href="#1704" id="1704">1704</a>
-<a href="#1705" id="1705">1705</a>
-<a href="#1706" id="1706">1706</a>
-<a href="#1707" id="1707">1707</a>
-<a href="#1708" id="1708">1708</a>
-<a href="#1709" id="1709">1709</a>
-<a href="#1710" id="1710">1710</a>
-<a href="#1711" id="1711">1711</a>
-<a href="#1712" id="1712">1712</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>std::borrow::Cow;
 
 <span class="kw">use </span>proc_macro2::{Ident, Span, TokenStream};
-<span class="kw">use </span>proc_macro_error::{abort, ResultExt};
-<span class="kw">use </span>quote::{quote, quote_spanned, ToTokens};
+<span class="kw">use </span>proc_macro_error::abort;
+<span class="kw">use </span>quote::{format_ident, quote, ToTokens};
 <span class="kw">use </span>syn::{
-    parse::Parse, punctuated::Punctuated, spanned::Spanned, token::Comma, Attribute, Data, Field,
-    Fields, FieldsNamed, FieldsUnnamed, GenericParam, Generics, Lifetime, LifetimeDef, Path,
-    PathArguments, Token, Variant, Visibility,
+    parse::Parse, parse_quote, punctuated::Punctuated, spanned::Spanned, token::Comma, Attribute,
+    Data, Field, Fields, FieldsNamed, FieldsUnnamed, GenericArgument, GenericParam, Generics,
+    Lifetime, LifetimeParam, Path, PathArguments, Token, Type, Variant, Visibility,
 };
 
 <span class="kw">use crate</span>::{
-    component::features::Rename,
+    component::features::{Example, Rename},
     doc_comment::CommentAttributes,
-    schema_type::{SchemaFormat, SchemaType},
-    Array, Deprecated,
+    Array, Deprecated, ResultExt,
 };
 
 <span class="kw">use </span><span class="self">self</span>::{
@@ -1743,10 +1589,10 @@
 <span class="kw">use super</span>::{
     features::{
         parse_features, pop_feature, pop_feature_as_inner, As, Feature, FeaturesExt, IntoInner,
-        IsInline, RenameAll, ToTokensExt, Validatable,
+        RenameAll, ToTokensExt,
     },
     serde::{<span class="self">self</span>, SerdeContainer, SerdeEnumRepr, SerdeValue},
-    FieldRename, GenericType, TypeTree, ValueType, VariantRename,
+    ComponentSchema, FieldRename, TypeTree, ValueType, VariantRename,
 };
 
 <span class="kw">mod </span>enum_variant;
@@ -1791,24 +1637,36 @@
 <span class="kw">impl </span>ToTokens <span class="kw">for </span>Schema&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">let </span>ident = <span class="self">self</span>.ident;
-        <span class="kw">let </span>variant = SchemaVariant::new(<span class="self">self</span>.data, <span class="self">self</span>.attributes, ident, <span class="self">self</span>.generics, <span class="prelude-val">None</span>);
+        <span class="kw">let </span>variant = SchemaVariant::new(
+            <span class="self">self</span>.data,
+            <span class="self">self</span>.attributes,
+            ident,
+            <span class="self">self</span>.generics,
+            <span class="prelude-val">None</span>::&lt;Vec&lt;(TypeTree, <span class="kw-2">&amp;</span>TypeTree)&gt;&gt;,
+        );
 
         <span class="kw">let </span>(<span class="kw">_</span>, ty_generics, where_clause) = <span class="self">self</span>.generics.split_for_impl();
 
         <span class="kw">let </span>life = <span class="kw-2">&amp;</span>Lifetime::new(Schema::TO_SCHEMA_LIFETIME, Span::call_site());
+
+        <span class="kw">let </span>schema_ty: Type = <span class="macro">parse_quote!</span>(#ident #ty_generics);
+        <span class="kw">let </span>schema_children = <span class="kw-2">&amp;*</span>TypeTree::from_type(<span class="kw-2">&amp;</span>schema_ty).children.unwrap_or_default();
 
         <span class="kw">let </span>aliases = <span class="self">self</span>.aliases.as_ref().map(|aliases| {
             <span class="kw">let </span>alias_schemas = aliases
                 .iter()
                 .map(|alias| {
                     <span class="kw">let </span>name = <span class="kw-2">&amp;*</span>alias.name;
+                    <span class="kw">let </span>alias_type_tree = TypeTree::from_type(<span class="kw-2">&amp;</span>alias.ty);
 
                     <span class="kw">let </span>variant = SchemaVariant::new(
                         <span class="self">self</span>.data,
                         <span class="self">self</span>.attributes,
                         ident,
                         <span class="self">self</span>.generics,
-                        <span class="prelude-val">Some</span>(alias),
+                        alias_type_tree
+                            .children
+                            .map(|children| children.into_iter().zip(schema_children)),
                     );
                     <span class="macro">quote! </span>{ (#name, #variant.into()) }
                 })
@@ -1827,12 +1685,17 @@
                 .map(|alias| {
                     <span class="kw">let </span>name = <span class="macro">quote::format_ident!</span>(<span class="string">&quot;{}&quot;</span>, alias.name);
                     <span class="kw">let </span>ty = <span class="kw-2">&amp;</span>alias.ty;
-                    <span class="kw">let </span>(<span class="kw">_</span>, alias_type_generics, <span class="kw">_</span>) = <span class="kw-2">&amp;</span>alias.generics.split_for_impl();
                     <span class="kw">let </span>vis = <span class="self">self</span>.vis;
-                    <span class="kw">let </span>name_generics = <span class="kw-2">&amp;</span>alias.get_name_lifetime_generics();
+                    <span class="kw">let </span>name_generics = alias.get_lifetimes().fold(
+                        Punctuated::&lt;<span class="kw-2">&amp;</span>GenericArgument, Comma&gt;::new(),
+                        |<span class="kw-2">mut </span>acc, lifetime| {
+                            acc.push(lifetime);
+                            acc
+                        },
+                    );
 
                     <span class="macro">quote! </span>{
-                        #vis <span class="kw">type </span>#name #name_generics = #ty #alias_type_generics;
+                        #vis <span class="kw">type </span>#name &lt; #name_generics &gt; = #ty;
                     }
                 })
                 .collect::&lt;TokenStream&gt;()
@@ -1844,7 +1707,7 @@
             ident.to_string()
         };
 
-        <span class="kw">let </span>schema_lifetime: GenericParam = LifetimeDef::new(life.clone()).into();
+        <span class="kw">let </span>schema_lifetime: GenericParam = LifetimeParam::new(life.clone()).into();
         <span class="kw">let </span>schema_generics = Generics {
             params: [schema_lifetime.clone()].into_iter().collect(),
             ..Default::default()
@@ -1868,7 +1731,8 @@
     }
 }
 
-<span class="kw">enum </span>SchemaVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+</span><span class="kw">enum </span>SchemaVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
     Named(NamedStructSchema&lt;<span class="lifetime">&#39;a</span>&gt;),
     Unnamed(UnnamedStructSchema&lt;<span class="lifetime">&#39;a</span>&gt;),
     Enum(EnumSchema&lt;<span class="lifetime">&#39;a</span>&gt;),
@@ -1876,12 +1740,12 @@
 }
 
 <span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SchemaVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">pub fn </span>new(
+    <span class="kw">pub fn </span>new&lt;I: IntoIterator&lt;Item = (TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;&gt;(
         data: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Data,
         attributes: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>[Attribute],
         ident: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Ident,
         generics: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Generics,
-        alias: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AliasSchema&gt;,
+        aliases: <span class="prelude-ty">Option</span>&lt;I&gt;,
     ) -&gt; SchemaVariant&lt;<span class="lifetime">&#39;a</span>&gt; {
         <span class="kw">match </span>data {
             Data::Struct(content) =&gt; <span class="kw">match </span><span class="kw-2">&amp;</span>content.fields {
@@ -1915,7 +1779,7 @@
                         fields: named,
                         generics: <span class="prelude-val">Some</span>(generics),
                         schema_as,
-                        alias,
+                        aliases: aliases.map(|aliases| aliases.into_iter().collect()),
                     })
                 }
                 Fields::Unit =&gt; <span class="self">Self</span>::Unit(UnitStructVariant),
@@ -1953,7 +1817,8 @@
     }
 }
 
-<span class="kw">struct </span>UnitStructVariant;
+<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
+</span><span class="kw">struct </span>UnitStructVariant;
 
 <span class="kw">impl </span>ToTokens <span class="kw">for </span>UnitStructVariant {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
@@ -1971,22 +1836,70 @@
     <span class="kw">pub </span>features: <span class="prelude-ty">Option</span>&lt;Vec&lt;Feature&gt;&gt;,
     <span class="kw">pub </span>rename_all: <span class="prelude-ty">Option</span>&lt;RenameAll&gt;,
     <span class="kw">pub </span>generics: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Generics&gt;,
-    <span class="kw">pub </span>alias: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>AliasSchema&gt;,
+    <span class="kw">pub </span>aliases: <span class="prelude-ty">Option</span>&lt;Vec&lt;(TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;)&gt;&gt;,
     <span class="kw">pub </span>schema_as: <span class="prelude-ty">Option</span>&lt;As&gt;,
+}
+
+<span class="kw">struct </span>NamedStructFieldOptions&lt;<span class="lifetime">&#39;a</span>&gt; {
+    property: Property,
+    rename_field_value: <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;a</span>, str&gt;&gt;,
+    required: <span class="prelude-ty">Option</span>&lt;<span class="kw">super</span>::features::Required&gt;,
+    is_option: bool,
 }
 
 <span class="kw">impl </span>NamedStructSchema&lt;<span class="lifetime">&#39;_</span>&gt; {
     <span class="kw">fn </span>field_as_schema_property&lt;R&gt;(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         field: <span class="kw-2">&amp;</span>Field,
-        yield_: <span class="kw">impl </span>FnOnce(Property&lt;<span class="lifetime">&#39;_</span>&gt;, <span class="prelude-ty">Option</span>&lt;Cow&lt;<span class="lifetime">&#39;_</span>, str&gt;&gt;) -&gt; R,
+        container_rules: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span>&lt;SerdeContainer&gt;,
+        yield_: <span class="kw">impl </span>FnOnce(NamedStructFieldOptions&lt;<span class="lifetime">&#39;_</span>&gt;) -&gt; R,
     ) -&gt; R {
         <span class="kw">let </span>type_tree = <span class="kw-2">&amp;mut </span>TypeTree::from_type(<span class="kw-2">&amp;</span>field.ty);
+        <span class="kw">if let </span><span class="prelude-val">Some</span>(aliases) = <span class="kw-2">&amp;</span><span class="self">self</span>.aliases {
+            <span class="kw">for </span>(new_generic, old_generic_matcher) <span class="kw">in </span>aliases.iter() {
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(generic_match) = type_tree.find_mut(old_generic_matcher) {
+                    <span class="kw-2">*</span>generic_match = new_generic.clone();
+                }
+            }
+        }
 
         <span class="kw">let </span><span class="kw-2">mut </span>field_features = field
             .attrs
             .parse_features::&lt;NamedFieldFeatures&gt;()
             .into_inner();
+
+        <span class="kw">let </span>schema_default = <span class="self">self
+            </span>.features
+            .as_ref()
+            .map(|features| features.iter().any(|f| <span class="macro">matches!</span>(f, Feature::Default(<span class="kw">_</span>))))
+            .unwrap_or(<span class="bool-val">false</span>);
+        <span class="kw">let </span>serde_default = container_rules
+            .as_ref()
+            .map(|rules| rules.default)
+            .unwrap_or(<span class="bool-val">false</span>);
+
+        <span class="kw">if </span>schema_default || serde_default {
+            <span class="kw">let </span>features_inner = field_features.get_or_insert(<span class="macro">vec!</span>[]);
+            <span class="kw">if </span>!features_inner
+                .iter()
+                .any(|f| <span class="macro">matches!</span>(f, Feature::Default(<span class="kw">_</span>)))
+            {
+                <span class="kw">let </span>field_ident = field.ident.as_ref().unwrap().to_owned();
+                <span class="kw">let </span>struct_ident = <span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.struct_name);
+                features_inner.push(Feature::Default(
+                    <span class="kw">crate</span>::features::Default::new_default_trait(struct_ident, field_ident.into()),
+                ));
+            }
+        }
+
+        <span class="comment">// check for Rust&#39;s `#[deprecated]` attribute first, then check for `deprecated` feature
+        </span><span class="kw">let </span>deprecated = <span class="kw">super</span>::get_deprecated(<span class="kw-2">&amp;</span>field.attrs).or_else(|| {
+            <span class="macro">pop_feature!</span>(field_features =&gt; Feature::Deprecated(<span class="kw">_</span>)).and_then(|feature| <span class="kw">match </span>feature
+            {
+                Feature::Deprecated(<span class="kw">_</span>) =&gt; <span class="prelude-val">Some</span>(Deprecated::True),
+                <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+            })
+        });
 
         <span class="kw">let </span>rename_field =
             <span class="macro">pop_feature!</span>(field_features =&gt; Feature::Rename(<span class="kw">_</span>)).and_then(|feature| <span class="kw">match </span>feature {
@@ -1994,26 +1907,6 @@
                 <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
             });
 
-        <span class="kw">if let </span><span class="prelude-val">Some</span>((generic_types, alias)) = <span class="self">self</span>.generics.zip(<span class="self">self</span>.alias) {
-            generic_types
-                .type_params()
-                .enumerate()
-                .for_each(|(index, generic)| {
-                    <span class="kw">if let </span><span class="prelude-val">Some</span>(generic_type) = type_tree.find_mut_by_ident(<span class="kw-2">&amp;</span>generic.ident) {
-                        generic_type.update(
-                            alias
-                                .generics
-                                .type_params()
-                                .nth(index)
-                                .unwrap()
-                                .ident
-                                .clone(),
-                        );
-                    };
-                })
-        }
-
-        <span class="kw">let </span>deprecated = <span class="kw">super</span>::get_deprecated(<span class="kw-2">&amp;</span>field.attrs);
         <span class="kw">let </span>value_type = field_features
             .as_mut()
             .and_then(|features| features.pop_value_type_feature());
@@ -2021,22 +1914,27 @@
             .as_ref()
             .map(|value_type| value_type.as_type_tree());
         <span class="kw">let </span>comments = CommentAttributes::from_attributes(<span class="kw-2">&amp;</span>field.attrs);
-        <span class="kw">let </span>with_schema = <span class="macro">pop_feature!</span>(field_features =&gt; Feature::SchemaWith(<span class="kw">_</span>));
+        <span class="kw">let </span>schema_with = <span class="macro">pop_feature!</span>(field_features =&gt; Feature::SchemaWith(<span class="kw">_</span>));
+        <span class="kw">let </span>required = <span class="macro">pop_feature_as_inner!</span>(field_features =&gt; Feature::Required(_v));
+        <span class="kw">let </span>type_tree = override_type_tree.as_ref().unwrap_or(type_tree);
+        <span class="kw">let </span>is_option = type_tree.is_option();
 
-        yield_(
-            <span class="kw">if let </span><span class="prelude-val">Some</span>(with_schema) = with_schema {
-                Property::WithSchema(with_schema)
+        yield_(NamedStructFieldOptions {
+            property: <span class="kw">if let </span><span class="prelude-val">Some</span>(schema_with) = schema_with {
+                Property::SchemaWith(schema_with)
             } <span class="kw">else </span>{
-                Property::Schema(SchemaProperty::new(
-                    override_type_tree.as_ref().unwrap_or(type_tree),
-                    <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>comments),
-                    field_features.as_ref(),
-                    deprecated.as_ref(),
-                    <span class="self">self</span>.struct_name.as_ref(),
-                ))
+                Property::Schema(ComponentSchema::new(<span class="kw">super</span>::ComponentSchemaProps {
+                    type_tree,
+                    features: field_features,
+                    description: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>comments),
+                    deprecated: deprecated.as_ref(),
+                    object_name: <span class="self">self</span>.struct_name.as_ref(),
+                }))
             },
-            rename_field,
-        )
+            rename_field_value: rename_field,
+            required,
+            is_option,
+        })
     }
 }
 
@@ -2065,42 +1963,58 @@
                         field_name = <span class="kw-2">&amp;</span>field_name[<span class="number">2</span>..];
                     }
 
-                    <span class="self">self</span>.field_as_schema_property(field, |property, rename| {
-                        <span class="kw">let </span>rename_to = field_rule
-                            .as_ref()
-                            .and_then(|field_rule| field_rule.rename.as_deref().map(Cow::Borrowed))
-                            .or(rename);
-                        <span class="kw">let </span>rename_all = container_rules
-                            .as_ref()
-                            .and_then(|container_rule| container_rule.rename_all.as_ref())
-                            .or_else(|| {
-                                <span class="self">self</span>.rename_all
-                                    .as_ref()
-                                    .map(|rename_all| rename_all.as_rename_rule())
+                    <span class="self">self</span>.field_as_schema_property(
+                        field,
+                        <span class="kw-2">&amp;</span>container_rules,
+                        |NamedStructFieldOptions {
+                             property,
+                             rename_field_value,
+                             required,
+                             is_option,
+                         }| {
+                            <span class="kw">let </span>rename_to = field_rule
+                                .as_ref()
+                                .and_then(|field_rule| {
+                                    field_rule.rename.as_deref().map(Cow::Borrowed)
+                                })
+                                .or(rename_field_value);
+                            <span class="kw">let </span>rename_all = container_rules
+                                .as_ref()
+                                .and_then(|container_rule| container_rule.rename_all.as_ref())
+                                .or_else(|| {
+                                    <span class="self">self</span>.rename_all
+                                        .as_ref()
+                                        .map(|rename_all| rename_all.as_rename_rule())
+                                });
+
+                            <span class="kw">let </span>name =
+                                <span class="kw">super</span>::rename::&lt;FieldRename&gt;(field_name, rename_to, rename_all)
+                                    .unwrap_or(Cow::Borrowed(field_name));
+
+                            object_tokens.extend(<span class="macro">quote! </span>{
+                                .property(#name, #property)
                             });
 
-                        <span class="kw">let </span>name = <span class="kw">super</span>::rename::&lt;FieldRename&gt;(field_name, rename_to, rename_all)
-                            .unwrap_or(Cow::Borrowed(field_name));
-
-                        object_tokens.extend(<span class="macro">quote! </span>{
-                            .property(#name, #property)
-                        });
-
-                        <span class="kw">if let </span>Property::Schema(schema_property) = property {
-                            <span class="kw">if </span>!schema_property.is_option()
-                                &amp;&amp; !<span class="kw">super</span>::is_default(
-                                    <span class="kw-2">&amp;</span>container_rules.as_ref(),
-                                    <span class="kw-2">&amp;</span>field_rule.as_ref(),
-                                )
-                            {
-                                object_tokens.extend(<span class="macro">quote! </span>{
-                                    .required(#name)
-                                })
+                            <span class="kw">if let </span>Property::Schema(<span class="kw">_</span>) = property {
+                                <span class="kw">if </span>(!is_option
+                                    &amp;&amp; <span class="kw">super</span>::is_required(
+                                        field_rule.as_ref(),
+                                        container_rules.as_ref(),
+                                    ))
+                                    || required
+                                        .as_ref()
+                                        .map(<span class="kw">super</span>::features::Required::is_true)
+                                        .unwrap_or(<span class="bool-val">false</span>)
+                                {
+                                    object_tokens.extend(<span class="macro">quote! </span>{
+                                        .required(#name)
+                                    })
+                                }
                             }
-                        }
 
-                        object_tokens
-                    })
+                            object_tokens
+                        },
+                    )
                 },
             );
 
@@ -2119,9 +2033,13 @@
             });
 
             <span class="kw">for </span>field <span class="kw">in </span>flatten_fields {
-                <span class="self">self</span>.field_as_schema_property(field, |schema_property, <span class="kw">_</span>| {
-                    tokens.extend(<span class="macro">quote! </span>{ .item(#schema_property) });
-                })
+                <span class="self">self</span>.field_as_schema_property(
+                    field,
+                    <span class="kw-2">&amp;</span>container_rules,
+                    |NamedStructFieldOptions { property, .. }| {
+                        tokens.extend(<span class="macro">quote! </span>{ .item(#property) });
+                    },
+                )
             }
 
             tokens.extend(<span class="macro">quote! </span>{
@@ -2163,8 +2081,6 @@
         <span class="kw">let </span>first_field = <span class="self">self</span>.fields.first().unwrap();
         <span class="kw">let </span>first_part = <span class="kw-2">&amp;</span>TypeTree::from_type(<span class="kw-2">&amp;</span>first_field.ty);
 
-        <span class="kw">let </span><span class="kw-2">mut </span>is_object = <span class="macro">matches!</span>(first_part.value_type, ValueType::Object);
-
         <span class="kw">let </span>all_fields_are_same = fields_len == <span class="number">1
             </span>|| <span class="self">self</span>.fields.iter().skip(<span class="number">1</span>).all(|field| {
                 <span class="kw">let </span>schema_part = <span class="kw-2">&amp;</span>TypeTree::from_type(<span class="kw-2">&amp;</span>field.ty);
@@ -2182,21 +2098,28 @@
                 .as_ref()
                 .map(|value_type| value_type.as_type_tree());
 
-            <span class="kw">if </span>override_type_tree.is_some() {
-                is_object = override_type_tree
-                    .as_ref()
-                    .map(|override_type| <span class="macro">matches!</span>(override_type.value_type, ValueType::Object))
-                    .unwrap_or_default();
+            <span class="kw">if </span>fields_len == <span class="number">1 </span>{
+                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref mut </span>features) = unnamed_struct_features {
+                    <span class="kw">if </span><span class="macro">pop_feature!</span>(features =&gt; Feature::Default(<span class="kw">crate</span>::features::Default(<span class="prelude-val">None</span>)))
+                        .is_some()
+                    {
+                        <span class="kw">let </span>struct_ident = <span class="macro">format_ident!</span>(<span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.struct_name);
+                        <span class="kw">let </span>index: syn::Index = <span class="number">0</span>.into();
+                        features.push(Feature::Default(
+                            <span class="kw">crate</span>::features::Default::new_default_trait(struct_ident, index.into()),
+                        ));
+                    }
+                }
             }
 
             tokens.extend(
-                SchemaProperty::new(
-                    override_type_tree.as_ref().unwrap_or(first_part),
-                    <span class="prelude-val">None</span>,
-                    unnamed_struct_features.as_ref(),
-                    deprecated.as_ref(),
-                    <span class="self">self</span>.struct_name.as_ref(),
-                )
+                ComponentSchema::new(<span class="kw">super</span>::ComponentSchemaProps {
+                    type_tree: override_type_tree.as_ref().unwrap_or(first_part),
+                    features: unnamed_struct_features,
+                    description: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>CommentAttributes::from_attributes(<span class="self">self</span>.attributes)),
+                    deprecated: deprecated.as_ref(),
+                    object_name: <span class="self">self</span>.struct_name.as_ref(),
+                })
                 .to_token_stream(),
             );
         } <span class="kw">else </span>{
@@ -2215,18 +2138,13 @@
             <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>attrs) = <span class="self">self</span>.features {
                 tokens.extend(attrs.to_token_stream())
             }
-        };
-
-        <span class="kw">let </span>description = CommentAttributes::from_attributes(<span class="self">self</span>.attributes).as_formatted_string();
-        <span class="kw">if </span>!description.is_empty() &amp;&amp; !is_object {
-            tokens.extend(<span class="macro">quote! </span>{
-                .description(<span class="prelude-val">Some</span>(#description))
-            })
         }
 
         <span class="kw">if </span>fields_len &gt; <span class="number">1 </span>{
+            <span class="kw">let </span>description =
+                CommentAttributes::from_attributes(<span class="self">self</span>.attributes).as_formatted_string();
             tokens.extend(
-                <span class="macro">quote! </span>{ .to_array_builder().max_items(<span class="prelude-val">Some</span>(#fields_len)).min_items(<span class="prelude-val">Some</span>(#fields_len)) },
+                <span class="macro">quote! </span>{ .to_array_builder().description(<span class="prelude-val">Some</span>(#description)).max_items(<span class="prelude-val">Some</span>(#fields_len)).min_items(<span class="prelude-val">Some</span>(#fields_len)) },
             )
         }
     }
@@ -2253,7 +2171,7 @@
                 attributes
                     .iter()
                     .find_map(|attribute| {
-                        <span class="kw">if </span>attribute.path.is_ident(<span class="string">&quot;repr&quot;</span>) {
+                        <span class="kw">if </span>attribute.path().is_ident(<span class="string">&quot;repr&quot;</span>) {
                             attribute.parse_args::&lt;syn::TypePath&gt;().ok()
                         } <span class="kw">else </span>{
                             <span class="prelude-val">None
@@ -2524,7 +2442,7 @@
                     .map(|variant| (Cow::Borrowed(tag.as_str()), variant)),
             )
             .to_token_stream(),
-            SerdeEnumRepr::Untagged =&gt; UntaggedEnum.to_token_stream(),
+            SerdeEnumRepr::Untagged =&gt; UntaggedEnum::new().to_token_stream(),
             SerdeEnumRepr::AdjacentlyTagged { tag, content } =&gt; {
                 AdjacentlyTaggedEnum::new(enum_values.into_iter().map(|variant| {
                     (
@@ -2580,9 +2498,12 @@
                     rename_all,
                 );
 
+                <span class="kw">let </span>example = <span class="macro">pop_feature!</span>(named_struct_features =&gt; Feature::Example(<span class="kw">_</span>));
+
                 <span class="self">self</span>::enum_variant::Variant::to_tokens(<span class="kw-2">&amp;</span>ObjectVariant {
                     name: variant_name.unwrap_or(Cow::Borrowed(<span class="kw-2">&amp;</span>name)),
                     title: title_features.first().map(ToTokens::to_token_stream),
+                    example: example.as_ref().map(ToTokens::to_token_stream),
                     item: NamedStructSchema {
                         struct_name: Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.enum_name),
                         attributes: <span class="kw-2">&amp;</span>variant.attrs,
@@ -2590,7 +2511,7 @@
                         features: <span class="prelude-val">Some</span>(named_struct_features),
                         fields: <span class="kw-2">&amp;</span>named_fields.named,
                         generics: <span class="prelude-val">None</span>,
-                        alias: <span class="prelude-val">None</span>,
+                        aliases: <span class="prelude-val">None</span>,
                         schema_as: <span class="prelude-val">None</span>,
                     },
                 })
@@ -2610,9 +2531,12 @@
                     rename_all,
                 );
 
+                <span class="kw">let </span>example = <span class="macro">pop_feature!</span>(unnamed_struct_features =&gt; Feature::Example(<span class="kw">_</span>));
+
                 <span class="self">self</span>::enum_variant::Variant::to_tokens(<span class="kw-2">&amp;</span>ObjectVariant {
                     name: variant_name.unwrap_or(Cow::Borrowed(<span class="kw-2">&amp;</span>name)),
                     title: title_features.first().map(ToTokens::to_token_stream),
+                    example: example.as_ref().map(ToTokens::to_token_stream),
                     item: UnnamedStructSchema {
                         struct_name: Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.enum_name),
                         attributes: <span class="kw-2">&amp;</span>variant.attrs,
@@ -2628,7 +2552,8 @@
                         <span class="prelude-val">Ok</span>(<span class="macro">parse_features!</span>(
                             input <span class="kw">as </span><span class="kw">super</span>::features::Title,
                             RenameAll,
-                            Rename
+                            Rename,
+                            Example
                         ))
                     })
                     .unwrap_or_default();
@@ -2641,6 +2566,13 @@
                     rename_all,
                 );
 
+                <span class="kw">let </span>example: <span class="prelude-ty">Option</span>&lt;Feature&gt; = <span class="macro">pop_feature!</span>(unit_features =&gt; Feature::Example(<span class="kw">_</span>));
+
+                <span class="kw">let </span>description =
+                    CommentAttributes::from_attributes(<span class="kw-2">&amp;</span>variant.attrs).as_formatted_string();
+                <span class="kw">let </span>description =
+                    (!description.is_empty()).then(|| Feature::Description(description.into()));
+
                 <span class="comment">// Unit variant is just simple enum with single variant.
                 </span>Enum::new([SimpleEnumVariant {
                     value: variant_name
@@ -2648,6 +2580,8 @@
                         .to_token_stream(),
                 }])
                 .with_title(title.as_ref().map(ToTokens::to_token_stream))
+                .with_example(example.as_ref().map(ToTokens::to_token_stream))
+                .with_description(description.as_ref().map(ToTokens::to_token_stream))
                 .to_token_stream()
             }
         }
@@ -2671,7 +2605,7 @@
                     features: <span class="prelude-val">Some</span>(named_struct_features),
                     fields: <span class="kw-2">&amp;</span>named_fields.named,
                     generics: <span class="prelude-val">None</span>,
-                    alias: <span class="prelude-val">None</span>,
+                    aliases: <span class="prelude-val">None</span>,
                     schema_as: <span class="prelude-val">None</span>,
                 }
                 .to_token_stream()
@@ -2693,20 +2627,14 @@
                 .to_token_stream()
             }
             Fields::Unit =&gt; {
-                <span class="kw">let </span>unnamed_struct_features = variant
-                    .attrs
-                    .parse_features::&lt;EnumUnnamedFieldVariantFeatures&gt;()
-                    .into_inner()
+                <span class="kw">let </span><span class="kw-2">mut </span>unit_features =
+                    features::parse_schema_features_with(<span class="kw-2">&amp;</span>variant.attrs, |input| {
+                        <span class="prelude-val">Ok</span>(<span class="macro">parse_features!</span>(input <span class="kw">as </span><span class="kw">super</span>::features::Title))
+                    })
                     .unwrap_or_default();
+                <span class="kw">let </span>title = <span class="macro">pop_feature!</span>(unit_features =&gt; Feature::Title(<span class="kw">_</span>));
 
-                UnnamedStructSchema {
-                    struct_name: Cow::Borrowed(<span class="kw-2">&amp;*</span><span class="self">self</span>.enum_name),
-                    attributes: <span class="kw-2">&amp;</span>variant.attrs,
-                    features: <span class="prelude-val">Some</span>(unnamed_struct_features),
-                    fields: <span class="kw-2">&amp;</span>Punctuated::default(),
-                    schema_as: <span class="prelude-val">None</span>,
-                }
-                .to_token_stream()
+                UntaggedEnum::with_title(title).to_token_stream()
             }
         }
     }
@@ -2745,7 +2673,7 @@
                     features: <span class="prelude-val">Some</span>(named_struct_features),
                     fields: <span class="kw-2">&amp;</span>named_fields.named,
                     generics: <span class="prelude-val">None</span>,
-                    alias: <span class="prelude-val">None</span>,
+                    aliases: <span class="prelude-val">None</span>,
                     schema_as: <span class="prelude-val">None</span>,
                 };
                 <span class="kw">let </span>title = title_features.first().map(ToTokens::to_token_stream);
@@ -2897,7 +2825,7 @@
                     features: <span class="prelude-val">Some</span>(named_struct_features),
                     fields: <span class="kw-2">&amp;</span>named_fields.named,
                     generics: <span class="prelude-val">None</span>,
-                    alias: <span class="prelude-val">None</span>,
+                    aliases: <span class="prelude-val">None</span>,
                     schema_as: <span class="prelude-val">None</span>,
                 };
                 <span class="kw">let </span>title = title_features.first().map(ToTokens::to_token_stream);
@@ -3078,258 +3006,16 @@
 </span><span class="kw">struct </span>TypeTuple&lt;<span class="lifetime">&#39;a</span>, T&gt;(T, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Ident);
 
 <span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">enum </span>Property&lt;<span class="lifetime">&#39;a</span>&gt; {
-    Schema(SchemaProperty&lt;<span class="lifetime">&#39;a</span>&gt;),
-    WithSchema(Feature),
+</span><span class="kw">enum </span>Property {
+    Schema(ComponentSchema),
+    SchemaWith(Feature),
 }
 
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>Property&lt;<span class="lifetime">&#39;_</span>&gt; {
+<span class="kw">impl </span>ToTokens <span class="kw">for </span>Property {
     <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
         <span class="kw">match </span><span class="self">self </span>{
             <span class="self">Self</span>::Schema(schema) =&gt; schema.to_tokens(tokens),
-            <span class="self">Self</span>::WithSchema(with_schema) =&gt; with_schema.to_tokens(tokens),
-        }
-    }
-}
-
-<span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
-</span><span class="kw">struct </span>SchemaProperty&lt;<span class="lifetime">&#39;a</span>&gt; {
-    type_tree: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;,
-    comments: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommentAttributes&gt;,
-    features: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;Feature&gt;&gt;,
-    deprecated: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Deprecated&gt;,
-    object_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-}
-
-<span class="kw">impl</span>&lt;<span class="lifetime">&#39;a</span>&gt; SchemaProperty&lt;<span class="lifetime">&#39;a</span>&gt; {
-    <span class="kw">fn </span>new(
-        type_tree: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>TypeTree&lt;<span class="lifetime">&#39;a</span>&gt;,
-        comments: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>CommentAttributes&gt;,
-        features: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Vec&lt;Feature&gt;&gt;,
-        deprecated: <span class="prelude-ty">Option</span>&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>Deprecated&gt;,
-        object_name: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>str,
-    ) -&gt; <span class="self">Self </span>{
-        <span class="self">Self </span>{
-            type_tree,
-            comments,
-            features,
-            deprecated,
-            object_name,
-        }
-    }
-
-    <span class="doccomment">/// Check whether property is required or not
-    </span><span class="kw">fn </span>is_option(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
-        <span class="macro">matches!</span>(<span class="self">self</span>.type_tree.generic_type, <span class="prelude-val">Some</span>(GenericType::Option))
-    }
-
-    <span class="kw">fn </span>get_description(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TokenStream&gt; {
-        <span class="self">self</span>.comments
-            .and_then(|comments| {
-                <span class="kw">let </span>comment = CommentAttributes::as_formatted_string(comments);
-                <span class="kw">if </span>comment.is_empty() {
-                    <span class="prelude-val">None
-                </span>} <span class="kw">else </span>{
-                    <span class="prelude-val">Some</span>(comment)
-                }
-            })
-            .map(|description| <span class="macro">quote! </span>{ .description(<span class="prelude-val">Some</span>(#description)) })
-    }
-
-    <span class="kw">fn </span>get_deprecated(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;TokenStream&gt; {
-        <span class="self">self</span>.deprecated
-            .map(|deprecated| <span class="macro">quote! </span>{ .deprecated(<span class="prelude-val">Some</span>(#deprecated)) })
-    }
-}
-
-<span class="kw">impl </span>ToTokens <span class="kw">for </span>SchemaProperty&lt;<span class="lifetime">&#39;_</span>&gt; {
-    <span class="kw">fn </span>to_tokens(<span class="kw-2">&amp;</span><span class="self">self</span>, tokens: <span class="kw-2">&amp;mut </span>TokenStream) {
-        <span class="kw">match </span><span class="self">self</span>.type_tree.generic_type {
-            <span class="prelude-val">Some</span>(GenericType::Map) =&gt; {
-                <span class="kw">let </span>empty_features = Vec::new();
-                <span class="kw">let </span><span class="kw-2">mut </span>features = <span class="self">self</span>.features.unwrap_or(<span class="kw-2">&amp;</span>empty_features).clone();
-                <span class="kw">let </span>example = features.pop_by(|feature| <span class="macro">matches!</span>(feature, Feature::Example(<span class="kw">_</span>)));
-
-                <span class="kw">let </span>deprecated = <span class="self">self</span>.get_deprecated();
-                <span class="kw">let </span>description = <span class="self">self</span>.get_description();
-                <span class="comment">// Maps are treated as generic objects with no named properties and
-                // additionalProperties denoting the type
-                // maps have 2 child schemas and we are interested the second one of them
-                // which is used to determine the additional properties
-                </span><span class="kw">let </span>schema_property = SchemaProperty {
-                    type_tree: <span class="self">self
-                        </span>.type_tree
-                        .children
-                        .as_ref()
-                        .expect(<span class="string">&quot;SchemaProperty Map type should have children&quot;</span>)
-                        .iter()
-                        .nth(<span class="number">1</span>)
-                        .expect(<span class="string">&quot;SchemaProperty Map type should have 2 child&quot;</span>),
-                    comments: <span class="prelude-val">None</span>,
-                    features: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>features),
-                    deprecated: <span class="prelude-val">None</span>,
-                    object_name: <span class="self">self</span>.object_name,
-                };
-
-                tokens.extend(<span class="macro">quote! </span>{
-                    utoipa::openapi::ObjectBuilder::new()
-                        .additional_properties(<span class="prelude-val">Some</span>(#schema_property))
-                        #description
-                        #deprecated
-                });
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>example) = example {
-                    tokens.extend(example.to_token_stream());
-                }
-            }
-            <span class="prelude-val">Some</span>(GenericType::Vec) =&gt; {
-                <span class="kw">let </span>empty_features = Vec::new();
-                <span class="kw">let </span><span class="kw-2">mut </span>features = <span class="self">self</span>.features.unwrap_or(<span class="kw-2">&amp;</span>empty_features).clone();
-                <span class="kw">let </span>example = <span class="macro">pop_feature!</span>(features =&gt; Feature::Example(<span class="kw">_</span>));
-                <span class="kw">let </span>xml = features.extract_vec_xml_feature(<span class="self">self</span>.type_tree);
-                <span class="kw">let </span>max_items = <span class="macro">pop_feature!</span>(features =&gt; Feature::MaxItems(<span class="kw">_</span>));
-                <span class="kw">let </span>min_items = <span class="macro">pop_feature!</span>(features =&gt; Feature::MinItems(<span class="kw">_</span>));
-
-                <span class="kw">let </span>deprecated = <span class="self">self</span>.get_deprecated();
-                <span class="kw">let </span>description = <span class="self">self</span>.get_description();
-
-                <span class="kw">let </span>schema_property = SchemaProperty {
-                    type_tree: <span class="self">self
-                        </span>.type_tree
-                        .children
-                        .as_ref()
-                        .expect(<span class="string">&quot;SchemaProperty Vec should have children&quot;</span>)
-                        .iter()
-                        .next()
-                        .expect(<span class="string">&quot;SchemaProperty Vec should have 1 child&quot;</span>),
-                    comments: <span class="prelude-val">None</span>,
-                    features: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>features),
-                    deprecated: <span class="prelude-val">None</span>,
-                    object_name: <span class="self">self</span>.object_name,
-                };
-
-                <span class="kw">let </span>validate = |feature: <span class="kw-2">&amp;</span>Feature| {
-                    <span class="kw">let </span>type_path = <span class="kw-2">&amp;**</span><span class="self">self</span>.type_tree.path.as_ref().unwrap();
-                    <span class="kw">let </span>schema_type = SchemaType(type_path);
-                    feature.validate(<span class="kw-2">&amp;</span>schema_type, <span class="self">self</span>.type_tree);
-                };
-
-                tokens.extend(<span class="macro">quote! </span>{
-                    utoipa::openapi::schema::ArrayBuilder::new()
-                        .items(#schema_property)
-                        #deprecated
-                        #description
-                });
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(<span class="kw-2">ref </span>example) = example {
-                    tokens.extend(example.to_token_stream());
-                }
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(vec_xml) = xml.as_ref() {
-                    tokens.extend(vec_xml.to_token_stream());
-                };
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(max_items) = max_items {
-                    validate(<span class="kw-2">&amp;</span>max_items);
-                    tokens.extend(max_items.to_token_stream())
-                }
-
-                <span class="kw">if let </span><span class="prelude-val">Some</span>(min_items) = min_items {
-                    validate(<span class="kw-2">&amp;</span>min_items);
-                    tokens.extend(min_items.to_token_stream())
-                }
-            }
-            <span class="prelude-val">Some</span>(GenericType::Option)
-            | <span class="prelude-val">Some</span>(GenericType::Cow)
-            | <span class="prelude-val">Some</span>(GenericType::Box)
-            | <span class="prelude-val">Some</span>(GenericType::RefCell) =&gt; {
-                <span class="kw">let </span>schema_property = SchemaProperty {
-                    type_tree: <span class="self">self
-                        </span>.type_tree
-                        .children
-                        .as_ref()
-                        .expect(<span class="string">&quot;SchemaProperty generic container type should have children&quot;</span>)
-                        .iter()
-                        .next()
-                        .expect(<span class="string">&quot;SchemaProperty generic container type should have 1 child&quot;</span>),
-                    comments: <span class="self">self</span>.comments,
-                    features: <span class="self">self</span>.features,
-                    deprecated: <span class="self">self</span>.deprecated,
-                    object_name: <span class="self">self</span>.object_name,
-                };
-
-                tokens.extend(schema_property.into_token_stream())
-            }
-            <span class="prelude-val">None </span>=&gt; {
-                <span class="kw">let </span>type_tree = <span class="self">self</span>.type_tree;
-
-                <span class="kw">match </span>type_tree.value_type {
-                    ValueType::Primitive =&gt; {
-                        <span class="kw">let </span>type_path = <span class="kw-2">&amp;**</span>type_tree.path.as_ref().unwrap();
-                        <span class="kw">let </span>schema_type = SchemaType(type_path);
-
-                        tokens.extend(<span class="macro">quote! </span>{
-                            utoipa::openapi::ObjectBuilder::new().schema_type(#schema_type)
-                        });
-
-                        <span class="kw">let </span>format: SchemaFormat = (type_path).into();
-                        <span class="kw">if </span>format.is_known_format() {
-                            tokens.extend(<span class="macro">quote! </span>{
-                                .format(<span class="prelude-val">Some</span>(#format))
-                            })
-                        }
-
-                        tokens.extend(<span class="self">self</span>.get_description());
-                        tokens.extend(<span class="self">self</span>.get_deprecated());
-
-                        <span class="kw">if let </span><span class="prelude-val">Some</span>(features) = <span class="self">self</span>.features {
-                            <span class="kw">for </span>feature <span class="kw">in
-                                </span>features.iter().filter(|feature| feature.is_validatable())
-                            {
-                                feature.validate(<span class="kw-2">&amp;</span>schema_type, type_tree);
-                            }
-                            tokens.extend(features.to_token_stream())
-                        }
-                    }
-                    ValueType::Object =&gt; {
-                        <span class="kw">let </span>is_inline = <span class="self">self
-                            </span>.features
-                            .map(|features| features.is_inline())
-                            .unwrap_or_default();
-
-                        <span class="kw">if </span>type_tree.is_object() {
-                            <span class="kw">let </span>deprecated = <span class="self">self</span>.get_deprecated();
-                            <span class="kw">let </span>description = <span class="self">self</span>.get_description();
-
-                            tokens.extend(<span class="macro">quote! </span>{ utoipa::openapi::ObjectBuilder::new()#description #deprecated })
-                        } <span class="kw">else </span>{
-                            <span class="kw">let </span>type_path = <span class="kw-2">&amp;**</span>type_tree.path.as_ref().unwrap();
-                            <span class="kw">if </span>is_inline {
-                                tokens.extend(<span class="macro">quote_spanned! </span>{type_path.span() =&gt;
-                                    &lt;#type_path <span class="kw">as </span>utoipa::ToSchema&gt;::schema().<span class="number">1
-                                </span>});
-                            } <span class="kw">else </span>{
-                                <span class="kw">let </span><span class="kw-2">mut </span>name = Cow::Owned(format_path_ref(type_path));
-                                <span class="kw">if </span>name == <span class="string">&quot;Self&quot; </span>{
-                                    name = Cow::Borrowed(<span class="self">self</span>.object_name);
-                                }
-                                tokens.extend(<span class="macro">quote! </span>{
-                                    utoipa::openapi::Ref::from_schema_name(#name)
-                                })
-                            }
-                        }
-                    }
-                    <span class="comment">// TODO support for tuple types
-                    </span>ValueType::Tuple =&gt; {
-                        <span class="comment">// Detect unit type ()
-                        </span><span class="kw">if </span>type_tree.children.is_none() {
-                            tokens.extend(<span class="macro">quote! </span>{
-                                utoipa::openapi::schema::empty()
-                            })
-                        };
-                    }
-                }
-            }
+            <span class="self">Self</span>::SchemaWith(schema_with) =&gt; schema_with.to_tokens(tokens),
         }
     }
 }
@@ -3372,42 +3058,50 @@
 <span class="attr">#[cfg_attr(feature = <span class="string">&quot;debug&quot;</span>, derive(Debug))]
 </span><span class="kw">pub struct </span>AliasSchema {
     <span class="kw">pub </span>name: String,
-    <span class="kw">pub </span>ty: Ident,
-    <span class="kw">pub </span>generics: Generics,
+    <span class="kw">pub </span>ty: Type,
 }
 
 <span class="kw">impl </span>AliasSchema {
-    <span class="kw">fn </span>get_name_lifetime_generics(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;Generics&gt; {
-        <span class="kw">let </span>lifetimes = <span class="self">self
-            </span>.generics
-            .lifetimes()
-            .filter(|lifetime| lifetime.lifetime.ident != <span class="string">&quot;&#39;static&quot;</span>)
-            .map(|lifetime| GenericParam::Lifetime(lifetime.clone()))
-            .collect::&lt;Punctuated&lt;GenericParam, Comma&gt;&gt;();
+    <span class="kw">fn </span>get_lifetimes(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>GenericArgument&gt; {
+        <span class="kw">fn </span>lifetimes_from_type(ty: <span class="kw-2">&amp;</span>Type) -&gt; <span class="kw">impl </span>Iterator&lt;Item = <span class="kw-2">&amp;</span>GenericArgument&gt; {
+            <span class="kw">match </span>ty {
+                Type::Path(type_path) =&gt; type_path
+                    .path
+                    .segments
+                    .iter()
+                    .flat_map(|segment| <span class="kw">match </span><span class="kw-2">&amp;</span>segment.arguments {
+                        PathArguments::AngleBracketed(angle_bracketed_args) =&gt; {
+                            <span class="prelude-val">Some</span>(angle_bracketed_args.args.iter())
+                        }
+                        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+                    })
+                    .flatten()
+                    .flat_map(|arg| <span class="kw">match </span>arg {
+                        GenericArgument::Type(type_argument) =&gt; {
+                            lifetimes_from_type(type_argument).collect::&lt;Vec&lt;<span class="kw">_</span>&gt;&gt;()
+                        }
+                        <span class="kw">_ </span>=&gt; <span class="macro">vec!</span>[arg],
+                    })
+                    .filter(|generic_arg| <span class="macro">matches!</span>(generic_arg, syn::GenericArgument::Lifetime(lifetime) <span class="kw">if </span>lifetime.ident != <span class="string">&quot;&#39;static&quot;</span>)),
+                <span class="kw">_ </span>=&gt; <span class="macro">abort!</span>(
+                    <span class="kw-2">&amp;</span>ty.span(),
+                    <span class="string">&quot;AliasSchema `get_lifetimes` only supports syn::TypePath types&quot;
+                </span>),
+            }
+        }
 
-        <span class="kw">if </span>!lifetimes.is_empty() {
-            <span class="prelude-val">Some</span>(Generics {
-                params: lifetimes,
-                ..Default::default()
-            })
-        } <span class="kw">else </span>{
-            <span class="prelude-val">None
-        </span>}
+        lifetimes_from_type(<span class="kw-2">&amp;</span><span class="self">self</span>.ty)
     }
 }
 
 <span class="kw">impl </span>Parse <span class="kw">for </span>AliasSchema {
     <span class="kw">fn </span>parse(input: syn::parse::ParseStream) -&gt; syn::Result&lt;<span class="self">Self</span>&gt; {
         <span class="kw">let </span>name = input.parse::&lt;Ident&gt;()<span class="question-mark">?</span>;
-        <span class="kw">if </span>input.peek(<span class="macro">Token!</span>[&lt;]) {
-            input.parse::&lt;Generics&gt;()<span class="question-mark">?</span>;
-        }
         input.parse::&lt;<span class="macro">Token!</span>[=]&gt;()<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self </span>{
             name: name.to_string(),
-            ty: input.parse::&lt;Ident&gt;()<span class="question-mark">?</span>,
-            generics: input.parse()<span class="question-mark">?</span>,
+            ty: input.parse::&lt;Type&gt;()<span class="question-mark">?</span>,
         })
     }
 }
@@ -3415,7 +3109,7 @@
 <span class="kw">fn </span>parse_aliases(attributes: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;Punctuated&lt;AliasSchema, Comma&gt;&gt; {
     attributes
         .iter()
-        .find(|attribute| attribute.path.is_ident(<span class="string">&quot;aliases&quot;</span>))
+        .find(|attribute| attribute.path().is_ident(<span class="string">&quot;aliases&quot;</span>))
         .map(|aliases| {
             aliases
                 .parse_args_with(Punctuated::&lt;AliasSchema, Comma&gt;::parse_terminated)

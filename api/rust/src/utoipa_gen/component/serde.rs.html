@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.0.3/src/component/serde.rs`."><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa_gen/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `/home/runner/.cargo/registry/src/index.crates.io-6f17d22bba15001f/utoipa-gen-3.5.0/src/component/serde.rs`."><title>serde.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Regular-46f98efaafac5295.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Regular-018c141bf0843ffd.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/FiraSans-Medium-8f9a781e4970d388.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceSerif4-Bold-a2c9cd1067f8b328.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2"><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-9bb858ba049f1f21.css" id="mainThemeStyle"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="utoipa_gen" data-themes="" data-resource-suffix="" data-rustdoc-version="1.72.1 (d5c2e9c34 2023-09-13)" data-channel="1.72.1" data-search-js="search-f6292fe389d70017.js" data-settings-js="settings-de11bff964e9d4e5.js" data-settings-css="settings-8c76f75bfb6bd192.css" data-theme-light-css="light-0f8c037637f9eb3e.css" data-theme-dark-css="dark-1097f8e92a01e3cf.css" data-theme-ayu-css="ayu-614652228113ac93.css" ><script src="../../../static.files/storage-59fd9b8ccb335783.js"></script><script defer src="../../../static.files/source-script-106908c7a7964ba4.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../static.files/main-0795b7d26be81095.js"></script><noscript><link rel="stylesheet" media="(prefers-color-scheme:light)" href="../../../static.files/light-0f8c037637f9eb3e.css"><link rel="stylesheet" media="(prefers-color-scheme:dark)" href="../../../static.files/dark-1097f8e92a01e3cf.css"><link rel="stylesheet" href="../../../static.files/noscript-13285aec31fa243e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-16x16-8b506e7a72182f1c.png"><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"></nav><main><nav class="sub"><a class="sub-logo-container" href="../../../utoipa_gen/index.html"><img class="rust-logo" src="../../../static.files/rust-logo-151179464ae7ed46.svg" alt="logo"></a><form class="search-form"><span></span><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><a href="../../../help.html">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../static.files/wheel-7b819b6101059cd0.svg"></a></div></form></nav><section id="main-content" class="content"><div class="example-wrap"><div data-nosnippet><pre class="src-line-numbers"><a href="#1" id="1">1</a>
 <a href="#2" id="2">2</a>
 <a href="#3" id="3">3</a>
 <a href="#4" id="4">4</a>
@@ -435,13 +435,47 @@
 <a href="#435" id="435">435</a>
 <a href="#436" id="436">436</a>
 <a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
+<a href="#457" id="457">457</a>
+<a href="#458" id="458">458</a>
+<a href="#459" id="459">459</a>
+<a href="#460" id="460">460</a>
+<a href="#461" id="461">461</a>
+<a href="#462" id="462">462</a>
+<a href="#463" id="463">463</a>
+<a href="#464" id="464">464</a>
+<a href="#465" id="465">465</a>
+<a href="#466" id="466">466</a>
+<a href="#467" id="467">467</a>
+<a href="#468" id="468">468</a>
+<a href="#469" id="469">469</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Provides serde related features parsing serde attributes from types.
 
 </span><span class="kw">use </span>std::str::FromStr;
 
 <span class="kw">use </span>proc_macro2::{Ident, Span, TokenTree};
-<span class="kw">use </span>proc_macro_error::{abort, ResultExt};
+<span class="kw">use </span>proc_macro_error::abort;
 <span class="kw">use </span>syn::{buffer::Cursor, Attribute, Error};
+
+<span class="kw">use </span><span class="kw">crate</span>::ResultExt;
 
 <span class="attr">#[inline]
 </span><span class="kw">fn </span>parse_next_lit_str(next: Cursor) -&gt; <span class="prelude-ty">Option</span>&lt;(String, Span)&gt; {
@@ -464,6 +498,12 @@
     <span class="kw">pub </span>rename: <span class="prelude-ty">Option</span>&lt;String&gt;,
     <span class="kw">pub </span>default: bool,
     <span class="kw">pub </span>flatten: bool,
+    <span class="kw">pub </span>skip_serializing_if: bool,
+    <span class="kw">pub </span>double_option: bool,
+}
+
+<span class="kw">impl </span>SerdeValue {
+    <span class="kw">const </span>SERDE_WITH_DOUBLE_OPTION: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static </span>str = <span class="string">&quot;::serde_with::rust::double_option&quot;</span>;
 }
 
 <span class="kw">impl </span>SerdeValue {
@@ -474,9 +514,27 @@
             <span class="kw">let </span><span class="kw-2">mut </span>rest = <span class="kw-2">*</span>cursor;
             <span class="kw">while let </span><span class="prelude-val">Some</span>((tt, next)) = rest.token_tree() {
                 <span class="kw">match </span>tt {
-                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;skip&quot; </span>|| ident == <span class="string">&quot;skip_serializing&quot; </span>=&gt; {
+                    TokenTree::Ident(ident)
+                        <span class="kw">if </span>ident == <span class="string">&quot;skip&quot;
+                            </span>|| ident == <span class="string">&quot;skip_serializing&quot;
+                            </span>|| ident == <span class="string">&quot;skip_deserializing&quot; </span>=&gt;
+                    {
                         value.skip = <span class="bool-val">true
                     </span>}
+                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;skip_serializing_if&quot; </span>=&gt; {
+                        value.skip_serializing_if = <span class="bool-val">true
+                    </span>}
+                    TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;with&quot; </span>=&gt; {
+                        value.double_option = parse_next_lit_str(next)
+                            .and_then(|(literal, <span class="kw">_</span>)| {
+                                <span class="kw">if </span>literal == SerdeValue::SERDE_WITH_DOUBLE_OPTION {
+                                    <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)
+                                } <span class="kw">else </span>{
+                                    <span class="prelude-val">None
+                                </span>}
+                            })
+                            .unwrap_or(<span class="bool-val">false</span>);
+                    }
                     TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;flatten&quot; </span>=&gt; value.flatten = <span class="bool-val">true</span>,
                     TokenTree::Ident(ident) <span class="kw">if </span>ident == <span class="string">&quot;rename&quot; </span>=&gt; {
                         <span class="kw">if let </span><span class="prelude-val">Some</span>((literal, <span class="kw">_</span>)) = parse_next_lit_str(next) {
@@ -626,7 +684,7 @@
 <span class="kw">pub fn </span>parse_value(attributes: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;SerdeValue&gt; {
     attributes
         .iter()
-        .filter(|attribute| attribute.path.is_ident(<span class="string">&quot;serde&quot;</span>))
+        .filter(|attribute| attribute.path().is_ident(<span class="string">&quot;serde&quot;</span>))
         .map(|serde_attribute| {
             serde_attribute
                 .parse_args_with(SerdeValue::parse)
@@ -637,6 +695,9 @@
                 <span class="kw">if </span>value.skip {
                     acc.skip = value.skip;
                 }
+                <span class="kw">if </span>value.skip_serializing_if {
+                    acc.skip_serializing_if = value.skip_serializing_if;
+                }
                 <span class="kw">if </span>value.rename.is_some() {
                     acc.rename = value.rename;
                 }
@@ -645,6 +706,9 @@
                 }
                 <span class="kw">if </span>value.default {
                     acc.default = value.default;
+                }
+                <span class="kw">if </span>value.double_option {
+                    acc.double_option = value.double_option;
                 }
 
                 acc
@@ -655,7 +719,7 @@
 <span class="kw">pub fn </span>parse_container(attributes: <span class="kw-2">&amp;</span>[Attribute]) -&gt; <span class="prelude-ty">Option</span>&lt;SerdeContainer&gt; {
     attributes
         .iter()
-        .filter(|attribute| attribute.path.is_ident(<span class="string">&quot;serde&quot;</span>))
+        .filter(|attribute| attribute.path().is_ident(<span class="string">&quot;serde&quot;</span>))
         .map(|serde_attribute| {
             serde_attribute
                 .parse_args_with(SerdeContainer::parse)

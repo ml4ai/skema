@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"attr":["path"],"derive":["IntoParams","IntoResponses","OpenApi","ToResponse","ToSchema"]};
+window.SIDEBAR_ITEMS = {"attr":["path"],"derive":["IntoParams","IntoResponses","OpenApi","ToResponse","ToSchema"],"macro":["schema"]};
