@@ -193,6 +193,11 @@ pub fn subtract(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn multiply(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Multiply, alt((ws(tag("*")), ws(tag("&#x2217;")))))(input)?;
+    Ok((s, op))
+}
+
 pub fn equals(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Equals, ws(tag("=")))(input)?;
     Ok((s, op))
@@ -213,6 +218,11 @@ pub fn comma(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn mean(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Mean, ws(tag("¯")))(input)?;
+    Ok((s, op))
+}
+
 fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = ws(recognize(not_line_ending))(input)?;
     let op = Operator::Other(consumed.to_string());
@@ -220,7 +230,16 @@ fn operator_other(input: Span) -> IResult<Operator> {
 }
 
 pub fn operator(input: Span) -> IResult<Operator> {
-    let (s, op) = alt((add, subtract, equals, lparen, rparen, operator_other))(input)?;
+    let (s, op) = alt((
+        add,
+        subtract,
+        equals,
+        lparen,
+        rparen,
+        mean,
+        multiply,
+        operator_other,
+    ))(input)?;
     Ok((s, op))
 }
 
@@ -480,7 +499,8 @@ fn test_mover() {
         mover,
         Mover(
             Box::new(MathExpression::Mi(Mi("x".to_string()))),
-            Box::new(Mo(Operator::Other("¯".to_string()))),
+            Box::new(Mo(Operator::Mean)),
+            //Box::new(Mo(Operator::Other("¯".to_string()))),
         ),
     )
 }
@@ -570,7 +590,8 @@ fn test_mathml_parser() {
                 Msup(
                     Box::new(MathExpression::Mrow(Mrow(vec![Mover(
                         Box::new(MathExpression::Mi(Mi("x".to_string()))),
-                        Box::new(Mo(Operator::Other("¯".to_string()))),
+                        Box::new(Mo(Operator::Mean)),
+                        //Box::new(Mo(Operator::Other("¯".to_string()))),
                     )]))),
                     Box::new(MathExpression::Mi(Mi("a".to_string()))),
                 ),

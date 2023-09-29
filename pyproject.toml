@@ -12,6 +12,7 @@ description = "Scientific Knowledge Extraction and Model Analysis"
 version = "0.1.0"
 dependencies=[
     "Cython",
+    "numpy",
     "dill==0.3.7",
     "networkx==3.1",
     "PyYAML",
@@ -20,6 +21,7 @@ dependencies=[
     "beautifulsoup4", # used to remove comments etc from pMML before sending to MORAE
     "typing_extensions", # see https://github.com/pydantic/pydantic/issues/5821#issuecomment-1559196859
     "fastapi~=0.100.0",
+    "starlette",
     "pydantic~=2.0.0",
     "uvicorn",
     "python-multipart"
@@ -40,7 +42,7 @@ dynamic = ["readme"]
 # - six: Required by auto-generated Swagger models
 dev = ["pytest", "pytest-cov", "pytest-xdist", "httpx", "black", "mypy", "coverage", "pygraphviz", "six"]
 
-demo = ["jupyter==1.0.0"]
+demo = ["notebook"]
 
 # ISA dependencies.
 isa = [
@@ -76,8 +78,11 @@ doc = ["mkdocs==1.2.3", "pdoc3==0.10.0", "mkdocs-git-snippet==0.1.1", "mkdocs-gi
 
 core = ["skema[img2mml]", "skema[isa]", "skema[tr]", "skema[metal]"]
 
+# see skema/img2mml/render_mml/mathpix_annotator
+annotations = ["matplotlib", "notebook"]
+
 # all extras
-all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]"]
+all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotations]"]
 
 [tool.setuptools.package-dir]
 "skema.gromet" = "skema/gromet"
@@ -122,6 +127,7 @@ testpaths = [
     # TODO: Fix fortran tests
     #"skema/program_analysis/CAST/fortran/tests",
     "skema/program_analysis/CAST/matlab/tests",
+    #"skema/program_analysis/CAST/python/tests",
     "skema/rest/tests",
     # FIXME: skema_py is not being tested
     # and should probably be removed
