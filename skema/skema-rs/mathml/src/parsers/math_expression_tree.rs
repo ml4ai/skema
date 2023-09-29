@@ -1,6 +1,7 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
+//use crate::parsers::math_expression_tree::MathExpression::Differential;
 use crate::{
     ast::{
         operator::{Derivative, Operator},
@@ -31,6 +32,10 @@ impl fmt::Display for MathExpressionTree {
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
                 write!(f, "{}", x.content)
+            }
+            MathExpressionTree::Atom(MathExpression::Differential(x)) => {
+                write!(f, "{}", x.diff)?;
+                write!(f, "{}", x.func)
             }
             MathExpressionTree::Atom(i) => write!(f, "{}", i),
             MathExpressionTree::Cons(head, rest) => {
@@ -181,7 +186,16 @@ impl MathExpression {
             }
             // Insert implicit division operators, and wrap numerators and denominators in
             // parentheses for the Pratt parsing algorithm.
+            MathExpression::Differential(x) => {
+                println!("Inside differential");
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                //for element in ci {
+                //x.flatten(tokens);
+                //}
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
             MathExpression::Mfrac(numerator, denominator) => {
+                println!("numerator={:?}", numerator);
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 numerator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
@@ -813,20 +827,14 @@ fn test_mover_mean() {
 fn test_one_dimensional_ebm() {
     let input = "
     <math>
-        <mi>C</mi>
         <mfrac>
         <mrow><mi>∂</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo></mrow>
         <mrow><mi>∂</mi><mi>t</mi></mrow>
         </mfrac>
-        <mo>=</mo>
-        <mo>-</mo>
-        <mi>β</mi>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
     </math>
     ";
-    //let exp = input.parse::<MathExpressionTree>().unwrap();
-    //println!("exp={:?}", exp);
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
     //let ode = input.parse::<FirstOrderODE>().unwrap();
     //println!("ode ={:?}", ode);
 }
