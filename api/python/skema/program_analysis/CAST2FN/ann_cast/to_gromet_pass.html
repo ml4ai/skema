@@ -88,6 +88,8 @@ from skema.gromet.execution_engine.primitive_map import (
     is_primitive,
 )
 
+from skema.gromet import GROMET_VERSION
+
 PYTHON_VERSION = &#34;3.8&#34;
 
 
@@ -274,7 +276,7 @@ class ToGrometPass:
         # visiting nodes adds FNs
         self.gromet_module = GrometFNModule(
             schema=&#34;FN&#34;,
-            schema_version=&#34;0.1.7&#34;,
+            schema_version=GROMET_VERSION,
             name=&#34;&#34;,
             fn=None,
             fn_array=[],
@@ -518,7 +520,7 @@ class ToGrometPass:
             self.set_index()
 
             ref = node.source_refs[0]
-            metadata = self.create_source_code_reference(ref)
+            # metadata = self.create_source_code_reference(ref)
             # Creates the &#39;call&#39; to this primitive expression which then gets inserted into the parent&#39;s Gromet FN
             parent_primitive_call_bf = GrometBoxFunction(
                 function_type=FunctionType.EXPRESSION,
@@ -1746,6 +1748,7 @@ class ToGrometPass:
             name = node.value.name
             if name in self.import_collection:
                 func_info = self.determine_func_type(node)
+                metadata = self.create_source_code_reference(ref)
                 parent_gromet_fn.bf = insert_gromet_object(
                     parent_gromet_fn.bf,
                     GrometBoxFunction(
@@ -1757,9 +1760,7 @@ class ToGrometPass:
                         source_language=func_info[4],
                         source_language_version=func_info[5],
                         body=None,
-                        metadata=self.insert_metadata(
-                            self.create_source_code_reference(ref)
-                        ),
+                        metadata=self.insert_metadata(metadata)
                     ),
                 )
             elif isinstance(node.attr, AnnCastName):
@@ -2491,7 +2492,7 @@ class ToGrometPass:
                 if func_info != None
                 else None,
                 body=body,
-                metadata=metadata,
+                metadata=self.insert_metadata(metadata),
             )
             parent_gromet_fn.bf = insert_gromet_object(
                 parent_gromet_fn.bf, call_box_func
@@ -3358,7 +3359,6 @@ class ToGrometPass:
             node, parent_gromet_fn, parent_cast_node
         )
         ref = node.expr.source_refs[0]
-        # metadata = self.insert_metadata(self.create_source_code_reference(ref))
 
         # NOTE: gromet_bl and gromet_bc store indicies into the fn_array directly now
         gromet_bl.condition = condition_array_idx
@@ -3903,7 +3903,7 @@ class ToGrometPass:
         parent_gromet_fn.bf = insert_gromet_object(
             parent_gromet_fn.bf,
             GrometBoxFunction(
-                function_type=FunctionType.EXPRESSION, name=symbol, body=None
+                function_type=FunctionType.IMPORTED, name=symbol, body=None
             ),
         )
 
@@ -4033,6 +4033,8 @@ class ToGrometPass:
         code_file_references = [
             CodeFileReference(uid=str(uuid.uuid4()), name=file_name, path=&#34;&#34;)
         ]
+        gromet_creation_metadata = GrometCreation(provenance=generate_provenance())
+        gromet_creation_metadata.gromet_version = GROMET_VERSION
         self.gromet_module.metadata = self.insert_metadata(
             SourceCodeCollection(
                 provenance=generate_provenance(),
@@ -4040,7 +4042,7 @@ class ToGrometPass:
                 global_reference_id=&#34;&#34;,
                 files=code_file_references,
             ),
-            GrometCreation(provenance=generate_provenance()),
+            gromet_creation_metadata,
         )
 
         # Outer module box only has name &#39;module&#39; and its type &#39;Module&#39;
@@ -4779,7 +4781,7 @@ AnnCastAttribute</p></div>
         # visiting nodes adds FNs
         self.gromet_module = GrometFNModule(
             schema=&#34;FN&#34;,
-            schema_version=&#34;0.1.7&#34;,
+            schema_version=GROMET_VERSION,
             name=&#34;&#34;,
             fn=None,
             fn_array=[],
@@ -5023,7 +5025,7 @@ AnnCastAttribute</p></div>
             self.set_index()
 
             ref = node.source_refs[0]
-            metadata = self.create_source_code_reference(ref)
+            # metadata = self.create_source_code_reference(ref)
             # Creates the &#39;call&#39; to this primitive expression which then gets inserted into the parent&#39;s Gromet FN
             parent_primitive_call_bf = GrometBoxFunction(
                 function_type=FunctionType.EXPRESSION,
@@ -6251,6 +6253,7 @@ AnnCastAttribute</p></div>
             name = node.value.name
             if name in self.import_collection:
                 func_info = self.determine_func_type(node)
+                metadata = self.create_source_code_reference(ref)
                 parent_gromet_fn.bf = insert_gromet_object(
                     parent_gromet_fn.bf,
                     GrometBoxFunction(
@@ -6262,9 +6265,7 @@ AnnCastAttribute</p></div>
                         source_language=func_info[4],
                         source_language_version=func_info[5],
                         body=None,
-                        metadata=self.insert_metadata(
-                            self.create_source_code_reference(ref)
-                        ),
+                        metadata=self.insert_metadata(metadata)
                     ),
                 )
             elif isinstance(node.attr, AnnCastName):
@@ -6996,7 +6997,7 @@ AnnCastAttribute</p></div>
                 if func_info != None
                 else None,
                 body=body,
-                metadata=metadata,
+                metadata=self.insert_metadata(metadata),
             )
             parent_gromet_fn.bf = insert_gromet_object(
                 parent_gromet_fn.bf, call_box_func
@@ -7863,7 +7864,6 @@ AnnCastAttribute</p></div>
             node, parent_gromet_fn, parent_cast_node
         )
         ref = node.expr.source_refs[0]
-        # metadata = self.insert_metadata(self.create_source_code_reference(ref))
 
         # NOTE: gromet_bl and gromet_bc store indicies into the fn_array directly now
         gromet_bl.condition = condition_array_idx
@@ -8408,7 +8408,7 @@ AnnCastAttribute</p></div>
         parent_gromet_fn.bf = insert_gromet_object(
             parent_gromet_fn.bf,
             GrometBoxFunction(
-                function_type=FunctionType.EXPRESSION, name=symbol, body=None
+                function_type=FunctionType.IMPORTED, name=symbol, body=None
             ),
         )
 
@@ -8538,6 +8538,8 @@ AnnCastAttribute</p></div>
         code_file_references = [
             CodeFileReference(uid=str(uuid.uuid4()), name=file_name, path=&#34;&#34;)
         ]
+        gromet_creation_metadata = GrometCreation(provenance=generate_provenance())
+        gromet_creation_metadata.gromet_version = GROMET_VERSION
         self.gromet_module.metadata = self.insert_metadata(
             SourceCodeCollection(
                 provenance=generate_provenance(),
@@ -8545,7 +8547,7 @@ AnnCastAttribute</p></div>
                 global_reference_id=&#34;&#34;,
                 files=code_file_references,
             ),
-            GrometCreation(provenance=generate_provenance()),
+            gromet_creation_metadata,
         )
 
         # Outer module box only has name &#39;module&#39; and its type &#39;Module&#39;
@@ -8994,7 +8996,7 @@ be used in this file</p></div>
     parent_gromet_fn.bf = insert_gromet_object(
         parent_gromet_fn.bf,
         GrometBoxFunction(
-            function_type=FunctionType.EXPRESSION, name=symbol, body=None
+            function_type=FunctionType.IMPORTED, name=symbol, body=None
         ),
     )
 
@@ -9991,7 +9993,7 @@ Then it gets wired up to its parent_gromet_fn appropriately</p></div>
         self.set_index()
 
         ref = node.source_refs[0]
-        metadata = self.create_source_code_reference(ref)
+        # metadata = self.create_source_code_reference(ref)
         # Creates the &#39;call&#39; to this primitive expression which then gets inserted into the parent&#39;s Gromet FN
         parent_primitive_call_bf = GrometBoxFunction(
             function_type=FunctionType.EXPRESSION,
@@ -11708,6 +11710,7 @@ def visit_attribute(
         name = node.value.name
         if name in self.import_collection:
             func_info = self.determine_func_type(node)
+            metadata = self.create_source_code_reference(ref)
             parent_gromet_fn.bf = insert_gromet_object(
                 parent_gromet_fn.bf,
                 GrometBoxFunction(
@@ -11719,9 +11722,7 @@ def visit_attribute(
                     source_language=func_info[4],
                     source_language_version=func_info[5],
                     body=None,
-                    metadata=self.insert_metadata(
-                        self.create_source_code_reference(ref)
-                    ),
+                    metadata=self.insert_metadata(metadata)
                 ),
             )
         elif isinstance(node.attr, AnnCastName):
@@ -12092,7 +12093,7 @@ def visit_call(
             if func_info != None
             else None,
             body=body,
-            metadata=metadata,
+            metadata=self.insert_metadata(metadata),
         )
         parent_gromet_fn.bf = insert_gromet_object(
             parent_gromet_fn.bf, call_box_func
@@ -12622,7 +12623,6 @@ def visit_loop(
         node, parent_gromet_fn, parent_cast_node
     )
     ref = node.expr.source_refs[0]
-    # metadata = self.insert_metadata(self.create_source_code_reference(ref))
 
     # NOTE: gromet_bl and gromet_bc store indicies into the fn_array directly now
     gromet_bl.condition = condition_array_idx
@@ -13005,6 +13005,8 @@ def visit_module(
     code_file_references = [
         CodeFileReference(uid=str(uuid.uuid4()), name=file_name, path=&#34;&#34;)
     ]
+    gromet_creation_metadata = GrometCreation(provenance=generate_provenance())
+    gromet_creation_metadata.gromet_version = GROMET_VERSION
     self.gromet_module.metadata = self.insert_metadata(
         SourceCodeCollection(
             provenance=generate_provenance(),
@@ -13012,7 +13014,7 @@ def visit_module(
             global_reference_id=&#34;&#34;,
             files=code_file_references,
         ),
-        GrometCreation(provenance=generate_provenance()),
+        gromet_creation_metadata,
     )
 
     # Outer module box only has name &#39;module&#39; and its type &#39;Module&#39;
