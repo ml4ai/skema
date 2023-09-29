@@ -12,7 +12,7 @@ from pathlib import Path
 
 def test_single_assignment():
     """ Tests whether the parser can handle a single assignment statement """
-    filepath = Path(__file__).parent / "data/single_line_assignment.m"
+    filepath = Path(__file__).parent / "data" / "single_line_assignment.m"
     print(f"Testing parse tree for {str(filepath)}")
     parser = MatlabToCast(filepath)
     cast = parser.out_cast
