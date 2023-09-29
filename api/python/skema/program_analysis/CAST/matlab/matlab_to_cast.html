@@ -57,7 +57,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
 )
 
-from skema.program_analysis.CAST.matlab.matlab_tree_builder import MatlabTreeBuilder
+from skema.program_analysis.CAST.matlab.tree_builder import TreeBuilder
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
     NodeHelper,
@@ -85,12 +85,12 @@ class MatlabToCast(object):
         # print(self.source)
 
         # get a tree-sitter tree based on source input
-        matlab_tree_builder = MatlabTreeBuilder()
-        self.tree = matlab_tree_builder.get_tree(self.source)
-        self.tree.root_node = matlab_tree_builder.clean_nodes(self.tree.root_node)
+        tree_builder = TreeBuilder(&#34;matlab&#34;)
+        self.tree = tree_builder.get_tree(self.source)
+        self.tree.root_node = tree_builder.clean_nodes(self.tree.root_node)
 
         # print(&#39;\nSYNTAX TREE: &#39;)
-        matlab_tree_builder.traverse_tree(self.tree)
+        tree_builder.traverse_tree(self.tree)
         # print(&#34;\n&#34;)
 
         # Walking data
@@ -101,13 +101,13 @@ class MatlabToCast(object):
         self.out_cast = self.generate_cast()
 
         # print(&#39;\nCAST objects:&#39;)
-        for c in self.out_cast: 
-            j = json.dumps(
-                c.to_json_object(),
-                sort_keys=True,
-                indent=2,
-            )
-            # print(j)
+        # for c in self.out_cast: 
+        #     j = json.dumps(
+        #         c.to_json_object(),
+        #         sort_keys=True,
+        #         indent=2,
+        #     )
+        #     print(j)
         # print(&#39;CAST objects done\n\n&#39;)
 
     def generate_cast(self) -&gt; List[CAST]:
@@ -116,10 +116,10 @@ class MatlabToCast(object):
         modules = self.run(self.tree.root_node)
         # print(&#39;\nMODULES:&#39;)
         # for m in modules:
-            # print(m)
+        #     print(m)
         # print(&#34;MODULES done&#34;)
 
-        return [CAST([generate_dummy_source_refs(module)], &#34;matlab&#34;) for module in modules]
+        return [CAST([module], &#34;matlab&#34;) for module in modules]
         
     def run(self, root) -&gt; List[Module]:
         &#34;&#34;&#34;Annotated run routine.&#34;&#34;&#34;
@@ -151,9 +151,8 @@ class MatlabToCast(object):
         return modules
 
     def visit(self, node):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
-        # print(&#34;\nvisit&#34;)
-        # print(node.type)
+        &#34;&#34;&#34;Switch execution based on node type&#34;&#34;&#34;
+        #print(f&#34;\nvisit {node.type}&#34;)
 
         if node.type in [&#34;program&#34;, &#34;module&#34;, &#34;source_file&#34;] :
             return self.visit_module(node)
@@ -1219,12 +1218,12 @@ class MatlabToCast(object):
         # print(self.source)
 
         # get a tree-sitter tree based on source input
-        matlab_tree_builder = MatlabTreeBuilder()
-        self.tree = matlab_tree_builder.get_tree(self.source)
-        self.tree.root_node = matlab_tree_builder.clean_nodes(self.tree.root_node)
+        tree_builder = TreeBuilder(&#34;matlab&#34;)
+        self.tree = tree_builder.get_tree(self.source)
+        self.tree.root_node = tree_builder.clean_nodes(self.tree.root_node)
 
         # print(&#39;\nSYNTAX TREE: &#39;)
-        matlab_tree_builder.traverse_tree(self.tree)
+        tree_builder.traverse_tree(self.tree)
         # print(&#34;\n&#34;)
 
         # Walking data
@@ -1235,13 +1234,13 @@ class MatlabToCast(object):
         self.out_cast = self.generate_cast()
 
         # print(&#39;\nCAST objects:&#39;)
-        for c in self.out_cast: 
-            j = json.dumps(
-                c.to_json_object(),
-                sort_keys=True,
-                indent=2,
-            )
-            # print(j)
+        # for c in self.out_cast: 
+        #     j = json.dumps(
+        #         c.to_json_object(),
+        #         sort_keys=True,
+        #         indent=2,
+        #     )
+        #     print(j)
         # print(&#39;CAST objects done\n\n&#39;)
 
     def generate_cast(self) -&gt; List[CAST]:
@@ -1250,10 +1249,10 @@ class MatlabToCast(object):
         modules = self.run(self.tree.root_node)
         # print(&#39;\nMODULES:&#39;)
         # for m in modules:
-            # print(m)
+        #     print(m)
         # print(&#34;MODULES done&#34;)
 
-        return [CAST([generate_dummy_source_refs(module)], &#34;matlab&#34;) for module in modules]
+        return [CAST([module], &#34;matlab&#34;) for module in modules]
         
     def run(self, root) -&gt; List[Module]:
         &#34;&#34;&#34;Annotated run routine.&#34;&#34;&#34;
@@ -1285,9 +1284,8 @@ class MatlabToCast(object):
         return modules
 
     def visit(self, node):
-        &#34;&#34;&#34;Docstring&#34;&#34;&#34;
-        # print(&#34;\nvisit&#34;)
-        # print(node.type)
+        &#34;&#34;&#34;Switch execution based on node type&#34;&#34;&#34;
+        #print(f&#34;\nvisit {node.type}&#34;)
 
         if node.type in [&#34;program&#34;, &#34;module&#34;, &#34;source_file&#34;] :
             return self.visit_module(node)
@@ -2338,10 +2336,10 @@ class MatlabToCast(object):
     modules = self.run(self.tree.root_node)
     # print(&#39;\nMODULES:&#39;)
     # for m in modules:
-        # print(m)
+    #     print(m)
     # print(&#34;MODULES done&#34;)
 
-    return [CAST([generate_dummy_source_refs(module)], &#34;matlab&#34;) for module in modules]</code></pre>
+    return [CAST([module], &#34;matlab&#34;) for module in modules]</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.get_gromet_function_node"><code class="name flex">
@@ -2407,15 +2405,14 @@ class MatlabToCast(object):
 <span>def <span class="ident">visit</span></span>(<span>self, node)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Docstring</p></div>
+<div class="desc"><p>Switch execution based on node type</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def visit(self, node):
-    &#34;&#34;&#34;Docstring&#34;&#34;&#34;
-    # print(&#34;\nvisit&#34;)
-    # print(node.type)
+    &#34;&#34;&#34;Switch execution based on node type&#34;&#34;&#34;
+    #print(f&#34;\nvisit {node.type}&#34;)
 
     if node.type in [&#34;program&#34;, &#34;module&#34;, &#34;source_file&#34;] :
         return self.visit_module(node)
