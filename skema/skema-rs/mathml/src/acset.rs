@@ -461,16 +461,16 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             };
             let initials = Initial {
                 target: ode.lhs_var.to_string().clone(),
-                expression: format!("{}0", ode.lhs_var.to_string().clone()),
+                //expression: format!("{}0", ode.lhs_var.to_string().clone()),
                 ..Default::default()
             };
             let parameters = Parameter {
                 id: initials.expression.clone(),
                 name: Some(initials.expression.clone()),
-                description: Some(format!(
+                /*description: Some(format!(
                     "The total {} population at timestep 0",
                     ode.lhs_var.to_string().clone()
-                )),
+                )),*/
                 ..Default::default()
             };
             parameter_vec.push(parameters.clone());
@@ -491,7 +491,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 let parameters = Parameter {
                     id: param.clone(),
                     name: Some(param.clone()),
-                    description: Some(format!("{} rate", param.clone())),
+                    //description: Some(format!("{} rate", param.clone())),
                     ..Default::default()
                 };
                 parameter_vec.push(parameters.clone());
@@ -780,10 +780,10 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         };
 
         let header = Header {
-            name: "mathml model".to_string(),
+            name: "math model".to_string(),
             schema: "https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json".to_string(),
             schema_name: "PetriNet".to_string(),
-            description: "This is a model from mathml equations".to_string(),
+            description: "This is a model from equations".to_string(),
             model_version: "0.1".to_string(),
         };
 
