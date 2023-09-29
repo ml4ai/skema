@@ -146,10 +146,11 @@ class ExecutionEngine:
             return torch.tensor(value == "True", dtype=torch.bool)
         elif value_type == "List":
             # TODO - Add support for List
-            pass
+            print("WARNING: List LiteralValue not currently supported and will be skipped in computations")
         elif value_type == "Map":
             # TODO - Add support for Map
-            pass
+            print("WARNING: Map LiteralValue not currently supported and will be skipped in computations")
+            
 
     def visit_primitive(self, node):
         """Visitor for :Primitive node type"""
