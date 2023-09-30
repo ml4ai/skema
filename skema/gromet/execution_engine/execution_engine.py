@@ -1,6 +1,7 @@
 import yaml
 import argparse
 import asyncio
+from ast import literal_eval
 from pathlib import Path
 from typing import Any, List, Dict
 
@@ -100,6 +101,7 @@ class ExecutionEngine:
         symbol = self.visit(left_hand_side[0])
 
         # The right hand side can be either a LiteralValue, an Expression, or a Primitive
+        # A Literal
         index = {"Primitive": 1, "Expression": 1, "Literal": 2}
         right_hand_side = sorted(
             right_hand_side, key=lambda node: index[list(node._labels)[0]]
@@ -132,7 +134,21 @@ class ExecutionEngine:
         return node.name
 
     def visit_literal(self, node):
-        # Convert to Tensor for execution
+
+        def create_dummy_node(value: Dict):
+            """Create a dummy gqlalchemy node so that we can pass a LiteralValue to a visitor."""
+            class DummyNode():
+                pass
+            
+            node = DummyNode()
+            node._id = -1
+            node._labels = ["Literal"]
+            node.value = value
+
+            # TODO: Update LiteralValue representation for List types
+            node.value["value"] = str(node.value["value"])
+            
+            return node
 
         # TODO: Update LiteralValue to remove wrapping "" characters
         value = node.value["value"].strip('"')
@@ -142,14 +158,23 @@ class ExecutionEngine:
             return torch.tensor(int(value), dtype=torch.int)
         elif value_type == "AbstractFloat":
             return torch.tensor(float(value), dtype=torch.float)
+        elif value_type == "Complex":
+            # TODO - Add support for Complex
+            pass 
         elif value_type == "Boolean":
             return torch.tensor(value == "True", dtype=torch.bool)
         elif value_type == "List":
-            # TODO - Add support for List
-            pass
+            if value == "test":
+                return None
+    
+            list = literal_eval(value)
+            return [self.visit(create_dummy_node(element)) for element in list]
+            
         elif value_type == "Map":
             # TODO - Add support for Map
             pass
+        elif value_type == "None":
+            return None
 
     def visit_primitive(self, node):
         """Visitor for :Primitive node type"""
