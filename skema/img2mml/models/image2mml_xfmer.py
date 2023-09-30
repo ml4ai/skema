@@ -18,7 +18,7 @@ class Image2MathML_Xfmer(nn.Module):
         self.device = device
         
         # ===========================
-        self.linear = nn.Linear(32, 200)   # added for no xfmer_necoder
+        self.linear = nn.Linear(504, 200)   # added for no xfmer_necoder
 
     def forward(
         self,
