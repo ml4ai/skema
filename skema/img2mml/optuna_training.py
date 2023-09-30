@@ -139,7 +139,7 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
-        LEN_DIM = 128
+        LEN_DIM = 32
 
         ENC = {
             "CNN": ResNet18_Encoder(
@@ -211,49 +211,39 @@ def objective(
     # parameters
     optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
     learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-2)
-    weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-3)
+    weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-2)
+    gamma = trial.suggest_loguniform("gamma", 0.1, 0.999)
+    batch_size = trial.suggest_int("DEC_HID_DIM", low=8, high=64, step=8)
     DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
-    EMB_DIM = 256 # trial.suggest_int("EMB_DIM", low=128, high=1024, step=128)
-    ENC_DIM = 512  # trial.suggest_int("ENC_DIM", low=128, high=1024, step=128)
-    DEC_HID_DIM = (
-        512  # trial.suggest_int("DEC_HID_DIM", low=256, high=1024, step=256)
-    )
+    EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
+    ENC_DIM = trial.suggest_int("ENC_DIM", low=64, high=512, step=64)
+    DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=256)
     if optimizer_type == "Adam":
-        beta_1 = trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
-        beta_2 = trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
+        beta_1 = 0.9#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
+        beta_2 = 0.999#trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
 
     # transformers params
-    DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=512, high=2048, step=512)#config["dim_feedforward_for_xfmer"]
-    N_HEADS = trial.suggest_int("n_heads", low=4, high=8, step=4)#config["n_xfmer_heads"]
-    N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=4, high=10, step=2)#config["n_xfmer_encoder_layers"]
-    N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=4, high=10, step=2)#config["n_xfmer_decoder_layers"]
+    DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=512, step=64)#config["dim_feedforward_for_xfmer"]
+    N_HEADS = trial.suggest_int("n_heads", low=2, high=8, step=2)#config["n_xfmer_heads"]
+    N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
+    N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=1, high=8, step=1)#config["n_xfmer_decoder_layers"]
 
     EPOCHS = config["epochs"]
-    batch_size = config["batch_size"]
-    # use_scheduler = config["use_scheduler"]
+    # batch_size = config["batch_size"]
+    momentum = config["momentum"]
+    step_scheduler = config["step_scheduler"]
+    exponential_scheduler = config["exponential_scheduler"]
     starting_lr = config["starting_lr"]
     step_size = config["step_size"]
-    gamma = config["gamma"]
-    momentum = config["momentum"]
+    # gamma = config["gamma"]
     CLIP = config["clip"]
     SEED = config["seed"]
-    min_length_bean_search_normalization = config[
-        "min_length_bean_search_normalization"
-    ]
-    alpha = config["beam_search_alpha"]
-    beam_k = config["beam_k"]
     model_type = config["model_type"]
-    dataset_type = config["dataset_type"]
-    load_trained_model_for_testing = config["testing"]
-    cont_training = config["continue_training_from_last_saved_model"]
     g2p = config["garbage2pad"]
     use_single_gpu = config["use_single_gpu"]
     ddp = config["DDP"]
     dataparallel = config["DataParallel"]
-    dataParallel_ids = config["DataParallel_ids"]
     world_size = config["world_size"]
-    early_stopping = config["early_stopping"]
-    early_stopping_counts = config["early_stopping_counts"]
 
     # set_random_seed
     set_random_seed(SEED)
@@ -335,8 +325,13 @@ def objective(
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
-    # _lr = starting_lr if use_scheduler else learning_rate
-    _lr = learning_rate
+    isScheduler = False
+    scheduler = None
+    if step_scheduler or exponential_scheduler:
+        _lr = starting_lr 
+        isScheduler = True
+    else:
+        _lr = learning_rate
 
     if optimizer_type == "Adam":
         optimizer = torch.optim.Adam(
@@ -352,10 +347,20 @@ def objective(
             weight_decay=weight_decay,
             momentum=momentum,
         )
-    # if use_scheduler:
-    #     scheduler = torch.optim.lr_scheduler.StepLR(
-    #         optimizer, step_size=step_size, gamma=gamma
-    #     )
+    # which scheduler, if using
+    if step_scheduler:
+        scheduler = torch.optim.lr_scheduler.StepLR(
+            optimizer, 
+            step_size=step_size, 
+            gamma=gamma,
+        )
+    elif exponential_scheduler:
+        scheduler = torch.optim.lr_scheduler.ExponentialLR(
+            optimizer, 
+            gamma=gamma, 
+            last_epoch=-1, 
+            verbose=False,
+        )
 
     best_valid_loss = float("inf")
     trg_pad_idx = vocab.stoi["<pad>"]
@@ -369,19 +374,20 @@ def objective(
 
         start_time = time.time()
 
-        # training and validation
         train_loss = train(
-            model,
-            model_type,
-            img_tnsr_path,
-            train_dataloader,
-            optimizer,
-            criterion,
-            CLIP,
-            device,
-            ddp=ddp,
-            rank=rank,
-        )
+                    model,
+                    model_type,
+                    img_tnsr_path,
+                    train_dataloader,
+                    optimizer,
+                    criterion,
+                    CLIP,
+                    device,
+                    ddp=ddp,
+                    rank=rank,
+                    isScheduler=isScheduler,
+                    scheduler=scheduler,
+                )
 
         val_loss = evaluate(
             model,
@@ -395,8 +401,8 @@ def objective(
             ddp=ddp,
             rank=rank,
             g2p=g2p,
-            is_test=True,
         )
+
 
         # calculate bleu score
         print("epoch: ", epoch)
