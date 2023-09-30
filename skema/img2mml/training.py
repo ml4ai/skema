@@ -132,7 +132,7 @@ def define_model(config, VOCAB, DEVICE):
         N_HEADS = config["n_xfmer_heads"]
         N_XFMER_ENCODER_LAYERS = config["n_xfmer_encoder_layers"]
         N_XFMER_DECODER_LAYERS = config["n_xfmer_decoder_layers"]
-        LEN_DIM = 504  # 32
+        LEN_DIM = 128  # 32
 
         ENC = {
             "CNN": ResNet18_Encoder(
