@@ -33,9 +33,8 @@ impl fmt::Display for MathExpressionTree {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
                 write!(f, "{}", x.content)
             }
-            MathExpressionTree::Atom(MathExpression::Differential(x)) => {
-                write!(f, "{}", x.diff)?;
-                write!(f, "{}", x.func)
+            MathExpressionTree::Atom(MathExpression::Mo(Operator::Derivative(x))) => {
+                write!(f, "{:?}", x)
             }
             MathExpressionTree::Atom(i) => write!(f, "{}", i),
             MathExpressionTree::Cons(head, rest) => {
@@ -188,7 +187,14 @@ impl MathExpression {
             // parentheses for the Pratt parsing algorithm.
             MathExpression::Differential(x) => {
                 println!("Inside differential");
+
+                println!("x.diff={:?}", x.diff);
+                println!("x.func={:?}", x.func);
+                //tokens.push(x.diff);
+                //tokens.push(MathExpression::Mo(Operator::Derivative(x.diff)));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.diff.flatten(tokens);
+                x.func.flatten(tokens);
                 //for element in ci {
                 //x.flatten(tokens);
                 //}
@@ -827,12 +833,27 @@ fn test_mover_mean() {
 fn test_one_dimensional_ebm() {
     let input = "
     <math>
+        <mi>C</mi>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>∂</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>-</mo>
+        <mi>β</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+    </math>
+    ";
+
+    /*let input = "
+    <math>
         <mfrac>
         <mrow><mi>∂</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo></mrow>
         <mrow><mi>∂</mi><mi>t</mi></mrow>
         </mfrac>
     </math>
-    ";
+    ";*/
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
     //let ode = input.parse::<FirstOrderODE>().unwrap();

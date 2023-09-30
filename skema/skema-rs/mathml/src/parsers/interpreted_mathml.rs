@@ -19,6 +19,7 @@ use crate::{
 use nom::{
     branch::alt,
     bytes::complete::tag,
+    character::complete::char,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
     sequence::{delimited, pair, preceded, tuple},
@@ -158,6 +159,19 @@ fn d(input: Span) -> IResult<()> {
     }
 }
 
+/// Parse the identifier '∂'
+fn partial(input: Span) -> IResult<()> {
+    let (s, Mi(x)) = mi(input)?;
+    if let "∂" = x.as_ref() {
+        Ok((s, ()))
+    } else {
+        Err(nom::Err::Error(ParseError::new(
+            "Unable to identify Mi('∂')".to_string(),
+            input,
+        )))
+    }
+}
+
 /// Parse a content identifier with function of elements.
 /// Example: S(t,x)
 pub fn ci_unknown_with_bounds(input: Span) -> IResult<Ci> {
@@ -208,7 +222,7 @@ pub fn first_derivative_var(input: Span) -> IResult<Ci> {
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
 pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
-    let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), d))(input)?;
+    let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), alt((d, partial))))(input)?;
     let (s, func) = ws(alt((
         ci_univariate_func,
         map(
@@ -226,7 +240,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
         ci_subscript_func,
     )))(s)?;
     let (s, with_respect_to) = delimited(
-        tuple((etag!("mrow"), stag!("mrow"), d)),
+        tuple((etag!("mrow"), stag!("mrow"), alt((d, partial)))),
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
@@ -399,39 +413,6 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
-        /*map(
-            first_derivative,
-            |Derivative {
-                 order,
-                 var_index,
-                 bound_var,
-             }| {
-                MathExpression::
-                Mo(Operator::Derivative(Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                }))
-            },
-        ),
-        map(
-            first_derivative_var,
-            |Ci {
-                 r#type,
-                 content,
-                 func_of,
-             }| {
-                MathExpression::Ci(Ci {
-                    r#type,
-                    content,
-                    func_of,
-                })
-            },
-        ),
-                let x = Differential::new(
-                    Box::new(MathExpression::Mo(Operator::Derivative(differ))),
-                    Box::new(MathExpression::Ci(func)),
-        */
         map(
             first_order_derivative_leibniz_notation,
             |(
@@ -460,6 +441,34 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
+        /*map(
+            first_derivative,
+            |Derivative {
+                 order,
+                 var_index,
+                 bound_var,
+             }| {
+                MathExpression::Mo(Operator::Derivative(Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                }))
+            },
+        ),
+        map(
+            first_derivative_var,
+            |Ci {
+                 r#type,
+                 content,
+                 func_of,
+             }| {
+                MathExpression::Ci(Ci {
+                    r#type,
+                    content,
+                    func_of,
+                })
+            },
+        ),*/
         map(
             ci_univariate_with_bounds,
             |Ci {
