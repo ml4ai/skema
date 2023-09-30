@@ -33,12 +33,12 @@ class Image2MathML_Xfmer(nn.Module):
         # run the encoder --> get flattened FV of images
         # for inference Batch(B)=1
         cnn_enc_output = self.cnn_encoder(src)  # (B, L, dec_hid_dim)
-        # xfmer_enc_output = self.xfmer_encoder(
-        #     cnn_enc_output
-        # )  # (max_len, B, dec_hid_dim)
+        xfmer_enc_output = self.xfmer_encoder(
+            cnn_enc_output
+        )  # (max_len, B, dec_hid_dim)
 
         # =========================
-        xfmer_enc_output = self.linear(cnn_enc_output.permute(0,2,1)).permute(2,0,1)        
+        # xfmer_enc_output = self.linear(cnn_enc_output.permute(0,2,1)).permute(2,0,1)        
 
         if not is_inference:
             # normal training and testing part
