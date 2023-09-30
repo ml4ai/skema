@@ -88,13 +88,13 @@ class ResNet18_Encoder(nn.Module):
             res_block(64, 64, stride=1),
             res_block(64, 128, stride=2, downsampling=True),
             res_block(128, 128, stride=1),
-            res_block(128, 256, stride=2, downsampling=True),
-            res_block(256, 256, stride=1),
-            res_block(256, 512, stride=2, downsampling=True),
-            res_block(512, 512, stride=1),
+            # res_block(128, 256, stride=2, downsampling=True),
+            # res_block(256, 256, stride=1),
+            # res_block(256, 512, stride=2, downsampling=True),
+            # res_block(512, 512, stride=1),
         )
 
-        self.linear = nn.Linear(512, dec_hid_dim)   # was 256, dec_hid
+        self.linear = nn.Linear(128, dec_hid_dim)   # was 256, dec_hid
         self.init_weights()
 
     def init_weights(self):
