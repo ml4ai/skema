@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>skema.gromet.execution_engine API documentation</title>
+<title>skema.gromet.execution_engine.execute API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -20,42 +20,102 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Namespace <code>skema.gromet.execution_engine</code></h1>
+<h1 class="title">Module <code>skema.gromet.execution_engine.execute</code></h1>
 </header>
 <section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">from typing import Any, List, Dict
+import importlib
+import builtins # Used to call builtin functions
+
+module_imports = {}
+module_imports[&#34;__builtins__&#34;] = builtins
+
+def execute_primitive(primitive: str, inputs: List[Any]) -&gt; Any:
+    # If the module path has no . then we assume it is a builtin function 
+    # Builtin functions belong to the __builtins__ module
+    module_path = primitive.rsplit(&#34;.&#34;, 1)
+    if len(module_path) == 1: 
+        module = &#34;__builtins__&#34;
+        primitive = primitive
+    else:
+        module = module_path[0]
+        primitive = module_path[1]
+    
+    # Next, we check if the primitive can be imported from another installed library like operators
+    # or Numpy if it is installed
+    if module not in module_imports:
+        try:
+            module_imports[module] = importlib.import_module(module) 
+        except:
+            print(f&#34;Could not find module to import for: {primitive}&#34;)
+            return None
+    
+    # Finally, we attempt to execute the primitive
+    try:
+        f = getattr(module_imports[module], primitive)
+        return f(*inputs)
+    except:
+        print(f&#34;Could not execute primitive: {primitive}&#34;)
+        return None
+
+
+#print(execute_primitive(&#34;operator.add&#34;, [10, 20]))
+#print(execute_primitive(&#34;operator.sub&#34;, [1,-2]))
+#print(execute_primitive(&#34;numpy.array&#34;, [[1,2,3]]))
+#print(execute_primitive(&#34;list&#34;, [[1,2,3]]))
+#print(module_imports)</code></pre>
+</details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt><code class="name"><a title="skema.gromet.execution_engine.execute" href="execute.html">skema.gromet.execution_engine.execute</a></code></dt>
+<dt id="skema.gromet.execution_engine.execute.execute_primitive"><code class="name flex">
+<span>def <span class="ident">execute_primitive</span></span>(<span>primitive: str, inputs: List[Any]) ‑> Any</span>
+</code></dt>
 <dd>
 <div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.execution_engine" href="execution_engine.html">skema.gromet.execution_engine.execution_engine</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.primitive_map" href="primitive_map.html">skema.gromet.execution_engine.primitive_map</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.query_runner" href="query_runner.html">skema.gromet.execution_engine.query_runner</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.symbol_table" href="symbol_table.html">skema.gromet.execution_engine.symbol_table</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.types" href="types/index.html">skema.gromet.execution_engine.types</a></code></dt>
-<dd>
-<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def execute_primitive(primitive: str, inputs: List[Any]) -&gt; Any:
+    # If the module path has no . then we assume it is a builtin function 
+    # Builtin functions belong to the __builtins__ module
+    module_path = primitive.rsplit(&#34;.&#34;, 1)
+    if len(module_path) == 1: 
+        module = &#34;__builtins__&#34;
+        primitive = primitive
+    else:
+        module = module_path[0]
+        primitive = module_path[1]
+    
+    # Next, we check if the primitive can be imported from another installed library like operators
+    # or Numpy if it is installed
+    if module not in module_imports:
+        try:
+            module_imports[module] = importlib.import_module(module) 
+        except:
+            print(f&#34;Could not find module to import for: {primitive}&#34;)
+            return None
+    
+    # Finally, we attempt to execute the primitive
+    try:
+        f = getattr(module_imports[module], primitive)
+        return f(*inputs)
+    except:
+        print(f&#34;Could not execute primitive: {primitive}&#34;)
+        return None</code></pre>
+</details>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
 </section>
 <section>
 </section>
@@ -68,17 +128,12 @@
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="skema.gromet" href="../index.html">skema.gromet</a></code></li>
+<li><code><a title="skema.gromet.execution_engine" href="index.html">skema.gromet.execution_engine</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
-<ul>
-<li><code><a title="skema.gromet.execution_engine.execute" href="execute.html">skema.gromet.execution_engine.execute</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.execution_engine" href="execution_engine.html">skema.gromet.execution_engine.execution_engine</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.primitive_map" href="primitive_map.html">skema.gromet.execution_engine.primitive_map</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.query_runner" href="query_runner.html">skema.gromet.execution_engine.query_runner</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.symbol_table" href="symbol_table.html">skema.gromet.execution_engine.symbol_table</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.types" href="types/index.html">skema.gromet.execution_engine.types</a></code></li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.execute.execute_primitive" href="#skema.gromet.execution_engine.execute.execute_primitive">execute_primitive</a></code></li>
 </ul>
 </li>
 </ul>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>skema.gromet.execution_engine API documentation</title>
+<title>skema.gromet.execution_engine.query_runner API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -20,44 +20,154 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Namespace <code>skema.gromet.execution_engine</code></h1>
+<h1 class="title">Module <code>skema.gromet.execution_engine.query_runner</code></h1>
 </header>
 <section id="section-intro">
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">import yaml
+from pathlib import Path
+from gqlalchemy import Memgraph
+
+QUERIES_PATH = Path(__file__).parent / &#34;queries.yaml&#34;
+
+
+class QueryRunner:
+    def __init__(self, host: str, port: str):
+        # First set up the queries map
+        self.queries_path = QUERIES_PATH
+        self.queries_map = yaml.safe_load(self.queries_path.read_text())
+
+        # Set up memgrpah instance
+        self.memgraph = Memgraph(host=host, port=port)
+
+    def run_query(
+        self,
+        query: str,
+        n_or_m: str = &#34;m&#34;,
+        filename: str = None,
+        function: str = None,
+        id: int = None,
+    ):
+        # Check if query is in query map. Currently we return None if its not found
+        # TODO: Improve error handling
+        if query not in self.queries_map:
+            return None
+        query = self.queries_map[query]
+
+        # There are times we will want to limit the scope we are running queries in.
+        # This is done be adding clauses to the cypher queries.
+        if filename:
+            query = query.replace(&#34;$FILENAME&#34;, filename)
+
+        if id:
+            query = query.replace(&#34;$ID&#34;, str(id))
+
+        # In most cases, we only want the node objects itself. So we will just return a list of nodes.
+        results = self.memgraph.execute_and_fetch(query)
+        
+        return [result[n_or_m] for result in results]</code></pre>
+</details>
 </section>
 <section>
-<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt><code class="name"><a title="skema.gromet.execution_engine.execute" href="execute.html">skema.gromet.execution_engine.execute</a></code></dt>
+<dt id="skema.gromet.execution_engine.query_runner.QueryRunner"><code class="flex name class">
+<span>class <span class="ident">QueryRunner</span></span>
+<span>(</span><span>host: str, port: str)</span>
+</code></dt>
 <dd>
 <div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.execution_engine" href="execution_engine.html">skema.gromet.execution_engine.execution_engine</a></code></dt>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class QueryRunner:
+    def __init__(self, host: str, port: str):
+        # First set up the queries map
+        self.queries_path = QUERIES_PATH
+        self.queries_map = yaml.safe_load(self.queries_path.read_text())
+
+        # Set up memgrpah instance
+        self.memgraph = Memgraph(host=host, port=port)
+
+    def run_query(
+        self,
+        query: str,
+        n_or_m: str = &#34;m&#34;,
+        filename: str = None,
+        function: str = None,
+        id: int = None,
+    ):
+        # Check if query is in query map. Currently we return None if its not found
+        # TODO: Improve error handling
+        if query not in self.queries_map:
+            return None
+        query = self.queries_map[query]
+
+        # There are times we will want to limit the scope we are running queries in.
+        # This is done be adding clauses to the cypher queries.
+        if filename:
+            query = query.replace(&#34;$FILENAME&#34;, filename)
+
+        if id:
+            query = query.replace(&#34;$ID&#34;, str(id))
+
+        # In most cases, we only want the node objects itself. So we will just return a list of nodes.
+        results = self.memgraph.execute_and_fetch(query)
+        
+        return [result[n_or_m] for result in results]</code></pre>
+</details>
+<h3>Methods</h3>
+<dl>
+<dt id="skema.gromet.execution_engine.query_runner.QueryRunner.run_query"><code class="name flex">
+<span>def <span class="ident">run_query</span></span>(<span>self, query: str, n_or_m: str = 'm', filename: str = None, function: str = None, id: int = None)</span>
+</code></dt>
 <dd>
 <div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.primitive_map" href="primitive_map.html">skema.gromet.execution_engine.primitive_map</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.query_runner" href="query_runner.html">skema.gromet.execution_engine.query_runner</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.symbol_table" href="symbol_table.html">skema.gromet.execution_engine.symbol_table</a></code></dt>
-<dd>
-<div class="desc"></div>
-</dd>
-<dt><code class="name"><a title="skema.gromet.execution_engine.types" href="types/index.html">skema.gromet.execution_engine.types</a></code></dt>
-<dd>
-<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run_query(
+    self,
+    query: str,
+    n_or_m: str = &#34;m&#34;,
+    filename: str = None,
+    function: str = None,
+    id: int = None,
+):
+    # Check if query is in query map. Currently we return None if its not found
+    # TODO: Improve error handling
+    if query not in self.queries_map:
+        return None
+    query = self.queries_map[query]
+
+    # There are times we will want to limit the scope we are running queries in.
+    # This is done be adding clauses to the cypher queries.
+    if filename:
+        query = query.replace(&#34;$FILENAME&#34;, filename)
+
+    if id:
+        query = query.replace(&#34;$ID&#34;, str(id))
+
+    # In most cases, we only want the node objects itself. So we will just return a list of nodes.
+    results = self.memgraph.execute_and_fetch(query)
+    
+    return [result[n_or_m] for result in results]</code></pre>
+</details>
 </dd>
 </dl>
-</section>
-<section>
-</section>
-<section>
-</section>
-<section>
+</dd>
+</dl>
 </section>
 </article>
 <nav id="sidebar">
@@ -68,17 +178,17 @@
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="skema.gromet" href="../index.html">skema.gromet</a></code></li>
+<li><code><a title="skema.gromet.execution_engine" href="index.html">skema.gromet.execution_engine</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
-<li><code><a title="skema.gromet.execution_engine.execute" href="execute.html">skema.gromet.execution_engine.execute</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.execution_engine" href="execution_engine.html">skema.gromet.execution_engine.execution_engine</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.primitive_map" href="primitive_map.html">skema.gromet.execution_engine.primitive_map</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.query_runner" href="query_runner.html">skema.gromet.execution_engine.query_runner</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.symbol_table" href="symbol_table.html">skema.gromet.execution_engine.symbol_table</a></code></li>
-<li><code><a title="skema.gromet.execution_engine.types" href="types/index.html">skema.gromet.execution_engine.types</a></code></li>
+<li>
+<h4><code><a title="skema.gromet.execution_engine.query_runner.QueryRunner" href="#skema.gromet.execution_engine.query_runner.QueryRunner">QueryRunner</a></code></h4>
+<ul class="">
+<li><code><a title="skema.gromet.execution_engine.query_runner.QueryRunner.run_query" href="#skema.gromet.execution_engine.query_runner.QueryRunner.run_query">run_query</a></code></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

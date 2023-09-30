@@ -89,14 +89,10 @@ class LatexEquation(BaseModel):
 <span>(</span><span>**data: Any)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A base model class for creating Pydantic models.</p>
+<div class="desc"><p>Usage docs: <a href="https://docs.pydantic.dev/2.2/usage/models/">https://docs.pydantic.dev/2.2/usage/models/</a></p>
+<p>A base class for creating Pydantic models.</p>
 <h2 id="attributes">Attributes</h2>
 <dl>
-<dt><strong><code>model_config</code></strong></dt>
-<dd>Configuration settings for the model.</dd>
-<dt><strong><code>model_fields</code></strong></dt>
-<dd>Metadata about the fields defined on the model.
-This replaces <code>Model.__fields__</code> from Pydantic V1.</dd>
 <dt><strong><code>__class_vars__</code></strong></dt>
 <dd>The names of classvars defined on the model.</dd>
 <dt><strong><code>__private_attributes__</code></strong></dt>
@@ -134,8 +130,9 @@ This replaces <code>Model.__validators__</code> and <code>Model.__root_validator
 <dd>Instance attribute with the values of private attributes set on the model instance.</dd>
 </dl>
 <p>Create a new model by parsing and validating input data from keyword arguments.</p>
-<p>Raises ValidationError if the input data cannot be parsed to form a valid model.</p>
-<p>Uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
+<p>Raises [<code>ValidationError</code>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><code>__init__</code> uses <code>__pydantic_self__</code> instead of the more common <code>self</code> for the first arg to
 allow <code>self</code> as a field name.</p></div>
 <details class="source">
 <summary>
