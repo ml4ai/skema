@@ -404,7 +404,9 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sin => ((), 21),
         Operator::Tan => ((), 22),
         Operator::Mean => ((), 23),
-        Operator::Derivative(Derivative { .. }) => ((), 24),
+        Operator::Dot => ((), 24),
+        Operator::Grad => ((), 25),
+        Operator::Derivative(Derivative { .. }) => ((), 26),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -839,23 +841,51 @@ fn test_one_dimensional_ebm() {
         <mrow><mi>∂</mi><mi>t</mi></mrow>
         </mfrac>
         <mo>=</mo>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>Q</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo>
         <mo>-</mo>
-        <mi>β</mi>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mo>(</mo><mi>A</mi><mo>+</mo><mi>B</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>)</mo>
+        <mo>+</mo>
+        <mfrac>
+        <mi>K</mi>
+        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mfrac>
+        <mi>∂</mi>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>(</mo>
+        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi></mrow>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>)</mo>
     </math>
     ";
-
-    /*let input = "
-    <math>
-        <mfrac>
-        <mrow><mi>∂</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo></mrow>
-        <mrow><mi>∂</mi><mi>t</mi></mrow>
-        </mfrac>
-    </math>
-    ";*/
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
-    //let ode = input.parse::<FirstOrderODE>().unwrap();
-    //println!("ode ={:?}", ode);
+}
+
+#[test]
+fn test_halfar_dome_evolution_equation() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>H</mi></mrow>
+        <mrow><mi>∂</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>&#x2207;</mo>
+        <mo>&#x22c5;</mo>
+        <mo>(</mo>
+        <mi>Γ</mi>
+        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
+        <mo>|</mo><mo>&#x2207;</mo><mi>H</mi><msup><mo>|</mo>
+        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
+        <mo>&#x2207;</mo><mi>H</mi>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
 }

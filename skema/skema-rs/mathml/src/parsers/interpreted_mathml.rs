@@ -10,16 +10,15 @@ use crate::{
         Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, elem_many0, equals, etag, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
-        ParseError, Span,
+        add, attribute, comma, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt,
+        msub, msubsup, msup, multiply, operator_other, rparen, stag, subtract, tag_parser, ws,
+        xml_declaration, IResult, ParseError, Span,
     },
 };
 
 use nom::{
     branch::alt,
     bytes::complete::tag,
-    character::complete::char,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
     sequence::{delimited, pair, preceded, tuple},
@@ -30,7 +29,19 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((add, subtract, equals, lparen, rparen, comma, mean)),
+        alt((
+            add,
+            subtract,
+            multiply,
+            equals,
+            lparen,
+            rparen,
+            comma,
+            mean,
+            grad,
+            dot,
+            operator_other,
+        )),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
