@@ -373,6 +373,7 @@ def train_model(rank=None,):
             optimizer, 
             'min', 
             patience = 5,
+            factor=gamma,
         )
 
         
