@@ -374,6 +374,7 @@ def train_model(rank=None,):
             'min', 
             patience = 5,
             factor=gamma,
+            verbose=True,
         )
 
         
@@ -435,7 +436,10 @@ def train_model(rank=None,):
                 epoch_mins, epoch_secs = epoch_time(start_time, end_time)
 
                 if isEpochScheduler:
-                    scheduler.step()
+                    if reduce_on_plateau_scheduler:
+                        scheduler.step(val_loss)
+                    else:
+                        scheduler.step()
 
                 # saving the current model for transfer learning
                 if (not ddp) or (ddp and rank == 0):
