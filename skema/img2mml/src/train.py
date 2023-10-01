@@ -15,7 +15,7 @@ def train(
     device,
     ddp=False,
     rank=None,
-    isScheduler=False,
+    isBatchScheduler=False,
     scheduler=None,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
@@ -55,7 +55,7 @@ def train(
 
         epoch_loss += loss.item()
 
-        if isScheduler:
+        if isBatchScheduler:
             scheduler.step()
 
         tset.set_description('Loss: %.4f' % loss.item())

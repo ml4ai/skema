@@ -204,8 +204,10 @@ def train_model(rank=None,):
     optimizer_type = config["optimizer_type"]
     learning_rate = config["learning_rate"]
     weight_decay = config["weight_decay"]
+    scheduler_type = config["scheduler_type"]
     step_scheduler = config["step_scheduler"]
     exponential_scheduler = config["exponential_scheduler"]
+    reduce_on_plateau_scheduler = config["ReduceLROnPlateau"]
     starting_lr = config["starting_lr"]
     step_size = config["step_size"]
     gamma = config["gamma"]
@@ -326,11 +328,15 @@ def train_model(rank=None,):
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
-    isScheduler = False
+    isBatchScheduler = False
+    isEpochScheduler = False
     scheduler = None
     if step_scheduler or exponential_scheduler:
         _lr = starting_lr 
-        isScheduler = True
+        if scheduler_type == "batch":
+            isBatchScheduler = True
+        else:
+            isEpochScheduler = True
     else:
         _lr = learning_rate
 
@@ -362,7 +368,14 @@ def train_model(rank=None,):
             last_epoch=-1, 
             verbose=False,
         )
+    elif reduce_on_plateau_scheduler:
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, 
+            'min', 
+            patience = 5,
+        )
 
+        
     best_valid_loss = float("inf")
 
     # raw data paths
@@ -398,7 +411,7 @@ def train_model(rank=None,):
                     device,
                     ddp=ddp,
                     rank=rank,
-                    isScheduler=isScheduler,
+                    isScheduler=isBatchScheduler,
                     scheduler=scheduler,
                 )
 
@@ -419,6 +432,9 @@ def train_model(rank=None,):
                 end_time = time.time()
                 # total time spent on training an epoch
                 epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+
+                if isEpochScheduler:
+                    scheduler.step()
 
                 # saving the current model for transfer learning
                 if (not ddp) or (ddp and rank == 0):
