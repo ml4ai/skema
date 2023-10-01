@@ -412,7 +412,7 @@ def train_model(rank=None,):
                     device,
                     ddp=ddp,
                     rank=rank,
-                    isScheduler=isBatchScheduler,
+                    isBatchScheduler=isBatchScheduler,
                     scheduler=scheduler,
                 )
 
