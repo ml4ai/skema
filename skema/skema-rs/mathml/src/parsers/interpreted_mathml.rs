@@ -11,8 +11,8 @@ use crate::{
     },
     parsers::generic_mathml::{
         add, attribute, comma, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt,
-        msub, msubsup, msup, multiply, operator_other, rparen, stag, subtract, tag_parser, ws,
-        xml_declaration, IResult, ParseError, Span,
+        msub, msubsup, msup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration,
+        IResult, ParseError, Span,
     },
 };
 
@@ -30,17 +30,7 @@ pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
         alt((
-            add,
-            subtract,
-            multiply,
-            equals,
-            lparen,
-            rparen,
-            comma,
-            mean,
-            grad,
-            dot,
-            operator_other,
+            add, subtract, multiply, equals, lparen, rparen, comma, mean, grad, dot,
         )),
         etag!("mo"),
     ))(input)?;
@@ -219,17 +209,6 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
         Ci::new(None, Box::new(MathExpression::Mi(x)), Some(ci_func_of)),
     ))
 }
-/*
-///Obtain Derivative from ordinary differential equations
-pub fn first_derivative(input: Span) -> IResult<Derivative> {
-    let (s, (derivative, _)) = first_order_derivative_leibniz_notation(input)?;
-    return Ok((s, derivative));
-}
-
-pub fn first_derivative_var(input: Span) -> IResult<Ci> {
-    let (s, (_, ci)) = first_order_derivative_leibniz_notation(input)?;
-    return Ok((s, ci));
-}*/
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
 pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
@@ -262,15 +241,6 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                 == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
             {
                 println!("Match successful");
-                /*let differ = Derivative::new(
-                    1,
-                    (indx + 1) as u8,
-                    Ci::new(
-                        Some(Type::Real),
-                        Box::new(MathExpression::Mi(with_respect_to)),
-                        None,
-                    ),
-                );*/
                 return Ok((
                     s,
                     (
@@ -286,23 +256,9 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                         func,
                     ),
                 ));
-                /*let x = Differential::new(
-                    Box::new(MathExpression::Mo(Operator::Derivative(differ))),
-                    Box::new(MathExpression::Ci(func)),
-                );
-                Ok((s, x));*/
             } else if Some(bvar.content.clone())
                 == Some(Box::new(MathExpression::Mi(Mi("".to_string()))))
             {
-                /*let differ = Derivative::new(
-                    1,
-                    1,
-                    Ci::new(
-                        Some(Type::Real),
-                        Box::new(MathExpression::Mi(with_respect_to)),
-                        None,
-                    ),
-                );*/
                 return Ok((
                     s,
                     (
@@ -318,12 +274,6 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                         func,
                     ),
                 ));
-
-                /*let x = Differential::new(
-                    Box::new(MathExpression::Mo(Operator::Derivative(differ))),
-                    Box::new(MathExpression::Ci(func)),
-                );
-                Ok((s, x));*/
             }
         }
     }
@@ -452,34 +402,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        /*map(
-            first_derivative,
-            |Derivative {
-                 order,
-                 var_index,
-                 bound_var,
-             }| {
-                MathExpression::Mo(Operator::Derivative(Derivative {
-                    order,
-                    var_index,
-                    bound_var,
-                }))
-            },
-        ),
-        map(
-            first_derivative_var,
-            |Ci {
-                 r#type,
-                 content,
-                 func_of,
-             }| {
-                MathExpression::Ci(Ci {
-                    r#type,
-                    content,
-                    func_of,
-                })
-            },
-        ),*/
         map(
             ci_univariate_with_bounds,
             |Ci {

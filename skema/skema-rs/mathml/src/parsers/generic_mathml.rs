@@ -232,11 +232,6 @@ pub fn dot(input: Span) -> IResult<Operator> {
     let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
     Ok((s, op))
 }
-/*
-pub fn abs(input: Span) -> IResult<()> {
-    let (s, op) = value(Operator::Abs, ws(tag("|")))(input)?;
-    Ok((s, ()))
-}*/
 
 pub fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = ws(recognize(not_line_ending))(input)?;
