@@ -475,7 +475,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
 
         // create the ports
         create_opo(
-            gromet,    // gromet for metadata
+            gromet,     // gromet for metadata
             &mut nodes, // nodes
             &mut edges,
             &mut meta_nodes,
@@ -483,7 +483,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             c_args.clone(),
         );
         create_opi(
-            gromet,    // gromet for metadata
+            gromet,     // gromet for metadata
             &mut nodes, // nodes
             &mut edges,
             &mut meta_nodes,
@@ -650,7 +650,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         };
 
         create_function(
-            gromet,    // gromet for metadata
+            gromet,     // gromet for metadata
             &mut nodes, // nodes
             &mut edges,
             &mut meta_nodes,
@@ -691,7 +691,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         for _cond in gromet.modules[0].r#fn.bc.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
             create_conditional(
-                gromet,    // gromet for metadata
+                gromet,     // gromet for metadata
                 &mut nodes, // nodes
                 &mut edges,
                 &mut meta_nodes,
@@ -728,27 +728,30 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
         };
         for _while_l in gromet.modules[0].r#fn.bl.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
-            if gromet.modules[0].r#fn.bl.as_ref().unwrap()[while_counter as usize].pre.is_none() {
+            if gromet.modules[0].r#fn.bl.as_ref().unwrap()[while_counter as usize]
+                .pre
+                .is_none()
+            {
                 // if there is not a pre_condition then it is a while loop
                 create_while_loop(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
                     &mut start,
                     c_args.clone(),
-                while_counter,
+                    while_counter,
                 );
             } else {
                 // if there is pre condition then it is a for loop
                 create_for_loop(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
                     &mut start,
                     c_args.clone(),
-                while_counter,
+                    while_counter,
                 );
             }
             while_counter += 1;
@@ -847,7 +850,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             FunctionType::Primitive => {
                 c_args.att_idx = boxf.contents.unwrap() as usize;
                 create_att_primitive(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
@@ -857,7 +860,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
             }
             FunctionType::Literal => {
                 create_att_literal(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
@@ -869,7 +872,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 c_args.att_idx = boxf.contents.unwrap() as usize;
                 c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
                 create_att_predicate(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
@@ -881,7 +884,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                 c_args.att_idx = boxf.contents.unwrap() as usize;
                 c_args.att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone();
                 create_att_expression(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
@@ -989,7 +992,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
 
                     // construct opo nodes, if not none
                     create_opo(
-                        gromet,    // gromet for metadata
+                        gromet,     // gromet for metadata
                         &mut nodes, // nodes
                         &mut edges,
                         &mut meta_nodes,
@@ -997,7 +1000,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                         c_args.clone(),
                     );
                     create_opi(
-                        gromet,    // gromet for metadata
+                        gromet,     // gromet for metadata
                         &mut nodes, // nodes
                         &mut edges,
                         &mut meta_nodes,
@@ -1137,7 +1140,7 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
                     // new function call
                     c_args.att_idx = boxf.contents.unwrap() as usize;
                     create_function(
-                        gromet,    // gromet for metadata
+                        gromet,     // gromet for metadata
                         &mut nodes, // nodes
                         &mut edges,
                         &mut meta_nodes,
@@ -1169,14 +1172,13 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
         box_counter: 0,
     };
 
-
     // make conditionals if they exist
     if gromet.modules[0].r#fn.bc.as_ref().is_some() {
         let mut cond_counter = 0;
         for _cond in gromet.modules[0].r#fn.bc.as_ref().unwrap().iter() {
             // now lets check for and setup any conditionals at this level
             create_conditional(
-                gromet,    // gromet for metadata
+                gromet,     // gromet for metadata
                 &mut nodes, // nodes
                 &mut edges,
                 &mut meta_nodes,
@@ -1191,27 +1193,30 @@ fn create_function_net(gromet: &ModuleCollection, mut start: u32) -> Vec<String>
     if gromet.modules[0].r#fn.bl.as_ref().is_some() {
         let mut while_counter = 0;
         for _loop_count in gromet.modules[0].r#fn.bl.as_ref().unwrap().iter() {
-            if gromet.modules[0].r#fn.bl.as_ref().unwrap()[while_counter as usize].pre.is_none() {
+            if gromet.modules[0].r#fn.bl.as_ref().unwrap()[while_counter as usize]
+                .pre
+                .is_none()
+            {
                 // if there is not a pre_condition then it is a while loop
                 create_while_loop(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
                     &mut start,
                     c_args_other.clone(),
-                while_counter,
+                    while_counter,
                 );
             } else {
                 // if there is pre condition then it is a for loop
                 create_for_loop(
-                    gromet,    // gromet for metadata
+                    gromet,     // gromet for metadata
                     &mut nodes, // nodes
                     &mut edges,
                     &mut meta_nodes,
                     &mut start,
                     c_args_other.clone(),
-                while_counter,
+                    while_counter,
                 );
             }
             while_counter += 1;
@@ -1433,7 +1438,7 @@ pub fn create_function(
             // construct opo nodes, if not none, might need to
             create_opo(
                 gromet, // gromet for metadata
-                nodes,   // nodes
+                nodes,  // nodes
                 edges,
                 meta_nodes,
                 start,
@@ -1441,7 +1446,7 @@ pub fn create_function(
             );
             create_opi(
                 gromet, // gromet for metadata
-                nodes,   // nodes
+                nodes,  // nodes
                 edges,
                 meta_nodes,
                 start,
@@ -1459,7 +1464,7 @@ pub fn create_function(
                         new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
                         create_function(
                             gromet, // gromet for metadata
-                            nodes,   // nodes
+                            nodes,  // nodes
                             edges,
                             meta_nodes,
                             start,
@@ -1471,7 +1476,7 @@ pub fn create_function(
                         new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
                         create_att_predicate(
                             gromet, // gromet for metadata
-                            nodes,   // nodes
+                            nodes,  // nodes
                             edges,
                             meta_nodes,
                             start,
@@ -1482,7 +1487,7 @@ pub fn create_function(
                         new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
                         create_att_expression(
                             gromet, // gromet for metadata
-                            nodes,   // nodes
+                            nodes,  // nodes
                             edges,
                             meta_nodes,
                             start,
@@ -1492,7 +1497,7 @@ pub fn create_function(
                     FunctionType::Literal => {
                         create_att_literal(
                             gromet, // gromet for metadata
-                            nodes,   // nodes
+                            nodes,  // nodes
                             edges,
                             meta_nodes,
                             start,
@@ -1502,7 +1507,7 @@ pub fn create_function(
                     FunctionType::Primitive => {
                         create_att_primitive(
                             gromet, // gromet for metadata
-                            nodes,   // nodes
+                            nodes,  // nodes
                             edges,
                             meta_nodes,
                             start,
@@ -1715,7 +1720,9 @@ pub fn create_conditional(
     *start += 1;
 
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "Condition".to_string();
         }
     }
@@ -1727,7 +1734,9 @@ pub fn create_conditional(
     *start += 1;
 
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "if_body".to_string();
         }
     }
@@ -1739,11 +1748,12 @@ pub fn create_conditional(
     *start += 1;
 
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "else_body".to_string();
         }
     }
-
 
     // Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
     for wire in function_net.wfc.as_ref().unwrap().iter() {
@@ -2054,7 +2064,7 @@ pub fn create_conditional(
     } */
     // might still need pass through wiring??
 }
-pub fn create_for_loop(    
+pub fn create_for_loop(
     gromet: &ModuleCollection, // needed still for metadata unfortunately
     nodes: &mut Vec<Node>,
     edges: &mut Vec<Edge>,
@@ -2120,14 +2130,14 @@ pub fn create_for_loop(
 
     // now we construct the condition and body of the loop, assumption: condition is predicate, and body if a function
     let pre_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
-    .pre
-    .unwrap();
+        .pre
+        .unwrap();
     let condition_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
-    .condition
-    .unwrap();
+        .condition
+        .unwrap();
     let body_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
-    .body
-    .unwrap();
+        .body
+        .unwrap();
     let mut new_c_args = c_args.clone();
 
     // first create the pre function
@@ -2135,17 +2145,19 @@ pub fn create_for_loop(
     new_c_args.att_box = gromet.modules[0].attributes[(pre_att - 1) as usize].clone();
     new_c_args.att_idx = pre_att as usize;
     create_function(
-        gromet,    // gromet for metadata
-        nodes, // nodes
+        gromet, // gromet for metadata
+        nodes,  // nodes
         edges,
         meta_nodes,
         start,
         new_c_args.clone(),
     );
-    
+
     // now we need to rename the contains edge for the body to body
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "Body".to_string();
         }
     }
@@ -2155,8 +2167,8 @@ pub fn create_for_loop(
     new_c_args.att_box = gromet.modules[0].attributes[(condition_att - 1) as usize].clone();
     new_c_args.att_idx = condition_att as usize;
     create_att_predicate(
-        gromet,    // gromet for metadata
-        nodes, // nodes
+        gromet, // gromet for metadata
+        nodes,  // nodes
         edges,
         meta_nodes,
         start,
@@ -2164,7 +2176,9 @@ pub fn create_for_loop(
     );
     // we need to rename the contains edge to be a condition edge
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "Condition".to_string();
         }
     }
@@ -2174,8 +2188,8 @@ pub fn create_for_loop(
     new_c_args.att_box = gromet.modules[0].attributes[(body_att - 1) as usize].clone();
     new_c_args.att_idx = body_att as usize;
     create_function(
-        gromet,    // gromet for metadata
-        nodes, // nodes
+        gromet, // gromet for metadata
+        nodes,  // nodes
         edges,
         meta_nodes,
         start,
@@ -2184,7 +2198,9 @@ pub fn create_for_loop(
 
     // now we need to rename the contains edge for the body to body
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "Body".to_string();
         }
     }
@@ -2368,9 +2384,7 @@ pub fn create_for_loop(
     }
 
     // now to perform the implicit wiring:
- 
 }
-
 
 pub fn create_while_loop(
     gromet: &ModuleCollection, // needed still for metadata unfortunately
@@ -2439,11 +2453,11 @@ pub fn create_while_loop(
     // now we construct the condition and body of the loop, assumption: condition is predicate, and body if a function
 
     let condition_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
-    .condition
-    .unwrap();
+        .condition
+        .unwrap();
     let body_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
-    .body
-    .unwrap();
+        .body
+        .unwrap();
     let mut new_c_args = c_args.clone();
 
     // first the condition
@@ -2451,8 +2465,8 @@ pub fn create_while_loop(
     new_c_args.parent_node = n1.clone();
     new_c_args.att_idx = condition_att as usize;
     create_att_predicate(
-        gromet,    // gromet for metadata
-        nodes, // nodes
+        gromet, // gromet for metadata
+        nodes,  // nodes
         edges,
         meta_nodes,
         start,
@@ -2460,7 +2474,9 @@ pub fn create_while_loop(
     );
     // we need to rename the contains edge to be a condition edge
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "Condition".to_string();
         }
     }
@@ -2470,8 +2486,8 @@ pub fn create_while_loop(
     new_c_args.att_box = gromet.modules[0].attributes[(body_att - 1) as usize].clone();
     new_c_args.att_idx = body_att as usize;
     create_function(
-        gromet,    // gromet for metadata
-        nodes, // nodes
+        gromet, // gromet for metadata
+        nodes,  // nodes
         edges,
         meta_nodes,
         start,
@@ -2480,7 +2496,9 @@ pub fn create_while_loop(
 
     // now we need to rename the contains edge for the body to body
     for edge in edges.iter_mut() {
-        if edge.src == new_c_args.parent_node.node_id.clone() && edge.e_type == "Contains".to_string() {
+        if edge.src == new_c_args.parent_node.node_id.clone()
+            && edge.e_type == "Contains".to_string()
+        {
             edge.e_type = "Body".to_string();
         }
     }
@@ -2664,7 +2682,6 @@ pub fn create_while_loop(
     }
 
     // now to perform the implicit wiring:
-
 
     // now to perform the wl_cargs wiring which is a connection from the condition's pif/opi to the pic
     /*for wire in function_net.wl_cargs.as_ref().unwrap().iter() {
@@ -2955,8 +2972,7 @@ pub fn create_att_expression(
     *start += 1;
 
     let att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone(); // current expression attribute
-    let parent_att_box =
-        gromet.modules[0].attributes[c_args.parent_node.contents].clone(); // parent attribute
+    let parent_att_box = gromet.modules[0].attributes[c_args.parent_node.contents].clone(); // parent attribute
 
     // construct opo nodes, if not none
     // not calling the opo port constuctors since they are based on grabbing in the name from top level of the gromet,
@@ -3123,7 +3139,7 @@ pub fn create_att_expression(
                 FunctionType::Literal => {
                     create_att_literal(
                         gromet, // gromet for metadata
-                        nodes,   // nodes
+                        nodes,  // nodes
                         edges,
                         meta_nodes,
                         start,
@@ -3133,7 +3149,7 @@ pub fn create_att_expression(
                 FunctionType::Primitive => {
                     create_att_primitive(
                         gromet, // gromet for metadata
-                        nodes,   // nodes
+                        nodes,  // nodes
                         edges,
                         meta_nodes,
                         start,
@@ -3357,7 +3373,7 @@ pub fn create_att_predicate(
             FunctionType::Literal => {
                 create_att_literal(
                     gromet, // gromet for metadata
-                    nodes,   // nodes
+                    nodes,  // nodes
                     edges,
                     meta_nodes,
                     start,
@@ -3367,7 +3383,7 @@ pub fn create_att_predicate(
             FunctionType::Primitive => {
                 create_att_primitive(
                     gromet, // gromet for metadata
-                    nodes,   // nodes
+                    nodes,  // nodes
                     edges,
                     meta_nodes,
                     start,
@@ -4687,11 +4703,7 @@ pub fn wff_cross_att_wiring(
     }
 }
 // external wiring is the wiring between boxes at the module level
-pub fn external_wiring(
-    gromet: &ModuleCollection,
-    nodes: &mut Vec<Node>,
-    edges: &mut Vec<Edge>,
-) {
+pub fn external_wiring(gromet: &ModuleCollection, nodes: &mut Vec<Node>, edges: &mut Vec<Edge>) {
     if gromet.modules[0].r#fn.wff.as_ref().is_some() {
         for wire in gromet.modules[0].r#fn.wff.as_ref().unwrap().iter() {
             let src_idx = wire.src; // pif wire connects to

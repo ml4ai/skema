@@ -25,6 +25,8 @@ pub enum Operator {
     Exp,
     Power,
     Comma,
+    Grad,
+    Dot,
     Derivative(Derivative),
     Sin,
     Cos,
@@ -80,6 +82,8 @@ impl fmt::Display for Operator {
             Operator::Arccsc => write!(f, "Arccsc"),
             Operator::Arccot => write!(f, "Arccot"),
             Operator::Mean => write!(f, "Mean"),
+            Operator::Grad => write!(f, "Grad"),
+            Operator::Dot => write!(f, "Dot"),
         }
     }
 }
