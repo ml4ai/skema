@@ -438,6 +438,7 @@ def train_model(rank=None,):
                 if isEpochScheduler:
                     if reduce_on_plateau_scheduler:
                         scheduler.step(val_loss)
+                        print(optimizer.param_groups[0]['lr'])
                     else:
                         scheduler.step()
 
