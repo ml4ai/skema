@@ -83,6 +83,10 @@
 <a href="#83" id="83">83</a>
 <a href="#84" id="84">84</a>
 <a href="#85" id="85">85</a>
+<a href="#86" id="86">86</a>
+<a href="#87" id="87">87</a>
+<a href="#88" id="88">88</a>
+<a href="#89" id="89">89</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::ast::Ci;
 <span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
@@ -110,6 +114,8 @@
     Exp,
     Power,
     Comma,
+    Grad,
+    Dot,
     Derivative(Derivative),
     Sin,
     Cos,
@@ -165,6 +171,8 @@
             Operator::Arccsc =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Arccsc&quot;</span>),
             Operator::Arccot =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Arccot&quot;</span>),
             Operator::Mean =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Mean&quot;</span>),
+            Operator::Grad =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Grad&quot;</span>),
+            Operator::Dot =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;Dot&quot;</span>),
         }
     }
 }

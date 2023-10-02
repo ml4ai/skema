@@ -105,6 +105,18 @@
 <a href="#105" id="105">105</a>
 <a href="#106" id="106">106</a>
 <a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>derive_new::new;
 <span class="kw">use </span>std::fmt;
 
@@ -141,7 +153,13 @@
     <span class="kw">pub </span>func_of: <span class="prelude-ty">Option</span>&lt;Vec&lt;Ci&gt;&gt;,
 }
 
-<span class="doccomment">/// The MathExpression enum represents the corresponding element type in MathML 3
+<span class="attr">#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+</span><span class="kw">pub struct </span>Differential {
+    <span class="kw">pub </span>diff: Box&lt;MathExpression&gt;,
+    <span class="kw">pub </span>func: Box&lt;MathExpression&gt;,
+}
+
+<span class="doccomment">/// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 </span><span class="attr">#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
 </span><span class="kw">pub enum </span>MathExpression {
@@ -166,7 +184,9 @@
     MoLine(String),
     <span class="comment">//GroupTuple(Vec&lt;MathExpression&gt;),
     </span>Ci(Ci),
-    <span class="attr">#[default]
+    Differential(Differential),
+    <span class="comment">//Differential(Box&lt;MathExpression&gt;, Box&lt;MathExpression&gt;),
+    </span><span class="attr">#[default]
     </span><span class="prelude-val">None</span>,
 }
 
@@ -194,6 +214,10 @@
                     <span class="macro">write!</span>(f, <span class="string">&quot;{}&quot;</span>, e)<span class="question-mark">?</span>;
                 }
                 <span class="prelude-val">Ok</span>(())
+            }
+            MathExpression::Differential(Differential { diff, func }) =&gt; {
+                <span class="macro">write!</span>(f, <span class="string">&quot;{diff}&quot;</span>);
+                <span class="macro">write!</span>(f, <span class="string">&quot;{func}&quot;</span>)
             }
             expression =&gt; <span class="macro">write!</span>(f, <span class="string">&quot;{expression:?}&quot;</span>),
         }

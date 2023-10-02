@@ -4814,6 +4814,18 @@
 <a href="#4814" id="4814">4814</a>
 <a href="#4815" id="4815">4815</a>
 <a href="#4816" id="4816">4816</a>
+<a href="#4817" id="4817">4817</a>
+<a href="#4818" id="4818">4818</a>
+<a href="#4819" id="4819">4819</a>
+<a href="#4820" id="4820">4820</a>
+<a href="#4821" id="4821">4821</a>
+<a href="#4822" id="4822">4822</a>
+<a href="#4823" id="4823">4823</a>
+<a href="#4824" id="4824">4824</a>
+<a href="#4825" id="4825">4825</a>
+<a href="#4826" id="4826">4826</a>
+<a href="#4827" id="4827">4827</a>
+<a href="#4828" id="4828">4828</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -5291,7 +5303,7 @@ There being a second function call of the same function which contains an expres
 
         <span class="comment">// create the ports
         </span>create_opo(
-            gromet,    <span class="comment">// gromet for metadata
+            gromet,     <span class="comment">// gromet for metadata
             </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
             </span><span class="kw-2">&amp;mut </span>edges,
             <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5299,7 +5311,7 @@ There being a second function call of the same function which contains an expres
             c_args.clone(),
         );
         create_opi(
-            gromet,    <span class="comment">// gromet for metadata
+            gromet,     <span class="comment">// gromet for metadata
             </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
             </span><span class="kw-2">&amp;mut </span>edges,
             <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5466,7 +5478,7 @@ There being a second function call of the same function which contains an expres
         };
 
         create_function(
-            gromet,    <span class="comment">// gromet for metadata
+            gromet,     <span class="comment">// gromet for metadata
             </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
             </span><span class="kw-2">&amp;mut </span>edges,
             <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5507,7 +5519,7 @@ There being a second function call of the same function which contains an expres
         <span class="kw">for </span>_cond <span class="kw">in </span>gromet.modules[<span class="number">0</span>].r#fn.bc.as_ref().unwrap().iter() {
             <span class="comment">// now lets check for and setup any conditionals at this level
             </span>create_conditional(
-                gromet,    <span class="comment">// gromet for metadata
+                gromet,     <span class="comment">// gromet for metadata
                 </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                 </span><span class="kw-2">&amp;mut </span>edges,
                 <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5544,27 +5556,30 @@ There being a second function call of the same function which contains an expres
         };
         <span class="kw">for </span>_while_l <span class="kw">in </span>gromet.modules[<span class="number">0</span>].r#fn.bl.as_ref().unwrap().iter() {
             <span class="comment">// now lets check for and setup any conditionals at this level
-            </span><span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.bl.as_ref().unwrap()[while_counter <span class="kw">as </span>usize].pre.is_none() {
+            </span><span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.bl.as_ref().unwrap()[while_counter <span class="kw">as </span>usize]
+                .pre
+                .is_none()
+            {
                 <span class="comment">// if there is not a pre_condition then it is a while loop
                 </span>create_while_loop(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
                     <span class="kw-2">&amp;mut </span>start,
                     c_args.clone(),
-                while_counter,
+                    while_counter,
                 );
             } <span class="kw">else </span>{
                 <span class="comment">// if there is pre condition then it is a for loop
                 </span>create_for_loop(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
                     <span class="kw-2">&amp;mut </span>start,
                     c_args.clone(),
-                while_counter,
+                    while_counter,
                 );
             }
             while_counter += <span class="number">1</span>;
@@ -5663,7 +5678,7 @@ There being a second function call of the same function which contains an expres
             FunctionType::Primitive =&gt; {
                 c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
                 create_att_primitive(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5673,7 +5688,7 @@ There being a second function call of the same function which contains an expres
             }
             FunctionType::Literal =&gt; {
                 create_att_literal(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5685,7 +5700,7 @@ There being a second function call of the same function which contains an expres
                 c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
                 c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
                 create_att_predicate(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5697,7 +5712,7 @@ There being a second function call of the same function which contains an expres
                 c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
                 c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone();
                 create_att_expression(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5805,7 +5820,7 @@ There being a second function call of the same function which contains an expres
 
                     <span class="comment">// construct opo nodes, if not none
                     </span>create_opo(
-                        gromet,    <span class="comment">// gromet for metadata
+                        gromet,     <span class="comment">// gromet for metadata
                         </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                         </span><span class="kw-2">&amp;mut </span>edges,
                         <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5813,7 +5828,7 @@ There being a second function call of the same function which contains an expres
                         c_args.clone(),
                     );
                     create_opi(
-                        gromet,    <span class="comment">// gromet for metadata
+                        gromet,     <span class="comment">// gromet for metadata
                         </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                         </span><span class="kw-2">&amp;mut </span>edges,
                         <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5953,7 +5968,7 @@ There being a second function call of the same function which contains an expres
                     <span class="comment">// new function call
                     </span>c_args.att_idx = boxf.contents.unwrap() <span class="kw">as </span>usize;
                     create_function(
-                        gromet,    <span class="comment">// gromet for metadata
+                        gromet,     <span class="comment">// gromet for metadata
                         </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                         </span><span class="kw-2">&amp;mut </span>edges,
                         <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -5985,14 +6000,13 @@ There being a second function call of the same function which contains an expres
         box_counter: <span class="number">0</span>,
     };
 
-
     <span class="comment">// make conditionals if they exist
     </span><span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.bc.as_ref().is_some() {
         <span class="kw">let </span><span class="kw-2">mut </span>cond_counter = <span class="number">0</span>;
         <span class="kw">for </span>_cond <span class="kw">in </span>gromet.modules[<span class="number">0</span>].r#fn.bc.as_ref().unwrap().iter() {
             <span class="comment">// now lets check for and setup any conditionals at this level
             </span>create_conditional(
-                gromet,    <span class="comment">// gromet for metadata
+                gromet,     <span class="comment">// gromet for metadata
                 </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                 </span><span class="kw-2">&amp;mut </span>edges,
                 <span class="kw-2">&amp;mut </span>meta_nodes,
@@ -6007,27 +6021,30 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.bl.as_ref().is_some() {
         <span class="kw">let </span><span class="kw-2">mut </span>while_counter = <span class="number">0</span>;
         <span class="kw">for </span>_loop_count <span class="kw">in </span>gromet.modules[<span class="number">0</span>].r#fn.bl.as_ref().unwrap().iter() {
-            <span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.bl.as_ref().unwrap()[while_counter <span class="kw">as </span>usize].pre.is_none() {
+            <span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.bl.as_ref().unwrap()[while_counter <span class="kw">as </span>usize]
+                .pre
+                .is_none()
+            {
                 <span class="comment">// if there is not a pre_condition then it is a while loop
                 </span>create_while_loop(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
                     <span class="kw-2">&amp;mut </span>start,
                     c_args_other.clone(),
-                while_counter,
+                    while_counter,
                 );
             } <span class="kw">else </span>{
                 <span class="comment">// if there is pre condition then it is a for loop
                 </span>create_for_loop(
-                    gromet,    <span class="comment">// gromet for metadata
+                    gromet,     <span class="comment">// gromet for metadata
                     </span><span class="kw-2">&amp;mut </span>nodes, <span class="comment">// nodes
                     </span><span class="kw-2">&amp;mut </span>edges,
                     <span class="kw-2">&amp;mut </span>meta_nodes,
                     <span class="kw-2">&amp;mut </span>start,
                     c_args_other.clone(),
-                while_counter,
+                    while_counter,
                 );
             }
             while_counter += <span class="number">1</span>;
@@ -6249,7 +6266,7 @@ There being a second function call of the same function which contains an expres
             <span class="comment">// construct opo nodes, if not none, might need to
             </span>create_opo(
                 gromet, <span class="comment">// gromet for metadata
-                </span>nodes,   <span class="comment">// nodes
+                </span>nodes,  <span class="comment">// nodes
                 </span>edges,
                 meta_nodes,
                 start,
@@ -6257,7 +6274,7 @@ There being a second function call of the same function which contains an expres
             );
             create_opi(
                 gromet, <span class="comment">// gromet for metadata
-                </span>nodes,   <span class="comment">// nodes
+                </span>nodes,  <span class="comment">// nodes
                 </span>edges,
                 meta_nodes,
                 start,
@@ -6275,7 +6292,7 @@ There being a second function call of the same function which contains an expres
                         new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
                         create_function(
                             gromet, <span class="comment">// gromet for metadata
-                            </span>nodes,   <span class="comment">// nodes
+                            </span>nodes,  <span class="comment">// nodes
                             </span>edges,
                             meta_nodes,
                             start,
@@ -6287,7 +6304,7 @@ There being a second function call of the same function which contains an expres
                         new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
                         create_att_predicate(
                             gromet, <span class="comment">// gromet for metadata
-                            </span>nodes,   <span class="comment">// nodes
+                            </span>nodes,  <span class="comment">// nodes
                             </span>edges,
                             meta_nodes,
                             start,
@@ -6298,7 +6315,7 @@ There being a second function call of the same function which contains an expres
                         new_c_args.att_idx = att_sub_box.contents.unwrap() <span class="kw">as </span>usize;
                         create_att_expression(
                             gromet, <span class="comment">// gromet for metadata
-                            </span>nodes,   <span class="comment">// nodes
+                            </span>nodes,  <span class="comment">// nodes
                             </span>edges,
                             meta_nodes,
                             start,
@@ -6308,7 +6325,7 @@ There being a second function call of the same function which contains an expres
                     FunctionType::Literal =&gt; {
                         create_att_literal(
                             gromet, <span class="comment">// gromet for metadata
-                            </span>nodes,   <span class="comment">// nodes
+                            </span>nodes,  <span class="comment">// nodes
                             </span>edges,
                             meta_nodes,
                             start,
@@ -6318,7 +6335,7 @@ There being a second function call of the same function which contains an expres
                     FunctionType::Primitive =&gt; {
                         create_att_primitive(
                             gromet, <span class="comment">// gromet for metadata
-                            </span>nodes,   <span class="comment">// nodes
+                            </span>nodes,  <span class="comment">// nodes
                             </span>edges,
                             meta_nodes,
                             start,
@@ -6531,7 +6548,9 @@ There being a second function call of the same function which contains an expres
     <span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;Condition&quot;</span>.to_string();
         }
     }
@@ -6543,7 +6562,9 @@ There being a second function call of the same function which contains an expres
     <span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;if_body&quot;</span>.to_string();
         }
     }
@@ -6555,11 +6576,12 @@ There being a second function call of the same function which contains an expres
     <span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;else_body&quot;</span>.to_string();
         }
     }
-
 
     <span class="comment">// Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
     </span><span class="kw">for </span>wire <span class="kw">in </span>function_net.wfc.as_ref().unwrap().iter() {
@@ -6870,7 +6892,7 @@ There being a second function call of the same function which contains an expres
     } */
     // might still need pass through wiring??
 </span>}
-<span class="kw">pub fn </span>create_for_loop(    
+<span class="kw">pub fn </span>create_for_loop(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection, <span class="comment">// needed still for metadata unfortunately
     </span>nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
     edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
@@ -6936,14 +6958,14 @@ There being a second function call of the same function which contains an expres
 
     <span class="comment">// now we construct the condition and body of the loop, assumption: condition is predicate, and body if a function
     </span><span class="kw">let </span>pre_att = function_net.bl.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
-    .pre
-    .unwrap();
+        .pre
+        .unwrap();
     <span class="kw">let </span>condition_att = function_net.bl.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
-    .condition
-    .unwrap();
+        .condition
+        .unwrap();
     <span class="kw">let </span>body_att = function_net.bl.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
-    .body
-    .unwrap();
+        .body
+        .unwrap();
     <span class="kw">let </span><span class="kw-2">mut </span>new_c_args = c_args.clone();
 
     <span class="comment">// first create the pre function
@@ -6951,17 +6973,19 @@ There being a second function call of the same function which contains an expres
     new_c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[(pre_att - <span class="number">1</span>) <span class="kw">as </span>usize].clone();
     new_c_args.att_idx = pre_att <span class="kw">as </span>usize;
     create_function(
-        gromet,    <span class="comment">// gromet for metadata
-        </span>nodes, <span class="comment">// nodes
+        gromet, <span class="comment">// gromet for metadata
+        </span>nodes,  <span class="comment">// nodes
         </span>edges,
         meta_nodes,
         start,
         new_c_args.clone(),
     );
-    
+
     <span class="comment">// now we need to rename the contains edge for the body to body
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;Body&quot;</span>.to_string();
         }
     }
@@ -6971,8 +6995,8 @@ There being a second function call of the same function which contains an expres
     </span>new_c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[(condition_att - <span class="number">1</span>) <span class="kw">as </span>usize].clone();
     new_c_args.att_idx = condition_att <span class="kw">as </span>usize;
     create_att_predicate(
-        gromet,    <span class="comment">// gromet for metadata
-        </span>nodes, <span class="comment">// nodes
+        gromet, <span class="comment">// gromet for metadata
+        </span>nodes,  <span class="comment">// nodes
         </span>edges,
         meta_nodes,
         start,
@@ -6980,7 +7004,9 @@ There being a second function call of the same function which contains an expres
     );
     <span class="comment">// we need to rename the contains edge to be a condition edge
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;Condition&quot;</span>.to_string();
         }
     }
@@ -6990,8 +7016,8 @@ There being a second function call of the same function which contains an expres
     </span>new_c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[(body_att - <span class="number">1</span>) <span class="kw">as </span>usize].clone();
     new_c_args.att_idx = body_att <span class="kw">as </span>usize;
     create_function(
-        gromet,    <span class="comment">// gromet for metadata
-        </span>nodes, <span class="comment">// nodes
+        gromet, <span class="comment">// gromet for metadata
+        </span>nodes,  <span class="comment">// nodes
         </span>edges,
         meta_nodes,
         start,
@@ -7000,7 +7026,9 @@ There being a second function call of the same function which contains an expres
 
     <span class="comment">// now we need to rename the contains edge for the body to body
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;Body&quot;</span>.to_string();
         }
     }
@@ -7184,9 +7212,7 @@ There being a second function call of the same function which contains an expres
     }
 
     <span class="comment">// now to perform the implicit wiring:
- 
 </span>}
-
 
 <span class="kw">pub fn </span>create_while_loop(
     gromet: <span class="kw-2">&amp;</span>ModuleCollection, <span class="comment">// needed still for metadata unfortunately
@@ -7255,11 +7281,11 @@ There being a second function call of the same function which contains an expres
     <span class="comment">// now we construct the condition and body of the loop, assumption: condition is predicate, and body if a function
 
     </span><span class="kw">let </span>condition_att = function_net.bl.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
-    .condition
-    .unwrap();
+        .condition
+        .unwrap();
     <span class="kw">let </span>body_att = function_net.bl.as_ref().unwrap()[cond_counter <span class="kw">as </span>usize]
-    .body
-    .unwrap();
+        .body
+        .unwrap();
     <span class="kw">let </span><span class="kw-2">mut </span>new_c_args = c_args.clone();
 
     <span class="comment">// first the condition
@@ -7267,8 +7293,8 @@ There being a second function call of the same function which contains an expres
     new_c_args.parent_node = n1.clone();
     new_c_args.att_idx = condition_att <span class="kw">as </span>usize;
     create_att_predicate(
-        gromet,    <span class="comment">// gromet for metadata
-        </span>nodes, <span class="comment">// nodes
+        gromet, <span class="comment">// gromet for metadata
+        </span>nodes,  <span class="comment">// nodes
         </span>edges,
         meta_nodes,
         start,
@@ -7276,7 +7302,9 @@ There being a second function call of the same function which contains an expres
     );
     <span class="comment">// we need to rename the contains edge to be a condition edge
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;Condition&quot;</span>.to_string();
         }
     }
@@ -7286,8 +7314,8 @@ There being a second function call of the same function which contains an expres
     </span>new_c_args.att_box = gromet.modules[<span class="number">0</span>].attributes[(body_att - <span class="number">1</span>) <span class="kw">as </span>usize].clone();
     new_c_args.att_idx = body_att <span class="kw">as </span>usize;
     create_function(
-        gromet,    <span class="comment">// gromet for metadata
-        </span>nodes, <span class="comment">// nodes
+        gromet, <span class="comment">// gromet for metadata
+        </span>nodes,  <span class="comment">// nodes
         </span>edges,
         meta_nodes,
         start,
@@ -7296,7 +7324,9 @@ There being a second function call of the same function which contains an expres
 
     <span class="comment">// now we need to rename the contains edge for the body to body
     </span><span class="kw">for </span>edge <span class="kw">in </span>edges.iter_mut() {
-        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone() &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string() {
+        <span class="kw">if </span>edge.src == new_c_args.parent_node.node_id.clone()
+            &amp;&amp; edge.e_type == <span class="string">&quot;Contains&quot;</span>.to_string()
+        {
             edge.e_type = <span class="string">&quot;Body&quot;</span>.to_string();
         }
     }
@@ -7480,7 +7510,6 @@ There being a second function call of the same function which contains an expres
     }
 
     <span class="comment">// now to perform the implicit wiring:
-
 
     // now to perform the wl_cargs wiring which is a connection from the condition&#39;s pif/opi to the pic
     /*for wire in function_net.wl_cargs.as_ref().unwrap().iter() {
@@ -7771,8 +7800,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">let </span>att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone(); <span class="comment">// current expression attribute
-    </span><span class="kw">let </span>parent_att_box =
-        gromet.modules[<span class="number">0</span>].attributes[c_args.parent_node.contents].clone(); <span class="comment">// parent attribute
+    </span><span class="kw">let </span>parent_att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.parent_node.contents].clone(); <span class="comment">// parent attribute
 
     // construct opo nodes, if not none
     // not calling the opo port constuctors since they are based on grabbing in the name from top level of the gromet,
@@ -7939,7 +7967,7 @@ There being a second function call of the same function which contains an expres
                 FunctionType::Literal =&gt; {
                     create_att_literal(
                         gromet, <span class="comment">// gromet for metadata
-                        </span>nodes,   <span class="comment">// nodes
+                        </span>nodes,  <span class="comment">// nodes
                         </span>edges,
                         meta_nodes,
                         start,
@@ -7949,7 +7977,7 @@ There being a second function call of the same function which contains an expres
                 FunctionType::Primitive =&gt; {
                     create_att_primitive(
                         gromet, <span class="comment">// gromet for metadata
-                        </span>nodes,   <span class="comment">// nodes
+                        </span>nodes,  <span class="comment">// nodes
                         </span>edges,
                         meta_nodes,
                         start,
@@ -8173,7 +8201,7 @@ There being a second function call of the same function which contains an expres
             FunctionType::Literal =&gt; {
                 create_att_literal(
                     gromet, <span class="comment">// gromet for metadata
-                    </span>nodes,   <span class="comment">// nodes
+                    </span>nodes,  <span class="comment">// nodes
                     </span>edges,
                     meta_nodes,
                     start,
@@ -8183,7 +8211,7 @@ There being a second function call of the same function which contains an expres
             FunctionType::Primitive =&gt; {
                 create_att_primitive(
                     gromet, <span class="comment">// gromet for metadata
-                    </span>nodes,   <span class="comment">// nodes
+                    </span>nodes,  <span class="comment">// nodes
                     </span>edges,
                     meta_nodes,
                     start,
@@ -9503,11 +9531,7 @@ There being a second function call of the same function which contains an expres
     }
 }
 <span class="comment">// external wiring is the wiring between boxes at the module level
-</span><span class="kw">pub fn </span>external_wiring(
-    gromet: <span class="kw-2">&amp;</span>ModuleCollection,
-    nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;,
-    edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;,
-) {
+</span><span class="kw">pub fn </span>external_wiring(gromet: <span class="kw-2">&amp;</span>ModuleCollection, nodes: <span class="kw-2">&amp;mut </span>Vec&lt;Node&gt;, edges: <span class="kw-2">&amp;mut </span>Vec&lt;Edge&gt;) {
     <span class="kw">if </span>gromet.modules[<span class="number">0</span>].r#fn.wff.as_ref().is_some() {
         <span class="kw">for </span>wire <span class="kw">in </span>gromet.modules[<span class="number">0</span>].r#fn.wff.as_ref().unwrap().iter() {
             <span class="kw">let </span>src_idx = wire.src; <span class="comment">// pif wire connects to

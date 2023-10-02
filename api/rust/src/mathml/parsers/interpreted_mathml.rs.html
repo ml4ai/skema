@@ -412,6 +412,48 @@
 <a href="#412" id="412">412</a>
 <a href="#413" id="413">413</a>
 <a href="#414" id="414">414</a>
+<a href="#415" id="415">415</a>
+<a href="#416" id="416">416</a>
+<a href="#417" id="417">417</a>
+<a href="#418" id="418">418</a>
+<a href="#419" id="419">419</a>
+<a href="#420" id="420">420</a>
+<a href="#421" id="421">421</a>
+<a href="#422" id="422">422</a>
+<a href="#423" id="423">423</a>
+<a href="#424" id="424">424</a>
+<a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
+<a href="#450" id="450">450</a>
+<a href="#451" id="451">451</a>
+<a href="#452" id="452">452</a>
+<a href="#453" id="453">453</a>
+<a href="#454" id="454">454</a>
+<a href="#455" id="455">455</a>
+<a href="#456" id="456">456</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! This module contains parsers that perform some amount of preliminary domain-specific
 //! interpretation of presentation MathML (e.g., globbing S(t) to an identifier S of type
 //! &#39;function&#39;). This is in contrast to the `generic_mathml.rs` module that contains parsers that
@@ -421,12 +463,12 @@
 </span><span class="kw">use crate</span>::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, Math, MathExpression, Mi, Mrow, Type,
+        Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, elem_many0, equals, etag, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
-        ParseError, Span,
+        add, attribute, comma, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt,
+        msub, msubsup, msup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration,
+        IResult, ParseError, Span,
     },
 };
 
@@ -443,7 +485,9 @@
 </span><span class="kw">pub fn </span>operator(input: Span) -&gt; IResult&lt;Operator&gt; {
     <span class="kw">let </span>(s, op) = ws(delimited(
         <span class="macro">stag!</span>(<span class="string">&quot;mo&quot;</span>),
-        alt((add, subtract, equals, lparen, rparen, comma, mean)),
+        alt((
+            add, subtract, multiply, equals, lparen, rparen, comma, mean, grad, dot,
+        )),
         <span class="macro">etag!</span>(<span class="string">&quot;mo&quot;</span>),
     ))(input)<span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>((s, op))
@@ -572,6 +616,19 @@
     }
 }
 
+<span class="doccomment">/// Parse the identifier &#39;∂&#39;
+</span><span class="kw">fn </span>partial(input: Span) -&gt; IResult&lt;()&gt; {
+    <span class="kw">let </span>(s, Mi(x)) = mi(input)<span class="question-mark">?</span>;
+    <span class="kw">if let </span><span class="string">&quot;∂&quot; </span>= x.as_ref() {
+        <span class="prelude-val">Ok</span>((s, ()))
+    } <span class="kw">else </span>{
+        <span class="prelude-val">Err</span>(nom::Err::Error(ParseError::new(
+            <span class="string">&quot;Unable to identify Mi(&#39;∂&#39;)&quot;</span>.to_string(),
+            input,
+        )))
+    }
+}
+
 <span class="doccomment">/// Parse a content identifier with function of elements.
 /// Example: S(t,x)
 </span><span class="kw">pub fn </span>ci_unknown_with_bounds(input: Span) -&gt; IResult&lt;Ci&gt; {
@@ -611,7 +668,7 @@
 
 <span class="doccomment">/// Parse a first-order ordinary derivative written in Leibniz notation.
 </span><span class="kw">pub fn </span>first_order_derivative_leibniz_notation(input: Span) -&gt; IResult&lt;(Derivative, Ci)&gt; {
-    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">&quot;mfrac&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), d))(input)<span class="question-mark">?</span>;
+    <span class="kw">let </span>(s, <span class="kw">_</span>) = tuple((<span class="macro">stag!</span>(<span class="string">&quot;mfrac&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), alt((d, partial))))(input)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, func) = ws(alt((
         ci_univariate_func,
         map(
@@ -629,7 +686,7 @@
         ci_subscript_func,
     )))(s)<span class="question-mark">?</span>;
     <span class="kw">let </span>(s, with_respect_to) = delimited(
-        tuple((<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), d)),
+        tuple((<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">stag!</span>(<span class="string">&quot;mrow&quot;</span>), alt((d, partial)))),
         mi,
         pair(<span class="macro">etag!</span>(<span class="string">&quot;mrow&quot;</span>), <span class="macro">etag!</span>(<span class="string">&quot;mfrac&quot;</span>)),
     )(s)<span class="question-mark">?</span>;
@@ -640,7 +697,6 @@
                 == <span class="prelude-val">Some</span>(Box::new(MathExpression::Mi(with_respect_to.clone())))
             {
                 <span class="macro">println!</span>(<span class="string">&quot;Match successful&quot;</span>);
-
                 <span class="kw">return </span><span class="prelude-val">Ok</span>((
                     s,
                     (
@@ -774,6 +830,34 @@
 /// assumes that expressions such as S(t) are actually univariate functions.
 </span><span class="kw">pub fn </span>math_expression(input: Span) -&gt; IResult&lt;MathExpression&gt; {
     ws(alt((
+        map(
+            first_order_derivative_leibniz_notation,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         map(
             ci_univariate_with_bounds,
             |Ci {
