@@ -1,9 +1,9 @@
 import os
 import sys
 import ast
-from skema.program_analysis import astpp
 import json
 import argparse
+
 from skema.program_analysis.CAST.pythonAST import py_ast_to_cast
 from skema.program_analysis.CAST2FN import cast
 from skema.program_analysis.CAST2FN.model.cast import SourceRef
@@ -11,15 +11,15 @@ from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.visitors.cast_to_agraph_visitor import (
     CASTToAGraphVisitor,
 )
+
+from skema.program_analysis.CAST.python.ts2cast import TS2CAST
+
 from typing import Optional
 
 
 def get_args():
     parser = argparse.ArgumentParser(
         "Runs Python to CAST pipeline on input Python source file."
-    )
-    parser.add_argument(
-        "--astpp", help="Dumps Python AST to stdout", action="store_true"
     )
     parser.add_argument(
         "--rawjson",
@@ -41,6 +41,11 @@ def get_args():
         help="Generate CAST for GrFN 2.2 pipeline",
         action="store_true",
     )
+    parser.add_argument(
+        "--ts",
+        help="Generate CAST using tree-sitter parser generator instead of the Python AST",
+        action="store_true",
+    )
     parser.add_argument("pyfile_path", help="input Python source file")
     options = parser.parse_args()
     return options
@@ -54,13 +59,13 @@ def python_to_cast(
     rawjson=False,
     legacy=False,
     cast_obj=False,
+    tree_sitter=False
 ) -> Optional[CAST]:
     """Create a CAST object from a Python file and serialize it to JSON.
 
     Args:
         pyfile_path: Path to the Python source file
         agraph: If true, a PDF visualization of the graph is created.
-        astprint: View the AST using the astpp module.
         std_out: If true, the CAST JSON is printed to stdout instead
                  of written to a file.
         rawjson: If true, the raw JSON contents are printed to stdout.
@@ -73,50 +78,47 @@ def python_to_cast(
         returns None.
     """
 
-    # Open Python file as a giant string
-    with open(pyfile_path) as f:
-        file_contents = f.read()
+    if not tree_sitter:
+        # Open Python file as a giant string
+        with open(pyfile_path) as f:
+            file_contents = f.read()
 
-    file_name = pyfile_path.split("/")[-1]
+        file_name = pyfile_path.split("/")[-1]
 
-    # Count the number of lines in the file
-    with open(pyfile_path) as f:
-        file_list = f.readlines()
-        line_count = 0
-        for l in file_list:
-            line_count += 1
+        # Count the number of lines in the file
+        with open(pyfile_path) as f:
+            file_list = f.readlines()
+            line_count = len(file_list)
 
-    # Create a PyASTToCAST Object
-    if legacy:
-        convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
-    else:
-        convert = py_ast_to_cast.PyASTToCAST(file_name)
-
-    # Additional option to allow us to view the PyAST
-    # using the astpp module
-    if astprint:
-        astpp.parseprint(file_contents)
-
-    # 'Root' the current working directory so that it's where the
-    # Source file we're generating CAST for is (for Import statements)
-    old_path = os.getcwd()
-    try:
-        idx = pyfile_path.rfind("/")
-
-        if idx > -1:
-            curr_path = pyfile_path[0:idx]
-            os.chdir(curr_path)
+        # Create a PyASTToCAST Object
+        if legacy:
+            convert = py_ast_to_cast.PyASTToCAST(file_name, legacy=True)
         else:
-            curr_path = "./" + pyfile_path
+            convert = py_ast_to_cast.PyASTToCAST(file_name)
 
-        # Parse the Python program's AST and create the CAST
-        contents = ast.parse(file_contents)
-        C = convert.visit(contents, {}, {})
-        C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
-    finally:
-        os.chdir(old_path)
+        # 'Root' the current working directory so that it's where the
+        # Source file we're generating CAST for is (for Import statements)
+        old_path = os.getcwd()
+        try:
+            idx = pyfile_path.rfind("/")
 
-    out_cast = cast.CAST([C], "python")
+            if idx > -1:
+                curr_path = pyfile_path[0:idx]
+                os.chdir(curr_path)
+            else:
+                curr_path = "./" + pyfile_path
+
+            # Parse the Python program's AST and create the CAST
+            contents = ast.parse(file_contents)
+            C = convert.visit(contents, {}, {})
+            C.source_refs = [SourceRef(file_name, None, None, 1, line_count)]
+        finally:
+            os.chdir(old_path)
+
+        out_cast = cast.CAST([C], "python")
+    else:
+        file_name = pyfile_path.split("/")[-1]
+        out_cast = TS2CAST(pyfile_path).out_cast
 
     if agraph:
         V = CASTToAGraphVisitor(out_cast)
@@ -152,8 +154,8 @@ if __name__ == "__main__":
     python_to_cast(
         args.pyfile_path,
         args.agraph,
-        args.astpp,
         args.stdout,
         args.rawjson,
         args.legacy,
+        tree_sitter=args.ts
     )
