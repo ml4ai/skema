@@ -1199,7 +1199,6 @@
 <a href="#1199" id="1199">1199</a>
 <a href="#1200" id="1200">1200</a>
 <a href="#1201" id="1201">1201</a>
-<a href="#1202" id="1202">1202</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{operator::Operator, Math};
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -1272,7 +1271,6 @@
     <span class="kw">let </span>graph = subgraph2petgraph(module_id, host); <span class="comment">// makes petgraph of graph
 
     </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, host); <span class="comment">// gives back list of function nodes that might contain the dynamics
-
     </span><span class="kw">let </span>_line_span = get_line_span(core_id[<span class="number">0</span>], graph); <span class="comment">// get&#39;s the line span of function id
 
     //println!(&quot;\n{:?}&quot;, line_span);
@@ -1293,7 +1291,7 @@
 
     </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, host); <span class="comment">// gives back list of function nodes that might contain the dynamics
 
-    </span><span class="kw">let </span>_line_span = get_line_span(core_id[<span class="number">0</span>], graph); <span class="comment">// get&#39;s the line span of function id
+    //let _line_span = get_line_span(core_id[0], graph); // get&#39;s the line span of function id
 
     //println!(&quot;\n{:?}&quot;, line_span);
 
