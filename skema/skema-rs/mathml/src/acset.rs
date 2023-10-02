@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::{BTreeSet, HashMap, HashSet};
 use utoipa;
 use utoipa::ToSchema;
+use nanoid::nanoid;
 
 // We keep our ACSet representation in addition to the new SKEMA model representation since it is
 // more compact and easy to work with for development.
@@ -455,7 +456,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         // this first for loop is for the creation state related parameters in the AMR
         for ode in ode_vec.iter() {
             let states = State {
-                id: ode.lhs_var.to_string().clone(),
+                id: format!("{}-{}", ode.lhs_var.to_string().clone(), nanoid!(8)),
                 name: ode.lhs_var.to_string().clone(),
                 ..Default::default()
             };
@@ -594,7 +595,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
             if t.0.exp_states.len() == 1 {
                 // construct transtions for simple transtions
                 let transitions = Transition {
-                    id: format!("t{}", i.clone()),
+                    id: format!("t{}-{}", i.clone(), nanoid!(8)),
                     input: Some([t.1.dyn_state.clone()].to_vec()),
                     output: Some([t.0.dyn_state.clone()].to_vec()),
                     ..Default::default()
@@ -635,7 +636,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 }
 
                 let transitions = Transition {
-                    id: format!("t{}", i.clone()),
+                    id: format!("t{}-{}", i.clone(), nanoid!(8)),
                     input: Some(t.1.exp_states.clone()),
                     output: Some(output.clone()),
                     ..Default::default()
@@ -680,7 +681,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                     }
 
                     let transitions = Transition {
-                        id: format!("s{}", i),
+                        id: format!("s{}-{}", i, nanoid!(8)),
                         input: Some(input.clone()),
                         output: Some(output.clone()),
                         ..Default::default()
@@ -721,7 +722,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                     }
 
                     let transitions = Transition {
-                        id: format!("s{}", i),
+                        id: format!("s{}-{}", i, nanoid!(8)),
                         input: Some(input.clone()),
                         output: None,
                         ..Default::default()
@@ -762,6 +763,9 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
         parameter_vec.sort();
         parameter_vec.dedup();
+        for parameter in parameter_vec.iter_mut() {
+            parameter.id = format!("{}", nanoid!(8));
+        }
 
         // construct the PetriNet
         let ode = Ode {
