@@ -40,18 +40,6 @@ pub enum Operator {
     Arccot,
     // Catchall for operators we haven't explicitly defined as enum variants yet.
     Other(String),
-    Sin,
-    Cos,
-    Tan,
-    Sec,
-    Csc,
-    Cot,
-    Arcsin,
-    Arccos,
-    Arctan,
-    Arcsec,
-    Arccsc,
-    Arccot,
 }
 
 impl fmt::Display for Operator {
