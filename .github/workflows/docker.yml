@@ -271,6 +271,8 @@ jobs:
     - name: Build and push image (TR)
       # see https://github.com/docker/build-push-action
       uses: docker/build-push-action@v4
+      # our AWS deployment doesn't rely on this image being published
+      continue-on-error: true
       with:
         context: ./skema/text_reading/scala/webapp/target/docker/stage
         # NOTE: dynet throws an UnsatisfiedLinkError on ARM64 even with a platform compatible JRE.. :(
