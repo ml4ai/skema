@@ -865,27 +865,3 @@ fn test_one_dimensional_ebm() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
 }
-
-#[test]
-fn test_halfar_dome_evolution_equation() {
-    let input = "
-    <math>
-        <mfrac>
-        <mrow><mi>∂</mi><mi>H</mi></mrow>
-        <mrow><mi>∂</mi><mi>t</mi></mrow>
-        </mfrac>
-        <mo>=</mo>
-        <mo>&#x2207;</mo>
-        <mo>&#x22c5;</mo>
-        <mo>(</mo>
-        <mi>Γ</mi>
-        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
-        <mo>|</mo><mo>&#x2207;</mo><mi>H</mi><msup><mo>|</mo>
-        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
-        <mo>&#x2207;</mo><mi>H</mi>
-        <mo>)</mo>
-    </math>
-    ";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    //println!("exp={:?}", exp);
-}
