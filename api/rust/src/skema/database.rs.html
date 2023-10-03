@@ -4826,6 +4826,8 @@
 <a href="#4826" id="4826">4826</a>
 <a href="#4827" id="4827">4827</a>
 <a href="#4828" id="4828">4828</a>
+<a href="#4829" id="4829">4829</a>
+<a href="#4830" id="4830">4830</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -7956,6 +7958,7 @@ There being a second function call of the same function which contains an expres
     <span class="comment">// now to construct the nodes inside the expression, Literal and Primitives
     </span><span class="kw">let </span><span class="kw-2">mut </span>new_c_args = c_args.clone();
     <span class="kw">let </span><span class="kw-2">mut </span>box_counter: usize = <span class="number">1</span>;
+    new_c_args.att_box = att_box.clone();
     <span class="kw">if </span>att_box.bf.is_some() {
         <span class="kw">for </span>att_sub_box <span class="kw">in </span>att_box.bf.as_ref().unwrap().iter() {
             new_c_args.box_counter = box_counter;
@@ -8194,6 +8197,7 @@ There being a second function call of the same function which contains an expres
     <span class="comment">// now to construct the nodes inside the expression, Literal and Primitives
     </span><span class="kw">let </span><span class="kw-2">mut </span>new_c_args = c_args.clone();
     <span class="kw">let </span><span class="kw-2">mut </span>box_counter: usize = <span class="number">1</span>;
+    new_c_args.att_box = att_box.clone();
     <span class="kw">for </span>sub_att_box <span class="kw">in </span>att_box.bf.as_ref().unwrap().iter() {
         new_c_args.box_counter = box_counter;
         new_c_args.cur_box = sub_att_box.clone();
