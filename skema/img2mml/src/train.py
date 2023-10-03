@@ -56,7 +56,7 @@ def train(
 
         epoch_loss += loss.item()
 
-        last_lr = 10
+        last_lr = optimizer.param_groups[0]['lr']
         if isBatchScheduler:
             if reduce_on_plateau_scheduler:
                 scheduler.step(loss)
