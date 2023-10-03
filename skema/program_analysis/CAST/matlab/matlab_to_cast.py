@@ -52,8 +52,6 @@ class MatlabToCast(object):
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
         self.source = self.path.read_text()
-        # print('\nSOURCE:')
-        # print(self.source)
 
         # get a tree-sitter tree based on source input
         self.tree_builder = TreeBuilder("matlab")
@@ -80,10 +78,6 @@ class MatlabToCast(object):
         
     def run(self, root) -> List[Module]:
         """Annotated run routine."""
-        # print("run start")
-        # print("\nTREE STRUCTURE ___________")
-        # A MATLAB program has a body composed of n statements
-
         modules = []
 
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
