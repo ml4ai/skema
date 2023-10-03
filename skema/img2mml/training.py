@@ -333,7 +333,7 @@ def train_model(rank=None,):
     scheduler = None
     if step_scheduler or exponential_scheduler or reduce_on_plateau_scheduler:
         _lr = starting_lr 
-        if scheduler_type == "batch":
+        if scheduler_type == "Batch":
             isBatchScheduler = True
         else:
             isEpochScheduler = True
