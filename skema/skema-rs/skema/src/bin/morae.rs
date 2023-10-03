@@ -76,13 +76,6 @@ fn main() {
         println!("\nRegnet AMR: {:?}\n", regnet);
         let regnet_serial = serde_json::to_string(&regnet).unwrap();
         println!("For serialization test:\n\n {}", regnet_serial);
-
-        let mathml_pn_asts =
-            get_mathml_asts_from_file("../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
-        let pn = PetriNet::from(ACSet::from(mathml_pn_asts));
-        println!("\nPetriNet AMR: {:?}", pn);
-        let pn_serial = serde_json::to_string(&pn).unwrap();
-        println!("For serialization test:\n\n {}", pn_serial);
     } else {
         println!("Unknown Command!");
     }
