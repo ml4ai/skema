@@ -23,9 +23,9 @@ def train(
     model.train()
 
     epoch_loss = 0
-    # tset = tqdm(iter(train_dataloader))
-    for i, (img, mml) in enumerate(train_dataloader):
-    # for i, (img, mml) in enumerate(tset):
+    tset = tqdm(iter(train_dataloader))
+    # for i, (img, mml) in enumerate(train_dataloader):
+    for i, (img, mml) in enumerate(tset):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
         mml.shape[0]
@@ -56,20 +56,16 @@ def train(
 
         epoch_loss += loss.item()
 
-        last_lr = optimizer.param_groups[0]['lr']
         if isBatchScheduler:
             if reduce_on_plateau_scheduler:
                 scheduler.step(loss)
-                current_lr = optimizer.param_groups[0]['lr']
-                if current_lr < last_lr:
-                    print("learning rate: ", current_lr)
-                    last_lr = current_lr
+
             else:
                 scheduler.step()
 
-        # else:
-        #     # only for epoch scheduler
-        #     tset.set_description('Loss: %.4f' % loss.item())
+        desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
+        tset.set_description(desc)
+
 
     net_loss = epoch_loss / len(train_dataloader)
     return net_loss
