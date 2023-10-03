@@ -3752,8 +3752,6 @@ pub fn wfopi_wiring(
                                 if (wire.src as u32) == *p {
                                     wfopi_src_tgt.push(node.node_id.clone());
                                     prop = Some(i as u32);
-                                    if node.node_id == "n28".to_string() {
-                                    }
                                 }
                             }
                         }
@@ -3774,8 +3772,6 @@ pub fn wfopi_wiring(
                             // push the tgt now, being opi
                             if (wire.tgt as u32) == *p {
                                 wfopi_src_tgt.push(node.node_id.clone());
-                                if node.node_id == "n24".to_string() {
-                                }
                             }
                         }
                     }
