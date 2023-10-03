@@ -93,6 +93,10 @@ class NodeHelper():
 
         return identifier
 
+    def get_operator(self, node: Node) -&gt; str:
+        &#34;&#34;&#34;Given a unary/binary operator node, return the operator it contains&#34;&#34;&#34;
+        return node.type
+
 def get_children_by_types(node: Node, types: List):
     &#34;&#34;&#34;Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list&#34;&#34;&#34;
     return [child for child in node.children if child.type in types]</code></pre>
@@ -168,7 +172,11 @@ def get_children_by_types(node: Node, types: List):
             if in_identifier:
                 identifier += char
 
-        return identifier</code></pre>
+        return identifier
+
+    def get_operator(self, node: Node) -&gt; str:
+        &#34;&#34;&#34;Given a unary/binary operator node, return the operator it contains&#34;&#34;&#34;
+        return node.type</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -203,6 +211,20 @@ def get_children_by_types(node: Node, types: List):
             identifier += char
 
     return identifier</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.node_helper.NodeHelper.get_operator"><code class="name flex">
+<span>def <span class="ident">get_operator</span></span>(<span>self, node: tree_sitter.Node) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a unary/binary operator node, return the operator it contains</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_operator(self, node: Node) -&gt; str:
+    &#34;&#34;&#34;Given a unary/binary operator node, return the operator it contains&#34;&#34;&#34;
+    return node.type</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.node_helper.NodeHelper.get_source_ref"><code class="name flex">
@@ -248,6 +270,7 @@ def get_children_by_types(node: Node, types: List):
 <h4><code><a title="skema.program_analysis.CAST.python.node_helper.NodeHelper" href="#skema.program_analysis.CAST.python.node_helper.NodeHelper">NodeHelper</a></code></h4>
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST.python.node_helper.NodeHelper.get_identifier" href="#skema.program_analysis.CAST.python.node_helper.NodeHelper.get_identifier">get_identifier</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.node_helper.NodeHelper.get_operator" href="#skema.program_analysis.CAST.python.node_helper.NodeHelper.get_operator">get_operator</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.node_helper.NodeHelper.get_source_ref" href="#skema.program_analysis.CAST.python.node_helper.NodeHelper.get_source_ref">get_source_ref</a></code></li>
 </ul>
 </li>

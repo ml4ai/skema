@@ -112,12 +112,20 @@ class TS2CAST(object):
     def visit(self, node: Node):
         if node.type == &#34;module&#34;:
             return self.visit_module(node)
+        elif node.type == &#34;parenthesized_expression&#34;:
+            # Node for &#34;( op )&#34;, extract op
+            # The actual op is in the middle of the list of nodes
+            return self.visit(node.children[1])
         elif node.type == &#34;expression_statement&#34;:
             return self.visit_expression(node)
         elif node.type == &#34;assignment&#34;:
             return self.visit_assignment(node)
         elif node.type == &#34;identifier&#34;:
             return self.visit_identifier(node)
+        elif node.type ==&#34;unary_operator&#34;:
+            return self.visit_unary_op(node)
+        elif node.type ==&#34;binary_operator&#34;:
+            return self.visit_binary_op(node)
         elif node.type in [&#34;integer&#34;]:
             return self.visit_literal(node)
         else:
@@ -177,7 +185,29 @@ class TS2CAST(object):
             right=self.visit(right),
             source_refs=[literal_source_ref]
         )
+
+    def visit_unary_op(self, node: Node) -&gt; Operator:
+        &#34;&#34;&#34;
+            Unary Ops
+            OP operand
+            where operand is some kind of expression
+        &#34;&#34;&#34;
+        op = self.node_helper.get_operator(node.children[0])
+        operand = node.children[1]
         
+        return Operator(op=op, operands=[self.visit(operand)])
+
+    def visit_binary_op(self, node: Node) -&gt; Operator:
+        &#34;&#34;&#34;
+            Binary Ops
+            left OP right
+            where left and right can either be operators or literals
+        
+        &#34;&#34;&#34;
+        op = self.node_helper.get_operator(node.children[1])
+        left, _, right = node.children
+
+        return Operator(op=op, operands=[self.visit(left), self.visit(right)])
 
     def visit_identifier(self, node: Node):
         identifier = self.node_helper.get_identifier(node)
@@ -296,12 +326,20 @@ class TS2CAST(object):
     def visit(self, node: Node):
         if node.type == &#34;module&#34;:
             return self.visit_module(node)
+        elif node.type == &#34;parenthesized_expression&#34;:
+            # Node for &#34;( op )&#34;, extract op
+            # The actual op is in the middle of the list of nodes
+            return self.visit(node.children[1])
         elif node.type == &#34;expression_statement&#34;:
             return self.visit_expression(node)
         elif node.type == &#34;assignment&#34;:
             return self.visit_assignment(node)
         elif node.type == &#34;identifier&#34;:
             return self.visit_identifier(node)
+        elif node.type ==&#34;unary_operator&#34;:
+            return self.visit_unary_op(node)
+        elif node.type ==&#34;binary_operator&#34;:
+            return self.visit_binary_op(node)
         elif node.type in [&#34;integer&#34;]:
             return self.visit_literal(node)
         else:
@@ -361,7 +399,29 @@ class TS2CAST(object):
             right=self.visit(right),
             source_refs=[literal_source_ref]
         )
+
+    def visit_unary_op(self, node: Node) -&gt; Operator:
+        &#34;&#34;&#34;
+            Unary Ops
+            OP operand
+            where operand is some kind of expression
+        &#34;&#34;&#34;
+        op = self.node_helper.get_operator(node.children[0])
+        operand = node.children[1]
         
+        return Operator(op=op, operands=[self.visit(operand)])
+
+    def visit_binary_op(self, node: Node) -&gt; Operator:
+        &#34;&#34;&#34;
+            Binary Ops
+            left OP right
+            where left and right can either be operators or literals
+        
+        &#34;&#34;&#34;
+        op = self.node_helper.get_operator(node.children[1])
+        left, _, right = node.children
+
+        return Operator(op=op, operands=[self.visit(left), self.visit(right)])
 
     def visit_identifier(self, node: Node):
         identifier = self.node_helper.get_identifier(node)
@@ -460,12 +520,20 @@ class TS2CAST(object):
 <pre><code class="python">def visit(self, node: Node):
     if node.type == &#34;module&#34;:
         return self.visit_module(node)
+    elif node.type == &#34;parenthesized_expression&#34;:
+        # Node for &#34;( op )&#34;, extract op
+        # The actual op is in the middle of the list of nodes
+        return self.visit(node.children[1])
     elif node.type == &#34;expression_statement&#34;:
         return self.visit_expression(node)
     elif node.type == &#34;assignment&#34;:
         return self.visit_assignment(node)
     elif node.type == &#34;identifier&#34;:
         return self.visit_identifier(node)
+    elif node.type ==&#34;unary_operator&#34;:
+        return self.visit_unary_op(node)
+    elif node.type ==&#34;binary_operator&#34;:
+        return self.visit_binary_op(node)
     elif node.type in [&#34;integer&#34;]:
         return self.visit_literal(node)
     else:
@@ -490,6 +558,30 @@ class TS2CAST(object):
         right=self.visit(right),
         source_refs=[literal_source_ref]
     )</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op"><code class="name flex">
+<span>def <span class="ident">visit_binary_op</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.operator.Operator" href="../../CAST2FN/model/cast/operator.html#skema.program_analysis.CAST2FN.model.cast.operator.Operator">Operator</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Binary Ops
+left OP right
+where left and right can either be operators or literals</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_binary_op(self, node: Node) -&gt; Operator:
+    &#34;&#34;&#34;
+        Binary Ops
+        left OP right
+        where left and right can either be operators or literals
+    
+    &#34;&#34;&#34;
+    op = self.node_helper.get_operator(node.children[1])
+    left, _, right = node.children
+
+    return Operator(op=op, operands=[self.visit(left), self.visit(right)])</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression"><code class="name flex">
@@ -620,6 +712,29 @@ class TS2CAST(object):
     )</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op"><code class="name flex">
+<span>def <span class="ident">visit_unary_op</span></span>(<span>self, node: tree_sitter.Node) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.operator.Operator" href="../../CAST2FN/model/cast/operator.html#skema.program_analysis.CAST2FN.model.cast.operator.Operator">Operator</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Unary Ops
+OP operand
+where operand is some kind of expression</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def visit_unary_op(self, node: Node) -&gt; Operator:
+    &#34;&#34;&#34;
+        Unary Ops
+        OP operand
+        where operand is some kind of expression
+    &#34;&#34;&#34;
+    op = self.node_helper.get_operator(node.children[0])
+    operand = node.children[1]
+    
+    return Operator(op=op, operands=[self.visit(operand)])</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -645,11 +760,13 @@ class TS2CAST(object):
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.run" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.run">run</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit">visit</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_assignment">visit_assignment</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_binary_op">visit_binary_op</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_expression">visit_expression</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_identifier">visit_identifier</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_literal">visit_literal</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_module" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_module">visit_module</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_name" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_name">visit_name</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op" href="#skema.program_analysis.CAST.python.ts2cast.TS2CAST.visit_unary_op">visit_unary_op</a></code></li>
 </ul>
 </li>
 </ul>
