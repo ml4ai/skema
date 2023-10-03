@@ -31,6 +31,11 @@ We publish tagged images to dockerhub for each commit made to our primary branch
 - [PRs](https://github.com/ml4ai/skema/pulls?q=is%3Apr+is%3Amerged+merged%3A2023-09-04..2023-09-17)
 - [resolved issues](https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-09-04..2023-09-17) -->
 
+## [v1.9.3](https://github.com/ml4ai/skema/releases/tag/v1.9.3)
+
+- [PRs](https://github.com/ml4ai/skema/pulls?q=is%3Apr+is%3Amerged+merged%3A2023-09-19..2023-10-02)
+- [resolved issues](https://github.com/ml4ai/skema/issues?q=is%3Aissue+is%3Aclosed+closed%3A2023-09-19..2023-10-02)
+
 ## [v1.9.2](https://github.com/ml4ai/skema/releases/tag/v1.9.2)
 
 - [PRs](https://github.com/ml4ai/skema/pulls?q=is%3Apr+is%3Amerged+merged%3A2023-09-04..2023-09-18)
