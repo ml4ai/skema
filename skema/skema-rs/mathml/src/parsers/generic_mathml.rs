@@ -223,6 +223,16 @@ pub fn mean(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
+pub fn grad(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Grad, alt((ws(tag("𝛁")), ws(tag("&#x2207;")))))(input)?;
+    Ok((s, op))
+}
+
+pub fn dot(input: Span) -> IResult<Operator> {
+    let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
+    Ok((s, op))
+}
+
 fn operator_other(input: Span) -> IResult<Operator> {
     let (s, consumed) = ws(recognize(not_line_ending))(input)?;
     let op = Operator::Other(consumed.to_string());
@@ -238,6 +248,8 @@ pub fn operator(input: Span) -> IResult<Operator> {
         rparen,
         mean,
         multiply,
+        grad,
+        dot,
         operator_other,
     ))(input)?;
     Ok((s, op))

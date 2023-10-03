@@ -7,12 +7,12 @@
 use crate::{
     ast::{
         operator::{Derivative, Operator},
-        Ci, Math, MathExpression, Mi, Mrow, Type,
+        Ci, Differential, Math, MathExpression, Mi, Mrow, Type,
     },
     parsers::generic_mathml::{
-        add, attribute, comma, elem_many0, equals, etag, lparen, mean, mi, mn, msqrt, msub,
-        msubsup, msup, rparen, stag, subtract, tag_parser, ws, xml_declaration, IResult,
-        ParseError, Span,
+        add, attribute, comma, dot, elem_many0, equals, etag, grad, lparen, mean, mi, mn, msqrt,
+        msub, msubsup, msup, multiply, rparen, stag, subtract, tag_parser, ws, xml_declaration,
+        IResult, ParseError, Span,
     },
 };
 
@@ -29,7 +29,9 @@ use nom::{
 pub fn operator(input: Span) -> IResult<Operator> {
     let (s, op) = ws(delimited(
         stag!("mo"),
-        alt((add, subtract, equals, lparen, rparen, comma, mean)),
+        alt((
+            add, subtract, multiply, equals, lparen, rparen, comma, mean, grad, dot,
+        )),
         etag!("mo"),
     ))(input)?;
     Ok((s, op))
@@ -158,6 +160,19 @@ fn d(input: Span) -> IResult<()> {
     }
 }
 
+/// Parse the identifier '∂'
+fn partial(input: Span) -> IResult<()> {
+    let (s, Mi(x)) = mi(input)?;
+    if let "∂" = x.as_ref() {
+        Ok((s, ()))
+    } else {
+        Err(nom::Err::Error(ParseError::new(
+            "Unable to identify Mi('∂')".to_string(),
+            input,
+        )))
+    }
+}
+
 /// Parse a content identifier with function of elements.
 /// Example: S(t,x)
 pub fn ci_unknown_with_bounds(input: Span) -> IResult<Ci> {
@@ -197,7 +212,7 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
 
 /// Parse a first-order ordinary derivative written in Leibniz notation.
 pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
-    let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), d))(input)?;
+    let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), alt((d, partial))))(input)?;
     let (s, func) = ws(alt((
         ci_univariate_func,
         map(
@@ -215,7 +230,7 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
         ci_subscript_func,
     )))(s)?;
     let (s, with_respect_to) = delimited(
-        tuple((etag!("mrow"), stag!("mrow"), d)),
+        tuple((etag!("mrow"), stag!("mrow"), alt((d, partial)))),
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
@@ -226,7 +241,6 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
                 == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
             {
                 println!("Match successful");
-
                 return Ok((
                     s,
                     (
@@ -360,6 +374,34 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
+        map(
+            first_order_derivative_leibniz_notation,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         map(
             ci_univariate_with_bounds,
             |Ci {
