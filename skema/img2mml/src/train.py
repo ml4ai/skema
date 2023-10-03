@@ -63,8 +63,9 @@ def train(
             else:
                 scheduler.step()
 
-        desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
-        tset.set_description(desc)
+        if (not ddp) or (ddp and rank == 0):
+            desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
+            tset.set_description(desc)
 
 
     net_loss = epoch_loss / len(train_dataloader)
