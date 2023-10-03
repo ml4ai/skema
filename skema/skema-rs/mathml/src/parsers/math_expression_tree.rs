@@ -1,6 +1,7 @@
 //! Pratt parsing module to construct S-expressions from presentation MathML.
 //! This is based on the nice tutorial at https://matklad.github.io/2020/04/13/simple-but-powerful-pratt-parsing.html
 
+//use crate::parsers::math_expression_tree::MathExpression::Differential;
 use crate::{
     ast::{
         operator::{Derivative, Operator},
@@ -31,6 +32,9 @@ impl fmt::Display for MathExpressionTree {
         match self {
             MathExpressionTree::Atom(MathExpression::Ci(x)) => {
                 write!(f, "{}", x.content)
+            }
+            MathExpressionTree::Atom(MathExpression::Mo(Operator::Derivative(x))) => {
+                write!(f, "{:?}", x)
             }
             MathExpressionTree::Atom(i) => write!(f, "{}", i),
             MathExpressionTree::Cons(head, rest) => {
@@ -181,7 +185,23 @@ impl MathExpression {
             }
             // Insert implicit division operators, and wrap numerators and denominators in
             // parentheses for the Pratt parsing algorithm.
+            MathExpression::Differential(x) => {
+                println!("Inside differential");
+
+                println!("x.diff={:?}", x.diff);
+                println!("x.func={:?}", x.func);
+                //tokens.push(x.diff);
+                //tokens.push(MathExpression::Mo(Operator::Derivative(x.diff)));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                x.diff.flatten(tokens);
+                x.func.flatten(tokens);
+                //for element in ci {
+                //x.flatten(tokens);
+                //}
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
             MathExpression::Mfrac(numerator, denominator) => {
+                println!("numerator={:?}", numerator);
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 numerator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
@@ -384,7 +404,9 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Sin => ((), 21),
         Operator::Tan => ((), 22),
         Operator::Mean => ((), 23),
-        Operator::Derivative(Derivative { .. }) => ((), 24),
+        Operator::Dot => ((), 24),
+        Operator::Grad => ((), 25),
+        Operator::Derivative(Derivative { .. }) => ((), 26),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -819,14 +841,27 @@ fn test_one_dimensional_ebm() {
         <mrow><mi>∂</mi><mi>t</mi></mrow>
         </mfrac>
         <mo>=</mo>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>Q</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo>
         <mo>-</mo>
-        <mi>β</mi>
-        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
-        <mfrac><mrow><mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow><mi>N</mi></mfrac>
+        <mo>(</mo><mi>A</mi><mo>+</mo><mi>B</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>)</mo>
+        <mo>+</mo>
+        <mfrac>
+        <mi>K</mi>
+        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mfrac>
+        <mi>∂</mi>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>(</mo>
+        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi></mrow>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>)</mo>
     </math>
     ";
-    //let exp = input.parse::<MathExpressionTree>().unwrap();
-    //println!("exp={:?}", exp);
-    //let ode = input.parse::<FirstOrderODE>().unwrap();
-    //println!("ode ={:?}", ode);
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
 }
