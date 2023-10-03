@@ -33,6 +33,7 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import (
     LANGUAGES_YAML_FILEPATH,
 )
 
+
 def get_supported_languages() -> (List, Dict):
     """"""
     # We calculate the supported file extensions and mapping between extension and language by reading the languages.yaml file from tree_sitter_parsers
@@ -142,27 +143,31 @@ async def system_to_gromet(system: System):
     server_log = []
 
     # Check for unsupported files before processing. They will be removed and the user will be warned.
-    unsupported_files = [file for file in system.files if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS]
+    unsupported_files = [
+        file
+        for file in system.files
+        if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS
+    ]
     for file in unsupported_files:
         unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
         print(unsupported_file_str)
         system.files.remove(file)
         server_log.append(unsupported_file_str)
-        
+
     # If there are no supported files, then we will return an empty GrometFNModuleCollection with a top-level Debug metadata
     if len(system.files) == 0:
         no_supported_file_str = "ERROR: The system does not contain any files with supported file extensions. All files will be skipped."
         print(no_supported_file_str)
-        gromet_collection = GrometFNModuleCollection(metadata_collection=[[]], metadata=0)
+        gromet_collection = GrometFNModuleCollection(
+            metadata_collection=[[]], metadata=0
+        )
         gromet_collection.metadata_collection[0].append(
             Debug(
-                debug_type="code2fn",
-                severity="ERROR",
-                message=no_supported_file_str
-            ).to_dict() # There is a bug in Swagger that requires us to manually to_dict() this
+                debug_type="code2fn", severity="ERROR", message=no_supported_file_str
+            ).to_dict()  # There is a bug in Swagger that requires us to manually to_dict() this
         )
         return gromet_collection.to_dict()
-    
+
     # The CODE2FN Pipeline requires a file path as input.
     # We are receiving a serialized version of the code system as input, so we must store the file in a temporary directory.
     # This temp directory only persists during execution of the CODE2FN pipeline.
@@ -203,22 +208,18 @@ async def system_to_gromet(system: System):
                     k
                 ] = metadata.to_dict()
 
-
     # Add debug Metadata to Gromet objects
     if not gromet_collection.metadata_collection:
         gromet_collection.metadata_collection = [[]]
     for log in server_log:
         gromet_collection.metadata_collection[0].append(
             Debug(
-                debug_type="code2fn",
-                severity="WARNING",
-                message=log
+                debug_type="code2fn", severity="WARNING", message=log
             ).to_dict()  # There is a bug in Swagger that requires us to manually to_dict() this
         )
 
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
-
 
 
 router = APIRouter()
@@ -282,7 +283,7 @@ async def fn_given_filepaths(system: System):
     response = requests.post("http://0.0.0.0:8000/fn-given-filepaths", json=system)
     gromet_json = response.json()
     """
-    
+
     return await system_to_gromet(system)
 
 

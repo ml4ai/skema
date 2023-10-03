@@ -12,7 +12,7 @@ client = TestClient(app)
 
 
 def test_ping():
-    '''Test case for /code2fn/ping endpoint.'''
+    """Test case for /code2fn/ping endpoint."""
     response = client.get("/code2fn/ping")
     assert response.status_code == 200
 
@@ -43,8 +43,13 @@ def test_fn_given_filepaths():
                     ],
                     "multi": [],
                     "docstring": [
-                        {"function_name": "foo", "content": ["Increment the input variable"], "start_line_number": 4, "end_line_number": 4}
-                    ]
+                        {
+                            "function_name": "foo",
+                            "content": ["Increment the input variable"],
+                            "start_line_number": 4,
+                            "end_line_number": 4,
+                        }
+                    ],
                 }
             }
         },
@@ -108,7 +113,7 @@ def test_no_supported_files():
         "files": ["unsupported1.git", "unsupported2.lock"],
         "blobs": [
             "This is not a source code file.",
-            "This is not a source code file.",  
+            "This is not a source code file.",
         ],
         "system_name": "unsupported-system",
         "root_name": "unsupported-system",
@@ -119,31 +124,41 @@ def test_no_supported_files():
 
     gromet_collection = response.json()
     assert "metadata_collection" in gromet_collection
-    assert len(gromet_collection["metadata_collection"]) == 1 # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
-    assert len(gromet_collection["metadata_collection"][0]) == 1 # There should only be one ERROR Debug metadata since there are no source files to process.
+    assert (
+        len(gromet_collection["metadata_collection"]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection["metadata_collection"][0]) == 1
+    )  # There should only be one ERROR Debug metadata since there are no source files to process.
     assert gromet_collection["metadata_collection"][0][0]["gromet_type"] == "Debug"
     assert gromet_collection["metadata_collection"][0][0]["severity"] == "ERROR"
+
 
 def test_partial_supported_files():
     system = {
         "files": ["supported.py", "unsupported.lock"],
         "blobs": [
             "x=2",
-            "This is not a source code file.",  
+            "This is not a source code file.",
         ],
         "system_name": " mixed-system",
         "root_name": "mixed-system",
     }
-    
+
     response = client.post("/code2fn/fn-given-filepaths", json=system)
     assert response.status_code == 200
 
     gromet_collection = response.json()
     assert "metadata_collection" in gromet_collection
-    assert len(gromet_collection["metadata_collection"]) == 1 # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
-    assert len(gromet_collection["metadata_collection"][0]) == 1 # There should only be one WARNING Debug metadata since is a single unsupported file.
+    assert (
+        len(gromet_collection["metadata_collection"]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection["metadata_collection"][0]) == 1
+    )  # There should only be one WARNING Debug metadata since is a single unsupported file.
     assert gromet_collection["metadata_collection"][0][0]["gromet_type"] == "Debug"
     assert gromet_collection["metadata_collection"][0][0]["severity"] == "WARNING"
+
 
 # TODO: Add more complex test case to test_get_pyacset
 def test_get_pyacset():
