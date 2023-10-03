@@ -3128,6 +3128,7 @@ pub fn create_att_expression(
     // now to construct the nodes inside the expression, Literal and Primitives
     let mut new_c_args = c_args.clone();
     let mut box_counter: usize = 1;
+    new_c_args.att_box = att_box.clone();
     if att_box.bf.is_some() {
         for att_sub_box in att_box.bf.as_ref().unwrap().iter() {
             new_c_args.box_counter = box_counter;
@@ -3366,6 +3367,7 @@ pub fn create_att_predicate(
     // now to construct the nodes inside the expression, Literal and Primitives
     let mut new_c_args = c_args.clone();
     let mut box_counter: usize = 1;
+    new_c_args.att_box = att_box.clone();
     for sub_att_box in att_box.bf.as_ref().unwrap().iter() {
         new_c_args.box_counter = box_counter;
         new_c_args.cur_box = sub_att_box.clone();
@@ -3750,6 +3752,8 @@ pub fn wfopi_wiring(
                                 if (wire.src as u32) == *p {
                                     wfopi_src_tgt.push(node.node_id.clone());
                                     prop = Some(i as u32);
+                                    if node.node_id == "n28".to_string() {
+                                    }
                                 }
                             }
                         }
@@ -3770,6 +3774,8 @@ pub fn wfopi_wiring(
                             // push the tgt now, being opi
                             if (wire.tgt as u32) == *p {
                                 wfopi_src_tgt.push(node.node_id.clone());
+                                if node.node_id == "n24".to_string() {
+                                }
                             }
                         }
                     }
