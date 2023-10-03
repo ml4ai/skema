@@ -144,24 +144,23 @@ async def system_to_gromet(system: System):
     # Check for unsupported files before processing. They will be removed and the user will be warned.
     unsupported_files = [file for file in system.files if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS]
     for file in unsupported_files:
-        system.files.remove(file)
         unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
-        server_log.append(unsupported_file_str)
         print(unsupported_file_str)
-
-
+        system.files.remove(file)
+        server_log.append(unsupported_file_str)
+        
     # If there are no supported files, then we will return an empty GrometFNModuleCollection with a top-level Debug metadata
     if len(system.files) == 0:
         no_supported_file_str = "ERROR: The system does not contain any files with supported file extensions. All files will be skipped."
-        gromet_collection = GrometFNModuleCollection(metadata=0)
-        gromet_collection.metadata_collection.append(
+        print(no_supported_file_str)
+        gromet_collection = GrometFNModuleCollection(metadata_collection=[[]], metadata=0)
+        gromet_collection.metadata_collection[0].append(
             Debug(
                 debug_type="code2fn",
-                severity="Error",
+                severity="ERROR",
                 message=no_supported_file_str
-            )
+            ).to_dict() # There is a bug in Swagger that requires us to manually to_dict() this
         )
-        print(no_supported_file_str)
         return gromet_collection.to_dict()
     
     # The CODE2FN Pipeline requires a file path as input.
@@ -205,20 +204,18 @@ async def system_to_gromet(system: System):
                 ] = metadata.to_dict()
 
 
-   
-
     # Add debug Metadata to Gromet objects
-    metadata_collection = gromet_collection.metadata_collection
-    
-  
+    if not gromet_collection.metadata_collection:
+        gromet_collection.metadata_collection = [[]]
     for log in server_log:
-        metadata_collection.append(
+        gromet_collection.metadata_collection[0].append(
             Debug(
                 debug_type="code2fn",
-                severity="Warning",
+                severity="WARNING",
                 message=log
-            )
+            ).to_dict()  # There is a bug in Swagger that requires us to manually to_dict() this
         )
+
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()
 

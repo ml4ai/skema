@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from skema.skema_py.server import app
+from skema.gromet.metadata.debug import Debug
 
 client = TestClient(app)
 
@@ -101,6 +102,48 @@ def test_fn_given_filepaths_zip():
         assert response.status_code == 200
         assert "modules" in response.json()
 
+
+def test_no_supported_files():
+    system = {
+        "files": ["unsupported1.git", "unsupported2.lock"],
+        "blobs": [
+            "This is not a source code file.",
+            "This is not a source code file.",  
+        ],
+        "system_name": "unsupported-system",
+        "root_name": "unsupported-system",
+    }
+
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert "metadata_collection" in gromet_collection
+    assert len(gromet_collection["metadata_collection"]) == 1 # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert len(gromet_collection["metadata_collection"][0]) == 1 # There should only be one ERROR Debug metadata since there are no source files to process.
+    assert gromet_collection["metadata_collection"][0][0]["gromet_type"] == "Debug"
+    assert gromet_collection["metadata_collection"][0][0]["severity"] == "ERROR"
+
+def test_partial_supported_files():
+    system = {
+        "files": ["supported.py", "unsupported.lock"],
+        "blobs": [
+            "x=2",
+            "This is not a source code file.",  
+        ],
+        "system_name": " mixed-system",
+        "root_name": "mixed-system",
+    }
+    
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert "metadata_collection" in gromet_collection
+    assert len(gromet_collection["metadata_collection"]) == 1 # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert len(gromet_collection["metadata_collection"][0]) == 1 # There should only be one WARNING Debug metadata since is a single unsupported file.
+    assert gromet_collection["metadata_collection"][0][0]["gromet_type"] == "Debug"
+    assert gromet_collection["metadata_collection"][0][0]["severity"] == "WARNING"
 
 # TODO: Add more complex test case to test_get_pyacset
 def test_get_pyacset():
