@@ -372,7 +372,7 @@ def train_model(rank=None,):
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer, 
             'min', 
-            patience = 3,
+            patience = step_size,
             factor=gamma,
             verbose=True,
         )
@@ -414,6 +414,7 @@ def train_model(rank=None,):
                     ddp=ddp,
                     rank=rank,
                     isBatchScheduler=isBatchScheduler,
+                    reduce_on_plateau_scheduler=reduce_on_plateau_scheduler,
                     scheduler=scheduler,
                 )
 

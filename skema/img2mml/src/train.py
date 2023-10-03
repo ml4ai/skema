@@ -16,6 +16,7 @@ def train(
     ddp=False,
     rank=None,
     isBatchScheduler=False,
+    reduce_on_plateau_scheduler=False,
     scheduler=None,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
@@ -56,9 +57,15 @@ def train(
         epoch_loss += loss.item()
 
         if isBatchScheduler:
-            scheduler.step()
+            if reduce_on_plateau_scheduler:
+                scheduler.step(loss)
+                print("learning rate: ", optimizer.param_groups[0]['lr'])
+            else:
+                scheduler.step()
 
-        tset.set_description('Loss: %.4f' % loss.item())
+        else:
+            # only for epoch scheduler
+            tset.set_description('Loss: %.4f' % loss.item())
 
     net_loss = epoch_loss / len(train_dataloader)
     return net_loss
