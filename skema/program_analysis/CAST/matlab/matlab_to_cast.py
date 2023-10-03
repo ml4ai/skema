@@ -56,13 +56,9 @@ class MatlabToCast(object):
         # print(self.source)
 
         # get a tree-sitter tree based on source input
-        tree_builder = TreeBuilder("matlab")
-        self.tree = tree_builder.get_tree(self.source)
-        self.tree.root_node = tree_builder.clean_nodes(self.tree.root_node)
-
-        # print('\nSYNTAX TREE: ')
-        tree_builder.traverse_tree(self.tree)
-        # print("\n")
+        self.tree_builder = TreeBuilder("matlab")
+        self.tree = self.tree_builder.get_tree(self.source)
+        self.tree.root_node = self.tree_builder.clean_nodes(self.tree.root_node)
 
         # Walking data
         self.variable_context = VariableContext()
@@ -70,16 +66,6 @@ class MatlabToCast(object):
 
         # Create CAST object 
         self.out_cast = self.generate_cast()
-
-        # print('\nCAST objects:')
-        # for c in self.out_cast: 
-        #     j = json.dumps(
-        #         c.to_json_object(),
-        #         sort_keys=True,
-        #         indent=2,
-        #     )
-        #     print(j)
-        # print('CAST objects done\n\n')
 
     def generate_cast(self) -> List[CAST]:
         """Interface for generating CAST."""
