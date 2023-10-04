@@ -402,7 +402,7 @@ def train_model(rank=None,):
                 start_time = time.time()
 
 
-                print(f" =================== EPOCH : {epoch} =================== ")
+                # print(f" =================== EPOCH : {epoch} =================== ")
 
                 # training and validation
                 train_loss = train(

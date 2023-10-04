@@ -31,7 +31,7 @@ def train(
     epoch_loss = 0
     latest_val_loss = 100 # new addition
 
-    # tset = tqdm(iter(train_dataloader))
+    tset = tqdm(iter(train_dataloader))
 
     for i, (img, mml) in enumerate(train_dataloader):
     # for i, (img, mml) in enumerate(tset):
