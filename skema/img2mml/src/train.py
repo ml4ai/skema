@@ -86,7 +86,7 @@ def train(
                     if (not ddp) or (ddp and rank == 0):
                         torch.save(
                             model.state_dict(),
-                            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_batch_best.pt",
+                            f"trained_models/{model_type}_our_sampled_data_mml_batch_best.pt",
                         )
 
                 if reduce_on_plateau_scheduler:
