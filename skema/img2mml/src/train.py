@@ -76,7 +76,7 @@ def train(
             # of size 64.
             if i > 0 and i % 20 == 0 and i < len(train_dataloader):
                 # randomly choosing 50 samples for the validation
-                val_dataloader = random.sample(val_dataloader, 50)
+                val_dataloader = random.sample(list(val_dataloader), 10)
                 val_loss = evaluate(model,model_type,img_tnsr_path,
                                     batch_size,val_dataloader,criterion,
                                     device,vocab,ddp=ddp,rank=rank,)
@@ -94,7 +94,7 @@ def train(
                 else:
                     scheduler.step()
 
-                print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(train_loss):7.3f}")
+                print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(val_loss):7.3f}")
             """
             ----------------------------------------------------------------------
             """
