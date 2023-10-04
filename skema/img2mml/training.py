@@ -329,11 +329,14 @@ def train_model(rank=None,):
 
     # optimizer
     isBatchScheduler = False
+    isEpochScheduler = False
     scheduler = None
     if step_scheduler or exponential_scheduler or reduce_on_plateau_scheduler:
         _lr = starting_lr
         if scheduler_type == "Batch":
             isBatchScheduler = True
+        elif scheduler_type == "Epoch":
+            isEpochScheduler = True
     else:
         _lr = learning_rate
 
@@ -419,6 +422,7 @@ def train_model(rank=None,):
                 """
                 new addition --------
                 """
+                print(f" =================== EPOCH : {epoch} =================== ")
                 if not isBatchScheduler:
                     val_loss = evaluate(
                         model,
