@@ -401,6 +401,8 @@ def train_model(rank=None,):
             if count_es <= early_stopping_counts:
                 start_time = time.time()
 
+                
+                print(f" =================== EPOCH : {epoch} =================== ")
                 # training and validation
                 train_loss = train(
                     model,
@@ -422,7 +424,7 @@ def train_model(rank=None,):
                 """
                 new addition --------
                 """
-                print(f" =================== EPOCH : {epoch} =================== ")
+
                 if not isBatchScheduler:
                     val_loss = evaluate(
                         model,
