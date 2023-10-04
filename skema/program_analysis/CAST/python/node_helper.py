@@ -64,6 +64,10 @@ class NodeHelper():
 
         return identifier
 
+    def get_operator(self, node: Node) -> str:
+        """Given a unary/binary operator node, return the operator it contains"""
+        return node.type
+
 def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
