@@ -74,9 +74,9 @@ def train(
         if isBatchScheduler:
             # Calculating val_loss after every 1000 batches
             # of size 64.
-            if i > 0 and i % 200 == 0 and i < len(train_dataloader):
+            if i > 0 and i % 400 == 0 and i < len(train_dataloader):
                 # randomly choosing 50 samples for the validation
-                val_dataloader = random.sample(list(val_dataloader), 50)
+                val_dataloader = random.sample(list(val_dataloader), 100)
                 val_loss = evaluate(model,model_type,img_tnsr_path,
                                     batch_size,val_dataloader,criterion,
                                     device,vocab,ddp=ddp,rank=rank,)
