@@ -65,10 +65,6 @@ def train(
 
         epoch_loss += loss.item()
 
-        # if (not ddp) or (ddp and rank == 0):
-        #     desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
-        #     tset.set_description(desc)
-
         """
         new addition-------
         """
@@ -95,11 +91,18 @@ def train(
                 else:
                     scheduler.step()
 
-                print(f"steps completed: {i} \t train loss: {loss} \t train perplexity: {math.exp(loss):7.3f}")
-                print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(val_loss):7.3f}")
+                if (not ddp) or (ddp and rank == 0):
+                    print("learning_rate: ", optimizer.param_groups[0]['lr'])
+                    print(f"steps completed: {i} \t train loss: {loss} \t train perplexity: {math.exp(loss):7.3f}")
+                    print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(val_loss):7.3f}")
             """
             ----------------------------------------------------------------------
             """
         else:
-            net_loss = epoch_loss / len(train_dataloader)
-            return net_loss
+            if (not ddp) or (ddp and rank == 0):
+                desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
+                tset.set_description(desc)
+
+    if not isBatchScheduler:
+        net_loss = epoch_loss / len(train_dataloader)
+        return net_loss
