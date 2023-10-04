@@ -119,7 +119,7 @@ build-backend = "setuptools.build_meta"
 # pytest
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-v --cov=skema --cov-report html:docs/coverage/python -m "not ci_only"
+addopts = "-v --cov=skema --cov-report html:docs/coverage/python -m 'not ci_only'"
 testpaths = [
     "skema/img2mml/tests",
     "skema/program_analysis/tests",
