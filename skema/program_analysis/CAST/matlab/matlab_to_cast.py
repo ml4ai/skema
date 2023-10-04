@@ -51,7 +51,7 @@ class MatlabToCast(object):
         # Read the MATLAB source file
         self.path = Path(source_file_path)
         self.source_file_name = self.path.name
-        self.source = self.path.read_text()
+        self.source = self.path.read_text().strip()
 
         # get a tree-sitter tree based on source input
         self.tree_builder = TreeBuilder("matlab")
