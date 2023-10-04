@@ -20,6 +20,20 @@ jobs:
         #     python-version: '3.8'
         #   - os: windows-latest
         #     python-version: '3.6'
+    services:
+      graphdb:
+        image: "memgraph/memgraph-platform"
+        ports:
+          - "7687:7687"
+          - "3000:3000"
+          - "7444:7444"
+        volumes:
+          - mg_lib:/var/lib/memgraph
+          - mg_log:/var/log/memgraph
+          - mg_etc:/etc/memgraph
+        environment:
+          - MEMGRAPH=--memory-limit=3000 --log-level=TRACE"
+
     steps:
     # Checkout code
     - name: Checkout code
