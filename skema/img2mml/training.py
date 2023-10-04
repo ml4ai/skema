@@ -510,13 +510,13 @@ def train_model(rank=None,):
         f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
     )
     try:
-        loading pre_tained_model
+        #loading pre_tained_model
         model.load_state_dict(
             torch.load(
                 f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt"
             )
         )
-        
+
     except:
         try:
             # removing "module." from keys
