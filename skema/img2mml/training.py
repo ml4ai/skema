@@ -413,7 +413,7 @@ def train_model(rank=None,):
                     isBatchScheduler=isBatchScheduler,
                     reduce_on_plateau_scheduler=reduce_on_plateau_scheduler,
                     scheduler=scheduler,
-                    val_dataloader, batch_size, vocab # (for batch scheduler only. remove this line if doesn't work)
+                    val_dataloader, batch_size, vocab, # (for batch scheduler only. remove this line if doesn't work)
                 )
 
                 """
