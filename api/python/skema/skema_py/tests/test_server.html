@@ -35,12 +35,13 @@ from pathlib import Path
 from fastapi.testclient import TestClient
 
 from skema.skema_py.server import app
+from skema.gromet.metadata.debug import Debug
 
 client = TestClient(app)
 
 
 def test_ping():
-    &#39;&#39;&#39;Test case for /code2fn/ping endpoint.&#39;&#39;&#39;
+    &#34;&#34;&#34;Test case for /code2fn/ping endpoint.&#34;&#34;&#34;
     response = client.get(&#34;/code2fn/ping&#34;)
     assert response.status_code == 200
 
@@ -71,8 +72,13 @@ def test_fn_given_filepaths():
                     ],
                     &#34;multi&#34;: [],
                     &#34;docstring&#34;: [
-                        {&#34;function_name&#34;: &#34;foo&#34;, &#34;content&#34;: [&#34;Increment the input variable&#34;], &#34;start_line_number&#34;: 4, &#34;end_line_number&#34;: 4}
-                    ]
+                        {
+                            &#34;function_name&#34;: &#34;foo&#34;,
+                            &#34;content&#34;: [&#34;Increment the input variable&#34;],
+                            &#34;start_line_number&#34;: 4,
+                            &#34;end_line_number&#34;: 4,
+                        }
+                    ],
                 }
             }
         },
@@ -131,6 +137,58 @@ def test_fn_given_filepaths_zip():
         assert &#34;modules&#34; in response.json()
 
 
+def test_no_supported_files():
+    system = {
+        &#34;files&#34;: [&#34;unsupported1.git&#34;, &#34;unsupported2.lock&#34;],
+        &#34;blobs&#34;: [
+            &#34;This is not a source code file.&#34;,
+            &#34;This is not a source code file.&#34;,
+        ],
+        &#34;system_name&#34;: &#34;unsupported-system&#34;,
+        &#34;root_name&#34;: &#34;unsupported-system&#34;,
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert &#34;metadata_collection&#34; in gromet_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;][0]) == 1
+    )  # There should only be one ERROR Debug metadata since there are no source files to process.
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;ERROR&#34;
+
+
+def test_partial_supported_files():
+    system = {
+        &#34;files&#34;: [&#34;supported.py&#34;, &#34;unsupported.lock&#34;],
+        &#34;blobs&#34;: [
+            &#34;x=2&#34;,
+            &#34;This is not a source code file.&#34;,
+        ],
+        &#34;system_name&#34;: &#34; mixed-system&#34;,
+        &#34;root_name&#34;: &#34;mixed-system&#34;,
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert &#34;metadata_collection&#34; in gromet_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;][0]) == 1
+    )  # There should only be one WARNING Debug metadata since is a single unsupported file.
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;WARNING&#34;
+
+
 # TODO: Add more complex test case to test_get_pyacset
 def test_get_pyacset():
     &#34;&#34;&#34;Test case for /code2fn/get_pyacset endpoint.&#34;&#34;&#34;
@@ -177,8 +235,13 @@ def test_get_pyacset():
                     ],
                     &#34;multi&#34;: [],
                     &#34;docstring&#34;: [
-                        {&#34;function_name&#34;: &#34;foo&#34;, &#34;content&#34;: [&#34;Increment the input variable&#34;], &#34;start_line_number&#34;: 4, &#34;end_line_number&#34;: 4}
-                    ]
+                        {
+                            &#34;function_name&#34;: &#34;foo&#34;,
+                            &#34;content&#34;: [&#34;Increment the input variable&#34;],
+                            &#34;start_line_number&#34;: 4,
+                            &#34;end_line_number&#34;: 4,
+                        }
+                    ],
                 }
             }
         },
@@ -290,6 +353,76 @@ def test_get_pyacset():
     assert response.status_code == 200</code></pre>
 </details>
 </dd>
+<dt id="skema.skema_py.tests.test_server.test_no_supported_files"><code class="name flex">
+<span>def <span class="ident">test_no_supported_files</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_no_supported_files():
+    system = {
+        &#34;files&#34;: [&#34;unsupported1.git&#34;, &#34;unsupported2.lock&#34;],
+        &#34;blobs&#34;: [
+            &#34;This is not a source code file.&#34;,
+            &#34;This is not a source code file.&#34;,
+        ],
+        &#34;system_name&#34;: &#34;unsupported-system&#34;,
+        &#34;root_name&#34;: &#34;unsupported-system&#34;,
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert &#34;metadata_collection&#34; in gromet_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;][0]) == 1
+    )  # There should only be one ERROR Debug metadata since there are no source files to process.
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;ERROR&#34;</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.tests.test_server.test_partial_supported_files"><code class="name flex">
+<span>def <span class="ident">test_partial_supported_files</span></span>(<span>)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def test_partial_supported_files():
+    system = {
+        &#34;files&#34;: [&#34;supported.py&#34;, &#34;unsupported.lock&#34;],
+        &#34;blobs&#34;: [
+            &#34;x=2&#34;,
+            &#34;This is not a source code file.&#34;,
+        ],
+        &#34;system_name&#34;: &#34; mixed-system&#34;,
+        &#34;root_name&#34;: &#34;mixed-system&#34;,
+    }
+
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    assert response.status_code == 200
+
+    gromet_collection = response.json()
+    assert &#34;metadata_collection&#34; in gromet_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;]) == 1
+    )  # Only one element (GrometFNModuleCollection) should create metadata in this metadata_collection
+    assert (
+        len(gromet_collection[&#34;metadata_collection&#34;][0]) == 1
+    )  # There should only be one WARNING Debug metadata since is a single unsupported file.
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;gromet_type&#34;] == &#34;Debug&#34;
+    assert gromet_collection[&#34;metadata_collection&#34;][0][0][&#34;severity&#34;] == &#34;WARNING&#34;</code></pre>
+</details>
+</dd>
 <dt id="skema.skema_py.tests.test_server.test_ping"><code class="name flex">
 <span>def <span class="ident">test_ping</span></span>(<span>)</span>
 </code></dt>
@@ -300,7 +433,7 @@ def test_get_pyacset():
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def test_ping():
-    &#39;&#39;&#39;Test case for /code2fn/ping endpoint.&#39;&#39;&#39;
+    &#34;&#34;&#34;Test case for /code2fn/ping endpoint.&#34;&#34;&#34;
     response = client.get(&#34;/code2fn/ping&#34;)
     assert response.status_code == 200</code></pre>
 </details>
@@ -328,6 +461,8 @@ def test_get_pyacset():
 <li><code><a title="skema.skema_py.tests.test_server.test_fn_given_filepaths_zip" href="#skema.skema_py.tests.test_server.test_fn_given_filepaths_zip">test_fn_given_filepaths_zip</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_fn_supported_file_extensions" href="#skema.skema_py.tests.test_server.test_fn_supported_file_extensions">test_fn_supported_file_extensions</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_get_pyacset" href="#skema.skema_py.tests.test_server.test_get_pyacset">test_get_pyacset</a></code></li>
+<li><code><a title="skema.skema_py.tests.test_server.test_no_supported_files" href="#skema.skema_py.tests.test_server.test_no_supported_files">test_no_supported_files</a></code></li>
+<li><code><a title="skema.skema_py.tests.test_server.test_partial_supported_files" href="#skema.skema_py.tests.test_server.test_partial_supported_files">test_partial_supported_files</a></code></li>
 <li><code><a title="skema.skema_py.tests.test_server.test_ping" href="#skema.skema_py.tests.test_server.test_ping">test_ping</a></code></li>
 </ul>
 </li>

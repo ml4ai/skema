@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Coverage for skema/gromet/fn/gromet_fn.py: 80%</title>
+    <title>Coverage for skema/gromet/fn/gromet_fn.py: 85%</title>
     <link rel="icon" sizes="32x32" href="favicon_32.png">
     <link rel="stylesheet" href="style.css" type="text/css">
     <script type="text/javascript" src="coverage_html.js" defer></script>
@@ -12,7 +12,7 @@
     <div class="content">
         <h1>
             <span class="text">Coverage for </span><b>skema/gromet/fn/gromet_fn.py</b>:
-            <span class="pc_cov">80%</span>
+            <span class="pc_cov">85%</span>
         </h1>
         <aside id="help_panel_wrapper">
             <input id="help_panel_state" type="checkbox">
@@ -55,8 +55,8 @@
         </aside>
         <h2>
             <span class="text">310 statements &nbsp;</span>
-            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">248<span class="text"> run</span></button>
-            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">62<span class="text"> missing</span></button>
+            <button type="button" class="run button_toggle_run" value="run" data-shortcut="r" title="Toggle lines run">265<span class="text"> run</span></button>
+            <button type="button" class="mis show_mis button_toggle_mis" value="mis" data-shortcut="m" title="Toggle lines missing">45<span class="text"> missing</span></button>
             <button type="button" class="exc show_exc button_toggle_exc" value="exc" data-shortcut="x" title="Toggle lines excluded">0<span class="text"> excluded</span></button>
         </h2>
         <p class="text">
@@ -65,7 +65,7 @@
             <a id="nextFileLink" class="nav" href="d_73cad6f958711d10_gromet_fn_module_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-03 19:54 +0000
+            created at 2023-10-04 02:48 +0000
         </p>
         <aside class="hidden">
             <button type="button" class="button_next_chunk" data-shortcut="j"/>
@@ -284,7 +284,7 @@
     <p class="pln"><span class="n"><a id="t202" href="#t202">202</a></span><span class="t"><span class="str">        :return: The name of this GrometFN.  # noqa: E501</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t203" href="#t203">203</a></span><span class="t"><span class="str">        :rtype: str</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t204" href="#t204">204</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t205" href="#t205">205</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_name</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t205" href="#t205">205</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_name</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t206" href="#t206">206</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t207" href="#t207">207</a></span><span class="t">    <span class="op">@</span><span class="nam">name</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t208" href="#t208">208</a></span><span class="t">    <span class="key">def</span> <span class="nam">name</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">name</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -675,7 +675,7 @@
     <p class="pln"><span class="n"><a id="t593" href="#t593">593</a></span><span class="t"><span class="str">        :return: The wll of this GrometFN.  # noqa: E501</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t594" href="#t594">594</a></span><span class="t"><span class="str">        :rtype: list[GrometWire]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t595" href="#t595">595</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t596" href="#t596">596</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wll</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t596" href="#t596">596</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wll</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t597" href="#t597">597</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t598" href="#t598">598</a></span><span class="t">    <span class="op">@</span><span class="nam">wll</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t599" href="#t599">599</a></span><span class="t">    <span class="key">def</span> <span class="nam">wll</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">wll</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -721,7 +721,7 @@
     <p class="pln"><span class="n"><a id="t639" href="#t639">639</a></span><span class="t"><span class="str">        :return: The wlc of this GrometFN.  # noqa: E501</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t640" href="#t640">640</a></span><span class="t"><span class="str">        :rtype: list[GrometWire]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t641" href="#t641">641</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t642" href="#t642">642</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wlc</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t642" href="#t642">642</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wlc</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t643" href="#t643">643</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t644" href="#t644">644</a></span><span class="t">    <span class="op">@</span><span class="nam">wlc</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t645" href="#t645">645</a></span><span class="t">    <span class="key">def</span> <span class="nam">wlc</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">wlc</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -859,7 +859,7 @@
     <p class="pln"><span class="n"><a id="t777" href="#t777">777</a></span><span class="t"><span class="str">        :return: The wcl of this GrometFN.  # noqa: E501</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t778" href="#t778">778</a></span><span class="t"><span class="str">        :rtype: list[GrometWire]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t779" href="#t779">779</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t780" href="#t780">780</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wcl</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t780" href="#t780">780</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wcl</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t781" href="#t781">781</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t782" href="#t782">782</a></span><span class="t">    <span class="op">@</span><span class="nam">wcl</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t783" href="#t783">783</a></span><span class="t">    <span class="key">def</span> <span class="nam">wcl</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">wcl</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -882,7 +882,7 @@
     <p class="pln"><span class="n"><a id="t800" href="#t800">800</a></span><span class="t"><span class="str">        :return: The wcf of this GrometFN.  # noqa: E501</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t801" href="#t801">801</a></span><span class="t"><span class="str">        :rtype: list[GrometWire]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t802" href="#t802">802</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t803" href="#t803">803</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wcf</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t803" href="#t803">803</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wcf</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t804" href="#t804">804</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t805" href="#t805">805</a></span><span class="t">    <span class="op">@</span><span class="nam">wcf</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t806" href="#t806">806</a></span><span class="t">    <span class="key">def</span> <span class="nam">wcf</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">wcf</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -905,7 +905,7 @@
     <p class="pln"><span class="n"><a id="t823" href="#t823">823</a></span><span class="t"><span class="str">        :return: The wcc of this GrometFN.  # noqa: E501</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t824" href="#t824">824</a></span><span class="t"><span class="str">        :rtype: list[GrometWire]</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t825" href="#t825">825</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t826" href="#t826">826</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wcc</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t826" href="#t826">826</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_wcc</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t827" href="#t827">827</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t828" href="#t828">828</a></span><span class="t">    <span class="op">@</span><span class="nam">wcc</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t829" href="#t829">829</a></span><span class="t">    <span class="key">def</span> <span class="nam">wcc</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">wcc</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -950,7 +950,7 @@
     <p class="pln"><span class="n"><a id="t868" href="#t868">868</a></span><span class="t"><span class="str">        :return: The gromet_type of this GrometFN.  # noqa: E501</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t869" href="#t869">869</a></span><span class="t"><span class="str">        :rtype: str</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t870" href="#t870">870</a></span><span class="t"><span class="str">        """</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t871" href="#t871">871</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_gromet_type</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t871" href="#t871">871</a></span><span class="t">        <span class="key">return</span> <span class="nam">self</span><span class="op">.</span><span class="nam">_gromet_type</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t872" href="#t872">872</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t873" href="#t873">873</a></span><span class="t">    <span class="op">@</span><span class="nam">gromet_type</span><span class="op">.</span><span class="nam">setter</span>&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t874" href="#t874">874</a></span><span class="t">    <span class="key">def</span> <span class="nam">gromet_type</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">gromet_type</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
@@ -965,30 +965,30 @@
     <p class="pln"><span class="n"><a id="t883" href="#t883">883</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t884" href="#t884">884</a></span><span class="t">    <span class="key">def</span> <span class="nam">to_dict</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t885" href="#t885">885</a></span><span class="t">        <span class="str">"""Returns the model properties as a dict"""</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t886" href="#t886">886</a></span><span class="t">        <span class="nam">result</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t886" href="#t886">886</a></span><span class="t">        <span class="nam">result</span> <span class="op">=</span> <span class="op">{</span><span class="op">}</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t887" href="#t887">887</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t888" href="#t888">888</a></span><span class="t">        <span class="key">for</span> <span class="nam">attr</span><span class="op">,</span> <span class="nam">_</span> <span class="key">in</span> <span class="nam">six</span><span class="op">.</span><span class="nam">iteritems</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">swagger_types</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t889" href="#t889">889</a></span><span class="t">            <span class="nam">value</span> <span class="op">=</span> <span class="nam">getattr</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">attr</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t890" href="#t890">890</a></span><span class="t">            <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">list</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t891" href="#t891">891</a></span><span class="t">                <span class="nam">result</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="nam">map</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t888" href="#t888">888</a></span><span class="t">        <span class="key">for</span> <span class="nam">attr</span><span class="op">,</span> <span class="nam">_</span> <span class="key">in</span> <span class="nam">six</span><span class="op">.</span><span class="nam">iteritems</span><span class="op">(</span><span class="nam">self</span><span class="op">.</span><span class="nam">swagger_types</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t889" href="#t889">889</a></span><span class="t">            <span class="nam">value</span> <span class="op">=</span> <span class="nam">getattr</span><span class="op">(</span><span class="nam">self</span><span class="op">,</span> <span class="nam">attr</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t890" href="#t890">890</a></span><span class="t">            <span class="key">if</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">list</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t891" href="#t891">891</a></span><span class="t">                <span class="nam">result</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span> <span class="op">=</span> <span class="nam">list</span><span class="op">(</span><span class="nam">map</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t892" href="#t892">892</a></span><span class="t">                    <span class="key">lambda</span> <span class="nam">x</span><span class="op">:</span> <span class="nam">x</span><span class="op">.</span><span class="nam">to_dict</span><span class="op">(</span><span class="op">)</span> <span class="key">if</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">x</span><span class="op">,</span> <span class="str">"to_dict"</span><span class="op">)</span> <span class="key">else</span> <span class="nam">x</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t893" href="#t893">893</a></span><span class="t">                    <span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t894" href="#t894">894</a></span><span class="t">                <span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t895" href="#t895">895</a></span><span class="t">            <span class="key">elif</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="str">"to_dict"</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t895" href="#t895">895</a></span><span class="t">            <span class="key">elif</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="str">"to_dict"</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t896" href="#t896">896</a></span><span class="t">                <span class="nam">result</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span> <span class="op">=</span> <span class="nam">value</span><span class="op">.</span><span class="nam">to_dict</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t897" href="#t897">897</a></span><span class="t">            <span class="key">elif</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t897" href="#t897">897</a></span><span class="t">            <span class="key">elif</span> <span class="nam">isinstance</span><span class="op">(</span><span class="nam">value</span><span class="op">,</span> <span class="nam">dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t898" href="#t898">898</a></span><span class="t">                <span class="nam">result</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span> <span class="op">=</span> <span class="nam">dict</span><span class="op">(</span><span class="nam">map</span><span class="op">(</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t899" href="#t899">899</a></span><span class="t">                    <span class="key">lambda</span> <span class="nam">item</span><span class="op">:</span> <span class="op">(</span><span class="nam">item</span><span class="op">[</span><span class="num">0</span><span class="op">]</span><span class="op">,</span> <span class="nam">item</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">.</span><span class="nam">to_dict</span><span class="op">(</span><span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t900" href="#t900">900</a></span><span class="t">                    <span class="key">if</span> <span class="nam">hasattr</span><span class="op">(</span><span class="nam">item</span><span class="op">[</span><span class="num">1</span><span class="op">]</span><span class="op">,</span> <span class="str">"to_dict"</span><span class="op">)</span> <span class="key">else</span> <span class="nam">item</span><span class="op">,</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t901" href="#t901">901</a></span><span class="t">                    <span class="nam">value</span><span class="op">.</span><span class="nam">items</span><span class="op">(</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t902" href="#t902">902</a></span><span class="t">                <span class="op">)</span><span class="op">)</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t903" href="#t903">903</a></span><span class="t">            <span class="key">else</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t904" href="#t904">904</a></span><span class="t">                <span class="nam">result</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span> <span class="op">=</span> <span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t905" href="#t905">905</a></span><span class="t">        <span class="key">if</span> <span class="nam">issubclass</span><span class="op">(</span><span class="nam">GrometFN</span><span class="op">,</span> <span class="nam">dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t904" href="#t904">904</a></span><span class="t">                <span class="nam">result</span><span class="op">[</span><span class="nam">attr</span><span class="op">]</span> <span class="op">=</span> <span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t905" href="#t905">905</a></span><span class="t">        <span class="key">if</span> <span class="nam">issubclass</span><span class="op">(</span><span class="nam">GrometFN</span><span class="op">,</span> <span class="nam">dict</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t906" href="#t906">906</a></span><span class="t">            <span class="key">for</span> <span class="nam">key</span><span class="op">,</span> <span class="nam">value</span> <span class="key">in</span> <span class="nam">self</span><span class="op">.</span><span class="nam">items</span><span class="op">(</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="mis show_mis"><span class="n"><a id="t907" href="#t907">907</a></span><span class="t">                <span class="nam">result</span><span class="op">[</span><span class="nam">key</span><span class="op">]</span> <span class="op">=</span> <span class="nam">value</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t908" href="#t908">908</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
-    <p class="mis show_mis"><span class="n"><a id="t909" href="#t909">909</a></span><span class="t">        <span class="key">return</span> <span class="nam">result</span>&nbsp;</span><span class="r"></span></p>
+    <p class="run"><span class="n"><a id="t909" href="#t909">909</a></span><span class="t">        <span class="key">return</span> <span class="nam">result</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t910" href="#t910">910</a></span><span class="t">&nbsp;</span><span class="r"></span></p>
     <p class="run"><span class="n"><a id="t911" href="#t911">911</a></span><span class="t">    <span class="key">def</span> <span class="nam">to_str</span><span class="op">(</span><span class="nam">self</span><span class="op">)</span><span class="op">:</span>&nbsp;</span><span class="r"></span></p>
     <p class="pln"><span class="n"><a id="t912" href="#t912">912</a></span><span class="t">        <span class="str">"""Returns the string representation of the model"""</span>&nbsp;</span><span class="r"></span></p>
@@ -1017,7 +1017,7 @@
             <a id="nextFileLink" class="nav" href="d_73cad6f958711d10_gromet_fn_module_py.html">&#xbb; next</a>
             &nbsp; &nbsp; &nbsp;
             <a class="nav" href="https://coverage.readthedocs.io/en/7.3.2">coverage.py v7.3.2</a>,
-            created at 2023-10-03 19:54 +0000
+            created at 2023-10-04 02:48 +0000
         </p>
     </div>
 </footer>
