@@ -18,9 +18,8 @@ class TreeBuilder(object):
     def get_tree(self, source: str):
         """Create a syntax tree based on the grammar and an input string"""
         tree: Tree = self.parser.parse(bytes(source, "utf8"))
-        # remove empty nodes from syntax tree
+        # remove the tree cleaned of empty nodes.
         return self.clean_tree(tree)
-        # return tree
 
     def clean_nodes(self, node: Node):
         """Remove empty children from the node tree"""
@@ -38,12 +37,12 @@ class TreeBuilder(object):
         clean.root_node = self.clean_nodes(tree.root_node )
         return clean
 
-    def traverse_nodes(self, node: Node, indent = ''):
+    def print_nodes(self, node: Node, indent = ''):
         """Display the node branch in pretty format"""
         for child in node.children:
             print(f"{indent} node: {child.type}")
-            self.traverse_nodes(child, indent + '  ')
+            self.print_nodes(child, indent + '  ')
 
-    def traverse_tree(self, tree: Tree, indent = ''):
+    def print_tree(self, tree: Tree, indent = ''):
         """Display the tree starting at the root node"""
-        self.traverse_nodes(tree.root_node, indent)
+        self.print_nodes(tree.root_node, indent)
