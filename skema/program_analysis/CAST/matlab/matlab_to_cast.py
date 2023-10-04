@@ -28,7 +28,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
 )
 
-from skema.program_analysis.CAST.matlab.tree_builder import TreeBuilder
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
     NodeHelper,
@@ -47,20 +46,21 @@ MATLAB_VERSION='matlab_version_here'
 class MatlabToCast(object):
     def __init__(self, source_file_path: str):
         """docstring"""
-        
-        # Read the MATLAB source file
-        self.path = Path(source_file_path)
-        self.source_file_name = self.path.name
-        self.source = self.path.read_text().strip()
 
-        # get a tree-sitter tree based on source input
-        self.tree_builder = TreeBuilder("matlab")
-        self.tree = self.tree_builder.get_tree(self.source)
-        self.tree.root_node = self.tree_builder.clean_nodes(self.tree.root_node)
+        # create MATLAB parser
+        parser = Parser()
+        parser.set_language(
+            Language(INSTALLED_LANGUAGES_FILEPATH, "matlab")
+        )
+        
+        # create a syntax tree using the source file
+        path = Path(source_file_path)
+        self.source = path.read_text().strip()
+        self.tree = parser.parse(bytes(self.source, "utf8"))
 
         # Walking data
         self.variable_context = VariableContext()
-        self.node_helper = NodeHelper(self.source, self.source_file_name)
+        self.node_helper = NodeHelper(self.source, path.name)
 
         # Create CAST object 
         self.out_cast = self.generate_cast()
