@@ -35,6 +35,7 @@ class GrometFNModuleCollection(GrometObject):
         'modules': 'list[GrometFNModule]',
         'module_index': 'list[str]',
         'executables': 'list[int]',
+        'metadata_collection': 'list[list[Metadata]]',
         'gromet_type': 'str'
     }
     if hasattr(GrometObject, "swagger_types"):
@@ -47,12 +48,13 @@ class GrometFNModuleCollection(GrometObject):
         'modules': 'modules',
         'module_index': 'module_index',
         'executables': 'executables',
+        'metadata_collection': 'metadata_collection',
         'gromet_type': 'gromet_type'
     }
     if hasattr(GrometObject, "attribute_map"):
         attribute_map.update(GrometObject.attribute_map)
 
-    def __init__(self, schema='FN', schema_version=None, name=None, modules=None, module_index=None, executables=None, gromet_type='GrometFNModuleCollection', *args, **kwargs):  # noqa: E501
+    def __init__(self, schema='FN', schema_version=None, name=None, modules=None, module_index=None, executables=None, metadata_collection=None, gromet_type='GrometFNModuleCollection', *args, **kwargs):  # noqa: E501
         """GrometFNModuleCollection - a model defined in Swagger"""  # noqa: E501
         self._schema = None
         self._schema_version = None
@@ -60,6 +62,7 @@ class GrometFNModuleCollection(GrometObject):
         self._modules = None
         self._module_index = None
         self._executables = None
+        self._metadata_collection = None
         self._gromet_type = None
         self.discriminator = None
         if schema is not None:
@@ -74,6 +77,8 @@ class GrometFNModuleCollection(GrometObject):
             self.module_index = module_index
         if executables is not None:
             self.executables = executables
+        if metadata_collection is not None:
+            self.metadata_collection = metadata_collection
         if gromet_type is not None:
             self.gromet_type = gromet_type
         GrometObject.__init__(self, *args, **kwargs)
@@ -209,6 +214,29 @@ class GrometFNModuleCollection(GrometObject):
         """
 
         self._executables = executables
+
+    @property
+    def metadata_collection(self):
+        """Gets the metadata_collection of this GrometFNModuleCollection.  # noqa: E501
+
+        Table (array) of lists (arrays) of metadata, where each list in the Table-array represents the collection of metadata associated with a GrometFNModuleCollection object.   # noqa: E501
+
+        :return: The metadata_collection of this GrometFNModuleCollection.  # noqa: E501
+        :rtype: list[list[Metadata]]
+        """
+        return self._metadata_collection
+
+    @metadata_collection.setter
+    def metadata_collection(self, metadata_collection):
+        """Sets the metadata_collection of this GrometFNModuleCollection.
+
+        Table (array) of lists (arrays) of metadata, where each list in the Table-array represents the collection of metadata associated with a GrometFNModuleCollection object.   # noqa: E501
+
+        :param metadata_collection: The metadata_collection of this GrometFNModuleCollection.  # noqa: E501
+        :type: list[list[Metadata]]
+        """
+
+        self._metadata_collection = metadata_collection
 
     @property
     def gromet_type(self):
