@@ -3,16 +3,16 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import (
     INSTALLED_LANGUAGES_FILEPATH
 )
 
-# Create a Tree-sitter grammar tree using the grammar name and an input file
+# Create a Tree-sitter grammar tree using the language name and an input file
 
 class TreeBuilder(object):
-    def __init__(self, grammar):
-        """Docstring"""
+    def __init__(self, language_name):
+        """Build a parser for the language name, ie 'fortran' """
         
-        # Create the tree-sitter MATLAB parser
+        # Create the Tree-sitter parser for the language name
         self.parser = Parser()
         self.parser.set_language(
-            Language(INSTALLED_LANGUAGES_FILEPATH, grammar)
+            Language(INSTALLED_LANGUAGES_FILEPATH, language_name)
         )
 
     def get_tree(self, source: str):
