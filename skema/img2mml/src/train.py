@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import torch
+import math
 from tqdm.auto import tqdm
 from skema.img2mml.utils.utils import *
-
+from skema.img2mml.src.test import evaluate
 
 def train(
     model,
@@ -18,12 +19,15 @@ def train(
     isBatchScheduler=False,
     reduce_on_plateau_scheduler=False,
     scheduler=None,
+    val_dataloader, batch_size, vocab
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
 
     epoch_loss = 0
     tset = tqdm(iter(train_dataloader))
+    latest_val_loss = 100
+
     # for i, (img, mml) in enumerate(train_dataloader):
     for i, (img, mml) in enumerate(tset):
         # mml: (B, max_len)
@@ -56,17 +60,38 @@ def train(
 
         epoch_loss += loss.item()
 
-        if isBatchScheduler:
-            if reduce_on_plateau_scheduler:
-                scheduler.step(loss)
-
-            else:
-                scheduler.step()
-
         if (not ddp) or (ddp and rank == 0):
             desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
             tset.set_description(desc)
 
+        """
+        new addition-------
+        """
+        if isBatchScheduler:
+            # Calculating val_loss after every 1000 batches
+            # of size 64.
+            if i > 0 and i % 1000 == 0 and i < len(train_dataloader):
+                val_loss = evaluate(model,model_type,img_tnsr_path,
+                                    batch_size,val_dataloader,criterion,
+                                    device,vocab,ddp=ddp,rank=rank,)
 
-    net_loss = epoch_loss / len(train_dataloader)
-    return net_loss
+                if val_loss < latest_val_loss:
+                    latest_val_loss = val_loss
+                    if (not ddp) or (ddp and rank == 0):
+                        torch.save(
+                            model.state_dict(),
+                            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_batch_best.pt",
+                        )
+
+                if reduce_on_plateau_scheduler:
+                    scheduler.step(val_loss)
+                else:
+                    scheduler.step()
+
+                print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(train_loss):7.3f}")
+            """
+            ----------------------------------------------------------------------
+            """
+        else:
+            net_loss = epoch_loss / len(train_dataloader)
+            return net_loss

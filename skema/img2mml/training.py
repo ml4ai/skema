@@ -329,14 +329,11 @@ def train_model(rank=None,):
 
     # optimizer
     isBatchScheduler = False
-    isEpochScheduler = False
     scheduler = None
     if step_scheduler or exponential_scheduler or reduce_on_plateau_scheduler:
-        _lr = starting_lr 
+        _lr = starting_lr
         if scheduler_type == "Batch":
             isBatchScheduler = True
-        else:
-            isEpochScheduler = True
     else:
         _lr = learning_rate
 
@@ -357,27 +354,27 @@ def train_model(rank=None,):
     # which scheduler, if using
     if step_scheduler:
         scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, 
-            step_size=step_size, 
+            optimizer,
+            step_size=step_size,
             gamma=gamma,
         )
     elif exponential_scheduler:
         scheduler = torch.optim.lr_scheduler.ExponentialLR(
-            optimizer, 
-            gamma=gamma, 
-            last_epoch=-1, 
+            optimizer,
+            gamma=gamma,
+            last_epoch=-1,
             verbose=False,
         )
     elif reduce_on_plateau_scheduler:
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, 
-            'min', 
+            optimizer,
+            'min',
             patience = step_size,
             factor=gamma,
             verbose=False,
         )
 
-        
+
     best_valid_loss = float("inf")
 
     # raw data paths
@@ -416,73 +413,80 @@ def train_model(rank=None,):
                     isBatchScheduler=isBatchScheduler,
                     reduce_on_plateau_scheduler=reduce_on_plateau_scheduler,
                     scheduler=scheduler,
+                    val_dataloader, batch_size, vocab # (for batch scheduler only. remove this line if doesn't work)
                 )
 
-                val_loss = evaluate(
-                    model,
-                    model_type,
-                    img_tnsr_path,
-                    batch_size,
-                    val_dataloader,
-                    criterion,
-                    device,
-                    vocab,
-                    ddp=ddp,
-                    rank=rank,
-                    g2p=g2p,
-                )
-
-                end_time = time.time()
-                # total time spent on training an epoch
-                epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-
-                if isEpochScheduler:
-                    if reduce_on_plateau_scheduler:
-                        scheduler.step(val_loss)
-                        print("learning rate: ", optimizer.param_groups[0]['lr'])
-                    else:
-                        scheduler.step()
-
-                # saving the current model for transfer learning
-                if (not ddp) or (ddp and rank == 0):
-                    torch.save(
-                        model.state_dict(),
-                        f"trained_models/{model_type}_{dataset_type}_{config['markup']}_latest.pt",
+                """
+                new addition --------
+                """
+                if not isBatchScheduler:
+                    val_loss = evaluate(
+                        model,
+                        model_type,
+                        img_tnsr_path,
+                        batch_size,
+                        val_dataloader,
+                        criterion,
+                        device,
+                        vocab,
+                        ddp=ddp,
+                        rank=rank,
+                        g2p=g2p,
                     )
 
-                if val_loss < best_valid_loss:
-                    best_valid_loss = val_loss
-                    count_es = 0
+                    end_time = time.time()
+                    # total time spent on training an epoch
+                    epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+
+                    if isEpochScheduler:
+                        if reduce_on_plateau_scheduler:
+                            scheduler.step(val_loss)
+                        else:
+                            scheduler.step()
+
+                    # saving the current model for transfer learning
                     if (not ddp) or (ddp and rank == 0):
                         torch.save(
                             model.state_dict(),
-                            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
+                            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_latest.pt",
                         )
 
-                elif early_stopping:
-                    count_es += 1
+                    if val_loss < best_valid_loss:
+                        best_valid_loss = val_loss
+                        count_es = 0
+                        if (not ddp) or (ddp and rank == 0):
+                            torch.save(
+                                model.state_dict(),
+                                f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
+                            )
 
-                # logging
-                if (not ddp) or (ddp and rank == 0):
-                    print(
-                        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s"
-                    )
-                    print(
-                        f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
-                    )
-                    print(
-                        f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}"
-                    )
+                    elif early_stopping:
+                        count_es += 1
 
-                    loss_file.write(
-                        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\n"
-                    )
-                    loss_file.write(
-                        f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}\n"
-                    )
-                    loss_file.write(
-                        f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
-                    )
+                    # logging
+                    if (not ddp) or (ddp and rank == 0):
+                        print(
+                            f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s"
+                        )
+                        print(
+                            f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
+                        )
+                        print(
+                            f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}"
+                        )
+
+                        loss_file.write(
+                            f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\n"
+                        )
+                        loss_file.write(
+                            f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}\n"
+                        )
+                        loss_file.write(
+                            f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
+                        )
+                """
+                -------------------------------------------------------
+                """
 
             else:
                 print(
@@ -542,12 +546,12 @@ def train_model(rank=None,):
         from bin_testing import bin_test_dataloader
 
         test_dataloader = bin_test_dataloader(
-            config, 
-            vocab, 
-            device, 
-            start=config["start_bin"], 
+            config,
+            vocab,
+            device,
+            start=config["start_bin"],
             end=config["end_bin"],
-            length_based_binning=config["length_based_binning"], 
+            length_based_binning=config["length_based_binning"],
             content_based_binning=config["content_based_binning"],
         )
 
