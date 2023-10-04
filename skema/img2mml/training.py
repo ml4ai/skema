@@ -371,7 +371,7 @@ def train_model(rank=None,):
             'min',
             patience = step_size,
             factor=gamma,
-            verbose=False,
+            verbose=True,
         )
 
 
