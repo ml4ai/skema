@@ -56,11 +56,12 @@ class MatlabToCast(object):
         # create a syntax tree using the source file
         path = Path(source_file_path)
         self.source = path.read_text().strip()
+        self.filename = path.name
         self.tree = parser.parse(bytes(self.source, "utf8"))
 
         # Walking data
         self.variable_context = VariableContext()
-        self.node_helper = NodeHelper(self.source, path.name)
+        self.node_helper = NodeHelper(self.source, self.filename)
 
         # Create CAST object 
         self.out_cast = self.generate_cast()
