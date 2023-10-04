@@ -1,25 +1,7 @@
-from tree_sitter import Language, Parser, Node, Tree
-from skema.program_analysis.tree_sitter_parsers.build_parsers import (
-    INSTALLED_LANGUAGES_FILEPATH
-)
+from tree_sitter import Node, Tree
 
-# Create a Tree-sitter grammar tree using the language name and an input file
 
-class TreeBuilder(object):
-    def __init__(self, language_name):
-        """Build a parser for the language name, ie 'fortran' """
-        
-        # Create the Tree-sitter parser for the language name
-        self.parser = Parser()
-        self.parser.set_language(
-            Language(INSTALLED_LANGUAGES_FILEPATH, language_name)
-        )
-
-    def get_tree(self, source: str):
-        """Create a syntax tree based on the grammar and an input string"""
-        tree: Tree = self.parser.parse(bytes(source, "utf8"))
-        # remove the tree cleaned of empty nodes.
-        return self.clean_tree(tree)
+class TreeUtils():
 
     def clean_nodes(self, node: Node):
         """Remove empty children from the node tree"""
