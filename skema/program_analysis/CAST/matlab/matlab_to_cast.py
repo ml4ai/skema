@@ -39,7 +39,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_first_child_index,
     get_last_child_index,
 )
-from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
+
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
 MATLAB_VERSION='matlab_version_here'
