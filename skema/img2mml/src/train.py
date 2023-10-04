@@ -33,8 +33,8 @@ def train(
 
     tset = tqdm(iter(train_dataloader))
 
-    for i, (img, mml) in enumerate(train_dataloader):
-    # for i, (img, mml) in enumerate(tset):
+    # for i, (img, mml) in enumerate(train_dataloader):
+    for i, (img, mml) in enumerate(tset):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
         mml.shape[0]
