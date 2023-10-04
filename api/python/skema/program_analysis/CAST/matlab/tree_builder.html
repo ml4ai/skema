@@ -47,9 +47,8 @@ class TreeBuilder(object):
     def get_tree(self, source: str):
         &#34;&#34;&#34;Create a syntax tree based on the grammar and an input string&#34;&#34;&#34;
         tree: Tree = self.parser.parse(bytes(source, &#34;utf8&#34;))
-        # remove empty nodes from syntax tree
+        # remove the tree cleaned of empty nodes.
         return self.clean_tree(tree)
-        # return tree
 
     def clean_nodes(self, node: Node):
         &#34;&#34;&#34;Remove empty children from the node tree&#34;&#34;&#34;
@@ -67,15 +66,15 @@ class TreeBuilder(object):
         clean.root_node = self.clean_nodes(tree.root_node )
         return clean
 
-    def traverse_nodes(self, node: Node, indent = &#39;&#39;):
+    def print_nodes(self, node: Node, indent = &#39;&#39;):
         &#34;&#34;&#34;Display the node branch in pretty format&#34;&#34;&#34;
         for child in node.children:
             print(f&#34;{indent} node: {child.type}&#34;)
-            self.traverse_nodes(child, indent + &#39;  &#39;)
+            self.print_nodes(child, indent + &#39;  &#39;)
 
-    def traverse_tree(self, tree: Tree, indent = &#39;&#39;):
+    def print_tree(self, tree: Tree, indent = &#39;&#39;):
         &#34;&#34;&#34;Display the tree starting at the root node&#34;&#34;&#34;
-        self.traverse_nodes(tree.root_node, indent)</code></pre>
+        self.print_nodes(tree.root_node, indent)</code></pre>
 </details>
 </section>
 <section>
@@ -110,9 +109,8 @@ class TreeBuilder(object):
     def get_tree(self, source: str):
         &#34;&#34;&#34;Create a syntax tree based on the grammar and an input string&#34;&#34;&#34;
         tree: Tree = self.parser.parse(bytes(source, &#34;utf8&#34;))
-        # remove empty nodes from syntax tree
+        # remove the tree cleaned of empty nodes.
         return self.clean_tree(tree)
-        # return tree
 
     def clean_nodes(self, node: Node):
         &#34;&#34;&#34;Remove empty children from the node tree&#34;&#34;&#34;
@@ -130,15 +128,15 @@ class TreeBuilder(object):
         clean.root_node = self.clean_nodes(tree.root_node )
         return clean
 
-    def traverse_nodes(self, node: Node, indent = &#39;&#39;):
+    def print_nodes(self, node: Node, indent = &#39;&#39;):
         &#34;&#34;&#34;Display the node branch in pretty format&#34;&#34;&#34;
         for child in node.children:
             print(f&#34;{indent} node: {child.type}&#34;)
-            self.traverse_nodes(child, indent + &#39;  &#39;)
+            self.print_nodes(child, indent + &#39;  &#39;)
 
-    def traverse_tree(self, tree: Tree, indent = &#39;&#39;):
+    def print_tree(self, tree: Tree, indent = &#39;&#39;):
         &#34;&#34;&#34;Display the tree starting at the root node&#34;&#34;&#34;
-        self.traverse_nodes(tree.root_node, indent)</code></pre>
+        self.print_nodes(tree.root_node, indent)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -190,13 +188,12 @@ class TreeBuilder(object):
 <pre><code class="python">def get_tree(self, source: str):
     &#34;&#34;&#34;Create a syntax tree based on the grammar and an input string&#34;&#34;&#34;
     tree: Tree = self.parser.parse(bytes(source, &#34;utf8&#34;))
-    # remove empty nodes from syntax tree
-    return self.clean_tree(tree)
-    # return tree</code></pre>
+    # remove the tree cleaned of empty nodes.
+    return self.clean_tree(tree)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.traverse_nodes"><code class="name flex">
-<span>def <span class="ident">traverse_nodes</span></span>(<span>self, node: tree_sitter.Node, indent='')</span>
+<dt id="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.print_nodes"><code class="name flex">
+<span>def <span class="ident">print_nodes</span></span>(<span>self, node: tree_sitter.Node, indent='')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Display the node branch in pretty format</p></div>
@@ -204,15 +201,15 @@ class TreeBuilder(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def traverse_nodes(self, node: Node, indent = &#39;&#39;):
+<pre><code class="python">def print_nodes(self, node: Node, indent = &#39;&#39;):
     &#34;&#34;&#34;Display the node branch in pretty format&#34;&#34;&#34;
     for child in node.children:
         print(f&#34;{indent} node: {child.type}&#34;)
-        self.traverse_nodes(child, indent + &#39;  &#39;)</code></pre>
+        self.print_nodes(child, indent + &#39;  &#39;)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.traverse_tree"><code class="name flex">
-<span>def <span class="ident">traverse_tree</span></span>(<span>self, tree: tree_sitter.Tree, indent='')</span>
+<dt id="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.print_tree"><code class="name flex">
+<span>def <span class="ident">print_tree</span></span>(<span>self, tree: tree_sitter.Tree, indent='')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Display the tree starting at the root node</p></div>
@@ -220,9 +217,9 @@ class TreeBuilder(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def traverse_tree(self, tree: Tree, indent = &#39;&#39;):
+<pre><code class="python">def print_tree(self, tree: Tree, indent = &#39;&#39;):
     &#34;&#34;&#34;Display the tree starting at the root node&#34;&#34;&#34;
-    self.traverse_nodes(tree.root_node, indent)</code></pre>
+    self.print_nodes(tree.root_node, indent)</code></pre>
 </details>
 </dd>
 </dl>
@@ -249,8 +246,8 @@ class TreeBuilder(object):
 <li><code><a title="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.clean_nodes" href="#skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.clean_nodes">clean_nodes</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.clean_tree" href="#skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.clean_tree">clean_tree</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.get_tree" href="#skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.get_tree">get_tree</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.traverse_nodes" href="#skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.traverse_nodes">traverse_nodes</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.traverse_tree" href="#skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.traverse_tree">traverse_tree</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.print_nodes" href="#skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.print_nodes">print_nodes</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.print_tree" href="#skema.program_analysis.CAST.matlab.tree_builder.TreeBuilder.print_tree">print_tree</a></code></li>
 </ul>
 </li>
 </ul>

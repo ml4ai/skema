@@ -28,12 +28,20 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
+from skema.program_analysis.CAST.matlab.tree_builder import TreeBuilder
+from tree_sitter import Tree
+
 import json
 import sys
 
-def cast_out(filename):
-    &#34;&#34;&#34; Parse the file with the MATLAB parser&#34;&#34;&#34;
-    parser = MatlabToCast(filename)
+def show_source(parser):
+    &#34;&#34;&#34; Show the input source file &#34;&#34;&#34;
+    print(&#39;\nSOURCE:&#39;)
+    print(parser.source)
+
+def show_cast(parser):
+    &#34;&#34;&#34; Show the CAST structures &#34;&#34;&#34;
+    print(&#39;\nCAST:&#39;)
     cast_list = parser.out_cast
     for cast_index in range(0, len(cast_list)):
         jd = json.dumps(
@@ -43,11 +51,22 @@ def cast_out(filename):
         )
         print(jd)
 
+def show_tree(parser):
+    &#34;&#34;&#34; Show the Tree-sitter syntax tree &#34;&#34;&#34;
+    print(&#39;\nSYNTAX TREE:&#39;)
+    tree_builder = parser.tree_builder
+    tree_builder.print_tree(parser.tree)
+
 
 &#34;&#34;&#34; Run a file of any type through the Tree-sitter MATLAB parser&#34;&#34;&#34;
 if __name__ == &#34;__main__&#34;:
-    if len(sys.argv) == 2:
-        cast_out(sys.argv[1])
+    if len(sys.argv) &gt; 1:
+        for i in range(1, len(sys.argv)):
+            parser = MatlabToCast(sys.argv[i])
+            show_source(parser)
+            show_cast(parser)
+            show_tree(parser)
+
     else:
         print(&#34;Please enter one filename to parse&#34;)</code></pre>
 </details>
@@ -59,18 +78,18 @@ if __name__ == &#34;__main__&#34;:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="skema.program_analysis.CAST.matlab.cast_out.cast_out"><code class="name flex">
-<span>def <span class="ident">cast_out</span></span>(<span>filename)</span>
+<dt id="skema.program_analysis.CAST.matlab.cast_out.show_cast"><code class="name flex">
+<span>def <span class="ident">show_cast</span></span>(<span>parser)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Parse the file with the MATLAB parser</p></div>
+<div class="desc"><p>Show the CAST structures</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def cast_out(filename):
-    &#34;&#34;&#34; Parse the file with the MATLAB parser&#34;&#34;&#34;
-    parser = MatlabToCast(filename)
+<pre><code class="python">def show_cast(parser):
+    &#34;&#34;&#34; Show the CAST structures &#34;&#34;&#34;
+    print(&#39;\nCAST:&#39;)
     cast_list = parser.out_cast
     for cast_index in range(0, len(cast_list)):
         jd = json.dumps(
@@ -79,6 +98,37 @@ if __name__ == &#34;__main__&#34;:
             indent=2,
         )
         print(jd)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.cast_out.show_source"><code class="name flex">
+<span>def <span class="ident">show_source</span></span>(<span>parser)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Show the input source file</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def show_source(parser):
+    &#34;&#34;&#34; Show the input source file &#34;&#34;&#34;
+    print(&#39;\nSOURCE:&#39;)
+    print(parser.source)</code></pre>
+</details>
+</dd>
+<dt id="skema.program_analysis.CAST.matlab.cast_out.show_tree"><code class="name flex">
+<span>def <span class="ident">show_tree</span></span>(<span>parser)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Show the Tree-sitter syntax tree</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def show_tree(parser):
+    &#34;&#34;&#34; Show the Tree-sitter syntax tree &#34;&#34;&#34;
+    print(&#39;\nSYNTAX TREE:&#39;)
+    tree_builder = parser.tree_builder
+    tree_builder.print_tree(parser.tree)</code></pre>
 </details>
 </dd>
 </dl>
@@ -99,7 +149,9 @@ if __name__ == &#34;__main__&#34;:
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="skema.program_analysis.CAST.matlab.cast_out.cast_out" href="#skema.program_analysis.CAST.matlab.cast_out.cast_out">cast_out</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.cast_out.show_cast" href="#skema.program_analysis.CAST.matlab.cast_out.show_cast">show_cast</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.cast_out.show_source" href="#skema.program_analysis.CAST.matlab.cast_out.show_source">show_source</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.cast_out.show_tree" href="#skema.program_analysis.CAST.matlab.cast_out.show_tree">show_tree</a></code></li>
 </ul>
 </li>
 </ul>
