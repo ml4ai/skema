@@ -19,7 +19,7 @@ def train(
     isBatchScheduler=False,
     reduce_on_plateau_scheduler=False,
     scheduler=None,
-    val_dataloader, batch_size, vocab
+    val_dataloader=None, batch_size=None, vocab=None
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
