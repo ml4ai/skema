@@ -511,9 +511,14 @@ def train_model(rank=None,):
     )
     try:
         # loading pre_tained_model
+        # model.load_state_dict(
+        #     torch.load(
+        #         f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt"
+        #     )
+        # )
         model.load_state_dict(
             torch.load(
-                f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt"
+                f"trained_models/{model_type}_our_sampled_data_mml_batch_best.pt"
             )
         )
     except:
