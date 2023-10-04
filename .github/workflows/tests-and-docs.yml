@@ -31,8 +31,6 @@ jobs:
           - mg_lib:/var/lib/memgraph
           - mg_log:/var/log/memgraph
           - mg_etc:/etc/memgraph
-        environment:
-          - MEMGRAPH=--memory-limit=3000 --log-level=TRACE"
 
     steps:
     # Checkout code

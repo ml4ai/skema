@@ -119,7 +119,7 @@ build-backend = "setuptools.build_meta"
 # pytest
 [tool.pytest.ini_options]
 minversion = "7.0"
-addopts = "-v --cov=skema --cov-report html:docs/coverage/python"
+addopts = "-v --cov=skema --cov-report html:docs/coverage/python -m "not ci_only"
 testpaths = [
     "skema/img2mml/tests",
     "skema/program_analysis/tests",
@@ -133,6 +133,7 @@ testpaths = [
     # FIXME: skema_py is not being tested
     # and should probably be removed
     #"skema/skema_py/tests"
+    "skema/gromet/execution_engine/tests"
 ]
 
 # Configuration for Black.
