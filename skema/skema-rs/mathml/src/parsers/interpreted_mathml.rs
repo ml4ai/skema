@@ -370,6 +370,16 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
     Ok((s, Mrow(elements)))
 }
 
+///Absolute value
+pub fn absolute(input: Span) -> IResult<Mrow> {
+    let (s, elements) = ws(delimited(
+        stag!("<mo>|</mo>"),
+        many0(math_expression),
+        etag!("<mo>|</mo>"),
+    ))(input)?;
+    Ok((s, Mrow(elements)))
+}
+
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
@@ -444,6 +454,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         msqrt,
         mfrac,
         map(mrow, MathExpression::Mrow),
+        map(absolute, MathExpression::Mrow),
         msubsup,
     )))(input)
 }
