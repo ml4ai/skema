@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
-<title>skema.program_analysis.CAST.matlab.util API documentation</title>
+<title>skema.program_analysis.CAST.matlab.tree_out API documentation</title>
 <meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
@@ -20,34 +20,47 @@
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>skema.program_analysis.CAST.matlab.util</code></h1>
+<h1 class="title">Module <code>skema.program_analysis.CAST.matlab.tree_out</code></h1>
 </header>
 <section id="section-intro">
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import List
-from skema.program_analysis.CAST2FN.model.cast import AstNode, LiteralValue, SourceRef
+<pre><code class="python">import sys
+from tree_sitter import Language, Node, Parser
+from pathlib import Path
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH
+)
 
+&#34;&#34;&#34; Get the Tree-sitter syntax tree for MATLAB files&#34;&#34;&#34;
 
-def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
-    &#34;&#34;&#34;Walks a tree of AstNodes replacing any null SourceRefs with a dummy value&#34;&#34;&#34;
-    if isinstance(node, LiteralValue) and not node.source_code_data_type:
-        node.source_code_data_type = [&#34;Matlab&#34;, &#34;None&#34;]
-    if not node.source_refs:
-        node.source_refs = [SourceRef(&#34;&#34;, -1, -1, -1, -1)]
+def print_tree(node: Node, indent = &#39;&#39;):
+    &#34;&#34;&#34;Display the node branch in pretty format&#34;&#34;&#34;
+    for child in node.children:
+        print(f&#34;{indent} node: {child.type}&#34;)
+        print_tree(child, indent + &#39;  &#39;)
 
-    for attribute_str in node.attribute_map:
-        attribute = getattr(node, attribute_str)
-        if isinstance(attribute, AstNode):
-            generate_dummy_source_refs(attribute)
-        elif isinstance(attribute, List):
-            for element in attribute:
-                if isinstance(element, AstNode):
-                    generate_dummy_source_refs(element)
-
-    return node</code></pre>
+if __name__ == &#34;__main__&#34;:
+    if len(sys.argv) &gt; 1:
+        # Create the Tree-sitter parser for the language name
+        parser = Parser()
+        parser.set_language(
+            Language(INSTALLED_LANGUAGES_FILEPATH, &#34;matlab&#34;)
+        )
+        for i in range(1, len(sys.argv)):
+            path = Path(sys.argv[i])
+            print(&#34;\n\nINPUT:&#34;)
+            print(path.name)
+            source = path.read_text().strip()
+            print(&#34;\nSOURCE:&#34;)
+            print(source)
+            print(&#34;\nSYNTAX TREE:&#34;)
+            tree = parser.parse(bytes(source, &#34;utf8&#34;))
+            print_tree(tree.root_node)
+    else:
+        print(&#34;Please enter at least one input file&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -57,32 +70,20 @@ def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
 <section>
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
-<dt id="skema.program_analysis.CAST.matlab.util.generate_dummy_source_refs"><code class="name flex">
-<span>def <span class="ident">generate_dummy_source_refs</span></span>(<span>node: <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../../CAST2FN/model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a>) ‑> <a title="skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode" href="../../CAST2FN/model/cast/ast_node.html#skema.program_analysis.CAST2FN.model.cast.ast_node.AstNode">AstNode</a></span>
+<dt id="skema.program_analysis.CAST.matlab.tree_out.print_tree"><code class="name flex">
+<span>def <span class="ident">print_tree</span></span>(<span>node: tree_sitter.Node, indent='')</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Walks a tree of AstNodes replacing any null SourceRefs with a dummy value</p></div>
+<div class="desc"><p>Display the node branch in pretty format</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
-    &#34;&#34;&#34;Walks a tree of AstNodes replacing any null SourceRefs with a dummy value&#34;&#34;&#34;
-    if isinstance(node, LiteralValue) and not node.source_code_data_type:
-        node.source_code_data_type = [&#34;Matlab&#34;, &#34;None&#34;]
-    if not node.source_refs:
-        node.source_refs = [SourceRef(&#34;&#34;, -1, -1, -1, -1)]
-
-    for attribute_str in node.attribute_map:
-        attribute = getattr(node, attribute_str)
-        if isinstance(attribute, AstNode):
-            generate_dummy_source_refs(attribute)
-        elif isinstance(attribute, List):
-            for element in attribute:
-                if isinstance(element, AstNode):
-                    generate_dummy_source_refs(element)
-
-    return node</code></pre>
+<pre><code class="python">def print_tree(node: Node, indent = &#39;&#39;):
+    &#34;&#34;&#34;Display the node branch in pretty format&#34;&#34;&#34;
+    for child in node.children:
+        print(f&#34;{indent} node: {child.type}&#34;)
+        print_tree(child, indent + &#39;  &#39;)</code></pre>
 </details>
 </dd>
 </dl>
@@ -103,7 +104,7 @@ def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
 </li>
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
-<li><code><a title="skema.program_analysis.CAST.matlab.util.generate_dummy_source_refs" href="#skema.program_analysis.CAST.matlab.util.generate_dummy_source_refs">generate_dummy_source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.tree_out.print_tree" href="#skema.program_analysis.CAST.matlab.tree_out.print_tree">print_tree</a></code></li>
 </ul>
 </li>
 </ul>

@@ -1,4 +1,4 @@
-var sourcesIndex = JSON.parse('{\
+var srcIndex = JSON.parse('{\
 "actix_codec":["",[],["bcodec.rs","framed.rs","lib.rs","lines.rs"]],\
 "actix_http":["",[["body",[],["body_stream.rs","boxed.rs","either.rs","message_body.rs","mod.rs","none.rs","size.rs","sized_stream.rs","utils.rs"]],["encoding",[],["decoder.rs","encoder.rs","mod.rs"]],["h1",[],["chunked.rs","client.rs","codec.rs","decoder.rs","dispatcher.rs","encoder.rs","expect.rs","mod.rs","payload.rs","service.rs","timer.rs","upgrade.rs","utils.rs"]],["h2",[],["dispatcher.rs","mod.rs","service.rs"]],["header",[["shared",[],["charset.rs","content_encoding.rs","extended.rs","http_date.rs","mod.rs","quality.rs","quality_item.rs"]]],["as_name.rs","common.rs","into_pair.rs","into_value.rs","map.rs","mod.rs","utils.rs"]],["requests",[],["head.rs","mod.rs","request.rs"]],["responses",[],["builder.rs","head.rs","mod.rs","response.rs"]],["ws",[],["codec.rs","dispatcher.rs","frame.rs","mask.rs","mod.rs","proto.rs"]]],["builder.rs","config.rs","date.rs","error.rs","extensions.rs","helpers.rs","http_message.rs","keep_alive.rs","lib.rs","message.rs","payload.rs","service.rs","test.rs"]],\
 "actix_macros":["",[],["lib.rs"]],\
@@ -168,4 +168,4 @@ var sourcesIndex = JSON.parse('{\
 "zstd_safe":["",[],["constants.rs","lib.rs"]],\
 "zstd_sys":["",[],["bindings_zdict_std.rs","bindings_zstd_std.rs","lib.rs"]]\
 }');
-createSourceSidebar();
+createSrcSidebar();

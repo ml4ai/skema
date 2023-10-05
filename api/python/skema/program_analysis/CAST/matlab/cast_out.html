@@ -27,46 +27,29 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
-from skema.program_analysis.CAST.matlab.tree_builder import TreeBuilder
-from tree_sitter import Tree
-
-import json
+<pre><code class="python">import json
 import sys
-
-def show_source(parser):
-    &#34;&#34;&#34; Show the input source file &#34;&#34;&#34;
-    print(&#39;\nSOURCE:&#39;)
-    print(parser.source)
-
-def show_cast(parser):
-    &#34;&#34;&#34; Show the CAST structures &#34;&#34;&#34;
-    print(&#39;\nCAST:&#39;)
-    cast_list = parser.out_cast
-    for cast_index in range(0, len(cast_list)):
-        jd = json.dumps(
-            cast_list[cast_index].to_json_object(),
-            sort_keys=True,
-            indent=2,
-        )
-        print(jd)
-
-def show_tree(parser):
-    &#34;&#34;&#34; Show the Tree-sitter syntax tree &#34;&#34;&#34;
-    print(&#39;\nSYNTAX TREE:&#39;)
-    tree_builder = parser.tree_builder
-    tree_builder.print_tree(parser.tree)
-
+from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 
 &#34;&#34;&#34; Run a file of any type through the Tree-sitter MATLAB parser&#34;&#34;&#34;
+
 if __name__ == &#34;__main__&#34;:
     if len(sys.argv) &gt; 1:
         for i in range(1, len(sys.argv)):
             parser = MatlabToCast(sys.argv[i])
-            show_source(parser)
-            show_cast(parser)
-            show_tree(parser)
-
+            print(&#34;\n\nINPUT:&#34;)
+            print(parser.filename)
+            print(&#34;\nSOURCE:&#34;)
+            print(parser.source)
+            print(&#39;\nCAST:&#39;)
+            cast_list = parser.out_cast
+            for cast_index in range(0, len(cast_list)):
+                jd = json.dumps(
+                    cast_list[cast_index].to_json_object(),
+                    sort_keys=True,
+                    indent=2,
+                )
+                print(jd)
     else:
         print(&#34;Please enter one filename to parse&#34;)</code></pre>
 </details>
@@ -76,62 +59,6 @@ if __name__ == &#34;__main__&#34;:
 <section>
 </section>
 <section>
-<h2 class="section-title" id="header-functions">Functions</h2>
-<dl>
-<dt id="skema.program_analysis.CAST.matlab.cast_out.show_cast"><code class="name flex">
-<span>def <span class="ident">show_cast</span></span>(<span>parser)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Show the CAST structures</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def show_cast(parser):
-    &#34;&#34;&#34; Show the CAST structures &#34;&#34;&#34;
-    print(&#39;\nCAST:&#39;)
-    cast_list = parser.out_cast
-    for cast_index in range(0, len(cast_list)):
-        jd = json.dumps(
-            cast_list[cast_index].to_json_object(),
-            sort_keys=True,
-            indent=2,
-        )
-        print(jd)</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.CAST.matlab.cast_out.show_source"><code class="name flex">
-<span>def <span class="ident">show_source</span></span>(<span>parser)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Show the input source file</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def show_source(parser):
-    &#34;&#34;&#34; Show the input source file &#34;&#34;&#34;
-    print(&#39;\nSOURCE:&#39;)
-    print(parser.source)</code></pre>
-</details>
-</dd>
-<dt id="skema.program_analysis.CAST.matlab.cast_out.show_tree"><code class="name flex">
-<span>def <span class="ident">show_tree</span></span>(<span>parser)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Show the Tree-sitter syntax tree</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def show_tree(parser):
-    &#34;&#34;&#34; Show the Tree-sitter syntax tree &#34;&#34;&#34;
-    print(&#39;\nSYNTAX TREE:&#39;)
-    tree_builder = parser.tree_builder
-    tree_builder.print_tree(parser.tree)</code></pre>
-</details>
-</dd>
-</dl>
 </section>
 <section>
 </section>
@@ -145,13 +72,6 @@ if __name__ == &#34;__main__&#34;:
 <li><h3>Super-module</h3>
 <ul>
 <li><code><a title="skema.program_analysis.CAST.matlab" href="index.html">skema.program_analysis.CAST.matlab</a></code></li>
-</ul>
-</li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="skema.program_analysis.CAST.matlab.cast_out.show_cast" href="#skema.program_analysis.CAST.matlab.cast_out.show_cast">show_cast</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.matlab.cast_out.show_source" href="#skema.program_analysis.CAST.matlab.cast_out.show_source">show_source</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.matlab.cast_out.show_tree" href="#skema.program_analysis.CAST.matlab.cast_out.show_tree">show_tree</a></code></li>
 </ul>
 </li>
 </ul>
