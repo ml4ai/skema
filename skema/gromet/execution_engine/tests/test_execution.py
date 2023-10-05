@@ -6,7 +6,6 @@ from tempfile import TemporaryDirectory, TemporaryFile
 from skema.gromet.execution_engine.execution_engine import ExecutionEngine
 
 MEMGRAPH_CI_HOST = "graphdb"
-MEMGRAPH_CI_HOST = "localhost"
 MEMGRAPH_CI_PORT = 7687
 
 @pytest.mark.ci_only
