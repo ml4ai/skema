@@ -275,7 +275,7 @@ def train_model(config=None, rank=None):
                     val_dataloader,
                     vocab,
                 ) = preprocess_dataset(main_config)
-                model = define_model(conifg,sweep_config, vocab, device).to(device)
+                model = define_model(config,sweep_config, vocab, device).to(device)
 
             elif dataparallel:
                 os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
