@@ -201,41 +201,6 @@ def epoch_time(start_time, end_time):
 
 def train_model(sweep_config, rank=None,):
 
-    # parameters
-    EPOCHS = config["epochs"]
-    batch_size = sweep_config["batch_size"]
-    optimizer_type = config["optimizer_type"]
-    learning_rate = sweep_config["learning_rate"]
-    weight_decay = config["weight_decay"]
-    scheduler_type = config["scheduler_type"]
-    step_scheduler = config["step_scheduler"]
-    exponential_scheduler = config["exponential_scheduler"]
-    reduce_on_plateau_scheduler = config["ReduceLROnPlateau"]
-    starting_lr = config["starting_lr"]
-    step_size = config["step_size"]
-    gamma = config["gamma"]
-    (beta_1, beta_2) = sweep_config["beta_1"], sweep_config["beta_2"]
-    momentum = config["momentum"]
-    CLIP = config["clip"]
-    SEED = config["seed"]
-    min_length_bean_search_normalization = config[
-        "min_length_bean_search_normalization"
-    ]
-    alpha = config["beam_search_alpha"]
-    beam_k = config["beam_k"]
-    model_type = config["model_type"]
-    dataset_type = config["dataset_type"]
-    load_trained_model_for_testing = config["testing"]
-    cont_training = config["continue_training_from_last_saved_model"]
-    g2p = config["garbage2pad"]
-    use_single_gpu = config["use_single_gpu"]
-    ddp = config["DDP"]
-    dataparallel = config["DataParallel"]
-    dataParallel_ids = config["DataParallel_ids"]
-    world_size = config["world_size"]
-    early_stopping = config["early_stopping"]
-    early_stopping_counts = config["early_stopping_counts"]
-
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
     for f in FOLDER:
@@ -247,9 +212,44 @@ def train_model(sweep_config, rank=None,):
     # to log config(to keep track while running multiple experiments)
     config_log = open("logs/config_log.txt", "w")
     json.dump(config, config_log)
+    
+    with wandb.init(sweep_config=sweep_config):
+        # parameters
+        EPOCHS = config["epochs"]
+        batch_size = sweep_config["batch_size"]
+        optimizer_type = config["optimizer_type"]
+        learning_rate = sweep_config["learning_rate"]
+        weight_decay = config["weight_decay"]
+        scheduler_type = config["scheduler_type"]
+        step_scheduler = config["step_scheduler"]
+        exponential_scheduler = config["exponential_scheduler"]
+        reduce_on_plateau_scheduler = config["ReduceLROnPlateau"]
+        starting_lr = config["starting_lr"]
+        step_size = config["step_size"]
+        gamma = config["gamma"]
+        (beta_1, beta_2) = sweep_config["beta_1"], sweep_config["beta_2"]
+        momentum = config["momentum"]
+        CLIP = config["clip"]
+        SEED = config["seed"]
+        min_length_bean_search_normalization = config[
+            "min_length_bean_search_normalization"
+        ]
+        alpha = config["beam_search_alpha"]
+        beam_k = config["beam_k"]
+        model_type = config["model_type"]
+        dataset_type = config["dataset_type"]
+        load_trained_model_for_testing = config["testing"]
+        cont_training = config["continue_training_from_last_saved_model"]
+        g2p = config["garbage2pad"]
+        use_single_gpu = config["use_single_gpu"]
+        ddp = config["DDP"]
+        dataparallel = config["DataParallel"]
+        dataParallel_ids = config["DataParallel_ids"]
+        world_size = config["world_size"]
+        early_stopping = config["early_stopping"]
+        early_stopping_counts = config["early_stopping_counts"]
 
 
-    with wandb.init(sweep_config = sweep_config):
         # set_random_seed
         set_random_seed(SEED)
 
