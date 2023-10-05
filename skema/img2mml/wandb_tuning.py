@@ -199,7 +199,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(sweep_config, rank=None,):
+def train_model(config=None, rank=None,):
 
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
@@ -213,7 +213,7 @@ def train_model(sweep_config, rank=None,):
     config_log = open("logs/config_log.txt", "w")
     json.dump(main_config, config_log)
 
-    with wandb.init(config=sweep_config):
+    with wandb.init(config=config):
         sweep_config = wandb.config
 
         # parameters
@@ -544,6 +544,6 @@ if __name__ == "__main__":
     sweep_config['parameters'] = parameters_dict
     sweep_id = wandb.sweep(sweep_config, project="pytorch-sweeps-demo")
 
-    train_model(sweep_config)
+    # train_model(sweep_config)
 
-    wandb.agent(sweep_id, train, count=1)
+    wandb.agent(sweep_id, train_model, count=1)
