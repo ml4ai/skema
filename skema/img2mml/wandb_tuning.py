@@ -497,4 +497,4 @@ if __name__ == "__main__":
     # train_model(sweep_config)
 
     # wandb.agent(sweep_id, train_model, count=1)
-    wandb.agent(sweep_id, ddp_train, count=1)
+    wandb.agent(sweep_id, ddp_main, count=1)
