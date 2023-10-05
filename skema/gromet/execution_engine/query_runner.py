@@ -23,12 +23,15 @@ class QueryRunner:
         function: str = None,
         id: int = None,
     ):
+        print("4. Running query")
+        print(query)
         # Check if query is in query map. Currently we return None if its not found
         # TODO: Improve error handling
         if query not in self.queries_map:
             return None
         query = self.queries_map[query]
-
+        print(query)
+        
         # There are times we will want to limit the scope we are running queries in.
         # This is done be adding clauses to the cypher queries.
         if filename:

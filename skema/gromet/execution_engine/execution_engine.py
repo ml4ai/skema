@@ -74,9 +74,12 @@ class ExecutionEngine:
     ):
         """Run the execution engine at specified scope"""
         if module:
+            print("1: Starting execution")
             module_list = self.query_runner.run_query(
                 "module", n_or_m="n", filename=self.filename
             )
+            print(f"Num modules found {len(module_list)}")
+            print(f"First module {module_list[0]}")
             self.visit(module_list[0])
 
     def parameter_extraction(self):
@@ -89,11 +92,8 @@ class ExecutionEngine:
         return self.symbol_table.get_initial_values()
 
     def visit(self, node):
-        print("^^^^^^^^^^^^")
-        print(node)
-        print(node._id)
-        print(node._labels)
-              
+        print("2. Visiting Top level")
+        print(f"Node is {node}")
         node_types = node._labels
         if "Module" in node_types:
             self.visit_module(node)
@@ -111,9 +111,12 @@ class ExecutionEngine:
             return self.visit_primitive(node)
 
     def visit_module(self, node):
+        print("3: Visiting Module")
+        print(f"node is {node}")
         "Visitor for top-level module"
         node_id = node._id
-
+        print(f"node_id is {node_id}")
+        print(f"node_id type is {type(node_id)}")
         expressions = self.query_runner.run_query("ordered_expressions", id=node_id)
         for expression in expressions:
             self.visit(expression)
