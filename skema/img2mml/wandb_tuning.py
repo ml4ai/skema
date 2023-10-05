@@ -258,6 +258,24 @@ def train_model(config=None, rank=None):
         # set_random_seed
         set_random_seed(SEED)
 
+        _lr = learning_rate
+
+        if optimizer_type == "Adam":
+            optimizer = torch.optim.Adam(
+                params=model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                betas=(beta_1, beta_2),
+            )
+        elif optimizer_type == "SGD":
+            optimizer = torch.optim.SGD(
+                model.parameters(),
+                lr=_lr,
+                weight_decay=weight_decay,
+                momentum=momentum,
+            )
+
+
         # defining model using DataParallel
         if torch.cuda.is_available() and main_config["device"] == "cuda":
             if use_single_gpu:
