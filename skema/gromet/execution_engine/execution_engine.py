@@ -89,6 +89,11 @@ class ExecutionEngine:
         return self.symbol_table.get_initial_values()
 
     def visit(self, node):
+        print("^^^^^^^^^^^^")
+        print(node)
+        print(node._id)
+        print(node._labels)
+              
         node_types = node._labels
         if "Module" in node_types:
             self.visit_module(node)
