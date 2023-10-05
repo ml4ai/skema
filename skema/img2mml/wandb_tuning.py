@@ -557,13 +557,16 @@ if __name__ == "__main__":
               'min': 0.5,
               'max': 0.999
            },
-        'batch_size': {
-            # a flat distribution between 0 and 0.1
-            'distribution': 'q_log_uniform_values',
-            'q': 8,
-            'min': 32,
-            'max': 128,
-         },
+          'batch_size': {
+              'values': 128
+          },
+        # 'batch_size': {
+        #     # a flat distribution between 0 and 0.1
+        #     'distribution': 'q_log_uniform_values',
+        #     'q': 8,
+        #     'min': 32,
+        #     'max': 128,
+        #  },
     }
 
     sweep_config['parameters'] = parameters_dict
