@@ -34,7 +34,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument(
     "--config",
     help="configuration file for paths and hyperparameters",
-    default="configs/xfmer_mml_config.json",
+    default="configs/resnet_xfmer_mml_config.json",
 )
 
 args = parser.parse_args()
@@ -275,7 +275,7 @@ def train_model(config=None, rank=None):
                     val_dataloader,
                     vocab,
                 ) = preprocess_dataset(main_config)
-                model = define_model(config,sweep_config, vocab, device).to(device)
+                model = define_model(main_config, sweep_config, vocab, device).to(device)
 
             elif dataparallel:
                 os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
