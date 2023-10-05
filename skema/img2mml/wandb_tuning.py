@@ -212,8 +212,8 @@ def train_model(sweep_config, rank=None,):
     # to log config(to keep track while running multiple experiments)
     config_log = open("logs/config_log.txt", "w")
     json.dump(config, config_log)
-    
-    with wandb.init(sweep_config=sweep_config):
+
+    with wandb.init(config=sweep_config):
         # parameters
         EPOCHS = config["epochs"]
         batch_size = sweep_config["batch_size"]
