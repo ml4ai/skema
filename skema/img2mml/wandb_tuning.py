@@ -199,7 +199,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(config=None, rank=None):
+def train_model(rank=None, config,):
 
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
@@ -213,7 +213,7 @@ def train_model(config=None, rank=None):
     config_log = open("logs/config_log.txt", "w")
     json.dump(main_config, config_log)
 
-    with wandb.init(config=config):
+    with wandb.init(config=config, group="DDP"):
         sweep_config = wandb.config
 
         # parameters
@@ -409,97 +409,19 @@ def train_model(config=None, rank=None):
                     end_time = time.time()
                     # total time spent on training an epoch
                     epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-
-                    wandb.log({"val loss": val_loss, "epoch": epoch})
+                    if (not ddp) or (ddp and rank == 0):
+                        wandb.log({"val loss": val_loss, "epoch": epoch})
 
         if ddp:
             dist.destroy_process_group()
 
         time.sleep(3)
 
-        print(
-            "loading best saved model: ",
-            f"trained_models/{model_type}_{dataset_type}_{main_config['markup']}_best.pt",
-        )
-        try:
-            # loading pre_tained_model
-            model.load_state_dict(
-                torch.load(
-                    f"trained_models/{model_type}_{dataset_type}_{main_config['markup']}_best.pt"
-                )
-            )
-
-        except:
-            try:
-                # removing "module." from keys
-                pretrained_dict = {
-                    key.replace("module.", ""): value
-                    for key, value in model.state_dict().items()
-                }
-            except:
-                # adding "module." in keys
-                pretrained_dict = {
-                    f"module.{key}": value
-                    for key, value in model.state_dict().items()
-                }
-
-            model.load_state_dict(pretrained_dict)
-
-        epoch = "test_0"
-        if main_config["beam_search"]:
-            beam_params = [beam_k, alpha, min_length_bean_search_normalization]
-        else:
-            beam_params = None
-
-        """
-        bin comparison
-        """
-        if main_config["bin_comparison"]:
-            print("comparing bin...")
-            from bin_testing import bin_test_dataloader
-
-            test_dataloader = bin_test_dataloader(
-                main_config,
-                vocab,
-                device,
-                start=main_config["start_bin"],
-                end=main_config["end_bin"],
-                length_based_binning=main_config["length_based_binning"],
-                content_based_binning=main_config["content_based_binning"],
-            )
-
-        test_loss = evaluate(
-            model,
-            model_type,
-            img_tnsr_path,
-            batch_size,
-            test_dataloader,
-            criterion,
-            device,
-            vocab,
-            beam_params=beam_params,
-            is_test=True,
-            ddp=ddp,
-            rank=rank,
-            g2p=g2p,
-        )
-
-        if (not ddp) or (ddp and rank == 0):
-            print(
-                f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-            )
-            loss_file.write(
-                f"| Test Loss: {test_loss:.3f} | Test PPL: {math.exp(test_loss):7.3f} |"
-            )
-
-        # stopping time
-        print(time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime()))
-
 "============================================================"
-def ddp_main():
+def ddp_main(config):
     world_size = config["world_size"]
     os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
-    mp.spawn(train_model, args=(), nprocs=world_size, join=True)
+    mp.spawn(train_model, args=(config), nprocs=world_size, join=True)
 
 if __name__ == "__main__":
 
@@ -574,4 +496,5 @@ if __name__ == "__main__":
 
     # train_model(sweep_config)
 
-    wandb.agent(sweep_id, train_model, count=1)
+    # wandb.agent(sweep_id, train_model, count=1)
+    wandb.agent(sweep_id, ddp_train, count=1)
