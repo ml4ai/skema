@@ -67,7 +67,8 @@ class My_pad_collate(object):
         )
 
 
-def preprocess_dataset(config, batch_size):
+def preprocess_dataset(config):
+
     print("preprocessing data...")
 
     # reading raw text files
@@ -156,7 +157,7 @@ def preprocess_dataset(config, batch_size):
         shuffle = config["shuffle"]
     train_dataloader = DataLoader(
         imml_train,
-        batch_size=batch_size,
+        batch_size=config["batch_size"],
         num_workers=config["num_workers"],
         shuffle=shuffle,
         sampler=sampler,
@@ -177,7 +178,7 @@ def preprocess_dataset(config, batch_size):
 
     val_dataloader = DataLoader(
         imml_val,
-        batch_size=batch_size,
+        batch_size=config["batch_size"],
         num_workers=config["num_workers"],
         shuffle=shuffle,
         sampler=sampler,
@@ -197,7 +198,7 @@ def preprocess_dataset(config, batch_size):
 
     test_dataloader = DataLoader(
         imml_test,
-        batch_size=batch_size,
+        batch_size=config["batch_size"],
         num_workers=config["num_workers"],
         shuffle=shuffle,
         sampler=None,

@@ -218,7 +218,10 @@ def train_model(config=None, rank=None):
 
         # parameters
         EPOCHS = main_config["epochs"]
-        batch_size = sweep_config["batch_size"]#sweep_config["batch_size"]
+
+        batch_size = sweep_config["batch_size"]
+        main_config["batch_size"] = batch_size
+
         optimizer_type = main_config["optimizer_type"]
         learning_rate = sweep_config["learning_rate"]
         weight_decay = main_config["weight_decay"]
@@ -271,7 +274,7 @@ def train_model(config=None, rank=None):
                     test_dataloader,
                     val_dataloader,
                     vocab,
-                ) = preprocess_dataset(main_config,batch_size)
+                ) = preprocess_dataset(main_config)
                 model = define_model(conifg,sweep_config, vocab, device).to(device)
 
             elif dataparallel:
@@ -286,7 +289,7 @@ def train_model(config=None, rank=None):
                     test_dataloader,
                     val_dataloader,
                     vocab,
-                ) = preprocess_dataset(main_config,batch_size)
+                ) = preprocess_dataset(main_config)
                 model = define_model(main_config,sweep_config, vocab, device)
                 model = nn.DataParallel(
                     model.cuda(),
@@ -306,7 +309,7 @@ def train_model(config=None, rank=None):
                     test_dataloader,
                     val_dataloader,
                     vocab,
-                ) = preprocess_dataset(main_config,batch_size)
+                ) = preprocess_dataset(main_config)
                 model = define_model(main_config,sweep_config, vocab, rank)
                 model = DDP(
                     model.to(f"cuda:{rank}"),
