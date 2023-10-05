@@ -1,4 +1,5 @@
 import yaml
+import traceback
 from pathlib import Path
 from gqlalchemy import Memgraph
 
@@ -36,6 +37,8 @@ class QueryRunner:
         if id:
             query = query.replace("$ID", str(id))
 
+        print(query)
+        traceback.print_exc()
         # In most cases, we only want the node objects itself. So we will just return a list of nodes.
         results = self.memgraph.execute_and_fetch(query)
         
