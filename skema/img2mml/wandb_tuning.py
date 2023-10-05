@@ -40,7 +40,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 with open(args.config, "r") as cfg:
-    config = json.load(cfg)
+    main_config = json.load(cfg)
 
 torch.backends.cudnn.enabled = False
 
@@ -53,7 +53,7 @@ def set_random_seed(SEED):
     torch.cuda.manual_seed(SEED)
 
 
-def define_model(config,sweep_config, VOCAB, DEVICE):
+def define_model(main_config,sweep_config, VOCAB, DEVICE):
     """
     defining the model
     initializing encoder, decoder, and model
@@ -61,21 +61,21 @@ def define_model(config,sweep_config, VOCAB, DEVICE):
 
     print("defining model...")
 
-    MODEL_TYPE = config["model_type"]
-    INPUT_CHANNELS = config["input_channels"]
+    MODEL_TYPE = main_config["model_type"]
+    INPUT_CHANNELS = main_config["input_channels"]
     OUTPUT_DIM = len(VOCAB)
     EMB_DIM = sweep_config["embedding_dim"]
     ENC_DIM = sweep_config["encoder_dim"]
     DEC_HID_DIM = sweep_config["decoder_hid_dim"]
     DROPOUT = sweep_config["dropout"]
-    MAX_LEN = config["max_len"]
+    MAX_LEN = main_config["max_len"]
 
     print(f"building {MODEL_TYPE} model...")
 
     if MODEL_TYPE == "opennmt":
         ENCODING_TYPE = "row_encoding"
-        N_LAYERS = config["lstm_layers"]
-        TFR = config["teacher_force_ratio"]
+        N_LAYERS = main_config["lstm_layers"]
+        TFR = main_config["teacher_force_ratio"]
         ENC = CNN_Encoder(INPUT_CHANNELS, DEC_HID_DIM, DROPOUT, DEVICE)
         DEC = LSTM_Decoder(
             EMB_DIM,
@@ -209,58 +209,60 @@ def train_model(sweep_config, rank=None,):
 
     # to log losses
     loss_file = open("logs/loss_file.txt", "w")
-    # to log config(to keep track while running multiple experiments)
+    # to log main_config(to keep track while running multiple experiments)
     config_log = open("logs/config_log.txt", "w")
-    json.dump(config, config_log)
+    json.dump(main_config, config_log)
 
     with wandb.init(config=sweep_config):
+        sweep_config = wandb.config
+
         # parameters
-        EPOCHS = config["epochs"]
-        batch_size = sweep_config["batch_size"]
-        optimizer_type = config["optimizer_type"]
+        EPOCHS = main_config["epochs"]
+        batch_size = sweep_config.batch_size#sweep_config["batch_size"]
+        optimizer_type = main_config["optimizer_type"]
         learning_rate = sweep_config["learning_rate"]
-        weight_decay = config["weight_decay"]
-        scheduler_type = config["scheduler_type"]
-        step_scheduler = config["step_scheduler"]
-        exponential_scheduler = config["exponential_scheduler"]
-        reduce_on_plateau_scheduler = config["ReduceLROnPlateau"]
-        starting_lr = config["starting_lr"]
-        step_size = config["step_size"]
-        gamma = config["gamma"]
+        weight_decay = main_config["weight_decay"]
+        scheduler_type = main_config["scheduler_type"]
+        step_scheduler = main_config["step_scheduler"]
+        exponential_scheduler = main_config["exponential_scheduler"]
+        reduce_on_plateau_scheduler = main_config["ReduceLROnPlateau"]
+        starting_lr = main_config["starting_lr"]
+        step_size = main_config["step_size"]
+        gamma = main_config["gamma"]
         (beta_1, beta_2) = sweep_config["beta_1"], sweep_config["beta_2"]
-        momentum = config["momentum"]
-        CLIP = config["clip"]
-        SEED = config["seed"]
-        min_length_bean_search_normalization = config[
+        momentum = main_config["momentum"]
+        CLIP = main_config["clip"]
+        SEED = main_config["seed"]
+        min_length_bean_search_normalization = main_config[
             "min_length_bean_search_normalization"
         ]
-        alpha = config["beam_search_alpha"]
-        beam_k = config["beam_k"]
-        model_type = config["model_type"]
-        dataset_type = config["dataset_type"]
-        load_trained_model_for_testing = config["testing"]
-        cont_training = config["continue_training_from_last_saved_model"]
-        g2p = config["garbage2pad"]
-        use_single_gpu = config["use_single_gpu"]
-        ddp = config["DDP"]
-        dataparallel = config["DataParallel"]
-        dataParallel_ids = config["DataParallel_ids"]
-        world_size = config["world_size"]
-        early_stopping = config["early_stopping"]
-        early_stopping_counts = config["early_stopping_counts"]
+        alpha = main_config["beam_search_alpha"]
+        beam_k = main_config["beam_k"]
+        model_type = main_config["model_type"]
+        dataset_type = main_config["dataset_type"]
+        load_trained_model_for_testing = main_config["testing"]
+        cont_training = main_config["continue_training_from_last_saved_model"]
+        g2p = main_config["garbage2pad"]
+        use_single_gpu = main_config["use_single_gpu"]
+        ddp = main_config["DDP"]
+        dataparallel = main_config["DataParallel"]
+        dataParallel_ids = main_config["DataParallel_ids"]
+        world_size = main_config["world_size"]
+        early_stopping = main_config["early_stopping"]
+        early_stopping_counts = main_config["early_stopping_counts"]
 
 
         # set_random_seed
         set_random_seed(SEED)
 
         # defining model using DataParallel
-        if torch.cuda.is_available() and config["device"] == "cuda":
+        if torch.cuda.is_available() and main_config["device"] == "cuda":
             if use_single_gpu:
-                print(f"using single gpu:{config['gpu_id']}...")
+                print(f"using single gpu:{main_config['gpu_id']}...")
 
-                os.environ["CUDA_VISIBLE_DEVICES"] = str(config["gpu_id"])
+                os.environ["CUDA_VISIBLE_DEVICES"] = str(main_config["gpu_id"])
                 device = torch.device(
-                    f"cuda:{config['gpu_id']}"
+                    f"cuda:{main_config['gpu_id']}"
                     if torch.cuda.is_available()
                     else "cpu"
                 )
@@ -269,13 +271,13 @@ def train_model(sweep_config, rank=None,):
                     test_dataloader,
                     val_dataloader,
                     vocab,
-                ) = preprocess_dataset(config,sweep_config)
+                ) = preprocess_dataset(main_config,sweep_config)
                 model = define_model(conifg,sweep_config, vocab, device).to(device)
 
             elif dataparallel:
                 os.environ["CUDA_VISIBLE_DEVICES"] = dataParallel_ids
                 device = torch.device(
-                    f"cuda:{config['gpu_id']}"
+                    f"cuda:{main_config['gpu_id']}"
                     if torch.cuda.is_available()
                     else "cpu"
                 )
@@ -284,28 +286,28 @@ def train_model(sweep_config, rank=None,):
                     test_dataloader,
                     val_dataloader,
                     vocab,
-                ) = preprocess_dataset(config,sweep_config)
-                model = define_model(config,sweep_config, vocab, device)
+                ) = preprocess_dataset(main_config,sweep_config)
+                model = define_model(main_config,sweep_config, vocab, device)
                 model = nn.DataParallel(
                     model.cuda(),
                     device_ids=[
-                        int(i) for i in config["DataParallel_ids"].split(",")
+                        int(i) for i in main_config["DataParallel_ids"].split(",")
                     ],
                 )
 
             elif ddp:
                 # create default process group
                 dist.init_process_group("nccl", rank=rank, world_size=world_size)
-                # add rank to config
-                config["rank"] = rank
+                # add rank to main_config
+                main_config["rank"] = rank
                 device = f"cuda:{rank}"
                 (
                     train_dataloader,
                     test_dataloader,
                     val_dataloader,
                     vocab,
-                ) = preprocess_dataset(config,sweep_config)
-                model = define_model(config,sweep_config, vocab, rank)
+                ) = preprocess_dataset(main_config,sweep_config)
+                model = define_model(main_config,sweep_config, vocab, rank)
                 model = DDP(
                     model.to(f"cuda:{rank}"),
                     device_ids=[rank],
@@ -323,8 +325,8 @@ def train_model(sweep_config, rank=None,):
                 test_dataloader,
                 val_dataloader,
                 vocab,
-            ) = preprocess_dataset(config,sweep_config)
-            model = define_model(config,sweep_config, vocab, device).to(device)
+            ) = preprocess_dataset(main_config,sweep_config)
+            model = define_model(main_config,sweep_config, vocab, device).to(device)
 
 
         print("MODEL: ")
@@ -337,7 +339,7 @@ def train_model(sweep_config, rank=None,):
 
         # raw data paths
         img_tnsr_path = (
-            f"{config['data_path']}/{config['dataset_type']}/image_tensors"
+            f"{main_config['data_path']}/{main_config['dataset_type']}/image_tensors"
         )
 
         if not load_trained_model_for_testing:
@@ -347,7 +349,7 @@ def train_model(sweep_config, rank=None,):
             if cont_training:
                 model.load_state_dict(
                     torch.load(
-                        f"trained_models/{model_type}_{dataset_type}_{config['markup']}_latest.pt"
+                        f"trained_models/{model_type}_{dataset_type}_{main_config['markup']}_latest.pt"
                     )
                 )
                 print("continuing training from lastest saved model...")
@@ -397,13 +399,13 @@ def train_model(sweep_config, rank=None,):
 
         print(
             "loading best saved model: ",
-            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
+            f"trained_models/{model_type}_{dataset_type}_{main_config['markup']}_best.pt",
         )
         try:
             # loading pre_tained_model
             model.load_state_dict(
                 torch.load(
-                    f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt"
+                    f"trained_models/{model_type}_{dataset_type}_{main_config['markup']}_best.pt"
                 )
             )
 
@@ -424,7 +426,7 @@ def train_model(sweep_config, rank=None,):
             model.load_state_dict(pretrained_dict)
 
         epoch = "test_0"
-        if config["beam_search"]:
+        if main_config["beam_search"]:
             beam_params = [beam_k, alpha, min_length_bean_search_normalization]
         else:
             beam_params = None
@@ -432,18 +434,18 @@ def train_model(sweep_config, rank=None,):
         """
         bin comparison
         """
-        if config["bin_comparison"]:
+        if main_config["bin_comparison"]:
             print("comparing bin...")
             from bin_testing import bin_test_dataloader
 
             test_dataloader = bin_test_dataloader(
-                config,
+                main_config,
                 vocab,
                 device,
-                start=config["start_bin"],
-                end=config["end_bin"],
-                length_based_binning=config["length_based_binning"],
-                content_based_binning=config["content_based_binning"],
+                start=main_config["start_bin"],
+                end=main_config["end_bin"],
+                length_based_binning=main_config["length_based_binning"],
+                content_based_binning=main_config["content_based_binning"],
             )
 
         test_loss = evaluate(
