@@ -25,6 +25,7 @@ def link_amr(
         amr_path: str,  # Path of the AMR model
         attribute_collection: str,  # Path to the attribute collection
         amr_type: str,  # AMR model type. I.e. "petrinet" or "regnet"
+        eval_mode: bool = False, # True when the extractions are manual annotations
         output_path: Optional[str] = None,  # Output file path
         clean_xml_codepoints: Optional[bool] = False, # Replaces html codepoints with the unicode character
         similarity_model: str = "sentence-transformers/all-MiniLM-L6-v2",  # Transformer model to compute similarities
@@ -45,11 +46,16 @@ def link_amr(
         if clean_xml_codepoints:
             amr = replace_xml_codepoints(amr)
 
-    extractions = AttributeCollection.from_json(attribute_collection)
-
     linker = Linker(model_name=similarity_model, device=device, sim_threshold=similarity_threshold)
 
-    linked_model = linker.link_model_to_text_extractions(amr, extractions)
+    if not eval_mode:
+        extractions = AttributeCollection.from_json(attribute_collection)
+        linked_model = linker.link_model_to_text_extractions(amr, extractions)
+    else:
+        with open(attribute_collection) as f:
+            annotations = json.load(f)
+        annotations = replace_xml_codepoints(annotations)
+        linked_model = linker.link_model_to_manual_annotations(amr, annotations)
 
     if not output_path:
         input_amr_name = str(Path(amr_path).name)
