@@ -11,8 +11,7 @@ val tag = "1.0.0"
 
 
 Docker / defaultLinuxInstallLocation := appDir
-// TODO: can we run this with 11 (i.e., eclipse-temurin:11-jre-focal)?
-Docker / dockerBaseImage := "eclipse-temurin:8-jre-focal"
+Docker / dockerBaseImage := "eclipse-temurin:11-jre-focal"
 Docker / daemonUser := "nobody"
 Docker / dockerExposedPorts := List(port)
 Docker / maintainer := "Keith Alcock <docker@keithalcock.com>"
