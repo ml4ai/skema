@@ -41,7 +41,7 @@
 "beta_1":0.9,
 "beta_2":0.999,
 "learning_rate":0.001,
-"weight_decay": 1e-05,
+"weight_decay": 5e-05,
 "step_scheduler":true,
 "exponential_scheduler":false,
 "ReduceLROnPlateau":false,
@@ -52,7 +52,7 @@
 "dropout":0.1,
 
 "_comment_":"encoder params",
-"encoder_dim":128,
+"encoder_dim":256,
 "input_channels":3,
 "encoding_type":"positional_encoding",
 "n_xfmer_heads":4,
@@ -61,7 +61,7 @@
 
 "_comment_":"decoder params",
 "embedding_dim":128,
-"decoder_hid_dim":128,
+"decoder_hid_dim":256,
 "n_xfmer_decoder_layers":3,
 
 "_comment_":"training/testing params",
