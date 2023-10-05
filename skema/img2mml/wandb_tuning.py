@@ -207,12 +207,6 @@ def train_model(rank=None, config=None,):
         if not os.path.exists(f):
             os.mkdir(f)
 
-    # to log losses
-    loss_file = open("logs/loss_file.txt", "w")
-    # to log main_config(to keep track while running multiple experiments)
-    config_log = open("logs/config_log.txt", "w")
-    json.dump(main_config, config_log)
-
     with wandb.init(config=config, group="DDP"):
         sweep_config = wandb.config
 
@@ -420,9 +414,10 @@ def train_model(rank=None, config=None,):
 "============================================================"
 def ddp_main(config=None):
 
+    print("in dpp: ", config)
     world_size = main_config["world_size"]
     os.environ["CUDA_VISIBLE_DEVICES"] = main_config["DDP gpus"]
-    mp.spawn(train_model, args=(config), nprocs=world_size, join=True)
+    mp.spawn(train_model, args=(config,), nprocs=world_size, join=True)
 
 if __name__ == "__main__":
 
