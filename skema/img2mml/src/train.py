@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
 import torch
-
-# new addition
-import math
-import random
-
 from tqdm.auto import tqdm
 from skema.img2mml.utils.utils import *
 from skema.img2mml.src.test import evaluate
@@ -20,20 +15,14 @@ def train(
     device,
     ddp=False,
     rank=None,
-    isBatchScheduler=False,
-    reduce_on_plateau_scheduler=False,
-    scheduler=None,
-    val_dataloader=None, batch_size=None, vocab=None
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
 
     epoch_loss = 0
-    latest_val_loss = 100 # new addition
-
-    tset = tqdm(iter(train_dataloader))
 
     # for i, (img, mml) in enumerate(train_dataloader):
+    tset = tqdm(iter(train_dataloader))
     for i, (img, mml) in enumerate(tset):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
@@ -69,40 +58,6 @@ def train(
             desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
             tset.set_description(desc)
 
-        """
-        new addition-------
-        """
-        if isBatchScheduler:
-            # Calculating val_loss after every 1000 batches
-            # of size 64.
-            if i > 0 and i % 500 == 0 and i < len(train_dataloader):
-                # randomly choosing 100 samples for the validation
-                val_dataloader = random.sample(list(val_dataloader), 100)
-                val_loss = evaluate(model,model_type,img_tnsr_path,
-                                    batch_size,val_dataloader,criterion,
-                                    device,vocab,ddp=ddp,rank=rank,)
 
-                if val_loss < latest_val_loss:
-                    latest_val_loss = val_loss
-                    if (not ddp) or (ddp and rank == 0):
-                        torch.save(
-                            model.state_dict(),
-                            f"trained_models/{model_type}_our_sampled_data_mml_best.pt",
-                        )
-
-                if reduce_on_plateau_scheduler:
-                    scheduler.step(val_loss)
-                else:
-                    scheduler.step()
-
-                if (not ddp) or (ddp and rank == 0):
-                    print("learning_rate: ", optimizer.param_groups[0]['lr'])
-                    print(f"steps completed: {i} \t train loss: {loss} \t train perplexity: {math.exp(loss):7.3f}")
-                    print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(val_loss):7.3f}")
-            """
-            ----------------------------------------------------------------------
-            """
-
-    if not isBatchScheduler:
-        net_loss = epoch_loss / len(train_dataloader)
-        return net_loss
+    net_loss = epoch_loss / len(train_dataloader)
+    return net_loss
