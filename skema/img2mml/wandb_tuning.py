@@ -558,7 +558,7 @@ if __name__ == "__main__":
               'max': 0.999
            },
           'batch_size': {
-              'values': 128
+              'values': [128]
           },
         # 'batch_size': {
         #     # a flat distribution between 0 and 0.1
