@@ -35,10 +35,11 @@ class QueryRunner:
             query = query.replace("$FILENAME", filename)
 
         if id:
+            print(f"Id found {str(id)}")
             query = query.replace("$ID", str(id))
-
-        print(query)
-        traceback.print_exc()
+        else:
+            print(query)
+            print(f"ID not found")
         # In most cases, we only want the node objects itself. So we will just return a list of nodes.
         results = self.memgraph.execute_and_fetch(query)
         
