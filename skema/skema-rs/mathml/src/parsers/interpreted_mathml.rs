@@ -373,9 +373,9 @@ pub fn mrow(input: Span) -> IResult<Mrow> {
 ///Absolute value
 pub fn absolute(input: Span) -> IResult<Mrow> {
     let (s, elements) = ws(delimited(
-        stag!("<mo>|</mo>"),
+        tag("<mo>|</mo>"),
         many0(math_expression),
-        etag!("<mo>|</mo>"),
+        tag("<mo>|</mo>"),
     ))(input)?;
     Ok((s, Mrow(elements)))
 }
@@ -445,6 +445,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
+        map(absolute, MathExpression::Mrow),
         map(operator, MathExpression::Mo),
         mn,
         superscript,
@@ -454,7 +455,6 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
         msqrt,
         mfrac,
         map(mrow, MathExpression::Mrow),
-        map(absolute, MathExpression::Mrow),
         msubsup,
     )))(input)
 }
