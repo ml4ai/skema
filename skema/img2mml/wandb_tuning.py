@@ -199,7 +199,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(rank=None, config,):
+def train_model(rank=None, config=None,):
 
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
@@ -421,7 +421,7 @@ def train_model(rank=None, config,):
 def ddp_main(config):
     world_size = config["world_size"]
     os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
-    mp.spawn(train_model, args=(config), nprocs=world_size, join=True)
+    mp.spawn(train_model, args=(config=config), nprocs=world_size, join=True)
 
 if __name__ == "__main__":
 
