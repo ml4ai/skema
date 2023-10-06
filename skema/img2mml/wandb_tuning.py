@@ -211,12 +211,13 @@ def train_model(rank=None, config=None,):
         sweep_config = wandb.config
 
         # parameters
-        EPOCHS = main_config["epochs"]
+        batch_size = sweep_config.batch_size#["batch_size"]
+        learning_rate = sweep_config.learning_rate#["learning_rate"]
+        beta_1 = sweep_config.beta_1#["beta_1"],
+        beta_2 = sweep_config.beta_2#["beta_2"]
 
-        batch_size = sweep_config["batch_size"]
-        
+        EPOCHS = main_config["epochs"]
         optimizer_type = main_config["optimizer_type"]
-        learning_rate = sweep_config["learning_rate"]
         weight_decay = main_config["weight_decay"]
         scheduler_type = main_config["scheduler_type"]
         step_scheduler = main_config["step_scheduler"]
@@ -225,7 +226,6 @@ def train_model(rank=None, config=None,):
         starting_lr = main_config["starting_lr"]
         step_size = main_config["step_size"]
         gamma = main_config["gamma"]
-        (beta_1, beta_2) = sweep_config["beta_1"], sweep_config["beta_2"]
         momentum = main_config["momentum"]
         CLIP = main_config["clip"]
         SEED = main_config["seed"]
