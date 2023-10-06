@@ -199,7 +199,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(rank=None, config=None,):
+def train_model(rank=None, config=config,):
 
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
@@ -412,7 +412,7 @@ def train_model(rank=None, config=None,):
         time.sleep(3)
 
 "============================================================"
-def ddp_main(config=None):
+def ddp_main(config=config):
 
     print("in dpp: ", config)
     world_size = main_config["world_size"]
