@@ -83,12 +83,20 @@ class TS2CAST(object):
     def visit(self, node: Node):
         if node.type == "module":
             return self.visit_module(node)
+        elif node.type == "parenthesized_expression":
+            # Node for "( op )", extract op
+            # The actual op is in the middle of the list of nodes
+            return self.visit(node.children[1])
         elif node.type == "expression_statement":
             return self.visit_expression(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
+        elif node.type =="unary_operator":
+            return self.visit_unary_op(node)
+        elif node.type =="binary_operator":
+            return self.visit_binary_op(node)
         elif node.type in ["integer"]:
             return self.visit_literal(node)
         else:
@@ -148,7 +156,29 @@ class TS2CAST(object):
             right=self.visit(right),
             source_refs=[literal_source_ref]
         )
+
+    def visit_unary_op(self, node: Node) -> Operator:
+        """
+            Unary Ops
+            OP operand
+            where operand is some kind of expression
+        """
+        op = self.node_helper.get_operator(node.children[0])
+        operand = node.children[1]
         
+        return Operator(op=op, operands=[self.visit(operand)])
+
+    def visit_binary_op(self, node: Node) -> Operator:
+        """
+            Binary Ops
+            left OP right
+            where left and right can either be operators or literals
+        
+        """
+        op = self.node_helper.get_operator(node.children[1])
+        left, _, right = node.children
+
+        return Operator(op=op, operands=[self.visit(left), self.visit(right)])
 
     def visit_identifier(self, node: Node):
         identifier = self.node_helper.get_identifier(node)

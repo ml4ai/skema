@@ -28,7 +28,6 @@ from skema.program_analysis.CAST2FN.model.cast import (
     Attribute,
 )
 
-from skema.program_analysis.CAST.matlab.tree_builder import TreeBuilder
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
     NodeHelper,
@@ -39,7 +38,7 @@ from skema.program_analysis.CAST.matlab.node_helper import (
     get_first_child_index,
     get_last_child_index,
 )
-from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
+
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
 MATLAB_VERSION='matlab_version_here'
@@ -47,39 +46,25 @@ MATLAB_VERSION='matlab_version_here'
 class MatlabToCast(object):
     def __init__(self, source_file_path: str):
         """docstring"""
+
+        # create MATLAB parser
+        parser = Parser()
+        parser.set_language(
+            Language(INSTALLED_LANGUAGES_FILEPATH, "matlab")
+        )
         
-        # Read the MATLAB source file
-        self.path = Path(source_file_path)
-        self.source_file_name = self.path.name
-        self.source = self.path.read_text()
-        # print('\nSOURCE:')
-        # print(self.source)
-
-        # get a tree-sitter tree based on source input
-        tree_builder = TreeBuilder("matlab")
-        self.tree = tree_builder.get_tree(self.source)
-        self.tree.root_node = tree_builder.clean_nodes(self.tree.root_node)
-
-        # print('\nSYNTAX TREE: ')
-        tree_builder.traverse_tree(self.tree)
-        # print("\n")
+        # create a syntax tree using the source file
+        path = Path(source_file_path)
+        self.source = path.read_text().strip()
+        self.filename = path.name
+        self.tree = parser.parse(bytes(self.source, "utf8"))
 
         # Walking data
         self.variable_context = VariableContext()
-        self.node_helper = NodeHelper(self.source, self.source_file_name)
+        self.node_helper = NodeHelper(self.source, self.filename)
 
         # Create CAST object 
         self.out_cast = self.generate_cast()
-
-        # print('\nCAST objects:')
-        # for c in self.out_cast: 
-        #     j = json.dumps(
-        #         c.to_json_object(),
-        #         sort_keys=True,
-        #         indent=2,
-        #     )
-        #     print(j)
-        # print('CAST objects done\n\n')
 
     def generate_cast(self) -> List[CAST]:
         """Interface for generating CAST."""
@@ -94,10 +79,6 @@ class MatlabToCast(object):
         
     def run(self, root) -> List[Module]:
         """Annotated run routine."""
-        # print("run start")
-        # print("\nTREE STRUCTURE ___________")
-        # A MATLAB program has a body composed of n statements
-
         modules = []
 
         # Currently, we are supporting functions and subroutines defined outside of programs and modules
