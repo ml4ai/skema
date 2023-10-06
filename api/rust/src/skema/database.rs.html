@@ -4828,6 +4828,7 @@
 <a href="#4828" id="4828">4828</a>
 <a href="#4829" id="4829">4829</a>
 <a href="#4830" id="4830">4830</a>
+<a href="#4831" id="4831">4831</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Interface to the graph database we are using for persisting GroMEt objects and performing
 //! queries on them. We currently use MemgraphDB, an in-memory graph database.
 
@@ -6264,8 +6265,9 @@ There being a second function call of the same function which contains an expres
 
             <span class="kw">let </span><span class="kw-2">mut </span>new_c_args = c_args.clone();
             new_c_args.parent_node = n1.clone();
+            new_c_args.att_bf_idx = c_args.att_idx; <span class="comment">// This is the parent index 
 
-            <span class="comment">// construct opo nodes, if not none, might need to
+            // construct opo nodes, if not none, might need to
             </span>create_opo(
                 gromet, <span class="comment">// gromet for metadata
                 </span>nodes,  <span class="comment">// nodes
@@ -9161,7 +9163,7 @@ There being a second function call of the same function which contains an expres
                     <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
                     </span><span class="kw">if </span>src_att == node.contents <span class="kw">as </span>u32 {
                         <span class="comment">// make sure box index also lines up
-                        </span><span class="kw">if </span>(src_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32 {
+                        </span><span class="kw">if </span>(src_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32 {
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opi&quot; </span>{
                                 <span class="comment">// iterate through port to check for tgt
@@ -9262,7 +9264,7 @@ There being a second function call of the same function which contains an expres
                 <span class="comment">// make sure in correct box
                 </span><span class="kw">if </span>tgt_nbox == node.nbox <span class="kw">as </span>u8 {
                     <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
-                    </span><span class="kw">if </span>tgt_att == node.contents <span class="kw">as </span>u32 &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32
+                    </span><span class="kw">if </span>tgt_att == node.contents <span class="kw">as </span>u32 &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                     {
                         <span class="comment">// only opo&#39;s
                         </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opo&quot; </span>{
@@ -9346,7 +9348,7 @@ There being a second function call of the same function which contains an expres
                     </span><span class="kw">if </span>src_nbox == node.nbox <span class="kw">as </span>u8 {
                         <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
                         </span><span class="kw">if </span>src_att == node.contents <span class="kw">as </span>u32
-                            &amp;&amp; (src_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32
+                            &amp;&amp; (src_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opi&quot; </span>{
@@ -9366,7 +9368,7 @@ There being a second function call of the same function which contains an expres
                     </span><span class="kw">if </span>tgt_nbox == node.nbox <span class="kw">as </span>u8 {
                         <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
                         </span><span class="kw">if </span>tgt_att == node.contents <span class="kw">as </span>u32
-                            &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32
+                            &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opo&quot; </span>{
@@ -9400,7 +9402,7 @@ There being a second function call of the same function which contains an expres
                     </span><span class="kw">if </span>src_nbox == node.nbox <span class="kw">as </span>u8 {
                         <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
                         </span><span class="kw">if </span>src_att == node.contents <span class="kw">as </span>u32
-                            &amp;&amp; (src_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32
+                            &amp;&amp; (src_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opi&quot; </span>{
@@ -9420,7 +9422,7 @@ There being a second function call of the same function which contains an expres
                     </span><span class="kw">if </span>tgt_nbox == node.nbox <span class="kw">as </span>u8 {
                         <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
                         </span><span class="kw">if </span>tgt_att == node.contents <span class="kw">as </span>u32
-                            &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32
+                            &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Primitive&quot; </span>|| node.n_type == <span class="string">&quot;Literal&quot; </span>{
@@ -9486,7 +9488,7 @@ There being a second function call of the same function which contains an expres
                     </span><span class="kw">if </span>src_nbox == node.nbox <span class="kw">as </span>u8 {
                         <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
                         </span><span class="kw">if </span>src_att == node.contents <span class="kw">as </span>u32
-                            &amp;&amp; (src_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32
+                            &amp;&amp; (src_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Primitive&quot; </span>{
@@ -9506,7 +9508,7 @@ There being a second function call of the same function which contains an expres
                     </span><span class="kw">if </span>tgt_nbox == node.nbox <span class="kw">as </span>u8 {
                         <span class="comment">// make sure only looking in current attribute nodes for srcs and tgts
                         </span><span class="kw">if </span>tgt_att == node.contents <span class="kw">as </span>u32
-                            &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.att_bf_idx <span class="kw">as </span>u32
+                            &amp;&amp; (tgt_box <span class="kw">as </span>u32) == node.box_counter <span class="kw">as </span>u32
                         {
                             <span class="comment">// only opo&#39;s
                             </span><span class="kw">if </span>node.n_type == <span class="string">&quot;Opo&quot; </span>{
