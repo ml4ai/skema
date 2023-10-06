@@ -13,12 +13,15 @@ from gqlalchemy import Memgraph
 from skema.program_analysis.CAST.pythonAST.builtin_map import retrieve_operator
 from skema.program_analysis.single_file_ingester import process_file
 from skema.gromet.execution_engine.execute import execute_primitive
+
 # TODO: Broken import: from skema.rest.workflows import code_snippets_to_pn_amr
 from skema.skema_py.server import System
 from skema.gromet.execution_engine.query_runner import QueryRunner
 from skema.gromet.execution_engine.symbol_table import SymbolTable
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
+
 SKEMA_BIN = Path(__file__).resolve().parents[2] / "skema-rs" / "skema" / "src" / "bin"
+
 
 class Execute(torch.autograd.Function):
     @staticmethod
@@ -38,7 +41,7 @@ class ExecutionEngine:
         self.query_runner = QueryRunner(host, port)
         self.symbol_table = SymbolTable()
         self.source_path = source_path
-        
+
         # Filename is source path filename minus the extension
         self.filename = Path(source_path).stem
 
@@ -47,22 +50,23 @@ class ExecutionEngine:
 
     def upload_source(self):
         """Ingest source file and upload Gromet to Memgraph"""
-        
+
         # Currently, the Gromet ingester writes the output JSON to the directory where the script is run from.
         # Instead, we want to store it alongside the source so that we can upload it to Memgraph.
         gromet_collection = process_file(self.source_path)
         gromet_name = f"{self.filename}--Gromet-FN-auto.json"
         gromet_path = Path(self.source_path).parent / gromet_name
-        gromet_path.write_text(dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict())))
+        gromet_path.write_text(
+            dictionary_to_gromet_json(del_nulls(gromet_collection.to_dict()))
+        )
 
-        # The Memgraph database should be cleared before execution.
-        # Unexpected nodes/edges can cause errors in services making queries.
+        # The Memgraph database state should be reset before running any queries.
+        # Unexpected nodes/edges can cause issues with execution.
         self.query_runner.run_query("reset_state")
-    
+
         # Upload to memgraph
         subprocess.run(
-            ["cargo", "run", "--bin", "gromet2graphdb", str(gromet_path)], 
-            cwd=SKEMA_BIN
+            ["cargo", "run", "--bin", "gromet2graphdb", str(gromet_path)], cwd=SKEMA_BIN
         )
 
     def execute(
@@ -164,9 +168,10 @@ class ExecutionEngine:
     def visit_literal(self, node):
         def create_dummy_node(value: Dict):
             """Create a dummy gqlalchemy node so that we can pass a LiteralValue to a visitor."""
-            class DummyNode():
+
+            class DummyNode:
                 pass
-            
+
             node = DummyNode()
             node._id = -1
             node._labels = ["Literal"]
@@ -174,7 +179,7 @@ class ExecutionEngine:
 
             # TODO: Update LiteralValue representation for List types
             node.value["value"] = str(node.value["value"])
-            
+
             return node
 
         # TODO: Update LiteralValue to remove wrapping "" characters
@@ -186,20 +191,18 @@ class ExecutionEngine:
         elif value_type == "AbstractFloat":
             return torch.tensor(float(value), dtype=torch.float)
         elif value_type == "Complex":
-            # TODO - Add support for Complex
-            pass 
+            print(
+                "WARNING: Execution for type Complex not support and will be skipped."
+            )
         elif value_type == "Boolean":
             return torch.tensor(value == "True", dtype=torch.bool)
         elif value_type == "List":
-            if value == "test":
+            if isinstance(value, str):
                 return None
-    
             list = literal_eval(value)
             return [self.visit(create_dummy_node(element)) for element in list]
-            
         elif value_type == "Map":
-            # TODO - Add support for Map
-            pass
+            print("WARNING: Execution for type Map not support and will be skipped.")
         elif value_type == "None":
             return None
 
@@ -222,6 +225,7 @@ class ExecutionEngine:
         primative = retrieve_operator(node.name)
         return execute(primative, inputs)
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parameter Extraction Script")
     parser.add_argument("source_path", type=str, help="File path to source to execute")
@@ -238,8 +242,6 @@ if __name__ == "__main__":
 
     engine = ExecutionEngine(args.host, args.port, args.source_path)
     print(engine.parameter_extraction())
-
-    """TODO: Currently the file already has to be uploaded to memgraph. Add support for uploading the file at runtime."""
 
     """ TODO: New arguments to add with function execution support
     group = parser.add_mutually_exclusive_group(required=True)
