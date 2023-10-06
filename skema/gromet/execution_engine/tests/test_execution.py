@@ -11,6 +11,7 @@ MEMGRAPH_CI_PORT = 7687
 
 @pytest.mark.ci_only
 def test_parameter_extraction():
+    """Unit test for testing basic parameter extraction with execution engine"""
     input = """
 x = 2
 y = x+1
@@ -26,4 +27,5 @@ z = x+y
             host=MEMGRAPH_CI_HOST, port=MEMGRAPH_CI_PORT, source_path=source_path
         ).parameter_extraction()
 
+        # torch.tensor overrides the equality '==' operator, so the following is a valid check
         assert output == expected_output
