@@ -413,6 +413,7 @@ def ddp_main(config=None):
     print("in dpp: ", config)
     world_size = main_config["world_size"]
     os.environ["CUDA_VISIBLE_DEVICES"] = main_config["DDP gpus"]
+    ddp = main_config["DDP"]
     if (not ddp) or (ddp and rank == 0):
         with wandb.init(config=config, group="DDP"):
             sweep_config = wandb.config
