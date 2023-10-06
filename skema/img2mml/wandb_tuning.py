@@ -412,7 +412,7 @@ def ddp_main(config=None):
 
     print("in dpp: ", config)
     os.environ["MASTER_ADDR"] = "localhost"
-    os.environ["MASTER_PORT"] = "29890"
+    os.environ["MASTER_PORT"] = "29990"
     world_size = main_config["world_size"]
     os.environ["CUDA_VISIBLE_DEVICES"] = main_config["DDP gpus"]
     mp.spawn(train_model, args=(sweep_config,), nprocs=world_size, join=True)
