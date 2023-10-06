@@ -207,8 +207,10 @@ def train_model(rank=None, config=None,):
         if not os.path.exists(f):
             os.mkdir(f)
 
-    with wandb.init(config=config, group="DDP"):
-        sweep_config = wandb.config
+    ddp = main_config["DDP"]
+    if (not ddp) or (ddp and rank == 0):
+        with wandb.init(config=config, group="DDP"):
+            sweep_config = wandb.config
 
         # parameters
         batch_size = sweep_config.batch_size#["batch_size"]
@@ -240,7 +242,6 @@ def train_model(rank=None, config=None,):
         cont_training = main_config["continue_training_from_last_saved_model"]
         g2p = main_config["garbage2pad"]
         use_single_gpu = main_config["use_single_gpu"]
-        ddp = main_config["DDP"]
         dataparallel = main_config["DataParallel"]
         dataParallel_ids = main_config["DataParallel_ids"]
         world_size = main_config["world_size"]
@@ -489,5 +490,5 @@ if __name__ == "__main__":
     sweep_config['parameters'] = parameters_dict
     sweep_id = wandb.sweep(sweep_config, project="pytorch-sweeps-demo")
 
-    wandb.agent(sweep_id, train_model, count=1)
-    # wandb.agent(sweep_id, ddp_main, count=1)
+    # wandb.agent(sweep_id, train_model, count=1)
+    wandb.agent(sweep_id, ddp_main, count=1)
