@@ -199,7 +199,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(config=None,):
+def train_model(config=None,rank=None):
 
     print("in train_model: ", config)
     # to save trained model and logs
