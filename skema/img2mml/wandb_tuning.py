@@ -214,8 +214,7 @@ def train_model(rank=None, config=None,):
         EPOCHS = main_config["epochs"]
 
         batch_size = sweep_config["batch_size"]
-        main_config["batch_size"] = batch_size
-
+        
         optimizer_type = main_config["optimizer_type"]
         learning_rate = sweep_config["learning_rate"]
         weight_decay = main_config["weight_decay"]
