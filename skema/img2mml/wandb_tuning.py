@@ -450,7 +450,7 @@ if __name__ == "__main__":
               'values': [0.1,0.2,0.3]
             },
         'n_xfmer_heads':{
-                'values': [2,4,6]
+                'values': [2,4,8]
             },
         'n_xfmer_encoder_layers':{
             'values':[2,3,4,5,6]
