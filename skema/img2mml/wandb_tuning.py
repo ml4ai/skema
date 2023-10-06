@@ -201,6 +201,7 @@ def epoch_time(start_time, end_time):
 
 def train_model(config=None,):
 
+    print("in train_model: ", config)
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
     for f in FOLDER:
