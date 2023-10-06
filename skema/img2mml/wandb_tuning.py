@@ -209,9 +209,9 @@ def train_model(config=None,):
             os.mkdir(f)
 
     ddp = main_config["DDP"]
-    if (not ddp) or (ddp and rank == 0):
-        with wandb.init(config=config, group="DDP"):
-            sweep_config = wandb.config
+    # if (not ddp) or (ddp and rank == 0):
+    with wandb.init(config=config, group="DDP"):
+        sweep_config = wandb.config
 
         # parameters
         batch_size = sweep_config.batch_size#["batch_size"]
