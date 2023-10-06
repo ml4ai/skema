@@ -199,7 +199,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(rank=None, config=None,):
+def train_model(config=None,):
 
     print("in train_model: ", config)
 
@@ -488,6 +488,6 @@ if __name__ == "__main__":
     sweep_config['parameters'] = parameters_dict
     sweep_id = wandb.sweep(sweep_config, project="pytorch-sweeps-demo")
 
-    # wandb.agent(sweep_id, train_model, count=20)
+    wandb.agent(sweep_id, train_model, count=20)
 
-    wandb.agent(sweep_id, ddp_main, count=1)
+    # wandb.agent(sweep_id, ddp_main, count=1)
