@@ -412,7 +412,7 @@ def train_model(rank, config,):
         time.sleep(3)
 
 "============================================================"
-def ddp_main(config=config):
+def ddp_main(config):
 
     print("in dpp: ", config)
     world_size = main_config["world_size"]
