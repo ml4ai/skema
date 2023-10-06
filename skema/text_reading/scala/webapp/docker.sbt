@@ -11,7 +11,7 @@ val tag = "1.0.0"
 
 
 Docker / defaultLinuxInstallLocation := appDir
-Docker / dockerBaseImage := "eclipse-temurin:11-jre-focal"
+dockerBaseImage := "eclipse-temurin:11-jre-focal"
 Docker / daemonUser := "nobody"
 Docker / dockerExposedPorts := List(port)
 Docker / maintainer := "Keith Alcock <docker@keithalcock.com>"
@@ -67,4 +67,4 @@ def moveDir(dirname: String): Seq[(File, String)] = {
 
 // Universal / mappings ++= moveDir("./cache/geonames")
 
-Global / excludeLintKeys += Docker / dockerBaseImage
+Global / excludeLintKeys += dockerBaseImage
