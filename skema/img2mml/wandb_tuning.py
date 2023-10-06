@@ -491,5 +491,5 @@ if __name__ == "__main__":
     sweep_config['parameters'] = parameters_dict
     sweep_id = wandb.sweep(sweep_config, project="pytorch-sweeps-demo")
 
-    wandb.agent(sweep_id, train_model, count=1)
+    wandb.agent(sweep_id, train_model, count=20)
     # wandb.agent(sweep_id, ddp_main, count=1)
