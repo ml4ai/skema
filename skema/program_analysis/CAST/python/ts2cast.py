@@ -29,6 +29,12 @@ from skema.program_analysis.CAST2FN.model.cast import (
 
 from skema.program_analysis.CAST.python.node_helper import (
     NodeHelper,
+    get_first_child_by_type,
+    get_children_by_types,
+    get_first_child_index,
+    get_last_child_index,
+    get_control_children,
+    get_non_control_children
 )
 from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
 from skema.program_analysis.CAST.fortran.variable_context import VariableContext
@@ -80,6 +86,8 @@ class TS2CAST(object):
         # Which can then contain multiple things (Handled at module visitor)
         return self.visit(root)
 
+    # TODO: node helper for ignoring comments
+
     def visit(self, node: Node):
         if node.type == "module":
             return self.visit_module(node)
@@ -89,6 +97,10 @@ class TS2CAST(object):
             return self.visit(node.children[1])
         elif node.type == "expression_statement":
             return self.visit_expression(node)
+        elif node.type == "function_def":
+            return None
+        elif node.type == "return_statement":
+            return None
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "identifier":
@@ -146,6 +158,34 @@ class TS2CAST(object):
                 expr_body.append(child_cast)
 
         return expr_body
+
+    def visit_function_def(self, node: Node):
+        # Create new variable context
+        self.variable_context.push_context()
+
+        name_node = get_first_child_by_type(node, "name")
+        parameters = get_children_by_types(node, "parameters")
+        body = get_children_by_types(node, "body")
+        
+        name = self.visit(name_node)
+
+        func_params = []
+        body = []
+        for node in body:
+            cast = self.visit(node)
+            if isinstance(cast, List):
+                body.extend(cast)
+            elif isinstance(cast, AstNode):
+                body.append(cast)
+            # TODO: Do we need to handle return statements in any special way?
+
+        return FunctionDef(
+            name = name,
+            func_args=func_params,
+            body=body,
+            source_refs=None
+        )
+
 
     def visit_assignment(self, node: Node) -> Assignment:
         left, _, right = node.children
