@@ -199,7 +199,7 @@ def epoch_time(start_time, end_time):
     return elapsed_mins, elapsed_secs
 
 
-def train_model(config,):
+def train_model(config=None,):
 
     # to save trained model and logs
     FOLDER = ["trained_models", "logs"]
