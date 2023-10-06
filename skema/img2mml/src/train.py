@@ -31,10 +31,10 @@ def train(
     epoch_loss = 0
     latest_val_loss = 100 # new addition
 
-    tset = tqdm(iter(train_dataloader))
+    # tset = tqdm(iter(train_dataloader))
 
-    # for i, (img, mml) in enumerate(train_dataloader):
-    for i, (img, mml) in enumerate(tset):
+    for i, (img, mml) in enumerate(train_dataloader):
+    # for i, (img, mml) in enumerate(tset):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
         mml.shape[0]
@@ -65,44 +65,44 @@ def train(
 
         epoch_loss += loss.item()
 
-        if (not ddp) or (ddp and rank == 0):
-            desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
-            tset.set_description(desc)
+        # if (not ddp) or (ddp and rank == 0):
+            # desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
+            # tset.set_description(desc)
 
-        """
-        new addition-------
-        """
-        if isBatchScheduler:
-            # Calculating val_loss after every 1000 batches
-            # of size 64.
-            if i > 0 and i % 500 == 0 and i < len(train_dataloader):
-                # randomly choosing 100 samples for the validation
-                val_dataloader = random.sample(list(val_dataloader), 100)
-                val_loss = evaluate(model,model_type,img_tnsr_path,
-                                    batch_size,val_dataloader,criterion,
-                                    device,vocab,ddp=ddp,rank=rank,)
+        # """
+        # new addition-------
+        # """
+        # if isBatchScheduler:
+        #     # Calculating val_loss after every 1000 batches
+        #     # of size 64.
+        #     if i > 0 and i % 500 == 0 and i < len(train_dataloader):
+        #         # randomly choosing 100 samples for the validation
+        #         val_dataloader = random.sample(list(val_dataloader), 100)
+        #         val_loss = evaluate(model,model_type,img_tnsr_path,
+        #                             batch_size,val_dataloader,criterion,
+        #                             device,vocab,ddp=ddp,rank=rank,)
+        #
+        #         if val_loss < latest_val_loss:
+        #             latest_val_loss = val_loss
+        #             if (not ddp) or (ddp and rank == 0):
+        #                 torch.save(
+        #                     model.state_dict(),
+        #                     f"trained_models/{model_type}_our_sampled_data_mml_best.pt",
+        #                 )
+        #
+        #         if reduce_on_plateau_scheduler:
+        #             scheduler.step(val_loss)
+        #         else:
+        #             scheduler.step()
+        #
+        #         if (not ddp) or (ddp and rank == 0):
+        #             print("learning_rate: ", optimizer.param_groups[0]['lr'])
+        #             print(f"steps completed: {i} \t train loss: {loss} \t train perplexity: {math.exp(loss):7.3f}")
+        #             print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(val_loss):7.3f}")
+        #     """
+        #     ----------------------------------------------------------------------
+        #     """
 
-                if val_loss < latest_val_loss:
-                    latest_val_loss = val_loss
-                    if (not ddp) or (ddp and rank == 0):
-                        torch.save(
-                            model.state_dict(),
-                            f"trained_models/{model_type}_our_sampled_data_mml_best.pt",
-                        )
-
-                if reduce_on_plateau_scheduler:
-                    scheduler.step(val_loss)
-                else:
-                    scheduler.step()
-
-                if (not ddp) or (ddp and rank == 0):
-                    print("learning_rate: ", optimizer.param_groups[0]['lr'])
-                    print(f"steps completed: {i} \t train loss: {loss} \t train perplexity: {math.exp(loss):7.3f}")
-                    print(f"steps completed: {i} \t validation loss: {val_loss} \t validationn perplexity: {math.exp(val_loss):7.3f}")
-            """
-            ----------------------------------------------------------------------
-            """
-
-    if not isBatchScheduler:
-        net_loss = epoch_loss / len(train_dataloader)
-        return net_loss
+    # if not isBatchScheduler:
+    net_loss = epoch_loss / len(train_dataloader)
+    return net_loss
