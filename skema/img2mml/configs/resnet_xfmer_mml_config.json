@@ -46,13 +46,13 @@
 "exponential_scheduler":false,
 "ReduceLROnPlateau":true,
 "scheduler_type":"Epoch",
-"starting_lr":0.0015,
+"starting_lr":0.001,
 "step_size":2,
 "gamma":0.9,
 "dropout":0.1,
 
 "_comment_":"encoder params",
-"encoder_dim":256,
+"encoder_dim":512,
 "input_channels":3,
 "encoding_type":"positional_encoding",
 "n_xfmer_heads":4,
@@ -60,8 +60,8 @@
 "dim_feedforward_for_xfmer":128,
 
 "_comment_":"decoder params",
-"embedding_dim":128,
-"decoder_hid_dim":256,
+"embedding_dim":256,
+"decoder_hid_dim":512,
 "n_xfmer_decoder_layers":3,
 
 "_comment_":"training/testing params",
