@@ -41,7 +41,7 @@
 "beta_1":0.9,
 "beta_2":0.999,
 "learning_rate":0.002,
-"weight_decay": 5e-04,
+"weight_decay": 1e-04,
 "step_scheduler":false,
 "exponential_scheduler":false,
 "ReduceLROnPlateau":true,
@@ -49,7 +49,7 @@
 "starting_lr":0.001,
 "step_size":2,
 "gamma":0.5,
-"dropout":0.3,
+"dropout":0.1,
 
 "_comment_":"encoder params",
 "encoder_dim":512,
@@ -60,7 +60,7 @@
 "dim_feedforward_for_xfmer":256,
 
 "_comment_":"decoder params",
-"embedding_dim":256,
+"embedding_dim":128,
 "decoder_hid_dim":512,
 "n_xfmer_decoder_layers":6,
 
