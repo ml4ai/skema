@@ -31,10 +31,10 @@ def train(
     epoch_loss = 0
     latest_val_loss = 100 # new addition
 
-    # tset = tqdm(iter(train_dataloader))
+    tset = tqdm(iter(train_dataloader))
 
-    for i, (img, mml) in enumerate(train_dataloader):
-    # for i, (img, mml) in enumerate(tset):
+    # for i, (img, mml) in enumerate(train_dataloader):
+    for i, (img, mml) in enumerate(tset):
         # mml: (B, max_len)
         # img: (B, in_channel, H, W)
         mml.shape[0]
@@ -65,9 +65,9 @@ def train(
 
         epoch_loss += loss.item()
 
-        # if (not ddp) or (ddp and rank == 0):
-            # desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
-            # tset.set_description(desc)
+        if (not ddp) or (ddp and rank == 0):
+            desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
+            tset.set_description(desc)
 
         # """
         # new addition-------
