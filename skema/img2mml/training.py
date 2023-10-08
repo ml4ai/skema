@@ -379,6 +379,7 @@ def train_model(rank=None,):
             max_lr=0.1,
             base_lr=0.01,
             step_size_up=1200,
+            step_size_down=300,
         )
 
 
