@@ -376,8 +376,9 @@ def train_model(rank=None,):
     elif whichScheduler == "cycle_lr":
         scheduler = torch.optim.lr_scheduler.CyclicLR(
             optimizer,
-            max_lr=3,
+            max_lr=0.1,
             base_lr=0.01,
+            step_size_up=1200,
         )
 
 
