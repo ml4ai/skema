@@ -204,10 +204,12 @@ def train_model(rank=None,):
     optimizer_type = config["optimizer_type"]
     learning_rate = config["learning_rate"]
     weight_decay = config["weight_decay"]
-    scheduler_type = config["scheduler_type"]
-    step_scheduler = config["step_scheduler"]
-    exponential_scheduler = config["exponential_scheduler"]
-    reduce_on_plateau_scheduler = config["ReduceLROnPlateau"]
+    # scheduler_type = config["scheduler_type"]
+    isScheduler = config["isScheduler"]
+    whichScheduler = config["whichScheduler"]
+    # step_scheduler = config["step_scheduler"]
+    # exponential_scheduler = config["exponential_scheduler"]
+    # reduce_on_plateau_scheduler = config["ReduceLROnPlateau"]
     starting_lr = config["starting_lr"]
     step_size = config["step_size"]
     gamma = config["gamma"]
@@ -328,15 +330,9 @@ def train_model(rank=None,):
     criterion = torch.nn.CrossEntropyLoss(ignore_index=vocab.stoi["<pad>"])
 
     # optimizer
-    isBatchScheduler = False
-    isEpochScheduler = False
     scheduler = None
-    if step_scheduler or exponential_scheduler or reduce_on_plateau_scheduler:
+    if isScheduler:
         _lr = starting_lr
-        if scheduler_type == "Batch":
-            isBatchScheduler = True
-        elif scheduler_type == "Epoch":
-            isEpochScheduler = True
     else:
         _lr = learning_rate
 
@@ -354,27 +350,34 @@ def train_model(rank=None,):
             weight_decay=weight_decay,
             momentum=momentum,
         )
+
     # which scheduler, if using
-    if step_scheduler:
+    if whichScheduler == "step_lr":
         scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
             step_size=step_size,
             gamma=gamma,
         )
-    elif exponential_scheduler:
+    elif whichScheduler == "exp_lr":
         scheduler = torch.optim.lr_scheduler.ExponentialLR(
             optimizer,
             gamma=gamma,
             last_epoch=-1,
             verbose=False,
         )
-    elif reduce_on_plateau_scheduler:
+    elif whichScheduler == "reduce_lr":
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
             optimizer,
             'min',
             patience = step_size,
             factor=gamma,
             verbose=True,
+        )
+    elif whichScheduler == "cycle_lr":
+        scheduler = torch.optim.lr_scheduler.CyclicLR(
+            optimizer,
+            max_lr=0.1,
+            base_lr=0.01,
         )
 
 
@@ -401,9 +404,6 @@ def train_model(rank=None,):
             if count_es <= early_stopping_counts:
                 start_time = time.time()
 
-
-                # print(f" =================== EPOCH : {epoch} =================== ")
-
                 # training and validation
                 train_loss = train(
                     model,
@@ -416,84 +416,73 @@ def train_model(rank=None,):
                     device,
                     ddp=ddp,
                     rank=rank,
-                    isBatchScheduler=isBatchScheduler,
-                    reduce_on_plateau_scheduler=reduce_on_plateau_scheduler,
-                    scheduler=scheduler,
-                    val_dataloader=val_dataloader, batch_size=batch_size, vocab=vocab, # (for batch scheduler only. remove this line if doesn't work)
                 )
 
-                """
-                new addition --------
-                """
 
-                if not isBatchScheduler:
-                    val_loss = evaluate(
-                        model,
-                        model_type,
-                        img_tnsr_path,
-                        batch_size,
-                        val_dataloader,
-                        criterion,
-                        device,
-                        vocab,
-                        ddp=ddp,
-                        rank=rank,
-                        g2p=g2p,
+                val_loss = evaluate(
+                    model,
+                    model_type,
+                    img_tnsr_path,
+                    batch_size,
+                    val_dataloader,
+                    criterion,
+                    device,
+                    vocab,
+                    ddp=ddp,
+                    rank=rank,
+                    g2p=g2p,
+                )
+
+                end_time = time.time()
+                # total time spent on training an epoch
+                epoch_mins, epoch_secs = epoch_time(start_time, end_time)
+
+                if isScheduler:
+                    if whichScheduler == "reduce_lr":
+                        scheduler.step(val_loss)
+                    else:
+                        scheduler.step()
+
+                # saving the current model for transfer learning
+                if (not ddp) or (ddp and rank == 0):
+                    torch.save(
+                        model.state_dict(),
+                        f"trained_models/{model_type}_{dataset_type}_{config['markup']}_latest.pt",
                     )
 
-                    end_time = time.time()
-                    # total time spent on training an epoch
-                    epoch_mins, epoch_secs = epoch_time(start_time, end_time)
-
-                    if isEpochScheduler:
-                        if reduce_on_plateau_scheduler:
-                            scheduler.step(val_loss)
-                        else:
-                            scheduler.step()
-
-                    # saving the current model for transfer learning
+                if val_loss < best_valid_loss:
+                    best_valid_loss = val_loss
+                    count_es = 0
                     if (not ddp) or (ddp and rank == 0):
                         torch.save(
                             model.state_dict(),
-                            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_latest.pt",
+                            f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
                         )
 
-                    if val_loss < best_valid_loss:
-                        best_valid_loss = val_loss
-                        count_es = 0
-                        if (not ddp) or (ddp and rank == 0):
-                            torch.save(
-                                model.state_dict(),
-                                f"trained_models/{model_type}_{dataset_type}_{config['markup']}_best.pt",
-                            )
+                elif early_stopping:
+                    count_es += 1
 
-                    elif early_stopping:
-                        count_es += 1
+                # logging
+                if (not ddp) or (ddp and rank == 0):
+                    print(
+                        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s"
+                    )
+                    print(
+                        f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
+                    )
+                    print(
+                        f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}"
+                    )
 
-                    # logging
-                    if (not ddp) or (ddp and rank == 0):
-                        print(
-                            f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s"
-                        )
-                        print(
-                            f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}"
-                        )
-                        print(
-                            f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}"
-                        )
-
-                        loss_file.write(
-                            f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\n"
-                        )
-                        loss_file.write(
-                            f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}\n"
-                        )
-                        loss_file.write(
-                            f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
-                        )
-                """
-                -------------------------------------------------------
-                """
+                    loss_file.write(
+                        f"Epoch: {epoch+1:02} | Time: {epoch_mins}m {epoch_secs}s\n"
+                    )
+                    loss_file.write(
+                        f"\tTrain Loss: {train_loss:.3f} | Train PPL: {math.exp(train_loss):7.3f}\n"
+                    )
+                    loss_file.write(
+                        f"\t Val. Loss: {val_loss:.3f} |  Val. PPL: {math.exp(val_loss):7.3f}\n"
+                    )
 
             else:
                 print(
