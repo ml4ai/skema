@@ -416,6 +416,8 @@ def train_model(rank=None,):
                     device,
                     ddp=ddp,
                     rank=rank,
+                    scheduler=scheduler,
+                    whichScheduler=whichScheduler,
                 )
 
 

@@ -20,6 +20,8 @@ def train(
     device,
     ddp=False,
     rank=None,
+    scheduler=None,
+    whichScheduler=None,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
     model.train()
@@ -65,6 +67,8 @@ def train(
             desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
             tset.set_description(desc)
 
+        if whichScheduler == "cycle_lr":
+            scheduler.step()
 
     net_loss = epoch_loss / len(train_dataloader)
     return net_loss
