@@ -186,22 +186,12 @@ impl MathExpression {
             // Insert implicit division operators, and wrap numerators and denominators in
             // parentheses for the Pratt parsing algorithm.
             MathExpression::Differential(x) => {
-                println!("Inside differential");
-
-                println!("x.diff={:?}", x.diff);
-                println!("x.func={:?}", x.func);
-                //tokens.push(x.diff);
-                //tokens.push(MathExpression::Mo(Operator::Derivative(x.diff)));
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 x.diff.flatten(tokens);
                 x.func.flatten(tokens);
-                //for element in ci {
-                //x.flatten(tokens);
-                //}
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
             MathExpression::Mfrac(numerator, denominator) => {
-                println!("numerator={:?}", numerator);
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 numerator.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
@@ -218,6 +208,7 @@ impl MathExpression {
                         superscript.flatten(tokens);
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                     } else {
+                        println!("INSIDE");
                         tokens.push(MathExpression::Mo(Operator::Lparen));
                         base.flatten(tokens);
                         tokens.push(MathExpression::Mo(Operator::Rparen));
@@ -226,6 +217,15 @@ impl MathExpression {
                         superscript.flatten(tokens);
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                     }
+                } else {
+                    println!("----");
+                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    base.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
+                    tokens.push(MathExpression::Mo(Operator::Power));
+                    tokens.push(MathExpression::Mo(Operator::Lparen));
+                    superscript.flatten(tokens);
+                    tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
             MathExpression::Mover(base, over) => {
@@ -428,6 +428,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
+        //Operator::Dot => (17, 16),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -860,6 +861,79 @@ fn test_one_dimensional_ebm() {
         <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
         </mfrac>
         <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_absolute_value() {
+    let input = "
+    <math>
+        <mo>|</mo><mo>&#x2207;</mo><mi>H</mi><mo>|</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_absolute_as_msup() {
+    let input = "
+    <math>
+        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
+        <msup><mo>|</mo>
+        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_halfar_dome() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>H</mi></mrow>
+        <mrow><mi>∂</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mo>&#x2207;</mo>
+        <mo>&#x22c5;</mo>
+        <mo>(</mo>
+        <mi>Γ</mi>
+        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
+        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
+        <msup><mo>|</mo>
+        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
+        <mo>&#x2207;</mo><mi>H</mi>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_func_paren() {
+    let input = "
+    <math>
+        <mo>(</mo><mi>a</mi><mo>+</mo><mo>(</mo><mi>b</mi><mo>+</mo><mi>c</mi><mo>)</mo>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_func_paren_and_times() {
+    let input = "
+    <math>
+        <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo>)</mo>
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();

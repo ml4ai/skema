@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, tuple},
+    sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -379,6 +379,53 @@ pub fn absolute(input: Span) -> IResult<Mrow> {
     ))(input)?;
     Ok((s, Mrow(elements)))
 }
+/// Example: Divergence
+pub fn divergence(input: Span) -> IResult<Operator> {
+    let (s, (_, _)) = tuple((grad, dot))(input)?;
+    Ok((s, Operator::Grad))
+}
+
+///Absolute with Msup value
+pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
+    let (s, elements) = ws(map(
+        ws(delimited(
+            tag("<mo>|</mo>"),
+            separated_pair(math_expression, tag("<msup><mo>|</mo>"), math_expression),
+            tag("</msup>"),
+        )),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
+        //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
+    ))(input)?;
+    /*let (s, elements) = ws(delimited(
+        preceded(tag("<mo>|</mo>"), math_expression),
+        preceded(tag("<msup><mo>|</mo>"), math_expression),
+        tag("</msup>"),
+    ))(input)?;
+    println!("elements={:?}", elements);
+    let (s, other_elements) = ws(terminated(many0(math_expression), tag("</msup>")))(s)?;
+    //println!("other_elements={:?}", other_elements);
+    let combine = format!(
+        "<msup><mrow>{:?}</mrow>{:?}</msup>",
+        elements, other_elements
+    );*/
+    //let combine = concat!("<msup>", elements_to_string, "</msup>");
+    //let new = Span::new(combine.to_str());
+    //let (s, sup) = map(pair(math_expression, math_expression), |(x, y)| {
+
+    /*let (s, sup) = ws(map(
+        tag_parser!("msup", pair(math_expression, math_expression)),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
+    ))(input)?;*/
+
+    //let sup = MathExpression::Msup(Box::new(elements), Box::new(other_elements));
+    /*let sup = MathExpression::Msup(
+        Box::new(MathExpression::Mrow(Mrow(elements))),
+        Box::new(MathExpression::Mrow(Mrow(other_elements))),
+    );*/
+    //});
+
+    Ok((s, elements))
+}
 
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
 /// assumes that expressions such as S(t) are actually univariate functions.
@@ -445,6 +492,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
+        map(divergence, MathExpression::Mo),
+        absolute_with_msup,
         map(absolute, MathExpression::Mrow),
         map(operator, MathExpression::Mo),
         mn,

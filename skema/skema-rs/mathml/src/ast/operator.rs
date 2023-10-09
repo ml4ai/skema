@@ -27,6 +27,7 @@ pub enum Operator {
     Comma,
     Grad,
     Dot,
+    Div,
     Derivative(Derivative),
     Sin,
     Cos,
@@ -84,6 +85,7 @@ impl fmt::Display for Operator {
             Operator::Mean => write!(f, "Mean"),
             Operator::Grad => write!(f, "Grad"),
             Operator::Dot => write!(f, "Dot"),
+            Operator::Div => write!(f, "Div"),
         }
     }
 }
