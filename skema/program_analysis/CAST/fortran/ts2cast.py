@@ -60,14 +60,14 @@ class TS2CAST(object):
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
         self.root_node = remove_comments(self.tree.root_node)
-        print(self.root_node.sexp())
+    
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        print(self.out_cast[0].to_json_str())
+        #print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -81,7 +81,6 @@ class TS2CAST(object):
         # 2. A program body
         # 3. Everything else (defined functions)
         modules = []
-        print(root.children)
         contexts = get_children_by_types(root, ["module", "program"])
         for context in contexts:
             modules.append(self.visit(context))
@@ -298,12 +297,16 @@ class TS2CAST(object):
 
     def visit_function_call(self, node):
         # Pull relevent nodes
-        
         # A subroutine and function won't neccessarily have an arguments node.
         # So we should be careful about trying to access it.
-        function_node = get_children_by_types(node, ["subroutine", "identifier",])[0]
+        function_node = get_children_by_types(node, ["unary_expression", "subroutine", "identifier",])[0]
         arguments_node = get_first_child_by_type(node, "argument_list")
-    
+        
+        # If this is a unary expression (+foo()) the identifier will be nested.
+        # TODO: If this is a non '+' unary expression, how do we add it to the CAST?
+        if function_node.type == "unary_expression":
+            function_node = get_first_child_by_type(node, "identifier", recurse=True)
+
         function_identifier = self.node_helper.get_identifier(function_node)
 
         # Tree-Sitter incorrectly parses mutlidimensional array accesses as function calls
@@ -437,7 +440,9 @@ class TS2CAST(object):
         if while_statement_node:
             return self._visit_while(node)
 
-        # The first body node will be the node after the loop_control_expression
+        # If there is a loop control expression, the first body node will be the node after the loop_control_expression
+        # It is valid Fortran to have a single itteration do loop as well.
+        # TODO: Add support for single itteration do-loop
         # NOTE: This code is for the creation of the main body. The do loop will still add some additional nodes at the end of this body.
         body = []
         body_start_index = 1 + get_first_child_index(node, "loop_control_expression")
@@ -752,7 +757,6 @@ class TS2CAST(object):
         )
 
     def visit_math_expression(self, node):
-        #print(node.children)
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
