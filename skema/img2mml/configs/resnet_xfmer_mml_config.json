@@ -57,8 +57,8 @@
 "--": "these params are for step_lr, and reduce_lr only",
 "starting_lr":0.001,
 "step_size":2,
-"gamma":0.5,
-"dropout":0.1,
+"gamma":1.0,
+"dropout":0.2,
 
 "_comment_":"encoder params",
 "encoder_dim":256,
@@ -80,7 +80,7 @@
 "beam_search_alpha":0.6,
 "min_length_bean_search_normalization":3,
 "early_stopping":true,
-"early_stopping_counts":5,
+"early_stopping_counts":10,
 "garbage2pad":true,
 "clean_state_dict":false
 }
