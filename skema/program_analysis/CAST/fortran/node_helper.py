@@ -24,6 +24,13 @@ CONTROL_CHARACTERS = [
     "<=",
     ">=",
     "only",
+    "\.not\.",
+    "\.gt\.",
+    "\.ge\.",
+    "\.lt\.",
+    "\.le\.",
+    "\.eq\.",
+    "\.ne\.",
 ]
 
 class NodeHelper():

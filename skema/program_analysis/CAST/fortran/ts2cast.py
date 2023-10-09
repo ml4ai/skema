@@ -60,14 +60,14 @@ class TS2CAST(object):
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
         self.root_node = remove_comments(self.tree.root_node)
-        
+        print(self.root_node.sexp())
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
 
         # Start visiting
         self.out_cast = self.generate_cast()
-        #print(self.out_cast[0].to_json_str())
+        print(self.out_cast[0].to_json_str())
         
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
@@ -81,7 +81,7 @@ class TS2CAST(object):
         # 2. A program body
         # 3. Everything else (defined functions)
         modules = []
-
+        print(root.children)
         contexts = get_children_by_types(root, ["module", "program"])
         for context in contexts:
             modules.append(self.visit(context))
@@ -104,6 +104,7 @@ class TS2CAST(object):
                 source_refs=[self.node_helper.get_source_ref(root)]
             ))
     
+
         return modules
 
     def visit(self, node: Node):
@@ -297,13 +298,12 @@ class TS2CAST(object):
 
     def visit_function_call(self, node):
         # Pull relevent nodes
-        if node.type == "subroutine_call":
-            function_node = node.children[1]
-            arguments_node = node.children[2]
-        elif node.type == "call_expression":
-            function_node = node.children[0]
-            arguments_node = node.children[1]
-
+        
+        # A subroutine and function won't neccessarily have an arguments node.
+        # So we should be careful about trying to access it.
+        function_node = get_children_by_types(node, ["subroutine", "identifier",])[0]
+        arguments_node = get_first_child_by_type(node, "argument_list")
+    
         function_identifier = self.node_helper.get_identifier(function_node)
 
         # Tree-Sitter incorrectly parses mutlidimensional array accesses as function calls
@@ -323,10 +323,11 @@ class TS2CAST(object):
 
         # Add arguments to arguments list
         arguments = []
-        for argument in arguments_node.children:
-            child_cast = self.visit(argument)
-            if child_cast:
-                arguments.append(child_cast)
+        if arguments_node:
+            for argument in arguments_node.children:
+                child_cast = self.visit(argument)
+                if child_cast:
+                    arguments.append(child_cast)
 
         return Call(
             func=func,
@@ -619,9 +620,6 @@ class TS2CAST(object):
             if isinstance(orelse, ModelIf):
                 orelse = [orelse]
 
-        print(len(node.children))
-        print(body_start_index)
-        print(body_stop_index)
         return ModelIf(
             expr=self.visit(node.children[1]),
             body=[self.visit(child) for child in node.children[body_start_index:body_stop_index]],
@@ -630,6 +628,10 @@ class TS2CAST(object):
 
     def visit_logical_expression(self, node):
         """Visitior for logical expression (i.e. true and false) which is used in compound conditional"""
+        # If this is a .not. operator, we need to pass it on to the math_expression visitor
+        if len(node.children) < 3:
+            return self.visit_math_expression(node)
+        
         literal_value_false = LiteralValue("Boolean", False)
         literal_value_true = LiteralValue("Boolean", True)
         
@@ -750,6 +752,7 @@ class TS2CAST(object):
         )
 
     def visit_math_expression(self, node):
+        #print(node.children)
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
