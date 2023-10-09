@@ -60,7 +60,7 @@ class TS2CAST(object):
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
         self.root_node = remove_comments(self.tree.root_node)
-    
+        #print(self.root_node.sexp())
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
