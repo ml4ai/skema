@@ -376,10 +376,10 @@ def train_model(rank=None,):
     elif whichScheduler == "cycle_lr":
         scheduler = torch.optim.lr_scheduler.CyclicLR(
             optimizer,
-            max_lr=0.1,
-            base_lr=0.01,
-            step_size_up=1200,
-            step_size_down=300,
+            max_lr=config["max_lr"],
+            base_lr=config["base_lr"],
+            step_size_up=config["step_size_up"],
+            step_size_down=config["step_size_down"],
         )
 
 

@@ -46,6 +46,14 @@
 "__":"if want to scheduler. Options: {step_lr, exp_lr, reduce_lr, cycle_lr}",
 "isScheduler":true,
 "whichScheduler":"cycle_lr",
+
+"__":"params for cycle_lr",
+"base_lr":0.01,
+"max_lr":0.1,
+"step_size_up":1200,
+"step_size_down":300,
+
+"--": "these params are for step_lr, and reduce_lr only",
 "starting_lr":0.001,
 "step_size":2,
 "gamma":0.1,
