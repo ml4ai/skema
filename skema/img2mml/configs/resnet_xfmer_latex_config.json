@@ -48,8 +48,8 @@
 "whichScheduler":"cycle_lr",
 
 "__":"params for cycle_lr",
-"base_lr":0.0005,
-"max_lr":0.001,
+"base_lr":0.0001,
+"max_lr":0.005,
 "step_size_up":1200,
 "step_size_down":1200,
 "mode":"triangular",
@@ -61,17 +61,17 @@
 "dropout":0.2,
 
 "_comment_":"encoder params",
-"encoder_dim":256,
+"encoder_dim":128,
 "input_channels":3,
 "encoding_type":"positional_encoding",
-"n_xfmer_heads":4,
+"n_xfmer_heads":2,
 "n_xfmer_encoder_layers":3,
 "dim_feedforward_for_xfmer":128,
 
 
 "_comment_":"decoder params",
 "embedding_dim":128,
-"decoder_hid_dim":256,
+"decoder_hid_dim":128,
 "n_xfmer_decoder_layers":3,
 
 "_comment_":"training/testing params",
