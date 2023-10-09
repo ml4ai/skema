@@ -380,7 +380,7 @@ def train_model(rank=None,):
             base_lr=config["base_lr"],
             step_size_up=config["step_size_up"],
             step_size_down=config["step_size_down"],
-            mode="triangular",
+            mode=config["mode"],
             gamma=gamma,
             cycle_momentum=False,
         )
