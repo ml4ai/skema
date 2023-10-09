@@ -17,7 +17,7 @@
 "device":"cuda",
 "num_cpus":100,
 "epochs":50,
-"seed":42,
+"seed":2,
 
 "_comment_":"params for preprocessing",
 "data_path":"/groups/claytonm/im2markup_data_gauravs/data/",
@@ -49,7 +49,7 @@
 
 "__":"params for cycle_lr",
 "base_lr":0.0005,
-"max_lr":0.001,
+"max_lr":0.005,
 "step_size_up":1200,
 "step_size_down":1200,
 "mode":"triangular",
@@ -81,7 +81,7 @@
 "beam_search_alpha":0.6,
 "min_length_bean_search_normalization":3,
 "early_stopping":true,
-"early_stopping_counts":6,
+"early_stopping_counts":10,
 "garbage2pad":true,
 "clean_state_dict":false
 }
