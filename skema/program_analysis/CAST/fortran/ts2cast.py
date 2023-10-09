@@ -30,6 +30,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
 from skema.program_analysis.CAST.fortran.variable_context import VariableContext
 from skema.program_analysis.CAST.fortran.node_helper import (
     NodeHelper,
+    remove_comments,
     get_children_by_types,
     get_first_child_by_type,
     get_control_children,
@@ -58,16 +59,19 @@ class TS2CAST(object):
             )
         )
         self.tree = parser.parse(bytes(self.source, "utf8"))
-
+        self.root_node = remove_comments(self.tree.root_node)
+        
         # Walking data
         self.variable_context = VariableContext()
         self.node_helper = NodeHelper(self.source, self.source_file_name)
 
         # Start visiting
         self.out_cast = self.generate_cast()
+        #print(self.out_cast[0].to_json_str())
+        
     def generate_cast(self) -> List[CAST]:
         '''Interface for generating CAST.'''
-        modules = self.run(self.tree.root_node)
+        modules = self.run(self.root_node)
         return [CAST([generate_dummy_source_refs(module)], "Fortran") for module in modules]
         
     def run(self, root) -> List[Module]:
@@ -575,6 +579,15 @@ class TS2CAST(object):
         else:
             body_stop_index = else_index
 
+        # Single line if conditions don't have a 'then' or 'end if' clause. 
+        # So the starting index for the body can either be 2 or 3.
+        then_index = get_first_child_index(node, "then")
+        if then_index:
+            body_start_index = then_index+1
+        else:
+            body_start_index = 2
+            body_stop_index = len(node.children)
+
         prev = None
         orelse = None
         # If there are else_if statements, they need
@@ -586,7 +599,7 @@ class TS2CAST(object):
                     continue
                 elseif_expr = self.visit(condition.children[2])
                 elseif_body = [self.visit(child) for child in condition.children[4:]]
-
+                
                 prev.orelse = ModelIf(elseif_expr, elseif_body, [])
                 prev = prev.orelse
 
@@ -599,13 +612,20 @@ class TS2CAST(object):
             else:
                 orelse = else_body
 
+        # TODO: This orelse logic has gotten a little complex, we might want to refactor this.
         if isinstance(orelse, ModelIf):
             orelse = orelse.orelse
+        if orelse:
+            if isinstance(orelse, ModelIf):
+                orelse = [orelse]
 
+        print(len(node.children))
+        print(body_start_index)
+        print(body_stop_index)
         return ModelIf(
             expr=self.visit(node.children[1]),
-            body=[self.visit(child) for child in node.children[3:body_stop_index]],
-            orelse=[orelse] if orelse else [],
+            body=[self.visit(child) for child in node.children[body_start_index:body_stop_index]],
+            orelse=orelse if orelse else [],
         )
 
     def visit_logical_expression(self, node):
@@ -733,7 +753,6 @@ class TS2CAST(object):
         op = self.node_helper.get_identifier(
             get_control_children(node)[0]
         )  # The operator will be the first control character
-
         operands = []
         for operand in get_non_control_children(node):
             operands.append(self.visit(operand))
