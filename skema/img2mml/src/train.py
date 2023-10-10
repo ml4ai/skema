@@ -68,7 +68,7 @@ def train(
             desc = 'Loss: %.4f - Learning Rate: %.6f' % (loss.item(), optimizer.param_groups[0]['lr'])
             tset.set_description(desc)
 
-        if whichScheduler == "cycle_lr":
+        if (isScheduler) and (whichScheduler == "cycle_lr"):
             scheduler.step()
 
     net_loss = epoch_loss / len(train_dataloader)
