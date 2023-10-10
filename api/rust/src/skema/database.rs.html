@@ -7804,7 +7804,7 @@ There being a second function call of the same function which contains an expres
     </span><span class="kw-2">*</span>start += <span class="number">1</span>;
 
     <span class="kw">let </span>att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_idx - <span class="number">1</span>].clone(); <span class="comment">// current expression attribute
-    </span><span class="kw">let </span>parent_att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.parent_node.contents].clone(); <span class="comment">// parent attribute
+    </span><span class="kw">let </span>parent_att_box = gromet.modules[<span class="number">0</span>].attributes[c_args.att_bf_idx - <span class="number">1</span>].clone(); <span class="comment">// parent attribute
 
     // construct opo nodes, if not none
     // not calling the opo port constuctors since they are based on grabbing in the name from top level of the gromet,
