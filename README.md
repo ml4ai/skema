@@ -1,9 +1,3 @@
-![](http://ci.kraken.sista.arizona.edu/api/badges/ml4ai/skema/status.svg)  
-[![Docker lumai/askem-skema-py Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-py?sort=date&logo=docker&label=lumai%2Faskem-skema-py)](https://hub.docker.com/r/lumai/askem-skema-py)  
-[![Docker lumai/askem-skema-img2mml Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-img2mml?sort=date&logo=docker&label=lumai%2Faskem-skema-img2mml)](https://hub.docker.com/r/lumai/askem-skema-img2mml)  
-[![Docker lumai/askem-skema-rs Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-rs?sort=date&logo=docker&label=lumai%2Faskem-skema-rs)](https://hub.docker.com/r/lumai/askem-skema-rs)  
-[![Docker lumai/askem-skema-text-reading Image Version (latest by date)](https://img.shields.io/docker/v/lumai/askem-skema-text-reading?sort=date&logo=docker&label=lumai%2Faskem-skema-text-reading)](https://hub.docker.com/r/lumai/askem-skema-text-reading)
-
 # SKEMA: Scientific Knowledge Extraction and Model Analysis
 
 This is the main code repository for the SKEMA project. It contains the source
@@ -24,7 +18,6 @@ At the top level, we have the following files and directories:
 - `Dockerfile.skema-rs`: Dockerfile for the skema-rs service.
 - `LICENSE.txt`: License for the software components in this repository.
 - `README.md`: This README file.
-- `data`: Data for testing.
 - `scripts`: Miscellaneous scripts
 - `pyproject.toml`: This file declares and defines the `skema` Python package.
 - `skema`
@@ -56,6 +49,9 @@ The `text_reading` directory contains three subdirectories:
 The `README.md` files in the `skema/skema-rs` and
 `skema/text_reading/text_reading` directories provide instructions on how to
 run the software components that are written in Rust and Scala respectively.
+
+## Docker
+[For information on our releases and published docker images, please see this page](https://ml4ai.github.io/skema/changes/)
 
 ## Examples
 

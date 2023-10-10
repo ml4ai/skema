@@ -9,12 +9,15 @@ from io import BytesIO
 from zipfile import ZipFile
 from urllib.request import urlopen
 from fastapi import APIRouter, FastAPI, Body, File, UploadFile
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
 import skema.skema_py.acsets
 import skema.skema_py.petris
 
 import skema.program_analysis.comment_extractor.server as comment_service
+from skema.gromet.fn.gromet_fn_module_collection import GrometFNModuleCollection
+from skema.gromet.metadata.debug import Debug
 from skema.program_analysis.multi_file_ingester import process_file_system
 from skema.program_analysis.snippet_ingester import process_snippet
 from skema.program_analysis.fn_unifier import align_full_system
@@ -135,6 +138,36 @@ async def system_to_enriched_system(system: System) -> System:
 async def system_to_gromet(system: System):
     """Convert a System to Gromet JSON"""
 
+    # We maintain a log of warnings and error to pass back to the user.
+    # This allows us to warn the user about unsupported file extensions.
+    server_log = []
+
+    # Check for unsupported files before processing. They will be removed and the user will be warned.
+    unsupported_files = [
+        file
+        for file in system.files
+        if Path(file).suffix not in SUPPORTED_FILE_EXTENSIONS
+    ]
+    for file in unsupported_files:
+        unsupported_file_str = f"WARNING: Ingestion of file extension {Path(file).suffix} for file {file} is not supported and will be skipped."
+        print(unsupported_file_str)
+        system.files.remove(file)
+        server_log.append(unsupported_file_str)
+
+    # If there are no supported files, then we will return an empty GrometFNModuleCollection with a top-level Debug metadata
+    if len(system.files) == 0:
+        no_supported_file_str = "ERROR: The system does not contain any files with supported file extensions. All files will be skipped."
+        print(no_supported_file_str)
+        gromet_collection = GrometFNModuleCollection(
+            metadata_collection=[[]], metadata=0
+        )
+        gromet_collection.metadata_collection[0].append(
+            Debug(
+                debug_type="code2fn", severity="ERROR", message=no_supported_file_str
+            ).to_dict()  # There is a bug in Swagger that requires us to manually to_dict() this
+        )
+        return gromet_collection.to_dict()
+
     # The CODE2FN Pipeline requires a file path as input.
     # We are receiving a serialized version of the code system as input, so we must store the file in a temporary directory.
     # This temp directory only persists during execution of the CODE2FN pipeline.
@@ -174,6 +207,16 @@ async def system_to_gromet(system: System):
                 gromet_collection.modules[i].metadata_collection[j][
                     k
                 ] = metadata.to_dict()
+
+    # Add debug Metadata to Gromet objects
+    if not gromet_collection.metadata_collection:
+        gromet_collection.metadata_collection = [[]]
+    for log in server_log:
+        gromet_collection.metadata_collection[0].append(
+            Debug(
+                debug_type="code2fn", severity="WARNING", message=log
+            ).to_dict()  # There is a bug in Swagger that requires us to manually to_dict() this
+        )
 
     # Convert Gromet data-model to dict for return
     return gromet_collection.to_dict()

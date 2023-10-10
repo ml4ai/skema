@@ -21,10 +21,21 @@ def build_parsers(languages: List[str]) -> None:
 
     language_yaml_obj = yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())
     for language, language_dict in language_yaml_obj.items():
+        language_clone_directory = language_build_dir / language_dict["tree_sitter_name"]
         if language in languages:
+            # Clone the repository if it doesn't exist
             subprocess.run(
                 ["git", "clone", language_dict["clone_url"]], cwd=language_build_dir
             )
+            # Update the repository to pull any new commits
+            subprocess.run(
+                ["git", "pull"], cwd=language_clone_directory
+            )
+            # Checkout the correct commit if commit_sha is specified
+            if language_dict.get("commit_sha"):
+                subprocess.run(
+                    ["git", "checkout", language_dict["commit_sha"]], cwd=language_clone_directory
+                )
 
     # We can set pass the cwd for subprocess as an argument to run().
     # However, Language.build_library requires the cwd to be set to the build directory
@@ -51,11 +62,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
 
     language_yaml_obj = yaml.safe_load(open(LANGUAGES_YAML_FILEPATH))
+    parser.add_argument("--all", action="store_true", help="Build all tree-sitter parsers")
     for language, language_dict in language_yaml_obj.items():
         flag = f"--{language}"
         help_text = f"Include {language} language"
         parser.add_argument(flag, action="store_true", help=help_text)
-
     args = parser.parse_args()
-    selected_languages = [language for language, value in vars(args).items() if value]
+
+    if args.all:
+        selected_languages = [language for language in yaml.safe_load(LANGUAGES_YAML_FILEPATH.read_text())]
+    else:
+        selected_languages = [language for language, value in vars(args).items() if value]
+    
     build_parsers(selected_languages)

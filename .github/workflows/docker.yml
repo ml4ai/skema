@@ -66,6 +66,7 @@ jobs:
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
     - name: "Free disk space"
       run: |
+        sudo apt-get update
         sudo apt clean
         sudo rm -rf /usr/share/dotnet
         sudo rm -rf /opt/ghc
@@ -213,66 +214,10 @@ jobs:
       with:
         username: ${{ secrets.LUM_ASKEM_DOCKERHUB_USERNAME }}
         password: ${{ secrets.LUM_ASKEM_DOCKERHUB_TOKEN }}
-    - name: "Free disk space"
-      run: |
-        sudo apt clean
-        sudo rm -rf /usr/share/dotnet
-        sudo rm -rf /opt/ghc
-        sudo rm -rf "/usr/local/share/boost"
-        sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-
-    ########################################
-    # lumai/askem-skema-text-reading
-    ########################################
-    - name: Setup JDK (w/ SBT)
-      uses: actions/setup-java@v3
-      with:
-        distribution: temurin
-        java-version: 11
-        # Unfortunately, this will immediately 
-        # blow through the GH Actions cache...
-        #cache: 'sbt'
-    - name: Generate Dockerfile (TR)
-      working-directory: ./skema/text_reading/scala
-      env:
-        #APP_VERSION: ${{needs.app_version.outputs.app_version}}
-        APP_VERSION: ${{needs.app_version.outputs.commit}}
-      run: |
-        sbt "webapp/docker:stage"
-    - name: Tags for image (TR)
-      id: tags
-      # see https://github.com/docker/metadata-action
-      uses: docker/metadata-action@v4
-      with:
-        images: lumai/askem-skema-text-reading
-        tags: |
-          # latest
-          type=raw,value=latest
-          # version
-          type=semver,pattern={{version}}
-          # other tags
-          type=ref,event=tag
-          # short commit hash
-          type=sha
-    # The TR image is huge.
-    # We need to free up every last bit of space we can.
-    - name: Free disk space (aggressively)
-      uses: jlumbroso/free-disk-space@v1.2.0
-      with:
-        android: true
-        dotnet: true
-        haskell: true
-        large-packages: true
-        docker-images: true
-        swap-storage: true
-        tool-cache: false
-    - name: Build and push image (TR)
-      # see https://github.com/docker/build-push-action
-      uses: docker/build-push-action@v4
-      with:
-        context: ./skema/text_reading/scala/webapp/target/docker/stage
-        # NOTE: dynet throws an UnsatisfiedLinkError on ARM64 even with a platform compatible JRE.. :(
-        platforms: linux/amd64
-        push: ${{ github.event_name != 'pull_request' }}
-        # references `tags` step in steps for current job
-        tags: ${{ steps.tags.outputs.tags }}
+    # - name: "Free disk space"
+    #   run: |
+    #     sudo apt clean
+    #     sudo rm -rf /usr/share/dotnet
+    #     sudo rm -rf /opt/ghc
+    #     sudo rm -rf "/usr/local/share/boost"
+    #     sudo rm -rf "$AGENT_TOOLSDIRECTORY"
