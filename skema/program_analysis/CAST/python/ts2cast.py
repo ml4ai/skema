@@ -97,10 +97,12 @@ class TS2CAST(object):
             return self.visit(node.children[1])
         elif node.type == "expression_statement":
             return self.visit_expression(node)
-        elif node.type == "function_def":
-            return None
+        elif node.type == "function_definition":
+            return self.visit_function_def(node)
         elif node.type == "return_statement":
-            return None
+            return self.visit_return(node)
+        elif node.type == "call":
+            return self.visit_call(node)
         elif node.type == "assignment":
             return self.visit_assignment(node)
         elif node.type == "identifier":
@@ -163,28 +165,64 @@ class TS2CAST(object):
         # Create new variable context
         self.variable_context.push_context()
 
-        name_node = get_first_child_by_type(node, "name")
+        name_node = get_first_child_by_type(node, "identifier")
         parameters = get_children_by_types(node, "parameters")
-        body = get_children_by_types(node, "body")
+        
+        # The body of the function is stored in a 'block' type node
+        body = get_children_by_types(node, "block")[0].children
         
         name = self.visit(name_node)
 
         func_params = []
-        body = []
+        for node in parameters:
+            cast = self.visit(node)
+            if isinstance(cast, List):
+                func_params.extend(cast)
+            elif isinstance(cast, AstNode):
+                func_params.append(cast)
+
+        func_body = []
         for node in body:
             cast = self.visit(node)
             if isinstance(cast, List):
-                body.extend(cast)
+                func_body.extend(cast)
             elif isinstance(cast, AstNode):
-                body.append(cast)
+                func_body.append(cast)
             # TODO: Do we need to handle return statements in any special way?
 
+        self.variable_context.pop_context()
+
         return FunctionDef(
-            name = name,
+            name=name.val,
             func_args=func_params,
-            body=body,
-            source_refs=None
+            body=func_body,
+            source_refs=[]
         )
+
+    def visit_return(self, node: Node):
+        ret_val = node.children[1]
+        ret_cast = self.visit(ret_val)
+
+        return ModelReturn(value=ret_cast)
+
+    def visit_call(self, node: Node):
+        func_identifier = get_first_child_by_type(node, "identifier")
+        func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
+
+        arg_list = get_first_child_by_type(node, "argument_list")
+        args = get_children_by_types(arg_list, ["integer"])
+
+        print(args)
+
+        func_args = []
+        for arg in args:
+            cast = self.visit(arg)
+            if isinstance(cast, List):
+                func_args.extend(cast)
+            elif isinstance(cast, AstNode):
+                func_args.append(cast)
+
+        return Call(func=func_name, arguments=func_args)
 
 
     def visit_assignment(self, node: Node) -> Assignment:
