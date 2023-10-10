@@ -204,7 +204,6 @@ pub fn subgrapg2_core_dyn_MET_ast(
     for node in graph.node_indices() {
         if graph[node].labels == ["Expression"] {
             expression_nodes.push(node);
-            // println!("Expression Nodes: {:?}", graph[node].clone().id);
         }
     }
 
