@@ -1,4 +1,3 @@
-% simple MATLAB test file
-x = 1
-y = 2
-z = x + y
+x = 2;
+y = 3;
+z = x + y;
