@@ -423,6 +423,7 @@ def train_model(rank=None,):
                     ddp=ddp,
                     rank=rank,
                     scheduler=scheduler,
+                    isScheduler=isScheduler,
                     whichScheduler=whichScheduler,
                 )
 
