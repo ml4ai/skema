@@ -204,7 +204,7 @@ pub fn subgrapg2_core_dyn_MET_ast(
     for node in graph.node_indices() {
         if graph[node].labels == ["Expression"] {
             expression_nodes.push(node);
-            // println!("Expression Nodes: {:?}", graph[node].clone().id);
+            println!("Expression Nodes: {:?}", graph[node].clone().id);
         }
     }
 
@@ -233,6 +233,12 @@ pub fn subgrapg2_core_dyn_MET_ast(
         }
     }
 
+    for expr in trimmed_expressions_wiring.clone() {
+        for node_index in expr.clone().node_indices() {
+            println!("trimmed node labels: {:?}\n", expr[node_index].labels.clone());
+        }
+        println!("-----------------");
+    }
     // this is the actual convertion
     let mut core_dynamics = Vec::<FirstOrderODE>::new();
 
