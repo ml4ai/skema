@@ -4,11 +4,14 @@ from pathlib import Path
 # Test the CAST returned by processing the simplest MATLAB binary assignment
 
 # The source code for the single line assignment test is 'z = x + y;'
-# The correct CAST for this single line assignment would be a single node: 
-#   node_type 'binary_operator' 
-#   left.val.name 'x'
-#   right.value '5'
-#   right.value_type 'Integer'
+#  SYNTAX TREE:
+#  node: assignment
+#    node: identifier 'z'
+#    node: =
+#    node: binary_operator
+#      node: identifier 'x'
+#      node: +
+#      node: identifier 'y'
 
 def test_binary_operation():
     """ Tests whether the parser can handle a binary operation """
