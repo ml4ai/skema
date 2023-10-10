@@ -124,7 +124,7 @@ class MatlabToCast(object):
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
-        elif node.type in ["math_expression", "relational_expression"]:
+        elif node.type in ["binary_operator", "math_expression", "relational_expression"]:
             return self.visit_math_expression(node)
         elif node.type in ["number", "array", "string", "boolean"]:
             return self.visit_literal(node)
