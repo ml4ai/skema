@@ -21,6 +21,7 @@ def train(
     ddp=False,
     rank=None,
     scheduler=None,
+    isScheduler=False,
     whichScheduler=None,
 ):
     # train mode is ON i.e. dropout and normalization tech. will be used
