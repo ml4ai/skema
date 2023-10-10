@@ -119,7 +119,7 @@ class MatlabToCast(object):
         elif node.type == "variable_declaration":
             return self.visit_variable_declaration(node)
         elif node.type == "assignment":
-            return self.visit_assignment_statement(node)
+            return self.visit_assignment(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
         elif node.type == "name":
@@ -618,9 +618,9 @@ class MatlabToCast(object):
             orelse=orelse,
         )
 
-    def visit_assignment_statement(self, node):
+    def visit_assignment(self, node):
         """Docstring"""
-        # print('visit_assignment_statement')
+        # print('visit_assignment')
         left, _, right = node.children
 
         return Assignment(
@@ -742,7 +742,7 @@ class MatlabToCast(object):
                 (qualifier)
                 (value)
             (identifier) ...
-            (assignment_statement) ...
+            (assignment) ...
 
         (variable_declaration)
             (derived_type)
@@ -786,13 +786,13 @@ class MatlabToCast(object):
             node,
             [
                 "identifier",  # Variable declaration
-                "assignment_statement",  # Variable assignment
+                "assignment",  # Variable assignment
                 "call_expression",  # Dimension without intent
             ],
         )
         vars = []
         for variable in definied_variables:
-            if variable.type == "assignment_statement":
+            if variable.type == "assignment":
                 if variable.children[0].type == "call_expression":
                     vars.append(
                         Assignment(
@@ -1035,7 +1035,7 @@ class MatlabToCast(object):
         """Docstring"""
         # print('_visit_set')
         # Node structure
-        # (assignment_statement)
+        # (assignment)
         #  (call_expression)
         #  (right side)
 
