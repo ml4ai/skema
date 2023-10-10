@@ -37,3 +37,6 @@ def test_assignment():
     assert module['left']['val']['name'] == 'x'
     assert module['right']['value_type'] == 'Integer'
     assert module['right']['value'] == '5'
+
+if __name__ == "__main__":
+    test_assignment()
