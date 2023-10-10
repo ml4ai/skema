@@ -8,35 +8,35 @@ from tree_sitter import Language, Parser, Node, Tree
 
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
-    Module,
-    SourceRef,
     Assignment,
+    AstNode,
+    Attribute,
+    Call,
+    FunctionDef,
     LiteralValue,
-    Var,
-    VarType,
+    Loop,
+    ModelIf,
+    ModelImport,
+    ModelReturn,
+    Module,
     Name,
     Operator,
-    AstNode,
-    SourceCodeDataType,
-    ModelImport,
-    FunctionDef,
-    Loop,
-    Call,
-    ModelReturn,
-    ModelIf,
     RecordDef,
-    Attribute,
+    SourceCodeDataType,
+    SourceRef,
+    Var,
+    VarType,
 )
 
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
-    NodeHelper,
     get_children_by_types,
-    get_first_child_by_type,
     get_control_children,
-    get_non_control_children,
+    get_first_child_by_type,
     get_first_child_index,
     get_last_child_index,
+    get_non_control_children,
+    NodeHelper,
 )
 
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
