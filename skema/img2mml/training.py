@@ -352,38 +352,39 @@ def train_model(rank=None,):
         )
 
     # which scheduler, if using
-    if whichScheduler == "step_lr":
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer,
-            step_size=step_size,
-            gamma=gamma,
-        )
-    elif whichScheduler == "exp_lr":
-        scheduler = torch.optim.lr_scheduler.ExponentialLR(
-            optimizer,
-            gamma=gamma,
-            last_epoch=-1,
-            verbose=False,
-        )
-    elif whichScheduler == "reduce_lr":
-        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer,
-            'min',
-            patience = step_size,
-            factor=gamma,
-            verbose=True,
-        )
-    elif whichScheduler == "cycle_lr":
-        scheduler = torch.optim.lr_scheduler.CyclicLR(
-            optimizer,
-            max_lr=config["max_lr"],
-            base_lr=config["base_lr"],
-            step_size_up=config["step_size_up"],
-            step_size_down=config["step_size_down"],
-            mode=config["mode"],
-            gamma=gamma,
-            cycle_momentum=False,
-        )
+    if isScheduler:
+        if whichScheduler == "step_lr":
+            scheduler = torch.optim.lr_scheduler.StepLR(
+                optimizer,
+                step_size=step_size,
+                gamma=gamma,
+            )
+        elif whichScheduler == "exp_lr":
+            scheduler = torch.optim.lr_scheduler.ExponentialLR(
+                optimizer,
+                gamma=gamma,
+                last_epoch=-1,
+                verbose=False,
+            )
+        elif whichScheduler == "reduce_lr":
+            scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+                optimizer,
+                'min',
+                patience = step_size,
+                factor=gamma,
+                verbose=True,
+            )
+        elif whichScheduler == "cycle_lr":
+            scheduler = torch.optim.lr_scheduler.CyclicLR(
+                optimizer,
+                max_lr=config["max_lr"],
+                base_lr=config["base_lr"],
+                step_size_up=config["step_size_up"],
+                step_size_down=config["step_size_down"],
+                mode=config["mode"],
+                gamma=gamma,
+                cycle_momentum=False,
+            )
 
 
     best_valid_loss = float("inf")
