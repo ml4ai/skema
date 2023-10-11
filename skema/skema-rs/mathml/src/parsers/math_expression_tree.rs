@@ -939,3 +939,15 @@ fn test_func_paren_and_times() {
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
 }
+
+#[test]
+fn test_func_paren_and_times_another() {
+    let input = "
+    <math>
+        <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>(</mo><mi>a</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>+</mo><mi>b</mi><mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
