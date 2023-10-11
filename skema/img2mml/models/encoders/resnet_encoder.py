@@ -126,7 +126,6 @@ class ResNet18_Encoder(nn.Module):
         else:
             output = torch.flatten(output, 2, -1)  # (B, 512, L=H*W)
             output = output.permute(0, 2, 1)  # (B, L, 512)
-            if encoding_type == "positional_features":
-                output += add_positional_features(output)  # (B, L, 512)
+            # if encoding_type == "positional_features":
+            #     output += add_positional_features(output)  # (B, L, 512)
             return self.linear(output)  # (B, L, dec_hid_dim)
-        
