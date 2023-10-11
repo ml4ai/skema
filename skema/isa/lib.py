@@ -4,7 +4,7 @@ All the functions required by performing incremental structure alignment (ISA)
 Author: Liang Zhang (liangzh@arizona.edu)
 Updated date: August 24, 2023
 """
-
+import json
 import warnings
 from typing import List, Any, Union, Dict
 from numpy import ndarray
@@ -256,6 +256,117 @@ def heuristic_compare_variable_names(var1: str, var2: str) -> bool:
 
     # Compare the variable names
     return var1.lower() == var2.lower()
+
+
+def extract_var_information(
+    data: Dict[
+        str,
+        Union[
+            List[
+                Dict[
+                    str,
+                    Union[Dict[str, Union[str, int]], List[Dict[str, Union[str, int]]]],
+                ]
+            ],
+            None,
+        ],
+    ]
+) -> List[Dict[str, str]]:
+    """
+    Extracts variable information from the given JSON data of the SKEMA mention extraction.
+
+    Parameters:
+    - data (Dict[str, Union[List[Dict[str, Union[Dict[str, Union[str, int]], List[Dict[str, Union[str, int]]]]]], None]]): The input JSON data.
+
+    Returns:
+    - List[Dict[str, str]]: A list of dictionaries containing extracted information (name, definition, and document_id).
+    """
+    outputs = data.get("outputs", [])
+    extracted_data = []
+
+    for output in outputs:
+        attributes = output.get("data", {}).get("attributes", [])
+
+        for attribute in attributes:
+            payload = attribute.get("payload", {})
+            mentions = payload.get("mentions", [])
+            text_descriptions = payload.get("text_descriptions", [])
+
+            for mention in mentions:
+                name = mention.get("name", "")
+                extraction_source = mention.get("extraction_source", {})
+                document_reference = extraction_source.get("document_reference", {})
+                document_id = document_reference.get("id", "")
+
+                for text_description in text_descriptions:
+                    description = text_description.get("description", "")
+                    extraction_source = text_description.get("extraction_source", {})
+
+                    extracted_data.append(
+                        {
+                            "name": name,
+                            "definition": description,
+                            "document_id": document_id,
+                        }
+                    )
+
+    return extracted_data
+
+
+def organize_into_json(
+    extracted_data: List[Dict[str, str]]
+) -> Dict[str, List[Dict[str, str]]]:
+    """
+    Organizes the extracted information into a new JSON format.
+
+    Parameters:
+    - extracted_data (List[Dict[str, str]]): A list of dictionaries containing extracted information (name, definition, and document_id).
+
+    Returns:
+    - Dict[str, List[Dict[str, str]]]: A dictionary containing organized information in a new JSON format.
+    """
+    organized_data = {"variables": []}
+
+    for item in extracted_data:
+        organized_data["variables"].append(
+            {
+                "name": item["name"],
+                "definition": item["definition"],
+                "document_id": item["document_id"],
+            }
+        )
+
+    return organized_data
+
+
+def extract_var_defs_from_metions(input_file: str) -> Dict[str, List[Dict[str, str]]]:
+    """
+    Processes the input JSON file, extracts information, and writes the organized data to the output JSON file.
+
+    Parameters:
+    - input_file (str): The path to the input JSON file.
+
+    Returns:
+    - organized_data (Dict[str, List[Dict[str, str]]]): The dictionary of the variable names and their definitions.
+    """
+    try:
+        # Read the original JSON data
+        with open(input_file, "r", encoding="utf-8") as file:
+            original_data = json.load(file)
+    except FileNotFoundError:
+        print(f"Error: File '{input_file}' not found.")
+        return {}
+    except json.JSONDecodeError as e:
+        print(f"Error: JSON decoding failed. Details: {e}")
+        return {}
+
+    # Extract information
+    extracted_data = extract_var_information(original_data)
+
+    # Organize into a new JSON format
+    organized_data = organize_into_json(extracted_data)
+
+    return organized_data
 
 
 def get_seeds(
