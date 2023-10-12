@@ -416,8 +416,8 @@ def objective(
         if trial.should_prune():
             raise optuna.exceptions.TrialPruned()
 
-    # if ddp:
-    #     dist.destroy_process_group()
+    if ddp:
+        dist.destroy_process_group()
 
     time.sleep(3)
 
