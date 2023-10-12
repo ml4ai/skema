@@ -390,18 +390,25 @@ def find_definition(
     return ""
 
 
-def calculate_similarity(definition1: str, definition2: str) -> float:
+def calculate_similarity(
+    definition1: str, definition2: str, field: str = "biomedical"
+) -> float:
     """
     Calculates semantic similarity between two variable definitions using BERT embeddings.
 
     Args:
         definition1 (str): First variable definition.
         definition2 (str): Second variable definition.
+        field (str): Language model to load.
 
     Returns:
         float: Semantic similarity score between 0 and 1.
     """
-    model = SentenceTransformer("msmarco-distilbert-base-v2")
+    if field == "biomedical":
+        pre_trained_model = "allenai/biomed_roberta_base"
+    else:
+        pre_trained_model = "msmarco-distilbert-base-v2"
+    model = SentenceTransformer(pre_trained_model)
 
     # Convert definitions to BERT embeddings
     embedding1 = model.encode(definition1, convert_to_tensor=True)
