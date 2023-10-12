@@ -440,7 +440,7 @@ def tune(rank=None,):
         trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
     )
 
-    if config["ddp"] and rank==0:
+    if config["DDP"] and rank==0:
         study = optuna.create_study(direction="maximize")
         study.optimize(func, n_trials=20)
 
