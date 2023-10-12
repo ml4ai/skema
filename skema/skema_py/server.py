@@ -344,10 +344,10 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
 
 
 @router.post(
-    "/get-object-count",
+    "/gromet-object-count",
     summary=("Endpoint for counting the number of boxes, wires, and ports in a Gromet object."),
 )
-async def get_object_count(gromet_object: Dict):
+async def gromet_object_count(gromet_object: Dict):
     """
     Endpoint for counting the number of boxes, wires, and ports in a Gromet object.
     ### Python example
@@ -362,7 +362,7 @@ async def get_object_count(gromet_object: Dict):
     }
     response = client.post("/code2fn/fn-given-filepaths", json=system)
     gromet_collection = response.json()
-    response = client.post("/code2fn/get-object-count", json=gromet_collection)
+    response = client.post("/code2fn/gromet-object-count", json=gromet_collection)
     gromet_object_count = response.json()
     """
 
