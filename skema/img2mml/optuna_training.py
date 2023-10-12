@@ -419,7 +419,7 @@ def objective(
     if ddp:
         dist.destroy_process_group()
 
-    time.sleep(10)
+    time.sleep(20)
 
     bs = calculate_bleu_score()
 
