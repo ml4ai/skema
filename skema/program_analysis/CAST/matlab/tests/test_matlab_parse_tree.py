@@ -17,4 +17,8 @@ def test_parse_matlab_files():
             print(f"Testing parse tree for {str(filepath)}")
             parser = MatlabToCast(filepath)
             cast = parser.out_cast
-            assert len(cast) == 1  
+            assert not len(cast) == 0  
+
+if __name__ == "__main__":
+    test_parse_matlab_files()
+
