@@ -204,7 +204,6 @@ pub fn subgrapg2_core_dyn_MET_ast(
     for node in graph.node_indices() {
         if graph[node].labels == ["Expression"] {
             expression_nodes.push(node);
-            println!("expression node: {:?}", graph[node.clone()].id);
         }
     }
 
@@ -246,9 +245,8 @@ pub fn subgrapg2_core_dyn_MET_ast(
                 primitive_counter += 1;
             }
         }
-        println!("primtive_counter: {:?}", primitive_counter);
         if root_node.len() >= 2  || primitive_counter == 0 {
-            println!("More than one Opo! Skipping Expression!");
+            //println!("More than one Opo! Skipping Expression!");
         } else {
             core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[0]).unwrap());
         }
