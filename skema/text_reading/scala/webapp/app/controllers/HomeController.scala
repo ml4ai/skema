@@ -6,6 +6,7 @@ import org.clulab.odin.{EventMention, Mention, RelationMention, TextBoundMention
 import org.clulab.processors.{Document, Sentence}
 import org.clulab.serialization.json.stringify
 import org.ml4ai.skema.text_reading.TextReadingPipeline
+import org.clulab.pdf2txt.utils.Tokenizer
 import org.json4s.{JArray, JValue}
 import org.ml4ai.skema.text_reading.{CosmosTextReadingPipeline, TextReadingPipelineWithContext}
 import org.ml4ai.skema.text_reading.serializer.SkemaJSONSerializer
@@ -44,7 +45,7 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
   // Use this one instead of the lazy val in MireEmbeddingsGrounder or newGrounder.
   val miraEmbeddingsGrounder = TextReadingPipeline.newGrounder(fastNlpProcessorOpt, chosenEngineOpt = Some("miraembeddings"))
 
-  val processorOpt = None//Some(DocumentByWord.processor)
+  val processorOpt = Some(Tokenizer.lazyTokenizer.value.processor)
   // TODO Add the window parameter to the configuration file.
   val cosmosPipeline = new CosmosTextReadingPipeline(contextWindowSize = 3, processorOpt, odinEngineOpt, Some(miraEmbeddingsGrounder))
   // TODO Add the window parameter to the configuration file.
