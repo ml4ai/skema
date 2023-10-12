@@ -416,10 +416,10 @@ def objective(
         if trial.should_prune():
             raise optuna.exceptions.TrialPruned()
 
-    if ddp:
-        dist.destroy_process_group()
+    # if ddp:
+    #     dist.destroy_process_group()
 
-    time.sleep(20)
+    time.sleep(3)
 
     bs = calculate_bleu_score()
 
