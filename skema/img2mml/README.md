@@ -39,7 +39,6 @@ pip install -e .[img2mml]
 
 pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 torchaudio==0.13.1 --extra-index-url https://download.pytorch.org/whl/cu117
 
-python3 -m pip install -r requirements.txt
 ````
 
 ### Using conda virtual environment
@@ -49,8 +48,11 @@ conda create -n image2mathml_venv python=3.8 -y ; conda activate image2mathml_ve
 pip install -e .[img2mml]  (to ensure proper working of skema module)
 
 conda install pytorch==1.12.1 torchvision==0.13.1 torchaudio==0.12.1 cudatoolkit=11.6 -c pytorch -c conda-forge -y
+```
 
-conda install --file requirements.txt
+Finally, for both version:
+```
+python3 -m pip install -r requirements.txt
 ```
 
 To deactivate (if used pyenv to create virtual environment)
@@ -107,7 +109,7 @@ Please ensure that `data_path` and `dataset_type` are properly set under `params
 
 If only want to test the pre-trained model, change the `load_trained_model_for_testing` to true.
 
-NOTE: We always first want to preprocess Images to reject, if any, corrupt image. 
+NOTE: We always first want to preprocess Images to reject, if any, corrupt image.
 #### To preprocess images:
 ```
 python preprocessing/preprocess_images.py --config configs/xfmer_mml_config.json
