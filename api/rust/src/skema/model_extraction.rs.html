@@ -1198,6 +1198,15 @@
 <a href="#1198" id="1198">1198</a>
 <a href="#1199" id="1199">1199</a>
 <a href="#1200" id="1200">1200</a>
+<a href="#1201" id="1201">1201</a>
+<a href="#1202" id="1202">1202</a>
+<a href="#1203" id="1203">1203</a>
+<a href="#1204" id="1204">1204</a>
+<a href="#1205" id="1205">1205</a>
+<a href="#1206" id="1206">1206</a>
+<a href="#1207" id="1207">1207</a>
+<a href="#1208" id="1208">1208</a>
+<a href="#1209" id="1209">1209</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>mathml::ast::{operator::Operator, Math};
 
 <span class="kw">pub use </span>mathml::mml2pn::{ACSet, Term};
@@ -1286,7 +1295,7 @@
 }
 
 <span class="kw">pub fn </span>module_id2mathml_ast(module_id: i64, host: <span class="kw-2">&amp;</span>str) -&gt; Vec&lt;Math&gt; {
-    <span class="kw">let </span>graph = subgraph2petgraph(module_id, host); <span class="comment">// makes petgraph of graph
+    <span class="kw">let </span>_graph = subgraph2petgraph(module_id, host); <span class="comment">// makes petgraph of graph
 
     </span><span class="kw">let </span>core_id = find_pn_dynamics(module_id, host); <span class="comment">// gives back list of function nodes that might contain the dynamics
 
@@ -1437,13 +1446,16 @@
 
     <span class="kw">for </span>expr <span class="kw">in </span>trimmed_expressions_wiring.clone() {
         <span class="kw">let </span><span class="kw-2">mut </span>root_node = Vec::&lt;NodeIndex&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>primitive_counter = <span class="number">0</span>;
         <span class="kw">for </span>node_index <span class="kw">in </span>expr.clone().node_indices() {
             <span class="kw">if </span>expr[node_index].labels == [<span class="string">&quot;Opo&quot;</span>] {
                 root_node.push(node_index);
+            } <span class="kw">else if </span>expr[node_index].labels == [<span class="string">&quot;Primitive&quot;</span>] {
+                primitive_counter += <span class="number">1</span>;
             }
         }
-        <span class="kw">if </span>root_node.len() &gt;= <span class="number">2 </span>{
-            <span class="comment">// println!(&quot;More than one Opo! Skipping Expression!&quot;);
+        <span class="kw">if </span>root_node.len() &gt;= <span class="number">2 </span>|| primitive_counter == <span class="number">0 </span>{
+            <span class="comment">//println!(&quot;More than one Opo! Skipping Expression!&quot;);
         </span>} <span class="kw">else </span>{
             core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[<span class="number">0</span>]).unwrap());
         }
@@ -1632,9 +1644,15 @@
 
     <span class="comment">// fix order of args
     </span><span class="kw">let </span><span class="kw-2">mut </span>ordered_args = args.clone();
-    <span class="kw">for </span>(i, ind) <span class="kw">in </span>arg_order.iter().enumerate() {
+    <span class="comment">//println!(&quot;ordered_args: {:?}&quot;, ordered_args.clone());
+    //println!(&quot;ordered_args[0]: {:?}&quot;, ordered_args[0]);
+    //println!(&quot;ordered_args.len(): {:?}&quot;, ordered_args.len());
+    //println!(&quot;arg_order: {:?}&quot;, arg_order.clone());
+    </span><span class="kw">for </span>(i, ind) <span class="kw">in </span>arg_order.iter().enumerate() {
         <span class="comment">// the ind&#39;th element of order_args is the ith element of the unordered args
-        </span><span class="kw">let </span>_temp = std::mem::replace(<span class="kw-2">&amp;mut </span>ordered_args[<span class="kw-2">*</span>ind <span class="kw">as </span>usize], args[i].clone());
+        </span><span class="kw">if </span>ordered_args.len() &gt; <span class="kw-2">*</span>ind <span class="kw">as </span>usize {
+            <span class="kw">let </span>_temp = std::mem::replace(<span class="kw-2">&amp;mut </span>ordered_args[<span class="kw-2">*</span>ind <span class="kw">as </span>usize], args[i].clone());
+        }
     }
 
     ordered_args
