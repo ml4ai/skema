@@ -212,7 +212,7 @@ def objective(
     optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
     learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-2)
     weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-2)
-    gamma = trial.suggest_loguniform("gamma", 0.1, 0.9)
+    # gamma = trial.suggest_loguniform("gamma", 0.1, 0.9)
     batch_size = trial.suggest_int("batch_size", low=32, high=128, step=8)
     DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
     EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
@@ -239,7 +239,7 @@ def objective(
     # reduce_on_plateau_scheduler = config["ReduceLROnPlateau"]
     starting_lr = config["starting_lr"]
     step_size = config["step_size"]
-    # gamma = config["gamma"]
+    gamma = config["gamma"]
     CLIP = config["clip"]
     SEED = config["seed"]
     model_type = config["model_type"]
