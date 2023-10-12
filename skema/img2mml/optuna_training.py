@@ -465,7 +465,7 @@ def tune(rank=None,):
         for key, value in trial.params.items():
             print("    {}: {}".format(key, value))
     else:
-        pritn(rank)
+        print(rank)
 
 
 # for DDP
