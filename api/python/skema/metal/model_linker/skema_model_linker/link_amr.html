@@ -35,6 +35,7 @@ import fire.fire_test
 from askem_extractions.data_model import AttributeCollection
 
 from .linkers import PetriNetLinker, RegNetLinker
+import itertools as it
 
 def replace_xml_codepoints(json):
     &#34;&#34;&#34; Looks for xml special characters and substitutes them with their unicode character &#34;&#34;&#34;
@@ -74,7 +75,18 @@ def link_amr(
         if clean_xml_codepoints:
             amr = replace_xml_codepoints(amr)
 
-    extractions = AttributeCollection.from_json(attribute_collection)
+    # Handle extractions from the SKEMA service or directly from the library
+    try:
+        extractions = AttributeCollection.from_json(attribute_collection)
+    except KeyError:
+        with open(attribute_collection) as f:
+            service_output = json.load(f)
+            collections = list()
+            for collection in service_output[&#39;outputs&#39;]:
+                collection = AttributeCollection.from_json(collection[&#39;data&#39;])
+                collections.append(collection)
+
+            extractions = AttributeCollection(attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
     linker = Linker(model_name=similarity_model, device=device, sim_threshold=similarity_threshold)
 
@@ -137,7 +149,18 @@ if __name__ == &#34;__main__&#34;:
         if clean_xml_codepoints:
             amr = replace_xml_codepoints(amr)
 
-    extractions = AttributeCollection.from_json(attribute_collection)
+    # Handle extractions from the SKEMA service or directly from the library
+    try:
+        extractions = AttributeCollection.from_json(attribute_collection)
+    except KeyError:
+        with open(attribute_collection) as f:
+            service_output = json.load(f)
+            collections = list()
+            for collection in service_output[&#39;outputs&#39;]:
+                collection = AttributeCollection.from_json(collection[&#39;data&#39;])
+                collections.append(collection)
+
+            extractions = AttributeCollection(attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
     linker = Linker(model_name=similarity_model, device=device, sim_threshold=similarity_threshold)
 

@@ -166,6 +166,6 @@ var srcIndex = JSON.parse('{\
 "walkdir":["",[],["dent.rs","error.rs","lib.rs","util.rs"]],\
 "zstd":["",[["bulk",[],["compressor.rs","decompressor.rs","mod.rs"]],["stream",[["read",[],["mod.rs"]],["write",[],["mod.rs"]],["zio",[],["mod.rs","reader.rs","writer.rs"]]],["functions.rs","mod.rs","raw.rs"]]],["dict.rs","lib.rs"]],\
 "zstd_safe":["",[],["constants.rs","lib.rs"]],\
-"zstd_sys":["",[],["bindings_zdict_std.rs","bindings_zstd_std.rs","lib.rs"]]\
+"zstd_sys":["",[],["bindings_zdict.rs","bindings_zstd.rs","lib.rs"]]\
 }');
 createSrcSidebar();
