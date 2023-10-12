@@ -1,10 +1,10 @@
 package org.ml4ai.skema.text_reading
 
 import org.clulab.odin.Mention
-import org.clulab.pdf2txt.Pdf2txt
-import org.clulab.pdf2txt.common.pdf.TextConverter
-import org.clulab.pdf2txt.languageModel.GigawordLanguageModel
-import org.clulab.pdf2txt.preprocessor._
+//import org.clulab.pdf2txt.Pdf2txt
+//import org.clulab.pdf2txt.common.pdf.TextConverter
+//import org.clulab.pdf2txt.languageModel.GigawordLanguageModel
+//import org.clulab.pdf2txt.preprocessor._
 import org.clulab.processors.Processor
 import org.ml4ai.skema.text_reading.attachments.MentionLocationAttachment
 import org.ml4ai.skema.text_reading.data.CosmosJsonDataLoader
@@ -18,20 +18,20 @@ class CosmosTextReadingPipeline(contextWindowSize: Int, processorOpt: Option[Pro
     extends TextReadingPipeline(processorOpt, odinEngineOpt, grounderOpt) {
 
   // PDF converted to fix pdf tokenization artifacts
-  private val pdfConverter = new TextConverter()
-  private val languageModel = GigawordLanguageModel()
-  private val preprocessors = Array(
-    new LinePreprocessor(),
-    new ParagraphPreprocessor(),
-    new UnicodePreprocessor(),
-    new CasePreprocessor(CasePreprocessor.defaultCutoff),
-    new NumberPreprocessor(NumberPreprocessor.Hyperparameters()),
-    new LigaturePreprocessor(languageModel),
-    new LineBreakPreprocessor(languageModel),
-    new WordBreakByHyphenPreprocessor(),
-    // new WordBreakBySpacePreprocessor(languageModel) // This is by default NeverLanguageModel.
-  )
-  val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
+//  private val pdfConverter = new TextConverter()
+//  private val languageModel = GigawordLanguageModel()
+//  private val preprocessors = Array(
+//    new LinePreprocessor(),
+//    new ParagraphPreprocessor(),
+//    new UnicodePreprocessor(),
+//    new CasePreprocessor(CasePreprocessor.defaultCutoff),
+//    new NumberPreprocessor(NumberPreprocessor.Hyperparameters()),
+//    new LigaturePreprocessor(languageModel),
+//    new LineBreakPreprocessor(languageModel),
+//    new WordBreakByHyphenPreprocessor(),
+//    // new WordBreakBySpacePreprocessor(languageModel) // This is by default NeverLanguageModel.
+//  )
+//  val pdf2txt = new Pdf2txt(pdfConverter, preprocessors)
   ////
 
 
@@ -58,7 +58,7 @@ class CosmosTextReadingPipeline(contextWindowSize: Int, processorOpt: Option[Pro
       val Array(rawText, filename) = tf.split(jsonSeparator)
       // Extract mentions and apply grounding
 
-      val text = pdf2txt.process(rawText, maxLoops = 1)
+      val text = rawText//pdf2txt.process(rawText, maxLoops = 1)
       this.extractMentions(text, Some(filename))._2
 
     }

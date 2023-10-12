@@ -1,5 +1,4 @@
 package org.ml4ai.skema.text_reading.scenario_context
-import org.apache.poi.openxml4j.exceptions.InvalidOperationException
 import org.clulab.odin.Mention
 import org.ml4ai.skema.text_reading.attachments.MentionLocationAttachment
 
@@ -20,7 +19,7 @@ class CosmosOrderer(ms:Iterable[Mention]) extends MentionOrderer {
     ms.toSeq.map(
       m => {
         if (!m.attachments.exists(_.isInstanceOf[MentionLocationAttachment]))
-          throw new InvalidOperationException("Mention without MentionLocationAttachment")
+          throw new IllegalStateException("Mention without MentionLocationAttachment")
 
         val location = getMentionLocation(m)
         val page = location.pageNum.head

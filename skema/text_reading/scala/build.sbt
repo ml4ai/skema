@@ -9,7 +9,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   val breezeVer = "1.2"
-  val procVer = "8.5.3"
+  val procVer = "8.5.4-SNAPSHOT"
   val uJsonVer = "2.0.0"
 
   Seq(
@@ -21,7 +21,7 @@ libraryDependencies ++= {
     "org.clulab"                 %% "epidemiology-embeddings-model-ser"   % "1.0.0",
 //    "org.clulab"                  % "spaceweather-model-unigram-ser"      % "1.0.0",
     "org.clulab"                  % "glove-840b-300d"                     % "0.1.0" % Test,
-    "org.clulab"                 %% "pdf2txt"                             % "1.1.3",
+//    "org.clulab"                 %% "pdf2txt"                             % "1.1.3",
     "com.typesafe.play"          %% "play-json"                           % "2.9.3",
     "org.clulab"                 %% "processors-main"                     % procVer,
     "org.clulab"                 %% "processors-corenlp"                  % procVer,
@@ -35,6 +35,8 @@ libraryDependencies ++= {
     "xml-apis"                    % "xml-apis"                            % "1.4.01",
     "com.github.scopt"           %% "scopt"                               % "4.1.0",
     "com.lihaoyi"                %% "requests"                            % "0.1.8",
+    "com.typesafe.scala-logging" %% "scala-logging" % "3.9.3",
+    "ch.qos.logback" % "logback-classic" % "1.2.3"
   )
 }
 

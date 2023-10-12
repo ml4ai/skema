@@ -3,7 +3,7 @@ package org.ml4ai.skema.text_reading.grounding
 import breeze.linalg.DenseVector
 import MiraEmbeddingsGrounder.generateNormalizedEmbedding
 import org.clulab.processors.Processor
-import org.clulab.processors.clu.CluProcessor
+import org.clulab.processors.clu.BalaurProcessor
 
 import scala.collection.mutable
 // to import all packages in linalg
@@ -78,7 +78,7 @@ object MiraEmbeddingsGrounder{
 
   // This is held in reserve and only created if necessary.
   lazy val processor = {
-    new CluProcessor()
+    new BalaurProcessor()
   }
 
   /**

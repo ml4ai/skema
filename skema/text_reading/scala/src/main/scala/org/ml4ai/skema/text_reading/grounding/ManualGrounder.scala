@@ -1,9 +1,10 @@
 package org.ml4ai.skema.text_reading.grounding
 
-import org.clulab.dynet.Utils.newSource
 import org.clulab.processors.Processor
 
+import java.io.{File, FileNotFoundException}
 import scala.collection.mutable
+import scala.io.Source
 import scala.util.control.Breaks._
 
 /**
@@ -54,6 +55,24 @@ class ManualGrounder(targetEntries:Iterable[ManualGroundingEntry], processor:Pro
 }
 
 object ManualGrounder {
+
+  def newSource(filename: String): Source = {
+    val f = new File(filename)
+    if (f.exists()) {
+      // This file exists on disk.
+      Source.fromFile(filename, "UTF-8")
+    } else {
+      // The file does not exist on disk.  Let's hope it's in the classpath.
+      // This should work for both scala 2.11 and 2.12.
+      // The resource will be null if it isn't found, so use an Option!
+      val inputStreamOpt = Option(getClass.getResourceAsStream("/" + filename))
+      val sourceOpt = inputStreamOpt.map(Source.fromInputStream)
+      // This only works for scala 2.12, so we can't cross compile with 2.11.
+      // Source.fromResource(filename)
+      sourceOpt.getOrElse(throw new FileNotFoundException(s"""Could not find resource "$filename"."""))
+    }
+  }
+
   /**
     * Builds a manual grounder from a collection of phrases and grounding ids in a file or resource
     * @param path to the file or resource with the grounding phrases
