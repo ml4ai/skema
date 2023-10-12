@@ -41,12 +41,12 @@
 "beta_1":0.9,
 "beta_2":0.999,
 "learning_rate":0.00017157810468937788,
-"weight_decay": 3.19487e-05,
+"weight_decay": 3.19487e-04,
 
 
 "__":"if want to scheduler. Options: {step_lr, exp_lr, reduce_lr, cycle_lr}",
-"isScheduler":false,
-"whichScheduler":"reduce_lr",
+"isScheduler":true,
+"whichScheduler":"step_lr",
 
 "__":"params for cycle_lr",
 "base_lr":0.0003,
@@ -57,8 +57,8 @@
 
 "--": "these params are for step_lr, and reduce_lr only",
 "starting_lr":0.001,
-"step_size":3,
-"gamma":0.5,
+"step_size":10,
+"gamma":0.1715,
 "dropout":0.2,
 
 "_comment_":"encoder params",
@@ -71,7 +71,7 @@
 
 "_comment_":"decoder params",
 "embedding_dim":128,
-"decoder_hid_dim":320,
+"decoder_hid_dim":512,
 "n_xfmer_decoder_layers":6,
 
 "_comment_":"training/testing params",
