@@ -1,7 +1,7 @@
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from pathlib import Path
 
-# Test the CAST returned by processing a single line MATLAB source file
+# Test the CAST returned by processing the simplest MATLAB assignment
 
 # The source code for the single line assignment test is 'x = 5'
 # The correct CAST for this single line assignment would be a single node: 
@@ -10,9 +10,9 @@ from pathlib import Path
 #   right.value '5'
 #   right.value_type 'Integer'
 
-def test_single_assignment():
+def test_assignment():
     """ Tests whether the parser can handle a single assignment statement """
-    filepath = Path(__file__).parent / "data" / "single_line_assignment.m"
+    filepath = Path(__file__).parent / "data" / "assignment.m"
     print(f"Testing parse tree for {str(filepath)}")
     parser = MatlabToCast(filepath)
     cast = parser.out_cast
@@ -37,3 +37,6 @@ def test_single_assignment():
     assert module['left']['val']['name'] == 'x'
     assert module['right']['value_type'] == 'Integer'
     assert module['right']['value'] == '5'
+
+if __name__ == "__main__":
+    test_assignment()
