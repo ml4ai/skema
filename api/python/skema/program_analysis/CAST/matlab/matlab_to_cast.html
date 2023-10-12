@@ -37,35 +37,35 @@ from tree_sitter import Language, Parser, Node, Tree
 
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
-    Module,
-    SourceRef,
     Assignment,
+    AstNode,
+    Attribute,
+    Call,
+    FunctionDef,
     LiteralValue,
-    Var,
-    VarType,
+    Loop,
+    ModelIf,
+    ModelImport,
+    ModelReturn,
+    Module,
     Name,
     Operator,
-    AstNode,
-    SourceCodeDataType,
-    ModelImport,
-    FunctionDef,
-    Loop,
-    Call,
-    ModelReturn,
-    ModelIf,
     RecordDef,
-    Attribute,
+    SourceCodeDataType,
+    SourceRef,
+    Var,
+    VarType,
 )
 
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
-    NodeHelper,
     get_children_by_types,
-    get_first_child_by_type,
     get_control_children,
-    get_non_control_children,
+    get_first_child_by_type,
     get_first_child_index,
     get_last_child_index,
+    get_non_control_children,
+    NodeHelper,
 )
 
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
@@ -148,12 +148,12 @@ class MatlabToCast(object):
         elif node.type == &#34;variable_declaration&#34;:
             return self.visit_variable_declaration(node)
         elif node.type == &#34;assignment&#34;:
-            return self.visit_assignment_statement(node)
+            return self.visit_assignment(node)
         elif node.type == &#34;identifier&#34;:
             return self.visit_identifier(node)
         elif node.type == &#34;name&#34;:
             return self.visit_name(node)
-        elif node.type in [&#34;math_expression&#34;, &#34;relational_expression&#34;]:
+        elif node.type in [&#34;binary_operator&#34;, &#34;math_expression&#34;, &#34;relational_expression&#34;]:
             return self.visit_math_expression(node)
         elif node.type in [&#34;number&#34;, &#34;array&#34;, &#34;string&#34;, &#34;boolean&#34;]:
             return self.visit_literal(node)
@@ -647,9 +647,9 @@ class MatlabToCast(object):
             orelse=orelse,
         )
 
-    def visit_assignment_statement(self, node):
+    def visit_assignment(self, node):
         &#34;&#34;&#34;Docstring&#34;&#34;&#34;
-        # print(&#39;visit_assignment_statement&#39;)
+        # print(&#39;visit_assignment&#39;)
         left, _, right = node.children
 
         return Assignment(
@@ -771,7 +771,7 @@ class MatlabToCast(object):
                 (qualifier)
                 (value)
             (identifier) ...
-            (assignment_statement) ...
+            (assignment) ...
 
         (variable_declaration)
             (derived_type)
@@ -815,13 +815,13 @@ class MatlabToCast(object):
             node,
             [
                 &#34;identifier&#34;,  # Variable declaration
-                &#34;assignment_statement&#34;,  # Variable assignment
+                &#34;assignment&#34;,  # Variable assignment
                 &#34;call_expression&#34;,  # Dimension without intent
             ],
         )
         vars = []
         for variable in definied_variables:
-            if variable.type == &#34;assignment_statement&#34;:
+            if variable.type == &#34;assignment&#34;:
                 if variable.children[0].type == &#34;call_expression&#34;:
                     vars.append(
                         Assignment(
@@ -1064,7 +1064,7 @@ class MatlabToCast(object):
         &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         # print(&#39;_visit_set&#39;)
         # Node structure
-        # (assignment_statement)
+        # (assignment)
         #  (call_expression)
         #  (right side)
 
@@ -1263,12 +1263,12 @@ class MatlabToCast(object):
         elif node.type == &#34;variable_declaration&#34;:
             return self.visit_variable_declaration(node)
         elif node.type == &#34;assignment&#34;:
-            return self.visit_assignment_statement(node)
+            return self.visit_assignment(node)
         elif node.type == &#34;identifier&#34;:
             return self.visit_identifier(node)
         elif node.type == &#34;name&#34;:
             return self.visit_name(node)
-        elif node.type in [&#34;math_expression&#34;, &#34;relational_expression&#34;]:
+        elif node.type in [&#34;binary_operator&#34;, &#34;math_expression&#34;, &#34;relational_expression&#34;]:
             return self.visit_math_expression(node)
         elif node.type in [&#34;number&#34;, &#34;array&#34;, &#34;string&#34;, &#34;boolean&#34;]:
             return self.visit_literal(node)
@@ -1762,9 +1762,9 @@ class MatlabToCast(object):
             orelse=orelse,
         )
 
-    def visit_assignment_statement(self, node):
+    def visit_assignment(self, node):
         &#34;&#34;&#34;Docstring&#34;&#34;&#34;
-        # print(&#39;visit_assignment_statement&#39;)
+        # print(&#39;visit_assignment&#39;)
         left, _, right = node.children
 
         return Assignment(
@@ -1886,7 +1886,7 @@ class MatlabToCast(object):
                 (qualifier)
                 (value)
             (identifier) ...
-            (assignment_statement) ...
+            (assignment) ...
 
         (variable_declaration)
             (derived_type)
@@ -1930,13 +1930,13 @@ class MatlabToCast(object):
             node,
             [
                 &#34;identifier&#34;,  # Variable declaration
-                &#34;assignment_statement&#34;,  # Variable assignment
+                &#34;assignment&#34;,  # Variable assignment
                 &#34;call_expression&#34;,  # Dimension without intent
             ],
         )
         vars = []
         for variable in definied_variables:
-            if variable.type == &#34;assignment_statement&#34;:
+            if variable.type == &#34;assignment&#34;:
                 if variable.children[0].type == &#34;call_expression&#34;:
                     vars.append(
                         Assignment(
@@ -2179,7 +2179,7 @@ class MatlabToCast(object):
         &#34;&#34;&#34;Docstring&#34;&#34;&#34;
         # print(&#39;_visit_set&#39;)
         # Node structure
-        # (assignment_statement)
+        # (assignment)
         #  (call_expression)
         #  (right side)
 
@@ -2386,12 +2386,12 @@ class MatlabToCast(object):
     elif node.type == &#34;variable_declaration&#34;:
         return self.visit_variable_declaration(node)
     elif node.type == &#34;assignment&#34;:
-        return self.visit_assignment_statement(node)
+        return self.visit_assignment(node)
     elif node.type == &#34;identifier&#34;:
         return self.visit_identifier(node)
     elif node.type == &#34;name&#34;:
         return self.visit_name(node)
-    elif node.type in [&#34;math_expression&#34;, &#34;relational_expression&#34;]:
+    elif node.type in [&#34;binary_operator&#34;, &#34;math_expression&#34;, &#34;relational_expression&#34;]:
         return self.visit_math_expression(node)
     elif node.type in [&#34;number&#34;, &#34;array&#34;, &#34;string&#34;, &#34;boolean&#34;]:
         return self.visit_literal(node)
@@ -2411,8 +2411,8 @@ class MatlabToCast(object):
         return self._visit_passthrough(node)</code></pre>
 </details>
 </dd>
-<dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_assignment_statement"><code class="name flex">
-<span>def <span class="ident">visit_assignment_statement</span></span>(<span>self, node)</span>
+<dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_assignment"><code class="name flex">
+<span>def <span class="ident">visit_assignment</span></span>(<span>self, node)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Docstring</p></div>
@@ -2420,9 +2420,9 @@ class MatlabToCast(object):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def visit_assignment_statement(self, node):
+<pre><code class="python">def visit_assignment(self, node):
     &#34;&#34;&#34;Docstring&#34;&#34;&#34;
-    # print(&#39;visit_assignment_statement&#39;)
+    # print(&#39;visit_assignment&#39;)
     left, _, right = node.children
 
     return Assignment(
@@ -3329,7 +3329,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
             (qualifier)
             (value)
         (identifier) ...
-        (assignment_statement) ...
+        (assignment) ...
 
     (variable_declaration)
         (derived_type)
@@ -3373,13 +3373,13 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
         node,
         [
             &#34;identifier&#34;,  # Variable declaration
-            &#34;assignment_statement&#34;,  # Variable assignment
+            &#34;assignment&#34;,  # Variable assignment
             &#34;call_expression&#34;,  # Dimension without intent
         ],
     )
     vars = []
     for variable in definied_variables:
-        if variable.type == &#34;assignment_statement&#34;:
+        if variable.type == &#34;assignment&#34;:
             if variable.children[0].type == &#34;call_expression&#34;:
                 vars.append(
                     Assignment(
@@ -3452,7 +3452,7 @@ The do while loop will be passed off to a seperate visitor. Returns a Loop objec
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.get_gromet_function_node" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.get_gromet_function_node">get_gromet_function_node</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.run" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.run">run</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit">visit</a></code></li>
-<li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_assignment_statement" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_assignment_statement">visit_assignment_statement</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_assignment" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_assignment">visit_assignment</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_derived_type" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_derived_type">visit_derived_type</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_derived_type_member_expression" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_derived_type_member_expression">visit_derived_type_member_expression</a></code></li>
 <li><code><a title="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_do_loop_statement" href="#skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast.visit_do_loop_statement">visit_do_loop_statement</a></code></li>
