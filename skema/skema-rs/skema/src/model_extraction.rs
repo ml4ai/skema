@@ -245,7 +245,7 @@ pub fn subgrapg2_core_dyn_MET_ast(
                 primitive_counter += 1;
             }
         }
-        if root_node.len() >= 2  || primitive_counter == 0 {
+        if root_node.len() >= 2 || primitive_counter == 0 {
             //println!("More than one Opo! Skipping Expression!");
         } else {
             core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[0]).unwrap());

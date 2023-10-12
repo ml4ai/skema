@@ -1434,7 +1434,7 @@ pub fn create_function(
 
             let mut new_c_args = c_args.clone();
             new_c_args.parent_node = n1.clone();
-            new_c_args.att_bf_idx = c_args.att_idx; // This is the parent index 
+            new_c_args.att_bf_idx = c_args.att_idx; // This is the parent index
 
             // construct opo nodes, if not none, might need to
             create_opo(
@@ -1516,7 +1516,7 @@ pub fn create_function(
                         );
                     }
                     FunctionType::Abstract => {
-                        create_att_abstract(                            
+                        create_att_abstract(
                             gromet, // gromet for metadata
                             nodes,  // nodes
                             edges,
@@ -1525,7 +1525,9 @@ pub fn create_function(
                             new_c_args.clone(),
                         );
                     }
-                    _ => {println!("Missing a box in a function!");}
+                    _ => {
+                        println!("Missing a box in a function!");
+                    }
                 }
                 box_counter += 1;
                 *start += 1;
@@ -2984,7 +2986,8 @@ pub fn create_att_expression(
     let att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone(); // current expression attribute
     let mut parent_att_box = att_box.clone();
     if c_args.att_bf_idx != 0 {
-        parent_att_box = gromet.modules[0].attributes[c_args.att_bf_idx - 1].clone(); // parent attribute
+        parent_att_box = gromet.modules[0].attributes[c_args.att_bf_idx - 1].clone();
+    // parent attribute
     } else {
         parent_att_box = gromet.modules[0].r#fn.clone();
     }
@@ -3106,7 +3109,9 @@ pub fn create_att_expression(
                         let src_pif = parent_att_box.pif.clone().unwrap()[wire_src - 1].clone();
                         let tgt_pof = parent_att_box.pof.clone().unwrap()[wire_tgt - 1].clone();
                         // if pif matches this opi
-                        if src_pif.r#box as usize == c_args.box_counter && src_pif.id.unwrap() as usize == j + 1 {
+                        if src_pif.r#box as usize == c_args.box_counter
+                            && src_pif.id.unwrap() as usize == j + 1
+                        {
                             // wire tgt is unpack
                             if tgt_pof.r#box as usize == unpack_box {
                                 opi_name.push(tgt_pof.name.unwrap().clone());
@@ -3606,7 +3611,7 @@ pub fn create_att_primitive(
 }
 
 // This constructs abtract nodes (Primarily packs and unpacks)
-// I continue to treat these as a Primitive nodes to simplify the wiring. 
+// I continue to treat these as a Primitive nodes to simplify the wiring.
 pub fn create_att_abstract(
     gromet: &ModuleCollection, // needed still for metadata unfortunately
     nodes: &mut Vec<Node>,
@@ -4560,7 +4565,8 @@ pub fn wfopo_cross_att_wiring(
                 // make sure in correct box
                 if tgt_nbox == node.nbox as u8 {
                     // make sure only looking in current attribute nodes for srcs and tgts
-                    if tgt_att == node.contents as u32 && (tgt_box as u32) == node.box_counter as u32
+                    if tgt_att == node.contents as u32
+                        && (tgt_box as u32) == node.box_counter as u32
                     {
                         // only opo's
                         if node.n_type == "Opo" {
