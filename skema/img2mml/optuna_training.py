@@ -468,7 +468,7 @@ def tune(rank=None,):
 if __name__ == "__main__":
     if config["DDP"]:
         os.environ["MASTER_ADDR"] = "localhost"
-        os.environ["MASTER_PORT"] = "29890"
+        os.environ["MASTER_PORT"] = "29880"
         world_size = config["world_size"]
         os.environ["NCCL_DEBUG"] = "INFO"
         os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
