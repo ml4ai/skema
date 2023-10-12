@@ -28,7 +28,7 @@
 "padding":8,
 "resizing_factor":0.5,
 "max_input_hgt":100,
-"batch_size":64,
+"batch_size":104,
 "max_len": 350,
 "vocab_freq":5,
 "shuffle":true,
@@ -40,8 +40,8 @@
 "momentum":0.9,
 "beta_1":0.9,
 "beta_2":0.999,
-"learning_rate":0.0007,
-"weight_decay": 5e-04,
+"learning_rate":0.0008904877609177206,
+"weight_decay": 5.432078106949899e-06,
 
 
 "__":"if want to scheduler. Options: {step_lr, exp_lr, reduce_lr, cycle_lr}",
@@ -62,17 +62,17 @@
 "dropout":0.2,
 
 "_comment_":"encoder params",
-"encoder_dim":256,
+"encoder_dim":192,
 "input_channels":3,
 "encoding_type":"positional_encoding",
-"n_xfmer_heads":4,
+"n_xfmer_heads":8,
 "n_xfmer_encoder_layers":6,
-"dim_feedforward_for_xfmer":128,
+"dim_feedforward_for_xfmer":384,
 
 "_comment_":"decoder params",
-"embedding_dim":128,
-"decoder_hid_dim":256,
-"n_xfmer_decoder_layers":4,
+"embedding_dim":384,
+"decoder_hid_dim":320,
+"n_xfmer_decoder_layers":8,
 
 "_comment_":"training/testing params",
 "clip":1,
