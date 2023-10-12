@@ -440,17 +440,18 @@ def tune(rank=None,):
         trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
     )
 
+
+    study = optuna.create_study(direction="maximize")
+    study.optimize(func, n_trials=20)
+
+    pruned_trials = study.get_trials(
+        deepcopy=False, states=[TrialState.PRUNED]
+    )
+    complete_trials = study.get_trials(
+        deepcopy=False, states=[TrialState.COMPLETE]
+    )
+
     if config["DDP"] and rank==0:
-        study = optuna.create_study(direction="maximize")
-        study.optimize(func, n_trials=20)
-
-        pruned_trials = study.get_trials(
-            deepcopy=False, states=[TrialState.PRUNED]
-        )
-        complete_trials = study.get_trials(
-            deepcopy=False, states=[TrialState.COMPLETE]
-        )
-
         print("Study statistics: ")
         print("  Number of finished trials: ", len(study.trials))
         print("  Number of pruned trials: ", len(pruned_trials))
