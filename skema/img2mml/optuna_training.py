@@ -440,32 +440,30 @@ def tune(rank=None,):
         trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
     )
 
-    if rank==0:
-        study = optuna.create_study(direction="maximize")
-        study.optimize(func, n_trials=20)
 
-        pruned_trials = study.get_trials(
-            deepcopy=False, states=[TrialState.PRUNED]
-        )
-        complete_trials = study.get_trials(
-            deepcopy=False, states=[TrialState.COMPLETE]
-        )
+    study = optuna.create_study(direction="maximize")
+    study.optimize(func, n_trials=20)
 
-        print("Study statistics: ")
-        print("  Number of finished trials: ", len(study.trials))
-        print("  Number of pruned trials: ", len(pruned_trials))
-        print("  Number of complete trials: ", len(complete_trials))
+    pruned_trials = study.get_trials(
+        deepcopy=False, states=[TrialState.PRUNED]
+    )
+    complete_trials = study.get_trials(
+        deepcopy=False, states=[TrialState.COMPLETE]
+    )
 
-        print("Best trial:")
-        trial = study.best_trial
+    print("Study statistics: ")
+    print("  Number of finished trials: ", len(study.trials))
+    print("  Number of pruned trials: ", len(pruned_trials))
+    print("  Number of complete trials: ", len(complete_trials))
 
-        print("  Value: ", trial.value)
+    print("Best trial:")
+    trial = study.best_trial
 
-        print("  Params: ")
-        for key, value in trial.params.items():
-            print("    {}: {}".format(key, value))
-    else:
-        print(rank)
+    print("  Value: ", trial.value)
+
+    print("  Params: ")
+    for key, value in trial.params.items():
+        print("    {}: {}".format(key, value))
 
 
 # for DDP
