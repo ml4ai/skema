@@ -212,21 +212,21 @@ def objective(
     optimizer_type = trial.suggest_categorical("optimizer_type", ["Adam"])
     learning_rate = trial.suggest_loguniform("lr", 1e-5, 1e-2)
     weight_decay = trial.suggest_loguniform("weight_decay", 1e-6, 1e-2)
-    gamma = trial.suggest_loguniform("gamma", 0.1, 0.999)
-    batch_size = trial.suggest_int("DEC_HID_DIM", low=8, high=64, step=8)
+    gamma = trial.suggest_loguniform("gamma", 0.1, 0.9)
+    batch_size = trial.suggest_int("batch_size", low=32, high=128, step=8)
     DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
     EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
     ENC_DIM = trial.suggest_int("ENC_DIM", low=64, high=512, step=64)
     DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=256)
     if optimizer_type == "Adam":
-        beta_1 = 0.9#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
-        beta_2 = 0.999#trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
+        beta_1 = 0.7#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
+        beta_2 = 0.9#trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
 
     # transformers params
-    DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=512, step=64)#config["dim_feedforward_for_xfmer"]
+    DIM_FEEDFWD = trial.suggest_int("dim_ff_xfmer", low=64, high=1024, step=64)#config["dim_feedforward_for_xfmer"]
     N_HEADS = trial.suggest_int("n_heads", low=2, high=8, step=2)#config["n_xfmer_heads"]
-    N_XFMER_ENCODER_LAYERS = trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
-    N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=1, high=8, step=1)#config["n_xfmer_decoder_layers"]
+    N_XFMER_ENCODER_LAYERS = 6#trial.suggest_int("n_enc_layer", low=1, high=8, step=1)#config["n_xfmer_encoder_layers"]
+    N_XFMER_DECODER_LAYERS = trial.suggest_int("n_dec_layer", low=2, high=8, step=1)#config["n_xfmer_decoder_layers"]
 
     EPOCHS = config["epochs"]
     # batch_size = config["batch_size"]
@@ -328,7 +328,7 @@ def objective(
     isScheduler = False
     scheduler = None
     if step_scheduler or exponential_scheduler:
-        _lr = starting_lr 
+        _lr = starting_lr
         isScheduler = True
     else:
         _lr = learning_rate
@@ -350,15 +350,15 @@ def objective(
     # which scheduler, if using
     if step_scheduler:
         scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer, 
-            step_size=step_size, 
+            optimizer,
+            step_size=step_size,
             gamma=gamma,
         )
     elif exponential_scheduler:
         scheduler = torch.optim.lr_scheduler.ExponentialLR(
-            optimizer, 
-            gamma=gamma, 
-            last_epoch=-1, 
+            optimizer,
+            gamma=gamma,
+            last_epoch=-1,
             verbose=False,
         )
 
@@ -416,7 +416,7 @@ def objective(
         dist.destroy_process_group()
 
     time.sleep(3)
-    
+
     bs = calculate_bleu_score()
 
     return bs
