@@ -428,8 +428,6 @@ def objective(
 
 def tune(rank=None,):
 
-    os.environ["NCCL_DEBUG"] = "INFO"
-
     config["rank"] = rank
     (
         train_dataloader,
@@ -442,34 +440,36 @@ def tune(rank=None,):
         trial, train_dataloader, test_dataloader, val_dataloader, vocab, rank
     )
 
-    study = optuna.create_study(direction="maximize")
-    study.optimize(func, n_trials=20)
+    if rank==0:
+        study = optuna.create_study(direction="maximize")
+        study.optimize(func, n_trials=20)
 
-    pruned_trials = study.get_trials(
-        deepcopy=False, states=[TrialState.PRUNED]
-    )
-    complete_trials = study.get_trials(
-        deepcopy=False, states=[TrialState.COMPLETE]
-    )
+        pruned_trials = study.get_trials(
+            deepcopy=False, states=[TrialState.PRUNED]
+        )
+        complete_trials = study.get_trials(
+            deepcopy=False, states=[TrialState.COMPLETE]
+        )
 
-    print("Study statistics: ")
-    print("  Number of finished trials: ", len(study.trials))
-    print("  Number of pruned trials: ", len(pruned_trials))
-    print("  Number of complete trials: ", len(complete_trials))
+        print("Study statistics: ")
+        print("  Number of finished trials: ", len(study.trials))
+        print("  Number of pruned trials: ", len(pruned_trials))
+        print("  Number of complete trials: ", len(complete_trials))
 
-    print("Best trial:")
-    trial = study.best_trial
+        print("Best trial:")
+        trial = study.best_trial
 
-    print("  Value: ", trial.value)
+        print("  Value: ", trial.value)
 
-    print("  Params: ")
-    for key, value in trial.params.items():
-        print("    {}: {}".format(key, value))
+        print("  Params: ")
+        for key, value in trial.params.items():
+            print("    {}: {}".format(key, value))
 
 
 # for DDP
 def ddp_main():
     world_size = config["world_size"]
+    os.environ["NCCL_DEBUG"] = "INFO"
     os.environ["CUDA_VISIBLE_DEVICES"] = config["DDP gpus"]
     mp.spawn(tune, args=(), nprocs=world_size, join=True)
 
