@@ -94,13 +94,6 @@
 <a href="#94" id="94">94</a>
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
-<a href="#99" id="99">99</a>
-<a href="#100" id="100">100</a>
-<a href="#101" id="101">101</a>
-<a href="#102" id="102">102</a>
-<a href="#103" id="103">103</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 
 <span class="kw">use </span>mathml::mml2pn::get_mathml_asts_from_file;
@@ -108,7 +101,7 @@
 
 <span class="comment">// new imports
 </span><span class="kw">use </span>mathml::acset::{PetriNet, RegNet};
-
+<span class="kw">use </span>mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 <span class="kw">use </span>skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
 
 <span class="attr">#[derive(Parser, Debug)]
@@ -141,24 +134,24 @@
 
         <span class="kw">let </span>host = <span class="string">&quot;localhost&quot;</span>;
 
-        <span class="kw">let </span>math_content = module_id2mathml_MET_ast(module_id, host);
+        <span class="comment">//let math_content = module_id2mathml_MET_ast(module_id, host);
 
-        <span class="comment">//let input_src = &quot;../../data/mml2pn_inputs/testing_eqns/mml_list3.txt&quot;;
+        </span><span class="kw">let </span>input_src = <span class="string">&quot;../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt&quot;</span>;
 
-        // This does get a panic with a message, so need to figure out how to forward it
+        <span class="comment">// This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
 
-        //let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
+        </span><span class="kw">let </span>odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
-        //println!(&quot;\nmath_content: {:?}&quot;, math_content);
+        <span class="comment">//println!(&quot;\nmath_content: {:?}&quot;, math_content);
         //println!(&quot;\nmathml_ast: {:?}&quot;, odes);
 
-        /*println!(
-            &quot;\nAMR from mathml: {}\n&quot;,
-            serde_json::to_string(&amp;PetriNet::from(odes)).unwrap()
-        );*/
-        </span><span class="macro">println!</span>(<span class="string">&quot;\nAMR from code: {:?}&quot;</span>, PetriNet::from(math_content));
-    }
+        </span><span class="macro">println!</span>(
+            <span class="string">&quot;\nAMR from mathml: {}\n&quot;</span>,
+            serde_json::to_string(<span class="kw-2">&amp;</span>PetriNet::from(odes)).unwrap()
+        );
+        <span class="comment">//println!(&quot;\nAMR from code: {:?}&quot;, PetriNet::from(math_content));
+    </span>}
     <span class="comment">// This is the graph id for the top level function for the core dynamics for our test case.
     </span><span class="kw">else if </span>new_args.arg == <span class="kw-2">*</span><span class="string">&quot;manual&quot; </span>{
         <span class="comment">// still need to grab the module id
@@ -179,13 +172,6 @@
         <span class="macro">println!</span>(<span class="string">&quot;\nRegnet AMR: {:?}\n&quot;</span>, regnet);
         <span class="kw">let </span>regnet_serial = serde_json::to_string(<span class="kw-2">&amp;</span>regnet).unwrap();
         <span class="macro">println!</span>(<span class="string">&quot;For serialization test:\n\n {}&quot;</span>, regnet_serial);
-
-        <span class="kw">let </span>mathml_pn_asts =
-            get_mathml_asts_from_file(<span class="string">&quot;../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt&quot;</span>);
-        <span class="kw">let </span>pn = PetriNet::from(ACSet::from(mathml_pn_asts));
-        <span class="macro">println!</span>(<span class="string">&quot;\nPetriNet AMR: {:?}&quot;</span>, pn);
-        <span class="kw">let </span>pn_serial = serde_json::to_string(<span class="kw-2">&amp;</span>pn).unwrap();
-        <span class="macro">println!</span>(<span class="string">&quot;For serialization test:\n\n {}&quot;</span>, pn_serial);
     } <span class="kw">else </span>{
         <span class="macro">println!</span>(<span class="string">&quot;Unknown Command!&quot;</span>);
     }

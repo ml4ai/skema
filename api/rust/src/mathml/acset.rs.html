@@ -1088,80 +1088,6 @@
 <a href="#1088" id="1088">1088</a>
 <a href="#1089" id="1089">1089</a>
 <a href="#1090" id="1090">1090</a>
-<a href="#1091" id="1091">1091</a>
-<a href="#1092" id="1092">1092</a>
-<a href="#1093" id="1093">1093</a>
-<a href="#1094" id="1094">1094</a>
-<a href="#1095" id="1095">1095</a>
-<a href="#1096" id="1096">1096</a>
-<a href="#1097" id="1097">1097</a>
-<a href="#1098" id="1098">1098</a>
-<a href="#1099" id="1099">1099</a>
-<a href="#1100" id="1100">1100</a>
-<a href="#1101" id="1101">1101</a>
-<a href="#1102" id="1102">1102</a>
-<a href="#1103" id="1103">1103</a>
-<a href="#1104" id="1104">1104</a>
-<a href="#1105" id="1105">1105</a>
-<a href="#1106" id="1106">1106</a>
-<a href="#1107" id="1107">1107</a>
-<a href="#1108" id="1108">1108</a>
-<a href="#1109" id="1109">1109</a>
-<a href="#1110" id="1110">1110</a>
-<a href="#1111" id="1111">1111</a>
-<a href="#1112" id="1112">1112</a>
-<a href="#1113" id="1113">1113</a>
-<a href="#1114" id="1114">1114</a>
-<a href="#1115" id="1115">1115</a>
-<a href="#1116" id="1116">1116</a>
-<a href="#1117" id="1117">1117</a>
-<a href="#1118" id="1118">1118</a>
-<a href="#1119" id="1119">1119</a>
-<a href="#1120" id="1120">1120</a>
-<a href="#1121" id="1121">1121</a>
-<a href="#1122" id="1122">1122</a>
-<a href="#1123" id="1123">1123</a>
-<a href="#1124" id="1124">1124</a>
-<a href="#1125" id="1125">1125</a>
-<a href="#1126" id="1126">1126</a>
-<a href="#1127" id="1127">1127</a>
-<a href="#1128" id="1128">1128</a>
-<a href="#1129" id="1129">1129</a>
-<a href="#1130" id="1130">1130</a>
-<a href="#1131" id="1131">1131</a>
-<a href="#1132" id="1132">1132</a>
-<a href="#1133" id="1133">1133</a>
-<a href="#1134" id="1134">1134</a>
-<a href="#1135" id="1135">1135</a>
-<a href="#1136" id="1136">1136</a>
-<a href="#1137" id="1137">1137</a>
-<a href="#1138" id="1138">1138</a>
-<a href="#1139" id="1139">1139</a>
-<a href="#1140" id="1140">1140</a>
-<a href="#1141" id="1141">1141</a>
-<a href="#1142" id="1142">1142</a>
-<a href="#1143" id="1143">1143</a>
-<a href="#1144" id="1144">1144</a>
-<a href="#1145" id="1145">1145</a>
-<a href="#1146" id="1146">1146</a>
-<a href="#1147" id="1147">1147</a>
-<a href="#1148" id="1148">1148</a>
-<a href="#1149" id="1149">1149</a>
-<a href="#1150" id="1150">1150</a>
-<a href="#1151" id="1151">1151</a>
-<a href="#1152" id="1152">1152</a>
-<a href="#1153" id="1153">1153</a>
-<a href="#1154" id="1154">1154</a>
-<a href="#1155" id="1155">1155</a>
-<a href="#1156" id="1156">1156</a>
-<a href="#1157" id="1157">1157</a>
-<a href="#1158" id="1158">1158</a>
-<a href="#1159" id="1159">1159</a>
-<a href="#1160" id="1160">1160</a>
-<a href="#1161" id="1161">1161</a>
-<a href="#1162" id="1162">1162</a>
-<a href="#1163" id="1163">1163</a>
-<a href="#1164" id="1164">1164</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -1174,6 +1100,7 @@
 <span class="kw">use </span>std::collections::{BTreeSet, HashMap, HashSet};
 <span class="kw">use </span>utoipa;
 <span class="kw">use </span>utoipa::ToSchema;
+<span class="kw">use </span>nanoid::nanoid;
 
 <span class="comment">// We keep our ACSet representation in addition to the new SKEMA model representation since it is
 // more compact and easy to work with for development.
@@ -1483,129 +1410,7 @@
 <span class="comment">// -------------------------------------------------------------------------------------------
 // This function takes our previous model form, the ACSet and transforms it to the new TA4 exchange format
 // -------------------------------------------------------------------------------------------
-</span><span class="kw">impl </span>From&lt;ACSet&gt; <span class="kw">for </span>PetriNet {
-    <span class="kw">fn </span>from(pn: ACSet) -&gt; PetriNet {
-        <span class="kw">let </span><span class="kw-2">mut </span>states_vec = BTreeSet::&lt;State&gt;::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = BTreeSet::&lt;Transition&gt;::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>initial_vec = Vec::&lt;Initial&gt;::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>parameter_vec = Vec::&lt;Parameter&gt;::new();
-        <span class="kw">let </span><span class="kw-2">mut </span>rate_vec = Vec::&lt;Rate&gt;::new();
-
-        <span class="comment">// -----------------------------------------------------------
-
-        </span><span class="kw">for </span>state <span class="kw">in </span>pn.S.iter() {
-            <span class="kw">let </span>states = State {
-                id: state.sname.clone(),
-                name: state.sname.clone(),
-                ..Default::default()
-            };
-            <span class="kw">let </span>initials = Initial {
-                target: state.sname.clone(),
-                expression: <span class="macro">format!</span>(<span class="string">&quot;{}0&quot;</span>, state.sname.clone()),
-                ..Default::default()
-            };
-            <span class="kw">let </span>parameters = Parameter {
-                id: initials.expression.clone(),
-                name: <span class="prelude-val">Some</span>(initials.expression.clone()),
-                description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
-                    <span class="string">&quot;The total {} population at timestep 0&quot;</span>,
-                    state.sname.clone()
-                )),
-                ..Default::default()
-            };
-            parameter_vec.push(parameters.clone());
-            initial_vec.push(initials.clone());
-            states_vec.insert(states.clone());
-        }
-
-        <span class="kw">for </span>(i, trans) <span class="kw">in </span>pn.T.iter().enumerate() {
-            <span class="comment">// convert transition index to base 1
-            </span><span class="kw">let </span>transition = i + <span class="number">1</span>;
-
-            <span class="comment">// construct array of incoming states
-            </span><span class="kw">let </span><span class="kw-2">mut </span>string_vec1 = Vec::&lt;String&gt;::new();
-            <span class="kw">for </span>incoming <span class="kw">in </span>pn.I.clone().iter() {
-                <span class="kw">if </span>incoming.it == transition {
-                    <span class="kw">let </span>state_idx = incoming.is - <span class="number">1</span>; <span class="comment">// 0 based to index the rust vec
-                    </span><span class="kw">let </span>state_name = pn.S[state_idx].sname.clone();
-                    string_vec1.push(state_name.clone());
-                }
-            }
-            <span class="comment">// construct array of outgoing states
-            </span><span class="kw">let </span><span class="kw-2">mut </span>string_vec2 = Vec::&lt;String&gt;::new();
-            <span class="kw">for </span>outgoing <span class="kw">in </span>pn.O.clone().iter() {
-                <span class="kw">if </span>outgoing.ot == transition {
-                    <span class="kw">let </span>state_idx = outgoing.os - <span class="number">1</span>; <span class="comment">// 0 based to index the rust vec
-                    </span><span class="kw">let </span>state_name = pn.S[state_idx].sname.clone();
-                    string_vec2.push(state_name.clone());
-                }
-            }
-
-            <span class="kw">let </span>transitions = Transition {
-                id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
-                input: <span class="prelude-val">Some</span>(string_vec1.clone()),
-                output: <span class="prelude-val">Some</span>(string_vec2.clone()),
-                ..Default::default()
-            };
-            <span class="kw">let </span>parameters = Parameter {
-                id: trans.tname.clone(),
-                name: <span class="prelude-val">Some</span>(trans.tname.clone()),
-                description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{} rate&quot;</span>, trans.tname.clone())),
-                ..Default::default()
-            };
-
-            <span class="kw">let </span><span class="kw-2">mut </span>terms = String::new();
-            <span class="kw">for </span>term <span class="kw">in </span>transitions.input.clone().unwrap() {
-                <span class="kw">let </span>terms_temp = terms.clone();
-                terms = <span class="macro">format!</span>(<span class="string">&quot;{}*{}&quot;</span>, terms_temp.clone(), term.clone());
-            }
-
-            <span class="kw">let </span>rate = Rate {
-                target: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
-                expression: <span class="macro">format!</span>(<span class="string">&quot;{}{}&quot;</span>, trans.tname.clone(), terms.clone()), <span class="comment">// the second term needs to be the product of the inputs
-                </span>..Default::default()
-            };
-
-            rate_vec.push(rate.clone());
-            parameter_vec.push(parameters.clone());
-            transitions_vec.insert(transitions.clone());
-        }
-
-        <span class="comment">// -----------------------------------------------------------
-
-        </span><span class="kw">let </span>ode = Ode {
-            rates: <span class="prelude-val">Some</span>(rate_vec),
-            initials: <span class="prelude-val">Some</span>(initial_vec),
-            parameters: <span class="prelude-val">Some</span>(parameter_vec),
-            ..Default::default()
-        };
-
-        <span class="kw">let </span>semantics = Semantics { ode };
-
-        <span class="kw">let </span>model = ModelPetriNet {
-            states: states_vec,
-            transitions: transitions_vec,
-            metadata: <span class="prelude-val">None</span>,
-        };
-
-        <span class="kw">let </span>header = Header {
-            name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
-            schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
-            schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
-            description: <span class="string">&quot;This is a model from mathml equations&quot;</span>.to_string(),
-            model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
-        };
-
-        PetriNet {
-            header,
-            model,
-            semantics: <span class="prelude-val">Some</span>(semantics),
-            metadata: <span class="prelude-val">None</span>,
-        }
-    }
-}
-
-<span class="kw">impl </span>From&lt;Vec&lt;FirstOrderODE&gt;&gt; <span class="kw">for </span>PetriNet {
+</span><span class="kw">impl </span>From&lt;Vec&lt;FirstOrderODE&gt;&gt; <span class="kw">for </span>PetriNet {
     <span class="kw">fn </span>from(ode_vec: Vec&lt;FirstOrderODE&gt;) -&gt; PetriNet {
         <span class="comment">// initialize vecs
         </span><span class="kw">let </span><span class="kw-2">mut </span>states_vec = BTreeSet::&lt;State&gt;::new();
@@ -1619,23 +1424,23 @@
         <span class="comment">// this first for loop is for the creation state related parameters in the AMR
         </span><span class="kw">for </span>ode <span class="kw">in </span>ode_vec.iter() {
             <span class="kw">let </span>states = State {
-                id: ode.lhs_var.to_string().clone(),
+                id: <span class="macro">format!</span>(<span class="string">&quot;{}-{}&quot;</span>, ode.lhs_var.to_string().clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>)),
                 name: ode.lhs_var.to_string().clone(),
                 ..Default::default()
             };
             <span class="kw">let </span>initials = Initial {
-                target: ode.lhs_var.to_string().clone(),
-                expression: <span class="macro">format!</span>(<span class="string">&quot;{}0&quot;</span>, ode.lhs_var.to_string().clone()),
-                ..Default::default()
+                target: states.id.clone(),
+                <span class="comment">//expression: format!(&quot;{}0&quot;, ode.lhs_var.to_string().clone()),
+                </span>..Default::default()
             };
             <span class="kw">let </span>parameters = Parameter {
                 id: initials.expression.clone(),
                 name: <span class="prelude-val">Some</span>(initials.expression.clone()),
-                description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(
-                    <span class="string">&quot;The total {} population at timestep 0&quot;</span>,
+                <span class="comment">/*description: Some(format!(
+                    &quot;The total {} population at timestep 0&quot;,
                     ode.lhs_var.to_string().clone()
-                )),
-                ..Default::default()
+                )),*/
+                </span>..Default::default()
             };
             parameter_vec.push(parameters.clone());
             initial_vec.push(initials.clone());
@@ -1655,8 +1460,8 @@
                 <span class="kw">let </span>parameters = Parameter {
                     id: param.clone(),
                     name: <span class="prelude-val">Some</span>(param.clone()),
-                    description: <span class="prelude-val">Some</span>(<span class="macro">format!</span>(<span class="string">&quot;{} rate&quot;</span>, param.clone())),
-                    ..Default::default()
+                    <span class="comment">//description: Some(format!(&quot;{} rate&quot;, param.clone())),
+                    </span>..Default::default()
                 };
                 parameter_vec.push(parameters.clone());
             }
@@ -1756,11 +1561,22 @@
         <span class="comment">// now we construct transitions of all paired terms
         </span><span class="kw">for </span>(i, t) <span class="kw">in </span>transition_pair.iter().enumerate() {
             <span class="kw">if </span>t.<span class="number">0</span>.exp_states.len() == <span class="number">1 </span>{
+                <span class="kw">let </span><span class="kw-2">mut </span>input = Vec::&lt;String&gt;::new();
+                <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::&lt;String&gt;::new();
+
+                <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                    <span class="kw">if </span>state.name == t.<span class="number">1</span>.dyn_state {
+                        input.push(state.id.clone());
+                    } 
+                    <span class="kw">else if </span>state.name == t.<span class="number">0</span>.dyn_state {
+                        output.push(state.id.clone());
+                    }
+                }
                 <span class="comment">// construct transtions for simple transtions
                 </span><span class="kw">let </span>transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
-                    input: <span class="prelude-val">Some</span>([t.<span class="number">1</span>.dyn_state.clone()].to_vec()),
-                    output: <span class="prelude-val">Some</span>([t.<span class="number">0</span>.dyn_state.clone()].to_vec()),
+                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}-{}&quot;</span>, i.clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>)),
+                    input: <span class="prelude-val">Some</span>(input.clone()),
+                    output: <span class="prelude-val">Some</span>(output.clone()),
                     ..Default::default()
                 };
                 transitions_vec.insert(transitions.clone());
@@ -1790,17 +1606,33 @@
             } <span class="kw">else </span>{
                 <span class="comment">// construct transitions for complicated transitions
                 // mainly need to construct the output specially,
-                </span><span class="kw">let </span><span class="kw-2">mut </span>output = [t.<span class="number">0</span>.dyn_state.clone()].to_vec();
-
-                <span class="kw">for </span>state <span class="kw">in </span>t.<span class="number">0</span>.exp_states.iter() {
-                    <span class="kw">if </span><span class="kw-2">*</span>state != t.<span class="number">1</span>.dyn_state {
-                        output.push(state.clone());
+                </span><span class="kw">let </span><span class="kw-2">mut </span>input = Vec::&lt;String&gt;::new();
+                <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::&lt;String&gt;::new();
+                <span class="kw">for </span>exp <span class="kw">in </span>t.<span class="number">1</span>.exp_states.iter() {
+                    <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                        <span class="kw">if </span>state.name == <span class="kw-2">*</span>exp {
+                            input.push(state.id.clone());
+                        }
+                    }
+                }
+                <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                    <span class="kw">if </span>state.name == t.<span class="number">0</span>.dyn_state {
+                        output.push(state.id.clone());
+                    }
+                }
+                <span class="kw">for </span>exp <span class="kw">in </span>t.<span class="number">0</span>.exp_states.iter() {
+                    <span class="kw">if </span><span class="kw-2">*</span>exp != t.<span class="number">1</span>.dyn_state {
+                        <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                            <span class="kw">if </span>state.name == <span class="kw-2">*</span>exp {
+                                output.push(state.id.clone());
+                            }
+                        }
                     }
                 }
 
                 <span class="kw">let </span>transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}&quot;</span>, i.clone()),
-                    input: <span class="prelude-val">Some</span>(t.<span class="number">1</span>.exp_states.clone()),
+                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}-{}&quot;</span>, i.clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>)),
+                    input: <span class="prelude-val">Some</span>(input.clone()),
                     output: <span class="prelude-val">Some</span>(output.clone()),
                     ..Default::default()
                 };
@@ -1836,15 +1668,23 @@
             <span class="kw">for </span>(i, term) <span class="kw">in </span>terms.iter().enumerate() {
                 <span class="kw">if </span>term.polarity {
                     <span class="kw">let </span><span class="kw-2">mut </span>input = Vec::&lt;String&gt;::new();
+                    <span class="kw">let </span><span class="kw-2">mut </span>output = Vec::&lt;String&gt;::new();
 
-                    <span class="kw">let </span>output = [term.dyn_state.clone()].to_vec();
-
-                    <span class="kw">for </span>state <span class="kw">in </span>term.exp_states.iter() {
-                        input.push(state.clone());
+                    <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                        <span class="kw">if </span>state.name == term.dyn_state {
+                            output.push(state.id.clone());
+                        }
+                    }
+                    <span class="kw">for </span>exp <span class="kw">in </span>term.exp_states.iter() {
+                        <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                            <span class="kw">if </span>state.name == <span class="kw-2">*</span>exp {
+                                input.push(state.id.clone());
+                            }
+                        }
                     }
 
                     <span class="kw">let </span>transitions = Transition {
-                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}&quot;</span>, i),
+                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}-{}&quot;</span>, i, <span class="macro">nanoid!</span>(<span class="number">8</span>)),
                         input: <span class="prelude-val">Some</span>(input.clone()),
                         output: <span class="prelude-val">Some</span>(output.clone()),
                         ..Default::default()
@@ -1878,14 +1718,23 @@
                     };
                     rate_vec.push(rate.clone());
                 } <span class="kw">else </span>{
-                    <span class="kw">let </span><span class="kw-2">mut </span>input = [term.dyn_state.clone()].to_vec();
+                    <span class="kw">let </span><span class="kw-2">mut </span>input = Vec::&lt;String&gt;::new();
+                    <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                        <span class="kw">if </span>state.name == term.dyn_state {
+                            input.push(state.id.clone());
+                        }
+                    }
 
-                    <span class="kw">for </span>state <span class="kw">in </span>term.exp_states.iter() {
-                        input.push(state.clone());
+                    <span class="kw">for </span>exp <span class="kw">in </span>term.exp_states.iter() {
+                        <span class="kw">for </span>state <span class="kw">in </span>states_vec.iter() {
+                            <span class="kw">if </span><span class="kw-2">*</span>exp == state.name {
+                                input.push(state.id.clone());
+                            }
+                        }
                     }
 
                     <span class="kw">let </span>transitions = Transition {
-                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}&quot;</span>, i),
+                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}-{}&quot;</span>, i, <span class="macro">nanoid!</span>(<span class="number">8</span>)),
                         input: <span class="prelude-val">Some</span>(input.clone()),
                         output: <span class="prelude-val">None</span>,
                         ..Default::default()
@@ -1926,6 +1775,9 @@
 
         </span>parameter_vec.sort();
         parameter_vec.dedup();
+        <span class="kw">for </span>parameter <span class="kw">in </span>parameter_vec.iter_mut() {
+            parameter.id = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro">nanoid!</span>(<span class="number">8</span>));
+        }
 
         <span class="comment">// construct the PetriNet
         </span><span class="kw">let </span>ode = Ode {
@@ -1944,10 +1796,10 @@
         };
 
         <span class="kw">let </span>header = Header {
-            name: <span class="string">&quot;mathml model&quot;</span>.to_string(),
+            name: <span class="string">&quot;math model&quot;</span>.to_string(),
             schema: <span class="string">&quot;https://github.com/DARPA-ASKEM/Model-Representations/blob/main/petrinet/petrinet_schema.json&quot;</span>.to_string(),
             schema_name: <span class="string">&quot;PetriNet&quot;</span>.to_string(),
-            description: <span class="string">&quot;This is a model from mathml equations&quot;</span>.to_string(),
+            description: <span class="string">&quot;This is a model from equations&quot;</span>.to_string(),
             model_version: <span class="string">&quot;0.1&quot;</span>.to_string(),
         };
 
