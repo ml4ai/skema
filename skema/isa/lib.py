@@ -23,6 +23,7 @@ from typing import Tuple
 import re
 import xml.etree.ElementTree as ET
 import html
+from sentence_transformers import SentenceTransformer, util
 
 # Set up the random seed
 np.random.seed(1)
@@ -369,11 +370,104 @@ def extract_var_defs_from_metions(input_file: str) -> Dict[str, List[Dict[str, s
     return organized_data
 
 
+def find_definition(
+    variable_name: str, extracted_data: Dict[str, List[Dict[str, str]]]
+) -> str:
+    """
+    Finds the definition for a variable name in the extracted data.
+
+    Args:
+        variable_name (str): Variable name to find.
+        extracted_data (List[Dict[str, Union[str, int]]]): List of dictionaries containing extracted information.
+
+    Returns:
+        str: Definition for the variable name, or an empty string if not found.
+    """
+    for attribute in extracted_data["variables"]:
+        if heuristic_compare_variable_names(variable_name, attribute["name"]):
+            return attribute["definition"]
+
+    return ""
+
+
+def calculate_similarity(definition1: str, definition2: str) -> float:
+    """
+    Calculates semantic similarity between two variable definitions using BERT embeddings.
+
+    Args:
+        definition1 (str): First variable definition.
+        definition2 (str): Second variable definition.
+
+    Returns:
+        float: Semantic similarity score between 0 and 1.
+    """
+    model = SentenceTransformer("msmarco-distilbert-base-v2")
+
+    # Convert definitions to BERT embeddings
+    embedding1 = model.encode(definition1, convert_to_tensor=True)
+    embedding2 = model.encode(definition2, convert_to_tensor=True)
+
+    # Calculate cosine similarity between embeddings
+    cosine_similarity = util.pytorch_cos_sim(embedding1, embedding2)[0][0].item()
+
+    return cosine_similarity
+
+
+def match_variable_definitions(
+    list1: List[str],
+    list2: List[str],
+    json_path1: str,
+    json_path2: str,
+    threshold: float,
+) -> Tuple[List[int], List[int]]:
+    """
+    Match variable definitions for given variable names in two lists.
+
+    Args:
+        list1 (List[str]): List of variable names from the first equation.
+        list2 (List[str]): List of variable names from the second equation.
+        json_path1 (str): Path to the JSON file containing variable definitions for the first article.
+        json_path2 (str): Path to the JSON file containing variable definitions for the second article.
+        threshold (float): Similarity threshold for considering a match.
+
+    Returns:
+        Tuple[List[int], List[int]]: Lists of indices for matched variable names in list1 and list2.
+    """
+    extracted_data1 = extract_var_defs_from_metions(json_path1)
+    extracted_data2 = extract_var_defs_from_metions(json_path2)
+
+    var_idx_list1 = []
+    var_idx_list2 = []
+
+    for idx1, var1 in enumerate(list1):
+        max_similarity = 0.0
+        matching_idx = -1
+
+        for idx2, var2 in enumerate(list2):
+            def1 = find_definition(var1, extracted_data1)
+            def2 = find_definition(var2, extracted_data2)
+
+            if def1 and def2:
+                similarity = calculate_similarity(def1, def2)
+                if similarity > max_similarity and similarity >= threshold:
+                    print(similarity)
+                    max_similarity = similarity
+                    matching_idx = idx2
+
+        if matching_idx != -1:
+            var_idx_list1.append(idx1)
+            var_idx_list2.append(matching_idx)
+
+    return var_idx_list1, var_idx_list2
+
+
 def get_seeds(
     node_labels1: List[str],
     node_labels2: List[str],
     method: str = "heuristic",
     threshold: float = 0.8,
+    mention_json1: str = "",
+    mention_json2: str = "",
 ) -> Tuple[List[int], List[int]]:
     """
     Calculate the seeds in the two equations.
@@ -387,32 +481,48 @@ def get_seeds(
             - "jaccard": Based on Jaccard similarity of variable names.
             - "cosine": Based on cosine similarity of variable names.
         threshold: The threshold to use for Levenshtein, Jaccard, and cosine methods.
+        mention_json1: The JSON file path of the mention extraction of paper 1.
+        mention_json2: The JSON file path of the mention extraction of paper 2.
 
     Returns:
         A tuple of two lists:
         - seed1: The seed indices from equation 1.
         - seed2: The seed indices from equation 2.
     """
-    seed1 = [0, 1]
-    seed2 = [0, 1]
-    for i in range(2, len(node_labels1)):
-        for j in range(2, len(node_labels2)):
-            if method == "heuristic":
-                if heuristic_compare_variable_names(node_labels1[i], node_labels2[j]):
-                    seed1.append(i)
-                    seed2.append(j)
-            elif method == "levenshtein":
-                if levenshtein_similarity(node_labels1[i], node_labels2[j]) > threshold:
-                    seed1.append(i)
-                    seed2.append(j)
-            elif method == "jaccard":
-                if jaccard_similarity(node_labels1[i], node_labels2[j]) > threshold:
-                    seed1.append(i)
-                    seed2.append(j)
-            elif method == "cosine":
-                if cosine_similarity(node_labels1[i], node_labels2[j]) > threshold:
-                    seed1.append(i)
-                    seed2.append(j)
+    seed1 = []
+    seed2 = []
+    if method == "var_defs":
+        seed1, seed2 = match_variable_definitions(
+            node_labels1,
+            node_labels2,
+            json_path1=mention_json1,
+            json_path2=mention_json2,
+            threshold=0.9,
+        )
+    else:
+        for i in range(0, len(node_labels1)):
+            for j in range(0, len(node_labels2)):
+                if method == "heuristic":
+                    if heuristic_compare_variable_names(
+                        node_labels1[i], node_labels2[j]
+                    ):
+                        seed1.append(i)
+                        seed2.append(j)
+                elif method == "levenshtein":
+                    if (
+                        levenshtein_similarity(node_labels1[i], node_labels2[j])
+                        > threshold
+                    ):
+                        seed1.append(i)
+                        seed2.append(j)
+                elif method == "jaccard":
+                    if jaccard_similarity(node_labels1[i], node_labels2[j]) > threshold:
+                        seed1.append(i)
+                        seed2.append(j)
+                elif method == "cosine":
+                    if cosine_similarity(node_labels1[i], node_labels2[j]) > threshold:
+                        seed1.append(i)
+                        seed2.append(j)
 
     return seed1, seed2
 
@@ -554,7 +664,11 @@ def check_square_array(arr: np.ndarray) -> List[int]:
 
 
 def align_mathml_eqs(
-    file1: str = "", file2: str = "", mode: int = 1
+    file1: str = "",
+    file2: str = "",
+    mention_json1: str = "",
+    mention_json2: str = "",
+    mode: int = 2,
 ) -> Tuple[
     Any, Any, List[str], List[str], Union[int, Any], Union[int, Any], Dot, List[int]
 ]:
@@ -564,8 +678,9 @@ def align_mathml_eqs(
     [1] Fishkind, D. E., Adali, S., Patsolic, H. G., Meng, L., Singh, D., Lyzinski, V., & Priebe, C. E. (2019).
     Seeded graph matching. Pattern recognition, 87, 203-215.
 
-    Input: the paths of the two equation MathMLs; mode 0: without considering any priors; mode 1: having a heuristic prior
-    with the similarity of node labels; mode 2: TBD
+    Input: the paths of the two equation MathMLs; mention_json1: the mention file of paper 1; mention_json1: the mention file of paper 2;
+            mode 0: without considering any priors; mode 1: having a heuristic prior
+            with the similarity of node labels; mode 2: using the variable definitions
     Output:
         matching_ratio: the matching ratio between the equations 1 and the equation 2
         num_diff_edges: the number of different edges between the equations 1 and the equation 2
@@ -582,14 +697,24 @@ def align_mathml_eqs(
     amatrix1, node_labels1 = generate_amatrix(graph1)
     amatrix2, node_labels2 = generate_amatrix(graph2)
 
+    #  If there are no mention files provided, it returns to mode 1
+    if (mention_json1 == "" or mention_json2 == "") and mode == 2:
+        mode = 1
+
     if mode == 0:
         seed1 = []
         seed2 = []
     elif mode == 1:
         seed1, seed2 = get_seeds(node_labels1, node_labels2)
     else:
-        seed1 = []
-        seed2 = []
+        seed1, seed2 = get_seeds(
+            node_labels1,
+            node_labels2,
+            method="var_defs",
+            threshold=0.9,
+            mention_json1=mention_json1,
+            mention_json2=mention_json2,
+        )
 
     partial_match = np.column_stack((seed1, seed2))
 
