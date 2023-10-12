@@ -217,7 +217,7 @@ def objective(
     DROPOUT = trial.suggest_float("DROPOUT", low=0.1, high=0.5, step=0.1)
     EMB_DIM = trial.suggest_int("EMB_DIM", low=64, high=512, step=64)
     ENC_DIM = trial.suggest_int("ENC_DIM", low=64, high=512, step=64)
-    DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=256)
+    DEC_HID_DIM = trial.suggest_int("DEC_HID_DIM", low=64, high=512, step=64)
     if optimizer_type == "Adam":
         beta_1 = 0.7#trial.suggest_float("beta1", low=0.5, high=0.9, step=0.1)
         beta_2 = 0.9#trial.suggest_float("beta2", low=0.5, high=0.999, step=0.1)
