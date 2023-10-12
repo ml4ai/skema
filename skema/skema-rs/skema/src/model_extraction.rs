@@ -204,6 +204,7 @@ pub fn subgrapg2_core_dyn_MET_ast(
     for node in graph.node_indices() {
         if graph[node].labels == ["Expression"] {
             expression_nodes.push(node);
+            println!("expression node: {:?}", graph[node.clone()].id);
         }
     }
 
@@ -237,13 +238,17 @@ pub fn subgrapg2_core_dyn_MET_ast(
 
     for expr in trimmed_expressions_wiring.clone() {
         let mut root_node = Vec::<NodeIndex>::new();
+        let mut primitive_counter = 0;
         for node_index in expr.clone().node_indices() {
             if expr[node_index].labels == ["Opo"] {
                 root_node.push(node_index);
+            } else if expr[node_index].labels == ["Primitive"] {
+                primitive_counter += 1;
             }
         }
-        if root_node.len() >= 2 {
-            // println!("More than one Opo! Skipping Expression!");
+        println!("primtive_counter: {:?}", primitive_counter);
+        if root_node.len() >= 2  || primitive_counter == 0 {
+            println!("More than one Opo! Skipping Expression!");
         } else {
             core_dynamics.push(tree_2_MET_ast(expr.clone(), root_node[0]).unwrap());
         }
@@ -432,9 +437,15 @@ pub fn get_args_MET(
 
     // fix order of args
     let mut ordered_args = args.clone();
+    //println!("ordered_args: {:?}", ordered_args.clone());
+    //println!("ordered_args[0]: {:?}", ordered_args[0]);
+    //println!("ordered_args.len(): {:?}", ordered_args.len());
+    //println!("arg_order: {:?}", arg_order.clone());
     for (i, ind) in arg_order.iter().enumerate() {
         // the ind'th element of order_args is the ith element of the unordered args
-        let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
+        if ordered_args.len() > *ind as usize {
+            let _temp = std::mem::replace(&mut ordered_args[*ind as usize], args[i].clone());
+        }
     }
 
     ordered_args

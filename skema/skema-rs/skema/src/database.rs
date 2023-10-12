@@ -1516,7 +1516,7 @@ pub fn create_function(
                         );
                     }
                     // stub for where to put in create function for nested functions
-                    _ => {}
+                    _ => {println!("I'm missing 2 abtracts I'm guessing?");}
                 }
                 box_counter += 1;
                 *start += 1;
