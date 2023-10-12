@@ -307,22 +307,6 @@ pub async fn get_subgraph(path: web::Path<i64>, config: web::Data<Config>) -> Ht
     HttpResponse::Ok().json(web::Json(response))
 }
 
-/// This retrieves a PetriNet AMR based on model id.
-#[allow(non_snake_case)]
-#[utoipa::path(
-    responses(
-        (
-            status = 200, description = "Successfully retrieved PN AMR",
-            body = PetriNet
-        )
-    )
-)]
-#[get("/models/{id}/PN")]
-pub async fn get_model_PN(path: web::Path<i64>, config: web::Data<Config>) -> HttpResponse {
-    let mathml_ast = module_id2mathml_ast(path.into_inner(), &config.db_host);
-    HttpResponse::Ok().json(web::Json(PetriNet::from(ACSet::from(mathml_ast))))
-}
-
 /// This retrieves a RegNet AMR based on model id.
 #[allow(non_snake_case)]
 #[utoipa::path(

@@ -70,7 +70,6 @@ async fn main() -> std::io::Result<()> {
             gromet::get_named_opis,
             gromet::get_named_ports,
             gromet::get_subgraph,
-            gromet::get_model_PN,
             gromet::get_model_RN,
             gromet::model2PN,
             gromet::model2RN,
@@ -144,7 +143,6 @@ async fn main() -> std::io::Result<()> {
             .service(skema::services::mathml::get_acset)
             .service(skema::services::mathml::get_regnet)
             .service(skema::services::mathml::get_amr)
-            .service(gromet::get_model_PN)
             .service(gromet::get_model_RN)
             .service(gromet::model2PN)
             .service(gromet::model2RN)
