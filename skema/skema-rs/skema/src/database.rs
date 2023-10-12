@@ -2973,7 +2973,12 @@ pub fn create_att_expression(
     *start += 1;
 
     let att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone(); // current expression attribute
-    let parent_att_box = gromet.modules[0].attributes[c_args.att_bf_idx - 1].clone(); // parent attribute
+    let mut parent_att_box = att_box.clone();
+    if c_args.att_bf_idx != 0 {
+        parent_att_box = gromet.modules[0].attributes[c_args.att_bf_idx - 1].clone(); // parent attribute
+    } else {
+        parent_att_box = gromet.modules[0].r#fn.clone();
+    }
 
     // construct opo nodes, if not none
     // not calling the opo port constuctors since they are based on grabbing in the name from top level of the gromet,
