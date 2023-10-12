@@ -331,11 +331,11 @@ def objective(
     # optimizer
     isScheduler = False
     scheduler = None
-    if step_scheduler or exponential_scheduler:
-        _lr = starting_lr
-        isScheduler = True
-    else:
-        _lr = learning_rate
+    # if step_scheduler or exponential_scheduler:
+    #     _lr = starting_lr
+    #     isScheduler = True
+    # else:
+    _lr = learning_rate
 
     if optimizer_type == "Adam":
         optimizer = torch.optim.Adam(
