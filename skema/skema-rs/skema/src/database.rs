@@ -1434,6 +1434,7 @@ pub fn create_function(
 
             let mut new_c_args = c_args.clone();
             new_c_args.parent_node = n1.clone();
+            new_c_args.att_bf_idx = c_args.att_idx; // This is the parent index 
 
             // construct opo nodes, if not none, might need to
             create_opo(
@@ -2972,7 +2973,7 @@ pub fn create_att_expression(
     *start += 1;
 
     let att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone(); // current expression attribute
-    let parent_att_box = gromet.modules[0].attributes[c_args.parent_node.contents].clone(); // parent attribute
+    let parent_att_box = gromet.modules[0].attributes[c_args.att_bf_idx - 1].clone(); // parent attribute
 
     // construct opo nodes, if not none
     // not calling the opo port constuctors since they are based on grabbing in the name from top level of the gromet,
@@ -4331,7 +4332,7 @@ pub fn wfopi_cross_att_wiring(
                     // make sure only looking in current attribute nodes for srcs and tgts
                     if src_att == node.contents as u32 {
                         // make sure box index also lines up
-                        if (src_box as u32) == node.att_bf_idx as u32 {
+                        if (src_box as u32) == node.box_counter as u32 {
                             // only opo's
                             if node.n_type == "Opi" {
                                 // iterate through port to check for tgt
@@ -4432,7 +4433,7 @@ pub fn wfopo_cross_att_wiring(
                 // make sure in correct box
                 if tgt_nbox == node.nbox as u8 {
                     // make sure only looking in current attribute nodes for srcs and tgts
-                    if tgt_att == node.contents as u32 && (tgt_box as u32) == node.att_bf_idx as u32
+                    if tgt_att == node.contents as u32 && (tgt_box as u32) == node.box_counter as u32
                     {
                         // only opo's
                         if node.n_type == "Opo" {
@@ -4516,7 +4517,7 @@ pub fn wff_cross_att_wiring(
                     if src_nbox == node.nbox as u8 {
                         // make sure only looking in current attribute nodes for srcs and tgts
                         if src_att == node.contents as u32
-                            && (src_box as u32) == node.att_bf_idx as u32
+                            && (src_box as u32) == node.box_counter as u32
                         {
                             // only opo's
                             if node.n_type == "Opi" {
@@ -4536,7 +4537,7 @@ pub fn wff_cross_att_wiring(
                     if tgt_nbox == node.nbox as u8 {
                         // make sure only looking in current attribute nodes for srcs and tgts
                         if tgt_att == node.contents as u32
-                            && (tgt_box as u32) == node.att_bf_idx as u32
+                            && (tgt_box as u32) == node.box_counter as u32
                         {
                             // only opo's
                             if node.n_type == "Opo" {
@@ -4570,7 +4571,7 @@ pub fn wff_cross_att_wiring(
                     if src_nbox == node.nbox as u8 {
                         // make sure only looking in current attribute nodes for srcs and tgts
                         if src_att == node.contents as u32
-                            && (src_box as u32) == node.att_bf_idx as u32
+                            && (src_box as u32) == node.box_counter as u32
                         {
                             // only opo's
                             if node.n_type == "Opi" {
@@ -4590,7 +4591,7 @@ pub fn wff_cross_att_wiring(
                     if tgt_nbox == node.nbox as u8 {
                         // make sure only looking in current attribute nodes for srcs and tgts
                         if tgt_att == node.contents as u32
-                            && (tgt_box as u32) == node.att_bf_idx as u32
+                            && (tgt_box as u32) == node.box_counter as u32
                         {
                             // only opo's
                             if node.n_type == "Primitive" || node.n_type == "Literal" {
@@ -4656,7 +4657,7 @@ pub fn wff_cross_att_wiring(
                     if src_nbox == node.nbox as u8 {
                         // make sure only looking in current attribute nodes for srcs and tgts
                         if src_att == node.contents as u32
-                            && (src_box as u32) == node.att_bf_idx as u32
+                            && (src_box as u32) == node.box_counter as u32
                         {
                             // only opo's
                             if node.n_type == "Primitive" {
@@ -4676,7 +4677,7 @@ pub fn wff_cross_att_wiring(
                     if tgt_nbox == node.nbox as u8 {
                         // make sure only looking in current attribute nodes for srcs and tgts
                         if tgt_att == node.contents as u32
-                            && (tgt_box as u32) == node.att_bf_idx as u32
+                            && (tgt_box as u32) == node.box_counter as u32
                         {
                             // only opo's
                             if node.n_type == "Opo" {
