@@ -352,19 +352,19 @@ def objective(
             momentum=momentum,
         )
     # which scheduler, if using
-    if step_scheduler:
-        scheduler = torch.optim.lr_scheduler.StepLR(
-            optimizer,
-            step_size=step_size,
-            gamma=gamma,
-        )
-    elif exponential_scheduler:
-        scheduler = torch.optim.lr_scheduler.ExponentialLR(
-            optimizer,
-            gamma=gamma,
-            last_epoch=-1,
-            verbose=False,
-        )
+    # if step_scheduler:
+    #     scheduler = torch.optim.lr_scheduler.StepLR(
+    #         optimizer,
+    #         step_size=step_size,
+    #         gamma=gamma,
+    #     )
+    # elif exponential_scheduler:
+    #     scheduler = torch.optim.lr_scheduler.ExponentialLR(
+    #         optimizer,
+    #         gamma=gamma,
+    #         last_epoch=-1,
+    #         verbose=False,
+    #     )
 
     best_valid_loss = float("inf")
     trg_pad_idx = vocab.stoi["<pad>"]
