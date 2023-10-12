@@ -1733,7 +1733,7 @@ pub fn create_conditional(
 
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "Condition".to_string();
         }
@@ -1747,7 +1747,7 @@ pub fn create_conditional(
 
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "if_body".to_string();
         }
@@ -1761,7 +1761,7 @@ pub fn create_conditional(
 
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "else_body".to_string();
         }
@@ -2168,7 +2168,7 @@ pub fn create_for_loop(
     // now we need to rename the contains edge for the body to body
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "Body".to_string();
         }
@@ -2189,7 +2189,7 @@ pub fn create_for_loop(
     // we need to rename the contains edge to be a condition edge
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "Condition".to_string();
         }
@@ -2211,7 +2211,7 @@ pub fn create_for_loop(
     // now we need to rename the contains edge for the body to body
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "Body".to_string();
         }
@@ -2487,7 +2487,7 @@ pub fn create_while_loop(
     // we need to rename the contains edge to be a condition edge
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "Condition".to_string();
         }
@@ -2509,7 +2509,7 @@ pub fn create_while_loop(
     // now we need to rename the contains edge for the body to body
     for edge in edges.iter_mut() {
         if edge.src == new_c_args.parent_node.node_id.clone()
-            && edge.e_type == "Contains".to_string()
+            && edge.e_type == *"Contains"
         {
             edge.e_type = "Body".to_string();
         }
@@ -3010,15 +3010,13 @@ pub fn create_att_expression(
                     }
                 }
             }
-        } else {
-            if gromet.modules[0].r#fn.pof.is_some() {
-                for port in gromet.modules[0].r#fn.pof.as_ref().unwrap().iter() {
-                    if port.r#box == c_args.bf_counter as u8 {
-                        if port.name.is_some() {
-                            opo_name.push(port.name.as_ref().unwrap().clone());
-                        } else {
-                            opo_name.push(String::from("un-named"));
-                        }
+        } else if gromet.modules[0].r#fn.pof.is_some() {
+            for port in gromet.modules[0].r#fn.pof.as_ref().unwrap().iter() {
+                if port.r#box == c_args.bf_counter as u8 {
+                    if port.name.is_some() {
+                        opo_name.push(port.name.as_ref().unwrap().clone());
+                    } else {
+                        opo_name.push(String::from("un-named"));
                     }
                 }
             }
@@ -3092,10 +3090,8 @@ pub fn create_att_expression(
                 for (i, bf) in parent_att_box.bf.clone().unwrap().iter().enumerate() {
                     match bf.function_type {
                         FunctionType::Abstract => {
-                            if bf.name.is_some() {
-                                if *bf.name.as_ref().unwrap() == String::from("unpack") {
-                                    unpack_box = i + 1; // base 1 in gromet
-                                }
+                            if bf.name.is_some() && *bf.name.as_ref().unwrap() == String::from("unpack") {
+                                unpack_box = i + 1; // base 1 in gromet
                             }
                         }
                         _ => {}

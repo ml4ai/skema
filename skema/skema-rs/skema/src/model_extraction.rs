@@ -86,7 +86,7 @@ pub fn module_id2mathml_MET_ast(module_id: i64, host: &str) -> Vec<FirstOrderODE
 }
 
 pub fn module_id2mathml_ast(module_id: i64, host: &str) -> Vec<Math> {
-    let graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
+    let _graph = subgraph2petgraph(module_id, host); // makes petgraph of graph
 
     let core_id = find_pn_dynamics(module_id, host); // gives back list of function nodes that might contain the dynamics
 
