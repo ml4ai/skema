@@ -27,6 +27,9 @@ root = config["src_path"]
 random.seed(config["seed"])
 
 # create destination files and directory
+if not os.path.exists("training_data"):
+    os.mkdir("training_data")
+
 data_path = "training_data/sample_data"
 
 if not os.path.exists(data_path):
