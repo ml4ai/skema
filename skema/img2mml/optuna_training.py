@@ -377,7 +377,7 @@ def objective(
     for epoch in range(EPOCHS):
 
         start_time = time.time()
-
+        print("epoch: ", epoch)
         train_loss = train(
                     model,
                     model_type,
@@ -404,12 +404,12 @@ def objective(
             vocab,
             ddp=ddp,
             rank=rank,
+            is_test=True,
             g2p=g2p,
         )
 
 
         # calculate bleu score
-        print("epoch: ", epoch)
         trial.report(val_loss, epoch)
 
         # Handle pruning based on the intermediate value.
@@ -419,7 +419,7 @@ def objective(
     if ddp:
         dist.destroy_process_group()
 
-    time.sleep(3)
+    time.sleep(10)
 
     bs = calculate_bleu_score()
 
