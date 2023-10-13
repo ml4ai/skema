@@ -385,7 +385,14 @@ def train_model(rank=None,):
                 gamma=gamma,
                 cycle_momentum=False,
             )
-
+        elif whichScheduler == "multistep_lr":
+            scheduler = torch.optim.lr_scheduler.MultiStepLR(
+                optimizer,
+                milestones=[10],
+                gamma=0.1,
+                last_epoch=-1,
+                verbose=True
+            )
 
     best_valid_loss = float("inf")
 
