@@ -388,8 +388,8 @@ def train_model(rank=None,):
         elif whichScheduler == "multistep_lr":
             scheduler = torch.optim.lr_scheduler.MultiStepLR(
                 optimizer,
-                milestones=[10],
-                gamma=0.1,
+                milestones=[step_size],
+                gamma=gamma,
                 last_epoch=-1,
                 verbose=True
             )
