@@ -343,6 +343,13 @@ def train_model(rank=None,):
             weight_decay=weight_decay,
             betas=(beta_1, beta_2),
         )
+    if optimizer_type == "AdamW":
+        optimizer = torch.optim.AdamW(
+            params=model.parameters(),
+            # lr=_lr,
+            # weight_decay=weight_decay,
+            # betas=(beta_1, beta_2),
+        )
     elif optimizer_type == "SGD":
         optimizer = torch.optim.SGD(
             model.parameters(),
@@ -391,7 +398,7 @@ def train_model(rank=None,):
                 milestones=[step_size],
                 gamma=gamma,
                 last_epoch=-1,
-                verbose=True
+                verbose=False
             )
 
     best_valid_loss = float("inf")
