@@ -379,34 +379,81 @@ pub fn absolute(input: Span) -> IResult<Mrow> {
     ))(input)?;
     Ok((s, Mrow(elements)))
 }
+
 /// Example: Divergence
-pub fn divergence(input: Span) -> IResult<Operator> {
-    let (s, (_, _)) = tuple((grad, dot))(input)?;
-    Ok((s, Operator::Grad))
+pub fn div(input: Span) -> IResult<Operator> {
+    //let (s, div) = value(Operator::Grad, alt((ws(tag("𝛁")), ws(tag("&#x2207;")))))(input)?;
+    //let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
+    let (s, op) = //value(
+        //Operator::Div,
+        ws(pair(
+            ws(delimited(
+                stag!("mo"),
+                grad,
+                //alt((ws(tag("𝛁")), ws(tag("&#x2207;")))),
+                etag!("mo"),
+            )),
+            ws(delimited(
+                stag!("mo"),
+                dot,
+                //alt((ws(tag("⋅")), ws(tag("&#x22c5;")))),
+                etag!("mo"),
+            )),
+        ),
+    )(input)?;
+    //let op = Operator::Div;
+    println!("op={:?}", op);
+    let div = Operator::Div;
+    println!("div={:?}", div);
+    Ok((s, div))
+}
+
+pub fn absolute_base(input: Span) -> IResult<MathExpression> {
+    let (s, base) = ws(delimited(
+        tag("<mo>|</mo>"),
+        many0(math_expression),
+        tag("<msup><mo>|</mo>"),
+    ))(input)?;
+    let row = MathExpression::Mrow(Mrow(base));
+    Ok((s, row))
+}
+
+pub fn absolute_superscript(input: Span) -> IResult<MathExpression> {
+    let (s, sup) = ws(delimited(
+        tag("<mo>|</mo>"),
+        math_expression,
+        tag("</msup>"),
+    ))(input)?;
+    Ok((s, sup))
 }
 
 ///Absolute with Msup value
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
-    let (s, elements) = ws(map(
+    /*let (s, sup) = ws(map(
         ws(delimited(
             tag("<mo>|</mo>"),
             separated_pair(math_expression, tag("<msup><mo>|</mo>"), math_expression),
             tag("</msup>"),
         )),
-        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
-        //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
+    ))(input)?;*/
+    let (s, base) = absolute_base(input)?;
+    //let (s, new_base) = ws(map(absolute_base, MathExpression::Mrow))(input)?;
+    //let (s, other_elements) = ws(terminated(math_expression, tag("</msup>")))(s)?;
+    let (s, other_elements) = absolute_superscript(s)?;
+    /*let (s, x) = ws(delimited(
+        tag("<mo>|</mo>"),
+        many0(math_expression),
+        tag("<msup><mo>|</mo>"),
     ))(input)?;
-    /*let (s, elements) = ws(delimited(
-        preceded(tag("<mo>|</mo>"), math_expression),
-        preceded(tag("<msup><mo>|</mo>"), math_expression),
-        tag("</msup>"),
-    ))(input)?;
+    println!("x={:?}", x);
+    let elements = Mrow(x);
     println!("elements={:?}", elements);
-    let (s, other_elements) = ws(terminated(many0(math_expression), tag("</msup>")))(s)?;
-    //println!("other_elements={:?}", other_elements);
-    let combine = format!(
-        "<msup><mrow>{:?}</mrow>{:?}</msup>",
-        elements, other_elements
+    //println!("elements={:?}", elements);
+    let (s, other_elements) = ws(terminated(math_expression, tag("</msup>")))(s)?;
+    let sup = MathExpression::Msup(
+        Box::new(MathExpression::Mrow(elements)),
+        Box::new(other_elements),
     );*/
     //let combine = concat!("<msup>", elements_to_string, "</msup>");
     //let new = Span::new(combine.to_str());
@@ -418,13 +465,11 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     ))(input)?;*/
 
     //let sup = MathExpression::Msup(Box::new(elements), Box::new(other_elements));
-    /*let sup = MathExpression::Msup(
-        Box::new(MathExpression::Mrow(Mrow(elements))),
-        Box::new(MathExpression::Mrow(Mrow(other_elements))),
-    );*/
+    let sup = MathExpression::Msup(Box::new(base), Box::new(other_elements));
     //});
 
-    Ok((s, elements))
+    //Ok((s, elements))
+    Ok((s, sup))
 }
 
 /// Parser for math expressions. This varies from the one in the generic_mathml module, since it
@@ -492,8 +537,8 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
-        map(divergence, MathExpression::Mo),
         absolute_with_msup,
+        map(div, MathExpression::Mo),
         map(absolute, MathExpression::Mrow),
         map(operator, MathExpression::Mo),
         mn,

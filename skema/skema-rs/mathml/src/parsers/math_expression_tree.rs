@@ -351,10 +351,14 @@ impl FromStr for MathExpressionTree {
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
+    let mut count = 0;
     let mut lhs = match lexer.next() {
         Token::Atom(it) => MathExpressionTree::Atom(it),
         Token::Op(Operator::Lparen) => {
             let lhs = expr_bp(lexer, 0);
+            println!("lhs={:?}", lhs);
+            count += 1;
+            println!("count= {}", count);
             assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
             lhs
         }
@@ -372,6 +376,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
             t => panic!("bad token: {:?}", t),
         };
         if let Some((l_bp, ())) = postfix_binding_power(&op) {
+            println!("op1={:?}", op);
             if l_bp < min_bp {
                 break;
             }
@@ -380,12 +385,14 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
             continue;
         }
         if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
+            println!("op={:?}", op);
             if l_bp < min_bp {
                 break;
             }
             lexer.next();
             lhs = {
                 let rhs = expr_bp(lexer, r_bp);
+                println!("rhs={:?}", rhs);
                 MathExpressionTree::Cons(op, vec![lhs, rhs])
             };
             continue;
@@ -406,7 +413,8 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Mean => ((), 23),
         Operator::Dot => ((), 24),
         Operator::Grad => ((), 25),
-        Operator::Derivative(Derivative { .. }) => ((), 26),
+        Operator::Div => ((), 29),
+        Operator::Derivative(Derivative { .. }) => ((), 27),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -428,7 +436,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
-        //Operator::Dot => (17, 16),
+        Operator::Div => (17, 16),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -882,7 +890,7 @@ fn test_absolute_value() {
 fn test_absolute_as_msup() {
     let input = "
     <math>
-        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
+        <mo>|</mo><mo>&#x2207;</mo><mi>H</mi>
         <msup><mo>|</mo>
         <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
     </math>
@@ -946,6 +954,18 @@ fn test_func_paren_and_times_another() {
     <math>
         <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
         <mo>(</mo><mi>a</mi><mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>+</mo><mi>b</mi><mi>R</mi><mo>(</mo><mi>t</mi><mo>)</mo><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_divergence() {
+    let input = "
+    <math>
+        <mo>&#x2207;</mo><mo>&#x22c5;</mo>
+        <mi>H</mi>
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
