@@ -922,9 +922,7 @@ class ToGrometPass:
                     PYTHON_VERSION,
                 )
             if isinstance(node.func, AnnCastAttribute):
-                print(func_name)
                 attr_node = node.func
-                print(self.import_collection)
                 if func_name in self.import_collection:
                     # print(f"Module {func_name} has imported function {attr_node.attr.name}")
                     # Check if it's gromet_fn_module/native/other
