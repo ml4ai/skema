@@ -346,9 +346,9 @@ def train_model(rank=None,):
     if optimizer_type == "AdamW":
         optimizer = torch.optim.AdamW(
             params=model.parameters(),
-            # lr=_lr,
-            # weight_decay=weight_decay,
-            # betas=(beta_1, beta_2),
+            lr=_lr,
+            weight_decay=weight_decay,
+            betas=(beta_1, beta_2),
         )
     elif optimizer_type == "SGD":
         optimizer = torch.optim.SGD(

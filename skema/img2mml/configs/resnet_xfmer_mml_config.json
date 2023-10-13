@@ -41,11 +41,11 @@
 "beta_1":0.9,
 "beta_2":0.999,
 "learning_rate":0.00017157810468937788,
-"weight_decay": 0.0001,
+"weight_decay": 0.01,
 
 
 "__":"if want to scheduler. Options: {step_lr, multistep_lr, exp_lr, reduce_lr, cycle_lr}",
-"isScheduler":true,
+"isScheduler":false,
 "whichScheduler":"multistep_lr",
 
 "__":"params for cycle_lr",
@@ -56,7 +56,7 @@
 "mode":"triangular",
 
 "--": "these params are for step_lr, and reduce_lr only",
-"starting_lr":0.001,
+"starting_lr":0.0001,
 "step_size":10,
 "gamma":0.5,
 "dropout":0.3,
