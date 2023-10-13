@@ -45,6 +45,7 @@ import skema.skema_py.acsets
 import skema.skema_py.petris
 
 import skema.program_analysis.comment_extractor.server as comment_service
+from skema.utils.fold import del_nulls
 from skema.gromet.fn.gromet_fn_module_collection import GrometFNModuleCollection
 from skema.gromet.metadata.debug import Debug
 from skema.program_analysis.multi_file_ingester import process_file_system
@@ -372,6 +373,88 @@ async def fn_given_filepaths_zip(zip_file: UploadFile = File()):
 
 
 @router.post(
+    &#34;/gromet-object-count&#34;,
+    summary=(&#34;Endpoint for counting the number of boxes, wires, and ports in a Gromet object.&#34;),
+)
+async def gromet_object_count(gromet_object: Dict):
+    &#34;&#34;&#34;
+    Endpoint for counting the number of boxes, wires, and ports in a Gromet object.
+    ### Python example
+    ```
+    import requests
+
+    system = {
+        &#34;files&#34;: [&#34;example1.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;greet = lambda: print(&#39;howdy!&#39;)&#34;
+        ],
+    }
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    response = client.post(&#34;/code2fn/gromet-object-count&#34;, json=gromet_collection)
+    gromet_object_count = response.json()
+    &#34;&#34;&#34;
+
+    gromet_keys = {
+        &#34;b&#34;: 0,
+        &#34;bf&#34;: 0,
+        &#34;opi&#34;: 0,
+        &#34;opo&#34;: 0,
+        &#34;pil&#34;: 0,
+        &#34;pol&#34;: 0,
+        &#34;wlopi&#34;: 0,
+        &#34;wll&#34;: 0,
+        &#34;wlf&#34;: 0,
+        &#34;wlc&#34;: 0,
+        &#34;wlopo&#34;: 0,
+        &#34;pof&#34;: 0,
+        &#34;pif&#34;: 0,
+        &#34;wfopi&#34;: 0,
+        &#34;wfl&#34;: 0,
+        &#34;wff&#34;: 0,
+        &#34;wfc&#34;: 0,
+        &#34;wfopo&#34;: 0,
+        &#34;pic&#34;: 0,
+        &#34;poc&#34;: 0,
+        &#34;wcopi&#34;: 0,
+        &#34;wcl&#34;: 0,
+        &#34;wcf&#34;: 0,
+        &#34;wcc&#34;: 0,
+        &#34;wcopo&#34;: 0,
+    }
+
+    def recurse(gromet_object: Dict):
+        &#34;&#34;&#34;Recursive walking function for Gromet&#34;&#34;&#34;
+        for key, value in gromet_object.items():
+            if key in gromet_keys:
+                gromet_keys[key] += len(value)
+            elif isinstance(value, List):
+                for element in value:
+                    if isinstance(element, Dict):
+                        recurse(element)
+            elif isinstance(value, Dict):
+                recurse(value)
+
+    # Its likely that the Gromet passed to this endpoint will not have None values removed.
+    # So, we need to remove None values ahead of time.
+    del_nulls(gromet_object)
+    recurse(gromet_object)
+
+    # We also will aggregate the boxes, wires, and ports to better support MORAE usecases
+    gromet_keys[&#34;boxes&#34;] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith(&#34;b&#34;)]
+    )
+    gromet_keys[&#34;wires&#34;] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith(&#34;w&#34;)]
+    )
+    gromet_keys[&#34;ports&#34;] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith((&#34;p&#34;, &#34;o&#34;))]
+    )
+
+    return gromet_keys
+
+
+@router.post(
     &#34;/get-pyacset&#34;,
     summary=(&#34;Get PyACSet for a given model&#34;),
 )
@@ -640,6 +723,110 @@ async def get_pyacset(ports: Ports):
             )
 
     return supported_file_extensions, extension_to_language</code></pre>
+</details>
+</dd>
+<dt id="skema.skema_py.server.gromet_object_count"><code class="name flex">
+<span>async def <span class="ident">gromet_object_count</span></span>(<span>gromet_object: Dict[~KT, ~VT])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Endpoint for counting the number of boxes, wires, and ports in a Gromet object.</p>
+<h3 id="python-example">Python example</h3>
+<p>```
+import requests</p>
+<p>system = {
+"files": ["example1.py"],
+"blobs": [
+"greet = lambda: print('howdy!')"
+],
+}
+response = client.post("/code2fn/fn-given-filepaths", json=system)
+gromet_collection = response.json()
+response = client.post("/code2fn/gromet-object-count", json=gromet_collection)
+gromet_object_count = response.json()</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@router.post(
+    &#34;/gromet-object-count&#34;,
+    summary=(&#34;Endpoint for counting the number of boxes, wires, and ports in a Gromet object.&#34;),
+)
+async def gromet_object_count(gromet_object: Dict):
+    &#34;&#34;&#34;
+    Endpoint for counting the number of boxes, wires, and ports in a Gromet object.
+    ### Python example
+    ```
+    import requests
+
+    system = {
+        &#34;files&#34;: [&#34;example1.py&#34;],
+        &#34;blobs&#34;: [
+            &#34;greet = lambda: print(&#39;howdy!&#39;)&#34;
+        ],
+    }
+    response = client.post(&#34;/code2fn/fn-given-filepaths&#34;, json=system)
+    gromet_collection = response.json()
+    response = client.post(&#34;/code2fn/gromet-object-count&#34;, json=gromet_collection)
+    gromet_object_count = response.json()
+    &#34;&#34;&#34;
+
+    gromet_keys = {
+        &#34;b&#34;: 0,
+        &#34;bf&#34;: 0,
+        &#34;opi&#34;: 0,
+        &#34;opo&#34;: 0,
+        &#34;pil&#34;: 0,
+        &#34;pol&#34;: 0,
+        &#34;wlopi&#34;: 0,
+        &#34;wll&#34;: 0,
+        &#34;wlf&#34;: 0,
+        &#34;wlc&#34;: 0,
+        &#34;wlopo&#34;: 0,
+        &#34;pof&#34;: 0,
+        &#34;pif&#34;: 0,
+        &#34;wfopi&#34;: 0,
+        &#34;wfl&#34;: 0,
+        &#34;wff&#34;: 0,
+        &#34;wfc&#34;: 0,
+        &#34;wfopo&#34;: 0,
+        &#34;pic&#34;: 0,
+        &#34;poc&#34;: 0,
+        &#34;wcopi&#34;: 0,
+        &#34;wcl&#34;: 0,
+        &#34;wcf&#34;: 0,
+        &#34;wcc&#34;: 0,
+        &#34;wcopo&#34;: 0,
+    }
+
+    def recurse(gromet_object: Dict):
+        &#34;&#34;&#34;Recursive walking function for Gromet&#34;&#34;&#34;
+        for key, value in gromet_object.items():
+            if key in gromet_keys:
+                gromet_keys[key] += len(value)
+            elif isinstance(value, List):
+                for element in value:
+                    if isinstance(element, Dict):
+                        recurse(element)
+            elif isinstance(value, Dict):
+                recurse(value)
+
+    # Its likely that the Gromet passed to this endpoint will not have None values removed.
+    # So, we need to remove None values ahead of time.
+    del_nulls(gromet_object)
+    recurse(gromet_object)
+
+    # We also will aggregate the boxes, wires, and ports to better support MORAE usecases
+    gromet_keys[&#34;boxes&#34;] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith(&#34;b&#34;)]
+    )
+    gromet_keys[&#34;wires&#34;] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith(&#34;w&#34;)]
+    )
+    gromet_keys[&#34;ports&#34;] = sum(
+        [val for key, val in gromet_keys.items() if key.startswith((&#34;p&#34;, &#34;o&#34;))]
+    )
+
+    return gromet_keys</code></pre>
 </details>
 </dd>
 <dt id="skema.skema_py.server.ping"><code class="name flex">
@@ -1034,6 +1221,7 @@ allow <code>self</code> as a field name.</p></div>
 <li><code><a title="skema.skema_py.server.fn_supported_file_extensions" href="#skema.skema_py.server.fn_supported_file_extensions">fn_supported_file_extensions</a></code></li>
 <li><code><a title="skema.skema_py.server.get_pyacset" href="#skema.skema_py.server.get_pyacset">get_pyacset</a></code></li>
 <li><code><a title="skema.skema_py.server.get_supported_languages" href="#skema.skema_py.server.get_supported_languages">get_supported_languages</a></code></li>
+<li><code><a title="skema.skema_py.server.gromet_object_count" href="#skema.skema_py.server.gromet_object_count">gromet_object_count</a></code></li>
 <li><code><a title="skema.skema_py.server.ping" href="#skema.skema_py.server.ping">ping</a></code></li>
 <li><code><a title="skema.skema_py.server.system_to_enriched_system" href="#skema.skema_py.server.system_to_enriched_system">system_to_enriched_system</a></code></li>
 <li><code><a title="skema.skema_py.server.system_to_gromet" href="#skema.skema_py.server.system_to_gromet">system_to_gromet</a></code></li>
