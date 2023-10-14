@@ -373,12 +373,48 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     let mut lhs = match lexer.next() {
         Token::Atom(it) => MathExpressionTree::Atom(it),
         Token::Op(Operator::Lparen) => {
-            let lhs = expr_bp(lexer, 0);
-            println!("--------- lhs={:?}", lhs);
-            count += 1;
-            println!("count= {}", count);
-            assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
-            lhs
+            if let Token::Op(op) = lexer.peek() {
+                println!("hereeeee");
+                if op == Operator::Lparen {
+                    let lhs = expr_bp(lexer, 0);
+                    assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+                    lhs
+                } else {
+                    let ((), r_bp) = prefix_binding_power(&op);
+                    lexer.next();
+                    let rhs = expr_bp(lexer, r_bp);
+                    assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+                    println!("]]]]]]");
+                    MathExpressionTree::Cons(op, vec![rhs])
+                }
+            } else {
+                let lhs = expr_bp(lexer, 0);
+                println!("--------- lhs={:?}", lhs);
+                count += 1;
+                println!("count= {}", count);
+                //println!("lhs={:?}", lhs);
+                //let ((), r_bp) = prefix_binding_power(&op);
+                /*if lexer.next() == Token::Op(Operator::Lparen) {
+                    let lhs = expr_bp(lexer, 0);
+                    assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+                    lhs
+                }*/
+                match lexer.next() {
+                    Token::Op(Operator::Rparen) => {
+                        let lhs = expr_bp(lexer, 0);
+                        assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+                        lhs
+                    }
+                    Token::Op(op) => {
+                        println!("[[[[");
+                        let ((), r_bp) = prefix_binding_power(&op);
+                        lexer.next();
+                        let rhs = expr_bp(lexer, r_bp);
+                        MathExpressionTree::Cons(op, vec![rhs])
+                    }
+                    t => panic!("bad token: {:?}", t),
+                }
+            }
         }
         Token::Op(op) => {
             let ((), r_bp) = prefix_binding_power(&op);
@@ -424,15 +460,15 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
-        Operator::Exp => ((), 18),
-        Operator::Cos => ((), 19),
-        Operator::Sin => ((), 21),
-        Operator::Tan => ((), 22),
-        Operator::Mean => ((), 23),
-        Operator::Dot => ((), 24),
-        Operator::Grad => ((), 25),
-        Operator::Div => ((), 26),
-        Operator::Derivative(Derivative { .. }) => ((), 27),
+        Operator::Exp => ((), 20),
+        Operator::Cos => ((), 21),
+        Operator::Sin => ((), 22),
+        Operator::Tan => ((), 23),
+        Operator::Mean => ((), 24),
+        Operator::Dot => ((), 25),
+        Operator::Grad => ((), 26),
+        Operator::Div => ((), 29),
+        Operator::Derivative(Derivative { .. }) => ((), 31),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -454,7 +490,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
-        Operator::Grad => (17, 16),
+        //Operator::Grad => (18, 17),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -960,10 +996,8 @@ fn test_halfar_dome2() {
         <mo>(</mo>
         <mi>Γ</mi>
         <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
-        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
-        <msup><mo>|</mo>
+        <msup><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
         <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
-        <mo>&#x2207;</mo><mi>H</mi>
         <mo>)</mo>
     </math>
     ";
