@@ -186,8 +186,13 @@ impl MathExpression {
             // Insert implicit division operators, and wrap numerators and denominators in
             // parentheses for the Pratt parsing algorithm.
             MathExpression::Differential(x) => {
+                println!("x={:?}", x);
                 tokens.push(MathExpression::Mo(Operator::Lparen));
-                x.diff.flatten(tokens);
+                if x.diff == Box::new(MathExpression::Mo(Operator::Grad)) {
+                    tokens.push(MathExpression::Mo(Operator::Grad));
+                } else {
+                    x.diff.flatten(tokens);
+                }
                 x.func.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
             }
@@ -228,6 +233,17 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
+            MathExpression::Sup(base, superscript) => {
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                for element in base {
+                    element.flatten(tokens);
+                }
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+                tokens.push(MathExpression::Mo(Operator::Power));
+                tokens.push(MathExpression::Mo(Operator::Lparen));
+                superscript.flatten(tokens);
+                tokens.push(MathExpression::Mo(Operator::Rparen));
+            }
             MathExpression::Mover(base, over) => {
                 if MathExpression::Mo(Operator::Mean) == **over {
                     tokens.push(MathExpression::Mo(Operator::Mean));
@@ -262,13 +278,14 @@ impl Lexer {
                             // If the last element is an Mo, noop.
                         } else {
                             // Otherwise, insert a multiplication operator.
+                            println!("nnnnnnnnnnnnnn");
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
                         acc.push(x);
                     }
-
                     // Handle other types of operators.
-                    MathExpression::Mo(_) => {
+                    MathExpression::Mo(y) => {
+                        println!("||||||y ={:?}", y);
                         acc.push(x);
                     }
                     // Handle other types of MathExpression objects.
@@ -280,9 +297,10 @@ impl Lexer {
                                 // insert a multiplication operator
                                 acc.push(&MathExpression::Mo(Operator::Multiply));
                             }
-                            MathExpression::Mo(_) => {
+                            MathExpression::Mo(y) => {
                                 // If the last item in the accumulator is an Mo (but not a right
                                 // parenthesis), noop
+                                println!("testing in y = {:?}", y);
                             }
                             _ => {
                                 // Otherwise, insert a multiplication operator
@@ -356,7 +374,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
         Token::Atom(it) => MathExpressionTree::Atom(it),
         Token::Op(Operator::Lparen) => {
             let lhs = expr_bp(lexer, 0);
-            println!("lhs={:?}", lhs);
+            println!("--------- lhs={:?}", lhs);
             count += 1;
             println!("count= {}", count);
             assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
@@ -376,7 +394,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
             t => panic!("bad token: {:?}", t),
         };
         if let Some((l_bp, ())) = postfix_binding_power(&op) {
-            println!("op1={:?}", op);
+            println!("--------op1={:?}", op);
             if l_bp < min_bp {
                 break;
             }
@@ -385,14 +403,14 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
             continue;
         }
         if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
-            println!("op={:?}", op);
+            println!("-----------op={:?}", op);
             if l_bp < min_bp {
                 break;
             }
             lexer.next();
             lhs = {
                 let rhs = expr_bp(lexer, r_bp);
-                println!("rhs={:?}", rhs);
+                println!("--------rhs={:?}", rhs);
                 MathExpressionTree::Cons(op, vec![lhs, rhs])
             };
             continue;
@@ -413,7 +431,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Mean => ((), 23),
         Operator::Dot => ((), 24),
         Operator::Grad => ((), 25),
-        Operator::Div => ((), 29),
+        Operator::Div => ((), 26),
         Operator::Derivative(Derivative { .. }) => ((), 27),
         _ => panic!("Bad operator: {:?}", op),
     }
@@ -436,7 +454,7 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
         Operator::Multiply | Operator::Divide => (7, 8),
         Operator::Compose => (14, 13),
         Operator::Power => (16, 15),
-        Operator::Div => (17, 16),
+        Operator::Grad => (17, 16),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
     };
@@ -887,10 +905,21 @@ fn test_absolute_value() {
 }
 
 #[test]
+fn test_grad() {
+    let input = "
+    <math>
+        <mo>&#x2207;</mo><mi>H</mi>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
 fn test_absolute_as_msup() {
     let input = "
     <math>
-        <mo>|</mo><mo>&#x2207;</mo><mi>H</mi>
+        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
         <msup><mo>|</mo>
         <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
     </math>
@@ -910,6 +939,24 @@ fn test_halfar_dome() {
         <mo>=</mo>
         <mo>&#x2207;</mo>
         <mo>&#x22c5;</mo>
+        <mo>(</mo>
+        <mi>Γ</mi>
+        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
+        <mo>|</mo><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
+        <msup><mo>|</mo>
+        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
+        <mo>&#x2207;</mo><mi>H</mi>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_halfar_dome2() {
+    let input = "
+    <math>
         <mo>(</mo>
         <mi>Γ</mi>
         <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>

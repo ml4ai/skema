@@ -387,13 +387,8 @@ pub fn div(input: Span) -> IResult<Operator> {
     let (s, op) = //value(
         //Operator::Div,
         ws(pair(
-            ws(delimited(
-                stag!("mo"),
-                grad,
-                //alt((ws(tag("𝛁")), ws(tag("&#x2207;")))),
-                etag!("mo"),
-            )),
-            ws(delimited(
+                gradient,
+                ws(delimited(
                 stag!("mo"),
                 dot,
                 //alt((ws(tag("⋅")), ws(tag("&#x22c5;")))),
@@ -408,6 +403,19 @@ pub fn div(input: Span) -> IResult<Operator> {
     Ok((s, div))
 }
 
+pub fn gradient(input: Span) -> IResult<Operator> {
+    let (s, op) = ws(delimited(stag!("mo"), grad, etag!("mo")))(input)?;
+    Ok((s, op))
+}
+
+pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
+    let (s, (op, id)) = ws(pair(gradient, mi))(input)?;
+    let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(id)), None);
+    println!("op = {:?}, ci = {:?}", op, ci);
+    Ok((s, (op, ci)))
+}
+
+/*
 pub fn absolute_base(input: Span) -> IResult<Mrow> {
     let abs = delimited(stag!("mo"), tag("|"), etag!("mo"));
     println!("---abs");
@@ -428,20 +436,19 @@ pub fn absolute_superscript(input: Span) -> IResult<MathExpression> {
     ))(input)?;
     Ok((s, sup))
 }
-
+*/
 ///Absolute with Msup value
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
     let (s, sup) = ws(map(
         ws(delimited(
             tag("<mo>|</mo>"),
-            separated_pair(
-                many0(math_expression),
-                tag("<msup><mo>|</mo>"),
+            tuple((
                 math_expression,
-            ),
+                preceded(tag("<msup><mo>|</mo>"), math_expression),
+            )),
             tag("</msup>"),
         )),
-        |(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
+        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
     ))(input)?;
     //let (s, base) = absolute_base(input)?;
     //let (s, new_base) = ws(map(absolute_base, MathExpression::Mrow))(input);
@@ -487,6 +494,7 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
+        absolute_with_msup,
         map(
             first_order_derivative_leibniz_notation,
             |(
@@ -548,12 +556,32 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
-        absolute_with_msup,
+        map(
+            grad_func,
+            |(
+                op,
+                Ci {
+                    r#type,
+                    content,
+                    func_of,
+                },
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(op)),
+                    func: Box::new(MathExpression::Ci(Ci {
+                        r#type,
+                        content,
+                        func_of,
+                    })),
+                })
+            },
+        ),
         map(div, MathExpression::Mo),
+        map(gradient, MathExpression::Mo),
         map(absolute, MathExpression::Mrow),
         map(operator, MathExpression::Mo),
         mn,
-        superscript,
+        //superscript,
         msup,
         over_term,
         msub,
