@@ -408,17 +408,19 @@ pub fn div(input: Span) -> IResult<Operator> {
     Ok((s, div))
 }
 
-pub fn absolute_base(input: Span) -> IResult<MathExpression> {
-    let (s, base) = ws(delimited(
-        tag("<mo>|</mo>"),
-        many0(math_expression),
-        tag("<msup><mo>|</mo>"),
-    ))(input)?;
-    let row = MathExpression::Mrow(Mrow(base));
+pub fn absolute_base(input: Span) -> IResult<Mrow> {
+    let abs = delimited(stag!("mo"), tag("|"), etag!("mo"));
+    println!("---abs");
+    let (s, base) = ws(delimited(abs, many0(math_expression), stag!("msup")))(input)?;
+    println!("base = {:?}", base);
+    //let row = MathExpression::Mrow(Mrow(base));
+    let row = Mrow(base);
+    println!("row={:?}", row);
     Ok((s, row))
 }
 
 pub fn absolute_superscript(input: Span) -> IResult<MathExpression> {
+    //let abs =
     let (s, sup) = ws(delimited(
         tag("<mo>|</mo>"),
         math_expression,
@@ -429,18 +431,24 @@ pub fn absolute_superscript(input: Span) -> IResult<MathExpression> {
 
 ///Absolute with Msup value
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
-    /*let (s, sup) = ws(map(
+    let (s, sup) = ws(map(
         ws(delimited(
             tag("<mo>|</mo>"),
-            separated_pair(math_expression, tag("<msup><mo>|</mo>"), math_expression),
+            separated_pair(
+                many0(math_expression),
+                tag("<msup><mo>|</mo>"),
+                math_expression,
+            ),
             tag("</msup>"),
         )),
-        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
-    ))(input)?;*/
-    let (s, base) = absolute_base(input)?;
-    //let (s, new_base) = ws(map(absolute_base, MathExpression::Mrow))(input)?;
+        |(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
+    ))(input)?;
+    //let (s, base) = absolute_base(input)?;
+    //let (s, new_base) = ws(map(absolute_base, MathExpression::Mrow))(input);
+    //println!("base={:?}", base);
+
     //let (s, other_elements) = ws(terminated(math_expression, tag("</msup>")))(s)?;
-    let (s, other_elements) = absolute_superscript(s)?;
+    //let (s, other_elements) = absolute_superscript(s)?;
     /*let (s, x) = ws(delimited(
         tag("<mo>|</mo>"),
         many0(math_expression),
@@ -464,8 +472,11 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
         |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
     ))(input)?;*/
 
-    //let sup = MathExpression::Msup(Box::new(elements), Box::new(other_elements));
-    let sup = MathExpression::Msup(Box::new(base), Box::new(other_elements));
+    /* let sup = MathExpression::Msup(
+        Box::new(MathExpression::Mrow(base)),
+        Box::new(other_elements),
+    );*/
+    // let sup = MathExpression::Msup(Box::new(new_base), Box::new(other_elements));
     //});
 
     //Ok((s, elements))
