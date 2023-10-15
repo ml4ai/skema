@@ -210,6 +210,38 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
     ))
 }
 
+pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative, MathExpression)> {
+    println!("--in here");
+    let (s, _) = tuple((stag!("mfrac"), alt((d, partial))))(input)?;
+    let (s, with_respect_to) = delimited(
+        tuple((stag!("mrow"), alt((d, partial)))),
+        mi,
+        pair(etag!("mrow"), etag!("mfrac")),
+    )(s)?;
+    println!("in here");
+    let (s, func) = delimited(
+        tuple((stag!("mo"), lparen, etag!("mo"))),
+        math_expression,
+        tuple((stag!("mo"), lparen, etag!("mo"))),
+    )(s)?;
+    println!("next");
+    Ok((
+        s,
+        (
+            Derivative::new(
+                1,
+                1,
+                Ci::new(
+                    Some(Type::Real),
+                    Box::new(MathExpression::Mi(with_respect_to)),
+                    None,
+                ),
+            ),
+            func,
+        ),
+    ))
+}
+
 /// Parse a first-order ordinary derivative written in Leibniz notation.
 pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivative, Ci)> {
     let (s, _) = tuple((stag!("mfrac"), stag!("mrow"), alt((d, partial))))(input)?;
@@ -408,12 +440,12 @@ pub fn gradient(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
+/*pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
     let (s, (op, id)) = ws(pair(gradient, mi))(input)?;
     let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(id)), None);
     println!("op = {:?}, ci = {:?}", op, ci);
     Ok((s, (op, ci)))
-}
+}*/
 
 /*
 pub fn absolute_base(input: Span) -> IResult<Mrow> {
@@ -496,6 +528,26 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
         absolute_with_msup,
         map(
+            first_order_with_func_in_parenthesis,
+            |(
+                Derivative {
+                    order,
+                    var_index,
+                    bound_var,
+                },
+                y,
+            )| {
+                MathExpression::Differential(Differential {
+                    diff: Box::new(MathExpression::Mo(Operator::Derivative(Derivative {
+                        order,
+                        var_index,
+                        bound_var,
+                    }))),
+                    func: Box::new(y),
+                })
+            },
+        ),
+        map(
             first_order_derivative_leibniz_notation,
             |(
                 Derivative {
@@ -556,7 +608,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 func_of: None,
             })
         }),
-        map(
+        /*map(
             grad_func,
             |(
                 op,
@@ -575,13 +627,13 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     })),
                 })
             },
-        ),
+        ),*/
         map(div, MathExpression::Mo),
-        map(gradient, MathExpression::Mo),
+        //map(gradient, MathExpression::Mo),
         map(absolute, MathExpression::Mrow),
         map(operator, MathExpression::Mo),
         mn,
-        //superscript,
+        superscript,
         msup,
         over_term,
         msub,
