@@ -5,6 +5,9 @@
 "testing":false,
 "continue_training_from_last_saved_model":false,
 "bin_comparison":false,
+"length_based_binning":true,
+"start_bin":0,
+"end_bin":50,
 
 "_comment_":"general params ",
 "use_single_gpu":false,
@@ -42,7 +45,7 @@
 "beta_2":0.999,
 "learning_rate":0.0001,
 "weight_decay": 0.01,
-
+"dropout":0.3,
 
 "__":"if want to scheduler. Options: {step_lr, multistep_lr, exp_lr, reduce_lr, cycle_lr}",
 "isScheduler":false,
@@ -59,7 +62,7 @@
 "starting_lr":0.001,
 "step_size":10,
 "gamma":0.5,
-"dropout":0.3,
+
 
 "_comment_":"encoder params",
 "encoder_dim":256,

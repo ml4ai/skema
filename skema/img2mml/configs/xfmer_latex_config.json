@@ -25,7 +25,7 @@
 
 "_comment_":"params for preprocessing",
 "data_path":"/home/gauravs/data/odata/",
-"dataset_type":"im2data",
+"dataset_type":"our_sampled_data",
 "markup":"latex",
 "preprocessed_image_width":500,
 "preprocessed_image_height":60,
@@ -46,12 +46,24 @@
 "beta_2":0.9,
 "learning_rate":0.0001,
 "weight_decay": 1e-5,
-"step_scheduler":false,
-"exponential_scheduler":false,
-"starting_lr":0.01,
-"step_size":30,
-"gamma":0.1,
 "dropout":0.1,
+
+"__":"if want to scheduler. Options: {step_lr, multistep_lr, exp_lr, reduce_lr, cycle_lr}",
+"isScheduler":false,
+"whichScheduler":"multistep_lr",
+
+"__":"params for cycle_lr",
+"base_lr":0.0003,
+"max_lr":0.003,
+"step_size_up":1250,
+"step_size_down":3750,
+"mode":"triangular",
+
+"--": "these params are for scheduler only",
+"starting_lr":0.001,
+"step_size":10,
+"gamma":0.5,
+
 
 "_comment_":"encoder params",
 "encoder_dim":512,
@@ -60,7 +72,6 @@
 "n_xfmer_heads":4,
 "n_xfmer_encoder_layers":8,
 "dim_feedforward_for_xfmer":1024,
-
 
 "_comment_":"decoder params",
 "embedding_dim":256,
