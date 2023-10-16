@@ -64,28 +64,28 @@ class My_pad_collate(object):
         )
 
 
-def bin_test_dataloader(config, 
-                        vocab, 
-                        device, 
-                        start=None, 
+def bin_test_dataloader(config,
+                        vocab,
+                        device,
+                        start=None,
                         end=None,
                         length_based_binning=False,
                         content_based_binning=False,
-):  
+):
     df = pd.read_csv(
         f"{config['data_path']}/{config['dataset_type']}/test.csv"
     )
     imgs, eqns = df["IMG"], df["EQUATION"]
 
     eqns_arr = list()
-    imgs_arr = list()    
+    imgs_arr = list()
     if length_based_binning:
-        for i, e in zip(imgs, eqns):            
+        for i, e in zip(imgs, eqns):
             if len(e.split()) > start and len(e.split()) <= end:
                 eqns_arr.append(e)
                 imgs_arr.append(i)
-            
-    elif content_based_binning:
+
+    elif content_based_binning:   # only fo mml
         """
         first run the latex config and save the csv as
         test_latex which then be used for reference.
