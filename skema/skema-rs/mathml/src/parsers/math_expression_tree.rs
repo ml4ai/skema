@@ -216,14 +216,19 @@ impl MathExpression {
                         println!("INSIDE");
                         tokens.push(MathExpression::Mo(Operator::Lparen));
                         base.flatten(tokens);
+                        //println!("base.flatten(tokens): {:?}", base.flatten(tokens));
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                         tokens.push(MathExpression::Mo(Operator::Power));
                         tokens.push(MathExpression::Mo(Operator::Lparen));
                         superscript.flatten(tokens);
+                        //println!(
+                        //   "supersciprt.flatten(tokens): {:?}",
+                        //  superscript.flatten(tokens)
+                        //);
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                     }
                 } else {
-                    println!("----");
+                    println!("Super");
                     tokens.push(MathExpression::Mo(Operator::Lparen));
                     base.flatten(tokens);
                     tokens.push(MathExpression::Mo(Operator::Rparen));
@@ -233,7 +238,7 @@ impl MathExpression {
                     tokens.push(MathExpression::Mo(Operator::Rparen));
                 }
             }
-            MathExpression::Sup(base, superscript) => {
+            /*MathExpression::Sup(base, superscript) => {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 for element in base {
                     element.flatten(tokens);
@@ -243,7 +248,7 @@ impl MathExpression {
                 tokens.push(MathExpression::Mo(Operator::Lparen));
                 superscript.flatten(tokens);
                 tokens.push(MathExpression::Mo(Operator::Rparen));
-            }
+            }*/
             MathExpression::Mover(base, over) => {
                 if MathExpression::Mo(Operator::Mean) == **over {
                     tokens.push(MathExpression::Mo(Operator::Mean));
@@ -278,23 +283,28 @@ impl Lexer {
                             // If the last element is an Mo, noop.
                         } else {
                             // Otherwise, insert a multiplication operator.
-                            println!("nnnnnnnnnnnnnn");
+                            //println!("nnnnnnnnnnnnnn");
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
                         acc.push(x);
+                        println!("x={:?}", x);
                     }
                     // Handle other types of operators.
                     MathExpression::Mo(y) => {
-                        println!("||||||y ={:?}", y);
+                        //println!("||||||y ={:?}", y);
+                        println!("y = {:?}", y);
+                        println!("-->x={:?}", x);
                         acc.push(x);
                     }
                     // Handle other types of MathExpression objects.
                     t => {
+                        println!("t = {:?}", t);
                         let last_token = acc.last().unwrap();
                         match last_token {
                             MathExpression::Mo(Operator::Rparen) => {
                                 // If the last item in the accumulator is a right parenthesis ')',
                                 // insert a multiplication operator
+                                println!("in here");
                                 acc.push(&MathExpression::Mo(Operator::Multiply));
                             }
                             MathExpression::Mo(y) => {
@@ -369,11 +379,17 @@ impl FromStr for MathExpressionTree {
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
-    let mut count = 0;
     let mut lhs = match lexer.next() {
-        Token::Atom(it) => MathExpressionTree::Atom(it),
+        Token::Atom(it) => {
+            println!("it={:?}", it);
+            MathExpressionTree::Atom(it)
+        }
         Token::Op(Operator::Lparen) => {
-            if let Token::Op(op) = lexer.peek() {
+            let lhs = expr_bp(lexer, 0);
+            println!("lhs={:?}", lhs);
+            assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+            lhs
+            /*if let Token::Op(op) = lexer.peek() {
                 println!("hereeeee");
                 if op == Operator::Lparen {
                     let lhs = expr_bp(lexer, 0);
@@ -414,7 +430,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
                     }
                     t => panic!("bad token: {:?}", t),
                 }
-            }
+            }*/
         }
         Token::Op(op) => {
             let ((), r_bp) = prefix_binding_power(&op);
@@ -434,8 +450,14 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
             if l_bp < min_bp {
                 break;
             }
-            lexer.next();
-            lhs = MathExpressionTree::Cons(op, vec![lhs]);
+            if op == Operator::Lparen {
+                let rhs = expr_bp(lexer, 0);
+                assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+                lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
+            } else {
+                lexer.next();
+                lhs = MathExpressionTree::Cons(op, vec![lhs]);
+            }
             continue;
         }
         if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
@@ -466,7 +488,7 @@ fn prefix_binding_power(op: &Operator) -> ((), u8) {
         Operator::Tan => ((), 23),
         Operator::Mean => ((), 24),
         Operator::Dot => ((), 25),
-        Operator::Grad => ((), 26),
+        Operator::Grad => ((), 27),
         Operator::Div => ((), 29),
         Operator::Derivative(Derivative { .. }) => ((), 31),
         _ => panic!("Bad operator: {:?}", op),
@@ -904,12 +926,12 @@ fn test_one_dimensional_ebm() {
         <mrow><mi>∂</mi><mi>t</mi></mrow>
         </mfrac>
         <mo>=</mo>
-        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>Q</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo>
+        <mo>(</mo><mn>1</mn><mo>−</mo><mi>α</mi><mo>)</mo><mi>S</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo>
         <mo>-</mo>
         <mo>(</mo><mi>A</mi><mo>+</mo><mi>B</mi><mi>T</mi><mo>(</mo><mi>ϕ</mi><mo>,</mo><mi>t</mi><mo>)</mo><mo>)</mo>
         <mo>+</mo>
         <mfrac>
-        <mi>K</mi>
+        <mn>1</mn>
         <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
         </mfrac>
         <mfrac>
@@ -993,16 +1015,20 @@ fn test_halfar_dome() {
 fn test_halfar_dome2() {
     let input = "
     <math>
-        <mo>(</mo>
-        <mi>Γ</mi>
-        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
-        <msup><mrow><mo>&#x2207;</mo><mi>H</mi></mrow>
-        <mrow><mi>n</mi><mo>−</mo><mn>1</mn></mrow></msup>
-        <mo>)</mo>
+        <mrow>
+        <mn>3</mn>
+        <mi>x</mi>
+        </mrow>
+        <mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow>
+        <msup><mi>S</mi><mrow><mi>m</mi><mo>-</mo><mn>2</mn></mrow></msup>
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
+    let math = exp.to_infix_expression();
+    println!("math={:?}", math);
 }
 
 #[test]
@@ -1047,6 +1073,40 @@ fn test_divergence() {
     <math>
         <mo>&#x2207;</mo><mo>&#x22c5;</mo>
         <mi>H</mi>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+#[test]
+fn test_partial_without_rhs() {
+    let input = "
+    <math>
+        <mfrac>
+        <mi>∂</mi>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>(</mo>
+        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
+        <mfrac>
+        <mrow><mi>∂</mi><mi>T</mi></mrow>
+        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
+        </mfrac>
+        <mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_combination() {
+    let input = "
+    <math>
+        <mi>S</mi>
+        <mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow>
+        <mrow><mi>i</mi><mo>-</mo><mn>3</mn></mrow>
+        <msup><mi>S</mi><mrow><mi>m</mi><mo>-</mo><mn>2</mn></mrow></msup>
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
