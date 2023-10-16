@@ -28,6 +28,7 @@
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">import yaml
+import traceback
 from pathlib import Path
 from gqlalchemy import Memgraph
 
@@ -49,7 +50,7 @@ class QueryRunner:
         n_or_m: str = &#34;m&#34;,
         filename: str = None,
         function: str = None,
-        id: int = None,
+        id: str = None,
     ):
         # Check if query is in query map. Currently we return None if its not found
         # TODO: Improve error handling
@@ -105,7 +106,7 @@ class QueryRunner:
         n_or_m: str = &#34;m&#34;,
         filename: str = None,
         function: str = None,
-        id: int = None,
+        id: str = None,
     ):
         # Check if query is in query map. Currently we return None if its not found
         # TODO: Improve error handling
@@ -129,7 +130,7 @@ class QueryRunner:
 <h3>Methods</h3>
 <dl>
 <dt id="skema.gromet.execution_engine.query_runner.QueryRunner.run_query"><code class="name flex">
-<span>def <span class="ident">run_query</span></span>(<span>self, query: str, n_or_m: str = 'm', filename: str = None, function: str = None, id: int = None)</span>
+<span>def <span class="ident">run_query</span></span>(<span>self, query: str, n_or_m: str = 'm', filename: str = None, function: str = None, id: str = None)</span>
 </code></dt>
 <dd>
 <div class="desc"></div>
@@ -143,7 +144,7 @@ class QueryRunner:
     n_or_m: str = &#34;m&#34;,
     filename: str = None,
     function: str = None,
-    id: int = None,
+    id: str = None,
 ):
     # Check if query is in query map. Currently we return None if its not found
     # TODO: Improve error handling
