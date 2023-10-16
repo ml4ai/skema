@@ -137,7 +137,7 @@ class TS2CAST(object):
             source_refs = [self.node_helper.get_source_ref(node)]
         )
 
-    def visit_name(self, node):
+    def visit_name(self, node) -> Var:
         # First, we will check if this name is already defined, and if it is return the name node generated previously
         identifier = self.node_helper.get_identifier(node)
         if self.variable_context.is_variable(identifier):
@@ -147,7 +147,7 @@ class TS2CAST(object):
             identifier, "Unknown", [self.node_helper.get_source_ref(node)]
         )
 
-    def visit_expression(self, node: Node):
+    def visit_expression(self, node: Node) -> List(AstNode):
         # NOTE: Is there an instance where an 'expression statement' node
         # Has more than one child?
 
@@ -161,7 +161,7 @@ class TS2CAST(object):
 
         return expr_body
 
-    def visit_function_def(self, node: Node):
+    def visit_function_def(self, node: Node) -> FunctionDef:
         # Create new variable context
         self.variable_context.push_context()
 
@@ -199,13 +199,13 @@ class TS2CAST(object):
             source_refs=[]
         )
 
-    def visit_return(self, node: Node):
+    def visit_return(self, node: Node) -> ModelReturn:
         ret_val = node.children[1]
         ret_cast = self.visit(ret_val)
 
         return ModelReturn(value=ret_cast)
 
-    def visit_call(self, node: Node):
+    def visit_call(self, node: Node) -> Call:
         func_identifier = get_first_child_by_type(node, "identifier")
         func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
 
@@ -222,7 +222,8 @@ class TS2CAST(object):
             elif isinstance(cast, AstNode):
                 func_args.append(cast)
 
-        return Call(func=func_name, arguments=func_args)
+        # Function calls only want the 'Name' part of the 'Var' that the visit returns
+        return Call(func=func_name.val, arguments=func_args)
 
 
     def visit_assignment(self, node: Node) -> Assignment:
@@ -258,7 +259,7 @@ class TS2CAST(object):
 
         return Operator(op=op, operands=[self.visit(left), self.visit(right)])
 
-    def visit_identifier(self, node: Node):
+    def visit_identifier(self, node: Node) -> Var:
         identifier = self.node_helper.get_identifier(node)
 
         if self.variable_context.is_variable(identifier):
@@ -278,7 +279,7 @@ class TS2CAST(object):
             source_refs=[self.node_helper.get_source_ref(node)]
         )
 
-    def visit_literal(self, node: Node):
+    def visit_literal(self, node: Node) -> Any:
         literal_type = node.type        
         literal_value = self.node_helper.get_identifier(node)
         literal_source_ref = self.node_helper.get_source_ref(node)
