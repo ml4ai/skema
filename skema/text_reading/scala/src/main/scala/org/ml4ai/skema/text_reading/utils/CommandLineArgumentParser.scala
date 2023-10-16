@@ -9,6 +9,7 @@ import java.io.File
   */
 case class ArgsConfig(
                        outDir: File = new File("."),
+                       annotateGrounding: Boolean = false,
                        inputFiles: Seq[File] = Seq(),
                      )
 
@@ -34,6 +35,9 @@ object CommandLineArgumentParser {
           .required()
           .action((x, c) => c.copy(outDir = x)).withFallback(() => new File("."))
           .text("directory to write the output files to"),
+        opt[Unit]('a', "annotateGrounding")
+          .action((_, c) => c.copy(annotateGrounding = true))
+          .text("Writes grounding file for human annotation"),
         // more options here...
         arg[Seq[File]]("<input file 1>...")
           .unbounded()

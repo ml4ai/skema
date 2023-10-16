@@ -1,0 +1,48 @@
+---
+module:
+  "
+  MATCH (n)-[r*]->(m)
+  WHERE n.filename='$FILENAME'
+  MATCH (n:Module)
+  RETURN DISTINCT n
+  "
+
+assignment_left_hand:
+  "
+  MATCH (n)-[r]->(m)
+  WHERE m:Opo and id(n)=$ID
+  RETURN r,m
+  ORDER BY r.index
+  LIMIT 1
+  "
+
+assignment_right_hand:
+  "
+  MATCH (n)-[r]->(m)
+  WHERE (m:Primitive or m:Literal or m:Expression) and id(n)=$ID
+  RETURN m
+  "
+
+ordered_expressions:
+  "
+  MATCH (n)-[r]->(m)
+  WHERE m:Expression and id(n)=$ID
+  RETURN DISTINCT r,m
+  ORDER BY r.index 
+  "
+
+named_opos:
+  "
+  MATCH (n)-[r*]->(m)
+  WHERE n.filename=$FILENAME
+  MATCH (m:Opo) WHERE NOT m.name = 'un-named'
+  RETURN n,r,m
+  "
+
+primitive_operands:
+  "
+  MATCH (n)-[r]->(m)
+  WHERE (m:Literal or m:Expression or m:Opi or m:Primitive) and id(n)=$ID
+  RETURN r, m
+  ORDER BY r.index
+  "

@@ -9,6 +9,12 @@ from subprocess import run, PIPE
 
 from tree_sitter import Parser, Node, Language, Tree
 
+from skema.program_analysis.tree_sitter_parsers.build_parsers import (
+    INSTALLED_LANGUAGES_FILEPATH,
+)
+from skema.program_analysis.CAST.fortran.preprocessor.fixed2free import convertToFree
+
+
 def preprocess(
     source_path: Path,
     out_dir=None,
@@ -16,7 +22,7 @@ def preprocess(
     out_missing_includes=False,
     out_gcc=False,
     out_unsupported=False,
-    out_corrected=False,
+    out_free=False,
 ) -> str:
     """Run the full preprocessing pipeline for Fortran->Tree-Sitter->CAST
     Takes the original source as input and will return the tree-sitter parse tree as output
@@ -24,15 +30,16 @@ def preprocess(
     1. A log of missing files that are included by preprocessor directives in the source code
     2. The intermediary product from running the c-preprocessor
     3. A log of unsupported idioms
-    4. The source code with unsupported idioms corrected
+    4. The source code converted to free-form
     """
     # NOTE: The order of preprocessing steps does matter. We have to run the GCC preprocessor before correcting the continuation lines or there could be issues
 
+    # TODO: Create single location for generating include base path 
     source = source_path.read_text()
 
     # Get paths for intermediate products
     if out_dir:
-        if not (out_missing_includes or out_gcc or out_unsupported or out_corrected):
+        if not (out_missing_includes or out_gcc or out_unsupported or out_free):
             logging.warning("out_dir is specified, but no out flags are set")
 
         out_dir.mkdir(parents=True, exist_ok=True)
@@ -40,7 +47,7 @@ def preprocess(
         missing_includes_path = Path(out_dir, "missing_includes.txt")
         gcc_path = Path(out_dir, "gcc.F")
         unsupported_path = Path(out_dir, "unsupported_idioms.txt")
-        corrected_path = Path(out_dir, "corrected.F")
+        free_path = Path(out_dir, "corrected.F")
         parse_path = Path(out_dir, "parse_tree.txt")
 
     # Step 1: Check for missing included files
@@ -60,28 +67,31 @@ def preprocess(
 
     # Step 2: Correct include directives to remove system references
     source = fix_include_directives(source)
-
+    
     # Step 3: Process with gcc c-preprocessor
-    source = run_c_preprocessor(source, source_path.parent)
+    include_base_directory = Path(source_path.parent, f"include_{source_path.stem}")
+    if not include_base_directory.exists():
+        include_base_directory = include_base_directory.parent
+    source = run_c_preprocessor(source, include_base_directory)
     if out_gcc:
         gcc_path.write_text(source)
-
+    
     # Step 4: Prepare for tree-sitter
     # This step removes any additional preprocessor directives added or not removed by GCC
     source = "\n".join(
         ["!" + line if line.startswith("#") else line for line in source.splitlines()]
     )
-
+    
     # Step 5: Check for unsupported idioms
     if out_unsupported:
         unsupported_path.write_text(
             "\n".join(search_for_unsupported_idioms(source, "idioms_regex.txt"))
         )
 
-    # Step 6 : Fix unsupported idioms
-    source = fix_unsupported_idioms(source)
-    if out_corrected:
-        corrected_path.write_text(source)
+    # Step 6 : Convert to free-form for tree-sitter parsing
+    source = convert_to_free_form(source)
+    if out_free:
+        free_path.write_text(source)
 
     return source
 
@@ -146,23 +156,6 @@ def search_for_unsupported_idioms(source: str, idioms_regex_path: str):
     return log
 
 
-def fix_unsupported_idioms(source: str):
-    """
-    Preprocesses Fortran source code to convert continuation lines to tree-sitter supported format:
-    1. Replaces the first occurrence of '|' with '&' if it is the first non-whitespace character in the line.
-    2. Adds an additional '&' to the previous line
-    """
-    processed_lines = []
-    for i, line in enumerate(source.splitlines()):
-        if line.lstrip().startswith("|"):
-            line = line.replace("|", "&", 1)
-            processed_lines[-1] += "&"
-        processed_lines.append(line)
-    source = "\n".join(processed_lines)
-
-    return source
-
-
 def fix_include_directives(source: str) -> str:
     """There are a few corrections we need to make to the include statements
     1. Convert system level includes to local includes
@@ -188,6 +181,31 @@ def run_c_preprocessor(source: str, include_base_path: Path) -> str:
         cwd=include_base_path,
     )
     return result.stdout
+
+
+def convert_to_free_form(source: str) -> str:
+    """If fixed-form Fortran source, convert to free-form"""
+    def validate_parse_tree(source: str) -> bool:
+        """Parse source with tree-sitter and check if an error is returned."""
+        language = Language(INSTALLED_LANGUAGES_FILEPATH, "fortran")
+        parser = Parser()
+        parser.set_language(language)
+        tree = parser.parse(bytes(source, encoding="utf-8"))
+        return "ERROR" not in tree.root_node.sexp()
+
+    # We don't know for sure if a source is meant to be fixed-form or free-form
+    # So, we will run the parser first to check
+    if validate_parse_tree(source):
+        return source
+    else:
+        # convertToFree takes a stream as input and returns a generator
+        free_source = "".join(
+            [line for line in convertToFree(source.splitlines(keepends=True))]
+        )
+        if validate_parse_tree(free_source):
+            return free_source
+    
+    return source
 
 
 def main():
@@ -217,7 +235,7 @@ def main():
         help="Output unsupported idioms log",
     )
     parser.add_argument(
-        "--out_corrected",
+        "--out_free",
         action="store_true",
         help="Output source after fixing unsupported idioms",
     )
@@ -230,7 +248,7 @@ def main():
         args.out_missing_includes,
         args.out_gcc,
         args.out_unsupported,
-        args.out_corrected,
+        args.out_free,
     )
 
 

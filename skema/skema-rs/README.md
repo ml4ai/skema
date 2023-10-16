@@ -20,8 +20,14 @@ via REST APIs.
 If you are a developer working on this project, you will likely want to launch
 the `skema_service` outside of Docker:
 
-```
+```bash
 cargo run --bin skema_service
+```
+
+To build an executable, you can use the following command:
+
+```bash
+cargo build --release --bin skema_service
 ```
 
 ### Documentation

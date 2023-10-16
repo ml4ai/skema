@@ -14,7 +14,7 @@ abstract class AutomatesAttachment extends Attachment with Serializable {
 
 }
 
-class GroundingAttachment(candidates:Seq[GroundingCandidate]) extends AutomatesAttachment {
+class GroundingAttachment(val candidates:Seq[GroundingCandidate]) extends AutomatesAttachment {
 
   override def toJson: JsValue = Json.arr(candidates map {
     c => Json.obj(

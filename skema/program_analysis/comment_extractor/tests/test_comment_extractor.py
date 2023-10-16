@@ -15,7 +15,7 @@ def test_extract_c():
         "language": "c",
         "source": c_source_path.read_text()
     }
-    response = client.post("/comments-extract", json=request)
+    response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200
 
 
@@ -25,7 +25,7 @@ def test_extract_cpp():
         "language": "cpp",
         "source": cpp_source_path.read_text()
     }
-    response = client.post("/comments-extract", json=request)
+    response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200
 
 def test_extract_fortran():
@@ -34,7 +34,7 @@ def test_extract_fortran():
         "language": "fortran",
         "source": fortran_source_path.read_text()
     }
-    response = client.post("/comments-extract", json=request)
+    response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200
 
 def test_extract_matlab():
@@ -43,7 +43,7 @@ def test_extract_matlab():
         "language": "matlab",
         "source": matlab_source_path.read_text()
     }
-    response = client.post("/comments-extract", json=request)
+    response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200
 
 def test_extract_python():
@@ -52,7 +52,7 @@ def test_extract_python():
         "language": "python",
         "source": python_source_path.read_text()
     }
-    response = client.post("/comments-extract", json=request)
+    response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200
 
 def test_extract_r():
@@ -61,5 +61,5 @@ def test_extract_r():
         "language": "r",
         "source": r_source_path.read_text()
     }
-    response = client.post("/comments-extract", json=request)
+    response = client.post("/comment_service/comments-extract", json=request)
     assert response.status_code == 200

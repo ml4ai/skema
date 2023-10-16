@@ -12,6 +12,7 @@ from skema.gromet.fn import (
 from skema.program_analysis.run_ann_cast_pipeline import ann_cast_pipeline
 from skema.program_analysis.python2cast import python_to_cast
 from skema.program_analysis.fortran2cast import fortran_to_cast
+from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.utils.fold import dictionary_to_gromet_json, del_nulls
 
 
@@ -59,6 +60,8 @@ def process_file_system(
             # To maintain backwards compatibility for the process_file_system function, for now we will determine the language by file extension
             if full_file.endswith(".py"):
                 cast = python_to_cast(full_file, cast_obj=True)
+            elif full_file.endswith(".m"):
+                cast = matlab_to_cast(full_file, cast_obj=True)
             elif full_file.endswith(".F") or full_file.endswith(".f95"):
                 cast = fortran_to_cast(full_file, cast_obj=True)
             else:
