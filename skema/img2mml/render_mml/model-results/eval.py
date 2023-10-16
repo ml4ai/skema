@@ -7,7 +7,7 @@ from multiprocessing import Pool
 import numpy as np
 import pylatexenc.latex2text as l2t
 import pylatexenc.latexwalker as lw
-from sacrebleu import corpus_bleu
+from sacrebleu import BLEU, corpus_bleu
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -16,31 +16,6 @@ def load_test_results(test_results_file):
     with open(test_results_file, "r") as f:
         test_results = json.load(f)
     return test_results
-
-
-def post_process(s: str):
-    """Remove unnecessary whitespace from LaTeX code.
-
-    Args:
-        s (str): Input string
-
-    Returns:
-        str: Processed image
-    """
-    text_reg = r"(\\(operatorname|mathrm|text|mathbf)\s?\*? {.*?})"
-    letter = "[a-zA-Z]"
-    noletter = "[\W_^\d]"
-    names = [x[0].replace(" ", "") for x in re.findall(text_reg, s)]
-    s = re.sub(text_reg, lambda match: str(names.pop(0)), s)
-    news = s
-    while True:
-        s = news
-        news = re.sub(r"(?!\\ )(%s)\s+?(%s)" % (noletter, noletter), r"\1\2", s)
-        news = re.sub(r"(?!\\ )(%s)\s+?(%s)" % (noletter, letter), r"\1\2", news)
-        news = re.sub(r"(%s)\s+?(%s)" % (letter, noletter), r"\1\2", news)
-        if news == s:
-            break
-    return s
 
 
 def is_latex_valid(latex_expr: str) -> bool:
@@ -73,9 +48,14 @@ def process_batch(batch):
     bleu_scores = np.zeros(len(batch))
     valid_latex = 0
     for i, result in enumerate(batch):
-        prediction = post_process(result["prediction"])
-        ground_truth = post_process(result["ground_truth"])
-        cur_bleu_score = corpus_bleu([prediction], [[ground_truth]]).score
+        prediction = result["prediction"]
+        ground_truth = result["ground_truth"]
+        cur_bleu_score = corpus_bleu(
+            hypotheses=[prediction],
+            references=[[ground_truth]],
+            smooth_method="none",
+            tokenize="char",
+        ).score
         bleu_scores[i] = cur_bleu_score
         if is_latex_valid(prediction):
             valid_latex += 1
