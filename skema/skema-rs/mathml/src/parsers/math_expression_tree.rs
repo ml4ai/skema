@@ -150,6 +150,7 @@ pub enum Token {
 }
 
 /// Lexer for the Pratt parsing algorithm.
+#[derive(Debug)]
 struct Lexer {
     /// Vector of input tokens.
     tokens: Vec<Token>,
@@ -353,7 +354,23 @@ impl Lexer {
 /// Construct a MathExpressionTree from a vector of MathExpression structs.
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
-    expr_bp(&mut lexer, 0)
+    //expr_bp(&mut lexer, 0)
+    let mut ast = expr_bp(&mut lexer, 0);
+    while let Token::Op(op) = lexer.peek() {
+        if let Some((l_bp, _)) = infix_binding_power(&op) {
+            if l_bp <= 0 {
+                lexer.next(); // Consume the operator
+                let rhs = expr_bp(&mut lexer, l_bp);
+                ast = MathExpressionTree::Cons(op, vec![ast, rhs]);
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+
+    ast
 }
 
 impl From<Vec<MathExpression>> for MathExpressionTree {
@@ -379,6 +396,9 @@ impl FromStr for MathExpressionTree {
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
+    //let mut combo = Vec::new();
+    //while lexer.peek() {
+    println!("lexer={:?}", lexer);
     let mut lhs = match lexer.next() {
         Token::Atom(it) => {
             println!("it={:?}", it);
@@ -387,58 +407,62 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
         Token::Op(Operator::Lparen) => {
             let lhs = expr_bp(lexer, 0);
             println!("lhs={:?}", lhs);
+            /*if lexer.next() == Token::Op(&op) {
+                println!("inside Token::Op(op)");
+                let ((), r_bp) = prefix_binding_power(&op);
+                let rhs = expr_bp(lexer, r_bp);
+                MathExpressionTree::Cons(op, vec![rhs])
+                return lhs;
+            }*/
             assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
             lhs
-            /*if let Token::Op(op) = lexer.peek() {
-                println!("hereeeee");
-                if op == Operator::Lparen {
-                    let lhs = expr_bp(lexer, 0);
-                    assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
-                    lhs
-                } else {
-                    let ((), r_bp) = prefix_binding_power(&op);
-                    lexer.next();
-                    let rhs = expr_bp(lexer, r_bp);
-                    assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
-                    println!("]]]]]]");
-                    MathExpressionTree::Cons(op, vec![rhs])
-                }
-            } else {
-                let lhs = expr_bp(lexer, 0);
-                println!("--------- lhs={:?}", lhs);
-                count += 1;
-                println!("count= {}", count);
-                //println!("lhs={:?}", lhs);
-                //let ((), r_bp) = prefix_binding_power(&op);
-                /*if lexer.next() == Token::Op(Operator::Lparen) {
-                    let lhs = expr_bp(lexer, 0);
-                    assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
-                    lhs
-                }*/
-                match lexer.next() {
-                    Token::Op(Operator::Rparen) => {
-                        let lhs = expr_bp(lexer, 0);
-                        assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
-                        lhs
-                    }
-                    Token::Op(op) => {
-                        println!("[[[[");
-                        let ((), r_bp) = prefix_binding_power(&op);
-                        lexer.next();
-                        let rhs = expr_bp(lexer, r_bp);
-                        MathExpressionTree::Cons(op, vec![rhs])
-                    }
-                    t => panic!("bad token: {:?}", t),
-                }
-            }*/
         }
         Token::Op(op) => {
+            println!("inside Token::Op(op)");
             let ((), r_bp) = prefix_binding_power(&op);
             let rhs = expr_bp(lexer, r_bp);
             MathExpressionTree::Cons(op, vec![rhs])
         }
         t => panic!("bad token: {:?}", t),
     };
+    //while let Token::Op(op) = lexer.peek() {
+    while lexer.peek() != Token::Eof {
+        println!(",,,,,");
+        lhs = match lexer.next() {
+            Token::Atom(it) => {
+                println!(",,,it={:?}", it);
+                MathExpressionTree::Atom(it)
+            }
+            Token::Op(Operator::Lparen) => {
+                let lhs = expr_bp(lexer, 0);
+                println!(",,,,lhs={:?}", lhs);
+                assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+                lhs
+            }
+            Token::Op(op) => {
+                println!(",,,inside Token::Op(op) = {:?}", op);
+                let ((), r_bp) = prefix_binding_power(&op);
+                let rhs = expr_bp(lexer, r_bp);
+                MathExpressionTree::Cons(op, vec![rhs])
+            }
+            t => panic!("bad token: {:?}", t),
+        };
+        /*if op == Operator::Lparen {
+            lhs = expr_bp(lexer, 0);
+            println!(",,,,lhs={:?}", lhs);
+            assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+            //lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
+        } else {
+            break;
+        }*/
+    }
+    // Handle implicit multiplication at the beginning of an expression
+    //while let Token::Atom(_) = lexer.peek() {
+    //    let rhs = expr_bp(lexer, 0);
+    //    lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
+    //
+    //}
+
     loop {
         let op = match lexer.peek() {
             Token::Eof => break,
@@ -450,14 +474,13 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
             if l_bp < min_bp {
                 break;
             }
-            if op == Operator::Lparen {
+            /*if op == Operator::Lparen {
                 let rhs = expr_bp(lexer, 0);
                 assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
                 lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
-            } else {
-                lexer.next();
-                lhs = MathExpressionTree::Cons(op, vec![lhs]);
-            }
+            } else {*/
+            lexer.next();
+            lhs = MathExpressionTree::Cons(op, vec![lhs]);
             continue;
         }
         if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
@@ -475,6 +498,9 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
         }
         break;
     }
+    //  combo.push(lhs);
+    //}
+    //combo
     lhs
 }
 
@@ -482,15 +508,15 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
 fn prefix_binding_power(op: &Operator) -> ((), u8) {
     match op {
         Operator::Add | Operator::Subtract => ((), 9),
-        Operator::Exp => ((), 20),
-        Operator::Cos => ((), 21),
-        Operator::Sin => ((), 22),
-        Operator::Tan => ((), 23),
-        Operator::Mean => ((), 24),
-        Operator::Dot => ((), 25),
-        Operator::Grad => ((), 27),
-        Operator::Div => ((), 29),
-        Operator::Derivative(Derivative { .. }) => ((), 31),
+        Operator::Exp => ((), 22),
+        Operator::Cos => ((), 23),
+        Operator::Sin => ((), 24),
+        Operator::Tan => ((), 25),
+        Operator::Mean => ((), 26),
+        Operator::Dot => ((), 27),
+        Operator::Grad => ((), 28),
+        Operator::Div => ((), 31),
+        Operator::Derivative(Derivative { .. }) => ((), 33),
         _ => panic!("Bad operator: {:?}", op),
     }
 }
@@ -509,9 +535,10 @@ fn infix_binding_power(op: &Operator) -> Option<(u8, u8)> {
     let res = match op {
         Operator::Equals => (2, 1),
         Operator::Add | Operator::Subtract => (5, 6),
-        Operator::Multiply | Operator::Divide => (7, 8),
-        Operator::Compose => (14, 13),
-        Operator::Power => (16, 15),
+        //Operator::Multiply | Operator::Divide => (7, 8),
+        Operator::Multiply | Operator::Divide => (21, 22),
+        Operator::Compose => (8, 7),
+        Operator::Power => (18, 17),
         //Operator::Grad => (18, 17),
         Operator::Other(op) => panic!("Unhandled operator: {}!", op),
         _ => return None,
@@ -1015,10 +1042,6 @@ fn test_halfar_dome() {
 fn test_halfar_dome2() {
     let input = "
     <math>
-        <mrow>
-        <mn>3</mn>
-        <mi>x</mi>
-        </mrow>
         <mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow>
         <msup><mi>S</mi><mrow><mi>m</mi><mo>-</mo><mn>2</mn></mrow></msup>
     </math>
@@ -1048,6 +1071,17 @@ fn test_func_paren_and_times() {
     let input = "
     <math>
         <mi>S</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+        <mo>(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo>)</mo>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+}
+
+#[test]
+fn test_func_a_plus_b() {
+    let input = "
+    <math>
         <mo>(</mo><mi>a</mi><mo>+</mo><mi>b</mi><mo>)</mo>
     </math>
     ";
