@@ -5,7 +5,7 @@ pub use mathml::mml2pn::{ACSet, Term};
 
 // new imports
 use mathml::acset::{PetriNet, RegNet};
-
+use mathml::parsers::first_order_ode::get_FirstOrderODE_vec_from_file;
 use skema::model_extraction::{module_id2mathml_MET_ast, subgraph2_core_dyn_ast};
 
 #[derive(Parser, Debug)]
@@ -28,7 +28,7 @@ fn main() {
     let new_args = Cli::parse();
 
     //let mut module_id = 883;
-    let mut module_id = 1035;
+    let mut module_id = 2399;
     // now to prototype an algorithm to find the function that contains the core dynamics
 
     if new_args.arg == *"auto" {
@@ -38,23 +38,23 @@ fn main() {
 
         let host = "localhost";
 
-        let math_content = module_id2mathml_MET_ast(module_id, host);
+        //let math_content = module_id2mathml_MET_ast(module_id, host);
 
-        //let input_src = "../../data/mml2pn_inputs/testing_eqns/mml_list3.txt";
+        let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
 
         // This does get a panic with a message, so need to figure out how to forward it
         //let _mathml_ast = get_mathml_asts_from_file(input_src.clone());
 
-        //let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
+        let odes = get_FirstOrderODE_vec_from_file(input_src.clone());
 
         //println!("\nmath_content: {:?}", math_content);
         //println!("\nmathml_ast: {:?}", odes);
 
-        /*println!(
+        println!(
             "\nAMR from mathml: {}\n",
             serde_json::to_string(&PetriNet::from(odes)).unwrap()
-        );*/
-        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
+        );
+        //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
     else if new_args.arg == *"manual" {
@@ -76,13 +76,6 @@ fn main() {
         println!("\nRegnet AMR: {:?}\n", regnet);
         let regnet_serial = serde_json::to_string(&regnet).unwrap();
         println!("For serialization test:\n\n {}", regnet_serial);
-
-        let mathml_pn_asts =
-            get_mathml_asts_from_file("../../data/mml2pn_inputs/simple_sir_v1/mml_list.txt");
-        let pn = PetriNet::from(ACSet::from(mathml_pn_asts));
-        println!("\nPetriNet AMR: {:?}", pn);
-        let pn_serial = serde_json::to_string(&pn).unwrap();
-        println!("For serialization test:\n\n {}", pn_serial);
     } else {
         println!("Unknown Command!");
     }

@@ -8,38 +8,37 @@ from tree_sitter import Language, Parser, Node, Tree
 
 from skema.program_analysis.CAST2FN.cast import CAST
 from skema.program_analysis.CAST2FN.model.cast import (
-    Module,
-    SourceRef,
     Assignment,
+    AstNode,
+    Attribute,
+    Call,
+    FunctionDef,
     LiteralValue,
-    Var,
-    VarType,
+    Loop,
+    ModelIf,
+    ModelImport,
+    ModelReturn,
+    Module,
     Name,
     Operator,
-    AstNode,
-    SourceCodeDataType,
-    ModelImport,
-    FunctionDef,
-    Loop,
-    Call,
-    ModelReturn,
-    ModelIf,
     RecordDef,
-    Attribute,
+    SourceCodeDataType,
+    SourceRef,
+    Var,
+    VarType,
 )
 
-from skema.program_analysis.CAST.matlab.tree_builder import TreeBuilder
 from skema.program_analysis.CAST.matlab.variable_context import VariableContext
 from skema.program_analysis.CAST.matlab.node_helper import (
-    NodeHelper,
     get_children_by_types,
-    get_first_child_by_type,
     get_control_children,
-    get_non_control_children,
+    get_first_child_by_type,
     get_first_child_index,
     get_last_child_index,
+    get_non_control_children,
+    NodeHelper,
 )
-from skema.program_analysis.CAST.matlab.util import generate_dummy_source_refs
+
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
 
 MATLAB_VERSION='matlab_version_here'
@@ -47,20 +46,22 @@ MATLAB_VERSION='matlab_version_here'
 class MatlabToCast(object):
     def __init__(self, source_file_path: str):
         """docstring"""
-        
-        # Read the MATLAB source file
-        self.path = Path(source_file_path)
-        self.source_file_name = self.path.name
-        self.source = self.path.read_text()
 
-        # get a tree-sitter tree based on source input
-        self.tree_builder = TreeBuilder("matlab")
-        self.tree = self.tree_builder.get_tree(self.source)
-        self.tree.root_node = self.tree_builder.clean_nodes(self.tree.root_node)
+        # create MATLAB parser
+        parser = Parser()
+        parser.set_language(
+            Language(INSTALLED_LANGUAGES_FILEPATH, "matlab")
+        )
+        
+        # create a syntax tree using the source file
+        path = Path(source_file_path)
+        self.source = path.read_text().strip()
+        self.filename = path.name
+        self.tree = parser.parse(bytes(self.source, "utf8"))
 
         # Walking data
         self.variable_context = VariableContext()
-        self.node_helper = NodeHelper(self.source, self.source_file_name)
+        self.node_helper = NodeHelper(self.source, self.filename)
 
         # Create CAST object 
         self.out_cast = self.generate_cast()
@@ -118,12 +119,12 @@ class MatlabToCast(object):
         elif node.type == "variable_declaration":
             return self.visit_variable_declaration(node)
         elif node.type == "assignment":
-            return self.visit_assignment_statement(node)
+            return self.visit_assignment(node)
         elif node.type == "identifier":
             return self.visit_identifier(node)
         elif node.type == "name":
             return self.visit_name(node)
-        elif node.type in ["math_expression", "relational_expression"]:
+        elif node.type in ["binary_operator", "math_expression", "relational_expression"]:
             return self.visit_math_expression(node)
         elif node.type in ["number", "array", "string", "boolean"]:
             return self.visit_literal(node)
@@ -617,9 +618,9 @@ class MatlabToCast(object):
             orelse=orelse,
         )
 
-    def visit_assignment_statement(self, node):
+    def visit_assignment(self, node):
         """Docstring"""
-        # print('visit_assignment_statement')
+        # print('visit_assignment')
         left, _, right = node.children
 
         return Assignment(
@@ -741,7 +742,7 @@ class MatlabToCast(object):
                 (qualifier)
                 (value)
             (identifier) ...
-            (assignment_statement) ...
+            (assignment) ...
 
         (variable_declaration)
             (derived_type)
@@ -785,13 +786,13 @@ class MatlabToCast(object):
             node,
             [
                 "identifier",  # Variable declaration
-                "assignment_statement",  # Variable assignment
+                "assignment",  # Variable assignment
                 "call_expression",  # Dimension without intent
             ],
         )
         vars = []
         for variable in definied_variables:
-            if variable.type == "assignment_statement":
+            if variable.type == "assignment":
                 if variable.children[0].type == "call_expression":
                     vars.append(
                         Assignment(
@@ -1034,7 +1035,7 @@ class MatlabToCast(object):
         """Docstring"""
         # print('_visit_set')
         # Node structure
-        # (assignment_statement)
+        # (assignment)
         #  (call_expression)
         #  (right side)
 
