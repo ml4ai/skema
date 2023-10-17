@@ -396,10 +396,9 @@ impl FromStr for MathExpressionTree {
 
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
-    //let mut combo = Vec::new();
     //while lexer.peek() {
     println!("lexer={:?}", lexer);
-    let mut lhs = match lexer.next() {
+    /*let mut lhs = match lexer.next() {
         Token::Atom(it) => {
             println!("it={:?}", it);
             MathExpressionTree::Atom(it)
@@ -424,11 +423,11 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
             MathExpressionTree::Cons(op, vec![rhs])
         }
         t => panic!("bad token: {:?}", t),
-    };
+    };*/
     //while let Token::Op(op) = lexer.peek() {
     while lexer.peek() != Token::Eof {
         println!(",,,,,");
-        lhs = match lexer.next() {
+        let mut lhs = match lexer.next() {
             Token::Atom(it) => {
                 println!(",,,it={:?}", it);
                 MathExpressionTree::Atom(it)
@@ -480,7 +479,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
                 lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
             } else {*/
             lexer.next();
-            lhs = MathExpressionTree::Cons(op, vec![lhs]);
+            let lhs = MathExpressionTree::Cons(op, vec![lhs]);
             continue;
         }
         if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
@@ -489,7 +488,7 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
                 break;
             }
             lexer.next();
-            lhs = {
+            let lhs = {
                 let rhs = expr_bp(lexer, r_bp);
                 println!("--------rhs={:?}", rhs);
                 MathExpressionTree::Cons(op, vec![lhs, rhs])
