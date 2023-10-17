@@ -355,7 +355,9 @@ impl Lexer {
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
     //expr_bp(&mut lexer, 0)
-    let mut result = MathExpressionTree::Atom(MathExpression::Mi(Mi(String::from(" "))));
+    //let mut result = MathExpressionTree::Atom(MathExpression::Mi(Mi(String::from(" "))));
+
+    let mut result = expr_bp(&mut lexer, 0);
     while lexer.peek() != Token::Eof {
         let comp = expr_bp(&mut lexer, 0);
         //result = comp;
