@@ -1088,6 +1088,12 @@
 <a href="#1088" id="1088">1088</a>
 <a href="#1089" id="1089">1089</a>
 <a href="#1090" id="1090">1090</a>
+<a href="#1091" id="1091">1091</a>
+<a href="#1092" id="1092">1092</a>
+<a href="#1093" id="1093">1093</a>
+<a href="#1094" id="1094">1094</a>
+<a href="#1095" id="1095">1095</a>
+<a href="#1096" id="1096">1096</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -1412,6 +1418,12 @@
 // -------------------------------------------------------------------------------------------
 </span><span class="kw">impl </span>From&lt;Vec&lt;FirstOrderODE&gt;&gt; <span class="kw">for </span>PetriNet {
     <span class="kw">fn </span>from(ode_vec: Vec&lt;FirstOrderODE&gt;) -&gt; PetriNet {
+
+        <span class="comment">// for nanoid uuids:
+        </span><span class="kw">let </span>alphabet: [char; <span class="number">17</span>] = [
+            <span class="string">&#39;1&#39;</span>, <span class="string">&#39;2&#39;</span>, <span class="string">&#39;3&#39;</span>, <span class="string">&#39;4&#39;</span>, <span class="string">&#39;5&#39;</span>, <span class="string">&#39;6&#39;</span>, <span class="string">&#39;7&#39;</span>, <span class="string">&#39;8&#39;</span>, <span class="string">&#39;9&#39;</span>, <span class="string">&#39;0&#39;</span>, <span class="string">&#39;a&#39;</span>, <span class="string">&#39;b&#39;</span>, <span class="string">&#39;c&#39;</span>, <span class="string">&#39;d&#39;</span>, <span class="string">&#39;e&#39;</span>, <span class="string">&#39;f&#39;</span>, <span class="string">&#39;g&#39;
+        </span>];
+
         <span class="comment">// initialize vecs
         </span><span class="kw">let </span><span class="kw-2">mut </span>states_vec = BTreeSet::&lt;State&gt;::new();
         <span class="kw">let </span><span class="kw-2">mut </span>transitions_vec = BTreeSet::&lt;Transition&gt;::new();
@@ -1424,7 +1436,7 @@
         <span class="comment">// this first for loop is for the creation state related parameters in the AMR
         </span><span class="kw">for </span>ode <span class="kw">in </span>ode_vec.iter() {
             <span class="kw">let </span>states = State {
-                id: <span class="macro">format!</span>(<span class="string">&quot;{}-{}&quot;</span>, ode.lhs_var.to_string().clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>)),
+                id: <span class="macro">format!</span>(<span class="string">&quot;{}_{}&quot;</span>, ode.lhs_var.to_string().clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>, <span class="kw-2">&amp;</span>alphabet)),
                 name: ode.lhs_var.to_string().clone(),
                 ..Default::default()
             };
@@ -1574,7 +1586,7 @@
                 }
                 <span class="comment">// construct transtions for simple transtions
                 </span><span class="kw">let </span>transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}-{}&quot;</span>, i.clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>)),
+                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}_{}&quot;</span>, i.clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>, <span class="kw-2">&amp;</span>alphabet)),
                     input: <span class="prelude-val">Some</span>(input.clone()),
                     output: <span class="prelude-val">Some</span>(output.clone()),
                     ..Default::default()
@@ -1631,7 +1643,7 @@
                 }
 
                 <span class="kw">let </span>transitions = Transition {
-                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}-{}&quot;</span>, i.clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>)),
+                    id: <span class="macro">format!</span>(<span class="string">&quot;t{}_{}&quot;</span>, i.clone(), <span class="macro">nanoid!</span>(<span class="number">8</span>, <span class="kw-2">&amp;</span>alphabet)),
                     input: <span class="prelude-val">Some</span>(input.clone()),
                     output: <span class="prelude-val">Some</span>(output.clone()),
                     ..Default::default()
@@ -1684,7 +1696,7 @@
                     }
 
                     <span class="kw">let </span>transitions = Transition {
-                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}-{}&quot;</span>, i, <span class="macro">nanoid!</span>(<span class="number">8</span>)),
+                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}_{}&quot;</span>, i, <span class="macro">nanoid!</span>(<span class="number">8</span>, <span class="kw-2">&amp;</span>alphabet)),
                         input: <span class="prelude-val">Some</span>(input.clone()),
                         output: <span class="prelude-val">Some</span>(output.clone()),
                         ..Default::default()
@@ -1734,7 +1746,7 @@
                     }
 
                     <span class="kw">let </span>transitions = Transition {
-                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}-{}&quot;</span>, i, <span class="macro">nanoid!</span>(<span class="number">8</span>)),
+                        id: <span class="macro">format!</span>(<span class="string">&quot;s{}_{}&quot;</span>, i, <span class="macro">nanoid!</span>(<span class="number">8</span>, <span class="kw-2">&amp;</span>alphabet)),
                         input: <span class="prelude-val">Some</span>(input.clone()),
                         output: <span class="prelude-val">None</span>,
                         ..Default::default()
@@ -1776,7 +1788,7 @@
         </span>parameter_vec.sort();
         parameter_vec.dedup();
         <span class="kw">for </span>parameter <span class="kw">in </span>parameter_vec.iter_mut() {
-            parameter.id = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro">nanoid!</span>(<span class="number">8</span>));
+            parameter.id = <span class="macro">format!</span>(<span class="string">&quot;{}&quot;</span>, <span class="macro">nanoid!</span>(<span class="number">8</span>, <span class="kw-2">&amp;</span>alphabet));
         }
 
         <span class="comment">// construct the PetriNet
