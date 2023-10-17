@@ -1,14 +1,15 @@
 from skema.program_analysis.CAST.matlab.matlab_to_cast import MatlabToCast
 from skema.program_analysis.CAST2FN.model.cast import (
     Assignment,
-    Var,
+    LiteralValue,
     Name,
-    LiteralValue
+    Var
 )
 
 # Test the CAST returned by processing the simplest MATLAB assignment
 
-def test_assignment_cast():
+def test_assignment():
+    """ Tests parser assignment CAST """
 
     source = 'x = 5;'
     
@@ -17,7 +18,7 @@ def test_assignment_cast():
     # there should only be one CAST object in the cast output list
     assert len(cast) == 1  
 
-    # There is only one assignment node to this CAST
+    # The root of the CAST should be assignment
     node = cast[0].nodes[0].body[0]
     assert isinstance(node, Assignment)
 
@@ -27,7 +28,7 @@ def test_assignment_cast():
     assert isinstance(left.val, Name)
     assert left.val.name == "x"
 
-    # Right branch of an assignment is the value
+    # Right branch of this assignment is an Integer literal
     right = node.right
     assert isinstance(right, LiteralValue)
     assert right.value_type == "Integer"
