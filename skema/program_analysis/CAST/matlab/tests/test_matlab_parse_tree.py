@@ -18,7 +18,3 @@ def test_parse_matlab_files():
             parser = MatlabToCast(filepath)
             cast = parser.out_cast
             assert not len(cast) == 0  
-
-if __name__ == "__main__":
-    test_parse_matlab_files()
-

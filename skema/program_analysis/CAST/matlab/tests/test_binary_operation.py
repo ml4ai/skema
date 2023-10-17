@@ -45,6 +45,3 @@ def test_binary_operation():
     assert module['right']['operands'][1]['node_type'] == 'Var'
     assert module['right']['operands'][1]['val']['name'] == 'y'
     # ...
-
-if __name__ == "__main__":
-    test_binary_operation()
