@@ -25,6 +25,7 @@ from skema.program_analysis.CAST2FN.model.cast import (
     ModelIf,
     RecordDef,
     Attribute,
+    ScalarType
 )
 
 from skema.program_analysis.CAST.python.node_helper import (
@@ -36,7 +37,10 @@ from skema.program_analysis.CAST.python.node_helper import (
     get_control_children,
     get_non_control_children
 )
-from skema.program_analysis.CAST.fortran.util import generate_dummy_source_refs
+from skema.program_analysis.CAST.python.util import (
+    generate_dummy_source_refs,
+    get_op
+)
 from skema.program_analysis.CAST.fortran.variable_context import VariableContext
 
 from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_LANGUAGES_FILEPATH
@@ -137,17 +141,7 @@ class TS2CAST(object):
             source_refs = [self.node_helper.get_source_ref(node)]
         )
 
-    def visit_name(self, node) -> Var:
-        # First, we will check if this name is already defined, and if it is return the name node generated previously
-        identifier = self.node_helper.get_identifier(node)
-        if self.variable_context.is_variable(identifier):
-            return self.variable_context.get_node(identifier)
-
-        return self.variable_context.add_variable(
-            identifier, "Unknown", [self.node_helper.get_source_ref(node)]
-        )
-
-    def visit_expression(self, node: Node) -> List(AstNode):
+    def visit_expression(self, node: Node):
         # NOTE: Is there an instance where an 'expression statement' node
         # Has more than one child?
 
@@ -162,16 +156,20 @@ class TS2CAST(object):
         return expr_body
 
     def visit_function_def(self, node: Node) -> FunctionDef:
+        ref = self.node_helper.get_source_ref(node)
+
+        name_node = get_first_child_by_type(node, "identifier")
+        name = self.visit(name_node)
+
         # Create new variable context
         self.variable_context.push_context()
 
-        name_node = get_first_child_by_type(node, "identifier")
-        parameters = get_children_by_types(node, "parameters")
+        parameters = get_children_by_types(node, "parameters")[0]
+        parameters = get_non_control_children(parameters)
         
         # The body of the function is stored in a 'block' type node
         body = get_children_by_types(node, "block")[0].children
         
-        name = self.visit(name_node)
 
         func_params = []
         for node in parameters:
@@ -196,44 +194,53 @@ class TS2CAST(object):
             name=name.val,
             func_args=func_params,
             body=func_body,
-            source_refs=[]
+            source_refs=[ref]
         )
 
     def visit_return(self, node: Node) -> ModelReturn:
+        ref = self.node_helper.get_source_ref(node)
         ret_val = node.children[1]
         ret_cast = self.visit(ret_val)
 
-        return ModelReturn(value=ret_cast)
+        return ModelReturn(value=ret_cast, source_refs=[ref])
 
     def visit_call(self, node: Node) -> Call:
+        ref = self.node_helper.get_source_ref(node)
         func_identifier = get_first_child_by_type(node, "identifier")
         func_name = self.visit(func_identifier) #self.node_helper.get_identifier(func_identifier)
 
         arg_list = get_first_child_by_type(node, "argument_list")
-        args = get_children_by_types(arg_list, ["integer"])
-
-        print(args)
+        args = get_non_control_children(arg_list)
 
         func_args = []
         for arg in args:
-            cast = self.visit(arg)
+            cast = get_name_node(self.visit(arg))
             if isinstance(cast, List):
                 func_args.extend(cast)
             elif isinstance(cast, AstNode):
                 func_args.append(cast)
 
         # Function calls only want the 'Name' part of the 'Var' that the visit returns
-        return Call(func=func_name.val, arguments=func_args)
+        return Call(
+            func=func_name.val, 
+            arguments=func_args, 
+            source_refs=[ref]
+        )
 
 
     def visit_assignment(self, node: Node) -> Assignment:
         left, _, right = node.children
-        literal_source_ref = self.node_helper.get_source_ref(node)
+        ref = self.node_helper.get_source_ref(node)
+        
+        # For the RHS of an assignment we want the Name CAST node
+        # and not the entire Var CAST node if we're doing an
+        # assignment like x = y
+        right_cast = get_name_node(self.visit(right))
         
         return Assignment(
             left=self.visit(left),
-            right=self.visit(right),
-            source_refs=[literal_source_ref]
+            right=right_cast,
+            source_refs=[ref]
         )
 
     def visit_unary_op(self, node: Node) -> Operator:
@@ -242,10 +249,26 @@ class TS2CAST(object):
             OP operand
             where operand is some kind of expression
         """
-        op = self.node_helper.get_operator(node.children[0])
+        ref = self.node_helper.get_source_ref(node)
+        op = get_op(self.node_helper.get_operator(node.children[0]))
         operand = node.children[1]
         
-        return Operator(op=op, operands=[self.visit(operand)])
+        if op == 'ast.Sub':
+            op = 'ast.USub'
+        
+        # For the operand we need the Name CAST node and
+        # not the whole Var CAST node
+        # in instances like -x
+        operand_cast = get_name_node(self.visit(operand))
+        
+        if isinstance(operand_cast, Var):
+            operand_cast = operand_cast.val
+
+        return Operator(
+            op=op, 
+            operands=[operand_cast], 
+            source_refs=[ref]
+        )
 
     def visit_binary_op(self, node: Node) -> Operator:
         """
@@ -254,10 +277,18 @@ class TS2CAST(object):
             where left and right can either be operators or literals
         
         """
-        op = self.node_helper.get_operator(node.children[1])
+        ref = self.node_helper.get_source_ref(node)
+        op = get_op(self.node_helper.get_operator(node.children[1]))
         left, _, right = node.children
 
-        return Operator(op=op, operands=[self.visit(left), self.visit(right)])
+        left_cast = get_name_node(self.visit(left))
+        right_cast = get_name_node(self.visit(right))
+
+        return Operator(
+            op=op, 
+            operands=[left_cast, right_cast], 
+            source_refs=[ref]
+        )
 
     def visit_identifier(self, node: Node) -> Var:
         identifier = self.node_helper.get_identifier(node)
@@ -286,9 +317,23 @@ class TS2CAST(object):
 
         if literal_type == "integer":
             return LiteralValue(
-                value_type="Integer",
+                value_type=ScalarType.INTEGER,
                 value=literal_value,
-                source_code_data_type=["Python", PYTHON_VERSION, "integer"],
+                source_code_data_type=["Python", PYTHON_VERSION, str(type(1))],
+                source_refs=[literal_source_ref]
+            )
+        elif literal_type == "float":
+            return LiteralValue(
+                value_type=ScalarType.ABSTRACTFLOAT,
+                value=literal_value,
+                source_code_data_type=["Python", PYTHON_VERSION, str(type(1.0))],
+                source_refs=[literal_source_ref]
+            )
+        elif literal_type == "true" or literal_type == "false":
+            return LiteralValue(
+                value_type=ScalarType.BOOLEAN,
+                value="True" if literal_type == "true" else "False",
+                source_code_data_type=["Python", PYTHON_VERSION, str(type(True))],
                 source_refs=[literal_source_ref]
             )
 
@@ -310,3 +355,15 @@ class TS2CAST(object):
             child_cast = self.visit(child)
             if child_cast:
                 return child_cast
+            
+def get_name_node(node):
+    # Given a CAST node, if it's type Var, then we extract the name node out of it
+    # If it's anything else, then the node just gets returned normally
+    cur_node = node
+    if isinstance(node, list):
+        cur_node = node[0]
+
+    if isinstance(cur_node, Var):
+        return cur_node.val
+    else:
+        return node
