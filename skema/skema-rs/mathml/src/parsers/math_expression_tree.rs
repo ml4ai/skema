@@ -220,13 +220,13 @@ impl MathExpression {
                         //println!("base.flatten(tokens): {:?}", base.flatten(tokens));
                         tokens.push(MathExpression::Mo(Operator::Rparen));
                         tokens.push(MathExpression::Mo(Operator::Power));
-                        tokens.push(MathExpression::Mo(Operator::Lparen));
+                        //tokens.push(MathExpression::Mo(Operator::Lparen));
                         superscript.flatten(tokens);
                         //println!(
                         //   "supersciprt.flatten(tokens): {:?}",
                         //  superscript.flatten(tokens)
                         //);
-                        tokens.push(MathExpression::Mo(Operator::Rparen));
+                        //tokens.push(MathExpression::Mo(Operator::Rparen));
                     }
                 } else {
                     println!("Super");
@@ -398,6 +398,7 @@ impl FromStr for MathExpressionTree {
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     //while lexer.peek() {
     println!("lexer={:?}", lexer);
+    let mut parse_val = MathExpressionTree::Atom(MathExpression::Mi(Mi(String::from(" "))));
     /*let mut lhs = match lexer.next() {
         Token::Atom(it) => {
             println!("it={:?}", it);
@@ -430,22 +431,29 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
         let mut lhs = match lexer.next() {
             Token::Atom(it) => {
                 println!(",,,it={:?}", it);
-                MathExpressionTree::Atom(it)
+                MathExpressionTree::Atom(it.clone())
             }
+            //Token::Op(Operator::Rparen) => break,
             Token::Op(Operator::Lparen) => {
-                let lhs = expr_bp(lexer, 0);
-                println!(",,,,lhs={:?}", lhs);
+                let lhs_in = expr_bp(lexer, 0);
+                println!(",,,,lhs={:?}", lhs_in);
                 assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
-                lhs
+                lhs_in
             }
+
             Token::Op(op) => {
-                println!(",,,inside Token::Op(op) = {:?}", op);
-                let ((), r_bp) = prefix_binding_power(&op);
-                let rhs = expr_bp(lexer, r_bp);
-                MathExpressionTree::Cons(op, vec![rhs])
+                if op == Operator::Rparen {
+                    break;
+                } else {
+                    println!(",,,inside Token::Op(op) = {:?}", op);
+                    let ((), r_bp) = prefix_binding_power(&op);
+                    let rhs = expr_bp(lexer, r_bp);
+                    MathExpressionTree::Cons(op, vec![rhs])
+                }
             }
             t => panic!("bad token: {:?}", t),
         };
+
         /*if op == Operator::Lparen {
             lhs = expr_bp(lexer, 0);
             println!(",,,,lhs={:?}", lhs);
@@ -454,53 +462,55 @@ fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
         } else {
             break;
         }*/
-    }
-    // Handle implicit multiplication at the beginning of an expression
-    //while let Token::Atom(_) = lexer.peek() {
-    //    let rhs = expr_bp(lexer, 0);
-    //    lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
-    //
-    //}
+        //}
+        // Handle implicit multiplication at the beginning of an expression
+        //while let Token::Atom(_) = lexer.peek() {
+        //    let rhs = expr_bp(lexer, 0);
+        //    lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
+        //
+        //}
 
-    loop {
-        let op = match lexer.peek() {
-            Token::Eof => break,
-            Token::Op(op) => op,
-            t => panic!("bad token: {:?}", t),
-        };
-        if let Some((l_bp, ())) = postfix_binding_power(&op) {
-            println!("--------op1={:?}", op);
-            if l_bp < min_bp {
-                break;
-            }
-            /*if op == Operator::Lparen {
-                let rhs = expr_bp(lexer, 0);
-                assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
-                lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
-            } else {*/
-            lexer.next();
-            let lhs = MathExpressionTree::Cons(op, vec![lhs]);
-            continue;
-        }
-        if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
-            println!("-----------op={:?}", op);
-            if l_bp < min_bp {
-                break;
-            }
-            lexer.next();
-            let lhs = {
-                let rhs = expr_bp(lexer, r_bp);
-                println!("--------rhs={:?}", rhs);
-                MathExpressionTree::Cons(op, vec![lhs, rhs])
+        loop {
+            let op = match lexer.peek() {
+                Token::Eof => break,
+                Token::Op(op) => op,
+                t => panic!("bad token: {:?}", t),
             };
-            continue;
+            if let Some((l_bp, ())) = postfix_binding_power(&op) {
+                println!("--------op1={:?}", op);
+                if l_bp < min_bp {
+                    break;
+                }
+                /*if op == Operator::Lparen {
+                    let rhs = expr_bp(lexer, 0);
+                    assert_eq!(lexer.next(), Token::Op(Operator::Rparen));
+                    lhs = MathExpressionTree::Cons(Operator::Multiply, vec![lhs, rhs]);
+                } else {*/
+                lexer.next();
+                let lhs = MathExpressionTree::Cons(op, vec![lhs.clone()]);
+                continue;
+            }
+            if let Some((l_bp, r_bp)) = infix_binding_power(&op) {
+                println!("-----------op={:?}", op);
+                if l_bp < min_bp {
+                    break;
+                }
+                lexer.next();
+                let lhs = {
+                    let rhs = expr_bp(lexer, r_bp);
+                    println!("--------rhs={:?}", rhs);
+                    MathExpressionTree::Cons(op, vec![lhs.clone(), rhs])
+                };
+                continue;
+            }
+            break;
         }
-        break;
+        //  combo.push(lhs);
+        //}
+        //combo
+        parse_val = lhs;
     }
-    //  combo.push(lhs);
-    //}
-    //combo
-    lhs
+    parse_val
 }
 
 /// Table of binding powers for prefix operators.
