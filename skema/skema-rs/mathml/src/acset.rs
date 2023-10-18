@@ -322,6 +322,12 @@ pub struct AMRmathml {
 // -------------------------------------------------------------------------------------------
 impl From<Vec<FirstOrderODE>> for PetriNet {
     fn from(ode_vec: Vec<FirstOrderODE>) -> PetriNet {
+
+        // for nanoid uuids:
+        let alphabet: [char; 17] = [
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'a', 'b', 'c', 'd', 'e', 'f', 'g'
+        ];
+
         // initialize vecs
         let mut states_vec = BTreeSet::<State>::new();
         let mut transitions_vec = BTreeSet::<Transition>::new();
@@ -334,7 +340,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         // this first for loop is for the creation state related parameters in the AMR
         for ode in ode_vec.iter() {
             let states = State {
-                id: format!("{}-{}", ode.lhs_var.to_string().clone(), nanoid!(8)),
+                id: format!("{}_{}", ode.lhs_var.to_string().clone(), nanoid!(8, &alphabet)),
                 name: ode.lhs_var.to_string().clone(),
                 ..Default::default()
             };
@@ -484,7 +490,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 }
                 // construct transtions for simple transtions
                 let transitions = Transition {
-                    id: format!("t{}-{}", i.clone(), nanoid!(8)),
+                    id: format!("t{}_{}", i.clone(), nanoid!(8, &alphabet)),
                     input: Some(input.clone()),
                     output: Some(output.clone()),
                     ..Default::default()
@@ -541,7 +547,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                 }
 
                 let transitions = Transition {
-                    id: format!("t{}-{}", i.clone(), nanoid!(8)),
+                    id: format!("t{}_{}", i.clone(), nanoid!(8, &alphabet)),
                     input: Some(input.clone()),
                     output: Some(output.clone()),
                     ..Default::default()
@@ -594,7 +600,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                     }
 
                     let transitions = Transition {
-                        id: format!("s{}-{}", i, nanoid!(8)),
+                        id: format!("s{}_{}", i, nanoid!(8, &alphabet)),
                         input: Some(input.clone()),
                         output: Some(output.clone()),
                         ..Default::default()
@@ -644,7 +650,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
                     }
 
                     let transitions = Transition {
-                        id: format!("s{}-{}", i, nanoid!(8)),
+                        id: format!("s{}_{}", i, nanoid!(8, &alphabet)),
                         input: Some(input.clone()),
                         output: None,
                         ..Default::default()
@@ -686,7 +692,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         parameter_vec.sort();
         parameter_vec.dedup();
         for parameter in parameter_vec.iter_mut() {
-            parameter.id = format!("{}", nanoid!(8));
+            parameter.id = format!("{}", nanoid!(8, &alphabet));
         }
 
         // construct the PetriNet
