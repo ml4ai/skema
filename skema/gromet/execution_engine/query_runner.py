@@ -1,4 +1,5 @@
 import yaml
+import traceback
 from pathlib import Path
 from gqlalchemy import Memgraph
 
@@ -20,7 +21,7 @@ class QueryRunner:
         n_or_m: str = "m",
         filename: str = None,
         function: str = None,
-        id: int = None,
+        id: str = None,
     ):
         # Check if query is in query map. Currently we return None if its not found
         # TODO: Improve error handling
