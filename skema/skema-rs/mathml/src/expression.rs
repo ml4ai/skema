@@ -1179,7 +1179,7 @@ pub fn preprocess_content(content_str: String) -> String {
         let loc = pre_string[*ul..].find('<').map(|i| i + ul);
         match loc {
             None => {}
-            Some(x) => pre_string.insert(x, ';'),
+            Some(x) => {}
         }
     }
     pre_string = html_escape::decode_html_entities(&pre_string).to_string();

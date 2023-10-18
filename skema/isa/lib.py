@@ -26,8 +26,8 @@ import html
 from sentence_transformers import SentenceTransformer, util
 
 # Set up the random seed
-np.random.seed(1)
-rng = np.random.default_rng(1)
+np.random.seed(4)
+rng = np.random.default_rng(4)
 
 # The encodings of basic operators when converting adjacency matrix
 op_dict = {"+": 1, "-": 2, "*": 3, "/": 4, "=": 5, "√": 6}
@@ -404,10 +404,7 @@ def calculate_similarity(
     Returns:
         float: Semantic similarity score between 0 and 1.
     """
-    if field == "biomedical":
-        pre_trained_model = "allenai/biomed_roberta_base"
-    else:
-        pre_trained_model = "msmarco-distilbert-base-v2"
+    pre_trained_model = "msmarco-distilbert-base-v2"
     model = SentenceTransformer(pre_trained_model)
 
     # Convert definitions to BERT embeddings
@@ -449,7 +446,6 @@ def match_variable_definitions(
     for idx1, var1 in enumerate(list1):
         max_similarity = 0.0
         matching_idx = -1
-
         for idx2, var2 in enumerate(list2):
             def1 = find_definition(var1, extracted_data1)
             def2 = find_definition(var2, extracted_data2)
@@ -457,13 +453,13 @@ def match_variable_definitions(
             if def1 and def2:
                 similarity = calculate_similarity(def1, def2)
                 if similarity > max_similarity and similarity >= threshold:
-                    print(similarity)
                     max_similarity = similarity
                     matching_idx = idx2
 
         if matching_idx != -1:
-            var_idx_list1.append(idx1)
-            var_idx_list2.append(matching_idx)
+            if idx1 not in var_idx_list1:
+                var_idx_list1.append(idx1)
+                var_idx_list2.append(matching_idx)
 
     return var_idx_list1, var_idx_list2
 
@@ -513,23 +509,27 @@ def get_seeds(
                     if heuristic_compare_variable_names(
                         node_labels1[i], node_labels2[j]
                     ):
-                        seed1.append(i)
-                        seed2.append(j)
+                        if i not in seed1:
+                            seed1.append(i)
+                            seed2.append(j)
                 elif method == "levenshtein":
                     if (
                         levenshtein_similarity(node_labels1[i], node_labels2[j])
                         > threshold
                     ):
-                        seed1.append(i)
-                        seed2.append(j)
+                        if i not in seed1:
+                            seed1.append(i)
+                            seed2.append(j)
                 elif method == "jaccard":
                     if jaccard_similarity(node_labels1[i], node_labels2[j]) > threshold:
-                        seed1.append(i)
-                        seed2.append(j)
+                        if i not in seed1:
+                            seed1.append(i)
+                            seed2.append(j)
                 elif method == "cosine":
                     if cosine_similarity(node_labels1[i], node_labels2[j]) > threshold:
-                        seed1.append(i)
-                        seed2.append(j)
+                        if i not in seed1:
+                            seed1.append(i)
+                            seed2.append(j)
 
     return seed1, seed2
 
