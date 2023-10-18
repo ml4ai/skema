@@ -34,7 +34,13 @@ pub struct Ci {
     pub func_of: Option<Vec<Ci>>,
 }
 
-/// The MathExpression enum represents the corresponding element type in MathML 3
+#[derive(Debug, Ord, PartialOrd, PartialEq, Eq, Clone, Hash, new)]
+pub struct Differential {
+    pub diff: Box<MathExpression>,
+    pub func: Box<MathExpression>,
+}
+
+/// The MathExpression enum is not faithful to the corresponding element type in MathML 3
 /// (https://www.w3.org/TR/MathML3/appendixa.html#parsing_MathExpression)
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Hash, Default, new)]
 pub enum MathExpression {
@@ -59,6 +65,8 @@ pub enum MathExpression {
     MoLine(String),
     //GroupTuple(Vec<MathExpression>),
     Ci(Ci),
+    Differential(Differential),
+    //Differential(Box<MathExpression>, Box<MathExpression>),
     #[default]
     None,
 }
@@ -70,7 +78,7 @@ impl fmt::Display for MathExpression {
             MathExpression::Ci(Ci {
                 r#type: _,
                 content,
-                func_of,
+                func_of: _,
             }) => write!(f, "{}", content),
             MathExpression::Mn(number) => write!(f, "{}", number),
             MathExpression::Msup(base, superscript) => {
@@ -87,6 +95,10 @@ impl fmt::Display for MathExpression {
                     write!(f, "{}", e)?;
                 }
                 Ok(())
+            }
+            MathExpression::Differential(Differential { diff, func }) => {
+                write!(f, "{diff}");
+                write!(f, "{func}")
             }
             expression => write!(f, "{expression:?}"),
         }

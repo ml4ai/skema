@@ -11,8 +11,7 @@ val tag = "1.0.0"
 
 
 Docker / defaultLinuxInstallLocation := appDir
-// TODO: can we run this with 11 (i.e., eclipse-temurin:11-jre-focal)?
-Docker / dockerBaseImage := "eclipse-temurin:8-jre-focal"
+dockerBaseImage := "eclipse-temurin:11-jre-focal"
 Docker / daemonUser := "nobody"
 Docker / dockerExposedPorts := List(port)
 Docker / maintainer := "Keith Alcock <docker@keithalcock.com>"
@@ -26,16 +25,15 @@ Docker / version := tag
 // set our version based on our env variable
 dockerEnvVars ++= Map(
   "APP_VERSION" -> scala.util.Properties.envOrElse("APP_VERSION", "???"),
-  "APPLICATION_SECRET" -> "this-is-not-a-secure-key-please-change-me"
+  "APPLICATION_SECRET" -> "this-is-not-a-secure-key-please-change-me",
+  // NOTE: the expected min. RAM requirements
+  // FIXME: reduce RAM consumption $\le 8GB$
+  "_JAVA_OPTIONS" -> "-Xmx10g -Xms10g -Dfile.encoding=UTF-8"
 )
 dockerAdditionalPermissions += (DockerChmodType.UserGroupPlusExecute, app)
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
 // dockerCmd := Seq(s"-Dhttp.port=$port")
 dockerEntrypoint := Seq(app)
-// This is now delegated to skema-webapp.env.
-// dockerEnvVars := Map(
-//   "_JAVA_OPTIONS" -> "-Xmx16g -Xms16g -Dfile.encoding=UTF-8"
-// )
 dockerPermissionStrategy := DockerPermissionStrategy.MultiStage
 dockerUpdateLatest := true
 
@@ -69,4 +67,4 @@ def moveDir(dirname: String): Seq[(File, String)] = {
 
 // Universal / mappings ++= moveDir("./cache/geonames")
 
-Global / excludeLintKeys += Docker / dockerBaseImage
+Global / excludeLintKeys += dockerBaseImage
