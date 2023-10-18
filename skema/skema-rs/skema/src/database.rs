@@ -665,7 +665,8 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
     external_wiring(gromet, &mut nodes.clone(), &mut edges);
 
     // make conditionals if they exist
-    if gromet.modules[0].r#fn.bc.as_ref().is_some() {
+    /* I am commenteding out conditionals and loops for Library calls as we get duplicated traverals for now (10/18/23) */
+    /*if gromet.modules[0].r#fn.bc.as_ref().is_some() {
         let mut cond_counter = 0;
         let temp_mod_node = Node {
             n_type: String::from("module"),
@@ -756,7 +757,7 @@ fn create_function_net_lib(gromet: &ModuleCollection, mut start: u32) -> Vec<Str
             }
             while_counter += 1;
         }
-    }
+    } */
     // convert every node object into a node query
     let create = String::from("CREATE");
     for node in nodes.iter() {
@@ -1525,8 +1526,20 @@ pub fn create_function(
                             new_c_args.clone(),
                         );
                     }
+                    FunctionType::ImportedMethod => {
+                        // this is a function call, but for some reason is not called a function
+                        new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                        create_function(
+                            gromet, // gromet for metadata
+                            nodes,  // nodes
+                            edges,
+                            meta_nodes,
+                            start,
+                            new_c_args.clone(),
+                        );
+                    }
                     _ => {
-                        println!("Missing a box in a function!");
+                        println!("Missing a box in a function! {:?}", att_sub_box.function_type.clone());
                     }
                 }
                 box_counter += 1;
@@ -1713,15 +1726,21 @@ pub fn create_conditional(
     let body_if_box = function_net.bc.as_ref().unwrap()[cond_counter as usize]
         .body_if
         .unwrap();
-    let body_else_box = function_net.bc.as_ref().unwrap()[cond_counter as usize]
-        .body_else
-        .unwrap();
+    let mut body_else_box = body_if_box.clone();
+    let mut else_exists = false;
+    if function_net.bc.as_ref().unwrap()[cond_counter as usize].body_else.is_some() {
+        body_else_box = function_net.bc.as_ref().unwrap()[cond_counter as usize].body_else.unwrap();
+        else_exists = true;
+    }
 
     // now we make the conditional, if, and else nodes
 
     let cond_att_box = gromet.modules[0].attributes[(cond_box - 1) as usize].clone();
     let if_att_box = gromet.modules[0].attributes[(body_if_box - 1) as usize].clone();
-    let else_att_box = gromet.modules[0].attributes[(body_else_box - 1) as usize].clone();
+    let mut else_att_box = if_att_box.clone();
+    if else_exists {
+        else_att_box = gromet.modules[0].attributes[(body_else_box - 1) as usize].clone();
+    }
 
     let mut new_c_args = c_args.clone();
     new_c_args.parent_node = n1.clone();
@@ -1768,7 +1787,8 @@ pub fn create_conditional(
     }
 
     // Now we start to wire these objects together there are two unique wire types and implicit wires that need to be made
-    for wire in function_net.wfc.as_ref().unwrap().iter() {
+    if function_net.wfc.is_some() {
+        for wire in function_net.wfc.as_ref().unwrap().iter() {
         // collect info to identify the opi src node
         let src_idx = wire.src; // port index
         let src_att = att_idx; // attribute index of submodule (also opi contents value)
@@ -1833,6 +1853,7 @@ pub fn create_conditional(
                 prop: None,
             };
             edges.push(e8);
+        }
         }
     }
 
@@ -1934,7 +1955,8 @@ pub fn create_conditional(
             edges.push(e10);
         }
     }
-    for opi in else_att_box.opi.unwrap().iter() {
+    if else_exists {
+        for opi in else_att_box.opi.unwrap().iter() {
         let src_id = opi.id.unwrap();
         let tgt_id = src_id;
         let tgt_bf_counter = 0; // because of how we have defined it
@@ -1980,12 +2002,13 @@ pub fn create_conditional(
             };
             edges.push(e11);
         }
+        }
     }
 
     // every opo in if and else statements gets mapped to a poc of the same id, every opo but the last in a predicate
     // gets mapped to a poc of the same id. 
 
-    for opo in if_att_box.opo.unwrap().iter() {
+    for opo in if_att_box.opo.clone().unwrap().iter() {
         let src_id = opo.id.unwrap();
         let tgt_id = src_id;
         let tgt_bf_counter = 0; // because of how we have defined it
@@ -2032,7 +2055,8 @@ pub fn create_conditional(
             edges.push(e12);
         }
     }
-    for opo in else_att_box.opo.unwrap().iter() {
+    if else_exists {
+        for opo in else_att_box.opo.unwrap().iter() {
         let src_id = opo.id.unwrap();
         let tgt_id = src_id;
         let tgt_bf_counter = 0; // because of how we have defined it
@@ -2077,6 +2101,7 @@ pub fn create_conditional(
                 prop: None,
             };
             edges.push(e13);
+        }
         }
     }
     // iterate through everything but last opo
@@ -3937,7 +3962,7 @@ pub fn wfopi_wiring(
                 }
             }
         }
-        if wfopi_src_tgt.len() == 2 {
+        if wfopi_src_tgt.len() == 2 && prop.is_some() {
             let e6 = Edge {
                 src: wfopi_src_tgt[0].clone(),
                 tgt: wfopi_src_tgt[1].clone(),
@@ -4093,7 +4118,7 @@ pub fn wff_wiring(
                 }
             }
         }
-        if wff_src_tgt.len() == 2 {
+        if wff_src_tgt.len() == 2 && prop.is_some() {
             let e8 = Edge {
                 src: wff_src_tgt[0].clone(),
                 tgt: wff_src_tgt[1].clone(),
