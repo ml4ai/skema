@@ -470,7 +470,11 @@ async def integrated_pdf_extractions(
     # Call COSMOS on the pdfs
     cosmos_data = list()
     for pdf in pdfs:
-        cosmos_data.append(cosmos_client(pdf.filename, pdf.file))
+        if pdf.filename.endswith("json"):
+            json_data = json.load(pdf.file)
+        else:
+            json_data = cosmos_client(pdf.filename, pdf.file)
+        cosmos_data.append(json_data)
 
     # Get the plain text version from cosmos, passed through to MIT pipeline
     plain_texts = ['\n'.join(block['content'] for block in c) for c in cosmos_data]

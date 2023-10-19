@@ -160,6 +160,27 @@ def test_partial_supported_files():
     assert gromet_collection["metadata_collection"][0][0]["severity"] == "WARNING"
 
 
+def test_gromet_object_count():
+    """Test case for get-object-count endpoint"""
+    system = {
+        "files": ["example1.py", "dir/example2.py"],
+        "blobs": [
+            "greet = lambda: print('howdy!')\ngreet()",
+            "#Variable declaration\nx=2\n#Function definition\ndef foo(x):\n    '''Increment the input variable'''\n    return x+1",  # Content of dir/example2.py
+        ],
+    }
+
+    response = client.post("/code2fn/fn-given-filepaths", json=system)
+    gromet_collection = response.json()
+    response = client.post("/code2fn/gromet-object-count", json=gromet_collection)
+    assert response.status_code == 200
+    gromet_object_count = response.json()
+    assert sum([value for key, value in gromet_object_count.items()]) > 0
+    assert gromet_object_count["boxes"] == 16
+    assert gromet_object_count["wires"] == 6
+    assert gromet_object_count["ports"] == 14
+
+
 # TODO: Add more complex test case to test_get_pyacset
 def test_get_pyacset():
     """Test case for /code2fn/get_pyacset endpoint."""
