@@ -288,30 +288,30 @@ impl Lexer {
                             acc.push(&MathExpression::Mo(Operator::Multiply));
                         }
                         acc.push(x);
-                        println!("x={:?}", x);
+                        //println!("x={:?}", x);
                     }
                     // Handle other types of operators.
-                    MathExpression::Mo(y) => {
+                    MathExpression::Mo(_) => {
                         //println!("||||||y ={:?}", y);
-                        println!("y = {:?}", y);
-                        println!("-->x={:?}", x);
+                        //println!("y = {:?}", y);
+                        //println!("-->x={:?}", x);
                         acc.push(x);
                     }
                     // Handle other types of MathExpression objects.
                     t => {
-                        println!("t = {:?}", t);
+                        //println!("t = {:?}", t);
                         let last_token = acc.last().unwrap();
                         match last_token {
                             MathExpression::Mo(Operator::Rparen) => {
                                 // If the last item in the accumulator is a right parenthesis ')',
                                 // insert a multiplication operator
-                                println!("in here");
+                                //println!("in here");
                                 acc.push(&MathExpression::Mo(Operator::Multiply));
                             }
-                            MathExpression::Mo(y) => {
+                            MathExpression::Mo(_) => {
                                 // If the last item in the accumulator is an Mo (but not a right
                                 // parenthesis), noop
-                                println!("testing in y = {:?}", y);
+                                //println!("testing in y = {:?}", y);
                             }
                             _ => {
                                 // Otherwise, insert a multiplication operator
@@ -358,9 +358,9 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     //let mut result = MathExpressionTree::Atom(MathExpression::Mi(Mi(String::from(" "))));
 
     let mut result = expr_bp(&mut lexer, 0);
-    println!("result={:?}", result);
-    while lexer.peek() != Token::Eof {
-        if let MathExpressionTree::Cons(Operator::Equals, mut vec) = result {
+    println!("--->result={:?}", result);
+    while lexer.next() != Token::Eof {
+        /*if let MathExpressionTree::Cons(Operator::Equals, mut vec) = result {
             let equals = expr_bp(&mut lexer, 2);
             vec.push(equals);
             println!("...vec1={:?}", vec);
@@ -375,7 +375,8 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
             let another = MathExpressionTree::Cons(Operator::Multiply, vec);
             //let result2 = MathExpressionTree::Cons(Operator::Div, vec![another]);
             result = MathExpressionTree::Cons(Operator::Equals, vec![another]);
-        } else if let MathExpressionTree::Cons(
+        } else*/
+        /*if let MathExpressionTree::Cons(
             Operator::Derivative(Derivative {
                 order,
                 var_index,
@@ -396,14 +397,16 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
                 }),
                 vec![another],
             );
-        } else if let MathExpressionTree::Cons(Operator::Div, mut vec) = result {
+        } else*/
+        if let MathExpressionTree::Cons(Operator::Div, mut vec) = result {
             let divergence = expr_bp(&mut lexer, 31);
             vec.push(divergence);
             println!("vec1={:?}", vec);
             let new_comp = expr_bp(&mut lexer, 0);
             vec.push(new_comp);
-            //println!("vec={:?}", vec);
-            let another = MathExpressionTree::Cons(Operator::Multiply, vec);
+            println!("vec={:?}", vec);
+            let vec1 = MathExpressionTree::Cons(Operator::Multiply, vec);
+            let another = MathExpressionTree::Cons(Operator::Multiply, vec![vec1]);
             result = MathExpressionTree::Cons(Operator::Div, vec![another]);
         /*} else if let MathExpressionTree::Cons(Operator::Equals, mut vec) = result {
            let equals = expr_bp(&mut lexer, 2);
@@ -476,7 +479,7 @@ impl FromStr for MathExpressionTree {
 /// The Pratt parsing algorithm for constructing an S-expression representing an equation.
 fn expr_bp(lexer: &mut Lexer, min_bp: u8) -> MathExpressionTree {
     //while lexer.peek() {
-    println!("lexer={:?}", lexer);
+    //println!("lexer={:?}", lexer);
     //let mut parse_val = MathExpressionTree::Atom(MathExpression::Mi(Mi(String::from(" "))));
 
     let mut lhs = match lexer.next() {
@@ -1046,13 +1049,10 @@ fn test_absolute_as_msup() {
 }
 
 #[test]
-fn test_halfar_dome() {
+fn test_equation_halfar_dome() {
     let input = "
     <math>
-        <mfrac>
-        <mrow><mi>∂</mi><mi>H</mi></mrow>
-        <mrow><mi>∂</mi><mi>t</mi></mrow>
-        </mfrac>
+        <mfrac><mrow><mi>∂</mi><mi>H</mi></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac>
         <mo>=</mo>
         <mo>&#x2207;</mo>
         <mo>&#x22c5;</mo>
@@ -1066,10 +1066,29 @@ fn test_halfar_dome() {
         <mo>)</mo>
     </math>
     ";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
+    /*let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("S-exp={:?}", s_exp);
+    */
+    let FirstOrderODE {
+        lhs_var,
+        func_of,
+        with_respect_to,
+        rhs,
+    } = first_order_ode(input.into()).unwrap().1;
+    println!("lhs_var={:?}", lhs_var);
+    println!("func_of={:?}", func_of);
+    println!("with_respect_to={:?}", with_respect_to);
+    println!("rhs = {:?}", rhs);
+    /*
+    assert_eq!(lhs_var.to_string(), "H");
+    assert_eq!(func_of[0].to_string(), "");
+    assert_eq!(with_respect_to.to_string(), "t");
+    assert_eq!(
+        rhs.to_string(),
+        "(Div (* (* (* Γ (^ H (+ n 2))) (^ (Grad H) (- n 1)) (Grad H))))"
+    );*/
 }
 
 #[test]
@@ -1125,6 +1144,21 @@ fn test_halfar_dome4() {
     let s_exp = exp.to_string();
     println!("S-exp={:?}", s_exp);
 }
+
+#[test]
+fn test_halfar_dome5() {
+    let input = "
+    <math>
+        <mi>Γ</mi>
+        <msup><mi>H</mi><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow></msup>
+    </math>
+    ";
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
+}
+
 #[test]
 fn test_func_paren() {
     let input = "
