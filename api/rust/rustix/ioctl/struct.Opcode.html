@@ -8,10 +8,10 @@ older drivers may still use this strategy.</p>
     group: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>,
     number: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>,
     data_size: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.usize.html">usize</a>
-) -&gt; Self</h4></section></summary><div class="docblock"><p>Create a new opcode from a direction, group, number and size.</p>
+) -&gt; Self</h4></section></summary><div class="docblock"><p>Create a new opcode from a direction, group, number, and size.</p>
 <p>This corresponds to the C macro <code>_IOC(direction, group, number, size)</code></p>
-</div></details><details class="toggle method-toggle" open><summary><section id="method.none" class="method"><a class="src rightside" href="../../src/rustix/ioctl/mod.rs.html#237-239">source</a><h4 class="code-header">pub const fn <a href="#method.none" class="fn">none</a>&lt;T&gt;(group: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>, number: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Create a new non-mutating opcode from a group, a number and the type of
-data.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="method.none" class="method"><a class="src rightside" href="../../src/rustix/ioctl/mod.rs.html#237-239">source</a><h4 class="code-header">pub const fn <a href="#method.none" class="fn">none</a>&lt;T&gt;(group: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>, number: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Create a new non-mutating opcode from a group, a number, and the type
+of data.</p>
 <p>This corresponds to the C macro <code>_IO(group, number)</code> when <code>T</code> is zero
 sized.</p>
 </div></details><details class="toggle method-toggle" open><summary><section id="method.read" class="method"><a class="src rightside" href="../../src/rustix/ioctl/mod.rs.html#247-249">source</a><h4 class="code-header">pub const fn <a href="#method.read" class="fn">read</a>&lt;T&gt;(group: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>, number: <a class="primitive" href="https://doc.rust-lang.org/1.73.0/std/primitive.u8.html">u8</a>) -&gt; Self</h4></section></summary><div class="docblock"><p>Create a new reading opcode from a group, a number and the type of

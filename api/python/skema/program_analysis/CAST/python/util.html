@@ -47,7 +47,41 @@ def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
                 if isinstance(element, AstNode):
                     generate_dummy_source_refs(element)
 
-    return node</code></pre>
+    return node
+
+def get_op(operator):
+    ops = {
+        &#39;+&#39;: &#39;ast.Add&#39;,
+        &#39;-&#39;: &#39;ast.Sub&#39;,
+        &#39;*&#39;: &#39;ast.Mult&#39;,
+        &#39;/&#39;: &#39;ast.Div&#39;,
+        # ast.UAdd: &#39;ast.UAdd&#39;,
+        # ast.USub: &#39;ast.USub&#39;,
+        # ast.FloorDiv: &#39;ast.FloorDiv&#39;,
+        # ast.Mod: &#39;ast.Mod&#39;,
+        # ast.Pow: &#39;ast.Pow&#39;,
+        # ast.LShift: &#39;ast.LShift&#39;,
+        # ast.RShift: &#39;ast.RShift&#39;,
+        # ast.BitOr: &#39;ast.BitOr&#39;,
+        # ast.BitAnd: &#39;ast.BitAnd&#39;,
+        # ast.BitXor: &#39;ast.BitXor&#39;,
+        # ast.And: &#39;ast.And&#39;,
+        # ast.Or: &#39;ast.Or&#39;,
+        # ast.Eq: &#39;ast.Eq&#39;,
+        # ast.NotEq: &#39;ast.NotEq&#39;,
+        # ast.Lt: &#39;ast.Lt&#39;,
+        # ast.LtE: &#39;ast.LtE&#39;,
+        # ast.Gt: &#39;ast.Gt&#39;,
+        # ast.GtE: &#39;ast.GtE&#39;,
+        # ast.In: &#39;ast.In&#39;,
+        # ast.NotIn: &#39;ast.NotIn&#39;,
+        # ast.Not: &#39;ast.Not&#39;,
+        # ast.Invert: &#39;ast.Invert&#39;,
+    }
+    if operator in ops.keys():
+        return ops[operator]
+    else:
+        raise NotImplementedError(f&#34;python tree sitter util.py: Operator {operator} isn&#39;t in the operations table&#34;)</code></pre>
 </details>
 </section>
 <section>
@@ -85,6 +119,50 @@ def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
     return node</code></pre>
 </details>
 </dd>
+<dt id="skema.program_analysis.CAST.python.util.get_op"><code class="name flex">
+<span>def <span class="ident">get_op</span></span>(<span>operator)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_op(operator):
+    ops = {
+        &#39;+&#39;: &#39;ast.Add&#39;,
+        &#39;-&#39;: &#39;ast.Sub&#39;,
+        &#39;*&#39;: &#39;ast.Mult&#39;,
+        &#39;/&#39;: &#39;ast.Div&#39;,
+        # ast.UAdd: &#39;ast.UAdd&#39;,
+        # ast.USub: &#39;ast.USub&#39;,
+        # ast.FloorDiv: &#39;ast.FloorDiv&#39;,
+        # ast.Mod: &#39;ast.Mod&#39;,
+        # ast.Pow: &#39;ast.Pow&#39;,
+        # ast.LShift: &#39;ast.LShift&#39;,
+        # ast.RShift: &#39;ast.RShift&#39;,
+        # ast.BitOr: &#39;ast.BitOr&#39;,
+        # ast.BitAnd: &#39;ast.BitAnd&#39;,
+        # ast.BitXor: &#39;ast.BitXor&#39;,
+        # ast.And: &#39;ast.And&#39;,
+        # ast.Or: &#39;ast.Or&#39;,
+        # ast.Eq: &#39;ast.Eq&#39;,
+        # ast.NotEq: &#39;ast.NotEq&#39;,
+        # ast.Lt: &#39;ast.Lt&#39;,
+        # ast.LtE: &#39;ast.LtE&#39;,
+        # ast.Gt: &#39;ast.Gt&#39;,
+        # ast.GtE: &#39;ast.GtE&#39;,
+        # ast.In: &#39;ast.In&#39;,
+        # ast.NotIn: &#39;ast.NotIn&#39;,
+        # ast.Not: &#39;ast.Not&#39;,
+        # ast.Invert: &#39;ast.Invert&#39;,
+    }
+    if operator in ops.keys():
+        return ops[operator]
+    else:
+        raise NotImplementedError(f&#34;python tree sitter util.py: Operator {operator} isn&#39;t in the operations table&#34;)</code></pre>
+</details>
+</dd>
 </dl>
 </section>
 <section>
@@ -104,6 +182,7 @@ def generate_dummy_source_refs(node: AstNode) -&gt; AstNode:
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="skema.program_analysis.CAST.python.util.generate_dummy_source_refs" href="#skema.program_analysis.CAST.python.util.generate_dummy_source_refs">generate_dummy_source_refs</a></code></li>
+<li><code><a title="skema.program_analysis.CAST.python.util.get_op" href="#skema.program_analysis.CAST.python.util.get_op">get_op</a></code></li>
 </ul>
 </li>
 </ul>

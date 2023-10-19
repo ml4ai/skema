@@ -85,7 +85,7 @@ def test_binop1():
     assert binop_node.left.val.name == &#34;x&#34;
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == &#34;+&#34;
+    assert binop_node.right.op == &#34;ast.Add&#34;
 
     assert isinstance(binop_node.right.operands[0], LiteralValue)
     assert binop_node.right.operands[0].value == &#39;2&#39;
@@ -119,11 +119,11 @@ def test_binop2():
     assert binop_node.left.val.id == 1
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == &#34;+&#34;
+    assert binop_node.right.op == &#34;ast.Add&#34;
 
-    assert isinstance(binop_node.right.operands[0], Var)
-    assert binop_node.right.operands[0].val.name == &#39;x&#39;
-    assert binop_node.right.operands[0].val.id == 0
+    assert isinstance(binop_node.right.operands[0], Name)
+    assert binop_node.right.operands[0].name == &#39;x&#39;
+    assert binop_node.right.operands[0].id == 0
 
     assert isinstance(binop_node.right.operands[1], LiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
@@ -165,37 +165,37 @@ def test_binop3():
     assert binop_node.left.val.id == 2
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == &#34;-&#34;
+    assert binop_node.right.op == &#34;ast.Sub&#34;
 
     binop_node_1 = binop_node.right.operands[0]
-    assert binop_node_1.op == &#34;+&#34;   
+    assert binop_node_1.op == &#34;ast.Add&#34;   
 
-    assert isinstance(binop_node_1.operands[0], Var)
-    assert binop_node_1.operands[0].val.name == &#34;x&#34;
-    assert binop_node_1.operands[0].val.id == 0
+    assert isinstance(binop_node_1.operands[0], Name)
+    assert binop_node_1.operands[0].name == &#34;x&#34;
+    assert binop_node_1.operands[0].id == 0
 
-    assert isinstance(binop_node_1.operands[1], Var)
-    assert binop_node_1.operands[1].val.name == &#34;y&#34;
-    assert binop_node_1.operands[1].val.id == 1
+    assert isinstance(binop_node_1.operands[1], Name)
+    assert binop_node_1.operands[1].name == &#34;y&#34;
+    assert binop_node_1.operands[1].id == 1
 
     binop_node_2 = binop_node.right.operands[1]
-    assert binop_node_2.op == &#34;/&#34;   
+    assert binop_node_2.op == &#34;ast.Div&#34;   
     assert isinstance(binop_node_2.operands[0], Operator)
 
-    assert isinstance(binop_node_2.operands[1], Var)
-    assert binop_node_2.operands[1].val.name == &#34;x&#34;
-    assert binop_node_2.operands[1].val.id == 0
+    assert isinstance(binop_node_2.operands[1], Name)
+    assert binop_node_2.operands[1].name == &#34;x&#34;
+    assert binop_node_2.operands[1].id == 0
 
     binop_node_3 = binop_node_2.operands[0]
-    assert binop_node_3.op == &#34;*&#34;
+    assert binop_node_3.op == &#34;ast.Mult&#34;
 
-    assert isinstance(binop_node_3.operands[0], Var)
-    assert binop_node_3.operands[0].val.name == &#34;y&#34;
-    assert binop_node_3.operands[0].val.id == 1
+    assert isinstance(binop_node_3.operands[0], Name)
+    assert binop_node_3.operands[0].name == &#34;y&#34;
+    assert binop_node_3.operands[0].id == 1
 
-    assert isinstance(binop_node_3.operands[1], Var)
-    assert binop_node_3.operands[1].val.name == &#34;x&#34;
-    assert binop_node_3.operands[1].val.id == 0
+    assert isinstance(binop_node_3.operands[1], Name)
+    assert binop_node_3.operands[1].name == &#34;x&#34;
+    assert binop_node_3.operands[1].id == 0
 
 def test_unary1():
     exp_cast = generate_cast(unary1())
@@ -209,7 +209,7 @@ def test_unary1():
     assert unary_node.left.val.id == 0
 
     assert isinstance(unary_node.right, Operator)
-    assert unary_node.right.op == &#34;-&#34;
+    assert unary_node.right.op == &#34;ast.USub&#34;
 
     assert isinstance(unary_node.right.operands[0], LiteralValue)
     assert unary_node.right.operands[0].value == &#39;1&#39;
@@ -239,11 +239,11 @@ def test_unary2():
     assert unary_node.left.val.id == 1
 
     assert isinstance(unary_node.right, Operator)
-    assert unary_node.right.op == &#34;-&#34;
+    assert unary_node.right.op == &#34;ast.USub&#34;
 
-    assert isinstance(unary_node.right.operands[0], Var)
-    assert unary_node.right.operands[0].val.name == &#39;x&#39;
-    assert unary_node.right.operands[0].val.id == 0</code></pre>
+    assert isinstance(unary_node.right.operands[0], Name)
+    assert unary_node.right.operands[0].name == &#39;x&#39;
+    assert unary_node.right.operands[0].id == 0</code></pre>
 </details>
 </section>
 <section>
@@ -337,7 +337,7 @@ z = x + y - (y * x) / x
     assert binop_node.left.val.name == &#34;x&#34;
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == &#34;+&#34;
+    assert binop_node.right.op == &#34;ast.Add&#34;
 
     assert isinstance(binop_node.right.operands[0], LiteralValue)
     assert binop_node.right.operands[0].value == &#39;2&#39;
@@ -381,11 +381,11 @@ z = x + y - (y * x) / x
     assert binop_node.left.val.id == 1
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == &#34;+&#34;
+    assert binop_node.right.op == &#34;ast.Add&#34;
 
-    assert isinstance(binop_node.right.operands[0], Var)
-    assert binop_node.right.operands[0].val.name == &#39;x&#39;
-    assert binop_node.right.operands[0].val.id == 0
+    assert isinstance(binop_node.right.operands[0], Name)
+    assert binop_node.right.operands[0].name == &#39;x&#39;
+    assert binop_node.right.operands[0].id == 0
 
     assert isinstance(binop_node.right.operands[1], LiteralValue)
     assert binop_node.right.operands[1].value == &#39;3&#39;
@@ -437,37 +437,37 @@ z = x + y - (y * x) / x
     assert binop_node.left.val.id == 2
 
     assert isinstance(binop_node.right, Operator)
-    assert binop_node.right.op == &#34;-&#34;
+    assert binop_node.right.op == &#34;ast.Sub&#34;
 
     binop_node_1 = binop_node.right.operands[0]
-    assert binop_node_1.op == &#34;+&#34;   
+    assert binop_node_1.op == &#34;ast.Add&#34;   
 
-    assert isinstance(binop_node_1.operands[0], Var)
-    assert binop_node_1.operands[0].val.name == &#34;x&#34;
-    assert binop_node_1.operands[0].val.id == 0
+    assert isinstance(binop_node_1.operands[0], Name)
+    assert binop_node_1.operands[0].name == &#34;x&#34;
+    assert binop_node_1.operands[0].id == 0
 
-    assert isinstance(binop_node_1.operands[1], Var)
-    assert binop_node_1.operands[1].val.name == &#34;y&#34;
-    assert binop_node_1.operands[1].val.id == 1
+    assert isinstance(binop_node_1.operands[1], Name)
+    assert binop_node_1.operands[1].name == &#34;y&#34;
+    assert binop_node_1.operands[1].id == 1
 
     binop_node_2 = binop_node.right.operands[1]
-    assert binop_node_2.op == &#34;/&#34;   
+    assert binop_node_2.op == &#34;ast.Div&#34;   
     assert isinstance(binop_node_2.operands[0], Operator)
 
-    assert isinstance(binop_node_2.operands[1], Var)
-    assert binop_node_2.operands[1].val.name == &#34;x&#34;
-    assert binop_node_2.operands[1].val.id == 0
+    assert isinstance(binop_node_2.operands[1], Name)
+    assert binop_node_2.operands[1].name == &#34;x&#34;
+    assert binop_node_2.operands[1].id == 0
 
     binop_node_3 = binop_node_2.operands[0]
-    assert binop_node_3.op == &#34;*&#34;
+    assert binop_node_3.op == &#34;ast.Mult&#34;
 
-    assert isinstance(binop_node_3.operands[0], Var)
-    assert binop_node_3.operands[0].val.name == &#34;y&#34;
-    assert binop_node_3.operands[0].val.id == 1
+    assert isinstance(binop_node_3.operands[0], Name)
+    assert binop_node_3.operands[0].name == &#34;y&#34;
+    assert binop_node_3.operands[0].id == 1
 
-    assert isinstance(binop_node_3.operands[1], Var)
-    assert binop_node_3.operands[1].val.name == &#34;x&#34;
-    assert binop_node_3.operands[1].val.id == 0</code></pre>
+    assert isinstance(binop_node_3.operands[1], Name)
+    assert binop_node_3.operands[1].name == &#34;x&#34;
+    assert binop_node_3.operands[1].id == 0</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.tests.test_operation_cast.test_unary1"><code class="name flex">
@@ -491,7 +491,7 @@ z = x + y - (y * x) / x
     assert unary_node.left.val.id == 0
 
     assert isinstance(unary_node.right, Operator)
-    assert unary_node.right.op == &#34;-&#34;
+    assert unary_node.right.op == &#34;ast.USub&#34;
 
     assert isinstance(unary_node.right.operands[0], LiteralValue)
     assert unary_node.right.operands[0].value == &#39;1&#39;
@@ -531,11 +531,11 @@ z = x + y - (y * x) / x
     assert unary_node.left.val.id == 1
 
     assert isinstance(unary_node.right, Operator)
-    assert unary_node.right.op == &#34;-&#34;
+    assert unary_node.right.op == &#34;ast.USub&#34;
 
-    assert isinstance(unary_node.right.operands[0], Var)
-    assert unary_node.right.operands[0].val.name == &#39;x&#39;
-    assert unary_node.right.operands[0].val.id == 0</code></pre>
+    assert isinstance(unary_node.right.operands[0], Name)
+    assert unary_node.right.operands[0].name == &#39;x&#39;
+    assert unary_node.right.operands[0].id == 0</code></pre>
 </details>
 </dd>
 <dt id="skema.program_analysis.tests.test_operation_cast.unary1"><code class="name flex">
