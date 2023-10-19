@@ -38,7 +38,7 @@ fn main() {
 
         let host = "localhost";
 
-        //let math_content = module_id2mathml_MET_ast(module_id, host);
+        let math_content = module_id2mathml_MET_ast(module_id, host);
 
         let input_src = "../../data/mml2pn_inputs/testing_eqns/sidarthe_mml.txt";
 
@@ -54,7 +54,7 @@ fn main() {
             "\nAMR from mathml: {}\n",
             serde_json::to_string(&PetriNet::from(odes)).unwrap()
         );
-        //println!("\nAMR from code: {:?}", PetriNet::from(math_content));
+        println!("\nAMR from code: {:?}", PetriNet::from(math_content));
     }
     // This is the graph id for the top level function for the core dynamics for our test case.
     else if new_args.arg == *"manual" {
