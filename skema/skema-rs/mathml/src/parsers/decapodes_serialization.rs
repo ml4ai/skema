@@ -68,6 +68,7 @@ pub struct WiringDiagram {
 pub fn to_decapodes_serialization(
     input: &MathExpressionTree,
     variables: &mut Vec<Variable>,
+    unary_operators: &mut Vec<UnaryOperator>,
     projection_operators: &mut Vec<ProjectionOperator>,
     sum_op: &mut Vec<Sum>,
     summand_op: &mut Vec<Summation>,
@@ -79,6 +80,7 @@ pub fn to_decapodes_serialization(
     mut power_count: usize,
 ) -> (
     Vec<Variable>,
+    Vec<UnaryOperator>,
     Vec<ProjectionOperator>,
     Vec<Sum>,
     Vec<Summation>,
@@ -114,6 +116,22 @@ pub fn to_decapodes_serialization(
         match head {
             Operator::Div => {
                 println!("Div");
+                operation_count += 1;
+                variable_count += 1;
+                let temp_str = format!("•{}", (variable_count).to_string());
+                let temp_variable = Variable {
+                    r#type: Type::infer,
+                    name: temp_str,
+                };
+                operation_count += 1;
+                variables.push(temp_variable.clone());
+
+                let unary = UnaryOperator {
+                    src: variable_count,
+                    tgt: variable_count + 1,
+                    op1: "Div".to_string(),
+                };
+                unary_operators.push(unary.clone());
             }
             Operator::Add => {
                 println!("+");
@@ -169,52 +187,53 @@ pub fn to_decapodes_serialization(
                 projection_operators.push(projection.clone());
             }
             Operator::Multiply => {
+                operation_count += 1;
+                multiply_count += 1;
+                variable_count += 1;
                 println!("*");
-                if operation_count == 0 {
-                    operation_count += 1;
-                    multiply_count += 1;
-                    variable_count += 1;
-                    let temp_variable = Variable {
-                        r#type: Type::infer,
-                        name: "mult_1".to_string(),
-                    };
-                    variables.push(temp_variable.clone());
-                    let projection = ProjectionOperator {
-                        proj1: variable_count,
-                        proj2: variable_count + 3,
-                        res: variable_count - 1,
-                        op2: "*".to_string(),
-                    };
-                    println!("projection = {:?}", projection);
-                    projection_operators.push(projection.clone());
-                } else if operation_count != 0 && multiply_count == 0 {
-                    let temp_str = format!("•{}", (operation_count - 1).to_string());
-                    operation_count += 1;
-                    multiply_count += 1;
-                    let summands1 = Summation {
-                        summand: variable_count,
-                        summation: 1,
-                    };
-                    summand_op.push(summands1.clone());
-                    variable_count += 1;
-                    let temp_variable = Variable {
-                        r#type: Type::infer,
-                        name: temp_str,
-                    };
-                    variables.push(temp_variable.clone());
-                    let summands2 = Summation {
-                        summand: variable_count,
-                        summation: 1,
-                    };
-                    summand_op.push(summands2.clone());
-                    let projection = ProjectionOperator {
-                        proj1: variable_count + 1,
-                        proj2: variable_count + 2,
-                        res: variable_count,
-                        op2: "*".to_string(),
-                    };
-                    projection_operators.push(projection.clone());
-                } else {
+                let temp_mult = format!("mult_{}", multiply_count.to_string());
+                //if operation_count == 0 {
+                let temp_variable = Variable {
+                    r#type: Type::infer,
+                    name: temp_mult,
+                };
+                variables.push(temp_variable.clone());
+                let projection = ProjectionOperator {
+                    proj1: variable_count,
+                    proj2: variable_count + 3,
+                    res: variable_count - 1,
+                    op2: "*".to_string(),
+                };
+                println!("projection = {:?}", projection);
+                projection_operators.push(projection.clone());
+                //} else if operation_count != 0 && multiply_count == 0 {
+                let temp_str = format!("•{}", (operation_count - 1).to_string());
+                operation_count += 1;
+                multiply_count += 1;
+                let summands1 = Summation {
+                    summand: variable_count,
+                    summation: 1,
+                };
+                summand_op.push(summands1.clone());
+                variable_count += 1;
+                let temp_variable = Variable {
+                    r#type: Type::infer,
+                    name: temp_str,
+                };
+                variables.push(temp_variable.clone());
+                let summands2 = Summation {
+                    summand: variable_count,
+                    summation: 1,
+                };
+                summand_op.push(summands2.clone());
+                let projection = ProjectionOperator {
+                    proj1: variable_count + 1,
+                    proj2: variable_count + 2,
+                    res: variable_count,
+                    op2: "*".to_string(),
+                };
+                projection_operators.push(projection.clone());
+                /*} else {
                     multiply_count += 1;
                     operation_count += 1;
                     let projection = ProjectionOperator {
@@ -224,7 +243,7 @@ pub fn to_decapodes_serialization(
                         op2: "*".to_string(),
                     };
                     projection_operators.push(projection.clone());
-                }
+                }*/
             }
             Operator::Equals => {}
             Operator::Divide => println!("/"),
@@ -372,6 +391,7 @@ pub fn to_decapodes_serialization(
                         println!("c ={:?}", c);
                         let (
                             v1,
+                            un_op,
                             p1,
                             summing_op,
                             summations,
@@ -384,6 +404,7 @@ pub fn to_decapodes_serialization(
                         ) = to_decapodes_serialization(
                             &c,
                             variables,
+                            unary_operators,
                             projection_operators,
                             sum_op,
                             summand_op,
@@ -414,6 +435,7 @@ pub fn to_decapodes_serialization(
     println!("variables={:?}", variables);
     return (
         variables.to_vec(),
+        unary_operators.to_vec(),
         projection_operators.to_vec(),
         sum_op.to_vec(),
         summand_op.to_vec(),
@@ -428,12 +450,14 @@ pub fn to_decapodes_serialization(
 
 pub fn to_wiring_diagram(input: &MathExpressionTree) -> WiringDiagram {
     let mut variables: Vec<Variable> = Vec::new();
+    let mut unary_operators: Vec<UnaryOperator> = Vec::new();
     let mut projection_operators: Vec<ProjectionOperator> = Vec::new();
     let mut unary_operators: Vec<UnaryOperator> = Vec::new();
     let mut sum_op: Vec<Sum> = Vec::new();
     let mut summand_op: Vec<Summation> = Vec::new();
     let (
         variables,
+        unary_operators,
         projection_operators,
         sum_op,
         summand_op,
@@ -446,6 +470,7 @@ pub fn to_wiring_diagram(input: &MathExpressionTree) -> WiringDiagram {
     ) = to_decapodes_serialization(
         &input,
         &mut variables,
+        &mut unary_operators,
         &mut projection_operators,
         &mut sum_op,
         &mut summand_op,
