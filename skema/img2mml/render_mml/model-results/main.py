@@ -204,13 +204,13 @@ def vizualize(binned_results):
             os.path.join(
                 script_directory, f"results/images/{dataset}-bleu-results.png"
             ),
-            dpi=100,
+            dpi=144,
         )
         fig2.savefig(
             os.path.join(
                 script_directory, f"results/images/{dataset}-valid-latex-results.png"
             ),
-            dpi=100,
+            dpi=144,
         )
 
 
