@@ -8,6 +8,7 @@ import numpy as np
 import pylatexenc.latex2text as l2t
 import pylatexenc.latexwalker as lw
 from sacrebleu import BLEU, corpus_bleu
+from sacrebleu.tokenizers import tokenizer_13a as t13a
 
 script_directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -45,27 +46,24 @@ def is_latex_valid(latex_expr: str) -> bool:
 
 
 def process_batch(batch):
-    bleu_scores = np.zeros(len(batch))
-    valid_latex = 0
-    for i, result in enumerate(batch):
+    tokenizer = t13a.Tokenizer13a()
+    for result in batch:
         prediction = result["prediction"]
         ground_truth = result["ground_truth"]
         cur_bleu_score = corpus_bleu(
             hypotheses=[prediction],
             references=[[ground_truth]],
-            smooth_method="none",
-            tokenize="char",
         ).score
-        bleu_scores[i] = cur_bleu_score
-        if is_latex_valid(prediction):
-            valid_latex += 1
-    return bleu_scores, valid_latex
+        result["bleu"] = cur_bleu_score
+        result["valid_latex"] = 1 if is_latex_valid(prediction) else 0
+        result["length"] = len(tokenizer(ground_truth).split(" "))
+    return batch
 
 
-def calculate_test_results(test_results):
+def calculate_test_results(test_results, num_processes=1):
     print("Calculating BLEU-4 score...")
     start_time = time.perf_counter()
-    num_batches = 4
+    num_batches = num_processes
     batch_size = len(test_results) // num_batches
 
     batches = [
@@ -73,24 +71,13 @@ def calculate_test_results(test_results):
         for i in range(0, len(test_results), batch_size)
     ]
 
-    with Pool(processes=num_batches) as pool:
-        score_batches = pool.map(process_batch, batches)
+    with Pool(num_batches) as p:
+        results = p.map(process_batch, batches)
 
-    combined_bleu_scores = np.concatenate([x[0] for x in score_batches])
-    combined_valid_latex = sum([x[1] for x in score_batches])
-    valid_latex_percentage = combined_valid_latex / len(combined_bleu_scores) * 100
-
-    num_test_results = len(combined_bleu_scores)
-    mean_bleu_score = np.mean(combined_bleu_scores)
-
-    finish_time = time.perf_counter()
-
-    print(f"Number of test results: {num_test_results}")
-    print(f"BLEU-4 score: {mean_bleu_score:.2f}")
-    print(f"Time taken: {finish_time - start_time:.2f}s")
-    print(f"Valid LaTeX percentage: {valid_latex_percentage:.2f}%")
-
-    return mean_bleu_score, valid_latex_percentage
+    final_results = []
+    for result in results:
+        final_results.extend(result)
+    return final_results
 
 
 if __name__ == "__main__":
@@ -125,27 +112,56 @@ if __name__ == "__main__":
 
             dataset_name = results_file.split("_")[0]
             results = calculate_test_results(
-                load_test_results(os.path.join(results_dir, results_file))
+                load_test_results(os.path.join(results_dir, results_file)), 4
             )
-            models[model]["results"][dataset_name] = {
-                "bleu_score": results[0],
-                "valid_latex_percentage": results[1],
+
+            result_bins = {
+                "0-50": {"bleu": [], "valid_latex": []},
+                "50-100": {"bleu": [], "valid_latex": []},
+                "100-150": {"bleu": [], "valid_latex": []},
+                "150-200": {"bleu": [], "valid_latex": []},
+                "200-250": {"bleu": [], "valid_latex": []},
+                "250-300": {"bleu": [], "valid_latex": []},
+                "300-10000": {"bleu": [], "valid_latex": []},
             }
+            # Put results into ins based on length
+            for result in results:
+                length = result["length"]
+                for res_bin in result_bins:
+                    l, r = res_bin.split("-")
+                    if int(l) <= length < int(r):
+                        result_bins[res_bin]["bleu"].append(result["bleu"])
+                        result_bins[res_bin]["valid_latex"].append(
+                            result["valid_latex"]
+                        )
+                        break
 
-    # write results to result.json
-    with open(os.path.join(script_directory, "results.json"), "w") as f:
+            # Calculate average BLEU score for each bin
+            for res_bin in result_bins:
+                mean_bleu_score = (
+                    np.round(np.mean(result_bins[res_bin]["bleu"]), 2)
+                    if len(result_bins[res_bin]["bleu"]) > 0
+                    else 0
+                )
+                valid_latex_percentage = (
+                    (
+                        (
+                            np.count_nonzero(result_bins[res_bin]["valid_latex"])
+                            / len(result_bins[res_bin]["valid_latex"])
+                        )
+                        * 100
+                    )
+                    if len(result_bins[res_bin]["valid_latex"]) > 0
+                    else 0
+                )
+                if dataset_name not in models[model]["results"]:
+                    models[model]["results"][dataset_name] = {}
+                models[model]["results"][dataset_name][res_bin] = {
+                    "bleu": mean_bleu_score,
+                    "valid_latex": valid_latex_percentage,
+                }
+
+    if not os.path.exists(os.path.join(script_directory, "results")):
+        os.makedirs(os.path.join(script_directory, "results"))
+    with open(os.path.join(script_directory, "results/model-results.json"), "w") as f:
         json.dump(models, f, indent=4)
-
-    print("--- Results ---")
-    for model in models:
-        print(f"{model}:")
-        print(f"\tRepo: {models[model]['repo_name']}")
-        print(f"\tURL: {models[model]['url']}")
-        for dataset_name in models[model]["results"]:
-            print(
-                f"\t{dataset_name} dataset BLEU-4: {models[model]['results'][dataset_name]['bleu_score']:.2f}"
-            )
-            print(
-                f"\t{dataset_name} dataset valid LaTeX percentage: {models[model]['results'][dataset_name]['valid_latex_percentage']:.2f}%"
-            )
-    print("---------------")
