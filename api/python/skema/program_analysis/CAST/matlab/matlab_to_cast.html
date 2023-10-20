@@ -73,8 +73,18 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 MATLAB_VERSION=&#39;matlab_version_here&#39;
 
 class MatlabToCast(object):
-    def __init__(self, source_file_path: str):
+    def __init__(self, source_path = &#34;&#34;, source = &#34;&#34;):
         &#34;&#34;&#34;docstring&#34;&#34;&#34;
+
+        # if a source file path is provided, read source from file
+        if not source_path == &#34;&#34;:
+            path = Path(source_path)
+            self.source = path.read_text().strip()
+            self.filename = path.name
+        # otherwise copy the input source and flag the filename unused
+        else:
+            self.source = source
+            self.filename = &#34;None&#34;
 
         # create MATLAB parser
         parser = Parser()
@@ -83,9 +93,6 @@ class MatlabToCast(object):
         )
         
         # create a syntax tree using the source file
-        path = Path(source_file_path)
-        self.source = path.read_text().strip()
-        self.filename = path.name
         self.tree = parser.parse(bytes(self.source, &#34;utf8&#34;))
 
         # Walking data
@@ -1179,7 +1186,7 @@ class MatlabToCast(object):
 <dl>
 <dt id="skema.program_analysis.CAST.matlab.matlab_to_cast.MatlabToCast"><code class="flex name class">
 <span>class <span class="ident">MatlabToCast</span></span>
-<span>(</span><span>source_file_path: str)</span>
+<span>(</span><span>source_path='', source='')</span>
 </code></dt>
 <dd>
 <div class="desc"><p>docstring</p></div>
@@ -1188,8 +1195,18 @@ class MatlabToCast(object):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class MatlabToCast(object):
-    def __init__(self, source_file_path: str):
+    def __init__(self, source_path = &#34;&#34;, source = &#34;&#34;):
         &#34;&#34;&#34;docstring&#34;&#34;&#34;
+
+        # if a source file path is provided, read source from file
+        if not source_path == &#34;&#34;:
+            path = Path(source_path)
+            self.source = path.read_text().strip()
+            self.filename = path.name
+        # otherwise copy the input source and flag the filename unused
+        else:
+            self.source = source
+            self.filename = &#34;None&#34;
 
         # create MATLAB parser
         parser = Parser()
@@ -1198,9 +1215,6 @@ class MatlabToCast(object):
         )
         
         # create a syntax tree using the source file
-        path = Path(source_file_path)
-        self.source = path.read_text().strip()
-        self.filename = path.name
         self.tree = parser.parse(bytes(self.source, &#34;utf8&#34;))
 
         # Walking data
