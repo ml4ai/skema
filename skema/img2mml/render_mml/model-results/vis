@@ -45,6 +45,7 @@ def visualize(binned_results):
         df = pd.DataFrame(data)
         plt.figure(figsize=(20, 10))
         custom_palette = sns.color_palette("rocket", n_colors=len(binned_results))
+        plt.style.use("ggplot")
 
         # Create a side-by-side bar plot for BLEU scores
         plt.subplot(121)
