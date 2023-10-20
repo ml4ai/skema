@@ -1,24 +1,20 @@
+#! /usr/bin/env python3
+
 import json
 import os
-import re
 import time
 from multiprocessing import Pool
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pylatexenc.latex2text as l2t
 import pylatexenc.latexwalker as lw
 from sacrebleu import BLEU, corpus_bleu
 from sacrebleu.tokenizers import tokenizer_13a as t13a
 
+from util import get_bins, load_json
+
 script_directory = os.path.dirname(os.path.abspath(__file__))
 tokenizer = t13a.Tokenizer13a()
-
-
-def load_test_results(test_results_file):
-    with open(test_results_file, "r") as f:
-        test_results = json.load(f)
-    return test_results
 
 
 def save_test_results(results):
@@ -26,10 +22,7 @@ def save_test_results(results):
         os.makedirs(os.path.join(script_directory, "results"))
     with open(os.path.join(script_directory, "results/model-results.json"), "w") as f:
         json.dump(results, f, indent=4)
-
-
-def get_bins():
-    return [i for i in range(0, 400, 50)]
+    print("Results saved to results directory")
 
 
 def is_latex_valid(latex_expr: str) -> bool:
@@ -152,68 +145,6 @@ def calculate_bin_results(models, binned_results):
     return models
 
 
-def vizualize(binned_results):
-    datasets = [
-        dataset
-        for dataset in binned_results[list(binned_results.keys())[0]]["results"].keys()
-    ]
-
-    for dataset in datasets:
-        width = 0.25  # the width of the bars
-        multiplier = 0
-        bins = [f"{i}-{i+50 if i < 350 else 'inf'}" for i in get_bins()]
-        bin_locations = np.arange(len(bins))
-
-        fig1, ax = plt.subplots(layout="constrained", figsize=(15, 8))
-        fig2, ax2 = plt.subplots(layout="constrained", figsize=(15, 8))
-        for model in binned_results:
-            results = binned_results[model]["results"]
-
-            bleu_scores = [results[dataset][res_bin]["bleu"] for res_bin in bins]
-            valid_latex_percentages = [
-                results[dataset][res_bin]["valid_latex"] for res_bin in bins
-            ]
-
-            offset = width * multiplier
-            bleu_rects = ax.bar(bin_locations + offset, bleu_scores, width, label=model)
-            valid_latex_rects = ax2.bar(
-                bin_locations + offset, valid_latex_percentages, width, label=model
-            )
-
-            ax.bar_label(bleu_rects, padding=3)
-            ax2.bar_label(valid_latex_rects, padding=3)
-
-            multiplier += 1
-
-        ax.set_ylabel("BLEU Score")
-        ax.set_title(f"BLEU Score by Model and Token Length for {dataset}")
-        ax.set_xticks(bin_locations + width, bins)
-        ax.set_xlabel("Token Length")
-        ax.legend(loc="upper left", ncols=len(binned_results.keys()))
-        ax.set_ylim(0, 120)
-
-        ax2.set_ylabel("Valid LaTeX %")
-        ax2.set_title(f"Valid LaTeX % by Model and Token Length for {dataset}")
-        ax2.set_xticks(bin_locations + width, bins)
-        ax2.set_xlabel("Token Length")
-        ax2.legend(loc="upper left", ncols=len(binned_results.keys()))
-        ax2.set_ylim(0, 120)
-
-        # save
-        fig1.savefig(
-            os.path.join(
-                script_directory, f"results/images/{dataset}-bleu-results.png"
-            ),
-            dpi=144,
-        )
-        fig2.savefig(
-            os.path.join(
-                script_directory, f"results/images/{dataset}-valid-latex-results.png"
-            ),
-            dpi=144,
-        )
-
-
 if __name__ == "__main__":
     models = json.load(open(os.path.join(script_directory, "models.json"), "r"))
 
@@ -227,7 +158,7 @@ if __name__ == "__main__":
         for results_file in results_files:
             dataset_name = results_file.split("_")[0]
             results = calculate_test_results(
-                load_test_results(os.path.join(results_dir, results_file)), 4
+                load_json(os.path.join(results_dir, results_file)), 4
             )
 
             binned_results = bin_results(results)
@@ -235,7 +166,3 @@ if __name__ == "__main__":
             final_results.update(binned_results)
 
     save_test_results(final_results)
-    print("Results saved to results directory")
-
-    print("Vizualizing results")
-    vizualize(final_results)

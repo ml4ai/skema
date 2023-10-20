@@ -1,0 +1,82 @@
+#! /usr/bin/env python3
+
+import json
+import os
+
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+from util import get_bins, load_json
+
+
+def convrt_to_df(results):
+    data = []
+    for model in results:
+        data.append(
+            {
+                "Model": model,
+                "BLEU Score": results[model]["bleu"],
+                "Valid LaTeX %": results[model]["valid_latex"],
+            }
+        )
+    return pd.DataFrame(data)
+
+
+def visualize(binned_results):
+    bins = [f"{i}-{i+50 if i < 350 else 'inf'}" for i in get_bins()]
+    datasets = binned_results[list(binned_results.keys())[0]]["results"].keys()
+    for dataset in datasets:
+        data = []
+        # Convert the binned results to a dataframe
+        # This is done to make it easier to plot the data
+        for model in binned_results:
+            results = binned_results[model]["results"]
+            for bin_label in bins:
+                data.append(
+                    {
+                        "Model": model,
+                        "Bin": bin_label,
+                        "BLEU Score": results[dataset][bin_label]["bleu"],
+                        "Valid LaTeX %": results[dataset][bin_label]["valid_latex"],
+                    }
+                )
+
+        df = pd.DataFrame(data)
+        plt.figure(figsize=(20, 10))
+        custom_palette = sns.color_palette("rocket", n_colors=len(binned_results))
+
+        # Create a side-by-side bar plot for BLEU scores
+        plt.subplot(121)
+        sns.barplot(
+            data=df, x="Bin", y="BLEU Score", hue="Model", palette=custom_palette
+        )
+        plt.title(f"BLEU Score by Model and Token Length for {dataset}")
+        plt.ylabel("BLEU Score")
+        plt.xlabel("Token Length")
+        plt.xticks(rotation=45, ha="right")
+
+        # Create a side-by-side bar plot for valid LaTeX percentages
+        plt.subplot(122)
+        sns.barplot(
+            data=df, x="Bin", y="Valid LaTeX %", hue="Model", palette=custom_palette
+        )
+        plt.title(f"Valid LaTeX % by Model and Token Length for {dataset}")
+        plt.ylabel("Valid LaTeX %")
+        plt.xlabel("Token Length")
+        plt.xticks(rotation=45, ha="right")
+
+        plt.tight_layout()
+
+        # Save the figures
+        plt.savefig(
+            os.path.join(script_directory, f"results/images/{dataset}-results.png"),
+            dpi=144,
+        )
+        print(f"Saved results for {dataset} to results/images directory")
+
+
+if __name__ == "__main__":
+    script_directory = os.path.dirname(os.path.realpath(__file__))
+    results = load_json(os.path.join(script_directory, "results/model-results.json"))
+    visualize(results)
