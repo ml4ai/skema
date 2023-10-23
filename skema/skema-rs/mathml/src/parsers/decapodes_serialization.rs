@@ -195,7 +195,59 @@ pub fn to_decapodes_serialization(
                 projection_operators.push(projection.clone());
             }
             Operator::Multiply => {
-                operation_count += 1;
+                if operation_count == 0 {
+                    operation_count += 1;
+                    variable_count += 1;
+                    multiply_count += 1;
+                    let temp_mult = format!("mult_{}", multiply_count.to_string());
+                    let temp_variable = Variable {
+                        r#type: Type::infer,
+                        name: temp_mult,
+                    };
+                    variables.push(temp_variable.clone());
+                    println!("variable_count in temp_variable= {}", variable_count);
+                    println!("multiply_count = {}", multiply_count);
+                } else if operation_count != 0 && multiply_count == 0 {
+                    println!("operation_count for • = {}", operation_count);
+                    multiply_count += 1;
+                    let temp_mult = format!("mult_{}", multiply_count.to_string());
+                    let temp_variable = Variable {
+                        r#type: Type::infer,
+                        name: temp_mult,
+                    };
+                    variables.push(temp_variable.clone());
+                    variable_count += 1;
+                    let temp_mult = format!("mult_{}", multiply_count.to_string());
+                    let temp_variable = Variable {
+                        r#type: Type::infer,
+                        name: temp_mult,
+                    };
+                    variables.push(temp_variable.clone());
+                    operation_count += 1;
+                } else {
+                    operation_count += 1;
+                    multiply_count += 1;
+                    variable_count += 1;
+                    let temp_mult = format!("mult_{}", multiply_count.to_string());
+                    let temp_variable = Variable {
+                        r#type: Type::infer,
+                        name: temp_mult,
+                    };
+                    variables.push(temp_variable.clone());
+                    operation_count += 1;
+                    println!("--var_count={}", variable_count);
+                    println!("--op_count={}", operation_count);
+                    let projection = ProjectionOperator {
+                        proj1: variable_count + 2,
+                        proj2: variable_count + 3,
+                        res: variable_count,
+                        op2: "*".to_string(),
+                    };
+                    println!("projection = {:?}", projection);
+                    projection_operators.push(projection.clone());
+                    operation_count += 1;
+                }
+                /* operation_count += 1;
                 multiply_count += 1;
                 variable_count += 1;
                 println!("*");
@@ -255,6 +307,7 @@ pub fn to_decapodes_serialization(
                     };
                     projection_operators.push(projection.clone());
                 }*/
+                */
             }
             Operator::Equals => {}
             Operator::Divide => println!("/"),
@@ -370,28 +423,63 @@ pub fn to_decapodes_serialization(
                         Operator::Multiply => {
                             //if operation_count == 0 {
                             println!("**");
-                            operation_count += 1;
-                            variable_count += 1;
-                            println!("variable_count={}", variable_count);
-                            multiply_count += 1;
-                            //} else if operation_count != 0 && multiply_count == 0 {
-                            //variable_count += 1;
-                            let temp_mult = format!("mult_{}", multiply_count.to_string());
-                            let temp_variable = Variable {
-                                r#type: Type::infer,
-                                name: temp_mult,
-                            };
-                            variables.push(temp_variable.clone());
-                            //} else {
-                            //    println!("$$$$$$$$$$ANOTHER MULTIPLICATION");
-                            //}
+                            if operation_count == 0 {
+                                operation_count += 1;
+                                variable_count += 1;
+                                multiply_count += 1;
+                                let temp_variable = Variable {
+                                    r#type: Type::infer,
+                                    name: "mult_1".to_string(),
+                                };
+                                variables.push(temp_variable.clone());
+                                println!("variable_count in temp_variable= {}", variable_count);
+                                println!("multiply_count = {}", multiply_count);
+                            } else if operation_count != 0 && multiply_count == 0 {
+                                println!("operation_count for • = {}", operation_count);
+                                variable_count += 1;
+                                let temp_str = format!("•{}", operation_count.to_string());
+                                let temp_variable = Variable {
+                                    r#type: Type::infer,
+                                    name: temp_str,
+                                };
+                                println!("variable_count in temp varible '•' = {}", variable_count);
+                                operation_count += 1;
+                            } else {
+                                println!("$$$$$$$$$$ANOTHER MULTIPLICATION");
+                            }
+                            println!("--var_count={}", variable_count);
+                            println!("--op_count={}", operation_count);
                             let projection = ProjectionOperator {
                                 proj1: variable_count + 1,
                                 proj2: variable_count + 2,
                                 res: variable_count,
                                 op2: "*".to_string(),
                             };
+                            println!("projection = {:?}", projection);
                             projection_operators.push(projection.clone());
+                            /* operation_count += 1;
+                                variable_count += 1;
+                                println!("variable_count={}", variable_count);
+                                multiply_count += 1;
+                                //} else if operation_count != 0 && multiply_count == 0 {
+                                //variable_count += 1;
+                                let temp_mult = format!("mult_{}", multiply_count.to_string());
+                                let temp_variable = Variable {
+                                    r#type: Type::infer,
+                                    name: temp_mult,
+                                };
+                                variables.push(temp_variable.clone());
+                                //} else {
+                                //    println!("$$$$$$$$$$ANOTHER MULTIPLICATION");
+                                //}
+                                let projection = ProjectionOperator {
+                                    proj1: variable_count + 1,
+                                    proj2: variable_count + 2,
+                                    res: variable_count,
+                                    op2: "*".to_string(),
+                                };
+                                projection_operators.push(projection.clone());
+                            */
                         }
                         Operator::Equals => {}
                         Operator::Divide => println!("/"),
@@ -580,6 +668,34 @@ fn test_serialize_multiply_sup() {
 }
 
 #[test]
+fn test_serialize_hackathon2_scenario1_eq5() {
+    let input = "
+    <math>
+        <mfrac>
+        <mrow><mi>d</mi><mi>D</mi><mo>(</mo><mi>t</mi><mo>)</mo></mrow>
+        <mrow><mi>d</mi><mi>t</mi></mrow>
+        </mfrac>
+        <mo>=</mo>
+        <mi>α</mi>
+        <mi>ρ</mi>
+        <mi>I</mi><mo>(</mo><mi>t</mi><mo>)</mo>
+    </math>
+    ";
+    let expression = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", expression);
+    let s_exp = expression.to_string();
+    println!("|||||||||||||||||||||||||||||||||||||");
+    println!("S-exp={:?}", s_exp);
+    println!("|||||||||||||||||||||||||||||||||||||");
+    let mut var: Vec<Variable> = Vec::new();
+    let mut proj: Vec<ProjectionOperator> = Vec::new();
+    let wiring_diagram = to_wiring_diagram(&expression);
+    println!("wiring_diagram = {:#?}", wiring_diagram);
+    let json = to_decapodes_json(wiring_diagram);
+    println!("json={:?}", json);
+}
+
+#[test]
 fn test_serialize_halfar_dome3() {
     let input = "
     <math>
@@ -605,4 +721,6 @@ fn test_serialize_halfar_dome3() {
     let mut proj: Vec<ProjectionOperator> = Vec::new();
     let wiring_diagram = to_wiring_diagram(&expression);
     println!("wiring_diagram = {:#?}", wiring_diagram);
+    let json = to_decapodes_json(wiring_diagram);
+    println!("json={:#?}", json);
 }
