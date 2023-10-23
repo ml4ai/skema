@@ -447,12 +447,12 @@ pub fn gradient(input: Span) -> IResult<Operator> {
     Ok((s, op))
 }
 
-/*pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
+pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
     let (s, (op, id)) = ws(pair(gradient, mi))(input)?;
     let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(id)), None);
     println!("op = {:?}, ci = {:?}", op, ci);
     Ok((s, (op, ci)))
-}*/
+}
 
 /*
 pub fn absolute_base(input: Span) -> IResult<Mrow> {
@@ -478,6 +478,7 @@ pub fn absolute_superscript(input: Span) -> IResult<MathExpression> {
 */
 ///Absolute with Msup value
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
+    println!("Inside absolute with msup");
     let (s, sup) = ws(map(
         ws(delimited(
             tag("<mo>|</mo>"),
@@ -487,7 +488,7 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
             )),
             tag("</msup>"),
         )),
-        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
+        |(x, y)| MathExpression::AbsoluteSup(Box::new(x), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
     ))(input)?;
     //let (s, base) = absolute_base(input)?;
     //let (s, new_base) = ws(map(absolute_base, MathExpression::Mrow))(input);
@@ -533,6 +534,7 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
 /// assumes that expressions such as S(t) are actually univariate functions.
 pub fn math_expression(input: Span) -> IResult<MathExpression> {
     ws(alt((
+        map(div, MathExpression::Mo),
         absolute_with_msup,
         map(
             first_order_derivative_leibniz_notation,
@@ -615,7 +617,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                 })
             },
         ),
-        /*map(
+        map(
             grad_func,
             |(
                 op,
@@ -634,8 +636,7 @@ pub fn math_expression(input: Span) -> IResult<MathExpression> {
                     })),
                 })
             },
-        ),*/
-        map(div, MathExpression::Mo),
+        ),
         //map(gradient, MathExpression::Mo),
         map(absolute, MathExpression::Mrow),
         map(operator, MathExpression::Mo),
