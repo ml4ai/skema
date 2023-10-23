@@ -358,7 +358,7 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
 
     let mut result = expr_bp(&mut lexer, 0);
     while lexer.next() != Token::Eof {
-        /*if let MathExpressionTree::Cons(Operator::Equals, mut vec) = result {
+        if let MathExpressionTree::Cons(Operator::Equals, mut vec) = result {
             let equals = expr_bp(&mut lexer, 2);
             vec.push(equals);
             println!("...vec1={:?}", vec);
@@ -371,9 +371,9 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
             }
             println!("...vec2={:?}", vec);
             let another = MathExpressionTree::Cons(Operator::Multiply, vec);
-            //let result2 = MathExpressionTree::Cons(Operator::Div, vec![another]);
-            result = MathExpressionTree::Cons(Operator::Equals, vec![another]);
-        } else*/
+            let result2 = MathExpressionTree::Cons(Operator::Div, vec![another]);
+            result = MathExpressionTree::Cons(Operator::Equals, vec![result2]);
+        } else
         /*if let MathExpressionTree::Cons(
             Operator::Derivative(Derivative {
                 order,
@@ -1065,7 +1065,7 @@ fn test_equation_halfar_dome() {
         <mo>)</mo>
     </math>
     ";
-    let FirstOrderODE {
+    /*let FirstOrderODE {
         lhs_var,
         func_of,
         with_respect_to,
@@ -1078,7 +1078,11 @@ fn test_equation_halfar_dome() {
     assert_eq!(
         rhs.to_string(),
         "(Div (* (* (* Γ (^ H (+ n 2))) (Abs (^ (Grad H) (- n 1))) (Grad H))))"
-    );
+    );*/
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
 }
 
 #[test]
