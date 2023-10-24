@@ -1380,188 +1380,202 @@ pub fn create_function(
             );
         }
         _ => {
-            let n1 = Node {
-                n_type: String::from("Function"),
-                value: None,
-                name: Some(
-                    att_box.b.as_ref().unwrap()[0]
-                        .name
-                        .clone()
-                        .map_or_else(|| format!("Function{}", start), |x| x),
-                ),
-                node_id: format!("n{}", start),
-                out_idx: None,
-                in_indx: None,
-                contents: c_args.att_idx,
-                nbox: c_args.bf_counter,
-                att_bf_idx: c_args.att_bf_idx,
-                box_counter: c_args.box_counter,
-            };
-            let e1 = Edge {
-                src: c_args.parent_node.node_id.clone(),
-                tgt: n1.node_id.clone(),
-                e_type: String::from("Contains"),
-                prop: Some(c_args.att_idx),
-            };
-            nodes.push(n1.clone());
-            edges.push(e1);
-            let mut metadata_idx = 0;
-            // attribute b level metadata reference
-            if att_box.b.as_ref().unwrap()[0].metadata.as_ref().is_some() {
-                metadata_idx = att_box.b.as_ref().unwrap()[0].metadata.unwrap();
-                let mut repeat_meta = false;
-                for node in meta_nodes.iter() {
-                    if node.metadata_idx == metadata_idx {
-                        repeat_meta = true;
+            if att_box.bf.is_some() {
+                let n1 = Node {
+                    n_type: String::from("Function"),
+                    value: None,
+                    name: Some(
+                        att_box.b.as_ref().unwrap()[0]
+                            .name
+                            .clone()
+                            .map_or_else(|| format!("Function{}", start), |x| x),
+                    ),
+                    node_id: format!("n{}", start),
+                    out_idx: None,
+                    in_indx: None,
+                    contents: c_args.att_idx,
+                    nbox: c_args.bf_counter,
+                    att_bf_idx: c_args.att_bf_idx,
+                    box_counter: c_args.box_counter,
+                };
+                let e1 = Edge {
+                    src: c_args.parent_node.node_id.clone(),
+                    tgt: n1.node_id.clone(),
+                    e_type: String::from("Contains"),
+                    prop: Some(c_args.att_idx),
+                };
+                nodes.push(n1.clone());
+                edges.push(e1);
+                let mut metadata_idx = 0;
+                // attribute b level metadata reference
+                if att_box.b.as_ref().unwrap()[0].metadata.as_ref().is_some() {
+                    metadata_idx = att_box.b.as_ref().unwrap()[0].metadata.unwrap();
+                    let mut repeat_meta = false;
+                    for node in meta_nodes.iter() {
+                        if node.metadata_idx == metadata_idx {
+                            repeat_meta = true;
+                        }
+                    }
+                    if !repeat_meta {
+                        meta_nodes.append(&mut create_metadata_node(&gromet.clone(), metadata_idx));
+                        let me1 = Edge {
+                            src: n1.node_id.clone(),
+                            tgt: format!("m{}", metadata_idx),
+                            e_type: String::from("Metadata"),
+                            prop: None,
+                        };
+                        edges.push(me1);
                     }
                 }
-                if !repeat_meta {
-                    meta_nodes.append(&mut create_metadata_node(&gromet.clone(), metadata_idx));
-                    let me1 = Edge {
-                        src: n1.node_id.clone(),
-                        tgt: format!("m{}", metadata_idx),
-                        e_type: String::from("Metadata"),
-                        prop: None,
-                    };
-                    edges.push(me1);
-                }
-            }
-            // initial function node has been constructed, based on given inputs
+                // initial function node has been constructed, based on given inputs
 
-            // now travel to contents index of the attribute list (note it is 1 index,
-            // so contents=1 => attribute[0])
-            // create nodes and edges for this entry, include opo's and opi's
-            *start += 1;
-
-            let mut new_c_args = c_args.clone();
-            new_c_args.parent_node = n1.clone();
-            new_c_args.att_bf_idx = c_args.att_idx; // This is the parent index
-
-            // construct opo nodes, if not none, might need to
-            create_opo(
-                gromet, // gromet for metadata
-                nodes,  // nodes
-                edges,
-                meta_nodes,
-                start,
-                new_c_args.clone(),
-            );
-            create_opi(
-                gromet, // gromet for metadata
-                nodes,  // nodes
-                edges,
-                meta_nodes,
-                start,
-                new_c_args.clone(),
-            );
-            // now to construct the nodes inside the function, currently supported Literals and Primitives
-            // first include an Expression for increased depth
-            let mut box_counter: usize = 1;
-            for att_sub_box in att_box.bf.as_ref().unwrap().iter() {
-                new_c_args.box_counter = box_counter;
-                new_c_args.cur_box = att_sub_box.clone();
-                new_c_args.att_idx = c_args.att_idx;
-                match att_sub_box.function_type {
-                    FunctionType::Function => {
-                        new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
-                        create_function(
-                            gromet, // gromet for metadata
-                            nodes,  // nodes
-                            edges,
-                            meta_nodes,
-                            start,
-                            new_c_args.clone(),
-                        );
-                    }
-
-                    FunctionType::Predicate => {
-                        new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
-                        create_att_predicate(
-                            gromet, // gromet for metadata
-                            nodes,  // nodes
-                            edges,
-                            meta_nodes,
-                            start,
-                            new_c_args.clone(),
-                        );
-                    }
-                    FunctionType::Expression => {
-                        new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
-                        create_att_expression(
-                            gromet, // gromet for metadata
-                            nodes,  // nodes
-                            edges,
-                            meta_nodes,
-                            start,
-                            new_c_args.clone(),
-                        );
-                    }
-                    FunctionType::Literal => {
-                        create_att_literal(
-                            gromet, // gromet for metadata
-                            nodes,  // nodes
-                            edges,
-                            meta_nodes,
-                            start,
-                            new_c_args.clone(),
-                        );
-                    }
-                    FunctionType::Primitive => {
-                        create_att_primitive(
-                            gromet, // gromet for metadata
-                            nodes,  // nodes
-                            edges,
-                            meta_nodes,
-                            start,
-                            new_c_args.clone(),
-                        );
-                    }
-                    FunctionType::Abstract => {
-                        create_att_abstract(
-                            gromet, // gromet for metadata
-                            nodes,  // nodes
-                            edges,
-                            meta_nodes,
-                            start,
-                            new_c_args.clone(),
-                        );
-                    }
-                    FunctionType::ImportedMethod => {
-                        // this is a function call, but for some reason is not called a function
-                        new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
-                        create_function(
-                            gromet, // gromet for metadata
-                            nodes,  // nodes
-                            edges,
-                            meta_nodes,
-                            start,
-                            new_c_args.clone(),
-                        );
-                    }
-                    _ => {
-                        println!("Missing a box in a function! {:?}", att_sub_box.function_type.clone());
-                    }
-                }
-                box_counter += 1;
+                // now travel to contents index of the attribute list (note it is 1 index,
+                // so contents=1 => attribute[0])
+                // create nodes and edges for this entry, include opo's and opi's
                 *start += 1;
-            }
 
-            // Now we perform the internal wiring of this branch
-            internal_wiring(
-                att_box.clone(),
-                nodes,
-                edges,
-                c_args.att_idx,
-                c_args.bf_counter,
-            );
-            // perform cross attributal wiring of function
-            cross_att_wiring(
-                att_box.clone(),
-                nodes,
-                edges,
-                c_args.att_idx,
-                c_args.bf_counter,
-            );
+                let mut new_c_args = c_args.clone();
+                new_c_args.parent_node = n1.clone();
+                new_c_args.att_bf_idx = c_args.att_idx; // This is the parent index
+
+                // construct opo nodes, if not none, might need to
+                create_opo(
+                    gromet, // gromet for metadata
+                    nodes,  // nodes
+                    edges,
+                    meta_nodes,
+                    start,
+                    new_c_args.clone(),
+                );
+                create_opi(
+                    gromet, // gromet for metadata
+                    nodes,  // nodes
+                    edges,
+                    meta_nodes,
+                    start,
+                    new_c_args.clone(),
+                );
+                // now to construct the nodes inside the function, currently supported Literals and Primitives
+                // first include an Expression for increased depth
+                let mut box_counter: usize = 1;
+                for att_sub_box in att_box.bf.as_ref().unwrap().iter() {
+                    new_c_args.box_counter = box_counter;
+                    new_c_args.cur_box = att_sub_box.clone();
+                    new_c_args.att_idx = c_args.att_idx;
+                    match att_sub_box.function_type {
+                        FunctionType::Function => {
+                            new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            create_function(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                        }
+
+                        FunctionType::Predicate => {
+                            new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            create_att_predicate(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                        }
+                        FunctionType::Expression => {
+                            new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            create_att_expression(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                        }
+                        FunctionType::Literal => {
+                            create_att_literal(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                        }
+                        FunctionType::Primitive => {
+                            create_att_primitive(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                        }
+                        FunctionType::Abstract => {
+                            create_att_abstract(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                        }
+                        FunctionType::ImportedMethod => {
+                            // this is a function call, but for some reason is not called a function
+                            new_c_args.att_idx = att_sub_box.contents.unwrap() as usize;
+                            create_function(
+                                gromet, // gromet for metadata
+                                nodes,  // nodes
+                                edges,
+                                meta_nodes,
+                                start,
+                                new_c_args.clone(),
+                            );
+                        }
+                        _ => {
+                            println!("Missing a box in a function! {:?}", att_sub_box.function_type.clone());
+                        }
+                    }
+                    box_counter += 1;
+                    *start += 1;
+                }
+
+                // Now we perform the internal wiring of this branch
+                internal_wiring(
+                    att_box.clone(),
+                    nodes,
+                    edges,
+                    c_args.att_idx,
+                    c_args.bf_counter,
+                );
+                // perform cross attributal wiring of function
+                cross_att_wiring(
+                    att_box.clone(),
+                    nodes,
+                    edges,
+                    c_args.att_idx,
+                    c_args.bf_counter,
+                );
+            } else {
+                create_import(gromet, nodes, edges, meta_nodes, start, c_args.clone());
+                *start += 1;
+                // now to implement wiring
+                import_wiring(
+                    &gromet.clone(),
+                    nodes,
+                    edges,
+                    c_args.att_idx,
+                    c_args.bf_counter,
+                    c_args.parent_node,
+                );
+            }
         }
     }
 }
