@@ -239,11 +239,11 @@ pub fn to_decapodes_serialization(
                     println!("--op_count={}", operation_count);
                     let projection = ProjectionOperator {
                         proj1: variable_count + 2,
-                        proj2: variable_count + 3,
-                        res: variable_count,
+                        proj2: variable_count - 1,
+                        res: variable_count - 2,
                         op2: "*".to_string(),
                     };
-                    println!("projection = {:?}", projection);
+                    println!("projection = {:#?}", projection);
                     projection_operators.push(projection.clone());
                     operation_count += 1;
                 }
@@ -312,8 +312,24 @@ pub fn to_decapodes_serialization(
             Operator::Equals => {}
             Operator::Divide => println!("/"),
             Operator::Derivative(Derivative {
-                order, var_index, ..
+                order,
+                var_index,
+                bound_var,
             }) if (order, var_index) == (&1_u8, &1_u8) => {
+                variable_count += 1;
+                let temp_str = format!("•{}", (variable_count).to_string());
+                let temp_variable = Variable {
+                    r#type: Type::infer,
+                    name: temp_str,
+                };
+                variables.push(temp_variable.clone());
+                let derivative_str = format!("D({},{})", order.to_string(), bound_var.to_string());
+                let unary = UnaryOperator {
+                    src: variable_count + 1,
+                    tgt: variable_count,
+                    op1: derivative_str,
+                };
+                unary_operators.push(unary.clone());
                 println!("diff");
             }
             Operator::Grad => {
@@ -484,8 +500,26 @@ pub fn to_decapodes_serialization(
                         Operator::Equals => {}
                         Operator::Divide => println!("/"),
                         Operator::Derivative(Derivative {
-                            order, var_index, ..
+                            order,
+                            var_index,
+                            bound_var,
                         }) if (order, var_index) == (&1_u8, &1_u8) => {
+                            variable_count += 1;
+                            let temp_str = format!("•{}", (variable_count).to_string());
+                            let temp_variable = Variable {
+                                r#type: Type::infer,
+                                name: temp_str,
+                            };
+                            variables.push(temp_variable.clone());
+                            let derivative_str =
+                                format!("D({},{})", order.to_string(), bound_var.to_string());
+                            let unary = UnaryOperator {
+                                src: variable_count + 1,
+                                tgt: variable_count,
+                                op1: derivative_str,
+                            };
+                            unary_operators.push(unary.clone());
+                            println!("diff");
                             println!("diff");
                         }
                         _ => {}
