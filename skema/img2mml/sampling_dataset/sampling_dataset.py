@@ -6,6 +6,8 @@ import subprocess
 from threading import Timer
 from shutil import copyfile as CP
 import multiprocessing as mp
+import requests
+import re
 
 # read config file and define paths
 config_path = "sampling_dataset/sampling_config.json"
@@ -25,6 +27,9 @@ root = config["src_path"]
 
 # setting seed
 random.seed(config["seed"])
+
+# fields we want papers from
+fields = set(config["fields"])
 
 # create destination files and directory
 if not os.path.exists("training_data"):
@@ -88,6 +93,58 @@ def get_paths(yr, yr_path, month):
 
     return temp_files
 
+def has_intersection(a: set, b: set):
+    return bool(a & b)
+
+def get_paper_categories(arxiv_ids: list) -> dict:
+    base_url = "http://export.arxiv.org/api/query?id_list="
+    url = base_url + ",".join(arxiv_ids)
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes.
+
+        # Parse the XML response using regex.
+        xml_data = response.text
+
+        categories_dict = {}
+
+        # Use regex to find all entry blocks in the XML.
+        entry_blocks = re.findall(r"<entry>(.*?)</entry>", xml_data, re.DOTALL)
+
+        for entry_block in entry_blocks:
+            # Use regex to extract the arXiv ID.
+            arxiv_id_match = re.search(r"<id>(.*?)</id>", entry_block)
+            if arxiv_id_match:
+                arxiv_id = arxiv_id_match.group(1)
+
+                # Use regex to find all category elements for this entry.
+                category_matches = re.findall(r'<category term="([^"]+)"', entry_block)
+
+                categories = set(category_matches)
+                categories_dict[arxiv_id] = categories
+
+        return categories_dict
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        return None
+
+
+def filter_paths_by_field(paths: list, fields: set):
+    arxvid_id_list = []
+    for path in paths:
+        arxiv_id = path.split("_")[2]
+        arxvid_id_list.append(arxiv_id)
+
+    category_dict =  get_paper_categories(arxvid_id_list)
+
+    filtered_paths = []
+    for path in paths:
+        arxiv_id = path.split("_")[2]
+        if (arxiv_id in category_dict) and has_intersection(category_dict[arxiv_id], fields):
+            filtered_paths.append(path)
+    return filtered_paths
 
 def divide_all_paths_into_chunks(all_paths):
     global chunk_size
@@ -236,6 +293,9 @@ def main():
             temp_paths = get_paths(yr, yr_path, month)
             for p in temp_paths:
                 all_paths.append(p)
+    
+    
+    all_paths = filter_paths_by_field(all_paths, fields)
 
     ######## step 2: shuffle it twice ########
     print("shuffling all the paths to create randomness...")
@@ -279,8 +339,8 @@ def main():
 
             for r in results:
                 if r is not None:
-                    tgt_bin, ap = r
-                    if counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
+                    tgt_bin, ap = r          
+                    if  counter_dist_dict[tgt_bin] <= dist_dict[tgt_bin]:
                         counter_dist_dict[tgt_bin] += 1
                         final_paths.append(ap)
                         count += 1
