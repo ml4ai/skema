@@ -96,54 +96,25 @@ def get_paths(yr, yr_path, month):
 def has_intersection(a: set, b: set):
     return bool(a & b)
 
-def get_paper_categories(arxiv_ids: list) -> dict:
-    base_url = "http://export.arxiv.org/api/query?id_list="
-    url = base_url + ",".join(arxiv_ids)
-
-    try:
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for 4xx or 5xx status codes.
-
-        # Parse the XML response using regex.
-        xml_data = response.text
-
-        categories_dict = {}
-
-        # Use regex to find all entry blocks in the XML.
-        entry_blocks = re.findall(r"<entry>(.*?)</entry>", xml_data, re.DOTALL)
-
-        for entry_block in entry_blocks:
-            # Use regex to extract the arXiv ID.
-            arxiv_id_match = re.search(r"<id>(.*?)</id>", entry_block)
-            if arxiv_id_match:
-                arxiv_id = arxiv_id_match.group(1)
-
-                # Use regex to find all category elements for this entry.
-                category_matches = re.findall(r'<category term="([^"]+)"', entry_block)
-
-                categories = set(category_matches)
-                categories_dict[arxiv_id] = categories
-
-        return categories_dict
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-        return None
-
-
 def filter_paths_by_field(paths: list, fields: set):
     arxvid_id_list = []
     for path in paths:
         arxiv_id = path.split("_")[2]
         arxvid_id_list.append(arxiv_id)
-
-    category_dict =  get_paper_categories(arxvid_id_list)
+    
+    script_dir = os.path.dirname(__file__)
+    with open(os.path.join(script_dir, "paper_data", "arxiv_paper_categories.json"), "r") as f:
+        category_dict =  json.load(f)
 
     filtered_paths = []
     for path in paths:
         arxiv_id = path.split("_")[2]
-        if (arxiv_id in category_dict) and has_intersection(category_dict[arxiv_id], fields):
-            filtered_paths.append(path)
+        if arxiv_id in category_dict:
+            paper_fields = {category.split(".")[0].lower() for category in category_dict[arxiv_id]}
+            if has_intersection(paper_fields, fields):
+                filtered_paths.append(path)
+    print(f"Filtered paths to include only papers in the following fields: {','.join(fields)}")
+    print(f"{len(paths)} total paths -> {len(filtered_paths)} total paths")
     return filtered_paths
 
 def divide_all_paths_into_chunks(all_paths):
