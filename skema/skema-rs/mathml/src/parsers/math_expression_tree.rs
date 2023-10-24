@@ -353,26 +353,42 @@ impl Lexer {
 /// Construct a MathExpressionTree from a vector of MathExpression structs.
 fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
     let mut lexer = Lexer::new(input);
-    //expr_bp(&mut lexer, 0)
     //let mut result = MathExpressionTree::Atom(MathExpression::Mi(Mi(String::from(" "))));
 
     let mut result = expr_bp(&mut lexer, 0);
     while lexer.next() != Token::Eof {
         if let MathExpressionTree::Cons(Operator::Equals, mut vec) = result {
+            println!("vec= {:?}", vec);
             let equals = expr_bp(&mut lexer, 2);
-            vec.push(equals);
-            println!("...vec1={:?}", vec);
-
-            let deriv = expr_bp(&mut lexer, 33);
+            //vec.push(equals);
+            //println!("...vec1={:?}", vec);
+            let lhs_var = vec[0].clone();
+            vec.remove(0);
+            //let deriv = expr_bp(&mut lexer, 33);
             //vec.push(deriv);
-            println!("...vec[0]={:?}", vec[0]);
-            if vec[0] == deriv.clone() {
-                vec.remove(0);
-            }
-            println!("...vec2={:?}", vec);
-            let another = MathExpressionTree::Cons(Operator::Multiply, vec);
-            let result2 = MathExpressionTree::Cons(Operator::Div, vec![another]);
-            result = MathExpressionTree::Cons(Operator::Equals, vec![result2]);
+            //println!("...vec[0]={:?}", vec[0]);
+            //if vec[0] == deriv.clone() {
+            //    vec.remove(0);
+            //}
+            //println!("...vec2={:?}", vec);
+            //let another = MathExpressionTree::Cons(Operator::Multiply, vec.clone());
+            //let result2 = MathExpressionTree::Cons(Operator::Div, vec![another]);
+            //let divergence = expr_bp(&mut lexer, 31);
+            //vec.push(divergence);
+            //let new_comp = expr_bp(&mut lexer, 0);
+            //vec.push(new_comp);
+            let new_comp = expr_bp(&mut lexer, 0);
+            //vec.push(new_comp);
+            for v in vec.iter() {}
+            println!("vec={:?}", vec);
+            let vec1 = MathExpressionTree::Cons(Operator::Multiply, vec);
+            println!("vec1={:?}", vec1);
+            let another = MathExpressionTree::Cons(Operator::Multiply, vec![vec1]);
+            //println!("vec={:?}", vec);
+            //println!("vec1={:?}", vec1);
+            //let another = MathExpressionTree::Cons(Operator::Multiply, vec![vec1]);
+            //let rhs_result = MathExpressionTree::Cons(Operator::Div, vec![another]);
+            result = MathExpressionTree::Cons(Operator::Equals, vec![another]);
         } else
         /*if let MathExpressionTree::Cons(
             Operator::Derivative(Derivative {
@@ -1065,13 +1081,17 @@ fn test_equation_halfar_dome() {
         <mo>)</mo>
     </math>
     ";
-    /*let FirstOrderODE {
+    let FirstOrderODE {
         lhs_var,
         func_of,
         with_respect_to,
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
-    println!("rhs={:?}", rhs.to_string());
+    let exp = input.parse::<MathExpressionTree>().unwrap();
+    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
+    /*println!("rhs={:?}", rhs.to_string());
     assert_eq!(lhs_var.to_string(), "H");
     assert_eq!(func_of[0].to_string(), "");
     assert_eq!(with_respect_to.to_string(), "t");
@@ -1079,10 +1099,6 @@ fn test_equation_halfar_dome() {
         rhs.to_string(),
         "(Div (* (* (* Γ (^ H (+ n 2))) (Abs (^ (Grad H) (- n 1))) (Grad H))))"
     );*/
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
-    let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
 }
 
 #[test]
