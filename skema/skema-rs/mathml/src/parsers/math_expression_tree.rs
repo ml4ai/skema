@@ -79,10 +79,10 @@ impl MathExpressionTree {
                     Operator::Power => content_mathml.push_str("<power/>"),
                     Operator::Exp => content_mathml.push_str("<exp/>"),
                     Operator::Derivative(Derivative {
-                                             order,
-                                             var_index,
-                                             bound_var,
-                                         }) if (*order, *var_index) == (1_u8, 1_u8) => {
+                        order,
+                        var_index,
+                        bound_var,
+                    }) if (*order, *var_index) == (1_u8, 1_u8) => {
                         content_mathml.push_str("<diff/>");
                         content_mathml.push_str(&format!("<bvar>{}</bar>", bound_var));
                     }
@@ -911,6 +911,8 @@ fn test_one_dimensional_ebm() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
 }
 
 #[test]
@@ -946,6 +948,8 @@ fn test_absolute_as_msup() {
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
     println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    println!("S-exp={:?}", s_exp);
 }
 
 #[test]
