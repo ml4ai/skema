@@ -211,7 +211,6 @@ pub fn ci_unknown(input: Span) -> IResult<Ci> {
 }
 
 pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative, Mrow)> {
-    //println!("--in here");
     let (s, _) = tuple((stag!("mfrac"), alt((d, partial))))(input)?;
     let (s, with_respect_to) = delimited(
         tuple((stag!("mrow"), alt((d, partial)))),
@@ -221,17 +220,8 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
     println!("in here");
 
     let (s, _) = tuple((stag!("mo"), tag("("), etag!("mo")))(s)?;
-    println!("next");
     let (s, func) = many0(math_expression)(s)?;
-    /*let (s, func) = delimited(
-        tuple((stag!("mo"), lparen, etag!("mo"))),
-        many0(math_expression),
-        tuple((stag!("mo"), rparen, etag!("mo"))),
-    )(s)?;*/
-    println!("func={:?}", func);
-    println!("nnext");
     let (s, _) = tuple((stag!("mo"), tag(")"), etag!("mo")))(s)?;
-    println!("nnnnnext");
     Ok((
         s,
         (
@@ -421,24 +411,8 @@ pub fn absolute(input: Span) -> IResult<Mrow> {
 
 /// Example: Divergence
 pub fn div(input: Span) -> IResult<Operator> {
-    //let (s, div) = value(Operator::Grad, alt((ws(tag("𝛁")), ws(tag("&#x2207;")))))(input)?;
-    //let (s, op) = value(Operator::Dot, alt((ws(tag("⋅")), ws(tag("&#x22c5;")))))(input)?;
-    let (s, op) = //value(
-        //Operator::Div,
-        ws(pair(
-                gradient,
-                ws(delimited(
-                stag!("mo"),
-                dot,
-                //alt((ws(tag("⋅")), ws(tag("&#x22c5;")))),
-                etag!("mo"),
-            )),
-        ),
-    )(input)?;
-    //let op = Operator::Div;
-    println!("op={:?}", op);
+    let (s, op) = ws(pair(gradient, ws(delimited(stag!("mo"), dot, etag!("mo")))))(input)?;
     let div = Operator::Div;
-    println!("div={:?}", div);
     Ok((s, div))
 }
 
@@ -454,31 +428,8 @@ pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
     Ok((s, (op, ci)))
 }
 
-/*
-pub fn absolute_base(input: Span) -> IResult<Mrow> {
-    let abs = delimited(stag!("mo"), tag("|"), etag!("mo"));
-    println!("---abs");
-    let (s, base) = ws(delimited(abs, many0(math_expression), stag!("msup")))(input)?;
-    println!("base = {:?}", base);
-    //let row = MathExpression::Mrow(Mrow(base));
-    let row = Mrow(base);
-    println!("row={:?}", row);
-    Ok((s, row))
-}
-
-pub fn absolute_superscript(input: Span) -> IResult<MathExpression> {
-    //let abs =
-    let (s, sup) = ws(delimited(
-        tag("<mo>|</mo>"),
-        math_expression,
-        tag("</msup>"),
-    ))(input)?;
-    Ok((s, sup))
-}
-*/
 ///Absolute with Msup value
 pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
-    println!("Inside absolute with msup");
     let (s, sup) = ws(map(
         ws(delimited(
             tag("<mo>|</mo>"),
@@ -488,45 +439,8 @@ pub fn absolute_with_msup(input: Span) -> IResult<MathExpression> {
             )),
             tag("</msup>"),
         )),
-        |(x, y)| MathExpression::AbsoluteSup(Box::new(x), Box::new(y)), //|(x, y)| MathExpression::Msup(Box::new(MathExpression::Mrow(Mrow(x))), Box::new(y)),
+        |(x, y)| MathExpression::AbsoluteSup(Box::new(x), Box::new(y)),
     ))(input)?;
-    //let (s, base) = absolute_base(input)?;
-    //let (s, new_base) = ws(map(absolute_base, MathExpression::Mrow))(input);
-    //println!("base={:?}", base);
-
-    //let (s, other_elements) = ws(terminated(math_expression, tag("</msup>")))(s)?;
-    //let (s, other_elements) = absolute_superscript(s)?;
-    /*let (s, x) = ws(delimited(
-        tag("<mo>|</mo>"),
-        many0(math_expression),
-        tag("<msup><mo>|</mo>"),
-    ))(input)?;
-    println!("x={:?}", x);
-    let elements = Mrow(x);
-    println!("elements={:?}", elements);
-    //println!("elements={:?}", elements);
-    let (s, other_elements) = ws(terminated(math_expression, tag("</msup>")))(s)?;
-    let sup = MathExpression::Msup(
-        Box::new(MathExpression::Mrow(elements)),
-        Box::new(other_elements),
-    );*/
-    //let combine = concat!("<msup>", elements_to_string, "</msup>");
-    //let new = Span::new(combine.to_str());
-    //let (s, sup) = map(pair(math_expression, math_expression), |(x, y)| {
-
-    /*let (s, sup) = ws(map(
-        tag_parser!("msup", pair(math_expression, math_expression)),
-        |(x, y)| MathExpression::Msup(Box::new(x), Box::new(y)),
-    ))(input)?;*/
-
-    /* let sup = MathExpression::Msup(
-        Box::new(MathExpression::Mrow(base)),
-        Box::new(other_elements),
-    );*/
-    // let sup = MathExpression::Msup(Box::new(new_base), Box::new(other_elements));
-    //});
-
-    //Ok((s, elements))
     Ok((s, sup))
 }
 
