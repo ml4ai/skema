@@ -730,9 +730,11 @@ fn test_serialize_hackathon2_scenario1_eq5() {
 }
 
 #[test]
-fn test_serialize_halfar_dome3() {
+fn test_serialize_halfar_dome() {
     let input = "
     <math>
+        <mfrac><mrow><mi>∂</mi><mi>H</mi></mrow><mrow><mi>∂</mi><mi>t</mi></mrow></mfrac>
+        <mo>=</mo>
         <mo>&#x2207;</mo>
         <mo>&#x22c5;</mo>
         <mo>(</mo>
