@@ -66,7 +66,7 @@ impl fmt::Display for Operator {
                 var_index,
                 bound_var,
             }) => {
-                write!(f, "D({order}, {var_index}, {bound_var})")
+                write!(f, "D({order}, {bound_var})")
             }
             Operator::Exp => write!(f, "exp"),
             Operator::Power => write!(f, "^"),
