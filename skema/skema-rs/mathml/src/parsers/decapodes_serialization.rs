@@ -238,7 +238,7 @@ pub fn to_decapodes_serialization(
             }
             Operator::Multiply => {
                 table_counts.multi_count += 1;
-                let temp_multi = format!("multi_{}", table_counts.multi_count.to_string());
+                let temp_multi = format!("mult_{}", table_counts.multi_count.to_string());
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_multi,
@@ -352,7 +352,7 @@ pub fn to_wiring_diagram(input: &MathExpressionTree) -> WiringDiagram {
 }
 
 pub fn to_decapodes_json(input: WiringDiagram) -> Result<()> {
-    let json_wiring_diagram = serde_json::to_string_pretty(&input).unwrap();
+    let json_wiring_diagram = serde_json::to_string(&input).unwrap();
     println!("json_wiring_diagran={:?}", json_wiring_diagram);
 
     Ok(())
