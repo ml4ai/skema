@@ -105,6 +105,9 @@ jobs:
       run: |
         pytest
 
+    - name: "Code2fn model coverage reports"
+      run: python skema/program_analysis/model_coverage_report/model_coverage_report.py $GITHUB_WORKSPACE/docs/coverage/code2fn_coverage/ all
+
     - name: "Unit tests for Rust components"
       working-directory: ./skema/skema-rs
       run: |
