@@ -352,11 +352,9 @@ pub fn to_wiring_diagram(input: &MathExpressionTree) -> WiringDiagram {
     };
 }
 
-pub fn to_decapodes_json(input: WiringDiagram) -> Result<()> {
-    let json_wiring_diagram = serde_json::to_string(&input).unwrap();
-    println!("json_wiring_diagran={:?}", json_wiring_diagram);
-
-    Ok(())
+pub fn to_decapodes_json(input: WiringDiagram) -> String {
+    serde_json::to_string(&input).unwrap()
+    //Ok(json_wiring_diagram)
 }
 
 #[test]
@@ -379,6 +377,7 @@ fn test_serialize1() {
     println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
     println!("json={:#?}", json);
+    assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"ρ_{w}\"},{\"type\":\"infer\",\"name\":\"c_{w}\"},{\"type\":\"infer\",\"name\":\"dz\"},{\"type\":\"infer\",\"name\":\"C_{o}\"}],\"Op1\":[],\"Op2\":[{\"proj1\":3,\"proj2\":4,\"res\":2,\"op2\":\"*\"},{\"proj1\":2,\"proj2\":5,\"res\":1,\"op2\":\"*\"}],\"Σ\":[],\"Summand\":[]}");
 }
 
 #[test]
@@ -402,6 +401,7 @@ fn test_serialize_APlusBT() {
     println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
     println!("json={:#?}", json);
+    assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"B\"},{\"type\":\"infer\",\"name\":\"T\"},{\"type\":\"infer\",\"name\":\"OLR\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"*\"}],\"Σ\":[{\"sum\":1}],\"Summand\":[{\"summand\":2,\"summation\":1},{\"summand\":3,\"summation\":1}]}");
 }
 
 #[test]
@@ -422,6 +422,9 @@ fn test_serialize_multiply_sup() {
     let mut proj: Vec<ProjectionOperator> = Vec::new();
     let wiring_diagram = to_wiring_diagram(&expression);
     println!("wiring_diagram = {:#?}", wiring_diagram);
+    let json = to_decapodes_json(wiring_diagram);
+    println!("json={:#?}", json);
+    assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"2\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":3,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":7,\"summation\":1}]}");
 }
 
 #[test]
@@ -450,6 +453,7 @@ fn test_serialize_hackathon2_scenario1_eq5() {
     println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
     println!("json={:?}", json);
+    assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"α\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"I\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"D\"}],\"Op1\":[{\"src\":7,\"tgt\":6,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":3,\"proj2\":4,\"res\":2,\"op2\":\"*\"},{\"proj1\":2,\"proj2\":5,\"res\":1,\"op2\":\"*\"}],\"Σ\":[],\"Summand\":[]}");
 }
 
 #[test]
@@ -471,10 +475,7 @@ fn test_serialize_halfar_dome() {
     </math>
     ";
     let expression = input.parse::<MathExpressionTree>().unwrap();
-    let s_exp = expression.to_string();
-    println!("S-exp={:?}", s_exp);
     let wiring_diagram = to_wiring_diagram(&expression);
-    println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
-    println!("json={:#?}", json);
+    assert_eq!(json,"{\"Var\":[{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"mult_3\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•2\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"2\"},{\"type\":\"infer\",\"name\":\"•3\"},{\"type\":\"infer\",\"name\":\"•4\"},{\"type\":\"infer\",\"name\":\"•5\"},{\"type\":\"infer\",\"name\":\"•6\"},{\"type\":\"infer\",\"name\":\"1\"},{\"type\":\"infer\",\"name\":\"•7\"},{\"type\":\"infer\",\"name\":\"•8\"}],\"Op1\":[{\"src\":7,\"tgt\":13,\"op1\":\"Grad\"},{\"src\":13,\"tgt\":12,\"op1\":\"Abs\"},{\"src\":7,\"tgt\":16,\"op1\":\"Grad\"},{\"src\":2,\"tgt\":1,\"op1\":\"Div\"},{\"src\":7,\"tgt\":17,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":7,\"proj2\":8,\"res\":6,\"op2\":\"^\"},{\"proj1\":5,\"proj2\":6,\"res\":4,\"op2\":\"*\"},{\"proj1\":9,\"proj2\":15,\"res\":14,\"op2\":\"-\"},{\"proj1\":12,\"proj2\":14,\"res\":11,\"op2\":\"^\"},{\"proj1\":4,\"proj2\":11,\"res\":3,\"op2\":\"*\"},{\"proj1\":3,\"proj2\":16,\"res\":2,\"op2\":\"*\"}],\"Σ\":[{\"sum\":8}],\"Summand\":[{\"summand\":9,\"summation\":1},{\"summand\":10,\"summation\":1}]}");
 }
