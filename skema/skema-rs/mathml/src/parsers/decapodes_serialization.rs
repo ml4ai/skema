@@ -131,8 +131,8 @@ pub fn to_decapodes_serialization(
     } else if let MathExpressionTree::Cons(head, rest) = input {
         match head {
             Operator::Equals => {
-                to_decapodes_serialization(&rest[0], tables, table_counts);
                 to_decapodes_serialization(&rest[1], tables, table_counts);
+                to_decapodes_serialization(&rest[0], tables, table_counts);
                 0
             }
             Operator::Div => {
@@ -186,12 +186,13 @@ pub fn to_decapodes_serialization(
                     sum: table_counts.variable_count,
                 };
                 tables.sum_op.push(summing.clone());
-                let tgt_idx = table_counts.sum_count.clone();
+                let tgt_idx = table_counts.variable_count.clone();
+                let sum_tgt_idx = table_counts.sum_count.clone();
 
                 for r in rest.iter() {
                     let summands = Summation {
                         summand: to_decapodes_serialization(r, tables, table_counts),
-                        summation: tgt_idx,
+                        summation: sum_tgt_idx,
                     };
                     tables.summand_op.push(summands.clone());
                 }
