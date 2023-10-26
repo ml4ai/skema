@@ -29,10 +29,9 @@ from skema.program_analysis.matlab2cast import matlab_to_cast
 from skema.program_analysis.tree_sitter_parsers.util import extension_to_language
 from skema.utils.fold import del_nulls, dictionary_to_gromet_json
 
-THIS_PATH = Path(__file__).resolve().parent
+THIS_PATH = Path(__file__).parent.resolve()
 MODEL_YAML_PATH = Path(__file__).parent / "models.yaml"
 MODEL_YAML = yaml.safe_load(MODEL_YAML_PATH.read_text())
-
 
 class Status(Enum):
     """Status enum for the status of executing a step in the code2fn pipeline"""
@@ -62,6 +61,7 @@ def generate_data_product(
     output_path: Path, data_product_function: Callable, args=(), kwargs=None
 ) -> str:
     """Wrapper function for generating data products, returns the status of processing."""
+    os.chdir(THIS_PATH)
     try:
         output = func_timeout(10, data_product_function, args=args, kwargs=kwargs)
         if output == "":
@@ -261,13 +261,16 @@ def main():
 
     args = parser.parse_args()
 
+    # output_dir has to be resolved ahead of time due to how the cwd is changed in the Gromet pipeline
+    output_dir = str(Path(args.output_dir).resolve()) 
+
     html = HTML_Instance()
     if args.mode == "all":
-        process_all_models(html, args.output_dir)
+        process_all_models(html, output_dir)
     elif args.mode == "single":
-        process_single_model(html, args.output_dir, args.model_name)
+        process_single_model(html, output_dir, args.model_name)
 
-    output_path = Path(args.output_dir) / "report.html"
+    output_path = Path(output_dir) / "report.html"
     output_path.write_text(html.soup.prettify())
 
 
