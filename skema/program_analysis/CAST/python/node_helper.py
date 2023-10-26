@@ -9,21 +9,17 @@ CONTROL_CHARACTERS = [
     "==",
     "(",
     ")",
-    "(/",
-    "/)",
     ":",
-    "::",
     "+",
     "-",
     "*",
     "**",
     "/",
-    "/="
+    "!="
     ">",
     "<",
     "<=",
     ">=",
-    "only",
     "in",
     "not"
 ]
@@ -68,6 +64,50 @@ class NodeHelper():
         """Given a unary/binary operator node, return the operator it contains"""
         return node.type
 
+def get_first_child_by_type(node: Node, type: str, recurse=False):
+    """Takes in a node and a type string as inputs and returns the first child matching that type. Otherwise, return None
+    When the recurse argument is set, it will also recursivly search children nodes as well.
+    """
+    for child in node.children:
+        if child.type == type:
+            return child
+
+    if recurse:
+        for child in node.children:
+            out = get_first_child_by_type(child, type, True)
+            if out:
+                return out
+    return None
+
 def get_children_by_types(node: Node, types: List):
     """Takes in a node and a list of types as inputs and returns all children matching those types. Otherwise, return an empty list"""
     return [child for child in node.children if child.type in types]
+
+def get_first_child_index(node, type: str):
+    """Get the index of the first child of node with type type."""
+    for i, child in enumerate(node.children):
+        if child.type == type:
+            return i
+
+
+def get_last_child_index(node, type: str):
+    """Get the index of the last child of node with type type."""
+    last = None
+    for i, child in enumerate(node.children):
+        if child.type == type:
+            last = child
+    return last
+
+
+def get_control_children(node: Node):
+    return get_children_by_types(node, CONTROL_CHARACTERS)
+
+
+def get_non_control_children(node: Node):
+    children = []
+    for child in node.children:
+        if child.type not in CONTROL_CHARACTERS:
+            children.append(child)
+
+    return children
+
