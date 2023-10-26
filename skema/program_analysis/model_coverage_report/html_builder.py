@@ -2,7 +2,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup
 
-HTML_BASE_PATH = Path(__file__).parent / "base.html"
+HTML_BASE_PATH = Path(__file__).resolve().parent / "base.html"
 HTML_BASE = HTML_BASE_PATH.read_text()
 
 
