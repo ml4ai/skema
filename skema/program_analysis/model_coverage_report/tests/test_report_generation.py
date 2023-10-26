@@ -1,4 +1,4 @@
-from skema.program_analysis.magit.magit import Status
+from skema.program_analysis.model_coverage_report.model_coverage_report import Status
 
 def test_all_valid():
     """Test cast for Status.all_valid static method"""
