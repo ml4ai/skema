@@ -47,23 +47,24 @@ def link_amr(
         if clean_xml_codepoints:
             amr = replace_xml_codepoints(amr)
 
-    # Handle extractions from the SKEMA service or directly from the library
-    try:
-        extractions = AttributeCollection.from_json(attribute_collection)
-    except KeyError:
-        with open(attribute_collection) as f:
-            service_output = json.load(f)
-            collections = list()
-            for collection in service_output['outputs']:
-                collection = AttributeCollection.from_json(collection['data'])
-                collections.append(collection)
 
-            extractions = AttributeCollection(attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
     linker = Linker(model_name=similarity_model, device=device, sim_threshold=similarity_threshold)
 
     if not eval_mode:
-        extractions = AttributeCollection.from_json(attribute_collection)
+        # Handle extractions from the SKEMA service or directly from the library
+        try:
+            extractions = AttributeCollection.from_json(attribute_collection)
+        except KeyError:
+            with open(attribute_collection) as f:
+                service_output = json.load(f)
+                collections = list()
+                for collection in service_output['outputs']:
+                    collection = AttributeCollection.from_json(collection['data'])
+                    collections.append(collection)
+
+                extractions = AttributeCollection(
+                    attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
         linked_model = linker.link_model_to_text_extractions(amr, extractions)
     else:
         with open(attribute_collection) as f:
