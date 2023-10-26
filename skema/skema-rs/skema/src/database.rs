@@ -1377,7 +1377,7 @@ pub fn create_function(
 ) {
     // function is not repeated
     let att_box = gromet.modules[0].attributes[c_args.att_idx - 1].clone(); // current expression attribute
-
+    let mut parent_node = c_args.parent_node.clone();
     // now we add a check for if this is an imported function
     match att_box.b.clone().unwrap()[0].function_type.clone() {
         FunctionType::Imported => {
@@ -1390,7 +1390,7 @@ pub fn create_function(
                 edges,
                 c_args.att_idx,
                 c_args.bf_counter,
-                c_args.parent_node,
+                c_args.parent_node.clone(),
             );
         }
         _ => {
@@ -1418,6 +1418,7 @@ pub fn create_function(
                     e_type: String::from("Contains"),
                     prop: Some(c_args.att_idx),
                 };
+                parent_node = n1.clone();
                 nodes.push(n1.clone());
                 edges.push(e1);
                 let mut metadata_idx = 0;
@@ -1587,9 +1588,61 @@ pub fn create_function(
                     edges,
                     c_args.att_idx,
                     c_args.bf_counter,
-                    c_args.parent_node,
+                    c_args.parent_node.clone(),
                 );
             }
+        }
+    }
+    let mut new_c_args = c_args.clone();
+    new_c_args.parent_node = parent_node.clone();
+    // make conditionals if they exist
+    if att_box.bc.as_ref().is_some() {
+        let mut cond_counter = 0;
+        for _cond in att_box.bc.as_ref().unwrap().iter() {
+            // now lets check for and setup any conditionals at this level
+            create_conditional(
+                gromet,     // gromet for metadata
+                nodes, // nodes
+                edges,
+                meta_nodes,
+                start,
+                new_c_args.clone(),
+                cond_counter,
+            );
+            cond_counter += 1;
+        }
+    }
+    // make loops if they exist
+    if att_box.bl.as_ref().is_some() {
+        let mut while_counter = 0;
+        for _loop_count in att_box.bl.as_ref().unwrap().iter() {
+            if att_box.bl.as_ref().unwrap()[while_counter as usize]
+                .pre
+                .is_none()
+            {
+                // if there is not a pre_condition then it is a while loop
+                create_while_loop(
+                    gromet,     // gromet for metadata
+                    nodes, // nodes
+                    edges,
+                    meta_nodes,
+                    start,
+                    new_c_args.clone(),
+                    while_counter,
+                );
+            } else {
+                // if there is pre condition then it is a for loop
+                create_for_loop(
+                    gromet,     // gromet for metadata
+                    nodes, // nodes
+                    edges,
+                    meta_nodes,
+                    start,
+                    new_c_args.clone(),
+                    while_counter,
+                );
+            }
+            while_counter += 1;
         }
     }
 }
@@ -2262,6 +2315,11 @@ pub fn create_for_loop(
     let body_att = function_net.bl.as_ref().unwrap()[cond_counter as usize]
         .body
         .unwrap();
+
+    let pre_att_box = gromet.modules[0].attributes[(pre_att - 1) as usize].clone();
+    let cond_att_box = gromet.modules[0].attributes[(condition_att - 1) as usize].clone();
+    let body_att_box = gromet.modules[0].attributes[(body_att - 1) as usize].clone();
+
     let mut new_c_args = c_args.clone();
 
     // first create the pre function
@@ -2282,7 +2340,7 @@ pub fn create_for_loop(
         if edge.src == new_c_args.parent_node.node_id.clone()
             && edge.e_type == *"Contains"
         {
-            edge.e_type = "Body".to_string();
+            edge.e_type = "Pre".to_string();
         }
     }
     *start += 1;
@@ -2508,6 +2566,298 @@ pub fn create_for_loop(
     }
 
     // now to perform the implicit wiring:
+    for opi in cond_att_box.opi.unwrap().iter() {
+        let src_id = opi.id.unwrap();
+        let tgt_id = src_id;
+        let tgt_bf_counter = 0; // because of how we have defined it
+        let tgt_att_idx = condition_att as usize;
+
+        let mut cond_src_tgt: Vec<String> = vec![];
+
+        for node in nodes.iter() {
+            if node.n_type == "Pil" {
+                // iterate through port to check for tgt
+                for p in node.in_indx.as_ref().unwrap().iter() {
+                    // push the src first, being pif
+                    if (src_id as u32) == *p {
+                        cond_src_tgt.push(node.node_id.clone());
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att_idx == node.contents {
+                    // only opo's
+                    if node.n_type == "Opi" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_id as u32) == *p {
+                                cond_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if cond_src_tgt.len() == 2 {
+            let e9 = Edge {
+                src: cond_src_tgt[0].clone(),
+                tgt: cond_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e9);
+        }
+    }
+    for opi in body_att_box.opi.unwrap().iter() {
+        let src_id = opi.id.unwrap();
+        let tgt_id = src_id;
+        let tgt_bf_counter = 0; // because of how we have defined it
+        let tgt_att_idx = body_att as usize;
+
+        let mut if_src_tgt: Vec<String> = vec![];
+
+        for node in nodes.iter() {
+            if node.n_type == "Pil" {
+                // iterate through port to check for tgt
+                for p in node.in_indx.as_ref().unwrap().iter() {
+                    // push the src first, being pif
+                    if (src_id as u32) == *p {
+                        if_src_tgt.push(node.node_id.clone());
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att_idx == node.contents {
+                    // only opo's
+                    if node.n_type == "Opi" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_id as u32) == *p {
+                                if_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if if_src_tgt.len() == 2 {
+            let e10 = Edge {
+                src: if_src_tgt[0].clone(),
+                tgt: if_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e10);
+        }
+    }
+    // every opo in if and else statements gets mapped to a poc of the same id, every opo but the last in a predicate
+    // gets mapped to a poc of the same id. 
+
+    for opo in body_att_box.opo.unwrap().iter() {
+        let src_id = opo.id.unwrap();
+        let tgt_id = src_id;
+        let tgt_bf_counter = 0; // because of how we have defined it
+        let tgt_att_idx = body_att as usize;
+
+        let mut if_src_tgt: Vec<String> = vec![];
+
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att_idx == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_id as u32) == *p {
+                                if_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            if node.n_type == "Pol" {
+                // iterate through port to check for tgt
+                for p in node.out_idx.as_ref().unwrap().iter() {
+                    // push the src first, being pif
+                    if (tgt_id as u32) == *p {
+                        if_src_tgt.push(node.node_id.clone());
+                    }
+                }
+            }
+        }
+        if if_src_tgt.len() == 2 {
+            let e12 = Edge {
+                src: if_src_tgt[0].clone(),
+                tgt: if_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e12);
+        }
+    }
+    for opi in pre_att_box.opi.unwrap().iter() {
+        let src_id = opi.id.unwrap();
+        let tgt_id = src_id;
+        let tgt_bf_counter = 0; // because of how we have defined it
+        let tgt_att_idx = pre_att as usize;
+
+        let mut if_src_tgt: Vec<String> = vec![];
+
+        for node in nodes.iter() {
+            if node.n_type == "Pil" {
+                // iterate through port to check for tgt
+                for p in node.in_indx.as_ref().unwrap().iter() {
+                    // push the src first, being pif
+                    if (src_id as u32) == *p {
+                        if_src_tgt.push(node.node_id.clone());
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att_idx == node.contents {
+                    // only opo's
+                    if node.n_type == "Opi" {
+                        // iterate through port to check for tgt
+                        for p in node.in_indx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (tgt_id as u32) == *p {
+                                if_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if if_src_tgt.len() == 2 {
+            let e15 = Edge {
+                src: if_src_tgt[0].clone(),
+                tgt: if_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e15);
+        }
+    }
+    // every opo in if and else statements gets mapped to a poc of the same id, every opo but the last in a predicate
+    // gets mapped to a poc of the same id. 
+
+    for opo in pre_att_box.opo.unwrap().iter() {
+        let src_id = opo.id.unwrap();
+        let tgt_id = src_id;
+        let tgt_bf_counter = 0; // because of how we have defined it
+        let tgt_att_idx = pre_att as usize;
+
+        let mut if_src_tgt: Vec<String> = vec![];
+
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att_idx == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_id as u32) == *p {
+                                if_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            if node.n_type == "Pol" {
+                // iterate through port to check for tgt
+                for p in node.out_idx.as_ref().unwrap().iter() {
+                    // push the src first, being pif
+                    if (tgt_id as u32) == *p {
+                        if_src_tgt.push(node.node_id.clone());
+                    }
+                }
+            }
+        }
+        if if_src_tgt.len() == 2 {
+            let e16 = Edge {
+                src: if_src_tgt[0].clone(),
+                tgt: if_src_tgt[1].clone(),
+                e_type: String::from("Wire"),
+                prop: None,
+            };
+            edges.push(e16);
+        }
+    }
+    // iterate through everything but last opo
+    let opo_final_idx = cond_att_box.opo.clone().unwrap().len() - 1;
+    for (i, opo) in cond_att_box.opo.unwrap().iter().enumerate() {
+        let src_id = opo.id.unwrap();
+        let tgt_id = src_id;
+        let tgt_bf_counter = 0; // because of how we have defined it
+        let tgt_att_idx = condition_att as usize;
+
+        let mut cond_src_tgt: Vec<String> = vec![];
+
+        for node in nodes.iter() {
+            // make sure in correct box
+            if tgt_bf_counter == node.nbox {
+                // make sure only looking in current attribute nodes for srcs and tgts
+                if tgt_att_idx == node.contents {
+                    // only opo's
+                    if node.n_type == "Opo" {
+                        // iterate through port to check for tgt
+                        for p in node.out_idx.as_ref().unwrap().iter() {
+                            // push the src first, being pif
+                            if (src_id as u32) == *p {
+                                cond_src_tgt.push(node.node_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        for node in nodes.iter() {
+            if node.n_type == "Pol" {
+                // iterate through port to check for tgt
+                for p in node.out_idx.as_ref().unwrap().iter() {
+                    // push the src first, being pif
+                    if (tgt_id as u32) == *p {
+                        cond_src_tgt.push(node.node_id.clone());
+                    }
+                }
+            }
+        }
+        if opo_final_idx != i {
+            if cond_src_tgt.len() == 2 {
+                let e14 = Edge {
+                    src: cond_src_tgt[0].clone(),
+                    tgt: cond_src_tgt[1].clone(),
+                    e_type: String::from("Wire"),
+                    prop: None,
+                };
+                edges.push(e14);
+            }
+        }
+    }
 }
 
 pub fn create_while_loop(
