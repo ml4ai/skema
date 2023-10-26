@@ -121,11 +121,16 @@ def get_node_name(ast_node):
     elif isinstance(ast_node, Attribute):
         return [ast_node.attr.name]
     elif isinstance(ast_node, Var):
-        return [ast_node.val.name]
+        if isinstance(ast_node.val, Call):
+            return get_node_name(ast_node.val.func)
+        else:
+            return [ast_node.val.name]
     elif isinstance(ast_node, Assignment):
         return get_node_name(ast_node.left)
     elif isinstance(ast_node, ast.Subscript):
         return get_node_name(ast_node.value)
+    elif isinstance(ast_node, ast.Call):
+        return get_node_name(ast_node.func)
     elif (
         isinstance(ast_node, LiteralValue)
         and (ast_node.value_type == StructureType.LIST or ast_node.value_type == StructureType.TUPLE)
@@ -239,6 +244,8 @@ class PyASTToCAST:
         self.list_comp_count = 0
         self.dict_comp_count = 0
         self.lambda_count = 0
+
+        self.curr_func_args = []
 
     def insert_next_id(self, scope_dict: dict, dict_key: str):
         """Given a scope_dictionary and a variable name as a key,
@@ -1521,17 +1528,48 @@ class PyASTToCAST:
                         )
                     ]
                 else:
-                    return [
-                        Call(
-                            func=Name(
-                                node.func.id,
-                                id=curr_scope_id_dict[unique_name] if unique_name in curr_scope_id_dict else prev_scope_id_dict[unique_name], # NOTE: do this everywhere?
-                                source_refs=ref,
-                            ),
-                            arguments=args,
-                            source_refs=ref,
+                    if node.func.id in self.curr_func_args:
+                        unique_name = construct_unique_name(
+                            self.filenames[-1], "_call"
                         )
-                    ]
+                        if unique_name not in prev_scope_id_dict.keys(): # and unique_name not in curr_scope_id_dict.keys():
+                            # If a built-in is called, then it gets added to the global dictionary if
+                            # it hasn't been called before. This is to maintain one consistent ID per built-in
+                            # function
+                            if unique_name not in self.global_identifier_dict.keys():
+                                self.insert_next_id(
+                                    self.global_identifier_dict, unique_name
+                                )
+
+                            prev_scope_id_dict[unique_name] = self.global_identifier_dict[
+                                unique_name
+                            ]
+                        source_code_data_type = None
+                        func_name_arg = LiteralValue(StructureType.LIST, node.func.id, None, ref)
+
+                        return [
+                            Call(
+                                func=Name(
+                                    "_call",
+                                    id=curr_scope_id_dict[unique_name] if unique_name in curr_scope_id_dict else prev_scope_id_dict[unique_name], # NOTE: do this everywhere?
+                                    source_refs=ref,
+                                ),
+                                arguments=args,
+                                source_refs=ref,
+                            )
+                        ]
+                    else:
+                        return [
+                            Call(
+                                func=Name(
+                                    node.func.id,
+                                    id=curr_scope_id_dict[unique_name] if unique_name in curr_scope_id_dict else prev_scope_id_dict[unique_name], # NOTE: do this everywhere?
+                                    source_refs=ref,
+                                ),
+                                arguments=args,
+                                source_refs=ref,
+                            )
+                        ]
 
     def collect_fields(
         self, node: ast.FunctionDef, prev_scope_id_dict, curr_scope_id_dict
@@ -2178,6 +2216,11 @@ class PyASTToCAST:
         # The idea for this is to prevent any weird overwritting issues that may arise from modifying
         # dictionaries in place
         prev_scope_id_dict_copy = copy.deepcopy(prev_scope_id_dict)
+        
+
+        # Need to maintain the previous scope, so copy them over here
+        prev_func_args = copy.deepcopy(self.curr_func_args) 
+        self.curr_func_args = []
 
         body = []
         args = []
@@ -2195,6 +2238,7 @@ class PyASTToCAST:
                     self.insert_next_id(curr_scope_id_dict, f"{arg.arg}")
                     # self.insert_next_id(curr_scope_id_dict, unique_name)
                     arg_ref = SourceRef(self.filenames[-1], arg.col_offset, arg.end_col_offset, arg.lineno, arg.end_lineno)
+                    self.curr_func_args.append(arg.arg)
                     args.append(
                         Var(
                             Name(
@@ -2218,6 +2262,7 @@ class PyASTToCAST:
                             prev_scope_id_dict,
                             curr_scope_id_dict,
                         )[0]
+                        self.curr_func_args.append(arg.arg)
                         args.append(
                             Var(
                                 Name(
@@ -2254,6 +2299,7 @@ class PyASTToCAST:
                         if arg_count == default_val_count:
                             break
                         self.insert_next_id(curr_scope_id_dict, arg.arg)
+                        self.curr_func_args.append(arg.arg)
                         args.append(
                             Var(
                                 Name(
@@ -2297,6 +2343,7 @@ class PyASTToCAST:
                             curr_scope_id_dict,
                         )[0]
                         # self.insert_next_id(curr_scope_id_dict, unique_name)
+                        self.curr_func_args.append(arg.arg)
                         args.append(
                             Var(
                                 Name(
@@ -2335,6 +2382,7 @@ class PyASTToCAST:
                 # unique_name = construct_unique_name(self.filenames[-1], arg.arg)
                 self.insert_next_id(curr_scope_id_dict, arg.arg)
                 # self.insert_next_id(curr_scope_id_dict, unique_name)
+                self.curr_func_args.append(arg.arg)
                 args.append(
                     Var(
                         Name(
@@ -2432,6 +2480,8 @@ class PyASTToCAST:
 
         functions_to_visit = []
 
+        print(self.curr_func_args)
+
         if len(node.body) > 0:
             # To account for nested loops we check to see if the CAST node is in a list and
             # extend accordingly
@@ -2439,8 +2489,14 @@ class PyASTToCAST:
             for piece in node.body:
                 if isinstance(piece, ast.Assign):
                     names = get_node_name(piece)
-
+                    
                     for var_name in names:
+                        
+                        # If something is overwritten in the curr_func_args then we 
+                        # remove it here, as it's no longer a function 
+                        if var_name in self.curr_func_args:
+                            self.curr_func_args.remove(var_name)
+
                         # unique_name = construct_unique_name(
                         #    self.filenames[-1], var_name
                         # )
@@ -2451,6 +2507,7 @@ class PyASTToCAST:
             for piece in node.body:
 
                 if isinstance(piece, ast.FunctionDef):
+                    self.curr_func_args.append(piece.name)
                     unique_name = construct_unique_name(self.filenames[-1], piece.name)
                     self.insert_next_id(curr_scope_id_dict, unique_name)
                     prev_scope_id_dict[unique_name] = curr_scope_id_dict[unique_name]
@@ -2489,11 +2546,6 @@ class PyASTToCAST:
             # Merge keys from prev_scope not in cur_scope into cur_scope
             # merge_dicts(prev_scope_id_dict, curr_scope_id_dict)
 
-            # Visit the deferred functions
-            #for piece in functions_to_visit:
-             #   to_add = self.visit(piece, curr_scope_id_dict, {})
-              #  body.extend(to_add)
-
         # TODO: Decorators? Returns? Type_comment?
         ref = [
             SourceRef(
@@ -2509,6 +2561,9 @@ class PyASTToCAST:
         # since none of the variables within here should exist outside of here..?
         # TODO: this might need to be different, since Python variables can exist outside of a scope??
         prev_scope_id_dict = copy.deepcopy(prev_scope_id_dict_copy)
+
+        prev_func_args = copy.deepcopy(self.curr_func_args) 
+        self.curr_func_args = copy.deepcopy(prev_func_args)
 
         # Global level (i.e. module level) functions have their module names appended to them, we make sure
         # we have the correct name depending on whether or not we're visiting a global

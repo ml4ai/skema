@@ -198,6 +198,8 @@ def get_left_side_name(node):
     if isinstance(node, AnnCastVar):
         return get_left_side_name(node.val)
     if isinstance(node, AnnCastCall):
+        if isinstance(node.func, AnnCastAttribute):
+            return get_left_side_name(node.func)
         return node.func.name
     return "NO LEFT SIDE NAME"
 
@@ -288,6 +290,9 @@ class ToGrometPass:
         level and creates a table that maps their function names to a map
         of its arguments with position values
 
+        We also, for each function, create an initial entry containing its name and its
+        index in the FN array
+
         NOTE: functions within functions aren't currently supported
 
         """
@@ -296,7 +301,7 @@ class ToGrometPass:
                 self.function_arguments[node.name.name] = {}
                 for i, arg in enumerate(node.func_args, 1):
                     self.function_arguments[node.name.name][arg.val.name] = i
-                self.symbol_table["functions"][node.name.name] = node.name.name
+                self.symbol_table["functions"][node.name.name] = (node.name.name, -1)
 
     def wire_from_var_env(self, name, gromet_fn):
         var_environment = self.symtab_variables()
@@ -406,6 +411,7 @@ class ToGrometPass:
         # primitives that come from something other than an assignment or functions designated to be inlined at all times have
         # special semantics in that they're inlined as opposed to creating their own GroMEt FNs
         if from_assignment or is_inline(func_name):
+            print(from_assignment)
             inline_func_bf = GrometBoxFunction(
                 name=func_name, function_type=FunctionType.LANGUAGE_PRIMITIVE
             )
@@ -2364,6 +2370,7 @@ class ToGrometPass:
         if isinstance(node.func, AnnCastAttribute):
             self.visit(node.func, parent_gromet_fn, parent_cast_node)
 
+
         # Have to find the index of the function we're trying to call
         # What if it's a primitive?
         # What if it doesn't exist for some reason?
@@ -2373,6 +2380,7 @@ class ToGrometPass:
                 node, parent_gromet_fn, parent_cast_node, from_assignment
             )
 
+            
             # Argument handling for primitives is a little different here, because we only want to find the variables that we need, and not create
             # any additional FNs. The additional FNs are created in the primitive handler
             for arg in node.arguments:
@@ -2816,6 +2824,7 @@ class ToGrometPass:
         # can clear the local  variable environment
         var_environment["local"] = deepcopy(prev_local_env)
 
+
     @_visit.register
     def visit_function_def(
         self, node: AnnCastFunctionDef, parent_gromet_fn, parent_cast_node
@@ -2842,6 +2851,11 @@ class ToGrometPass:
             )
         else:
             new_gromet = self.gromet_module.fn_array[idx - 1]
+
+        # Update the functions symbol table with its index in the FN array
+        # This is currently used for wiring function names as parameters to function calls
+        functions = self.symtab_functions()
+        functions[node.name.name] = (node.name.name, idx)
 
         metadata = self.create_source_code_reference(ref)
 
