@@ -329,6 +329,7 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
         let mut rate_vec = Vec::<Rate>::new();
         let mut state_string_list = Vec::<String>::new();
         let mut terms = Vec::<PnTerm>::new();
+        let mut dirty_terms = Vec::<PnTerm>::new();
 
         // this first for loop is for the creation state related parameters in the AMR
         for ode in ode_vec.iter() {
@@ -361,7 +362,14 @@ impl From<Vec<FirstOrderODE>> for PetriNet {
 
         // this collects all the terms from the equations
         for ode in ode_vec.iter() {
-            terms.append(&mut get_terms(state_string_list.clone(), ode.clone()));
+            dirty_terms.append(&mut get_terms(state_string_list.clone(), ode.clone()));
+        }
+
+        // now to trim off terms that are for euler methods, dyn_state != exp_state && parameters.len() != 0
+        for term in dirty_terms.iter() {
+            if term.dyn_state != term.exp_states[0] || term.parameters.len() != 0 {
+                terms.push(term.clone());
+            }
         }
 
         for term in terms.iter() {
