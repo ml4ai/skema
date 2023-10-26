@@ -1040,6 +1040,14 @@
 <a href="#1040" id="1040">1040</a>
 <a href="#1041" id="1041">1041</a>
 <a href="#1042" id="1042">1042</a>
+<a href="#1043" id="1043">1043</a>
+<a href="#1044" id="1044">1044</a>
+<a href="#1045" id="1045">1045</a>
+<a href="#1046" id="1046">1046</a>
+<a href="#1047" id="1047">1047</a>
+<a href="#1048" id="1048">1048</a>
+<a href="#1049" id="1049">1049</a>
+<a href="#1050" id="1050">1050</a>
 </pre></div><pre class="rust"><code><span class="doccomment">//! Structs to represent elements of ACSets (Annotated C-Sets, a concept from category theory).
 //! JSON-serialized ACSets are the form of model exchange between TA1 and TA2.
 </span><span class="kw">use </span><span class="kw">crate</span>::parsers::first_order_ode::{get_terms, FirstOrderODE, PnTerm};
@@ -1371,6 +1379,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>rate_vec = Vec::&lt;Rate&gt;::new();
         <span class="kw">let </span><span class="kw-2">mut </span>state_string_list = Vec::&lt;String&gt;::new();
         <span class="kw">let </span><span class="kw-2">mut </span>terms = Vec::&lt;PnTerm&gt;::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>dirty_terms = Vec::&lt;PnTerm&gt;::new();
 
         <span class="comment">// this first for loop is for the creation state related parameters in the AMR
         </span><span class="kw">for </span>ode <span class="kw">in </span>ode_vec.iter() {
@@ -1403,7 +1412,14 @@
 
         // this collects all the terms from the equations
         </span><span class="kw">for </span>ode <span class="kw">in </span>ode_vec.iter() {
-            terms.append(<span class="kw-2">&amp;mut </span>get_terms(state_string_list.clone(), ode.clone()));
+            dirty_terms.append(<span class="kw-2">&amp;mut </span>get_terms(state_string_list.clone(), ode.clone()));
+        }
+
+        <span class="comment">// now to trim off terms that are for euler methods, dyn_state != exp_state &amp;&amp; parameters.len() != 0
+        </span><span class="kw">for </span>term <span class="kw">in </span>dirty_terms.iter() {
+            <span class="kw">if </span>term.dyn_state != term.exp_states[<span class="number">0</span>] || term.parameters.len() != <span class="number">0 </span>{
+                terms.push(term.clone());
+            }
         }
 
         <span class="kw">for </span>term <span class="kw">in </span>terms.iter() {
