@@ -44,8 +44,18 @@ from skema.program_analysis.tree_sitter_parsers.build_parsers import INSTALLED_L
 MATLAB_VERSION='matlab_version_here'
 
 class MatlabToCast(object):
-    def __init__(self, source_file_path: str):
+    def __init__(self, source_path = "", source = ""):
         """docstring"""
+
+        # if a source file path is provided, read source from file
+        if not source_path == "":
+            path = Path(source_path)
+            self.source = path.read_text().strip()
+            self.filename = path.name
+        # otherwise copy the input source and flag the filename unused
+        else:
+            self.source = source
+            self.filename = "None"
 
         # create MATLAB parser
         parser = Parser()
@@ -54,9 +64,6 @@ class MatlabToCast(object):
         )
         
         # create a syntax tree using the source file
-        path = Path(source_file_path)
-        self.source = path.read_text().strip()
-        self.filename = path.name
         self.tree = parser.parse(bytes(self.source, "utf8"))
 
         # Walking data
