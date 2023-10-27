@@ -13,15 +13,14 @@ from io import BytesIO
 from zipfile import ZipFile
 import requests
 from pathlib import Path
-import json
+from pydantic import BaseModel
 from skema.rest.proxies import SKEMA_OPENAI_KEY
 
 router = APIRouter()
 
-class LineSpan:
-    def __init__(self, line_begin, line_end):
-        self.line_begin = line_begin
-        self.line_end = line_end
+class LineSpan(BaseModel):
+    line_begin: int
+    line_end: int
 
 
 @router.post(
@@ -130,7 +129,7 @@ async def get_lines_of_model(zip_file: UploadFile = File()) -> LineSpan:
         line_begin = 0
         line_end = 0
 
-    output = LineSpan(line_begin,line_end)
+    output = LineSpan(line_begin=line_begin,line_end=line_end)
     return output
 
 
