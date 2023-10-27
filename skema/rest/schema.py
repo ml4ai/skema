@@ -191,12 +191,19 @@ class TextReadingEvaluationResults(BaseModel):
         description="Total number of extractions detected in the current document",
     ),
     correct_extractions: int = Field(
-        name="correct_extractions",
         description="Number of extractions matched in the ground-truth annotations"
     ),
     precision: float = Field(
         description="Ratio of correct extractions against manual annotations"
     )
+
+
+class AMRLinkingEvaluationResults(BaseModel):
+    """ Evaluation results of the AMR Linking procedure """
+    num_gt_elems_with_metadata: int
+    precision: float
+    recall: float
+    f1: float
 
 
 class TextReadingAnnotationsOutput(BaseModel):
@@ -205,7 +212,7 @@ class TextReadingAnnotationsOutput(BaseModel):
     outputs: List[TextReadingDocumentResults] = Field(
         name="outputs",
         description="Contains the results of TR annotations for each input document. There is one entry per input and "
-        "inputs and outputs are matched by the same index in the list",
+                    "inputs and outputs are matched by the same index in the list",
         examples=[[
             TextReadingDocumentResults(
                 data=AttributeCollection(attributes=[]), errors=None
