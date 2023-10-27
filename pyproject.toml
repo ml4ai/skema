@@ -25,7 +25,8 @@ dependencies=[
     "starlette",
     "pydantic>=2.0.0",
     "uvicorn",
-    "python-multipart"
+    "python-multipart",
+    "func_timeout"
 ]
 # The Python program analysis pipeline does not currently work with Python 3.9
 # or 3.10. This may change in the future.
@@ -93,6 +94,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotati
 "skema.model_assembly" = "skema/model_assembly"
 "skema.program_analysis" = "skema/program_analysis"
 "skema.skema_py" = "skema/skema_py"
+"skema.utils" = "skema/utils"
 # re-map skema/text_reading/python to skema.text_reading
 #"skema.text_reading" = "skema/text_reading/python"
 "skema.metal.model_linker" = "skema/metal/model_linker/skema_model_linker"
@@ -102,7 +104,7 @@ all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotati
 
 [tool.setuptools.package-data]
 # needed to ensure models are included in package/discoverable
-"*" = ["*.json", "vocab.txt", "*.pt", "*.png"]
+"*" = ["*.json", "vocab.txt", "*.pt", "*.png", "*.html", "*.yml", "*.yaml"]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
