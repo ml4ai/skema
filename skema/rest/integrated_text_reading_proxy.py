@@ -676,8 +676,9 @@ def quantitative_eval() -> TextReadingEvaluationResults:
 
     return compute_text_reading_evaluation(gt_data, extractions)
 
+
 @router.post("/eval", response_model=TextReadingEvaluationResults, status_code=200)
-def quantitative_eval(extractions_file:UploadFile, gt_annotations:UploadFile):
+def quantitative_eval(extractions_file: UploadFile, gt_annotations: UploadFile):
     """
     # Gets performance metrics of a set of text extractions againts a ground truth annotations file.
 
@@ -711,6 +712,7 @@ def quantitative_eval(extractions_file:UploadFile, gt_annotations:UploadFile):
             attributes=list(it.chain.from_iterable(c.attributes for c in collections)))
 
     return compute_text_reading_evaluation(gt_data, extractions)
+
 
 app = FastAPI()
 app.include_router(router)

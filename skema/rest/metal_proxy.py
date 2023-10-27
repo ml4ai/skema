@@ -8,7 +8,8 @@ from pydantic import Json
 
 from skema.metal.model_linker.skema_model_linker.linkers import PetriNetLinker, RegNetLinker
 from skema.metal.model_linker.skema_model_linker.link_amr import replace_xml_codepoints
-from skema.rest.schema import TextReadingAnnotationsOutput
+from skema.rest.schema import TextReadingAnnotationsOutput, TextReadingEvaluationResults, AMRLinkingEvaluationResults
+from skema.rest.utils import compute_amr_linking_evaluation
 
 router = APIRouter()
 
@@ -88,6 +89,27 @@ def link_amr(amr_type: str,
 def healthcheck():
     return 200
 
+@router.post("/eval", response_model=AMRLinkingEvaluationResults, status_code=200)
+def quantitative_eval(linked_amr_file: UploadFile, gt_linked_amr_file: UploadFile) -> AMRLinkingEvaluationResults:
+    """
+     # Gets performance metrics of a linked amr with variable extractions against a ground truth linked amr.
+
+    ## Example:
+    ```python
+    files = {
+        "linked_amr": ("linked_amr_file.json", open("linked_amr_file.json", 'rb')),
+        "gt_linked_amr_file": ("gt_linked_amr_file.json", open("gt_linked_amr_file.json", 'rb')),
+    }
+
+    response = requests.post(f"{endpoint}/metal/eval", files=files)
+    ```
+
+    """
+
+    linked_amr = json.load(linked_amr_file.file)
+    gt_linked_amr_file = json.load(gt_linked_amr_file.file)
+
+    return compute_amr_linking_evaluation(linked_amr, gt_linked_amr_file)
 
 app = FastAPI()
 app.include_router(router)
