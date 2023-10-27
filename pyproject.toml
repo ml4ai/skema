@@ -82,8 +82,11 @@ core = ["skema[img2mml]", "skema[isa]", "skema[tr]", "skema[metal]"]
 # see skema/img2mml/render_mml/mathpix_annotator
 annotations = ["matplotlib", "notebook"]
 
+# for llm use in skema
+llms = ["langchain==0.0.325"]
+
 # all extras
-all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotations]"]
+all = ["skema[core]", "skema[dev]", "skema[doc]", "skema[demo]", "skema[annotations]", "skema[llms]"]
 
 [tool.setuptools.package-dir]
 "skema.gromet" = "skema/gromet"
