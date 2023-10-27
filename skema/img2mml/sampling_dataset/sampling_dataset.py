@@ -5,6 +5,7 @@ import random
 import re
 import shutil
 import subprocess
+import time
 from shutil import copyfile as CP
 from threading import Timer
 
@@ -79,14 +80,14 @@ lock = mp.Lock()
 
 
 def get_paths(yr, yr_path, month):
-    print(f"collecting paths for {yr}/{month}...")
+    print(f"Collecting paths for {yr}/{month}...")
+    start_time = time.perf_counter()
     temp_files = []
     month_path = os.path.join(yr_path, month, "latex_equations")
 
     for paper in os.listdir(month_path):
-        for eqn_type in ["large_eqns", "small_eqns"]:
-            type_of_eqn = "large" if eqn_type == "large_eqns" else "small"
-            eqn_folder = os.path.join(month_path, paper, eqn_type)
+        for type_of_eqn in ("large_eqns", "small_eqns"):
+            eqn_folder = os.path.join(month_path, paper, type_of_eqn)
 
             temp_files.extend(
                 [
@@ -94,7 +95,8 @@ def get_paths(yr, yr_path, month):
                     for eqn in os.listdir(eqn_folder)
                 ]
             )
-
+    end_time = time.perf_counter()
+    print(f"Finished collecting paths in {end_time - start_time} seconds")
     return temp_files
 
 
@@ -103,6 +105,10 @@ def has_intersection(a: set, b: set):
 
 
 def filter_paths_by_field(paths: list, fields: set):
+    start_time = time.perf_counter()
+    print(
+       f"Filtering paths by fields: {",".join(fields)}"
+    )
     arxvid_id_list = []
     for path in paths:
         arxiv_id = path.split("_")[2]
@@ -123,10 +129,9 @@ def filter_paths_by_field(paths: list, fields: set):
             }
             if has_intersection(paper_fields, fields):
                 filtered_paths.append(path)
-    print(
-        f"Filtered paths to include only papers in the following fields: {','.join(fields)}"
-    )
-    print(f"{len(paths)} total paths -> {len(filtered_paths)} total paths")
+    end_time = time.perf_counter()
+    print(f"Trimmed {len(paths)} paths to {len(filtered_paths)} paths")
+    print(f"Finished filtering paths in {end_time - start_time} seconds")
     return filtered_paths
 
 
@@ -165,28 +170,26 @@ def areAligned(mml, latex):
 def prepare_dataset(args):
     i, ap = args
     yr, month, folder, type_of_eqn, eqn_num = ap.split("_")
-    mml_path = os.path.join(
+    latex_path = os.path.join(
         root,
-        f"{yr}/{month}/mathjax_mml/{folder}/{type_of_eqn}_mml/{eqn_num}.xml",
+        f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_mml/{eqn_num}.txt",
     )
-    # latex_path = os.path.join(
-    #     root,
-    #     f"{yr}/{month}/latex_equations/{folder}/{type_of_eqn}_eqns/{eqn_num}.txt",
-    # )
-    mml = open(mml_path).readlines()[0]
-    # latex = open(latex_path).readlines()[0]
+    with open(latex_path, "r") as f:
+        # read first line
+        latex = f.readline().rstrip("\n")
 
-    # if areAligned(mml, latex):
-    open(f"{os.getcwd()}/sampling_dataset/temp_folder/smr_{i}.txt", "w").write(mml)
+    temp_file_path = f"{os.getcwd()}/sampling_dataset/temp_folder/sm_{i}.txt"
+    with open(temp_file_path, "w") as f:
+        f.write(latex)
+    return True
 
     cwd = os.getcwd()
     cmd = ["python", f"{cwd}/sampling_dataset/simp.py", str(i)]
-    output = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
-    my_timer = Timer(5, kill, [output])
+    process = subprocess.Popen(cmd, stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+    my_timer = Timer(5, kill, [process])
 
     try:
         my_timer.start()
-        stdout, stderr = output.communicate()
 
     except:
         if verbose:
@@ -197,8 +200,6 @@ def prepare_dataset(args):
 
     finally:
         my_timer.cancel()
-    # else:
-    #     pass
 
 
 def get_bin(af):
@@ -271,13 +272,13 @@ def main():
     all_paths = filter_paths_by_field(all_paths, fields) if fields else all_paths
 
     ######## step 2: shuffle it twice ########
-    print("shuffling all the paths to create randomness...")
+    print("Shuffling all the paths to create randomness...")
     random.shuffle(all_paths)
     random.shuffle(all_paths)
 
     ######## step 3: simplify MML and and find length  #####
     ######## and grab the corresponding PNG and latex ############
-    print("preparing dataset...")
+    print("Preparing dataset...")
 
     # opening a temporary folder to store temp files
     # this folder will be deleted at the end of the run.
@@ -298,6 +299,8 @@ def main():
 
             with mp.Pool(config["num_cpus"]) as pool:
                 pool.map(prepare_dataset, all_files)
+            
+            exit(1)
 
             with mp.Pool(config["num_cpus"]) as pool:
                 results = [
