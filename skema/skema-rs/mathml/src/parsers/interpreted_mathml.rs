@@ -21,7 +21,7 @@ use nom::{
     bytes::complete::tag,
     combinator::{map, opt, value},
     multi::{many0, many1, separated_list1},
-    sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
+    sequence::{delimited, pair, preceded, tuple},
 };
 
 /// Function to parse operators. This function differs from the one in parsers::generic_mathml by
@@ -217,7 +217,6 @@ pub fn first_order_with_func_in_parenthesis(input: Span) -> IResult<(Derivative,
         mi,
         pair(etag!("mrow"), etag!("mfrac")),
     )(s)?;
-    println!("in here");
 
     let (s, _) = tuple((stag!("mo"), tag("("), etag!("mo")))(s)?;
     let (s, func) = many0(math_expression)(s)?;
@@ -269,7 +268,6 @@ pub fn first_order_derivative_leibniz_notation(input: Span) -> IResult<(Derivati
             if Some(bvar.content.clone())
                 == Some(Box::new(MathExpression::Mi(with_respect_to.clone())))
             {
-                println!("Match successful");
                 return Ok((
                     s,
                     (
@@ -424,7 +422,6 @@ pub fn gradient(input: Span) -> IResult<Operator> {
 pub fn grad_func(input: Span) -> IResult<(Operator, Ci)> {
     let (s, (op, id)) = ws(pair(gradient, mi))(input)?;
     let ci = Ci::new(Some(Type::Real), Box::new(MathExpression::Mi(id)), None);
-    println!("op = {:?}, ci = {:?}", op, ci);
     Ok((s, (op, ci)))
 }
 

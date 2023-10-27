@@ -87,7 +87,7 @@ pub fn to_decapodes_serialization(
     input: &MathExpressionTree,
     tables: &mut Tables,
     table_counts: &mut TableCounts,
-) -> (usize) {
+) -> usize {
     if let MathExpressionTree::Atom(i) = input {
         match i {
             MathExpression::Ci(x) => {
@@ -112,7 +112,7 @@ pub fn to_decapodes_serialization(
                 let index = tables
                     .variables
                     .iter()
-                    .position(|variable| variable.name == number.to_string());
+                    .position(|variable| variable.name == *number);
                 match index {
                     Some(idx) => idx + 1,
                     None => {
@@ -137,14 +137,14 @@ pub fn to_decapodes_serialization(
             }
             Operator::Div => {
                 table_counts.operation_count += 1;
-                let temp_str = format!("•{}", (table_counts.operation_count).to_string());
+                let temp_str = format!("•{}", (table_counts.operation_count));
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
+                let tgt_idx = table_counts.variable_count;
 
                 let unary = UnaryOperator {
                     src: to_decapodes_serialization(&rest[0], tables, table_counts),
@@ -156,14 +156,14 @@ pub fn to_decapodes_serialization(
             }
             Operator::Abs => {
                 table_counts.operation_count += 1;
-                let temp_str = format!("•{}", (table_counts.operation_count).to_string());
+                let temp_str = format!("•{}", (table_counts.operation_count));
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
+                let tgt_idx = table_counts.variable_count;
 
                 let unary = UnaryOperator {
                     src: to_decapodes_serialization(&rest[0], tables, table_counts),
@@ -175,7 +175,7 @@ pub fn to_decapodes_serialization(
             }
             Operator::Add => {
                 table_counts.sum_count += 1;
-                let temp_sum = format!("sum_{}", table_counts.sum_count.to_string());
+                let temp_sum = format!("sum_{}", table_counts.sum_count);
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_sum,
@@ -186,8 +186,8 @@ pub fn to_decapodes_serialization(
                     sum: table_counts.variable_count,
                 };
                 tables.sum_op.push(summing.clone());
-                let tgt_idx = table_counts.variable_count.clone();
-                let sum_tgt_idx = table_counts.sum_count.clone();
+                let tgt_idx = table_counts.variable_count;
+                let sum_tgt_idx = table_counts.sum_count;
 
                 for r in rest.iter() {
                     let summands = Summation {
@@ -200,14 +200,14 @@ pub fn to_decapodes_serialization(
             }
             Operator::Power => {
                 table_counts.operation_count += 1;
-                let temp_str = format!("•{}", table_counts.operation_count.to_string());
+                let temp_str = format!("•{}", table_counts.operation_count);
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
+                let tgt_idx = table_counts.variable_count;
 
                 let projection = ProjectionOperator {
                     proj1: to_decapodes_serialization(&rest[0], tables, table_counts),
@@ -220,14 +220,14 @@ pub fn to_decapodes_serialization(
             }
             Operator::Subtract => {
                 table_counts.operation_count += 1;
-                let temp_str = format!("•{}", table_counts.operation_count.to_string());
+                let temp_str = format!("•{}", table_counts.operation_count);
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
+                let tgt_idx = table_counts.variable_count;
                 let projection = ProjectionOperator {
                     proj1: to_decapodes_serialization(&rest[0], tables, table_counts),
                     proj2: to_decapodes_serialization(&rest[1], tables, table_counts),
@@ -239,14 +239,14 @@ pub fn to_decapodes_serialization(
             }
             Operator::Multiply => {
                 table_counts.multi_count += 1;
-                let temp_multi = format!("mult_{}", table_counts.multi_count.to_string());
+                let temp_multi = format!("mult_{}", table_counts.multi_count);
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_multi,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
+                let tgt_idx = table_counts.variable_count;
                 let projection = ProjectionOperator {
                     proj1: to_decapodes_serialization(&rest[0], tables, table_counts),
                     proj2: to_decapodes_serialization(&rest[1], tables, table_counts),
@@ -258,14 +258,14 @@ pub fn to_decapodes_serialization(
             }
             Operator::Divide => {
                 table_counts.operation_count += 1;
-                let temp_str = format!("•{}", table_counts.operation_count.to_string());
+                let temp_str = format!("•{}", table_counts.operation_count);
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
+                let tgt_idx = table_counts.variable_count;
                 let projection = ProjectionOperator {
                     proj1: to_decapodes_serialization(&rest[0], tables, table_counts),
                     proj2: to_decapodes_serialization(&rest[1], tables, table_counts),
@@ -277,19 +277,19 @@ pub fn to_decapodes_serialization(
             }
             Operator::Derivative(Derivative {
                 order,
-                var_index,
+                var_index: _,
                 bound_var,
             }) => {
                 table_counts.operation_count += 1;
-                let temp_str = format!("•{}", (table_counts.operation_count).to_string());
+                let temp_str = format!("•{}", (table_counts.operation_count));
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
-                let derivative_str = format!("D({},{})", order.to_string(), bound_var.to_string());
+                let tgt_idx = table_counts.variable_count;
+                let derivative_str = format!("D({},{})", order, bound_var);
                 let unary = UnaryOperator {
                     src: to_decapodes_serialization(&rest[0], tables, table_counts),
                     tgt: tgt_idx,
@@ -300,14 +300,14 @@ pub fn to_decapodes_serialization(
             }
             Operator::Grad => {
                 table_counts.operation_count += 1;
-                let temp_str = format!("•{}", (table_counts.operation_count).to_string());
+                let temp_str = format!("•{}", (table_counts.operation_count));
                 let temp_variable = Variable {
                     r#type: Type::infer,
                     name: temp_str,
                 };
                 tables.variables.push(temp_variable.clone());
                 table_counts.variable_count += 1;
-                let tgt_idx = table_counts.variable_count.clone();
+                let tgt_idx = table_counts.variable_count;
                 let unary = UnaryOperator {
                     src: to_decapodes_serialization(&rest[0], tables, table_counts),
                     tgt: tgt_idx,
@@ -341,15 +341,15 @@ pub fn to_wiring_diagram(input: &MathExpressionTree) -> WiringDiagram {
         summand_op: Vec::new(),
     };
 
-    to_decapodes_serialization(&input, &mut tables, &mut table_counts);
+    to_decapodes_serialization(input, &mut tables, &mut table_counts);
 
-    return WiringDiagram {
+    WiringDiagram {
         Var: tables.variables,
         Op1: tables.unary_operators,
         Op2: tables.projection_operators,
         Σ: tables.sum_op,
         Summand: tables.summand_op,
-    };
+    }
 }
 
 pub fn to_decapodes_json(input: WiringDiagram) -> String {
@@ -369,14 +369,8 @@ fn test_serialize1() {
     </math>
     ";
     let expression = input.parse::<MathExpressionTree>().unwrap();
-    println!("expression={:?}", expression);
-    println!("expression.to_string()={}", expression.to_string());
-    let mut var: Vec<Variable> = Vec::new();
-    let mut proj: Vec<ProjectionOperator> = Vec::new();
     let wiring_diagram = to_wiring_diagram(&expression);
-    println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
-    println!("json={:#?}", json);
     assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"ρ_{w}\"},{\"type\":\"infer\",\"name\":\"c_{w}\"},{\"type\":\"infer\",\"name\":\"dz\"},{\"type\":\"infer\",\"name\":\"C_{o}\"}],\"Op1\":[],\"Op2\":[{\"proj1\":3,\"proj2\":4,\"res\":2,\"op2\":\"*\"},{\"proj1\":2,\"proj2\":5,\"res\":1,\"op2\":\"*\"}],\"Σ\":[],\"Summand\":[]}");
 }
 
@@ -393,14 +387,8 @@ fn test_serialize_APlusBT() {
     </math>
     ";
     let expression = input.parse::<MathExpressionTree>().unwrap();
-    println!("expression={:?}", expression);
-    println!("expression.to_string()={}", expression.to_string());
-    let mut var: Vec<Variable> = Vec::new();
-    let mut proj: Vec<ProjectionOperator> = Vec::new();
     let wiring_diagram = to_wiring_diagram(&expression);
-    println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
-    println!("json={:#?}", json);
     assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"A\"},{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"B\"},{\"type\":\"infer\",\"name\":\"T\"},{\"type\":\"infer\",\"name\":\"OLR\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"*\"}],\"Σ\":[{\"sum\":1}],\"Summand\":[{\"summand\":2,\"summation\":1},{\"summand\":3,\"summation\":1}]}");
 }
 
@@ -413,17 +401,8 @@ fn test_serialize_multiply_sup() {
     </math>
     ";
     let expression = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", expression);
-    let s_exp = expression.to_string();
-    println!("|||||||||||||||||||||||||||||||||||||");
-    println!("S-exp={:?}", s_exp);
-    println!("|||||||||||||||||||||||||||||||||||||");
-    let mut var: Vec<Variable> = Vec::new();
-    let mut proj: Vec<ProjectionOperator> = Vec::new();
     let wiring_diagram = to_wiring_diagram(&expression);
-    println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
-    println!("json={:#?}", json);
     assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"Γ\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"H\"},{\"type\":\"infer\",\"name\":\"sum_1\"},{\"type\":\"infer\",\"name\":\"n\"},{\"type\":\"infer\",\"name\":\"2\"}],\"Op1\":[],\"Op2\":[{\"proj1\":4,\"proj2\":5,\"res\":3,\"op2\":\"^\"},{\"proj1\":2,\"proj2\":3,\"res\":1,\"op2\":\"*\"}],\"Σ\":[{\"sum\":5}],\"Summand\":[{\"summand\":6,\"summation\":1},{\"summand\":7,\"summation\":1}]}");
 }
 
@@ -442,17 +421,8 @@ fn test_serialize_hackathon2_scenario1_eq5() {
     </math>
     ";
     let expression = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", expression);
-    let s_exp = expression.to_string();
-    println!("|||||||||||||||||||||||||||||||||||||");
-    println!("S-exp={:?}", s_exp);
-    println!("|||||||||||||||||||||||||||||||||||||");
-    let mut var: Vec<Variable> = Vec::new();
-    let mut proj: Vec<ProjectionOperator> = Vec::new();
     let wiring_diagram = to_wiring_diagram(&expression);
-    println!("wiring_diagram = {:#?}", wiring_diagram);
     let json = to_decapodes_json(wiring_diagram);
-    println!("json={:?}", json);
     assert_eq!(json, "{\"Var\":[{\"type\":\"infer\",\"name\":\"mult_1\"},{\"type\":\"infer\",\"name\":\"mult_2\"},{\"type\":\"infer\",\"name\":\"α\"},{\"type\":\"infer\",\"name\":\"ρ\"},{\"type\":\"infer\",\"name\":\"I\"},{\"type\":\"infer\",\"name\":\"•1\"},{\"type\":\"infer\",\"name\":\"D\"}],\"Op1\":[{\"src\":7,\"tgt\":6,\"op1\":\"D(1,t)\"}],\"Op2\":[{\"proj1\":3,\"proj2\":4,\"res\":2,\"op2\":\"*\"},{\"proj1\":2,\"proj2\":5,\"res\":1,\"op2\":\"*\"}],\"Σ\":[],\"Summand\":[]}");
 }
 

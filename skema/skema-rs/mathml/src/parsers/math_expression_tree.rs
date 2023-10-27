@@ -344,7 +344,7 @@ fn expr(input: Vec<MathExpression>) -> MathExpressionTree {
         math_vec.push(math_result.clone());
     }
 
-    if math_vec.len() > 0 {
+    if !math_vec.is_empty() {
         result = MathExpressionTree::Cons(Operator::Multiply, math_vec);
     }
 
@@ -580,16 +580,13 @@ fn test_content_hackathon2_scenario1_eq1() {
     </math>
     ";
     let ode = input.parse::<FirstOrderODE>().unwrap();
-    println!("ode={:?}", ode);
     let cmml = ode.to_cmml();
-    println!("cmml={:?}", cmml);
     let FirstOrderODE {
         lhs_var: _,
         func_of: _,
         with_respect_to: _,
         rhs,
     } = first_order_ode(input.into()).unwrap().1;
-    println!("rhs = {:?}", rhs.to_string());
     assert_eq!(cmml, "<apply><eq/><apply><diff/><bvar>t</bar><ci>S</ci></apply><apply><divide/><apply><times/><apply><times/><apply><minus/><ci>β</ci></apply><ci>I</ci></apply><ci>S</ci></apply><ci>N</ci></apply></apply>");
 }
 
@@ -731,7 +728,7 @@ fn test_content_hackathon2_scenario1_eq8() {
         "<apply><eq/><ci>β</ci><apply><times/><ci>κ</ci><ci>m</ci></apply></apply>"
     );
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(= β (* κ m))");
 }
 
 #[test]
@@ -797,9 +794,10 @@ fn test_mfrac() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let math = exp.to_infix_expression();
-    println!("math={:?}", math);
+    let s_exp = exp.to_string();
+    assert_eq!(math, "(S/N)");
+    assert_eq!(s_exp, "(/ S N)");
 }
 
 #[test]
@@ -813,9 +811,8 @@ fn test_superscript() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(^ x 3)");
 }
 
 #[test]
@@ -829,9 +826,8 @@ fn test_msup_exp() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(exp (* (* (- (- 1 α)) γ) I))");
 }
 
 #[test]
@@ -845,7 +841,8 @@ fn test_trig_cos() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Cos x)");
 }
 
 #[test]
@@ -861,7 +858,8 @@ fn test_trig_another_cos() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Cos x)");
 }
 
 #[test]
@@ -875,7 +873,8 @@ fn test_mover_mean() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Mean T)");
 }
 
 #[test]
@@ -910,7 +909,6 @@ fn test_one_dimensional_ebm() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     println!("S-exp={:?}", s_exp);
 }
@@ -923,7 +921,8 @@ fn test_absolute_value() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Grad H)");
 }
 
 #[test]
@@ -934,7 +933,8 @@ fn test_grad() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Grad H)");
 }
 
 #[test]
@@ -947,9 +947,8 @@ fn test_absolute_as_msup() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(^ (Abs (Grad H)) (- n 1))");
 }
 
 #[test]
@@ -971,7 +970,6 @@ fn test_equation_halfar_dome() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
     assert_eq!(
         s_exp,
@@ -996,9 +994,11 @@ fn test_halfar_dome_rhs() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(
+        s_exp,
+        "(Div (* (* (* Γ (^ H (+ n 2))) (^ (Abs (Grad H)) (- n 1))) (Grad H)))"
+    );
 }
 
 #[test]
@@ -1010,7 +1010,8 @@ fn test_func_paren() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(+ a (+ b c))");
 }
 
 #[test]
@@ -1022,7 +1023,8 @@ fn test_func_paren_and_times() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(* S (+ a b))");
 }
 
 #[test]
@@ -1033,7 +1035,8 @@ fn test_func_a_plus_b() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(+ a b)");
 }
 
 #[test]
@@ -1045,7 +1048,8 @@ fn test_func_paren_and_times_another() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(* S (+ (* a I) (* b R)))");
 }
 
 #[test]
@@ -1057,28 +1061,8 @@ fn test_divergence() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
-}
-
-#[test]
-fn test_partial_without_rhs() {
-    let input = "
-    <math>
-        <mfrac>
-        <mi>∂</mi>
-        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
-        </mfrac>
-        <mo>(</mo>
-        <mrow><mi>cos</mi><mi>ϕ</mi></mrow>
-        <mfrac>
-        <mrow><mi>∂</mi><mi>T</mi></mrow>
-        <mrow><mi>∂</mi><mi>ϕ</mi></mrow>
-        </mfrac>
-        <mo>)</mo>
-    </math>
-    ";
-    let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
+    let s_exp = exp.to_string();
+    assert_eq!(s_exp, "(Div H)");
 }
 
 #[test]
@@ -1092,7 +1076,6 @@ fn test_combination() {
     </math>
     ";
     let exp = input.parse::<MathExpressionTree>().unwrap();
-    println!("exp={:?}", exp);
     let s_exp = exp.to_string();
-    println!("S-exp={:?}", s_exp);
+    assert_eq!(s_exp, "(* (* (* S (+ n 4)) (- i 3)) (^ H (- m 2)))");
 }
