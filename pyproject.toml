@@ -47,10 +47,11 @@ demo = ["notebook"]
 
 # ISA dependencies.
 isa = [
-  "pydot", 
-  "graphviz",
+  "pydot==1.4.2",
+  "graphviz==0.20.1",
   "graspologic==3.2.0", # NOTE: this depends on rust when installing on an M1/ARM64 machine
-  "Levenshtein==0.21.1"
+  "Levenshtein==0.21.1",
+  "sentence_transformers==2.2.2"
 ]
 
 # shared ML dependencies
