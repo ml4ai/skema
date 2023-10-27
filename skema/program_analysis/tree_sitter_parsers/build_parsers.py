@@ -34,7 +34,7 @@ def build_parsers(languages: List[str]) -> None:
             # Checkout the correct commit if commit_sha is specified
             if language_dict.get("commit_sha"):
                 subprocess.run(
-                    ["git", "checkout", language_dict["commit_sha"]], cwd=language_clone_directory
+                    ["git", "checkout", str(language_dict["commit_sha"])], cwd=language_clone_directory
                 )
 
     # We can set pass the cwd for subprocess as an argument to run().

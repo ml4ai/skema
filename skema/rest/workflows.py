@@ -55,7 +55,7 @@ async def equations_to_amr(data: schema.EquationImagesToAMR):
         return JSONResponse(
             status_code=400,
             content={
-                "error": f"MORAE PUT /mathml/amr failed to process payload",
+                "error": f"MORAE PUT /mathml/amr failed to process payload with error {res.text}",
                 "payload": payload,
             },
         )
